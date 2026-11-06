@@ -250,7 +250,23 @@ type LiquidLook struct {
 }
 
 // looks are the candidate treatments. Order is the -look cycling order.
+// looks[0] is the DEFAULT: ticket 65 (A1581-approved direction,
+// docs/evidence/s1/65-style-direction.md §1.1) adds the wensity band
+// treatment and promotes it to the glass default - the four ticket-62
+// colour families stay selectable as glass sub-treatments (-look).
 var looks = []LiquidLook{
+	{ // ticket 65 Wensity band look (65-style-direction §1.1): dark glass
+		// body read through a horizontal rainbow band, a top white arc, an
+		// asymmetric bottom-right bright lip and a weak bottom glow. The
+		// blob fields mirror four of the band stops (the wensity branch
+		// bakes and draws NO blobs - wensity_windows.go); they exist so the
+		// shared glass plumbing (border/caustic/halo mixing) has a full
+		// LiquidLook value and so every look row stays machine-checked.
+		Name: lookWensityName, BlobA: hex(0xC2162F, 0.95), BlobB: hex(0xE649AF, 0.90),
+		BlobC: hex(0x48D7E6, 0.85), Deep: hex(0x246BD1, 0.60),
+		Rim: hex(0x1B1D24, 0.72), Lip: hex(0xF7FAFF, 0.75), Hi: rgba(255, 255, 255, 0.92),
+		Caustic: hex(0x53565E, 0.35), Glow: hex(0x0E35A8, 0.55),
+	},
 	{ // vivo 蓝心小V reference family: electric indigo / violet / cyan.
 		Name: "aurora", BlobA: hex(0x4B49FF, 0.95), BlobB: hex(0x8B5CF6, 0.90),
 		BlobC: hex(0x22D3EE, 0.85), Deep: hex(0x1E1B7A, 0.60),
@@ -336,6 +352,116 @@ func SetLook(name string) bool {
 
 // Look returns the active liquid treatment.
 func Look() LiquidLook { return activeLook }
+
+// lookWensityName is the -look value of the ticket-65 band treatment.
+const lookWensityName = "wensity"
+
+// wensityActive reports whether the active look is the Wensity band
+// treatment (the glass renderer branches on it: band instead of blobs).
+func wensityActive() bool { return activeLook.Name == lookWensityName }
+
+// ---------------------------------------------------------- style (ticket 65)
+
+// Style selects the ball's visual style family: the [ball] `style` config
+// key (D36 hot key, owner-approved direction A1581). The renderer maps the
+// family onto its look: glass uses the refined Wensity band treatment.
+type Style uint8
+
+const (
+	StyleGlass  Style = iota // refined Wensity band glass (the default)
+	StyleJarvis              // cyan particle-ring family; its renderer is the NEXT 65 leg - a jarvis-selected ball draws the glass frame until that leg lands (65-style-direction §2.0, §7 ②)
+)
+
+const (
+	styleGlassName  = "glass"
+	styleJarvisName = "jarvis"
+)
+
+// StyleNames lists the selectable [ball] style values (config vocabulary;
+// internal/config validates the same two names - a drift pin ties them).
+func StyleNames() []string { return []string{styleGlassName, styleJarvisName} }
+
+// activeStyle is the chosen style family (process-wide, like activeLook).
+var activeStyle = StyleGlass
+
+// SetStyle selects the style family; a repaint must follow. Returns false
+// for an unknown name so the caller can report it (mirrors SetLook).
+// Jarvis is accepted so the config seam is complete, but this leg ships
+// only the glass renderer - see the StyleJarvis comment.
+func SetStyle(name string) bool {
+	if sameName(name, styleGlassName) {
+		activeStyle = StyleGlass
+		return true
+	}
+	if sameName(name, styleJarvisName) {
+		activeStyle = StyleJarvis
+		return true
+	}
+	return false
+}
+
+// ActiveStyle returns the active style family (named ActiveStyle because the
+// family type itself is Style).
+func ActiveStyle() Style { return activeStyle }
+
+// ------------------------------------------------- ticket 65 Wensity band
+
+// WensityBand is the quantified token set of the Wensity light band
+// (65-style-direction §1.1: every value is a pixel-sampled measurement of
+// the reference image, not an eyeball number). The wensity branch of the
+// glass renderer consumes ONLY this struct plus the Wensity* geometry
+// constants below - zero colour literals anywhere else (C21,
+// TestNoHardcodedColorsInBallPackage).
+type WensityBand struct {
+	StopRed     Color // light-band left end: deep red (hue-cluster centroid @(−0.72R,+0.27R))
+	StopMagenta Color // magenta
+	StopWhite   Color // the white core of the band
+	StopBlue    Color // blue (right half, above the centre line)
+	StopCyan    Color // cyan (coldest stop)
+	StopOrange  Color // right end: orange (the band's warm tail)
+	SpecArc     Color // top arc highlight (pure white, 0.03-0.05R thick at −0.95R)
+	RimLip      Color // asymmetric bright lip at the bottom-right rim (0.97R)
+	BottomGlow  Color // weak neutral bottom inner glow (below 0.75R)
+}
+
+// wensityBandTokens is the band token value (one treatment, one value).
+var wensityBandTokens = WensityBand{
+	StopRed:     hex(0xC2162F, 0.95),
+	StopMagenta: hex(0xE649AF, 0.90),
+	StopWhite:   rgba(255, 255, 255, 0.95),
+	StopBlue:    hex(0x246BD1, 0.90),
+	StopCyan:    hex(0x48D7E6, 0.90),
+	StopOrange:  hex(0xD4994B, 0.85),
+	SpecArc:     hex(0xFFFFFF, 0.95),
+	RimLip:      hex(0xF7FAFF, 0.90),
+	BottomGlow:  hex(0x53565E, 0.35),
+}
+
+// WensityBandTokens returns the band token set (renderer/test seam).
+func WensityBandTokens() WensityBand { return wensityBandTokens }
+
+// wensityStopTs places the six stops along the band span (fractions 0..1;
+// hue-cluster centroids of 65-style-direction §1.1, spread so the
+// red->magenta->white->blue->cyan->orange order reads left to right).
+// Unexported on purpose: a within-treatment stop layout, not a knob.
+var wensityStopTs = [6]float32{0.06, 0.22, 0.46, 0.66, 0.84, 0.98}
+
+// Wensity band geometry (ticket 65; fractions of the orb radius R, measured
+// in 65-style-direction §1.1/§2.1 and C21-tabled - the renderer bakes from
+// these numbers only).
+const (
+	WensityBandCenterFrac    = 0.13 // band peak sits 0.13R above the orb centre
+	WensityBandWidthFrac     = 0.39 // FWHM of the band (Gaussian soft falloff)
+	WensityBandTiltFrac      = 0.33 // cold-end rise across the span (ends height difference)
+	WensityBandDeformFrac    = 0.15 // audio deform at full envelope, peak-to-peak
+	WensityBandSpanLeftFrac  = 0.84 // warm end reach left of the centre
+	WensityBandSpanRightFrac = 0.68 // cold end reach right of the centre
+	WensitySpecArcRadiusFrac = 0.95 // top arc highlight radius
+	WensitySpecArcThickFrac  = 0.04 // its stroke weight (R units)
+	WensitySpecArcSpanDeg    = 57   // horizontal coverage ~0.9R at 0.95R
+	WensityRimLipFrac        = 0.97 // bright lip radius, bottom-right only
+	WensityBottomGlowFrac    = 0.75 // bottom inner glow centre below the core
+)
 
 // Liquid blob placement (fractions of the orb radius; the renderer rotates
 // and swells these with the audio envelope - never re-allocates brushes).

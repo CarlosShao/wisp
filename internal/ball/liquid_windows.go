@@ -139,7 +139,7 @@ func (b *Ball) stopLiquidTimer() {
 func (b *Ball) frameVisual() Visual {
 	v := b.curVisual
 	if b.liq.active || b.liq.summon > 0 || b.liq.ownsBorder {
-		b.liq.applyTo(&v)
+		b.liq.applyTo(&v, bandDeformState(b.curState))
 	}
 	b.stampDock(&v)
 	return v

@@ -54,7 +54,10 @@ func validateApp(c *Config) error {
 	return nil
 }
 
-// validateBall checks the [ball] ranges (SPEC-03 sec 3: size 44-72).
+// validateBall checks the [ball] ranges (SPEC-03 sec 3: size 44-72) and the
+// ball.style enum (ticket 65: glass|jarvis - an unknown style is an error
+// naming the vocabulary, never a silent fall back to glass, same rule as
+// every other enum in this layer).
 func validateBall(c *Config) error {
 	if c.Ball.Size < 44 || c.Ball.Size > 72 {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(
@@ -63,6 +66,10 @@ func validateBall(c *Config) error {
 	if c.Ball.OpacityIdle < 0 || c.Ball.OpacityIdle > 1 {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(
 			"config.toml: ball.opacity_idle %v out of range [0, 1]", c.Ball.OpacityIdle))
+	}
+	if !slices.Contains(ballStyles, c.Ball.Style) {
+		return observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config.toml: ball.style %q must be one of %s", c.Ball.Style, vocabList(ballStyles)))
 	}
 	return nil
 }

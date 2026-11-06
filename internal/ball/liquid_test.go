@@ -100,13 +100,13 @@ func TestMotionOnlyAppliesInPrototypeMode(t *testing.T) {
 	m.beginSession()
 	stepMotion(m, 0.8, 10, 33*time.Millisecond)
 	v := Visual{Glass: true, BorderAlpha: 1}
-	m.applyTo(&v)
+	m.applyTo(&v, false)
 	if v.LiquidLevel != 0 || v.LiquidAngle != 0 || v.SummonFlow != 0 || v.BorderAlpha != 1 {
 		t.Fatalf("frozen mode must not receive prototype motion: %+v", v)
 	}
 	EnablePrototypeVisuals(true)
 	v2 := Visual{Glass: true, BorderAlpha: 1}
-	m.applyTo(&v2)
+	m.applyTo(&v2, false)
 	if v2.LiquidLevel == 0 || v2.SummonFlow == 0 {
 		t.Fatalf("prototype mode must carry the live motion: %+v", v2)
 	}
@@ -286,7 +286,7 @@ func TestSleepingFrameLosesTheBorderAuthority(t *testing.T) {
 	if v.BorderAlpha != 0 || !v.Glass {
 		t.Fatalf("the Sleeping frame must carry no border: %+v", v)
 	}
-	m.applyTo(&v)
+	m.applyTo(&v, false)
 	if v.BorderAlpha != 0 || v.LiquidLevel != 0 || v.SummonFlow != 0 || v.LiquidAngle != 0 {
 		t.Fatalf("the parked motion must not touch the Sleeping frame: %+v", v)
 	}

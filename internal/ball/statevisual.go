@@ -61,6 +61,15 @@ type Visual struct {
 	// DockProgress is how far that squash has completed (0..1).
 	Dock         Edge
 	DockProgress float32
+
+	// Pseudo-spectrum bands 0..1 (ticket 65): the audio-reactive input of
+	// the Wensity band, derived inside the liquid from the scalar envelope
+	// and stamped by applyTo ONLY in Listening/Thinking/Speaking
+	// (bandDeformState). Every other frame carries zeros, so the resting
+	// band is the same static frame every time (D32).
+	SpectrumLow  float32 // slow integrator (the voice's felt volume)
+	SpectrumMid  float32 // the smoothed envelope level itself
+	SpectrumHigh float32 // fast low-pass of the envelope rise (sibilance proxy)
 }
 
 // SizePx's DPI treatment is asymmetric, and ticket 68 AC#1 records it as found

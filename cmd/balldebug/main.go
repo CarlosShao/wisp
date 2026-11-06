@@ -94,6 +94,7 @@ func main() {
 	posY := flag.Int("y", -1, "debug: place the ball window at this y (with -x)")
 	sizePx := flag.Int("size", 0, "configured orb size px 44..72 (0 = ball default)")
 	look := flag.String("look", "", "liquid treatment: "+strings.Join(ball.LookNames(), "|")+" (empty = default)")
+	style := flag.String("style", "", "ball style family: "+strings.Join(ball.StyleNames(), "|")+" (empty = default glass; jarvis draws the glass frame until its renderer lands, ticket 65)")
 	frozen := flag.Bool("frozen", false, "render the frozen SPEC-08 §2.1 visuals instead of the ticket 62 prototype")
 	hold := flag.Bool("hold", false, "with -state: stay in that state until Ctrl+C / tray Exit")
 	statusPath := flag.String("status", "", "write 'ready=1 timers=<bool>' to this file (used by -diff)")
@@ -126,6 +127,13 @@ func main() {
 	// The ticket 62 prototype is what this harness exists to show; -frozen
 	// renders the still-frozen SPEC-08 §2.1 table for comparison.
 	ball.EnablePrototypeVisuals(!*frozen)
+	if *style != "" {
+		if !ball.SetStyle(*style) {
+			fmt.Fprintf(os.Stderr, "balldebug: unknown -style %q (choose one of %s)\n",
+				*style, strings.Join(ball.StyleNames(), ", "))
+			os.Exit(2)
+		}
+	}
 	if *look != "" {
 		if !ball.SetLook(*look) {
 			fmt.Fprintf(os.Stderr, "balldebug: unknown -look %q (choose one of %s)\n",
@@ -181,6 +189,7 @@ func main() {
 			amplify: *diffAmp,
 			size:    *sizePx,
 			look:    *look,
+			style:   *style,
 			frozen:  *frozen,
 			level:   *diffLevel,
 			dock:    *diffDock,

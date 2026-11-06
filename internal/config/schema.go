@@ -91,6 +91,11 @@ const (
 	ThinkingLow    = "low"
 	ThinkingMedium = "medium"
 	ThinkingHigh   = "high"
+
+	// [ball] style vocabulary (ticket 65; ball.StyleNames() ships the same
+	// two names).
+	BallStyleGlass  = "glass"
+	BallStyleJarvis = "jarvis"
 )
 
 var (
@@ -101,6 +106,11 @@ var (
 	protocols         = []string{ProtocolOpenAIChat, ProtocolOpenAIResponses, ProtocolAnthropic}
 	billingModes      = []string{BillingPayPerToken, BillingPlan}
 	thinkingIntensity = []string{ThinkingOff, ThinkingLow, ThinkingMedium, ThinkingHigh}
+	// ballStyles is the [ball] style vocabulary (ticket 65). The literals
+	// live here because internal/config must not import internal/ball; the
+	// drift pin (ball_style_65_test.go) keeps this list equal to
+	// ball.StyleNames().
+	ballStyles = []string{BallStyleGlass, BallStyleJarvis}
 )
 
 // Config is the whole config.toml (D36 section tree). Field order is the
@@ -168,6 +178,12 @@ type BallPos struct {
 type BallSection struct {
 	// Size is the floating ball diameter in px, range 44-72 (SPEC-03 sec 3).
 	Size int `toml:"size" default:"56"`
+	// Style selects the ball's visual style family (ticket 65; D36 [ball]
+	// hot key, owner-approved direction A1581). Vocabulary: glass (the
+	// refined Wensity band glass, the default) | jarvis (cyan particle ring;
+	// its renderer lands with the next 65 leg). Validated against the same
+	// vocabulary ball.StyleNames() ships (drift-pinned by a test).
+	Style string `toml:"style" default:"glass"`
 	// Position is the persisted window position.
 	Position BallPos `toml:"position"`
 	// OpacityIdle is the idle-state opacity (0..1).

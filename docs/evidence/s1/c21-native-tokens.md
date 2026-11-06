@@ -255,6 +255,9 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | 点击与渲染边界（`hit.go`，票 07，无 CSS 对应） | 环边距 22px / 点击容差 4px（96 DPI 物理 px，按显示器 DPI 缩放） | `RingMarginPx` / `ClickTolerancePx` | 前者定窗口边长（orb + 两侧边距，ring/glow 不被裁），后者把可点圆稍微扩到画出的环上；`ball.html` 的 inset 只是参照值不是出处。**22 是 09-30 桌面签收当场改的**：写窗口的那一版最宽元素是票 62 的 Listening 波纹（`R+5px` 起、再走 `16px`，外沿 `R+21.75`），8px 边距把它被矩形切平＝"球看着是方的"（owner 原话「整体是个方形…那个向外扩散的波纹都被外面那个方框给局限了」）；本表这一行自己的规则就是「ring/glow 不被裁」，所以 8 从未满足它写下的判据。44..72 全档能装下波纹的最小值＝22 |
 | 边框与流动时序（票 62/64，无 CSS 对应） | 边框淡入 220ms / 收声汇聚 180ms / 唤起一次性流动 900ms | `BorderOpenMs` / `BorderCloseMs` / `SummonFlowMs` | 180ms 属 `--dur-base` 档；220ms 属 `--dur-slow` 族；900ms 是一次性动效，不受「UI 过渡 ≤300ms」预算约束（SPEC-08 §2 时长预算） |
 | 边缘吸附（票 64，无 CSS 对应） | 泊靠动画 160ms / 泊靠后仍露出 0.42 直径 / 距边 24px 内开始挤压（96 DPI，按显示器缩放） | `DockAnimMs` / `DockOverlapFrac` / `DockTriggerPx` | 挤压量按间隙距离读出差分，不需要定时器（D32 空闲零定时器纪律）。**24 是 09-30 桌面签收当场跟着 `RingMarginPx` 抬的**：窗口停在_work area_ 内时，球离切点本来就差一个渲染边距（22px），触发距离若小于边距，"停手自动泊靠"这一支今天就永远不成立（`TestBallLiveEdgeDock` 当场打红＝这条耦合的唯一仪器） |
+| 票 65 wensity 带几何（无 CSS 对应） | 带心高于球心 0.13 / 半高全宽 0.39 / 冷端上翘 0.33 / 全幅形变 0.15 / 带展左 0.84 右 0.68 | `WensityBandCenterFrac` / `WensityBandWidthFrac` / `WensityBandTiltFrac` / `WensityBandDeformFrac` / `WensityBandSpanLeftFrac` / `WensityBandSpanRightFrac` | 65-style-direction §1.1 逐像素量化值（A1581 批准方向）。渲染按 span 预烘焙 16 段椭圆软斑（同 `liquidLadder` 法则：帧内零 COM 分配），静帧几何由 `wensity.go` 纯函数给出 |
+| 票 65 wensity 弧与缘（无 CSS 对应） | 顶部白弧半径 0.95 / 厚 0.04 / 跨 57 / 亮唇半径 0.97 / 底部内辉光 0.75 | `WensitySpecArcRadiusFrac` / `WensitySpecArcThickFrac` / `WensitySpecArcSpanDeg` / `WensityRimLipFrac` / `WensityBottomGlowFrac` | 非对称折射（§1.1 特征，非均匀描边）：亮唇只在右下 15°–75°，其余三向走 `looks[wensity].Rim` 暗缘 |
+| 票 65 伪谱三带时间常数（`liquid.go`，无 CSS 对应） | band-low τ 400ms / band-high τ 40ms / 满档上升率 8 | `SpecLowTauMs` / `SpecHighTauMs` / `SpecHighRateGain` | 从既有标量包络在 `liquidMotion` 内派生（§3.1 v1 决策）：不碰 internal/audio（C8 缝），无新时钟无新定时器；band-mid 就是既有 level 本身，不另设常量 |
 | 缓动 | `cubic-bezier(0.32,0.72,0,1)` | D2D 侧以分段线性近似（S1），周期动画用 ease-in-out 正弦近似 | 见 renderer |
 
 **值漂移（本票不自行裁定，列给 owner）**
@@ -276,12 +279,22 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 
 ## 票 62 液态玻璃 look 色板（`tokens.go` 的 `looks` 表；无 CSS 真相源）
 
-`LiquidLook` 的 9 个字段 × 4 套（aurora / glacier / nebula / solar），`looks[0]`（aurora）是
-`DefaultLook()`，选择走 `SetLook(name)` / `-look` 调试旗标。**下表的 CSS 两列如实为空**：这 36 个
+`LiquidLook` 的 9 个字段 × 5 套（**wensity / aurora / glacier / nebula / solar**；票 65 新增
+wensity 带状款并设为默认），`looks[0]`（wensity）是
+`DefaultLook()`，选择走 `SetLook(name)` / `-look` 调试旗标。**下表的 CSS 两列如实为空**：这些
 字面量不存在于 `tokens.css`，是本票对账时补录的原生自有值（见上「值漂移」第 3 条）。
 
 | CSS 变量 | tokens.css 值 | Go 字段 | Go 值 |
 |---|---|---|---|
+| （无，原生自有） | —— | `looks[wensity].BlobA` | `hex(0xC2162F,0.95)` |
+| （无，原生自有） | —— | `looks[wensity].BlobB` | `hex(0xE649AF,0.90)` |
+| （无，原生自有） | —— | `looks[wensity].BlobC` | `hex(0x48D7E6,0.85)` |
+| （无，原生自有） | —— | `looks[wensity].Deep` | `hex(0x246BD1,0.60)` |
+| （无，原生自有） | —— | `looks[wensity].Rim` | `hex(0x1B1D24,0.72)` |
+| （无，原生自有） | —— | `looks[wensity].Lip` | `hex(0xF7FAFF,0.75)` |
+| （无，原生自有） | —— | `looks[wensity].Hi` | `rgba(255,255,255,0.92)` |
+| （无，原生自有） | —— | `looks[wensity].Caustic` | `hex(0x53565E,0.35)` |
+| （无，原生自有） | —— | `looks[wensity].Glow` | `hex(0x0E35A8,0.55)` |
 | （无，原生自有） | —— | `looks[aurora].BlobA` | `hex(0x4B49FF,0.95)` |
 | （无，原生自有） | —— | `looks[aurora].BlobB` | `hex(0x8B5CF6,0.90)` |
 | （无，原生自有） | —— | `looks[aurora].BlobC` | `hex(0x22D3EE,0.85)` |
@@ -318,6 +331,24 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | （无，原生自有） | —— | `looks[solar].Hi` | `rgba(255,255,255,0.92)` |
 | （无，原生自有） | —— | `looks[solar].Caustic` | `hex(0x2A1206,0.32)` |
 | （无，原生自有） | —— | `looks[solar].Glow` | `hex(0xFDBA74,0.50)` |
+
+## 票 65 wensity 带状款 token（`WensityBand`，无 CSS 真相源）
+
+`internal/ball/wensity_windows.go` 的带绘制只消费这一组色值 + 上面的 `Wensity*` 几何常量
+（65-style-direction §1.1 逐像素量化值；A1581 批准方向）。机器检查走 `wensity.<Field>` 引用形
+（`TestC21TableColourRowsMatchCode` 已扩展）：代码加字段不加行必红，反向同理。
+
+| CSS 变量 | tokens.css 值 | Go 字段 | Go 值 |
+|---|---|---|---|
+| （无，原生自有） | —— | `wensity.StopRed` | `hex(0xC2162F,0.95)` |
+| （无，原生自有） | —— | `wensity.StopMagenta` | `hex(0xE649AF,0.90)` |
+| （无，原生自有） | —— | `wensity.StopWhite` | `rgba(255,255,255,0.95)` |
+| （无，原生自有） | —— | `wensity.StopBlue` | `hex(0x246BD1,0.90)` |
+| （无，原生自有） | —— | `wensity.StopCyan` | `hex(0x48D7E6,0.90)` |
+| （无，原生自有） | —— | `wensity.StopOrange` | `hex(0xD4994B,0.85)` |
+| （无，原生自有） | —— | `wensity.SpecArc` | `hex(0xFFFFFF,0.95)` |
+| （无，原生自有） | —— | `wensity.RimLip` | `hex(0xF7FAFF,0.90)` |
+| （无，原生自有） | —— | `wensity.BottomGlow` | `hex(0x53565E,0.35)` |
 
 ## 未接线豁免表（documented but unconsumed，票 74 family 3）
 
@@ -381,6 +412,12 @@ CSS 侧消费者、接线的票），"暂未使用"不算。
   三处 `const` 块是 Win32 修饰键/虚拟键码（`modAlt=0x0001` … `vkEscape=0x1B`）与 `HotkeyStatus`
   枚举，既无尺寸也无颜色；`hkNames` 的用户可见文案零 emoji。票 64 进本表的只有边缘吸附三常量
   （`DockAnimMs` / `DockOverlapFrac` / `DockTriggerPx`）。
+- 票 65 实现腿后补（2026-11-06，方向＝台账 `A1581` 批准 + `65-style-direction.md` §1.1 量化值）：
+  look 表 9 字段 × 4 套 → **× 5 套**（新增 wensity 带状款并升为 `looks[0]`＝默认），新增
+  **wensity 带状款节**（`WensityBand` 9 字段，`wensity.<Field>` 引用形，机器检查已扩展双向）、
+  **几何三行**（`WensityBand*` 六枚 + `Wensity*SpecArc/RimLip/BottomGlow` 五枚 + `Spec*` 伪谱三常数）、
+  零消费者判定不变（`looks[*].Deep` 豁免行继续覆盖第五套）。`design/assets/tokens.css` 真相源侧
+  无新增（wensity 全部原生自有，无 CSS 引用可查）⇒ CSS 移交面无变化。
 - **零 emoji 扫描（AC#7 前半）**：仓内唯一机器执行的 emoji 检查是 `tools/d22scan` 的 ban `emoji`
   （`tools/d22scan/main.go:71` 的 `emojiRe` + `walkEmoji`），**scope 只有 `design/` 与 `frontend/`
   两处**（`main.go:137-142`），且 `frontend/` 在当前 HEAD **不存在** ⇒ 该门今天实际只覆盖 `design/`。

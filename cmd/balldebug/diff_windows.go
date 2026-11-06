@@ -51,6 +51,7 @@ type diffOpts struct {
 	amplify   int           // diff PNG gain (1 = raw delta)
 	size      int           // child orb size px (0 = default from the ball)
 	look      string        // liquid treatment handed to the child ("" = default)
+	style     string        // ball style family handed to the child ("" = default)
 	frozen    bool          // measure the frozen SPEC-08 visuals, not the prototype
 	level     float64       // synthetic envelope handed to the child (-level)
 	dock      string        // also shoot each state docked here (-diff-dock)
@@ -413,6 +414,9 @@ func runDiffForState(exe string, o diffOpts, v stateVariant, idx int) (stateRow,
 	}
 	if o.look != "" {
 		childArgs = append(childArgs, "-look", o.look)
+	}
+	if o.style != "" {
+		childArgs = append(childArgs, "-style", o.style)
 	}
 	if o.frozen {
 		childArgs = append(childArgs, "-frozen")

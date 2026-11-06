@@ -47,6 +47,13 @@ type renderer struct {
 	// object is created during an animation tick (D32 CPU discipline).
 	liq     [3]liquidLayer
 	caustic unsafe.Pointer // contact shadow under the orb
+
+	// Wensity band material (ticket 65): pre-baked segments along the band
+	// span, plus the white core and the bottom inner glow. Baked only when
+	// the active look is the wensity treatment; released with the rest.
+	band        [wensityBandSegs]unsafe.Pointer
+	bandCore    unsafe.Pointer
+	wensityGlow unsafe.Pointer
 }
 
 // liquidLadder is the angular resolution of the pre-baked blob positions.
@@ -241,6 +248,9 @@ func (r *renderer) setAssets(v Visual) {
 		v.SizePx*0.70, v.SizePx*0.70)
 	if v.Glass {
 		r.setLiquid(v)
+		if wensityActive() {
+			r.setWensity(v)
+		}
 	}
 }
 
@@ -253,13 +263,25 @@ func lipOf(v Visual) Color {
 	return pal.OrbHi
 }
 
-// setLiquid bakes the three colour blobs of the liquid at every angle of the
-// ladder. The third blob carries the STATE colour so the 20 states stay
-// distinguishable inside one material.
+// setLiquid bakes the shared liquid material: the contact shadow always,
+// and the three colour blobs only for the blob treatments - the wensity
+// band look (ticket 65) replaces the blobs with its pre-baked band
+// (setWensity), so its bake is skipped here on purpose.
 func (r *renderer) setLiquid(v Visual) {
 	lk := activeLook
 	c := r.center()
 	R := v.SizePx / 2
+	// Contact shadow: what makes a light-coloured orb read on a white
+	// desktop. Sits under everything else, offset downward.
+	deep := mulA(lk.Caustic, v.Opacity)
+	r.caustic = r.radialBrush([]d2d1GradientStop{
+		{0.00, colorF(deep)},
+		{0.55, colorF(mulA(lk.Caustic, GlassCaustic*v.Opacity))},
+		{1.00, colorF(mulA(lk.Caustic, 0))},
+	}, d2d1Point2F{c.x, c.y + R*0.42}, d2d1Point2F{0, 0}, R*1.25, R*0.85)
+	if wensityActive() {
+		return
+	}
 	colors := [3]Color{
 		mulA(lk.BlobA, v.Opacity),
 		mulA(lk.BlobB, v.Opacity),
@@ -284,14 +306,6 @@ func (r *renderer) setLiquid(v Visual) {
 			}, p, d2d1Point2F{0, 0}, br, br)
 		}
 	}
-	// Contact shadow: what makes a light-coloured orb read on a white
-	// desktop. Sits under everything else, offset downward.
-	deep := mulA(lk.Caustic, v.Opacity)
-	r.caustic = r.radialBrush([]d2d1GradientStop{
-		{0.00, colorF(deep)},
-		{0.55, colorF(mulA(lk.Caustic, GlassCaustic*v.Opacity))},
-		{1.00, colorF(mulA(lk.Caustic, 0))},
-	}, d2d1Point2F{c.x, c.y + R*0.42}, d2d1Point2F{0, 0}, R*1.25, R*0.85)
 }
 
 // liquidIndex picks the ladder step of one blob at the current liquid angle.
@@ -311,6 +325,11 @@ func (r *renderer) dropAssets() {
 	comRelease(&r.hi)
 	comRelease(&r.core)
 	comRelease(&r.caustic)
+	comRelease(&r.bandCore)
+	comRelease(&r.wensityGlow)
+	for i := 0; i < wensityBandSegs; i++ {
+		comRelease(&r.band[i])
+	}
 	for bi := 0; bi < 3; bi++ {
 		for i := 0; i < liquidLadder; i++ {
 			comRelease(&r.liq[bi].brushes[i])
@@ -564,19 +583,25 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	// 2. Glass shell (cool translucent body) - squashed with the body.
 	r.fillEllipse(c, R*dockX, R*dockY, r.body)
 
-	// 3. The liquid: three blobs at their ladder positions for this angle.
-	// A louder envelope shrinks the visible patch (the surface "gathers")
-	// and the summon burst widens it (flow). Both gains are C21 tokens
+	// 3. The liquid. The wensity band look (ticket 65) draws its horizontal
+	// rainbow band here instead of the three blobs; the blob treatments keep
+	// the ticket-62 field exactly as delivered. In the blob branch a louder
+	// envelope shrinks the visible patch (the surface "gathers") and the
+	// summon burst widens it (flow). Both gains are C21 tokens
 	// (LiquidGatherPerLevel / SummonFlowSpread) - ticket 74 lifted them out of
 	// here, where they were bare literals no table row named.
-	shrink := 1 - LiquidGatherPerLevel*v.LiquidLevel
-	flow := 1 + SummonFlowSpread*v.SummonFlow
-	for bi := 0; bi < 3; bi++ {
-		lay := &r.liq[bi]
-		i := liquidIndex(v, bi)
-		if b := lay.brushes[i]; b != nil {
-			rr := R * liqRadius[bi] * shrink * flow
-			r.fillEllipse(lay.centers[i], rr*dockX, rr*dockY, b)
+	if wensityActive() {
+		r.drawWensityBand(v, c, R, dockX, dockY)
+	} else {
+		shrink := 1 - LiquidGatherPerLevel*v.LiquidLevel
+		flow := 1 + SummonFlowSpread*v.SummonFlow
+		for bi := 0; bi < 3; bi++ {
+			lay := &r.liq[bi]
+			i := liquidIndex(v, bi)
+			if b := lay.brushes[i]; b != nil {
+				rr := R * liqRadius[bi] * shrink * flow
+				r.fillEllipse(lay.centers[i], rr*dockX, rr*dockY, b)
+			}
 		}
 	}
 
@@ -596,6 +621,14 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	r.arcEx(c, (R-0.8*s)*dockX, (R-0.8*s)*dockY, 0, 360, GlassRimPx*s)
 	r.setSolid(mulA(lk.Lip, 0.85*v.Opacity))
 	r.arcEx(c, (R-2.6*s)*dockX, (R-2.6*s)*dockY, 0, 360, GlassLipPx*s)
+
+	// 6b. Wensity asymmetric refraction (ticket 65): the bright lip lives
+	// only on the bottom-right rim (~0.97R, the reference's signature) - the
+	// other three directions stay the dark rim step 6 just laid with lk.Rim -
+	// plus the top white arc highlight at 0.95R.
+	if wensityActive() {
+		r.drawWensityEdges(v, c, R, s, dockX, dockY)
+	}
 
 	// 7. The border that fades in when nobody speaks (owner's "丝滑引入边框").
 	if v.BorderAlpha > 0 {

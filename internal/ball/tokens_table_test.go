@@ -85,13 +85,14 @@ type c21NumClaim struct {
 }
 
 var (
-	c21IdentRe  = regexp.MustCompile("`([A-Za-z_][A-Za-z0-9_]*)`")
-	c21ExportRe = regexp.MustCompile(`^[A-Z][A-Za-z0-9]*$`)
-	c21NumRe    = regexp.MustCompile(`([0-9]+(?:\.[0-9]+)?)\s*(ms|fps|dpi|px|s|%)?`)
-	c21HexLitRe = regexp.MustCompile(`0[xX][0-9A-Fa-f]+`)
-	c21RGBARe   = regexp.MustCompile(`^rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9.]+)\s*\)$`)
-	c21HexRe    = regexp.MustCompile(`^hex\(\s*(0[xX][0-9A-Fa-f]{6})\s*,\s*([0-9.]+)\s*\)$`)
-	c21LookRef  = regexp.MustCompile(`^looks\[([^\]]+)\]\.([A-Za-z0-9]+)$`)
+	c21IdentRe    = regexp.MustCompile("`([A-Za-z_][A-Za-z0-9_]*)`")
+	c21ExportRe   = regexp.MustCompile(`^[A-Z][A-Za-z0-9]*$`)
+	c21NumRe      = regexp.MustCompile(`([0-9]+(?:\.[0-9]+)?)\s*(ms|fps|dpi|px|s|%)?`)
+	c21HexLitRe   = regexp.MustCompile(`0[xX][0-9A-Fa-f]+`)
+	c21RGBARe     = regexp.MustCompile(`^rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9.]+)\s*\)$`)
+	c21HexRe      = regexp.MustCompile(`^hex\(\s*(0[xX][0-9A-Fa-f]{6})\s*,\s*([0-9.]+)\s*\)$`)
+	c21LookRef    = regexp.MustCompile(`^looks\[([^\]]+)\]\.([A-Za-z0-9]+)$`)
+	c21WensityRef = regexp.MustCompile(`^wensity\.([A-Za-z0-9]+)$`)
 )
 
 // c21RepoRoot locates the checkout from this file's own path. A missing table is
@@ -159,6 +160,11 @@ func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow, []c
 				section = "light"
 			case strings.Contains(line, "色板"):
 				section = "look"
+			case strings.Contains(line, "wensity 带状款"):
+				// Ticket 65: the WensityBand colour section. Deliberately
+				// keyed on its own phrase (not 色板) so it parses as its own
+				// section with its own Go-reference form.
+				section = "wensity"
 			case strings.Contains(line, "几何"):
 				section = "geom"
 			case strings.Contains(line, "豁免"):
@@ -177,7 +183,7 @@ func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow, []c
 		}
 		where := fmt.Sprintf("%s:%d", c21TablePath, lineNo)
 		switch section {
-		case "dark", "light", "look":
+		case "dark", "light", "look", "wensity":
 			if len(cells) != 4 || strings.HasPrefix(cells[0], "CSS 变量") {
 				continue
 			}
@@ -479,6 +485,19 @@ var c21GeometryGolden = map[string]float64{
 	"GlassLipPx":     GlassLipPx,
 	"GlassCaustic":   GlassCaustic,
 	"BorderRingPx":   BorderRingPx,
+	// Ticket 65: the Wensity band geometry (65-style-direction §1.1
+	// measurements). Every entry is a reference to the constant itself.
+	"WensityBandCenterFrac":    WensityBandCenterFrac,
+	"WensityBandWidthFrac":     WensityBandWidthFrac,
+	"WensityBandTiltFrac":      WensityBandTiltFrac,
+	"WensityBandDeformFrac":    WensityBandDeformFrac,
+	"WensityBandSpanLeftFrac":  WensityBandSpanLeftFrac,
+	"WensityBandSpanRightFrac": WensityBandSpanRightFrac,
+	"WensitySpecArcRadiusFrac": WensitySpecArcRadiusFrac,
+	"WensitySpecArcThickFrac":  WensitySpecArcThickFrac,
+	"WensitySpecArcSpanDeg":    WensitySpecArcSpanDeg,
+	"WensityRimLipFrac":        WensityRimLipFrac,
+	"WensityBottomGlowFrac":    WensityBottomGlowFrac,
 	// SwimLevelGain / SpinLevelGain are gone (ticket 74 family 2): declared,
 	// tabled and read by nothing, while the gains that move the liquid lived in
 	// renderer_windows.go as bare literals. The two below are those literals
@@ -555,6 +574,13 @@ var c21MotionGolden = map[string]float64{
 	"LevelReleaseTauMs": LevelReleaseTauMs,
 	"MotionEpsilon":     MotionEpsilon,
 	"FrameIntervalMs":   FrameIntervalMs,
+
+	// liquid.go: the ticket-65 pseudo-spectrum time constants (the band-low
+	// integrator and the band-high sibilance low-pass, plus the rise rate
+	// that maps to full band-high).
+	"SpecLowTauMs":     SpecLowTauMs,
+	"SpecHighTauMs":    SpecHighTauMs,
+	"SpecHighRateGain": SpecHighRateGain,
 }
 
 // c21TabledValue looks a tabled constant's value up in either inventory.
@@ -672,7 +698,7 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 		t.Fatal("geometry table empty")
 	}
 
-	var dark, light, look []c21ColourRow
+	var dark, light, look, wensity []c21ColourRow
 	for _, r := range colour {
 		switch r.section {
 		case "dark":
@@ -681,11 +707,15 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 			light = append(light, r)
 		case "look":
 			look = append(look, r)
+		case "wensity":
+			wensity = append(wensity, r)
 		}
 	}
 	// These are the counts the table itself declares (40 dark + 38 light rows,
-	// and 4 looks x 9 colour fields). Deleting a row narrows the contract, so it
-	// stops here instead of quietly checking less; adding rows needs no edit.
+	// 5 looks x 9 colour fields since ticket 65's wensity look, and the 10
+	// WensityBand fields of the band treatment). Deleting a row narrows the
+	// contract, so it stops here instead of quietly checking less; adding rows
+	// needs no edit.
 	for _, c := range []struct {
 		name string
 		got  int
@@ -694,6 +724,7 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 		{"dark (:root)", len(dark), 40},
 		{"light ([data-theme=light])", len(light), 38},
 		{"look", len(look), len(looks) * 9},
+		{"wensity band", len(wensity), 9},
 	} {
 		if c.got < c.want {
 			t.Errorf("the %s colour table declares %d rows, want at least %d: a row that vanished takes its machine check with it (%s)",
@@ -751,6 +782,18 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 				t.Errorf("%s: LiquidLook has no Color field %q, so this row checks nothing", r.where, m[2])
 				continue
 			}
+		case "wensity":
+			m := c21WensityRef.FindStringSubmatch(r.goRef)
+			if m == nil {
+				t.Errorf("%s: %q is not a wensity.<Field> reference - this row no longer matches the table's documented form", r.where, r.goRef)
+				continue
+			}
+			band, ok := c21StructColour(wensityBandTokens, m[1])
+			if !ok {
+				t.Errorf("%s: WensityBand has no Color field %q, so this row checks nothing", r.where, m[1])
+				continue
+			}
+			got = band
 		default:
 			t.Errorf("%s: colour row in unknown section %q", r.where, r.section)
 			continue
@@ -830,6 +873,25 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 				continue
 			}
 			lookChecked++
+		}
+	}
+	// Ticket 65: the WensityBand struct owes a row per Colour field, same
+	// rule as Palette and LiquidLook (code -> table direction).
+	wensityIdx := map[string]bool{}
+	for _, r := range wensity {
+		if m := c21WensityRef.FindStringSubmatch(r.goRef); m != nil {
+			wensityIdx[m[1]] = true
+		}
+	}
+	bandType := reflect.TypeOf(WensityBand{})
+	for i := 0; i < bandType.NumField(); i++ {
+		f := bandType.Field(i)
+		if f.Type != reflect.TypeOf(Color{}) {
+			t.Errorf("WensityBand.%s is a %s, not a Color: the wensity table only covers Color fields, so this one would go unchecked - extend these tests deliberately", f.Name, f.Type)
+			continue
+		}
+		if !wensityIdx[f.Name] {
+			t.Errorf("WensityBand.%s exists in tokens.go but the wensity band table declares no row for it (code -> table direction, A24-D4)", f.Name)
 		}
 	}
 	t.Logf("verified %d/%d colour rows against tokens.go, plus %d retired-glass rows pinned ABSENT (ticket 344 shape A) (%d palette fields checked in code -> table, %d look colours, %d looks)",
@@ -1146,6 +1208,11 @@ func TestC21TokenConsumerReport(t *testing.T) {
 	}
 	for _, n := range c21ColourFieldNames(t, reflect.TypeOf(LiquidLook{})) {
 		tokens = append(tokens, "looks[*]."+n) // per-field: one look is live at a time
+	}
+	// Ticket 65: the WensityBand fields ride the same rule (one treatment,
+	// one value, every field either consumed or exemption-rowed).
+	for _, n := range c21ColourFieldNames(t, reflect.TypeOf(WensityBand{})) {
+		tokens = append(tokens, "wensity."+n)
 	}
 
 	var zero, live []string

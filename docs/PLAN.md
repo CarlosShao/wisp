@@ -2738,7 +2738,7 @@ Alfred Workflows · VS Code tasks.json 的 `command` + `args` 数组）：
 | section | 键（示例） | 生效级别 |
 |---|---|---|
 | `[app]` | `language` `theme` `autostart` `single_instance` `portable` | `restart`（`theme` 为 `hot`） |
-| `[ball]` | `size` `position{x,y,monitor}` `opacity_idle` `click_through` `hide_on_fullscreen` | `hot` |
+| `[ball]` | `size` **`style`** `position{x,y,monitor}` `opacity_idle` `click_through` `hide_on_fullscreen` | `hot` |
 | `[hotkey]` | `summon` `mute` `cancel` `panel` | `hot`（须重注册全局热键） |
 | `[session]` | **`warm_timeout_sec`(90)** `settling_sec`(3) `conversation_idle_sec`(30) | `hot` |
 | `[voice]` | `enabled` `wake_word{enabled,keywords[],thresholds[],veto_words[]}` `asr{provider,model}` `tts{provider,voice,speed}` `punctuation` **`conversation_mode`(false)** | `reload`（换模型）/ `hot`（阈值、否决词） |

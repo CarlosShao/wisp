@@ -36,6 +36,19 @@ const (
 	summonFullRotScale = 1.6
 )
 
+// Pseudo-spectrum bands (ticket 65 v1, 65-style-direction §3.1): three
+// bands derived INSIDE the liquidMotion from the existing scalar envelope -
+// no internal/audio touch (the C8 seam stays closed), no new clock and no
+// new timer (every band advances on the same pushLevel step as everything
+// else). band-low is the slow "body" integrator (the voice's felt volume),
+// band-mid IS the existing smoothed level (no extra state), band-high is a
+// fast low-pass over the envelope's rise (a sibilance proxy).
+const (
+	SpecLowTauMs     = 400 // band-low integrator tau (the "body")
+	SpecHighTauMs    = 40  // band-high low-pass tau (the "sibilance")
+	SpecHighRateGain = 8   // envelope rise in units/s that maps to full band-high
+)
+
 // liquidMotion is the whole simulation state of the liquid. It is owned by the
 // ball window's UI thread (no locking) and is advanced exclusively by level
 // updates and by the bounded burst timer.
@@ -46,6 +59,14 @@ type liquidMotion struct {
 	border float32       // "not speaking" border fade 0..1 (1 = fully introduced)
 	silent time.Duration // how long the raw feed has been under the gate
 	active bool          // a session is running (Sleeping never sets this)
+
+	// Pseudo-spectrum (ticket 65): band-low and band-high are derived from
+	// the scalar feed on the same pushLevel step; band-mid IS level. All
+	// three are zeroed with the session, so a static state never carries a
+	// spectrum into its frame (D32 static-frame pin).
+	specLow  float32 // slow integrator of level (tau SpecLowTauMs)
+	specHigh float32 // fast low-pass of the envelope rise (tau SpecHighTauMs)
+	prevRaw  float32 // the previous raw sample (rise computation only)
 
 	// Border transition inputs (ticket 62 item 1): borderState is what the
 	// current STATE asks for at rest (set by enterState, never applied in one
@@ -103,6 +124,9 @@ func (m *liquidMotion) endSession() {
 	m.border = 0
 	m.level = 0
 	m.silent = 0
+	m.specLow = 0
+	m.specHigh = 0
+	m.prevRaw = 0
 	m.borderState = 0
 	m.ownsBorder = false
 }
@@ -183,6 +207,22 @@ func clamp01(v float32) float32 {
 	return v
 }
 
+// specFollow advances one first-order pseudo-spectrum band toward its target
+// over dt with the given tau (ms). Pure and deterministic: the same feed
+// sequence produces the same bands on any machine, which is what keeps the
+// audio-reactive band reproducible in tests and stable across frame rates.
+func specFollow(cur, target float32, dt time.Duration, tauMs int) float32 {
+	if tauMs <= 0 || dt <= 0 {
+		return target
+	}
+	k := 1 - math.Exp(-float64(dt.Milliseconds())/float64(tauMs))
+	v := cur + (target-cur)*float32(k)
+	if math.Abs(float64(v)) < MotionEpsilon {
+		v = 0
+	}
+	return clamp01(v)
+}
+
 // pushLevel advances the simulation with one audio envelope sample. It returns
 // true when the rendered image changed enough to be worth a repaint, which is
 // how the ball avoids painting 30 identical frames a second while the mic
@@ -208,6 +248,23 @@ func (m *liquidMotion) pushLevel(raw float32, dt time.Duration) bool {
 	if math.Abs(float64(m.level)) < MotionEpsilon {
 		m.level = 0
 	}
+
+	// Pseudo-spectrum (ticket 65): band-low follows the smoothed level
+	// slowly, band-high tracks the envelope's rise fast (negative rises
+	// target zero, so the sibilance band decays between syllables). Same
+	// step, same clock discipline - no timer, no wall-clock deadline.
+	m.specLow = specFollow(m.specLow, m.level, dt, SpecLowTauMs)
+	if dt > 0 {
+		target := float32(float64(raw-m.prevRaw) / dt.Seconds() / SpecHighRateGain)
+		if target < 0 {
+			target = 0
+		}
+		if target > 1 {
+			target = 1
+		}
+		m.specHigh = specFollow(m.specHigh, target, dt, SpecHighTauMs)
+	}
+	m.prevRaw = raw
 
 	// Has the voice actually stopped? The raw feed answers that (the smoothed
 	// envelope is deliberately slow so syllables read as rhythm), with a short
@@ -269,16 +326,21 @@ func approach(cur, tgt, step float32) float32 {
 // whether a repaint would actually change any pixel.
 type motionSnapshot struct {
 	level, summon, border float32
+	specLow, specHigh     float32
 	angle                 float64
 }
 
 func (m *liquidMotion) snapshot() motionSnapshot {
-	return motionSnapshot{level: m.level, summon: m.summon, border: m.border, angle: m.angle}
+	return motionSnapshot{
+		level: m.level, summon: m.summon, border: m.border,
+		specLow: m.specLow, specHigh: m.specHigh, angle: m.angle,
+	}
 }
 
 func (m *liquidMotion) changed(before motionSnapshot) bool {
 	if quantChanged(before.level, m.level) || quantChanged(before.summon, m.summon) ||
-		quantChanged(before.border, m.border) {
+		quantChanged(before.border, m.border) || quantChanged(before.specLow, m.specLow) ||
+		quantChanged(before.specHigh, m.specHigh) {
 		return true
 	}
 	// 0.004 rad is under a tenth of a pixel of blob travel at this radius.
@@ -306,10 +368,29 @@ func (m *liquidMotion) busy(s statemachine.State) bool {
 	return m.ownsBorder && m.border != m.wantBorder()
 }
 
+// bandDeformState is the ticket-65 deform whitelist: only the three voice
+// states bend the light band (65-style-direction §3.2 mapping table).
+// Conversation/Warm/Acting still receive the audio feed (liquidDriven) but
+// their band stays static - the dispatch's "only Listening/Speaking/
+// Thinking deform the band amplitude". Pure function, pinned both ways by
+// TestWensityDeformGate.
+func bandDeformState(s statemachine.State) bool {
+	switch s {
+	case statemachine.StateListening, statemachine.StateThinking,
+		statemachine.StateSpeaking:
+		return true
+	}
+	return false
+}
+
 // applyTo stamps the live motion onto a freshly mapped visual. It is a no-op
 // while the frozen SPEC-08 §2.1 visuals are in force, so the contract tests
 // keep asserting the frozen table.
-func (m *liquidMotion) applyTo(v *Visual) {
+//
+// deform is the bandDeformState verdict of the frame's state: the
+// pseudo-spectrum reaches the renderer ONLY in Listening/Thinking/Speaking.
+// Every other frame carries zeros, so the resting band is static (D32).
+func (m *liquidMotion) applyTo(v *Visual, deform bool) {
 	if !prototypeVisuals || v == nil {
 		return
 	}
@@ -320,5 +401,10 @@ func (m *liquidMotion) applyTo(v *Visual) {
 		// The border is a transition, not a constant: whatever the state
 		// mapping asked for gets multiplied by how far the fade has travelled.
 		v.BorderAlpha *= m.border
+	}
+	if deform {
+		v.SpectrumLow = m.specLow
+		v.SpectrumMid = m.level
+		v.SpectrumHigh = m.specHigh
 	}
 }
