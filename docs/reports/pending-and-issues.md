@@ -31325,3 +31325,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - W177（5e344d27c 177-design-core-and-accounting-r2）：AC#5分账/AC#6时序/AC#0普查凭据齐；本腿零改票面。⇒ AC#5/#6 可翻；AC#0 仍待 owner 选丙（保守不结）。
 - **修**：abf2a35a6 编译缺口 → 补交 cmd/wisp/ticket123_replyleg_{test,windows_test,other_test}.go（446831ea9）；**纯 HEAD 导出树 `go vet ./cmd/wisp` rc=0** 已核；已推（未推=0）。
 - 待办：185 可结（收口腿在跑）；271 需非实现者裁形后结；136 AC#7/#10、182 AC#4-7、98 AC#1iii/AC#4 仍开。
+
+## A1569（2026-11-06 15:xx，编排者）收 wave32b＋串行收口：4 票结案（185/271/182/136），全池 done 282→286
+- CLOSE185：已 git mv 成 -done，双名核 files=1/done=1、无杂散；7 框全 [x]（AC#4 带注）。撤销 `git revert 8b32733d8 808b3b596`。
+- V271（754f10876 271-verdict）：非实现者独立裁 AC#0=甲（自推链条，非照抄）；AC#1/2/3 PASS、AC#4 N/A；closeable=yes。撤销 `git revert dcd5bc825`。
+- I182（aaf4fd3ef 182-ac4-ac7）：AC#4/5/6/7 PASS（与181分工、雷区5枚待人、契约零触、排程零依赖）；closeable。
+- I136（ff1da0ab9..9b3a9f5e6 136-ac7-ac10）：AC#7/AC#10 PASS（真CLI两发、两仪器各响各腿、门禁全绿；一笔事故已字节级复原三证齐）；closeable。
+- **串行收口 close3.sh**：271/182/136 三票翻框＋git mv -done，各 files=1/done=1/openboxes=0。**全池 done=286（≈72.8%）。**
+- 未推=15（网络间歇断，本地全安全），恢复统一推。
+- 授权登记：140 之 ci.yml「dev-branch doctor 断言 step」——编排者按先例规矩允许登记立此条；本次只出 diff 提案落证据＋做两处纯测试码修复（ticket224 WISP_ENV pin、R-140-1 恒真），ci.yml 本体待定是否摘。
+- 待办：剩余未结多为 C(owner 22)/D(真机 16)/E(CI 8)/F(gated 27)/B(前端 14)；干净可写 A 近见底（98/123 卡 CI 尾、177 AC#0 待 owner 选丙）⇒ 派 fresh census 找残余可写并出 owner 清单。
