@@ -31421,3 +31421,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 残留（不阻结）：①decideRisk 死分支清理（归票 12/162 写面）；②深度角标真窗肉眼签收＝winlive（机主当面看一次悬浮球角标）。
 - 诚实告警记录：1 项预存 375 roster 漂移、1 项克隆 DLL 环境，均非本票。
 - **编排者自查（当场修正）**：票21 AC 勾选格式＝`- [ ] L1 / L2 / Batch / Cancel / State machine`（5 框，非 `**AC#**`）。首刀 `-done` 因按 `**AC#` sed 空翻未勾框；已补 fixup commit 翻 5 个真框（open=0 / checked=5，done 仍 290）。**教训：每次收口前先 `grep -nE "^- \[ \]"` 确认该票真实勾选格式，勿假设 `**AC#**`。**
+
+## A1583（2026-11-06 18:xx，编排者）wave39 成(150 AC#3 仪器 4↔4)；W68 球腿挂死 74min ⇒ kill 重派窄口径
+- **W150-ac3**（`f7505f122`）：自检仪器 `tools/d22scan/deferred_registry_test.go`（+519 行）四门 PASS；分母 **4↔4** 逐枚吻合（D28-1×3 / D11-3×1）；突变自证红具名 D99-1/D98-2；`_test.go` 反形夹具与划线行正确出局；禁改面零触碰。**待非实现者裁→翻 AC#3→150 -done。**
+- **W68（wave36）挂死**：起 17:36、74min 零产出、internal/ball 零提交 ⇒ `job_kill`，重派 **W68b 窄口径**（⛔ 不碰桌面测量/不开任何 GUI/窗口进程，只改码＋迁移断言＋非 winlive 门禁；AC#3 桌面量留真机）。推测挂因＝`-diff Sleeping` 桌面像素测量阻塞。
+- 派 **wave40**：W68b（internal/ball 窄口径）＋ verdict150-ac3（非实现者复跑新测试＋突变验红）。
