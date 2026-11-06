@@ -499,6 +499,8 @@ func selfCounter(s *scanner, c selfCase, root string) (int, string, error) {
 		return s.examined["panel-approval"], "ban #6 frontend/ walk", nil
 	case "artifact":
 		return s.examined["internal-artifact-tool"], "ban #7 internal/tools/ walk", nil
+	case "riskGo":
+		return s.examined["phantom-symbol"], "ban #10 internal/risk/ walk", nil
 	case "emojiInternal":
 		return s.emojiSeen["internal/"], "ban #8 internal/ walk", nil
 	case "emojiCmd":
@@ -525,6 +527,7 @@ var selfCoverForTag = map[string]string{
 	"unparseable":            "internalGo",
 	"panel-approval":         "panel",
 	"internal-artifact-tool": "artifact",
+	"phantom-symbol":         "riskGo",
 	"emoji":                  "emojiInternal",
 	"phantom-citation":       "internalGo",
 }

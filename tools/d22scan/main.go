@@ -67,6 +67,24 @@
 //	                      it on the same comment line. All three are pinned
 //	                      expect-silent in selftestsamples.go (212-r3); "a
 //	                      path with no mark in it" still rings.
+//	10 phantom-symbol      a comment in internal/risk/ production Go files naming an
+//	                      `a[A-Z][A-Za-z0-9_]*`-shaped identifier that no declaration in
+//	                      that same package defines (ticket 350: AC#0 owner-approved
+//	                      2026-11-06, ledger A1571). The BOUNDS are the approval, and
+//	                      both were measured before it was given: the general camelCase
+//	                      / call forms ring 50% / 67% false positives (hostPathBox,
+//	                      macOS, DEFERRED, Nutstore, the deliberately deleted
+//	                      CloseScope - five enumerated classes in 343-v1's verdict),
+//	                      which is why the gate watches ONLY this shape in ONLY this
+//	                      tree, against the same package's own go/ast declaration
+//	                      roster. Widening shape or tree re-opens ticket 350 (AC#2);
+//	                      the start-anchor control (red = exactly aEquiv at 29d258f9)
+//	                      and the delivery-side zero are pinned in riskwordlist_test.go
+//	                      and the self-test samples. _test.go is outside the range by
+//	                      the same default as bans #1-5 (measured: every a[A-Z] token
+//	                      the test comments name resolves to a production declaration -
+//	                      nothing is hidden by that exclusion;
+//	                      docs/evidence/s1/350-bounded-wordlist-gate.md).
 //
 // Findings are suppressed only via allowlist.txt entries of the form
 // "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
@@ -265,6 +283,13 @@ func scanWithIgnore(root string, ign *gitIgnore) (*scanner, error) {
 	if err := s.walkGo(filepath.Join(root, "cmd")); err != nil {
 		return nil, err
 	}
+	// Ban #10 (ticket 350): the bounded wordlist walk. Its own tree, its own
+	// counter, one ledger row in declaredScopes() below - the same
+	// "coverage and reporting move together" rule every other walk obeys,
+	// because a walk nobody counts is a walk nobody notices going empty.
+	if err := s.walkRiskWordlist(filepath.Join(root, "internal", "risk")); err != nil {
+		return nil, err
+	}
 	// Directory-scoped bans.
 	if err := s.walkText(filepath.Join(root, "frontend"), "panel-approval", s.panelCheck, false); err != nil {
 		return nil, err
@@ -430,6 +455,16 @@ func declaredScopes(root string) []scanScope {
 		{
 			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
 			kind: "production Go files", examinedKey: "internal-artifact-tool", live: true,
+		},
+		{
+			// Ticket 350 (owner-approved AC#0, ledger A1571). live:true with no
+			// exemption on purpose: the ticket's own start-side measurement says
+			// the gate has exactly one true positive to offer (aEquiv) and the
+			// delivery tree offers zero, so an empty INTERNAL/RISK tree must read
+			// as "the instrument went blind", never as "the comments got clean".
+			// The tag doubles as the examined counter key, same as bans #6/#7.
+			label: "ban #10 internal/risk/", dir: filepath.Join(root, "internal", "risk"),
+			kind: "production Go files, comment symbol citations", examinedKey: "phantom-symbol", live: true,
 		},
 	}, ban8Scopes(root)...)
 }
@@ -697,6 +732,101 @@ func (s *scanner) walkGo(dir string) error {
 		s.examined[key]++
 		return s.scanGoFile(path)
 	})
+}
+
+// walkRiskWordlist runs ban #10 (ticket 350) over dir - in production the
+// internal/risk tree, and only that tree: the bound IS the owner approval
+// (ledger A1571), so the caller names the tree and this function does not
+// generalize it.
+//
+// Per DIRECTORY (= one Go package), it builds the package's declaration roster
+// from the same production files it then scans, so a comment citation is judged
+// against the symbols its own package actually declares; machinery in
+// riskwordlist.go, emission here because readRosters() reads exactly one
+// source (main.go) for its s.add sites - the same reason bans #1-9 all emit
+// from this file.
+//
+// A file that fails to parse contributes neither roster nor citations and is
+// already convicted by the "unparseable" finding scanGoFile reports, so this
+// walk never has to guess what an unparsable comment "meant".
+func (s *scanner) walkRiskWordlist(dir string) error {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil
+	}
+	pkgs := map[string][]string{}
+	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			if d.Name() == "testdata" || d.Name() == ".git" || s.ign.skip(path, true) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		// Same index-aware skip as walkGo (A214/F1): a tracked file under an
+		// ignore rule still gets read, an untracked build artifact does not
+		// become this ban's denominator.
+		if s.ign.skip(path, false) {
+			return nil
+		}
+		pkgs[filepath.Dir(path)] = append(pkgs[filepath.Dir(path)], path)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	// Directory order (then file order) is fixed so findings print in a stable
+	// order on every machine, the same property sort gives the rest of the
+	// tool's output.
+	var dirs []string
+	for d := range pkgs {
+		dirs = append(dirs, d)
+	}
+	sort.Strings(dirs)
+	// One finding per (file, token): the same phantom name repeated across a
+	// file's comments is one broken beacon, not several - ban #9's
+	// "one finding per phantom token" rule, scoped per file so a second
+	// package's identical citation still reports.
+	seen := map[string]bool{}
+	for _, d := range dirs {
+		files := pkgs[d]
+		sort.Strings(files)
+		s.examined["phantom-symbol"] += len(files)
+		roster := map[string]bool{}
+		pkgName := ""
+		for _, p := range files {
+			src, err := os.ReadFile(p)
+			if err != nil {
+				return err
+			}
+			fset := token.NewFileSet()
+			f, err := parser.ParseFile(fset, p, src, parser.ParseComments)
+			if err != nil {
+				continue // convicted as "unparseable" by scanGoFile's walk
+			}
+			if pkgName == "" {
+				pkgName = f.Name.Name
+			}
+			collectDeclaredIdents(f, roster)
+			for _, cit := range riskCommentCitations(fset, f, p) {
+				key := cit.Path + "\x00" + cit.Token
+				if roster[cit.Token] || seen[key] {
+					continue
+				}
+				seen[key] = true
+				s.add("phantom-symbol", cit.Path, cit.Line,
+					"comment names \""+cit.Token+"\", which no declaration in package "+
+						pkgName+" defines (ticket 350 ban #10): the citation is a navigation "+
+						"beacon to a symbol that does not exist - fix the comment or restore "+
+						"the symbol; widening this gate's shape or tree re-opens ticket 350")
+			}
+		}
+	}
+	return nil
 }
 
 func (s *scanner) scanGoFile(path string) error {

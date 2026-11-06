@@ -450,4 +450,65 @@ var selfCases = []selfCase{
 		summary: "SHAPE 3 (P5): a CJK-glued tail segment swallows a complete phantom path on the same line",
 		note:    "The widest of the three, and the reason the exemption cannot be described as \"a mark inside a path\": CJK is inside BOTH regex classes (\\x{4e00}-\\x{9fff}), so with no space to break the run, repoPathRe reports one token spanning both citations and shorthandRegionRe's region starts on the same offset and contains \"...\" - so the first, fully-spelled, non-existent page is never Stat()'d. 212-v2 §3 P6/P8/P9 bound the damage: the same glue WITHOUT a mark still rings, the exemption is computed per comment LINE (c.Text), and a space ends the region. This case is the shape a reader must not have to discover the hard way, which is why main.go's roster entry and its ban #9 comment now name all three.",
 	},
+
+	// ---- ban #10 phantom-symbol (ticket 350) ----------------------------------
+	// The samples seed internal/risk/ because that tree is the ban's whole
+	// range; each self-case builds its own fixture, so each case's file is the
+	// only production file of the fixture's package risk and the roster is
+	// exactly what that one file declares.
+	{
+		tag: "phantom-symbol", want: wantRing,
+		file: "internal/risk/phantom.go",
+		src: "package risk\n\n" +
+			"// aVanished was the helper the caller used to reach for; it is gone from\n" +
+			"// this package and nothing below declares it.\n" +
+			"func present() {}\n",
+		summary: "a comment names aVanished, which the package declares nowhere (the blacklist.go:193 aEquiv shape)",
+		note:    "Ticket 350's real-world shape: internal/risk/blacklist.go:193 cited aEquiv for close to a month while the symbol did not exist, and no existing ban looks at what a comment NAMES (ban #9 looks at what a comment cites as a PATH). The token is deliberately NOT declared anywhere in the fixture, so the only way this case stays green is the walk going blind.",
+	},
+	{
+		tag: "phantom-symbol", want: wantSilent,
+		file: "internal/risk/known.go",
+		src: "package risk\n\n" +
+			"// aKnown derives the verdict shape; the comment cites it and the\n" +
+			"// declaration below is the thing the citation names.\n" +
+			"func aKnown() {}\n",
+		summary: "the comment names aKnown and the same package declares it - a live citation is not a violation",
+		note:    "The delivery-side zero, in miniature: at HEAD every a[A-Z] token internal/risk's production comments name (aAnyForm aEq aRelates aRuleReason aUnder) resolves to a declaration in the same package, so the gate must be able to examine real files and stay green. A live scope is not a violation.",
+	},
+	{
+		tag: "phantom-symbol", want: wantSilent,
+		file: "internal/risk/methodok.go",
+		src: "package risk\n\n" +
+			"// reach names aBound on the box type; the comment cites the METHOD, not a\n" +
+			"// package-level symbol.\n" +
+			"type box struct{}\n\n" +
+			"func (box) aBound() {}\n\n" +
+			"func reach() {}\n",
+		summary: "a comment citing a METHOD of the package stays silent - the roster is every declaration, not only package-level ones",
+		note:    "Pins the roster's breadth, which is a deliberate choice of ticket 350's implementation: methods, fields and locals are declared identifiers of the same package and every a[A-Z] name is unexported, so a method citation can never be an other-package reference. Dropping methods from the roster is a range change and would re-open ticket 350 (AC#1).",
+	},
+	{
+		tag: "phantom-symbol", want: wantSilent,
+		file: "internal/risk/localok.go",
+		src: "package risk\n\n" +
+			"// walkOne mentions aLocal, which the function below declares.\n" +
+			"func walkOne() {\n" +
+			"\taLocal := 1\n" +
+			"\t_ = aLocal\n" +
+			"}\n",
+		summary: "a comment citing a := local stays silent - the roster includes function-body declarations",
+		note:    "Second half of the roster-breadth pin: the measured false-positive surface at HEAD is 0 and the roster is read from what the package declares, so a real citation of a local must not convict. A token that appears NOWHERE as a declaration still rings (the first case of this tag).",
+	},
+	{
+		tag: "phantom-symbol", want: wantSilent,
+		file: "internal/risk/prefixok.go",
+		src: "package risk\n\n" +
+			"// macOS shipped the spelling this package uses, and English prose keeps\n" +
+			"// \"a \" with a space before a capital, which the bounded shape refuses to\n" +
+			"// read as an identifier. Nothing a[A-Z]-shaped is cited in this comment.\n" +
+			"func prefixFacts() {}\n",
+		summary: "word-boundary and shape pins: 'macOS' and 'a ' prose stay silent",
+		note:    "Pins two shape facts of aWordRe in one file: \\b refuses the 'a' inside macOS (a word character precedes it), and \"a \" followed by a space is not an identifier start. 343-v1 measured these as the false-positive classes of the WIDER shapes this gate deliberately is not; this file is the fixture-scale transcription of that measurement.",
+	},
 }

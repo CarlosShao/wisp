@@ -737,6 +737,12 @@ func liveFixture(t *testing.T) string {
 	// instrument. The content is clean: ban #6 must be able to examine files and
 	// still be green (a live scope is not a violation).
 	seedFile(t, root, "frontend/src/panel.tsx", "export const Panel = () => null;\n")
+	// Ticket 350: ban #10 became live, so "every live scope does real work"
+	// now includes internal/risk/. The file declares the a-prefixed symbol its
+	// comment cites, so the fixture stays green - a live scope is not a
+	// violation, and an empty live scope must stay fatal (TestVerdictGreenOn-
+	// FullyLiveFixture asserts both halves through declaredScopes()).
+	seedFile(t, root, "internal/risk/ok.go", "package risk\n\n// aKnown is the fixture's declared a-prefix symbol; the citation above it is real.\nfunc aKnown() {}\n")
 	return root
 }
 
@@ -1308,10 +1314,17 @@ func TestWalksSkipGitIgnoredPaths(t *testing.T) {
 	// live.tsx + decide.tsx + frontend/.gitignore itself, which is a tracked file
 	// in the tree and both frontend walks take EVERY file (no suffix allowlist -
 	// ticket 96 AC#2), so it is one of the counted five; the two dist/ seeds are
-	// out. internal/'s Go count is ok/ok.go + tools/ok.go + pkg/keep.go;
-	// build/probe.go and pkg/x.generated.go are out. Ban #6 and ban #8 read the
-	// same tree with the same rule, so their numbers must be ONE integer (the
-	// invariant the real-repo test above also demands).
+	// out. internal/'s Go count is ok/ok.go + tools/ok.go + risk/ok.go +
+	// pkg/keep.go; build/probe.go and pkg/x.generated.go are out. Ban #6 and
+	// ban #8 read the same tree with the same rule, so their numbers must be ONE
+	// integer (the invariant the real-repo test above also demands).
+	//
+	// RESTATED BY TICKET 350: the internal/ number moved 3 -> 4 because
+	// liveFixture now seeds internal/risk/ok.go (ban #10's live scope, the
+	// same "every live scope does real work" rule ticket 88 applied to
+	// frontend/). The pin's intent is untouched: which files the ignore state
+	// excludes (probe.go, x.generated.go) or includes (keep.go) is what this
+	// test judges, and every file in the new count is named above.
 	if got, want := s.emojiSeen["frontend/"], 5; got != want {
 		t.Errorf("ban #8 examined %d frontend/ files, want %d", got, want)
 	}
@@ -1321,10 +1334,10 @@ func TestWalksSkipGitIgnoredPaths(t *testing.T) {
 	if ban6, ban8 := s.examined["panel-approval"], s.emojiSeen["frontend/"]; ban6 != ban8 {
 		t.Errorf("the two frontend/ walks disagree (%d vs %d): one of them grew an exclusion the other did not", ban6, ban8)
 	}
-	if got, want := s.examined[goScopeKey(filepath.Join(root, "internal"))], 3; got != want {
+	if got, want := s.examined[goScopeKey(filepath.Join(root, "internal"))], 4; got != want {
 		t.Errorf("bans #1-5 examined %d internal/ production Go files, want %d", got, want)
 	}
-	if got, want := s.emojiSeen["internal/"], 3; got != want {
+	if got, want := s.emojiSeen["internal/"], 4; got != want {
 		t.Errorf("ban #8 examined %d internal/ Go files, want %d", got, want)
 	}
 
@@ -1925,13 +1938,18 @@ func TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked(t *testing.T) {
 	s := scanFixture(t, root)
 
 	// 1. scanned, not skipped: both ignored paths are in the denominators.
+	// RESTATED BY TICKET 350: the internal/ number moved 3 -> 4 because
+	// liveFixture now seeds internal/risk/ok.go (ban #10's live scope). The
+	// pin's intent is unchanged - with no index to consult NOTHING may be
+	// excluded, so every production .go file the fixture holds, copied-leak.go
+	// included, must be counted and read.
 	if got, want := s.examined["panel-approval"], 3; got != want {
 		t.Errorf("ban #6 examined %d frontend/ files, want %d - with no index to consult nothing may be excluded", got, want)
 	}
 	if got, want := s.emojiSeen["frontend/"], 3; got != want {
 		t.Errorf("ban #8 examined %d frontend/ files, want %d", got, want)
 	}
-	if got, want := s.examined[goScopeKey(filepath.Join(root, "internal"))], 3; got != want {
+	if got, want := s.examined[goScopeKey(filepath.Join(root, "internal"))], 4; got != want {
 		t.Errorf("bans #1-5 examined %d internal/ production Go files, want %d (internal/build/copied-leak.go included)", got, want)
 	}
 
