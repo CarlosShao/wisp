@@ -178,6 +178,40 @@ func TestNearestDockEdgePicksTheEdgeYouPushed(t *testing.T) {
 
 func triggerForTest() int32 { return DockTriggerPx }
 
+// TestDockFollowsTheDrawnBody is R15#4/Q-4's pin: the position law is fed the
+// radius of the body actually drawn (dockOrbRadius), not the window's. The
+// Sleeping rest body is 34.72px inside a 56px configured orb (window edge 100
+// at 96 DPI), so the window-derived radius it was fed before made a landed
+// tab keep a ~82%-visible body; the state radius keeps DockOverlapFrac of it,
+// because drawGlass squashes the body along the dock axis with the same
+// factor the position law places the window with.
+func TestDockFollowsTheDrawnBody(t *testing.T) {
+	if got := dockOrbRadius(float32(dockTestOrb)); got != dockTestOrb/2 {
+		t.Fatalf("non-Sleeping states keep the configured radius at 96 DPI: got %d, want %d",
+			got, dockTestOrb/2)
+	}
+	rest := float32(dockTestOrb) * SleepRestRatio // 34.72
+	callR := dockOrbRadius(rest)
+	if callR != 17 {
+		t.Fatalf("the rest body's radius is what the call site feeds DockPos: got %d, want 17", callR)
+	}
+	work, e := dockWork(), dockTestEdge()
+	pos := DockPos(work, EdgeRight, 0, 600, e, callR, 1)
+	want := int(e)/2 + int(float32(callR)*DockOverlapFrac) // 50 + 7 = 57 of 100px window
+	if kept := work.R - pos.X; kept != want {
+		t.Fatalf("landed tab keeps %dpx of the window on screen, want %d (half + int(%d*%v))",
+			kept, want, callR, DockOverlapFrac)
+	}
+	// The reveal arithmetic, body-relative: the squashed body spans
+	// 2*17.36*0.42 ~ 14.6px, i.e. DockOverlapFrac of the 34.72px diameter -
+	// not the ~28.5px (82%) the window radius leaked out.
+	reveal := 2 * float64(rest) * float64(DockOverlapFrac) / 2 // squashed body span
+	if frac := reveal / float64(rest); frac < float64(DockOverlapFrac)-0.01 || frac > float64(DockOverlapFrac)+0.01 {
+		t.Fatalf("docked tab reveals %.1f%% of the rest body, want DockOverlapFrac (%.0f%%)",
+			frac*100, DockOverlapFrac*100)
+	}
+}
+
 // TestDockedLeavesAHittableStrip is "只留一条可命中区域" as a number: at full
 // dock the orb is a sliver, but a sliver wide enough to click.
 func TestDockedLeavesAHittableStrip(t *testing.T) {

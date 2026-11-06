@@ -521,6 +521,21 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	lk := activeLook
 
+	// The edge dock squeezes the whole body along the dock axis (dock.go's
+	// law: the tab is the squashed orb tucked against the boundary, and
+	// DockPos places the window with the same DockSquash factor). Before the
+	// R15#4 re-dispatch only the liquid/highlight obeyed it and the shell
+	// stayed round, so a landed tab leaked ~82% of the rest body onto the
+	// screen instead of keeping DockOverlapFrac (R15#4/Q-4).
+	dockX, dockY := float32(1), float32(1)
+	switch v.Dock {
+	case EdgeLeft, EdgeRight:
+		dockX = DockSquash(v.DockProgress)
+	case EdgeTop, EdgeBottom:
+		dockY = DockSquash(v.DockProgress)
+	case EdgeNone:
+	}
+
 	// 0. Contact shadow / caustic - the separation from a white wallpaper.
 	if r.caustic != nil {
 		r.fillEllipse(d2d1Point2F{c.x, c.y + R*0.30}, R*1.25, R*0.85, r.caustic)
@@ -546,8 +561,8 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 		r.fillEllipse(c, fillR, fillR, g)
 	}
 
-	// 2. Glass shell (cool translucent body).
-	r.fillEllipse(c, R, R, r.body)
+	// 2. Glass shell (cool translucent body) - squashed with the body.
+	r.fillEllipse(c, R*dockX, R*dockY, r.body)
 
 	// 3. The liquid: three blobs at their ladder positions for this angle.
 	// A louder envelope shrinks the visible patch (the surface "gathers")
@@ -556,17 +571,6 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	// here, where they were bare literals no table row named.
 	shrink := 1 - LiquidGatherPerLevel*v.LiquidLevel
 	flow := 1 + SummonFlowSpread*v.SummonFlow
-	// The edge dock squeezes the whole body along the dock axis; DockSquash is
-	// the same law DockPos places the window with, so the tab that hugs the
-	// screen edge is exactly as wide as the strip left on screen for it.
-	dockX, dockY := float32(1), float32(1)
-	switch v.Dock {
-	case EdgeLeft, EdgeRight:
-		dockX = DockSquash(v.DockProgress)
-	case EdgeTop, EdgeBottom:
-		dockY = DockSquash(v.DockProgress)
-	case EdgeNone:
-	}
 	for bi := 0; bi < 3; bi++ {
 		lay := &r.liq[bi]
 		i := liquidIndex(v, bi)
@@ -579,25 +583,26 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	// 4. Far-side refraction: the deep tone gathering at the bottom edge.
 	if r.core != nil && v.CoreAlpha > 0 {
 		r.fillEllipse(d2d1Point2F{c.x, c.y - v.SizePx*0.06},
-			v.SizePx*0.70, v.SizePx*0.70, r.core)
+			v.SizePx*0.70*dockX, v.SizePx*0.70*dockY, r.core)
 	}
 
 	// 5. Specular highlight (upper-left), the glass cue.
 	r.fillEllipse(d2d1Point2F{c.x - R*0.30, c.y - R*0.38},
 		R*0.46*dockX, R*0.36*dockY, r.hi)
 
-	// 6. Rim: dark edge light (contrast on white) + bright inner lip.
+	// 6. Rim: dark edge light (contrast on white) + bright inner lip. The
+	// rings follow the dock squash with the shell they outline.
 	r.setSolid(mulA(lk.Rim, v.Opacity))
-	r.circle(c, R-0.8*s, GlassRimPx*s*dockX)
+	r.arcEx(c, (R-0.8*s)*dockX, (R-0.8*s)*dockY, 0, 360, GlassRimPx*s)
 	r.setSolid(mulA(lk.Lip, 0.85*v.Opacity))
-	r.circle(c, R-2.6*s, GlassLipPx*s)
+	r.arcEx(c, (R-2.6*s)*dockX, (R-2.6*s)*dockY, 0, 360, GlassLipPx*s)
 
 	// 7. The border that fades in when nobody speaks (owner's "丝滑引入边框").
 	if v.BorderAlpha > 0 {
 		r.setSolid(mulA(lk.Lip, v.BorderAlpha*v.Opacity))
-		r.circle(c, R+3.5*s, BorderRingPx*s)
+		r.arcEx(c, (R+3.5*s)*dockX, (R+3.5*s)*dockY, 0, 360, BorderRingPx*s)
 		r.setSolid(mulA(lk.Rim, 0.55*v.BorderAlpha*v.Opacity))
-		r.circle(c, R+5.8*s, 1*s)
+		r.arcEx(c, (R+5.8*s)*dockX, (R+5.8*s)*dockY, 0, 360, 1*s)
 	}
 }
 
@@ -617,31 +622,42 @@ func (r *renderer) fillRect(rc d2d1RectF) {
 // stack-slot float = ABI-safe; DrawEllipse's is NOT, see the ABI note in
 // d2d_windows.go).
 func (r *renderer) circle(c d2d1Point2F, radius, width float32) {
-	r.arc(c, radius, 0, 360, width)
+	r.arcEx(c, radius, radius, 0, 360, width)
 }
 
 // arc draws a stroked circular arc (degrees) as a polyline.
 func (r *renderer) arc(c d2d1Point2F, radius float32, startDeg, endDeg, width float32) {
+	r.arcEx(c, radius, radius, startDeg, endDeg, width)
+}
+
+// arcEx draws a stroked ellipse arc (degrees) as a polyline, with per-axis
+// radii so the dock-squashed body's rings can follow the shell they outline
+// (same polyline law as arc; still ABI-safe, geometry lives in registers).
+func (r *renderer) arcEx(c d2d1Point2F, rx, ry float32, startDeg, endDeg, width float32) {
 	const segs = 48
 	if endDeg < startDeg {
 		startDeg, endDeg = endDeg, startDeg
 	}
 	span := endDeg - startDeg
 	n := int(span/360*segs) + 2
-	prev := r.pointOn(c, radius, startDeg)
+	prev := r.pointOnEx(c, rx, ry, startDeg)
 	for i := 1; i <= n; i++ {
 		a := startDeg + span*float32(i)/float32(n)
-		next := r.pointOn(c, radius, a)
+		next := r.pointOnEx(c, rx, ry, a)
 		r.line(prev, next, width)
 		prev = next
 	}
 }
 
 func (r *renderer) pointOn(c d2d1Point2F, radius, deg float32) d2d1Point2F {
+	return r.pointOnEx(c, radius, radius, deg)
+}
+
+func (r *renderer) pointOnEx(c d2d1Point2F, rx, ry, deg float32) d2d1Point2F {
 	rad := deg * float32(math.Pi) / 180
 	return d2d1Point2F{
-		c.x + radius*float32(math.Cos(float64(rad))),
-		c.y + radius*float32(math.Sin(float64(rad))),
+		c.x + rx*float32(math.Cos(float64(rad))),
+		c.y + ry*float32(math.Sin(float64(rad))),
 	}
 }
 

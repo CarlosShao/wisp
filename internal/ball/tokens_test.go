@@ -185,6 +185,26 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 	if v := VisualFor(p, 56, statemachine.StateSettling, 1); abs32(v.Opacity-RestSettledOpacity) > 1e-6 {
 		t.Errorf("Settling end opacity = %v, want %v", v.Opacity, RestSettledOpacity)
 	}
+	// The composite the user sees must land on the same number: the ULW
+	// constant alpha is the fade's only driver (the frame underneath is the
+	// fadeProgress=0 resting body), so settlingAlpha ends at
+	// RestSettledOpacity in prototype mode (R15#3) - the SleepOpacity it
+	// ended at before stacked a second fade on top and composited to ~0.33.
+	// Monotonic, clamped, both ends pinned.
+	if got := settlingAlpha(0); got != 1 {
+		t.Errorf("settlingAlpha(0) = %v, want 1", got)
+	}
+	if got := settlingAlpha(1); abs32(got-RestSettledOpacity) > 1e-6 {
+		t.Errorf("prototype settlingAlpha(1) = %v, want %v", got, RestSettledOpacity)
+	}
+	prev := float32(2)
+	for i := 0; i <= 10; i++ {
+		got := settlingAlpha(float64(i) / 10)
+		if got > prev+1e-6 {
+			t.Fatalf("settlingAlpha must not increase: p=%.1f gave %v after %v", float64(i)/10, got, prev)
+		}
+		prev = got
+	}
 	// Size clamping to the token range.
 	if v := VisualFor(p, 999, statemachine.StateWarm, 0); v.SizePx != BallSizeMaxPx {
 		t.Errorf("size clamp high: %v", v.SizePx)
@@ -216,6 +236,11 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 	if v := VisualFor(p, 56, statemachine.StateSettling, 1); abs32(v.Opacity-SleepOpacity) > 1e-6 {
 		t.Errorf("frozen Settling end opacity = %v, want %v", v.Opacity, SleepOpacity)
 	}
+	// The frozen fade keeps the §2.1 composite endpoint verbatim (the escape
+	// hatch must stay byte-identical to the shipped table).
+	if got := settlingAlpha(1); abs32(got-SleepOpacity) > 1e-6 {
+		t.Errorf("frozen settlingAlpha(1) = %v, want %v", got, SleepOpacity)
+	}
 }
 
 // TestSleepingSizeTruthTable is ticket 68 AC#1's three-column size table, read
@@ -227,8 +252,9 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 //
 // Column ③ is where the "it shrinks when docked" story actually lives, so the
 // table also pins the two pure laws the dock draws with - DockSquash and
-// DockPos - and records what they are computed FROM (the window's radius, not
-// the state's body), which is the third disagreement with SPEC-08 §2's 44px.
+// DockPos - and records what the position law is FED: dockOrbRadius hands it
+// the state's drawn body (R15#4/Q-4); the window radius it was fed before
+// leaked ~82% of the rest body past the edge at the landed ramp.
 func TestSleepingSizeTruthTable(t *testing.T) {
 	restored := PrototypeVisualsEnabled()
 	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
@@ -274,15 +300,29 @@ func TestSleepingSizeTruthTable(t *testing.T) {
 	if DockSquash(0) != 1 || abs32(DockSquash(1)-DockOverlapFrac) > 1e-6 {
 		t.Errorf("③ DockSquash endpoints = %v/%v, want 1 and %v", DockSquash(0), DockSquash(1), DockOverlapFrac)
 	}
-	// What a landed tab really leaves on screen, at the 96-DPI default (window
-	// edge 72, ring margin 8, so the position law's orbR is the WINDOW's 28):
-	// edgePx/2 + int(orbR*DockSquash(1)) = 36 + 11 = 47 of 72 px. That is the
-	// geometry the 62-diff-signoff "-dock-right" rows were shot at, and because
-	// 28 is the configured radius while a Sleeping body is 17.36, the rest orb
-	// keeps ~29 of its 34.72px visible - not the 42% the name promises.
+	// What a landed tab leaves on screen, at the 96-DPI default. Since
+	// R15#4/Q-4 the position law is fed the DRAWN body (dockOrbRadius), not
+	// the window's radius: rest body 34.72px -> orbR 17, off =
+	// int(17*DockOverlapFrac) = 7, so with the same 72px window injected the
+	// tab keeps 36+7 = 43px of window on screen; and drawGlass squashes the
+	// body along the axis with the same factor, so the tab shows
+	// 2*17.36*0.42 ~ 14.6px of the 34.72px body = DockOverlapFrac - the 42%
+	// the token name promises (the window radius kept a ~82%-visible tab).
+	// The 47px row below is the pure position law pinned at an INJECTED
+	// radius (28: the geometry the 62-diff-signoff "-dock-right" rows were
+	// shot at); the call-site radius is pinned right after it.
 	work := Rect{L: 0, T: 0, R: 1920, B: 1080}
 	if p1 := DockPos(work, EdgeRight, 900, 500, 72, 28, 1); work.R-p1.X != 47 {
-		t.Errorf("③ a landed tab keeps %d px on screen, want 47 (36 + int(28*%v))", work.R-p1.X, DockOverlapFrac)
+		t.Errorf("③ DockPos law at an injected radius: tab keeps %d px, want 47 (36 + int(28*%v))",
+			work.R-p1.X, DockOverlapFrac)
+	}
+	callR := dockOrbRadius(rest56) // 17: what dockGeometry now hands DockPos
+	if callR != 17 {
+		t.Errorf("③ dockOrbRadius(34.72) = %d, want the drawn body's 17 (not the window's 28)", callR)
+	}
+	if p1 := DockPos(work, EdgeRight, 900, 500, 72, callR, 1); work.R-p1.X != 36+int(float32(callR)*DockOverlapFrac) {
+		t.Errorf("③ a landed tab fed the state body keeps %d px on screen, want %d (36 + int(%d*%v))",
+			work.R-p1.X, 36+int(float32(callR)*DockOverlapFrac), callR, DockOverlapFrac)
 	}
 }
 

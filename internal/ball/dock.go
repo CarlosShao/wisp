@@ -128,6 +128,18 @@ func dockProgressOf(gap, triggerPx int32) float32 {
 	return 1 - float32(gap)/float32(triggerPx)
 }
 
+// dockOrbRadius is the radius the dock law must follow: the radius of the
+// body that is actually drawn - the state visual's SizePx at 96 DPI, where
+// the DC render target's units are physical pixels (see the DPI note in
+// statevisual.go) - NOT the window's own half-edge-minus-margin. Feeding the
+// dock the window radius made a landed Sleeping tab reveal ~82% of its
+// 34.72px rest body (R15#4/Q-4's measurement); the state radius keeps
+// DockOverlapFrac of the body on screen, which is the "hide half" semantics
+// the owner signed. drawGlass squashes the body along the dock axis with the
+// same DockSquash factor, so the tab the user sees IS the squashed orb this
+// law places.
+func dockOrbRadius(stateSizePx float32) int32 { return int32(stateSizePx / 2) }
+
 // DockPos is the position law of the ramp: it returns the window origin that
 // keeps the ORB, at its current squash level, tangent to edge e. Because the
 // law follows the squash instead of lerping between two endpoints, the ball

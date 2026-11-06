@@ -12,9 +12,11 @@ import "github.com/CarlosShao/wisp/internal/statemachine"
 //   - Warm: 2.4s opacity breathing 0.55<->0.7 via the compositor-friendly
 //     path - a slow (10fps) tick that changes ONLY the layered-window
 //     constant alpha (no D2D re-render, no pixel upload per frame).
-//   - Settling: the SPEC-08 §2.1 260ms fade 1 -> 0.35 as a bounded one-shot
-//     burst at the 30fps cap, then static. Documented SPEC-sanctioned
-//     exception to the "five states" list (it is not a loop).
+//   - Settling: the SPEC-08 §2.1 260ms fade as a bounded one-shot
+//     burst at the 30fps cap, then static. The endpoint is settlingAlpha's
+//     (RestSettledOpacity in prototype mode, the frozen 0.35 dot otherwise).
+//     Documented SPEC-sanctioned exception to the "five states" list (it is
+//     not a loop).
 //   - Every period respects the 30fps cap (>= 33ms).
 //
 // WarmKind lets the window route a tick to the cheap alpha path.

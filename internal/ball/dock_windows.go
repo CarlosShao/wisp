@@ -59,7 +59,14 @@ func (b *Ball) dockGeometry() (work Rect, edgePx, marginPx, orbR, triggerPx int3
 	}
 	edgePx = wr.width()
 	marginPx = int32(RingMarginPx*scale + 0.5)
-	orbR = edgePx/2 - marginPx
+	// orbR is the DRAWN body's radius (dockOrbRadius, R15#4/Q-4): the state
+	// visual lives at 96 DPI and is what the pointer must stay able to reach,
+	// while the window-derived radius (edgePx/2 - marginPx) would hand the
+	// position law a Sleeping tab 10px fatter than its 34.72px rest body and
+	// leak ~82% of the body past the edge at the landed ramp. Above 96 DPI
+	// the body does not scale with the window either (statevisual.go's DPI
+	// note), so the window radius would drift there too.
+	orbR = dockOrbRadius(b.curVisual.SizePx)
 	if orbR < 1 {
 		return work, 0, 0, 0, 0, 0, 0, false
 	}

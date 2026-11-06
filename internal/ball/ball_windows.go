@@ -471,13 +471,13 @@ func (b *Ball) onAnimTick() {
 		a := WarmOpacityLow + (WarmOpacityHigh-WarmOpacityLow)*w
 		b.constAlpha = uint8(a * 255)
 		b.renderFrame()
-	case AnimFade: // Settling: 260ms one-shot ramp 1 -> 0.35 (SPEC-08 §2.1).
+	case AnimFade: // Settling: 260ms one-shot ramp (SPEC-08 §2.1).
+		// The endpoint is settlingAlpha's: prototype fades to the RESTING
+		// glass body (RestSettledOpacity, R15#3), frozen to the 0.35 dot.
 		p := elapsed.Seconds() / (float64(SettlingFadeMs) / 1000)
+		b.constAlpha = u8(settlingAlpha(p) * 255.0)
 		if p >= 1 {
-			b.constAlpha = u8(float32(SleepOpacity) * 255.0)
 			b.stopAnimTimer()
-		} else {
-			b.constAlpha = u8(float32((1 - p*(1-SleepOpacity)) * 255.0))
 		}
 		b.renderFrame()
 	default: // AnimFrame: phase-advanced full re-render at <= 30fps.

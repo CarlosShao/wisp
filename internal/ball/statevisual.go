@@ -87,12 +87,17 @@ const (
 
 // prototypeVisuals selects the ticket 62 liquid-glass rendering. It is ON by
 // default since ticket 68 AC#2 (2026-11-01): the owner answered R15 in full
-// (registry A1378, "R15 全按推荐") - the Settling composite ≈0.33 and the
-// ≈82% dock reveal are accepted as implemented - so the default build now
-// draws exactly the look the owner signed, and SPEC-08 §2's Sleeping row
-// (rest body 34.72px, R15#1) describes the default configuration. The frozen
-// §2.1 table stays reachable as the escape hatch: EnablePrototypeVisuals(false)
-// and `balldebug -frozen` render the old 12px/0.35 Sleeping dot verbatim.
+// (registry A1378, "R15 全按推荐") and the recommended values are implemented
+// (68 re-dispatch, 2026-11-06) - the Settling one-shot fade lands on
+// RestSettledOpacity (settlingAlpha below: the window alpha no longer
+// double-fades through the frozen SleepOpacity on top of the visual's own
+// 0.95 landing) and the docked tab keeps DockOverlapFrac of the drawn body
+// (dockOrbRadius in dock.go: the position law follows the state body, not
+// the window) - so the default build now draws exactly the look the owner
+// signed, and SPEC-08 §2's Sleeping row (rest body 34.72px, R15#1) describes
+// the default configuration. The frozen §2.1 table stays reachable as the
+// escape hatch: EnablePrototypeVisuals(false) and `balldebug -frozen` render
+// the old 12px/0.35 Sleeping dot verbatim.
 var prototypeVisuals = true
 
 // EnablePrototypeVisuals turns on the ticket 62 liquid-glass mapping. The
@@ -306,6 +311,30 @@ func mixLook(lk LiquidLook, state Color) Color {
 		B: lk.Glow.B*(1-w) + state.B*w,
 		A: lk.Glow.A,
 	}
+}
+
+// settlingAlpha is the composite endpoint law of the Settling one-shot fade
+// (the 260ms ramp the window drives over ULW SourceConstantAlpha). The frame
+// drawn underneath is the fadeProgress=0 resting body, so the window alpha
+// is the fade's only driver and must land on the composite the owner signed:
+// RestSettledOpacity in prototype mode (R15#3 - ending at the frozen micro
+// dot's SleepOpacity stacked on the visual's own 0.95 landing double-
+// multiplied the fade down to a ~0.33 composite), and the frozen 0.35
+// verbatim in frozen mode (the escape hatch keeps the §2.1 table). p is the
+// fade progress 0..1; the function clamps both ends so the window driver and
+// the tests can never disagree about the endpoints.
+func settlingAlpha(p float64) float32 {
+	var end float32 = SleepOpacity
+	if prototypeVisuals {
+		end = RestSettledOpacity
+	}
+	if p >= 1 {
+		return end
+	}
+	if p <= 0 {
+		return 1
+	}
+	return 1 - float32(p)*(1-end)
 }
 
 // Animated reports whether the state runs an animation timer (SPEC-08 §2:
