@@ -1,0 +1,9 @@
+time=2026-11-06T16:23:49.435+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProjectInstructionsReachTheWireRequestBody
+--- PASS: TestProjectInstructionsReachTheWireRequestBody (0.07s)
+=== RUN   TestHostileInstructionFileMovesNoAuthorityKnob
+--- PASS: TestHostileInstructionFileMovesNoAuthorityKnob (0.04s)
+=== RUN   TestProjectInstructionsAreNotANewD39Section
+--- PASS: TestProjectInstructionsAreNotANewD39Section (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.391s

@@ -1,0 +1,23 @@
+time=2026-11-06T16:23:44.001+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestWalksUpFromWorkspaceInPriorityOrder
+--- PASS: TestWalksUpFromWorkspaceInPriorityOrder (0.01s)
+=== RUN   TestUpwardWalkTerminatesAtTheRoot
+--- PASS: TestUpwardWalkTerminatesAtTheRoot (0.01s)
+=== RUN   TestFileNamePriorityInsideOneDirectory
+--- PASS: TestFileNamePriorityInsideOneDirectory (0.01s)
+=== RUN   TestSameFileSeenTwiceIsInjectedOnce
+--- PASS: TestSameFileSeenTwiceIsInjectedOnce (0.01s)
+=== RUN   TestOverBudgetDropsBroadFirstAndTruncatesOnlyTheLast
+--- PASS: TestOverBudgetDropsBroadFirstAndTruncatesOnlyTheLast (0.01s)
+=== RUN   TestLoaderHasNoImportPathToPermOrConfig
+--- PASS: TestLoaderHasNoImportPathToPermOrConfig (0.00s)
+=== RUN   TestLoadedContentCarriesTheExistingC25SourceName
+--- PASS: TestLoadedContentCarriesTheExistingC25SourceName (0.01s)
+=== RUN   TestPanelCarrierCarriesTheManifest
+--- PASS: TestPanelCarrierCarriesTheManifest (0.01s)
+=== RUN   TestOffSwitchReadsNothingAndSaysWhy
+--- PASS: TestOffSwitchReadsNothingAndSaysWhy (0.01s)
+=== RUN   TestZeroBudgetIsStatedNotSilent
+--- PASS: TestZeroBudgetIsStatedNotSilent (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/projctx	0.143s

@@ -1,0 +1,5 @@
+time=2026-11-06T16:23:54.327+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- PASS: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.10s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.152s

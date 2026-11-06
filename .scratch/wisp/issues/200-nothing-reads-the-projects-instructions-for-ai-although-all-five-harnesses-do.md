@@ -91,3 +91,14 @@ C17 白名单**既有方法名**不动（只允许**新增快照字段**那一�
 - **撤销口令**：若界面那支决定"这一版先不显示说明清单"，则 Go 侧回到 200-r2 的**乙**（把键从 marshal 里摘掉），
   那一格 AC#7 当场退回并在本票具名记账——**不许留着"键在值恒缺"这一形**（同 `A408` 点名的反面教材）。
 
+## 200-v1（2026-11-06 16:3x +08，wave34 W200 验收腿，非实现者）
+
+- 八格 AC 在 HEAD `59ac99f9` **全部亲跑转绿**：projctx 10/10、agent 四枚判据 4/4、risk `TestC26…` PASS、
+  panel 定向 5/5（全包仅剩 2 红，逐名归票 197 `files` 键与 C21 tokens，**无一枚归 200**）、cmd/wisp 端到端 2/2。
+- **界面那一跳已交割**：`frontend/src/lib/panel.ts:252` 现量已声明 `instructions?: InstructionsSection`；
+  r2 名册里 `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme` 两枚**已转绿**（4 红→2 红）。
+- 证据件：`docs/evidence/s1/200-verdict.md`（读数归档 `.scratch/wisp/probes/200/v3/logs/01..11`）。
+  ⚠ 本机 `go build ./...` 被 .gitignore 内 `build\mut_rvw.go` 残渣挡（不在仓、不归本票，已在证据件具名）；`internal/cmd` 面构建 rc=0。
+- 判定＝**PASS 可结**；残量三笔均不阻结（子代理环归 197／生产 C25 戳 R4 休眠属在册老账／refused·not_run 两态 e2e 未造，panel 层已钉）。
+  翻框＋`-done` 归编排者。
+

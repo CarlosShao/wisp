@@ -1,0 +1,84 @@
+time=2026-11-06T16:24:26.549+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+    composer_test.go:83: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:78: Go ComposerState emits [files] that interface ComposerState does not declare
+    composer_test.go:83: ComposerState <-> ComposerState: 12 JSON keys reconciled
+    composer_test.go:83: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:83: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:83: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:83: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+time=2026-11-06T16:24:36.542+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow546967510\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-06T16:24:36.552+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-06T08:24:36Z duration_ms=10
+time=2026-11-06T16:24:36.561+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow546967510\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-06T16:24:36.568+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-06T08:24:36Z duration_ms=6
+time=2026-11-06T16:24:36.579+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow546967510\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-06T16:24:36.587+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-06T08:24:36Z duration_ms=7
+time=2026-11-06T16:24:36.597+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow546967510\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-06T16:24:36.607+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-06T08:24:36Z duration_ms=9
+time=2026-11-06T16:24:36.607+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-06T16:24:36.616+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow546967510\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-06T16:24:36.622+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-06T08:24:36Z duration_ms=4
+time=2026-11-06T16:24:36.633+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow546967510\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-06T16:24:36.639+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-06T08:24:36Z duration_ms=6
+time=2026-11-06T16:24:36.645+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-06T16:24:36.648+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-06T16:24:36.680+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-06T16:24:36.688+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-06T08:24:36Z duration_ms=8
+time=2026-11-06T16:24:36.697+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-06T16:24:36.702+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-06T08:24:36Z duration_ms=5
+time=2026-11-06T16:24:36.713+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-06T16:24:36.720+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-06T08:24:36Z duration_ms=7
+time=2026-11-06T16:24:36.734+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-06T16:24:36.743+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-06T08:24:36Z duration_ms=8
+time=2026-11-06T16:24:36.743+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-06T16:24:36.754+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-06T16:24:36.761+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-06T08:24:36Z duration_ms=6
+time=2026-11-06T16:24:36.772+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-06T16:24:36.779+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-06T08:24:36Z duration_ms=6
+time=2026-11-06T16:24:36.784+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-06T16:24:36.787+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-06T16:24:36.812+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-06T16:24:36.820+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-06T08:24:36Z duration_ms=8
+time=2026-11-06T16:24:36.832+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-06T16:24:36.838+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-06T08:24:36Z duration_ms=6
+time=2026-11-06T16:24:36.848+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-06T16:24:36.856+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-06T08:24:36Z duration_ms=8
+time=2026-11-06T16:24:36.868+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-06T16:24:36.878+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-06T08:24:36Z duration_ms=10
+time=2026-11-06T16:24:36.879+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-06T16:24:36.892+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-06T16:24:36.899+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-06T08:24:36Z duration_ms=6
+time=2026-11-06T16:24:36.911+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTheClaimInANameChangesNoVerdict448207699\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-06T16:24:36.922+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-06T08:24:36Z duration_ms=10
+time=2026-11-06T16:24:36.927+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-06T16:24:36.932+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-06T16:24:37.016+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestABidiNameWalksTheRealBoundaryIntoAWashedRow1514281781\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-06T16:24:37.024+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-06T08:24:37Z duration_ms=8
+time=2026-11-06T16:24:37.033+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestABidiNameWalksTheRealBoundaryIntoAWashedRow1514281781\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-06T16:24:37.042+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-06T08:24:37Z duration_ms=7
+time=2026-11-06T16:24:37.056+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestABidiNameWalksTheRealBoundaryIntoAWashedRow1514281781\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-06T16:24:37.070+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-06T08:24:37Z duration_ms=13
+time=2026-11-06T16:24:37.085+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestABidiNameWalksTheRealBoundaryIntoAWashedRow1514281781\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-06T16:24:37.100+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-06T08:24:37Z duration_ms=14
+time=2026-11-06T16:24:37.100+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-06T16:24:37.117+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestABidiNameWalksTheRealBoundaryIntoAWashedRow1514281781\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-06T16:24:37.128+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-06T08:24:37Z duration_ms=10
+time=2026-11-06T16:24:37.150+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestABidiNameWalksTheRealBoundaryIntoAWashedRow1514281781\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-06T16:24:37.159+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-06T08:24:37Z duration_ms=9
+time=2026-11-06T16:24:37.165+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-06T16:24:37.169+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:638: parties: frontend/scripts/gen-tokens.mjs=43 tokens, docs/evidence/s1/c21-native-tokens.md=78 colour rows, internal/ball/tokens.go=37/35 palette fields, frontend/src/styles/tokens.generated.css=43 light + 43 dark declarations, 11 mapped + 23 waived
+    tokens_fourway_test.go:682: value leg theme light: 43 tokens reconciled against frontend/scripts/gen-tokens.mjs
+    tokens_fourway_test.go:682: value leg theme dark: 43 tokens reconciled against frontend/scripts/gen-tokens.mjs
+    tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:58: the table names Palette.GlassRing, but internal/ball/tokens.go holds no such colour literal in DarkPalette()
+    tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:59: the table names Palette.GlassHi, but internal/ball/tokens.go holds no such colour literal in DarkPalette()
+    tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:60: the table names Palette.GlassHiSoft, but internal/ball/tokens.go holds no such colour literal in DarkPalette()
+    tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:103: the table names Palette.GlassRing, but internal/ball/tokens.go holds no such colour literal in LightPalette()
+    tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:104: the table names Palette.GlassHi, but internal/ball/tokens.go holds no such colour literal in LightPalette()
+    tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:105: the table names Palette.GlassHiSoft, but internal/ball/tokens.go holds no such colour literal in LightPalette()
+    tokens_fourway_test.go:862: check 2: frontend/src/styles/tokens.generated.css declares 34 coloured tokens = 11 mapped + 23 waived
+    tokens_fourway_test.go:871: checks 1-4 reconciled 22 of 22 mapped pairs (78 colour rows read, 72 agreed with internal/ball/tokens.go)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	20.192s
+FAIL

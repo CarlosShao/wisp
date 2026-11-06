@@ -1,0 +1,5 @@
+time=2026-11-06T16:26:22.481+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAssemblySplitsGuidanceFromUntrustedData
+--- PASS: TestAssemblySplitsGuidanceFromUntrustedData (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.064s
