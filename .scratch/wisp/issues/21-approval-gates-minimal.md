@@ -1,8 +1,8 @@
 # 21 — Approval gates minimal: L1 block window, L2 native card, queue trivial, batch D45-1
 
-**Status:** segment-1-landed-decision-layer (L1 window + veto channels + L2 queue + source check + batch + applied-steps type); segment 2 (native card rendering, ball visuals, loop rewiring) still open
-**Claimed by:** sub-agent A (segment 1: decision + queue layer, UI injected). Segment 2 unclaimed.
-**Last update:** 2026-09-20
+**Status:** in-progress (segment 2: native card rendering + ball depth badge + card-side wiring)
+**Claimed by:** sub-agent A (segment 1: decision + queue layer, UI injected). Segment 2: sub-agent C (wave 34, 2026-11-06, `git clone --shared` isolation per rule 21 - cmd/wisp also carries ticket 323's in-flight untracked tests).
+**Last update:** 2026-11-06
 **Blocked by:** 17-risk-assessor-c19
 **Parallel slots:** ≤2 sub-agents (A: L1 window + veto channels; B: L2 native card + queue +
 batch aggregation)
