@@ -7,6 +7,7 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -45,7 +46,23 @@ func TestTicket224ProductionSessionChangesAcrossRealOSProcesses(t *testing.T) {
 		cmd.Dir = h.dir
 		// WISP_TEST_DATA_DIR is the explicit data-root injection (proc/envfork.go:36),
 		// so both child processes share h.dir and therefore the same wisp.db.
-		cmd.Env = append(os.Environ(), "WISP_TEST_DATA_DIR="+h.dir)
+		// Ticket 140 AC#2 branch (b) (ledger A1569): the injection is only honored
+		// when the child resolves env "test" (proc/envfork.go:212; the CLI data
+		// root takes the same fork at cmd/wisp/doctor.go:255), so hermeticity is
+		// pinned here in the planted-then-pinned shape ticket 128's
+		// pinEnvThatAsksTheOS128 established: WISP_ENV=dev is planted first and
+		// WISP_ENV=test pinned after it, so the child's fork is this case's own
+		// doing on every host. Pinning test alone would leave the case green
+		// wherever a job-level WISP_ENV=test feeds the child - the exact
+		// "hermeticity supplied by ambient" dependency ticket 140 was opened to
+		// remove: measured on this host, an unpinned child resolved dev and wrote
+		// wisp.db + a live log into the real %APPDATA%\wisp-dev profile while the
+		// case read green (docs/evidence/s1/140-ac1-realrun-shaping-r1.md §4.2.1).
+		cmd.Env = append(os.Environ(),
+			"WISP_ENV=dev", // the planted ambient this pin must beat
+			"WISP_ENV=test",
+			"WISP_TEST_DATA_DIR="+h.dir,
+		)
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		cmd.Stderr = &out
@@ -67,6 +84,22 @@ func TestTicket224ProductionSessionChangesAcrossRealOSProcesses(t *testing.T) {
 	id1 := mint()
 	if !session.ID(id1).Valid() {
 		t.Fatalf("process 1 minted %q, which the shape lock (session.ID.Valid) rejects", id1)
+	}
+
+	// The pin's tooth, measured rather than asserted by construction: a real
+	// `wisp run` child that resolved env "test" opens its store ON the injected
+	// root and creates wisp.db there (open.go:40; the same write is what landed
+	// in the real %APPDATA%\wisp-dev profile when the unpinned shape was measured
+	// on this host, docs/evidence/s1/140-ac1-realrun-shaping-r1.md §4.2.1).
+	// t101boot plants config.toml and the DPAPI key fixture but no wisp.db, and
+	// the parent's own memory.Open below would create exactly that file, so this
+	// check sits between the two: only a child that actually booted on h.dir can
+	// satisfy it. Delete the pinned WISP_ENV=test above and the planted dev
+	// branch makes envfork.go:212 ignore the injection - the child boots on a
+	// different tree and this goes red on every host, instead of the case reading
+	// green while a dev-host child writes the operator's real profile.
+	if _, statErr := os.Stat(filepath.Join(h.dir, "wisp.db")); statErr != nil {
+		t.Fatalf("the pinned WISP_ENV=test did not reach the child: boot 1 left no wisp.db in the injected data dir %s (%v) - a child that resolved env \"test\" writes its store there, so boot 1 must have ignored WISP_TEST_DATA_DIR and booted on a different tree (proc/envfork.go:212 only honors the injection under env \"test\")", h.dir, statErr)
 	}
 
 	// Seed a session grant under process 1's REAL identity — as if boot 1 had

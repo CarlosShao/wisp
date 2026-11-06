@@ -196,9 +196,37 @@ func TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128(t *testing.T) {
 }
 
 // TestAC2TestDataDirBranchStillResolves128 keeps the refusal from swallowing the
-// harness branch: env "test" returns proc.TestDataDir() and asks the OS nothing.
-// AC#1 could not reach base = "." under WISP_ENV=test for exactly this reason
-// (A105 item 5a), and the fix must not change that either.
+// harness branch: env "test" resolves the harness's own data root and asks the OS
+// nothing. AC#1 could not reach base = "." under WISP_ENV=test for exactly this
+// reason (A105 item 5a), and the fix must not change that either.
+//
+// R-140-1 (ledger A188⑦, delivered under the A1569 registration): the
+// expectation here used to be proc.TestDataDir() - the very call doctor.go:256's
+// early return makes - so the comparison was the function under test against
+// itself. That shape can only catch the early return being DELETED (which the
+// err check above catches through failConfigDir128) and is structurally blind to
+// a keeper that resolves the WRONG root: if proc.TestDataDir's own answer drifts
+// (or the early return is re-aimed at another real directory while still
+// agreeing with it), both sides of the comparison move together and the case
+// stays green. The expectation is now computed from the filesystem, the way
+// ticket 119 cured its own self-derived comparisons
+// (internal/winsec/dataroot_symlink_119_other_test.go: the declared root is
+// compared as declared, and the spelled shape asks filepath.EvalSymlinks rather
+// than the function under test):
+//
+//   - when WISP_TEST_DATA_DIR is declared, that declared value IS the
+//     filesystem answer: the identity contract (proc/envfork.go:100-106) owes
+//     it back verbatim;
+//   - otherwise the root the harness contract names is
+//     <temp root>\wisp-test-<this pid> (proc/envfork.go:125), spelled from
+//     os.TempDir, os.Getpid and the symlink-clean temp spelling - facts about
+//     the OS, not about proc's code.
+//
+// Completion criterion (ticket 140 §④): swapping doctor.go's early-return
+// target for another real directory must redden this case. That mutant was run
+// on the isolated export tree before this landed and is recorded in
+// docs/evidence/s1/140-ac2-fixes.md §4, together with the probe that shows the
+// old self-derived form staying green under the same class of mutation.
 func TestAC2TestDataDirBranchStillResolves128(t *testing.T) {
 	assertNoPortableOverride128(t)
 	failConfigDir128(t)
@@ -206,9 +234,31 @@ func TestAC2TestDataDirBranchStillResolves128(t *testing.T) {
 	if err != nil {
 		t.Fatalf("AC#2: the test-env resolution refused as well: %v - the harness root is declared, not asked for", err)
 	}
-	if dir != proc.TestDataDir() {
-		t.Errorf("AC#2: test data dir = %q, want %q", dir, proc.TestDataDir())
+	want := wantTestDataDirFromDisk140(t)
+	if dir != want {
+		t.Errorf("AC#2 (R-140-1): test data dir = %q, want %q - the expectation is read off the filesystem (%s as declared, else the symlink-clean temp root joined with wisp-test-<this pid>), not from the function under test, so an early return aimed at a different real directory reddens this case", dir, want, proc.TestDataDirEnv)
 	}
+}
+
+// wantTestDataDirFromDisk140 computes the test-env data root from filesystem
+// facts only, per the R-140-1 completion criterion ("从文件系统算期望").
+// Deliberately NOT proc.TestDataDir: doctor.go:256's early return calls that
+// same function, and an expectation produced by the function under test is
+// exactly the tautology this closes. Equivalence with production's fallback is
+// a property this case asserts, not assumes: proc's doc names
+// <temp>\wisp-test-<pid> with the existing prefix resolved, and the clean
+// spelling below asks the filesystem (filepath.EvalSymlinks) the same question
+// about the same prefix.
+func wantTestDataDirFromDisk140(t *testing.T) string {
+	t.Helper()
+	if declared := os.Getenv(proc.TestDataDirEnv); declared != "" {
+		return declared
+	}
+	clean, err := filepath.EvalSymlinks(os.TempDir())
+	if err != nil {
+		t.Fatalf("the expectation cannot be read off the filesystem: EvalSymlinks(%q): %v", os.TempDir(), err)
+	}
+	return filepath.Join(clean, fmt.Sprintf("wisp-test-%d", os.Getpid()))
 }
 
 // TestAC2RefusalMarkersAreNotAShortenableList128 is the R-121-2 nail for this
