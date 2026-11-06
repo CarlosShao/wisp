@@ -41,14 +41,14 @@ block window (2–3s countdown strip) with its four veto channels, L2 native con
   (23 + 49).
 
 ## Acceptance criteria
-- [ ] L1: countdown executes on timeout; each working veto channel cancels; non-loaded-KWS
+- [x] L1: countdown executes on timeout; each working veto channel cancels; non-loaded-KWS
       message asserted; veto returns failure to LLM (loop continues).
-- [ ] L2: card shows full params + rules_hit; native allow executes; simulated panel-source
+- [x] L2: card shows full params + rules_hit; native allow executes; simulated panel-source
       allow REJECTED at API (test with forged source); 300s timeout → reject + warning at 270s
       + replay works.
-- [ ] Batch: 10 L1 ops → one confirm; L2 mixed in → no aggregation; 50+ → L2 (R7).
-- [ ] Cancel-mid-execution → applied-steps report rendered.
-- [ ] State machine: Confirming/AwaitingApproval transitions match D43 #17,21–24.
+- [x] Batch: 10 L1 ops → one confirm; L2 mixed in → no aggregation; 50+ → L2 (R7).
+- [x] Cancel-mid-execution → applied-steps report rendered.
+- [x] State machine: Confirming/AwaitingApproval transitions match D43 #17,21–24.
 
 ## Progress log (append-only, newest last)
 
