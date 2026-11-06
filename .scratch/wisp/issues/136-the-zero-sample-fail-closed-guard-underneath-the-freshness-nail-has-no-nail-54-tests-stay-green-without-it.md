@@ -44,12 +44,30 @@
 - [ ] **AC#5**（`R-134-3`）**P1 那把尺不查 `paths:` / `paths-ignore:` 触发过滤**——D22 mode-6 的四件禁令里**少了这一件**。
       ⇒ 要么把这一件补进禁令（`tools/d22scan/**` **不在本票地界**：若要动它，报回编排者具名解冻），
       要么在票面与注释里明写"这一维不查"，**不许沉默**。
+
+> **AC#5 "这一维不查"声明入库（2026-11-06，agent=worker-ticket136-ac5-ac6；本格勾未自翻）**：
+> 取票面第二条路（明写，拒绝沉默）。现量核实：`tools/d22scan/main.go` 头注 ban 名册 #1–#9 **无一枚**读 workflow 触发过滤键，
+> P1 的四条 grep（`on:`/`push:`/branches/`cron:`）＋ job 体 `if:`/`continue-on-error` 检查**均不读** `paths:`/`paths-ignore:`，
+> 且锚在触发块整体而非 `push:` 子树 ⇒ 在 `push:` 下加过滤能通过 P1 全部检查、slo-full 自动触发被静默收窄。
+> 声明落两处：`scripts/slo-freshness.sh` P1 static 段注释（逐点写明不查什么／greps 为何抓不到／mode-6 第四禁当前只由 review 承担／补 d22scan 需具名解冻）
+> ＋证据 `docs/evidence/s1/136-ac5-ac6-impl.md` §1。**d22scan 补 ban 未做**（须编排者具名解冻 `tools/d22scan/**` 后另派，本程未替编排者扩权）。
+> 撤销口令：**「撤 136 AC#5 不查声明」** ⇒ 删该两处注释块即复原，别无副作用。
 - [ ] **AC#6**（`R-134-4`，**编排者已把定性做完：属"到点没响"，不是"还没到点"**）`slo-fresh.yml` 的 `23 */6 * * *` 从未产出一枚 schedule run。
       09-23 18:1x 现量（UTC 10:17）：`gh run list --event schedule` ⇒ **`[]`（全历史 0 枚）**；
       `gh run list --workflow slo-fresh.yml` ⇒ **仅 1 枚**，是 `workflow_dispatch`、`createdAt=2026-09-23T07:23:34Z`、`success`、sha `6effb7e`（那枚是编排者为取 AC#6 读数手工点的）。
       该 workflow 文件 **03:41:11Z 就已提交**，而 cron 格点 **06:23Z 已过**（`23 */6` ⇒ 00/06/12/18 Z）⇒ **06:23Z 那格该响而未响，是一枚实证漏点**，不能再记成"还没到点"。
       ⇒ 本格要做的不是再等一次，而是**查明为什么 schedule 在本仓一枚都没产过**（先核 GitHub 侧该 workflow 是否 enabled、`on.schedule` 是否被解析到、以及"默认分支才有 schedule"这条规则在本仓的实际生效面），
       修好后**证明每日 ≥1 枚**；⚠ 改共享触发/并发配置要**按事件类型分别核**（`cancel-in-progress` 那族老账：给并发组无条件追加 `github.sha` 会连带改掉 PR 的取消语义）。
+
+> **AC#6 现量更正（2026-11-06，agent=worker-ticket136-ac5-ac6；票面原读数不抹，本 `>` 块取代其结论）**：
+> "从未产出一枚 schedule run"的前提**已被 GitHub 侧现量推翻——取数时刻太早，不是配置缺陷**。09-23 18:1x（UTC 10:17）读到 `[]` 时，
+> **同日 11:50:44Z 首枚 schedule run 尚未出队**（GitHub 对新注册 schedule 的首次评估不保证落在下一个 cron 格点，高负载会延迟/丢格，官方文档明载）。
+> 现量（只读 API，命令在证据表可复跑）：workflow state＝**active**；默认分支＝**dev**、文件在 dev（"schedule 只按默认分支评估"生效面成立）；
+> schedule run 共 **142 枚**、首枚 `2026-09-23T11:50:44Z`、**09-23 至 11-05 共 45/45 天每日 ≥2 枚**（多数 3–4 枚；nominal 23 */6 普遍延迟数十分钟出队，覆盖不受影响）
+> ⇒ **"每日 ≥1 枚"成立且有 2 倍余量，本格零配置改动即已满足**（票面 ⚠"按事件类型分别核并发"一条未触发——没有可改的东西）。
+> 失败枚逐因归档：`38561478699`（10-14）＝AC#3 cap 钉当天如实打红、同日 `:-20` 收口修复；10-18…10-24 每日 3–4 枚＝`slo-full-sample-stale`
+> 如实报出 10-14 后约 10 天无有效样本的 D32 真空期——**是钉在工作，不是病**；**10-25 起连续 12 天全 success**（最近 `42100267869`，11-05 20:06Z）。
+> 证据 `docs/evidence/s1/136-ac5-ac6-impl.md` §2。本格勾未自翻；若编排者认为还需对"4 格 cron 全缺"做显式红，属新格、不在 AC#6 判据内。
 - [ ] **AC#7** 门禁与账面：`gofmt -l` **整包**（`internal/observe`、`scripts` 那两个文件所在处）、`go vet` 双 GOOS、
       `go test -count=2 -v ./internal/observe/` 四数（只能从 `-v` 量，改前／改后各一份）、`sh scripts/d22scan.sh` 纯净快照 rc=0。
       ⚠ 新增用例会让四数动 ⇒ **逐名对上动了哪几枚**，别只给差值。
@@ -702,5 +720,11 @@
   wt 版真 API 5 发＝**4 发 rc=0**＋1 发空尾页 `page=7: EOF` 瞬断（fail-closed）⇒ 具名建议：**尽快提交并推 `:-20`**（否则逐 6h 连红），可选两条（扫描上界 `min(cap,ceil(total/100))` 消空尾页调用；注释给速率标窗口）见证据 §5。
   证据 `docs/evidence/s1/ticket136-136s-accept-v1.md`＋`probes/136/v/`（7 件）；自两处错位目录按只建不删留证（`D:\d\tmp\wisp136v`、`...\projects plans Wisp\.scratch\...`，后者无 .git 且早存他腿同病内容）。
   next=编排者据本表滚勾三格＋把收口一行入库（红线即刻可解）；AC#5/#6/#7/#10 不属本格。
+
+- [2026-11-06 09:5x +08] agent=worker-ticket136-ac5-ac6 did=**AC#5（refuse-silent）＋ AC#6（schedule 到点没响）交件；零 Go 面、零生产码**。锚点起手现读 `84b0a7c4d`（＝派发锚，零漂移）。
+  **AC#5** 取票面第二条路（明写"这一维不查"）：`tools/d22scan` 现量 ban 名册 #1–#9 无一枚读 workflow 触发过滤键、P1 四条 greps 均不读 `paths:`/`paths-ignore:` 且锚触发块整体 ⇒ 声明落 `scripts/slo-freshness.sh` P1 段注释（纯注释 hunk）＋票面 `>` 块＋证据 §1；**d22scan 补 ban 未做**（须具名解冻，本程不扩权）。
+  **AC#6** 票面前提被现量推翻：首枚 schedule run `2026-09-23T11:50:44Z`（票面 10:17Z 读 `[]` 早于它 1.5h；06:23Z 格未响＝GitHub 新注册 schedule 首评不保证下一个 cron 格点）；现量 142 枚、**45/45 天每日 ≥2 枚**（09-23→11-05）、state=active、默认分支 dev 且文件在 dev ⇒ **零配置改动即满足"每日 ≥1 枚"**；失败枚逐因归档（10-14＝AC#3 cap 钉如实红、10-18…24＝sample-stale 钉如实报 10 天 D32 真空、10-25 起连续 12 天全 success）。详见票面两枚 `>` 块＋`docs/evidence/s1/136-ac5-ac6-impl.md`。
+  **门禁**（本机）：`go build ./cmd/... ./internal/... ./tools/...` rc=0；`go test ./internal/observe -count=1 -timeout 420s` rc=0 `ok`；`gofumpt -l` 无输出；`sh scripts/d22scan.sh` rc=0；`sh -n scripts/slo-freshness.sh` rc=0（本程脚本改动纯注释）。
+  **两格勾均未自翻**（归编排者）；next=①编排者/非实现者复核两枚 `>` 块后裁 AC#5/AC#6；②AC#5 若判"补 ban 才算结"⇒ 请先具名解冻 `tools/d22scan/**`；③AC#7/AC#10 不属本程。
 
 - [2026-10-14 21:2x +08] **编排者：AC#2/#3/#4 三格翻勾＋收口 `:-20` 入库**。依据＝非实现者 `136-v` 判语（表 `docs/evidence/s1/ticket136-136s-accept-v1.md`；三格 **PASS、无附条件**；零放宽＝四树 132 发 rc 无一条由非绿变绿；AC#3 触发条件现量＝严格 `total>cap`；33 世界 rc 表 `probes/136/v/rctable.tsv` 在册）。⚠ **一条实况**：`:-20` 收口此前**只在工作树未入库** ⇒ `origin/dev` 仍 `:-3`，**12:07:32Z（20:07+08）的 schedule run `38561478699` 已因此红**（exit 2 逐字 `holds 350 entries … reads only 3 page(s) x 100 = 300`；上一发 05:04Z 绿）——**本班次已提交推送 `scripts/slo-freshness.sh`**，下一发 18:23Z 应转绿。候补（136-v 两条可选建议）：扫描上界改 `min(cap, ceil(total/100))` 消空尾页；注释给速率标窗口。本票余 AC#5（d22scan 解冻面）／AC#6（CI schedule 与 `.github` 批准面）／AC#7（observe 半已结之外的账）／AC#10（真跑 CLI＋机时）。

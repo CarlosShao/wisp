@@ -171,6 +171,20 @@ FAILURES=0
 # The trigger block is checked where it actually lives (top-level `on:`), which
 # is also what makes it cheap: if a future edit moves slo-full to a manual-only
 # trigger, the two lines below are exactly what disappear.
+#
+# What P1 deliberately does NOT check (ticket 136 AC#5, written down here so
+# the gap is a statement and not a silence): a `paths:` / `paths-ignore:`
+# filter under `push:` narrows WHEN slo-full auto-runs to only the commits
+# that touch matching files, and none of the greps below read those keys. They
+# are also anchored on the trigger block as a whole, not on `push:`'s subtree,
+# so a `paths:` added there passes every check P1 makes. D22 mode-6's fourth
+# prohibition ("no path filter", see the slo-fresh.yml header) is therefore
+# enforced by review only: the scanner (tools/d22scan) has no ban for workflow
+# trigger filters at all, and adding one is outside ticket 136's write face
+# (it would need a named unfreeze of tools/d22scan/**). Until that ban exists,
+# this comment is the record of the unchecked dimension: P1 does not guard
+# against a `paths:` / `paths-ignore:` edit, and nothing else in this pin
+# pretends to.
 if [ ! -f "$ci_file" ]; then
     echo "slo-freshness: no workflow file at $ci_file - cannot check the trigger block" >&2
     exit 2
