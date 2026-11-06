@@ -100,8 +100,8 @@
 | `D:\tmp\wisp\20261106\163ac1b\parked\`（空） | 归属两发用的暂挪点，已空 |
 | `/tmp/row_a1.txt`、`/tmp/row_head.txt` | 行文本 diff 的两枚碎片（几行文本，未引用即弃） |
 
-仓内件＝`.scratch/wisp/probes/163/ac1b/{ac1b.sh,main.go,logs/*}`（台件，随本腿提交）＋ `docs/evidence/s1/163-ac1b-recount.md`（本件）。
+仓内件＝`.scratch/wisp/probes/163/ac1b/{ac1b.sh,main.go,logs/*}`（台件，随本腿提交）＋ `docs/evidence/s1/163-ac1b-recount.md`（本件）。⚠ `logs/ac1b.out`（tee 的 stdout 复本）被仓里 `.gitignore` 盖住 ⇒ 只在盘、不进提交（规则 8 照旧不删）；**日志的提交凭据＝`logs/go-probe-ac1b.log`**，两枚内容同源（复跑＝`sh .scratch/wisp/probes/163/ac1b/ac1b.sh`）。
 
 ## 8. 撤销口令
 
-**「撤 163-ac1b 名册裁定表」**＝把克隆里那笔提交 revert 掉即可：diff 恰好 5 枚文件（本件＋台件 4 枚），产码零字节、票面零字节、主树零字节（提交在克隆，由编排者收件后按规矩并入 dev）。
+**「撤 163-ac1b 名册裁定表」**＝把克隆里那笔（两笔追加笔同 revert）revert 掉即可：提交 diff 恰好 **4 枚文件**（本件＋台件 3 枚；tee 复本本就在 git 之外），产码零字节、票面零字节、主树零字节（提交在克隆，由编排者收件后按规矩并入 dev）。
