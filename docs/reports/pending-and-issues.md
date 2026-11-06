@@ -31406,3 +31406,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 实现：`config[ball].style`→`ball.SetStyle`→renderer 分支（glass=现有+新 wensity look 默认；jarvis=新 `jarvis_windows.go` 纯 D2D，3 虚线弧+≤128 种子粒子）；token 走 C21 双胞胎机器。**D32 一字不改**：睡眠/静止单帧零定时器、动画只在五授权态复用现有计时器、零新增定时器/线程/WebGL。音频 v1 伪谱3带（不碰 internal/audio），真 FFT5 带 v2。设置 `[ball].style` hot-tier＋面板下拉，C17 白名单不动。
 - **裁定（铁律④）**：②Jarvis 待机不持续转（守静帧、不豁免 D32）；③v1 用伪谱3带。①`[ball].style` 属 D36 契约面（一行 PLAN.md diff 备于文档 §4.2）⇒ **摆机主批**。
 - 旁：wave38 的 **150 非实现者终裁已落**（`48610b495`），350 仍在验；收齐后一并结 150/350。
+
+## A1580（2026-11-06 18:xx，编排者）收 wave38：350 结案(done289)＋150 四格翻转(AC#3 开)
+- **W350 verdict**（`cb182e4f2` 非实现者）：7 AC 全 PASS、closeable=YES。编排者翻 7 框＋git mv -done（files=1/done=1/openAC=0）。**done 288→289。** 旁记：实现者证据「41→43」笔误（真基线 35→43=+8）；**AC#4 CI 面裁定 ride-along**（ci.yml 三步数据驱动、ban#10 随车上 CI，不加显式行；机主若要显式行一句话即可）。
+- **W150 verdict**（`48610b495`）：AC#1/#2/#4/#5 PASS ⇒ 已翻 4 框；**AC#3（会响的对账仪器）FAIL 仍开** ⇒ 整票暂不 -done。
+- **裁定 AC#3 落点（铁律②/④）**：取 **ⓑ**＝加一枚「读 SPEC-12 §5 登记表↔代码 DEFERRED 标记双向差集」的自检测试（进 CI、会响、打分母），**不动 d22scan 判据本体/契约文字**（ⓐ 扩 d22scan 属改「禁止形状」清单、需另批，故暂不取）。派 **wave39 W150-ac3** 实现；成后非实现者裁＋翻 AC#3 → 150 -done。撤销口令：撤该测试件即回未检态。
