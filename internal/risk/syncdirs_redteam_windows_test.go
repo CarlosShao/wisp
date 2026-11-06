@@ -202,10 +202,26 @@ func TestSyncRedTeamUnverifiableChainFailClosed(t *testing.T) {
 // bypass spellings aimed at the operator's actual, configured sync root.
 // It never writes into the cloud folder — the assertion is that the gate
 // denies, and that nothing appeared on disk afterwards.
+//
+// Ticket 123 AC#5: this leg used to skip twice on a machine with no live
+// sync root (no profile home; no detected root), which is every hosted CI
+// runner — so the windows leg went silent exactly where it is cheapest to
+// run. The skip is gone. When no live root exists the case runs the same
+// bypass-spelling battery against an injected registry-grade synthetic root
+// (the same strong-grade registration syncSandbox uses) and says loudly in
+// the log that this is the stand-in, not machine reality; when a live root
+// exists, the live assertions run unchanged. The battery's assertions —
+// gate denies every spelling, no byte lands — are root-agnostic, so neither
+// branch relaxes the other, and the choice of stand-in over an exemption
+// entry is ticket 123 AC#5's recorded decision.
 func TestSyncRedTeamRealOneDrive(t *testing.T) {
 	home := userHomeDir()
 	if home == "" {
-		t.Skip("no profile home")
+		// No skip: the battery below needs A home for the sensitive-source
+		// mark, not THE profile. A temp home keeps the leg loud on a
+		// stripped machine instead of silent.
+		home = t.TempDir()
+		t.Logf("ticket 123 AC#5: no profile home on this machine; using a temp home %s for the sensitive-source mark", home)
 	}
 	p := NewProvenance(ProvOptions{}) // live env: env/registry/config/default probes
 	var root string
@@ -217,7 +233,22 @@ func TestSyncRedTeamRealOneDrive(t *testing.T) {
 		}
 	}
 	if root == "" {
-		t.Skipf("no live sync root on this machine (detected roots: %+v)", p.SyncRoots())
+		base := t.TempDir()
+		home = base
+		root = filepath.Join(base, "OneDrive Copilot Sync")
+		if err := os.MkdirAll(root, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: base, SyncRoots: []SyncRoot{
+			{Provider: "OneDrive", Path: root, Source: "registry"},
+		}})
+		if !p.SyncDetectionComplete() {
+			t.Fatal("stand-in sanity: the injected registry-grade root must confirm detection, not the suspect fallback")
+		}
+		t.Logf("ticket 123 AC#5 stand-in: no live sync root on this machine (detected roots: %+v); "+
+			"running the same bypass-spelling battery against the synthetic registry-grade root %s. "+
+			"The machine-reality reading stays with machines that have a live root; this leg refuses to go silent.",
+			p.SyncRoots(), root)
 	}
 	p.OpenScope("task-1")
 	if !p.Mark("task-1", SrcFSRead, filepath.Join(home, "contract.pdf"), "clause "+marker) {

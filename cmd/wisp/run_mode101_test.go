@@ -49,6 +49,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -82,6 +83,16 @@ type t101host struct {
 	// fill it through the portable seam (secret_fixture_180_test.go, 票 98 C1) so
 	// no case depends on a DPAPI blob existing on a non-Windows leg.
 	keyRef string
+	// script is the ticket-123 programmable answer leg for the NEXT boot only:
+	// when non-nil, start() hands it to runSpec.reply in place of the attached-
+	// but-silent console, so the case - not a human at a console - answers the
+	// L2 cards this boot raises. Each script line names the correlation id the
+	// case itself minted, so the leg answers exactly the card it means to; on
+	// the L1 window route every line is inert (a window is not a queue item).
+	// The two refusal shapes below answer with `no` deliberately: C18 拒绝 is a
+	// legal ending, and a case that only ever injected approvals would be the
+	// always-approve stub AC#2 forbids.
+	script *t123replyScript
 }
 
 // t101boot writes a config whose [risk] block carries the given mode ("" = the
@@ -109,6 +120,11 @@ func (h *t101host) writeConfig(t *testing.T, mode string) {
 	if mode != "" {
 		riskLines += fmt.Sprintf("permission_mode = %q\n", mode)
 	}
+	allowed := t123dirSpellingForms(h.dir)
+	quoted := make([]string, len(allowed))
+	for i, form := range allowed {
+		quoted[i] = fmt.Sprintf("%q", form)
+	}
 	body := fmt.Sprintf(`schema_version = 2
 
 [llm]
@@ -129,9 +145,9 @@ enabled = true
 context_window = 128000
 
 [fs]
-allowed_dirs = [%q]
+allowed_dirs = [%s]
 
-%s`, h.base+"/v1", h.keyRef, filepath.ToSlash(h.dir), riskLines)
+%s`, h.base+"/v1", h.keyRef, strings.Join(quoted, ", "), riskLines)
 	if err := os.WriteFile(h.configPath(), []byte(body), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -143,18 +159,27 @@ allowed_dirs = [%q]
 func (h *t101host) start(t *testing.T, confirm perm.ConfirmFunc, hook func(*agentRuntime)) (int, string) {
 	t.Helper()
 	out, errb := &bytes.Buffer{}, &bytes.Buffer{}
+	// Ticket 123: the boot's answer side is either the case's own scripted
+	// leg (h.script, set just before this call) or the attached-but-silent
+	// console 375 introduced. Never os.Stdin: nothing here waits on a human.
+	var reply io.Reader = strings.NewReader("")
+	if h.script != nil {
+		reply = h.script
+	}
 	code := runTextTask(runSpec{
 		argv:        []string{"总结一下 这份笔记"},
 		stdout:      out,
 		stderr:      errb,
 		dataDir:     h.dir,
 		modeConfirm: confirm,
+		reply:       reply,
 		// Ticket 375: every case on this host measures what a MODE does to a live
 		// run, so the run must be one where a question could be answered (an
 		// attached, silent console). Without it the L1 route is refused for a
 		// reason that has nothing to do with the mode under test - the guard would
-		// be measuring itself.
-		reply: strings.NewReader(""),
+		// be measuring itself. Ticket 123 keeps the invariant but upgrades the
+		// value: the attached stream above is either the silent console or the
+		// case's own scripted answer leg - never a missing one, never os.Stdin.
 		onRuntime: func(rt *agentRuntime) {
 			if hook != nil {
 				hook(rt)
@@ -284,6 +309,15 @@ func TestTicket101ManualSwitchSurvivesRestart(t *testing.T) {
 	// No confirm stub in boot 2: nothing here switches, it only reads. This is
 	// the half AC#4's mutation targets - delete the assembly line and boot 2 is
 	// back on ask_every_step, which fails the first assertion below.
+	//
+	// Ticket 123: boot 2's answer leg is the case's own script. corr-2 is the
+	// red-line R2 read, which asks an L2 card on EVERY machine and every档 -
+	// the script answers it with an operator no, because C18 拒绝 is a legal
+	// ending and the case must not wait out the 40s deadline to learn that.
+	// corr-1 (the write auto_approve must silence) gets a yes only so that on
+	// a machine where the write is still escalated to L2 the remaining
+	// assertions report the real tripwire (cards == 0) instead of a timeout
+	// text; on the L1 route the line is refused as unknown and inert.
 	var (
 		boot2Mode  risk.Mode
 		cards      int
@@ -292,6 +326,7 @@ func TestTicket101ManualSwitchSurvivesRestart(t *testing.T) {
 		redLineTxt string
 		redLineErr bool
 	)
+	h.script = t123script(t, "yes t101-corr-1", "no t101-corr-2")
 	hook2 := func(rt *agentRuntime) {
 		boot2Mode = rt.modes.PermissionMode()
 		// (1) the L1 pre-execution window: auto_approve must silence it.
@@ -353,6 +388,13 @@ func TestTicket101UntouchedConfigRestartsAtDefault(t *testing.T) {
 			isErr bool
 			text  string
 		)
+		// Ticket 123: this case measures an unopposed L1 window - nobody
+		// answers anything. The yes line is aimed at the correlation the call
+		// below mints and is inert on the L1 route (a window is not a queue
+		// item); it only matters if a machine shape escalates the call to the
+		// L2 queue, where the case's intent (the write executes when the chain
+		// permits) still has to hold instead of timing out.
+		h.script = t123script(t, fmt.Sprintf("yes t101-corr-%d", boot))
 		code, log := h.start(t, nil, func(rt *agentRuntime) {
 			got = rt.modes.PermissionMode()
 			// The default档 ASKS about an L1 write: the window opens and the call
@@ -416,6 +458,13 @@ func TestTicket101SessionGrantDoesNotCrossRestart(t *testing.T) {
 		firstWhy    string
 		id          int64
 	)
+	// Ticket 123: the .env write asks an L2 card on every machine (B-tier R3
+	// sensitive, in every档). The script answers it with an operator no - the
+	// legal C18 refusal - so the case measures the boundary in milliseconds
+	// instead of waiting out the 40s deadline, and the refusal shape of the
+	// programmable answer leg is exercised on the composed stack (AC#2: the
+	// same machinery must pass with the leg saying no).
+	h.script = t123script(t, "no t101-corr-1")
 	code, log := h.start(t, nil, func(rt *agentRuntime) {
 		now := time.Now().Unix()
 		var err error
@@ -484,6 +533,12 @@ func TestTicket101SessionGrantDoesNotCrossRestart(t *testing.T) {
 		plainTxt string
 		mode     risk.Mode
 	)
+	// Ticket 123: boot 2 answers the same .env card with the same operator
+	// no, and the control write gets a yes so a machine shape that escalates
+	// it to L2 still reports plainErr == false (the control's job is to prove
+	// the refusal above is not "everything asks anyway"); on the L1 route the
+	// yes is inert and auto_approve silences the write with no card at all.
+	h.script = t123script(t, "no t101-corr-1", "yes t101-corr-2")
 	code, log = h.start(t, nil, func(rt *agentRuntime) {
 		rows, err := rt.store.ListGrantsBySession(ctx, "session-after-restart")
 		if err != nil {

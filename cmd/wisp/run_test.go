@@ -93,6 +93,17 @@ func newRunFixture(t *testing.T, protocol string) *runFixture {
 	cfgPath := filepath.Join(f.dir, configFileName)
 	keyRef := fixtureKeyRef181(t, f.dir, "dpapi:acme", fakeStoreKey)
 	f.keyRef = keyRef
+	// Ticket 123: allowlist every spelling the judge can meet the data dir in.
+	// GitHub windows runners hand TMP out as an 8.3 short path, so a target
+	// the judge reads back expanded can miss a single-spelling allowlist and
+	// take the L2 route - the exact shape of the four runner failures this
+	// ticket owns. Feeding both spellings is fixture-only: no judge or gate
+	// code changes.
+	allowed := t123dirSpellingForms(f.dir)
+	quoted := make([]string, len(allowed))
+	for i, form := range allowed {
+		quoted[i] = fmt.Sprintf("%q", form)
+	}
 	body := fmt.Sprintf(`schema_version = 2
 
 [llm]
@@ -115,8 +126,8 @@ enabled = true
 context_window = 128000
 
 [fs]
-allowed_dirs = [%q]
-`, protocol, f.srv.Base+"/v1", keyRef, filepath.ToSlash(f.dir))
+allowed_dirs = [%s]
+`, protocol, f.srv.Base+"/v1", keyRef, strings.Join(quoted, ", "))
 	if err := os.WriteFile(cfgPath, []byte(body), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -346,7 +357,14 @@ func TestComposedGateBlocksAWriteForTwoSeconds(t *testing.T) {
 	// question when somebody could have opposed it. The attached (silent) reply
 	// stream is what makes this run attended; without it 375's guard refuses the
 	// window before it opens and there is no 2s to measure.
-	f.reply = strings.NewReader("")
+	//
+	// Ticket 123: the stream also carries the case's own answer leg, aimed at
+	// the correlation the gated call below mints. On the L1 route it is inert
+	// (a window is not a queue item, so a yes can never answer one) and the
+	// 2s unopposed block is what the assertions below measure; it only bites
+	// if a machine shape escalates the call to the L2 queue, where the case's
+	// intent - the write executes when the chain permits - must still hold.
+	f.reply = t123script(t, "yes gate-corr")
 	target := filepath.Join(f.dir, "composed-write.txt")
 	var (
 		blocked    time.Duration
