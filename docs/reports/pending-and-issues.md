@@ -31397,3 +31397,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - verdict21 腿（`6d36d06045a246da`）把 build/test 丢后台即结束、**未出裁决表＝未验证**；仅静态链核对（statemachine ok 2.4s；L2 混合→不聚合分支在 `internal/agent/approval/batch.go:36`；decideRisk 死分支仍在 `internal/agent/loop.go:919-924`＝residual#1）。
 - 重派 **verdict21-narrow**：只跑 build(cmd/wisp+approval)、`go test ./internal/agent` 审批族、隔离树 cmd/wisp 卡面貌族（实现者曾 41s 跑完）；单命令 >6 分钟即 kill 报 partial；**裁决必须写在腿最终返回**、⛔ 挂后台即散；门禁/全量 build/vet/d22scan 采信 W21 已记读数。
 - 在飞：wave36(68)、wave37(65 设计)、wave38(350/150 验收)、verdict21-narrow。
+
+## A1579（2026-11-06 18:xx，编排者）W65-design 交卷：球视觉方案成稿（逐像素量）＋与机主核 D36
+- W65-design（`fcfa4d4ed`，docs/evidence/s1/65-style-direction.md 286 行）逐像素采样三图（非目测，4 采样脚本可复跑，v4/v5 否证初版 3 处读数）：
+  - **Glass/Wensity**：球心上方 0.13R 处 FWHM 0.39R 高斯彩虹带（红#C2162F→品红#E649AF→白核→蓝#246BD1→青#48D7E6→橙，冷端上翘0.33R）；顶部白弧高光厚0.04R；边缘非对称折射（仅右下0.97R亮唇#F7FAFF）；暗玻璃体近同背景色，辨识靠带/高光/唇。
+  - **Jarvis**：粒子覆盖 10–15%（44px≈60–120颗），2–3 椭圆轨道（内0.16R/主0.50R/核0.07R），态差=结构差（thinking主环0.67R/alert0.39R），配色=色相（cyan hue≈187°/violet#9F63FF）。
+  - **YouTube 形变**：网格峰-峰≈0.12R，满电平 pp≈0.15R（定 token）。
+- 实现：`config[ball].style`→`ball.SetStyle`→renderer 分支（glass=现有+新 wensity look 默认；jarvis=新 `jarvis_windows.go` 纯 D2D，3 虚线弧+≤128 种子粒子）；token 走 C21 双胞胎机器。**D32 一字不改**：睡眠/静止单帧零定时器、动画只在五授权态复用现有计时器、零新增定时器/线程/WebGL。音频 v1 伪谱3带（不碰 internal/audio），真 FFT5 带 v2。设置 `[ball].style` hot-tier＋面板下拉，C17 白名单不动。
+- **裁定（铁律④）**：②Jarvis 待机不持续转（守静帧、不豁免 D32）；③v1 用伪谱3带。①`[ball].style` 属 D36 契约面（一行 PLAN.md diff 备于文档 §4.2）⇒ **摆机主批**。
+- 旁：wave38 的 **150 非实现者终裁已落**（`48610b495`），350 仍在验；收齐后一并结 150/350。
