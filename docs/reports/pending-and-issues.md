@@ -31411,3 +31411,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W350 verdict**（`cb182e4f2` 非实现者）：7 AC 全 PASS、closeable=YES。编排者翻 7 框＋git mv -done（files=1/done=1/openAC=0）。**done 288→289。** 旁记：实现者证据「41→43」笔误（真基线 35→43=+8）；**AC#4 CI 面裁定 ride-along**（ci.yml 三步数据驱动、ban#10 随车上 CI，不加显式行；机主若要显式行一句话即可）。
 - **W150 verdict**（`48610b495`）：AC#1/#2/#4/#5 PASS ⇒ 已翻 4 框；**AC#3（会响的对账仪器）FAIL 仍开** ⇒ 整票暂不 -done。
 - **裁定 AC#3 落点（铁律②/④）**：取 **ⓑ**＝加一枚「读 SPEC-12 §5 登记表↔代码 DEFERRED 标记双向差集」的自检测试（进 CI、会响、打分母），**不动 d22scan 判据本体/契约文字**（ⓐ 扩 d22scan 属改「禁止形状」清单、需另批，故暂不取）。派 **wave39 W150-ac3** 实现；成后非实现者裁＋翻 AC#3 → 150 -done。撤销口令：撤该测试件即回未检态。
+
+## A1581（2026-11-06 18:xx，编排者）机主批 D36 `[ball].style`；并纠正编排者「明显产品决策别上问」
+- **D36 `[ball].style` 键：机主批「加」**（原话："加，这种问题还问我啊，你得有点产品的思维啊，肯定要加的"）。⇒ 风格切换正式解锁；W65-impl 可落 `[ball].style`＋`SetStyle`＋wensity/jarvis 渲染＋伪谱动效；PLAN.md §4.2 一行键清单 diff 随实现落（已获批）。
+- **教训（记入机主偏好）**：明显该做的产品功能（如风格切换这种"肯定要加"的）⛔ 不该当"待拍板"上问——要有产品思维，自己拍＋告知＋撤销口令即可；只有真正暧昧/涉钱/不可逆的才集中问。今后照此。
+
+## A1582（2026-11-06 18:xx，编排者）收 verdict21b：票21 结案(done290)
+- **verdict21b**（`047bb48d5` 非实现者）：5 AC 全 PASS、closeable=YES；自跑同步门禁全绿（build rc=0 13.3s；`internal/agent/approval` 23 测试 0 FAIL；隔离树 cmd/wisp 42/43 PASS——1 FAIL=预存 375 roster 漂移非本票、1 FAIL=克隆缺 DLL 环境；gofumpt 0）。⇒ 编排者翻 5 框＋git mv -done。**done 289→290。**
+- 残留（不阻结）：①decideRisk 死分支清理（归票 12/162 写面）；②深度角标真窗肉眼签收＝winlive（机主当面看一次悬浮球角标）。
+- 诚实告警记录：1 项预存 375 roster 漂移、1 项克隆 DLL 环境，均非本票。
+- **编排者自查（当场修正）**：票21 AC 勾选格式＝`- [ ] L1 / L2 / Batch / Cancel / State machine`（5 框，非 `**AC#**`）。首刀 `-done` 因按 `**AC#` sed 空翻未勾框；已补 fixup commit 翻 5 个真框（open=0 / checked=5，done 仍 290）。**教训：每次收口前先 `grep -nE "^- \[ \]"` 确认该票真实勾选格式，勿假设 `**AC#**`。**
