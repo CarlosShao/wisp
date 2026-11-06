@@ -31343,3 +31343,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 派 wave34（4 写腿，face 各异，腿内自检在飞）：W21（审批门 seg2，internal/agent/approval＋cmd/wisp 唯一槽）/ W85（lint 尺，ci.yml）/ W200（AI 说明书，docs）/ W226（最后一格销账）。
 - 全池 done=286；网络已恢复，wave33 三提交已推（未推清零）；wave34 起本地继续。
 - owner 清单（23 项）已成形待机主过目，见 census-199.md §4。
+
+## A1571（2026-11-06 17:xx，编排者）机主批复 owner 清单 23 项：A 全批(58 用 StepFun 英文链、60 复用现有凭据→省花钱)＋B 全批＋C 除 macOS 全批
+- **批复**：A(56/58/60)全批；B(211/215/256/345/350/354/174/177/138/150/148)全批；C 除 55(macOS 暂不做) 全批(57/65/68/70/168/170/264/274)。
+- **两项省钱核实（编排者答机主问，铁律④自拍）**：①**58 英文**：`internal/config/defaults.go:34` 已把 stepfun 当一等 provider（OpenAI 兼容 `https://api.stepfun.com/v1`），且 `voice.cloud_asr_chain`/`cloud_tts_chain`/`realtime` 均支持 stepfun 链 ⇒ **英文语音直接用 StepFun 云链，不另买英文模型**。②**60 云端凭据**：配置以 `llm.providers.<p>.APIKeyRef`/provider 行存凭据（面板 settings 保存的即这套）⇒ **60 复用现有 provider 行，不新增凭据/花钱**。
+- **Q 全部解扣**：Q-43、Q-49、Q-51、Q-52、Q-53、Q-54、Q-55、Q-59、Q-60、Q-61、Q-62、Q-63、Q-77 均获机主批复 ⇒ 解锁 138/148/150/170/174/177/211/215/256/345/350/354 ＋ 56/57/58/60/65/68/70/168/264/274。
+- 仍需机主侧料（非编队即刻可做）：56 SignPath 资质开户、65 球玻璃参考图、68 R15#3/#4/#5 三个签收答案；票 55 macOS 暂不做。
+- 契约类改动（211 D38d / 215 D36 / 256 C18 / 174 [fs] allowed_dirs / 168 C17C24 / 350 门禁 / 354 拍形 / 177 选支）按本次批复执行，改契约文字那步照批。
+- **wave34**：W85(`23b8fa25d`)、W200(`a6861da41`)、W226(`92d5a33d1`) 三腿已落；W21(审批门)仍在跑。
+- **派 wave35**（3 写腿，避 cmd/wisp[W21在跑]/agent/panel/tools 面）：W350(tools/d22scan 词表门禁) / W345(internal/config 迁移移出读路径) / W150(SPEC-12 §5 补 4 枚 DEFERRED 登记行，纯文档)。
