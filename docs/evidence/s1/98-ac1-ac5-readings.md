@@ -3,13 +3,13 @@
 **票**：`.scratch/wisp/issues/98-cmd-wisp-tests-never-run-on-this-host.md`
 **Status**：**实现证据，不是裁决表**。票面写死裁决表由验收方出；台账 `docs/reports/pending-and-issues.md` 归编排者（本腿一字未碰，AC#4 交付的是**收敛内容文本**，见 §6）。
 **树**：派单锚 `abf2a35a6`；本腿读数时主树 HEAD `8879c3d7b1`（`A1567收wave30`）。主树裸读数与门禁 @`8879c3d7b1`；隔离普查 clone pin `8879c3d7b1fcf670d89766cde1fb777bb2423bb8`（`/d/tmp/98-leg/census-20261106-122916`，`git clone --shared`，起手 `git status --porcelain` 空＝0）。
-**时间**：2026-11-06 12:15–12:5x +08。
+**时间**：2026-11-06 12:15–13:0x +08（普查窗 12:33:00–12:52:31）。
 **环境**：本机 Git Bash；`unset GOTMPDIR TMPDIR TEMP TMP`；`CGO_ENABLED` 保持默认 **1**（从未设 0）；PATH 注入只用派单给的 `$PWD/build:$PWD/third_party/sherpa-onnx`。
 **写面**：**仅本文件**。`scripts/**` 零改动——AC#3 已由 `4a682f698` 落地（守卫在 `scripts/wisp-cli-tests.sh:222-315`），AC#2 的 documented 命令已住在同脚本头部与票面 09-28 追加，本腿没有要补的脚本缺口，不做无收益动作。票面（`.scratch/wisp/issues/98-*.md`）未动，Progress log 收敛由编排者执行。
 
 ## 0. 一句话
 
-四件事：① **AC#1(i)(ii) 在当前树上重新实测**（裸命令红＝`0xc0000135`、0 条测试；加载器逐字点名 `sherpa-onnx-c-api.dll`；分母＝489 条可跑用例/156 枚测试文件）；② **AC#1(iii)** file:line 已在（`ci.yml:886/:906`），**真 run 步级结论＝E 尾，具名留档不冒充**；③ **AC#4** 收敛内容文本（§6，给编排者的笔）；④ **AC#5** 门禁全 rc 干净 ＋ 全仓**首次** `go test -count=2 ./cmd/wisp/` 全量普查（读数在飞，跟后提交补）。另有一个**不属于本票的意外发现**（§7）：**HEAD 纯净态编译不出 `go test ./cmd/wisp/`**——sweeper `abf2a35a6` 提交了引用、没提交定义，属于第 21 处的镜像形状，登记不追。
+四件事：① **AC#1(i)(ii) 在当前树上重新实测**（裸命令红＝`0xc0000135`、0 条测试；加载器逐字点名 `sherpa-onnx-c-api.dll`；分母＝489 条可跑用例/156 枚测试文件）；② **AC#1(iii)** file:line 已在（`ci.yml:886/:906`），**真 run 步级结论＝E 尾，具名留档不冒充**；③ **AC#4** 收敛内容文本（§6，给编排者的笔）；④ **AC#5** 门禁全 rc 干净 ＋ 全仓**首次** `go test -count=2 ./cmd/wisp/` 全量普查：**PASS=874 FAIL=96 SKIP=8（count=2，每轮 437/48/4，489×2=978 逐行对账），rc=1（真红非加载失败），守卫行 0 次**（§8.1）。另有一个**不属于本票的意外发现**（§7）：**HEAD 纯净态编译不出 `go test ./cmd/wisp/`**——sweeper `abf2a35a6` 提交了引用、没提交定义，属于第 21 处的镜像形状，登记不追。
 
 ## 1. AC#1(i) — 裸命令本机原文（@`8879c3d7b1`，无 PATH 注入，实测）
 
@@ -55,11 +55,11 @@ Documented 命令（两形，都已是在册文档，非本腿新造）：
 1. 一行式（票面 09-28 追加逐字）：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./cmd/wisp/`
 2. 脚本式（守卫全开、CI 同款）：`bash scripts/wisp-cli-tests.sh`
 
-真实读数：注入后 489 条用例可启动（§2）；在册 runtest 读数引前腿——票 111 树 `PASS=33 FAIL=0 SKIP=0`（脚本头 `:20-21`）、`ff61b9dbc` 树 `PASS=358 FAIL=41 SKIP=1, RUN=498, rc=1`（`98-load-guard.md` §2.2，红因在册属各票）。本腿补上**全仓首次 count=2 全量普查**（AC#5 口径）：在飞，读数跟后提交补（§8）。
+真实读数：注入后 489 条用例可启动（§2）；在册 runtest 读数引前腿——票 111 树 `PASS=33 FAIL=0 SKIP=0`（脚本头 `:20-21`）、`ff61b9dbc` 树 `PASS=358 FAIL=41 SKIP=1, RUN=498, rc=1`（`98-load-guard.md` §2.2，红因在册属各票）。本腿补上**全仓首次 count=2 全量普查**（AC#5 口径）：`PASS=874 FAIL=96 SKIP=8`，rc=1，逐行对账 489×2（§8.1）。
 
 ## 5. AC#3 — 已落地（本腿零新代码）
 
-`4a682f698`（A1551 在册）交付 PATH 可达性守卫＋加载失败兜底；本腿以普查日志做正控：**守卫行必须 0 次**（读数跟后提交补，`grep -c 'ticket 98 AC#3' census2.log`）。
+`4a682f698`（A1551 在册）交付 PATH 可达性守卫＋加载失败兜底；本腿以普查日志做正控：**守卫行实测 0 次**（`grep -c 'ticket 98 AC#3'` = **0**）——19m31s 的真红跑里守卫没被误触发，也没把真红改色。
 
 ## 6. AC#4 — 收敛内容（给编排者的笔；本腿不写台账、不改票面）
 
@@ -93,14 +93,28 @@ Documented 命令（两形，都已是在册文档，非本腿新造）：
 | `go build ./cmd/... ./internal/... ./tools/...` | clone（tracked HEAD `8879c3d7b1`） | **rc=0** |
 | `gofumpt -l cmd internal tools scripts` | clone（tracked HEAD） | **空**（rc=0，0 行输出） |
 | `go vet ./cmd/wisp/` | clone（HEAD＋§7 五枚具名在飞文件） | **rc=0** |
-| `go test -count=2 -timeout 45m -v ./cmd/wisp/` 全量普查 | clone（同上口径） | **在飞**，读数跟后提交补 |
-| `sh scripts/d22scan.sh` | 主树 @`8879c3d7b1` | 收尾前跑，读数跟后提交补 |
+| `go test -count=2 -timeout 45m -v ./cmd/wisp/` 全量普查 | clone（同上口径） | **PASS=874 FAIL=96 SKIP=8, RUN=1288**, pkg `FAIL … 1166.026s`, **rc=1**；对账 `489×2=978`＝874+96+8；唯一 FAIL 名 **52**（两轮皆红 **44**＝确定性红、单轮红 **8**＝窗口/焦点时序类），唯一 SKIP 名 **4**（全部具名非静默，见 §8.1） |
+| `sh scripts/d22scan.sh` | 主树 @`8879c3d7b1` | **rc=0**，尾行 `clean - no D22 ban violations`（live scope: internal/=363, cmd/=58, frontend/=116, design/=39, internal/tools/=48） |
 | 裸 `go test ./cmd/wisp/`（无注入） | 主树 @`8879c3d7b1` | rc=1 `0xc0000135`、0 用例——这是票 98 钉的形状本身，**不是门禁红** |
+
+### 8.1 count=2 普查读数（本腿现跑，全仓首次全量 count=2；2026-11-06 12:33:00–12:52:31 +08，19m31s）
+
+```
+census_rc=1
+PASS=874 FAIL=96 SKIP=8 RUN=1288
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1166.026s
+guard 行（'ticket 98 AC#3'）：0 次
+```
+
+- **对账**：每轮结果行 = 437 PASS + 48 FAIL + 4 SKIP = **489** ＝ §2 的 `-test.list` 分母，两轮 978 行分毫不差（count=2 无首轮/次轮分母漂移）。
+- **确定性红（两轮皆红）44 枚**，占 FAIL 名单的绝大多数；**单轮红 8 枚**：`TestPanelThreadIsSTAAndExitsCleanly`、`TestBallPanelGesturesReachThePanelThread`、`TestAC4PriorFocusSurvivesARefusedPanelSample`、`TestPanelHostRealWindowHopAndLifecycle`、`TestAC4FocusReturnToPriorWindowGap33r5`（5/15s 级窗口/焦点时序类）、`TestAC14AwaitedBindingReplyReachesThePage`/`TestAC14GoSideEvalPushReachesThePage`、`TestAC1ResidentLegInstallsItsLogListenerOnDisk`、`Test253r6TheSilentDropBranchIsLoud`。
+- **SKIP 4 枚（每轮同 4，全部具名非静默）**：`TestPanelPageFetchesItsOwnAssets299`（embed 无入口，票 33 r5 记录）、`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`（同上）、`TestAC247LiveMicrophoneLevelsReachTheBallSeam`（**真麦克风**，`WISP_LIVE_MIC=1` 才跑，`resident_audio_247_live_windows_test.go:130`）、`Test16r1PremortemMicPermissionDeniedLiveProbe`。无一枚是"加载失败被当 SKIP"。
+- **归属**：红全部是**真红**（有 `--- FAIL`），不是票 98 的加载形；逐枚归票＝各用例所在票（同 `98-attribution.md` §5 的口径），本腿不替他们裁。44 枚确定性红与 `98-load-guard.md` §2.2 的 41 枚 @`ff61b9dbc` 同族（树间 ±，以本读数为准）。
 
 ## 9. 本件没有建立的事（宁缺毋造）
 
 - **无 CI run id**（AC#1(iii) 后半＝E 尾，§3）；**未跑 gh**（等窗口，编排者面）。
-- count=2 普查在飞时本件先落盘，读数**只跟后提交**，绝无预填。
+- count=2 普查读数**只跟后提交**（先落盘时在飞，终值见 §8.1），绝无预填；-count=2 的单轮红（8 枚）已按两轮差分点名，未判 flaky 归因（那归各用例所在票）。
 - 未做 ubuntu 重普查（`ae8136261` 后余 40 枚归属不主张）；windows 侧 FAIL 未逐枚归票（ubuntu 侧点名已档案化，windows 侧只给计数与名字清单）。
 - 台账、票面、`scripts/**`、任何 Go 包：一字未动。
 
