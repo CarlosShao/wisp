@@ -769,7 +769,9 @@ jobs:
 
   # -------------------------------------------------------- test-windows ----
   # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
-  # PathResolver junction placeholder (real cases land with tickets 18/20).
+  # PathResolver junction real case (tickets 18/20; the stale "placeholder"
+  # wording was retired by ticket 85 AC#4 - the case is real and first-green,
+  # its wiring was landed by tickets 72/75).
   #
   # EVERY STEP BELOW THE SETUP ONES CARRIES `if: ${{ !cancelled() }}` (ticket 111
   # AC#6). Read this before touching it, because the shape looks like a relaxation
@@ -1090,7 +1092,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: bash scripts/portable-tests.sh --scope=windows
 
-      - name: "PathResolver junction placeholder (real cases tickets 18/20)"
+      - name: "PathResolver junction real case (tickets 18/20; wiring first-green tickets 72/75)"
         # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
         # pathresolver_junction_windows_test.go, so on any runner where the name or
         # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
