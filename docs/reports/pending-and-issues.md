@@ -31371,3 +31371,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W226**（`92d5a33d1`）：AC#5 归口②＝票 219 答复语法面，零产码停；closeable=否，等 219。
 - 新基线漂移登记（非本批责任）：256 花名册应 7 字段（归 375 尾）、247 prototypeVisuals 断言（W68 处理中）、`internal/risk` 涨 5 条（归 334/394→票 122）。
 - 待办：21 待非实现者裁决；219/224 解锁 226 撤销动词；下一波派 219、verdict21、及 A 桶余票（57/163/176/192/264/148/170/168/70/58/60 等）。
+
+## A1575（2026-11-06 18:xx，编排者）机主选球风格：可换风格（默认简洁玻璃球 Wensity／可选 Jarvis 粒子球）＋活跃态音频频谱动效借 #3
+- 机主评审 5 组参考：留 **#1 Wensity 简洁玻璃球**（形态好、疑无音频波纹）、**#3 YouTube 3D audio visualizer**（频谱形变动效很 OK）、**#5 Jarvis 粒子球**（最帅）；弃 #2（未见实机效果）、#4（太教学化）。
+- **编排者拍板（铁律②/④）**：做**风格可切换**——默认「简洁玻璃球」（Wensity 深色玻璃＋水平彩色光带，适合常驻小悬浮球）；可选「Jarvis 粒子球」（青色粒子环，含 idle/thinking/success/alert 态与自定义配色）；两风格**活跃态（在听/在说/在思考）动效统一吃 #3 的音频频谱驱动**（声波起伏/网格形变）。理由：最有价值（好看+个性+可选+听声起伏），最符合主流（Siri/ChatGPT 球皆音频驱动）。
+- **D32 守死**：睡眠/静止＝静态帧零定时器；动画只在活跃态跑、复用现有计时器，绝不常驻 WebGL/RAF；≤0.5% cpu、≤25MB、44px。
+- 参考图 3 张已存 `.scratch/wisp/probes/65/refs/`（wensity-siri-orb / youtube-audio-visualizer / jarvis-orb .png；不落 design/ 因 frontend/design 归外部 agent）。
+- 派 **W65-design**（只读分析+证据，面 docs/evidence，不碰 internal/ball——W68 在跑）：3 图量化成属性表＋两风格实现方案＋音频驱动映射＋D32 合规，落 `65-style-direction.md`。实现 **W65-impl 待 W68 收口后另派**。
+- 备注：加「球外观」设置项触及 config/panel 字段，属机主明确要求的配置新增，按批准办（若确属 D36 契约面则登记）。
