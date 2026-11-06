@@ -31379,3 +31379,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 参考图 3 张已存 `.scratch/wisp/probes/65/refs/`（wensity-siri-orb / youtube-audio-visualizer / jarvis-orb .png；不落 design/ 因 frontend/design 归外部 agent）。
 - 派 **W65-design**（只读分析+证据，面 docs/evidence，不碰 internal/ball——W68 在跑）：3 图量化成属性表＋两风格实现方案＋音频驱动映射＋D32 合规，落 `65-style-direction.md`。实现 **W65-impl 待 W68 收口后另派**。
 - 备注：加「球外观」设置项触及 config/panel 字段，属机主明确要求的配置新增，按批准办（若确属 D36 契约面则登记）。
+
+## A1576（2026-11-06 18:xx，编排者）机主确认球方向「就这么做」＋wave35 W350 落地
+- 机主确认 A1575 方向（默认简洁玻璃球＋可选 Jarvis＋活跃态音频频谱动效）＝**就这么做**。W65-design（wave37）在跑出方案。
+- **W350**（wave35，`747a38edc`+`58d86064a`）：有界词表门禁落地（tools/d22scan）；待收 W345/W150。
+- 派 **verdict21**（非实现者验收票 21 segment-2，隔离跑 cmd/wisp 避 323 在飞件，判 closeable）。
+- 在飞：wave35(345/150)、wave36(68)、wave37(65 设计)、verdict21。
