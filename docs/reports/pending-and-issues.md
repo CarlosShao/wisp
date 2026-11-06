@@ -31432,3 +31432,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W68b（68-r2）PASS**（`4592c76a5` 码＋`bca0990f8` 证据）：(a)settling→0.95；(b)dock→本体 42%（drawGlass 吃 DockSquash）；(c)hit 已在场零改；(d)默认翻转已在场零改；(e)断言迁移＋地雷已同 commit。**但 68 AC#2「默认值翻转(需桌面复测)」/AC#3「签收面复测(需桌面)」两格都要真桌面** ⇒ 68 保持开、列**机主真机签收待办**（fleet 侧码已就绪）。
 - 派 **wave41**：W65-impl-glass（internal/ball：wensity 玻璃量化落地＋`[ball].style` config/SetStyle＋伪谱3带音频驱动＋token；D36 PLAN 一行已批 A1581）＋ verdict68（非实现者复核 W68b 码＋非桌面门禁，列桌面待跑命令）。
 - 派 **wave42**：148（写腿，起手三核，若"panel 契约未写"未定义即停）＋ 264-ac0/274-ac0（先清数分析腿）。**写面据实**：A 桶余票多为「先清数/归口/未定义即停」型（176 等 175、168 等 50/51、192 撞未定义 web.search、264 明令本轮不派写腿），纯写腿变稀，故本波 1 写＋2 清数。
+
+## A1585（2026-11-06 19:xx，编排者）收 verdict68：代码半格 PASS；68 只剩「机主真桌面 8 步」＋机主重申 style 已批
+- **68-code-verdict**（`199ab3def` 非实现者）：AC#1/AC#4 PASS；AC#2 的代码在静态＋非桌面射程内**正确**（settlingAlpha 合成 0.95 闭环、dockOrbRadius=17 用态本体、drawGlass 吃 DockSquash 42%、逃生门在场）；**0.95/42% 两数未经桌面像素证实**；AC#3 未跑、维持 blocked-on-owner。
+- **机主真桌面必跑 8 步**（票面 72–85 逐字，见 `docs/evidence/s1/68-code-verdict.md` §4）：前置＝桌面空出＋缩放 100%；①`tasklist` 无 wisp/balldebug；②`go build -o build/balldebug.exe ./cmd/balldebug`；③`-diff build/t68-flip -diff-states Sleeping,Listening,Thinking,Acting,Speaking,Warm,Settling -diff-sample 5s -diff-dock right`；④`-frozen` 对照（非可选）；⑤`-state Sleeping -hold` 看 `timers=false`/句柄≤600；⑥`go test -tags winlive -count=2 -v ./internal/ball/`；⑦重跑 AC#4 四道门。**此 8 步＝68 结案唯一剩余**。
+- **机主重申（`style` 配置）**："要啊，我不都批了吗，要，配置要加style" ⇒ A1581 批准有效、W65glass（wave41）正在落地 `[ball].style`；⛔ 再就此上问。
+- **A1584 已推**（`86fb145ee`）＋ wave42 三笔（`72cdb5f87` 148 STOP、`199ab3def` 68 verdict、`77d114b00` 264 ac0）已推，未推=0。
