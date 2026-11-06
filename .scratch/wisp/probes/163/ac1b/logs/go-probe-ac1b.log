@@ -1,0 +1,7 @@
+# 163/ac1b go-probe 现量（go run，真包真注册表，形状照 cmd/wisp/run.go:624-1082 今日装配）
+## 注册表实名册（21 枚）: clipboard.read(L0) clipboard.write(L1) fs.edit(L2) fs.list(L0) fs.move(L1) fs.read(L0) fs.trash(L1) fs.write(L1) input.type(L2) media.control(L1) plan.present(L2) screen.capture(L1) system.get(L0) system.power(L2) system.set(L1) task.cancel(L1) task.output(L0) task.spawn(L0) window.focus(L1) window.list(L0) window.manage(L1)
+## Lookup("shell.exec") => registered=false
+## Lookup("shell.session") => registered=false
+## Lookup("task.output") => registered=true（对照组）
+## IsSensitiveSource(shell.exec)=false IsSensitiveSource(shell.session)=false IsSensitiveSource(fs.read)=true IsSensitiveSource(task.output)=true
+# 台件结束
