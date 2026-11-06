@@ -167,6 +167,18 @@ func heldProvider(started chan struct{}, release chan struct{}) func() llm.LlmPr
 // AC#1 / AC#2 - the registration itself, at the level D34 froze
 // ---------------------------------------------------------------------------
 
+// 票 271 甲形（A648 重开）：下方 :184 那把枚数尺是刻意哨兵，不是 bug。它数的是
+// "task 这一家注册了几枚"，所以哪天合法地注册第三枚 task 工具，它也会红——红是
+// 设计内的：枚数警报是全仓唯一接得住"家族变大"的传感器（271-a1 普查 §1），而
+// 236r3 的名集钉（tasklist_deferred_236r3_teeth_test.go）只按名字认 task.list，
+// 其他任何名字的误注册都从它手下绿着过去。响了之后的工序：
+//  1. 先分清你是哪种红：注册了 task.list => 真伤，找 236r3 那枚名集钉；
+//     注册了别的第三枚 => 先确认那枚工具的票是真的，然后回票 271 重选形
+//     （甲＝保留哨兵＋本段说明书；乙＝改成按名集判，须具名解冻落台账），
+//     ⛔ 不许就地把 != 2 放宽成任何变绿形状（票 271 AC#2）。
+//  2. 哨兵的红/假红实测在 taskfamily_roster_271_tripwire_test.go：B-3 台件
+//     （注册无关 task.note，overlay）下哨兵红而名集钉绿——即本段描述的形状，
+//     该文件每次跑套件都会重证一遍。
 func Test221TaskCancelIsRegisteredAtItsFrozenLevel(t *testing.T) {
 	entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
 	names := make([]string, 0, len(entries))
@@ -181,7 +193,9 @@ func Test221TaskCancelIsRegisteredAtItsFrozenLevel(t *testing.T) {
 		t.Fatalf("BuiltinTaskEntries 没注册 task.cancel（现名册：%v）—— 说明书又在许诺一枚不存在的工具", names)
 	}
 	if len(names) != 2 {
-		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它；"+
+			"票 271 甲形：这把枚数尺是刻意哨兵，合法第三枚也会红——响了先读本测试上方的工序注释，"+
+			"回票 271 重选形，不许就地放宽变绿）", len(names), names)
 	}
 	decl := cancelEntry.Decl
 	if decl.Declared != risk.L1 {
