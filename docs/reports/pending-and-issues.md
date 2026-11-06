@@ -31304,3 +31304,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - probe2（magpie/cline-pass）仍 null（第 2 goal 轮）。停派维持。
 - 扫 112 张 open 票「框全勾未 -done」仅 2 枚：311（票自陈六格齐但仍⛔ -done、3 笔残余）、239（票自陈不结案、残余 2 枚＋实现者=编排者须他腿裁）——均自 declared 陷阱，不碰。
 - 结论：无子代理时无安全可自结票；等机主 ClinePass 余额/网关 or 授权默认模型。
+
+## A1566（2026-11-06 10:xx，编排者）收 wave29（GLM 路由恢复后首批）：185/136/140 三腿全 PASS，3 笔已推
+- 路由切换（机主 2026-11-06 令）：ClinePass 周额度耗尽，子代理改 GLM 5.3 Flash 路由组（provider=magpie, model=auto/glm-5.3-flash）；探针 BACK4 正常；goal 模型段＋global AGENTS.md 铁律3 已同步改；外网恢复、未推补推清零。
+- 185（b7157ac19）PASS：**先测更正**——"缺陷在主线上"在 HEAD 为假；修法本体在、生产路径零 commit 变化；用 -overlay 摘名册跳取 HEAD-first red（risk4红+tools6红，与185-r2同名单），HEAD 全绿。落 internal/tools/pointer_185_reread_chain_test.go（续读链判据：12+1发全L0、逐字节、mark14分毫）+ 185-r3-head-criterion.md。AC#2 裁定 C25 声明"两边都不给"、只归 task.output（fs.read 由 risk hostMintedPathFor 派生）。⇒ 待非实现者 verdict 翻 AC#1/#7。
+- 136（001b516ce）PASS：AC#5 取"明写不查"路（slo-freshness.sh 注释+票面>块；d22scan 补 ban 未做=另派须解冻）；AC#6 票面前提被现量推翻——142枚 schedule run、45/45天每日≥2⇒"每日≥1"零改动已满足。⇒ 待非实现者 verdict 翻 AC#5/#6。
+- 140（edab04ab6）PASS(measure)+STOP：AC#1两形真跑读数（四包 env归因换色=0；cmd/wisp 489枚 44/45红全机器形状非WISP_ENV）；裁形主支(b)保env用例自钉+(c)三笔具名登记+补dev断言step（属ci.yml改动须先登记）。⇒ 未结，待登记决策。
