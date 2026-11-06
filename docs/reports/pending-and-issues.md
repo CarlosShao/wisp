@@ -31385,3 +31385,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W350**（wave35，`747a38edc`+`58d86064a`）：有界词表门禁落地（tools/d22scan）；待收 W345/W150。
 - 派 **verdict21**（非实现者验收票 21 segment-2，隔离跑 cmd/wisp 避 323 在飞件，判 closeable）。
 - 在飞：wave35(345/150)、wave36(68)、wave37(65 设计)、verdict21。
+
+## A1577（2026-11-06 18:xx，编排者）收 wave35：345 结案(done288)＋150 拉回主树＋350 PASS
+- **W345 重复派单教训**：票 345 早由 `2d3ad35e9`（11-02）实现，wave35 直派属陈旧分诊；345-v2 非实现者终裁 7/7 PASS（`ad88bee3e`）⇒ 编排者翻 7 框＋git mv 成 -done（files=1/done=1/open=0）。**全池 done 287→288。**
+- **W350**（`747a38edc`/`58d86064a`）：ban#10 phantom-symbol 词表门禁落地（tools/d22scan），四门全绿＋双向牙；PASS，待非实现者裁＋AC#4(接 CI step 摆机主)。
+- **W150**（`2ea6aa0fc` 已 fetch cherry-pick 回主树）：SPEC-12 §5 补 4 枚 DEFERRED 登记行（D28-1×3、D11-3×1），两向 diff 空；待非实现者裁＋AC#3(CI 仪器)缺口具名。
+- 机器卫生项（可选）：System32 旧 `onnxruntime.dll` 1.17.1 遮蔽致本机语音测试红，清则本地绿、不影响 CI。
+- 派 **wave38**：verdict350＋verdict150（非实现者裁，落 docs/evidence，不碰产码/票面）。
