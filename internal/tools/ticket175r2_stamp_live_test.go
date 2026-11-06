@@ -343,6 +343,13 @@ var classified175r2 = map[string]string{
 	// itself filed - no outside body flows back through it. ⚠ This line is the
 	// census being answered, not loosened: delete it and the leg goes red again.
 	"task.cancel": "unstamped: a receipt naming which roster row this call stopped",
+	// Ticket 47 AC#6 registers task.list: its reply is the scheduler's own
+	// rows - ids, labels and D43 states the host composed. A wait reason can
+	// quote a PATH (「在等 <task> 释放 <path>」), but it quotes a path the
+	// host's own conflict detector already judged through C26; no foreign
+	// body flows back through the list. ⚠ Same census rule: delete this line
+	// and the leg goes red again.
+	"task.list":   "unstamped: the scheduler's own row table, no foreign body",
 	"task.output": "marked: C25 roster since ticket 175-r2, its answer is what a task printed",
 }
 

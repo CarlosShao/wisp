@@ -4,21 +4,24 @@ package tools
 // not word counts - and measured today it has no teeth.
 //
 // What this file puts on trial is one thing only: whether the instrument can
-// tell a true claim from a false one. The claim itself (task.list is DEFERRED,
-// PLAN.md §7 :1531 / D34; ticket 236 must not register it) is NOT re-decided
-// here, and the marker <-> SPEC-12 §5 two-way reconciliation is ticket 225's,
-// not this file's. 票面 AC#2 逐字：「225 管『标记与 SPEC-12 §5 双向对账』，
-// 本格只管这把尺本身有没有牙」。
+// tell a true claim from a false one. The claim itself is owned by whichever
+// ticket owns the capability: at this file's landing, ticket 47 AC#6 has
+// REGISTERED task.list with a real implementation (its done-criterion is
+// PLAN.md:1537's registry row), and the marker/wiring same-landing rule
+// (ruling A434's shape, applied to the second half of the same D34 row) put
+// the registration, the implementation and THIS nail's flip in one commit.
+// The marker <-> SPEC-12 §5 two-way reconciliation is ticket 225's, not this
+// file's; 票面 AC#2 逐字：「225 管『标记与 SPEC-12 §5 双向对账』，本格只管
+// 这把尺本身有没有牙」.
 //
 // ---------------------------------------------------------------------------
-// The ruler on trial, and the two reasons its (b) branch is toothless
+// The ruler on trial, and the two reasons its (b) branch was toothless
 // ---------------------------------------------------------------------------
 //
-// Carrier being measured: task_cancel_221_legs_test.go:223-247,
+// Carrier being measured: task_cancel_221_legs_test.go,
 // Test221DeferredMarkerForCancelLiftedButListStillMarked. It does
-// os.ReadFile("task.go") (:224) and counts lines containing "DEFERRED",
+// os.ReadFile("task.go") and counts lines containing "DEFERRED",
 // branching on whether the same line also names task.cancel (a) or task.list (b).
-// The (b) branch is :244-246 (listMarked == 0 -> Errorf).
 //
 //  1. The count is propped by a narrative sentence, so it cannot fall to 0 for
 //     the reason it claims. Measured at 交件 §1: `grep -n DEFERRED task.go` = 3
@@ -144,21 +147,25 @@ func registeredTaskNames236r3(t *testing.T) []string {
 
 // Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment is the AC#2 nail.
 // Two name-set claims, both about capability, both reachable by -overlay:
-// task.list must NOT be in the roster, and the two rows that have
-// implementations must be. Deliberately NOT a count, so a legitimately
-// approved third task tool cannot false-red (交件 §3 M-2c measures that pair).
+// task.list MUST be in the roster (ticket 47 landed it - the nail flipped
+// with that landing in the same commit, the marker/wiring rule A434 set),
+// and the other two rows that have implementations must still be. The
+// negative half is NOT dropped: ticket 271's count tripwire still counts the
+// family, and the 271 B-3 positive control in this package proves the pair's
+// teeth on every run. Deliberately still NOT a count.
 func Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment(t *testing.T) {
 	names := registeredTaskNames236r3(t)
 
+	var sawList bool
 	for _, n := range names {
 		if n == "task.list" {
-			t.Errorf("DEFERRED 那一支和名册分叉了：BuiltinTaskEntries 的注册名册里出现了 task.list 这一行"+
-				"（现名册：%s）。§7 :1531 与 D34 都还把它记成 DEFERRED，「在册＋无实现＋无人认领」正是票 164 "+
-				"AC#1 要杀的那一形；真要解冻得由人工批准、标记与接线同批核销（A434 批准范围 item 7），"+
-				"而不是留下一行注释替一枚已注册的工具说它还不可用。"+
-				"这一枚就是 AC#2 要的牙：读注释那把尺在同一发突变下照旧全绿（交件 §3 M-2b）。",
-				strings.Join(names, " / "))
+			sawList = true
 		}
+	}
+	if !sawList {
+		t.Errorf("票 47 把 task.list 接进名册，而现在的注册名册里没有它（现名册：%s）。"+
+			"「在册＋有实现＋接了线」是这个格子此轮要落成的形状：这条尺从「不许在册」翻成「必须在册」"+
+			"就是那个落成的盘上读数——标记、接线与本枚钉同一发核销（A434 同规）。", strings.Join(names, " / "))
 	}
 
 	var sawOutput, sawCancel bool

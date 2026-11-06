@@ -62,6 +62,11 @@ var spawn229ReviewedSites = map[string]string{
 	`cmd/wisp/resident_task_source_windows.go|taskSourceConsoleGoroutine`:                "approval-waiter：per_task",
 	`cmd/wisp/resident_task_source_windows.go|taskSourceGoroutinePrefix+fmt.Sprint(seq)`: "agent-task-resident-<n>：per_task 前缀族",
 	`internal/tools/subagent_197.go|"agent-task-"+bg.ID`:                                 "per_task：票 229 修法后的子代理收尾协程（bg.ID 是孩子任务 id）",
+	// ticket 47 AC#1: the TaskScheduler's task root goroutine. t.id is the
+	// scheduler-minted task id, so the runtime name lands in the frozen
+	// per_task prefix family (agent-task-<id>, D38b), same shape as the
+	// loop's own RunAsync above.
+	`internal/agent/scheduler/scheduler.go|"agent-task-"+t.id`: "per_task：票 47 调度器的任务根协程（t.id 是调度器任务 id，落 agent-task- 前缀族）",
 	// ticket 31-r1: reminder-timer is NOT in D38b roster; CategoryUnknown.
 	// Option (a) extend D38b (改契约＝owner), option (b) leave as Unknown until owner decides.
 	// We take (b) now, with documented rationale at agent/reminder_timer.go line comment.

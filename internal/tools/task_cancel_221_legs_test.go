@@ -167,15 +167,15 @@ func heldProvider(started chan struct{}, release chan struct{}) func() llm.LlmPr
 // AC#1 / AC#2 - the registration itself, at the level D34 froze
 // ---------------------------------------------------------------------------
 
-// 票 271 甲形（A648 重开）：下方 :184 那把枚数尺是刻意哨兵，不是 bug。它数的是
-// "task 这一家注册了几枚"，所以哪天合法地注册第三枚 task 工具，它也会红——红是
-// 设计内的：枚数警报是全仓唯一接得住"家族变大"的传感器（271-a1 普查 §1），而
-// 236r3 的名集钉（tasklist_deferred_236r3_teeth_test.go）只按名字认 task.list，
-// 其他任何名字的误注册都从它手下绿着过去。响了之后的工序：
-//  1. 先分清你是哪种红：注册了 task.list => 真伤，找 236r3 那枚名集钉；
-//     注册了别的第三枚 => 先确认那枚工具的票是真的，然后回票 271 重选形
+// 票 271 甲形（A648 重开；票 47 合法第三枚落地时按其工序更到 3）：下方那把枚数尺
+// 是刻意哨兵，不是 bug。它数的是"task 这一家注册了几枚"，所以哪天合法地注册第四枚
+// task 工具，它也会红——红是设计内的：枚数警报是全仓唯一接得住"家族变大"的传感器
+// （271-a1 普查 §1），而 236r3 的名集钉（tasklist_deferred_236r3_teeth_test.go）
+// 只按名字认 task.list，其他任何名字的误注册都从它手下绿着过去。响了之后的工序：
+//  1. 先分清你是哪种红：注册了 task.list 已是历史（票 47，已核销）；注册了别的第四枚
+//     => 先确认那枚工具的票是真的，然后回票 271 重选形
 //     （甲＝保留哨兵＋本段说明书；乙＝改成按名集判，须具名解冻落台账），
-//     ⛔ 不许就地把 != 2 放宽成任何变绿形状（票 271 AC#2）。
+//     ⛔ 不许就地把 != 3 放宽成任何变绿形状（票 271 AC#2）。
 //  2. 哨兵的红/假红实测在 taskfamily_roster_271_tripwire_test.go：B-3 台件
 //     （注册无关 task.note，overlay）下哨兵红而名集钉绿——即本段描述的形状，
 //     该文件每次跑套件都会重证一遍。
@@ -192,10 +192,10 @@ func Test221TaskCancelIsRegisteredAtItsFrozenLevel(t *testing.T) {
 	if cancelEntry == nil {
 		t.Fatalf("BuiltinTaskEntries 没注册 task.cancel（现名册：%v）—— 说明书又在许诺一枚不存在的工具", names)
 	}
-	if len(names) != 2 {
-		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它；"+
-			"票 271 甲形：这把枚数尺是刻意哨兵，合法第三枚也会红——响了先读本测试上方的工序注释，"+
-			"回票 271 重选形，不许就地放宽变绿）", len(names), names)
+	if len(names) != 3 {
+		t.Errorf("task 家族注册了 %d 枚：%v（票 47 AC#6 落地了合法的第三枚 task.list；"+
+			"票 271 甲形的工序已走：这把枚数尺随那次合法落地一起从 2 更到 3，不是就地放宽——"+
+			"再变时先读 taskfamily_roster_271_tripwire_test.go 的说明书）", len(names), names)
 	}
 	decl := cancelEntry.Decl
 	if decl.Declared != risk.L1 {
@@ -229,11 +229,13 @@ func Test221TaskCancelIsRegisteredAtItsFrozenLevel(t *testing.T) {
 }
 
 // Test221DeferredMarkerForCancelLiftedButListStillMarked is AC#4 in the rewritten
-// form (票面 ⑤: this ticket does NOT claim a two-way 1:1 with SPEC-12 §5, whose
-// instrument is ticket 225's and which carries no task.* row at all). What it
-// claims is its own marker: (a) task.cancel's DEFERRED line is lifted, (b) lifted
-// in the same landing as the wiring - which this file proves by asserting the
-// wiring and the marker in one leg - and task.list's line is untouched.
+// form (票面 ⑤). Both halves of the D34 pair are registered with real
+// implementations now - task.cancel since this ticket (A434), task.list since
+// ticket 47 (PLAN.md:1537's registry row, marker/wiring same landing) - so
+// the marker shape this leg pins is: NEITHER name may carry a live
+// "DEFERRED + <name>" line in task.go any more. The count-shaped guard for
+// "the family did not silently shrink" stays with the roster nail (236r3)
+// and the count tripwire (271), which is where capability lives.
 func Test221DeferredMarkerForCancelLiftedButListStillMarked(t *testing.T) {
 	src, err := os.ReadFile("task.go")
 	if err != nil {
@@ -255,8 +257,10 @@ func Test221DeferredMarkerForCancelLiftedButListStillMarked(t *testing.T) {
 		t.Errorf("task.go 里还有 %d 行把 task.cancel 标成 DEFERRED：它已经注册并有实现，"+
 			"「在册＋无实现＋无人认领」正是票 164 AC#1 要杀的那一形", cancelMarked)
 	}
-	if listMarked == 0 {
-		t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")
+	if listMarked != 0 {
+		t.Errorf("task.go 里还有 %d 行把 task.list 标成 DEFERRED：票 47 已把它注册并有实现，"+
+			"标记与接线同一次核销（A434 同规）；留着一行注释替一枚已注册的工具说它不可用，"+
+			"正是那行注释在撒谎", listMarked)
 	}
 }
 

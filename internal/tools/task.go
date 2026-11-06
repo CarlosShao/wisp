@@ -15,21 +15,31 @@ import (
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
-// The D34 task family (ticket 164, plus ticket 221 甲形 per ruling A434). Two of
-// the three names the roster line carries now have an implementation here:
+// The D34 task family (ticket 164, plus ticket 221 甲形 per ruling A434, plus
+// ticket 47 AC#6). All three names the roster line carries now have an
+// implementation here:
 //
 //	task.output  L0  read what a background task printed   (this file)
 //	task.cancel  L1  stop one subagent the CALLER itself derived (this file, 221)
-//	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+//	task.list    L0  read the scheduler's task rows         (this file, 47)
 //
-// task.output is AC#3's leg, task.cancel is ticket 221's. task.list stays
-// unregistered because the §7 registry says so, and a half-claim is exactly the
-// "在册 + 无实现 + 无人认领" shape ticket 164 AC#1 was written to end - the same
-// shape ticket 221 was filed for, one row over: task.spawn's description had been
-// promising task.cancel to the model while nothing registered it and
-// TaskRoster.Cancel had zero production callers. Registration and implementation
-// therefore land in the SAME commit (A434 批准范围 item 7: 摘标记与接线同一次核销),
-// and the DEFERRED line above is the only one left standing.
+// task.output is AC#3's leg, task.cancel is ticket 221's. task.list lands
+// with ticket 47: its done-criterion (PLAN.md:1537's registry row) is
+// "注册表里 task.list／task.cancel 各有一枚真实现并过契约测试", ticket 163's
+// prerequisite already closed the 163/164 half, and the D34 row
+// (PLAN.md:2564, L0 for task.list) was in the frozen table from the start -
+// so this is the "标记与接线同一次核销" shape ruling A434 set for task.cancel,
+// applied to the second half of the same row. The DEFERRED line in the
+// header is lifted in THIS commit, with the registration and the tests that
+// pin the wiring (tasklist_deferred_236r3_teeth_test.go's roster nail now
+// demands the row) in the same landing.
+//
+// task.cancel's authority shape (only the row's own parent may stop it) is
+// UNCHANGED: task.cancel stops what the caller derived. The scheduler's rows
+// are reachable through task.list (read) and - for the scheduler's own rows
+// only, whose ParentTaskID the host files as the CALLER's task id - through
+// task.cancel's scheduler branch below. task.cancel also carries the scheduler
+// branch (task.list read + scheduler row stop, ticket 47 AC#6).
 
 // TaskDeps is what a task.* tool needs from the host.
 type TaskDeps struct {
@@ -39,6 +49,13 @@ type TaskDeps struct {
 	// taskOutput answers fail-closed instead of pretending the task list is
 	// merely empty.
 	Roster *TaskRoster
+	// Scheduler is ticket 47's C20 scheduler face (nil = not wired, the
+	// fail-closed shape below): task.list reads the rows through View, and
+	// task.cancel's scheduler branch stops a scheduler row through Control.
+	// Both faces are narrow by construction (SchedulerView carries no
+	// allow/answer verb, SchedulerControl carries exactly Cancel), which is
+	// what the 197 allow-door walker demands of anything TaskDeps holds.
+	Scheduler SchedulerDeps
 	// Paths is the SAME C26 canonicalizer the fs tools are wired with, and it
 	// is the only sanctioned way for this tool to answer "can the pointer I am
 	// about to hand the model actually be read right now" (ticket 174 AC#2).
@@ -54,6 +71,55 @@ type TaskDeps struct {
 	SpillTokens     int
 	SpillHeadTokens int
 	SpillTailTokens int
+}
+
+// SchedulerDeps is ticket 47's two narrow faces onto the scheduler, carried
+// as interfaces so internal/tools never imports agent/scheduler (the arrow
+// would drag every fs tool into the scheduler's graph, and tools is
+// consume-only for packages below it). The host (cmd/wisp's assembly, or a
+// test) fills them with adapters over *scheduler.Scheduler. A zero value
+// means "no scheduler wired": task.list then answers fail-closed.
+type SchedulerDeps struct {
+	// View is the read face: rows only, no verbs that answer anything.
+	View TaskListView
+	// Control is the write face: exactly one verb, Cancel.
+	Control TaskCanceler
+}
+
+// TaskListView is the read face task.list consumes. Deliberately minimal:
+// rows in, nothing else - so the 197 allow-door walker finds no answerer on
+// it, and a test double can be three rows wide.
+type TaskListView interface {
+	// Rows returns the scheduler's task rows (id, label, D43 state, note,
+	// held paths) in FIFO accept order.
+	Rows() []TaskListRow
+}
+
+// TaskCanceler is the write face task.cancel's scheduler branch consumes:
+// one verb, the same narrow shape TaskRoster.Cancel has.
+type TaskCanceler interface {
+	// Cancel stops one scheduler task (queued: dequeue+settle; running:
+	// root ctx cancel). An unknown id answers an error - the branch below
+	// surfaces it, never a silent no-op.
+	Cancel(id string) error
+}
+
+// TaskListRow is the scheduler row as the tool family sees it: the D43 state
+// vocabulary only (statemachine.State - the same discipline ticket 188 put
+// on the roster's status dimension), plus the free-text note where the
+// 「在等 <task> 释放 <path>」 reason lives, and the paths the row holds.
+// ParentTaskID is the authority join task.cancel's scheduler branch sits on:
+// the host files the scheduler row's parent as the CALLER's task id, so the
+// branch's "只有父任务能停" check is data, not a convention. Empty on a root
+// row (nobody may stop a root through this tool - the user's own stop path
+// is the panel, not a model verb).
+type TaskListRow struct {
+	ID           string
+	Label        string
+	State        statemachine.State
+	Note         string
+	ParentTaskID string
+	HeldPaths    []string
 }
 
 // The D15(3) reference numbers, the same ones the loop's spill layer uses
@@ -276,8 +342,10 @@ func (r *TaskRoster) Look(taskID string) (TaskOutput, bool) {
 }
 
 // Count reports how many tasks are filed. It exists for the host's own
-// diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
-// giving task.output a "list everything" mode would smuggle that row back in.
+// diagnostics. The model-facing list is task.list (ticket 47): it reads the
+// scheduler's rows, never this roster, so giving task.output a "list
+// everything" mode stays out (that would be a second list surface the D34
+// row never froze).
 func (r *TaskRoster) Count() int {
 	if r == nil {
 		return 0
@@ -595,12 +663,14 @@ func TaskOutputDecl() Decl {
 }
 
 // BuiltinTaskEntries returns the task family this configuration registers:
-// task.output and (since ticket 221 甲形, ruling A434) task.cancel. See the
-// header comment for why task.list is not here.
+// task.output, task.cancel (ticket 221 甲形, ruling A434) and - since ticket
+// 47, whose done-criterion is PLAN.md:1537's registry row - task.list. See
+// the header comment for the marker/wiring same-landing rule.
 func BuiltinTaskEntries(d TaskDeps) []Entry {
 	return []Entry{
 		{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
 		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+		{Tool: taskList{d: d}, Decl: taskListDecl()},
 	}
 }
 
@@ -708,6 +778,48 @@ func (t taskCancel) Execute(ctx context.Context, params json.RawMessage, onUpdat
 	caller := TaskID(ctx)
 	if caller == "" {
 		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
+	}
+	// --- ticket 47 AC#6: the scheduler branch --------------------------------
+	//
+	// A row filed by the C20 scheduler is NOT a roster row: it has no
+	// ParentTaskID in this roster (Look misses it), so without this branch a
+	// model could see the row through task.list and have task.cancel answer
+	// 「查不到这个任务」 - the promise/ capability fork ticket 221 was filed to
+	// kill, one row over. The branch sits BEFORE the roster read and keeps
+	// the same authority shape: only the row's own parent (the host files the
+	// scheduler row's parent as the CALLER's task id) may stop it, self-stop
+	// and foreign-stop are refused, and an unknown id is answered loudly.
+	if t.d.Scheduler.Control != nil && t.d.Scheduler.View != nil {
+		if row, known := schedulerLookup(t.d.Scheduler.View, target); known {
+			if target == caller {
+				return Result{
+					Text: fmt.Sprintf(
+						"拒绝停止：%s 就是这次调用所属的任务自己（调度器行）。"+
+							"子代理不许停自己（票 221 AC#3 的正控）；要收摊就把手上的活做完。", target),
+					IsError: true,
+				}, nil
+			}
+			if row.ParentTaskID != caller {
+				return Result{Text: fmt.Sprintf(
+					"拒绝停止：%s 是调度器任务 %s 派生的孩子，不是调用者 %s 的——只有父任务能停自己的那行"+
+						"（票 221 AC#3 的正控，调度器行同规）。用 task.list 看的是整张队列，能停的只有你自己派的那行。",
+					target, row.ParentTaskID, caller), IsError: true}, nil
+			}
+			if err := t.d.Scheduler.Control.Cancel(target); err != nil {
+				return Result{Text: fmt.Sprintf(
+					"没能停掉调度器任务 %s：%v（这一行没有被改动，别的行也没有被牵连）", target, err), IsError: true}, nil
+			}
+			if onUpdate != nil {
+				onUpdate(fmt.Sprintf("task.cancel 已对调度器任务 %s 发出停止", target))
+			}
+			return Result{Text: fmt.Sprintf(
+				"已对调度器任务 %s（%s）发出停止：排队中的那一行就地结算，在跑的那一行走任务根 ctx 取消（D38c）。"+
+					"它落地后的 applied-steps 台账留在它自己的行上，用 task.list 再看状态；"+
+					"这次停止只动了这一行，队列里别的任务没有受影响。", target, row.Label)}, nil
+		}
+		// The target is not a scheduler row either: fall through to the
+		// roster branch (a subagent row), which answers 「查不到」 for ids
+		// neither table filed.
 	}
 	rec, known := t.d.Roster.Look(target)
 	if !known {
@@ -901,11 +1013,100 @@ func takeTailTokens(s string, budget int) string {
 		return ""
 	}
 	n := len(s) - budget*4
-	if n <= 0 {
+	if n < 0 {
+		n = 0
+	}
+	if n > len(s) {
 		return s
 	}
 	for n < len(s) && !utf8.RuneStart(s[n]) {
 		n++
 	}
 	return s[n:]
+}
+
+// ---------------------------------------------------------------------------
+// task.list (C1 Tool, D34 row: PLAN.md:2564, declared L0, ticket 47 AC#6)
+// ---------------------------------------------------------------------------
+
+type taskList struct{ d TaskDeps }
+
+// taskListSchema carries no argument at all: the list is the whole state the
+// model may see, filtered by nothing (the D31 property is "被阻塞的东西必须
+// 可见" - a model that must guess a filter first would not see it).
+var taskListSchema = JSONSchema(`{"type":"object","properties":{},"additionalProperties":false}`)
+
+func (taskList) Name() string { return "task.list" }
+
+// Description says what the list is and what it is not: the scheduler's own
+// rows (queue order, D43 state, wait reason), not the subagent roster -
+// that one is reachable through task.output's task_id read.
+func (taskList) Description() string {
+	return "列出调度器当前的任务行（排队顺序）：每一行带任务 id、标题、D43 状态名" +
+		"（Queued=在排队，含「在等谁释放什么路径」的原因、Thinking/Acting/AwaitingApproval=在跑、" +
+		"Settling/Error=已结束）和它占着的路径。查某一行吐过什么用 task.output；" +
+		"停你自己派生的子代理用 task.cancel。"
+}
+
+func (taskList) Parameters() JSONSchema { return taskListSchema }
+
+// taskListDecl declares the row. L0 comes from the frozen D34 pair
+// "task.list / task.cancel | 查看/取消任务 | L0 / L1": reading an in-process
+// table touches no C3 capability face (Capabilities/Needs empty, same shape
+// as task.output's) and has no path parameter (the rows carry ids and
+// canonical paths the host already judged - a list is not a path argument).
+func taskListDecl() Decl {
+	return Decl{
+		Capabilities: nil,
+		Needs:        nil,
+		Declared:     risk.L0,
+		PathParams:   nil,
+		Resident:     true,
+		Provider:     KindBuiltin,
+	}
+}
+
+// Execute implements Tool. One answer per wiring state, and the unwired one
+// fails closed loudly: an empty list that read as "nothing runs" would be
+// the exact lie ticket 164 定案② bans for task.output.
+//
+// Answer shapes:
+//
+//	unwired   -> error: "调度器未接线"（fail-closed，绝不空成功）
+//	empty     -> success text saying the queue is EMPTY (a real answer)
+//	rows      -> one line per row: id, label, D43 state, note, held paths
+func (t taskList) Execute(ctx context.Context, _ json.RawMessage, onUpdate func(string)) (Result, error) {
+	if err := ctx.Err(); err != nil {
+		return Result{}, err
+	}
+	if t.d.Scheduler.View == nil {
+		return Result{Text: "调度器未接线（fail-closed：读不到任务行，不代表没有任务在跑）", IsError: true}, nil
+	}
+	rows := t.d.Scheduler.View.Rows()
+	if len(rows) == 0 {
+		return Result{Text: "调度器队列为空：当前没有任何任务。"}, nil
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "调度器任务 %d 行（排队顺序）：\n", len(rows))
+	for i, r := range rows {
+		fmt.Fprintf(&b, "%d. %s「%s」 状态=%s", i+1, r.ID, r.Label, string(r.State))
+		if r.Note != "" {
+			fmt.Fprintf(&b, "；%s", r.Note)
+		}
+		if len(r.HeldPaths) > 0 {
+			fmt.Fprintf(&b, "；占用路径：%s", strings.Join(r.HeldPaths, "、"))
+		}
+		b.WriteString("\n")
+	}
+	return Result{Text: b.String()}, nil
+}
+
+// schedulerLookup finds one row by id through the wired view.
+func schedulerLookup(v TaskListView, taskID string) (TaskListRow, bool) {
+	for _, r := range v.Rows() {
+		if r.ID == taskID {
+			return r, true
+		}
+	}
+	return TaskListRow{}, false
 }

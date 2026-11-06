@@ -42,3 +42,5 @@ later task with a visible reason.
 - [ ] task.list/cancel round-trip via agent (mock LLM drives both).
 
 ## Progress log (append-only, newest last)
+
+- 2026-11-06 22:4x +08 W47（wave45 写腿）：6 AC 全落。写面＝internal/agent/scheduler（scheduler.go/pathlock.go/bridge.go/goos_*，14 测试）＋internal/tools（task.list 注册＋task.cancel 调度器分支＋TaskDeps.Scheduler 窄面，3 测试＋五枚尺同批翻转）。AC#6 的 task.list 按 A434 同规（标记与接线同一次核销）解冻：done-判据=PLAN.md:1537 行，D34 行 L0 本就冻结、契约文字零改。D32 零新增 timer（死锁上限=等待任务自身 goroutine 的单调 deadline，可停）；D38b 唯一 spawn=agent-task-<id>（229 普查登记随落）。cmd/wisp 装配不动（盘上有 323 未跟踪件，规则 21 不触发；装配缝=NewBridgeDeps/ExecAdapter 留给装配票）。门禁：gofumpt 空／vet rc=0／scheduler+tools -count=2 ok（1.2s+55.5s）／d22scan clean rc=0／agent+observe 回归 ok／cmd/wisp allow-door+174 尺 ok。件 docs/evidence/s1/47-scheduler-pathlock.md。零 GUI、零 wisp.exe、零 winlive、零 push。

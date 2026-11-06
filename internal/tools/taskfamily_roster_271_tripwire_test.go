@@ -19,22 +19,25 @@ package tools
 // Pick = 甲. The reason that decides it: A648 ruled 丙 on 10-06 only because
 // every red-count in the three cost tables was transcribed, never measured
 // ("表里几枚红那一栏全部是转述"), and left an explicit reopen condition --
-// any leg about to wire a third task tool re-opens this ticket, which then
+// any leg about to wire a further task tool re-opens this ticket, which then
 // auto-promotes to 甲 with the landing leg supplying the un-run numbers.
-// This leg is that reopen. The positive control below converts the one
-// load-bearing un-run reading -- 236r3's archived M-2c gap, recorded in the
-// header of tasklist_deferred_236r3_teeth_test.go as "NOT measured by r3c ...
-// the false-red prediction stays an argument from source, not a reading" --
-// into something the suite itself re-proves on every run:
+// The reopen ran twice and both readings are now resident: ticket 47's
+// task.list took the family from 2 to 3 (this file's mutant expectations
+// moved with that landing, same commit), and this positive control keeps
+// converting the one load-bearing un-run reading -- 236r3's archived M-2c
+// gap, recorded in the header of tasklist_deferred_236r3_teeth_test.go as
+// "NOT measured by r3c ..." -- into something the suite itself re-proves on
+// every run:
 //
 //	B-3 shot (register an UNRELATED task.note):
 //	  - the count tripwire Test221TaskCancelIsRegisteredAtItsFrozenLevel
-//	    goes red, and the red names the tripwire message (3 registered) --
+//	    goes red, and the red names the tripwire message (4 registered) --
 //	    the alarm is wired, not dead;
 //	  - the capability nail Test236R3TaskListDeferralIsPinnedByTheRoster
 //	    NotByAComment stays GREEN on the same mutant -- the red is FALSE
-//	    in the capability dimension, exactly the false-red the ticket
-//	    names, now measured instead of transcribed;
+//	    in the capability dimension (task.note is not task.list, the one
+//	    name the nail demands), exactly the false-red the ticket names,
+//	    now measured instead of transcribed;
 //	  - the shared tree is never edited: the mutant exists only under
 //	    -overlay against a temp copy, and the restore proof below shows
 //	    disk bytes == compiled bytes and the real roster back at baseline.
@@ -215,8 +218,8 @@ func Test271B3UnrelatedThirdToolTripsOnlyTheCountTripwire(t *testing.T) {
 	if !strings.Contains(out, "FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel") {
 		t.Fatalf("内层红了，但红的不是枚数哨兵那一枚（红错了地方，读数不可归属）。内层输出：\n%s", out)
 	}
-	if !strings.Contains(out, "task 家族注册了 3 枚") || !strings.Contains(out, "task.note") {
-		t.Fatalf("枚数哨兵红了，但红句没有报出 3 枚与 task.note（哨兵文案被改，红得不可读）。内层输出：\n%s", out)
+	if !strings.Contains(out, "task 家族注册了 4 枚") || !strings.Contains(out, "task.note") {
+		t.Fatalf("枚数哨兵红了，但红句没有报出 4 枚与 task.note（哨兵文案被改，红得不可读）。内层输出：\n%s", out)
 	}
 
 	// half 2: the same mutant leaves the capability nail green.

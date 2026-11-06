@@ -33,21 +33,23 @@ import (
 // -> L2"）、未落地工具的越界/升级腿 —— 只对账两边都拿得到的读数。
 const tier172DocEnv = "WISP172_TIER_DOC"
 
-// 现量（2026-10-13 本腿，两处冻结文本逐字一致）：表里 37 行 markdown，其中 3 行各含多枚
-// 工具（reminder.* 三枚 / memory.* 两枚 / task.list+task.cancel）=> (工具, 档位) 条 41 条、
-// 去重工具名 40 枚；机器侧两边都有读数的 9 枚。这几个数是分母（AC#3）：任何一处变了都是
-// 契约变更，钉住它们是为了不让分母悄悄缩水。
+// 现量（2026-11-06 票 47 AC#6 本腿，两处冻结文本逐字一致）：表里 37 行 markdown，
+// 其中 3 行各含多枚工具（reminder.* 三枚 / memory.* 两枚 / task.list+task.cancel）
+// => (工具, 档位) 条 41 条、去重工具名 40 枚；机器侧两边都有读数的 10 枚（票 47 把
+// task.list 接进了生产名册，落地数 9→10，同一发更这行分母）。这几个数是分母（AC#3）：
+// 任何一处变了都是契约变更，钉住它们是为了不让分母悄悄缩水。
 const (
 	tier172TierEntries = 41
 	tier172DocNames    = 40
-	tier172LandedNumb  = 9
+	tier172LandedNumb  = 10
 )
 
 var (
-	// 两边都有读数、真被对账的 9 枚（fs family + task.output/task.cancel）。
+	// 两边都有读数、真被对账的 10 枚（fs family + task.output/task.cancel +
+	// 票 47 AC#6 的 task.list）。
 	tier172Landed = []string{
 		"fs.delete", "fs.edit", "fs.list", "fs.move", "fs.read",
-		"fs.trash", "fs.write", "task.cancel", "task.output",
+		"fs.trash", "fs.write", "task.cancel", "task.list", "task.output",
 	}
 	// 机器名册里有、两处冻结文本都没有它的行：今天只有 task.spawn（票 197）。
 	tier172Undocumented = []string{"task.spawn"}

@@ -53,6 +53,7 @@ func tier172Calls(t *testing.T) ([]tier172Call, *Bridge) {
 		{"fs.delete", map[string]any{"path": slash(existing)}, "永久删除"},
 		{"task.output", map[string]any{"task_id": "172-no-such-row"}, "读一枚不存在的任务行"},
 		{"task.cancel", map[string]any{"task_id": "172-no-such-row"}, "停一枚不存在的任务行"},
+		{"task.list", map[string]any{}, "看一眼调度器队列（票 47 AC#6 接进生产名册的那枚）"},
 		{"task.spawn", map[string]any{"task": "172 probe"}, "派生一枚子代理"},
 	}, tier172Bridge(t, in)
 }
