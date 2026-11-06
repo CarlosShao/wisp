@@ -61,6 +61,10 @@ const slo136FoldLine = "run.Pass = rep.Pass && observer.Pass"
 const slo136ExitBlock = "if !run.Pass {\n\t\texitCode = 1\n\t}"
 
 // TestSLO136StatePassFoldReachesRunPass pins the fold at slo_windows.go:399.
+// It carries its OWN needles: when this fold moves, the reading names only
+// this case (the exit-mapping case stays green over an unrelated fold change -
+// attribution was measured on the first M-A landing, which reded both cases
+// through a shared helper and was reworked for exactly that reason).
 func TestSLO136StatePassFoldReachesRunPass(t *testing.T) {
 	src := slo136ReadSelf(t)
 
@@ -83,7 +87,9 @@ func TestSLO136StatePassFoldReachesRunPass(t *testing.T) {
 	}
 }
 
-// TestSLO136FalseRunPassExitsOne pins the exit mapping at :336-338.
+// TestSLO136FalseRunPassExitsOne pins the exit mapping at :336-338 with its
+// OWN needles only: an unrelated fold change keeps this case green and this
+// case alone reds when the mapping moves.
 func TestSLO136FalseRunPassExitsOne(t *testing.T) {
 	src := slo136ReadSelf(t)
 
@@ -107,29 +113,16 @@ func TestSLO136FalseRunPassExitsOne(t *testing.T) {
 }
 
 // slo136ReadSelf reads the production sibling from the package directory (the
-// test binary's working directory is cmd/wisp) and refuses to grade a source
-// that no longer contains the pins: a missing needle is a red naming the pin,
-// never a silent green.
+// test binary's working directory is cmd/wisp). It grades nothing: every
+// verdict lives in the case that owns the pin, so each mutation reds exactly
+// the case that watches it.
 func slo136ReadSelf(t *testing.T) string {
 	t.Helper()
 	raw, err := os.ReadFile("slo_windows.go")
 	if err != nil {
 		t.Fatalf("read cmd/wisp/slo_windows.go: %v - the AC#10 instrument cannot grade a source it cannot read", err)
 	}
-	src := string(raw)
-	for _, needle := range []string{
-		slo136FoldLine,
-		slo136ExitBlock,
-		"func cmdSLO(",
-		"func runOutOfTree(",
-		"run.Pass = run.Settle.Pass",
-		"run.Pass = rep.Pass\n",
-	} {
-		if !strings.Contains(src, needle) {
-			t.Fatalf("slo_windows.go no longer contains %q - the AC#10 pins must be re-landed against the new bytes before any green is read here", needle)
-		}
-	}
-	return src
+	return string(raw)
 }
 
 // slo136TopLevelSegment returns the bytes from a top-level func declaration to
