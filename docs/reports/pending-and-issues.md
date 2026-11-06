@@ -31426,3 +31426,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W150-ac3**（`f7505f122`）：自检仪器 `tools/d22scan/deferred_registry_test.go`（+519 行）四门 PASS；分母 **4↔4** 逐枚吻合（D28-1×3 / D11-3×1）；突变自证红具名 D99-1/D98-2；`_test.go` 反形夹具与划线行正确出局；禁改面零触碰。**待非实现者裁→翻 AC#3→150 -done。**
 - **W68（wave36）挂死**：起 17:36、74min 零产出、internal/ball 零提交 ⇒ `job_kill`，重派 **W68b 窄口径**（⛔ 不碰桌面测量/不开任何 GUI/窗口进程，只改码＋迁移断言＋非 winlive 门禁；AC#3 桌面量留真机）。推测挂因＝`-diff Sleeping` 桌面像素测量阻塞。
 - 派 **wave40**：W68b（internal/ball 窄口径）＋ verdict150-ac3（非实现者复跑新测试＋突变验红）。
+
+## A1584（2026-11-06 19:xx，编排者）收 wave40：150 结案(done291)＋68 码落地(AC#2/#3 待真桌面)＋派 W65 玻璃实现+verdict68
+- **W150-ac3**（`f7505f122` 仪器＋`3463857e1` 裁决 PASS）：4↔4 自鸣、四发变异验红（D99-1/D98-2 具名）；150 五格齐 ⇒ 编排者翻 AC#3＋git mv -done（open=0/done=1）。**done 290→291。**
+- **W68b（68-r2）PASS**（`4592c76a5` 码＋`bca0990f8` 证据）：(a)settling→0.95；(b)dock→本体 42%（drawGlass 吃 DockSquash）；(c)hit 已在场零改；(d)默认翻转已在场零改；(e)断言迁移＋地雷已同 commit。**但 68 AC#2「默认值翻转(需桌面复测)」/AC#3「签收面复测(需桌面)」两格都要真桌面** ⇒ 68 保持开、列**机主真机签收待办**（fleet 侧码已就绪）。
+- 派 **wave41**：W65-impl-glass（internal/ball：wensity 玻璃量化落地＋`[ball].style` config/SetStyle＋伪谱3带音频驱动＋token；D36 PLAN 一行已批 A1581）＋ verdict68（非实现者复核 W68b 码＋非桌面门禁，列桌面待跑命令）。
+- 派 **wave42**：148（写腿，起手三核，若"panel 契约未写"未定义即停）＋ 264-ac0/274-ac0（先清数分析腿）。**写面据实**：A 桶余票多为「先清数/归口/未定义即停」型（176 等 175、168 等 50/51、192 撞未定义 web.search、264 明令本轮不派写腿），纯写腿变稀，故本波 1 写＋2 清数。
