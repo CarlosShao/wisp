@@ -4173,3 +4173,29 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - 方法沉淀：flash 腿对超大面板写活不稳(189需 dud+r2 两次;190首派零产出)→改**增量提交派单**(先核心件 commit 再接 wiring)+并行只读普查腿维持管线。
 - 脉象：面板补功能连号簇是真活脉(多枚同构:宿主侧 Go 供数据),可持续派。余 gated/前端/owner 项不变。
 - 台账最新 A1487。待机主 8 条 unchanged：256/301/185/347/230AC#4/174AC#4/226/264AC#0 + 放行 35；Q-76 第二枚(懒展开)暂未启用。
+
+### 4.0gx（2026-11-07 12:5x +08，编排者 goal round 205-207）★342 结案（第 293 枚）＋ 330 翻三格＋长度门 RED→GREEN｜65 球改道集成开源件
+
+**本会话这轮做了四件事（全部已推送，未推=0）**
+
+1. **342 结案（第 293 枚 done）**：非实现者裁决腿 \342-v4\（\da547c31b\）判 AC#1 **PASS**、AC#4 **PASS（升格）**。读数：POSIX 容器 \	runcated=0 deleted=0 untouched=1500\＋liveness \provedLinkCycles=177/172\、\pinnedParentBeforeOpen=20/19\；Windows \	runcated=0\＋\provedReparse=11/10\、\ormBLegRefusals=3/4\；消费者五包两平台十发全 rc=0。★变异有牙：M-B 双平台红（POSIX \deleted=69/1500\＋\pinnedParentBeforeOpen=0\，Windows \	runcated=6/400\ 漏出 44 字节载荷）、M-A Windows 红／POSIX 构造性 no-op（如实记）、还原复绿。我翻两格 ⇒ 7/7 ⇒ rename 加 \-done\（\36d8169fc\，**双名同时字面点名**，收尾核 \git ls-tree HEAD | grep -c "342-"\＝1 枚新名）。
+2. **330 翻三格（6/8）**：裁决腿 \330-verdict\（\d1e978caf\）判 AC#0/#1/#2 PASS。★G1 那一发它亲重放：sed 打 golden \:12\＋镜像 \:38\ 成 \plan.presentX\、真名册零字节 ⇒ **FAIL rc=1 红在 \:128\**，红句具名 22 枚全名单；还原后 sha256 逐位回基线。我翻三格（\d833d8fbe\）。**两格如实留开**：AC#5（整包四数作差＝0，裁决腿判部分、四数未取）⇒ 已派 wave54 \330-ac5\ 在仓外导出树补做；AC#7（"必须排在 329 之后"）★前提已死——裁决腿亲核全历史 grep＝**零枚 329 落地提交**。
+3. **★长度门 RED→GREEN 真修（我自己动手，\532f936d6\）**：\scripts/check-path-length-budget.sh\ roster 6 条过期条目跟 \-done\ 改名（135/136/150/179/182/185）。修前 \VERDICT RED\，修后 **\VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree\**、65/65 全覆盖。这是 342-r3 报出的真缺陷。
+4. **246 AC#8 落地**（写腿 \c56d8d90b\）：\signal.Notify(bootExit…)\＋Stop defer 提到 \unResident\ 第一句。正控：修前 \-count=5\ ⇒ **5 发 1 红**（exit \ xc000013a\）；修后 \-count=10\ ⇒ **10/10 绿**。我独立复跑 \-count=5\ ⇒ **ok 35.9s**。真修三无。
+
+**★65 玻璃球改道（台账 A1594，机主两次否手写）**
+- 机主逐字两次：① "**不行，要完全跟人家的一致，你这还是属于拉裤兜子的复刻**"；② "**你搞错了，其实没必要自己哼哧哼哧写，别人有现成的成熟的方案，你就直接搞过来不就行了吗，为什么要自己写一套，而且很可能有bug呢？服了**"。
+- ⇒ **裁定**：⛔ 继续手写 D2D/WebGL 着色器；改**集成现成开源件**。**D2D 两笔（\5a921e40\／\ 2182e1e8\）不结案、不翻 AC#6**。
+- **选型（我拍，铁律 ⓪⓪⓪）**：\LerSent001/orb\（**749 星**、**MIT**、13 预设、WebGPU/WGSL 1236 行、自带独立 Web 导出器）。淘汰：\wensity\ siri-orb（**付费 http=402**，源码不可得）；\zq52xy/glass-voice-orb-study\（**非商用** 许可）。
+- **实测凭据**：\D:\tmp\wisp\20261107\orblab\orb749\ pnpm 装依赖成功 → dev server \127.0.0.1:5180\ 真 Edge 开窗截屏球体渲染正常（玻璃折射/彩虹光带/边缘高光全在，图在 \siri-big.png\）；导出器产出 13 枚独立单文件 HTML（各 ~89KB），**导出页纯净＝只 canvas+status**。
+- **落地腿**：wave53 \orb-integrate\ 在飞（WebView2 透明置顶点击穿透悬浮窗＋与 \internal/ball\ 状态机对接＋保留 D2D fallback）。
+
+**在飞（本轮末）**：wave53（球集成）、wave54（330-ac5 ＋ 145 筛查 ＋ 174 筛查）。
+
+**下一手（从这儿接）**
+1. 收 wave53／wave54 三腿，按三把尺复核后推送。
+2. 330 AC#5 若导出树台面达成 ⇒ 翻格；AC#7 前提死 ⇒ 按"无撞面事实"处置（改判或改票面文字，后者属"改契约文字"要摆机主）。
+3. 球集成腿交付后：给机主一条可核命令看活球，等他那句"这次对了"才翻 65 AC#7。
+4. 继续筛票铺写腿（≥3 在飞）。
+
+**台账最新**：\A1595\。**HEAD**（现跑）：见 \git log --oneline -1\。
