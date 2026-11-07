@@ -31819,3 +31819,21 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★我现核出最后一枚装配缺口**：grep -rn ModelSwitch --include=*.go cmd/wisp/ ⇒ **零命中**。而 BallStyle（un.go:1049）与 Run（un.go:1059）都已接 ⇒ **只有 ModelSwitch 没接**（187 腿自己如实报了这条，我核实成立）。⇒ 活机上 modelSwitch 快照键不出（读口在 internal/panel/pump.go:231/:432 已就位）。
 - **★腿如实报的自身错误**：187 腿改用例时把票面 Progress log 行首误粘过一次，**当场发现当场修复**，提交前 diff 复核为纯追加一行。
 - **撤销口令**：145 接线＝git revert 1a0ba0ef2；187 case＝git revert 7817ad09a。
+
+## A1622（2026-11-07 22:0x，编排者）**★★机主令：永久授权 frontend/** 与全部 UI｜★机主令：不再需要他自己切换，直接把 Jarvis 搞出来看**
+
+### 机主原话（逐字，两条）
+1. **「以后没有那个什么外部agent了，你直接永久被授权接收frontend，包括所有UI」**
+2. **「这个你说的球风格切换，我不知道怎么弄，要不你直接把Jarvis风格搞出来给我看算了，我就不自己搞了」**
+
+### 令一：frontend 授权变更（★永久，覆盖此前全部「frontend 归外部 agent Q-51」的记载）
+- **从本条起**：rontend/** 与**全部 UI**（含 design/** 的产物消费面）**归本编队写面**，与 internal/**、cmd/** 同级。
+- **作废的旧记载**：此前台账/派单里「rontend/**、design/** 归机主外部 agent（Q-51）、本编队零写面」**一律作废**，⛔ 再拿它当「派不出腿」的理由。
+- **★直接后果**：卡了多轮的**三枚 TS 契约红**（commands/modelSwitch/allStyle 未在 rontend/src/lib/panel.ts 声明）**现在可以派腿修**；设置页 config-screen.tsx 的 APPEARANCE_ROWS 加 all.style 一行**也可以派腿做**。
+- **边界仍守**：①改契约文字仍须机主批（SPEC-12 §4.1 不动）；②	hresholds/golden 仍 ⛔ 动；③UI 里零 emoji（D29/d22scan ban#8）仍守。
+
+### 令二：机主要「直接看到 Jarvis」，⛔ 再让他跑命令
+- **我实测已完成的部分**：uild/balldebug-orb.exe -style=jarvis 起来后**两窗 rect 重合**（Wisp/Wisp Orb），球在屏幕右下 (3300,1252)-(3416,1368)；截图放大后**青色粒子环＋轨道环线确实在渲染**（球心读数 (149,189,192) 青系）。
+- **★我实测抓到的真问题（必须修，⛔ 糊弄）**：**球只有 100px**（-size 上限 72），且**透明叠加在桌面上** ⇒ 背后是白色窗口时，Jarvis 的粒子被洗成灰白（我截的 JARVIS-PRODUCT-REAL.png 就是这样）。**上游 demo 好看的前提是「大尺寸 ＋ 深底」**，我们两个都不满足。
+- **⇒ 结论（我拍，铁律 ⓪⓪⓪）**：要让 Jarvis **好看**，必须给它**自己的深色圆盘底**（不是全窗黑底——那会破坏透明叠加架构），即**球面画一个深色圆形 backdrop，粒子画在它上面**。这是主流做法（Jarvis/Siri 类 orb UI 都是「深盘 + 亮粒子」），且**不改透明架构**（盘外的窗口区域仍透明）。
+- **撤销口令**：本条是政策记录，无产码；若要收回 frontend 授权，机主说一句「frontend 收回归外部」即可，我恢复零写面。
