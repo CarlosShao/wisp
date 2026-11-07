@@ -117,6 +117,26 @@ go test -tags winlive ./internal/ball/ -run 'TestOrbControllerCloseStopsBrowserP
 - 阴性对照（修前形状）不需本腿复演：前腿 `9a11eff81` 的收割器读数已证修前每轮 reap 1 组泄漏进程（40/40 坍塌证据链）。
 - 附带读数：探针日志有 `orb DwmEnableBlurBehindWindow failed` WARN——属透明链环境读数（wave62 修 orb 透明的射程），与本票 Close 判据无关，如实登记不归因。
 
-## §4 步4 门禁读数
+## §4 步4 门禁读数（2026-11-07 16:4x–16:5x 现跑；★部分门禁已绿，count=5 未认证，open 两条如实登记）
 
-（步4 完成后回填）
+| 门禁 | 读数 | 状态 |
+|---|---|---|
+| gofumpt（绝对路径 gofumpt.exe，三改面文件） | 空（rc0） | ✅ |
+| `go vet ./internal/ball` | rc0 | ✅ |
+| scoped build（`go build ./cmd/... ./internal/...`） | rc0（`./build` 包红为既有形状，非本票面——前腿门禁同口径 scoped） | ✅ |
+| `go test ./internal/ball -count=1` | ok 0.237s | ✅ |
+| d22scan（`tools/d22scan/d22scan.exe`） | clean rc0（437 生产 Go 文件，8 类 scope 读数齐） | ✅ |
+| ★`go test -tags winlive ./internal/ball/ -run 'TestBallLiveOrb' -count=5` | **未认证 5/5**，详见下 | ⚠ open |
+
+### count=5 实况与归因隔离（如实，不翻任何 AC）
+
+- 第 1 轮 4 枚全绿（Pixel 首发 18.9s 即 37.15% 非黑——泄漏修后首轮即亮）；第 2 轮 Pixel 起跑处**测试二进制静默死亡**（无 `--- FAIL`、无 panic 痕迹，包级 FAIL 30.4s）。
+- 归因隔离（三核③纪律）：隔离场＝`git archive 2bb639e4e` 解到**仓外** `/d/work/tmp/wisp65iso`（含本票 fork+replace+探针，**不含** wave62 四文件 WIP、不含未提交的 destroy hunk）＋手工施加同一 destroy hunk：
+  - 隔离场探针（不占 quiet-desktop）：1 发 PASS（baseline=0→after=0，12.3s）＋1 发 attach 15s 超时（并发负载形状：机器同刻压着 wave62 在飞腿与外来验证仪）。
+  - 隔离场 Pixel count=5：被外来 `balldebug-65verify.exe`（16:49:40／16:50:49 两次拉起、`-stay` 常驻、非本腿进程）挡在 quiet-desktop 守卫外，未能取得读数。
+- ⇒ **静默死亡暂无法归因**：同树含 wave62 四文件 WIP（orb_live_windows_test.go +319 行等），而同一修复在隔离场探针 PASS——⛔ 不能归本票修复，也⛔ 无证据归他腿；等 wave62 落盘后在新基线复跑 count=5 定案。
+- destroy() 产码 hunk 未 commit 的原因：`orb_windows.go` 工作区混有 wave62 的 182/65 行未落盘改动，本腿 pathspec commit 会把他人 WIP 吞进本票提交（违共享工作树纪律）；hunk 已在工作区可复跑（隔离场用同一文本验证），待其落盘后单独 commit。
+
+### "reaped 1" 读数注（与修复不矛盾）
+
+套件内每轮测试起步 reap 1 ＝ 上一测试的浏览器进程树退出途中（>1s 慢退出）被下一测试的开场收割捞走；探针的 15s 预算读数（after=0）证明该 1 枚在数秒内自行退场、**非永久泄漏**。修前形状是每轮净增一组、永不清零（前腿 `9a11eff81` 证据链）。
