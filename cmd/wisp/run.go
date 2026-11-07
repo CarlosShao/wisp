@@ -378,9 +378,17 @@ type agentRuntime struct {
 	// signal is provider_health.quota_state, written by the gate itself).
 	// nil until the first execute() assembles the gate.
 	quotaLedger *observe.QuotaLedger
-	gate        *approval.Gate
-	ui          *consoleApprovalUI
-	bridge      *tools.Bridge
+
+	// runFeed is ticket 145's working-state holder, built by assembleRuntime
+	// next to every other live snapshot object: the console sink's event
+	// switch feeds it (Publish's four branches, hop 1) and the PumpSources.Run
+	// reader below reads its Section (hop 2). One object, both hops - a second
+	// holder would let the packet and the sink disagree about what happened.
+	runFeed *panel.RunFeed
+
+	gate   *approval.Gate
+	ui     *consoleApprovalUI
+	bridge *tools.Bridge
 	// liveCards is the native-side ledger of the cards this run displayed: the
 	// one place a displayed card's single-use grant is kept, and therefore the
 	// one thing that makes an allow possible at all (ticket 201). It is filled
@@ -982,6 +990,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// .scratch/wisp/probes/329/r1/page-contract.md. Every run also keeps booking
 	// to the ledger, exactly as panel_pump.go says.
 	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+	// Ticket 145's working-state holder, built here with the other live
+	// snapshot objects: the sink this runtime later builds in execute() feeds
+	// it, and the Run reader in the literal below reads it. See runFeed's
+	// field comment for why it is one object and not two.
+	rt.runFeed = panel.NewRunFeed()
 	rt.pump = panel.NewSnapshotPump(panel.PumpSources{
 		Verdicts:  rt.liveVerdicts,
 		Mode:      rt.modes.PermissionMode,
@@ -1037,6 +1050,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 			v := mgr.BallStyleOptions()
 			return panel.BallStyleSection{Style: v.Style, Vocabulary: v.Vocabulary}
 		},
+		// Ticket 145's hop 2, the working-state reader: the feed the sink
+		// fills (Publish's EvToolEnd / EvReasoningDelta / EvError / EvStuck
+		// branches) hands its Section here, so the packet's top-level "run"
+		// key carries the loop's own event values. run_feed_145.go's contract
+		// governs the shape: a reader that exists always sends the key, and
+		// an empty feed renders "tools":[] rather than a vanished key.
+		Run: rt.runFeed.Section,
 		// Ticket 33 AC#8's naming split (33-r14): Publish keeps the blocking
 		// ledger entry by that name, and the AC#8 clamp-branch ruler drives the
 		// packet through tryBookPanelSnapshot when it needs a pass that cannot
@@ -1670,7 +1690,7 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// its Stream runs and the chain ADVANCES, with the skip and the step both
 	// announced on this run's own sink. The ledger lives on the runtime so the
 	// caps accumulate across this process's tasks.
-	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle}
+	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle, runFeed: rt.runFeed}
 	quotaKeys := append([]string{}, rt.names...)
 	if len(quotaKeys) > 0 {
 		quotaKeys[0] = ep.Provider + "/" + ep.Model
@@ -2251,6 +2271,14 @@ type consoleSink struct {
 	// settle is ticket 12 AC#9's T0 stamp target (settle_trace_12r2.go). Nil
 	// leaves Publish byte-identical to its pre-seam shape.
 	settle *settleTrace
+	// runFeed is ticket 145's hop-1 feed: the working-state holder the
+	// assembly root built (assembleRuntime) and the pump's PumpSources.Run
+	// reader reads. Publish's EvToolEnd / EvReasoningDelta / EvError / EvStuck
+	// branches each hand it one line, the values the event already carries.
+	// nil is safe by the feed's own nil-receiver guards - a sink built
+	// without the feed just drops the line - but the production sink below
+	// (execute) always carries the runtime's feed.
+	runFeed *panel.RunFeed
 }
 
 func (c consoleSink) Publish(e agent.Event) {
@@ -2269,21 +2297,35 @@ func (c consoleSink) Publish(e agent.Event) {
 		// Reasoning is shown as it is what the thinking probe measures; it is
 		// never mixed into the reply text. It is equally kept out of the
 		// snapshot's results section, whose contract is an assistant RESULT
-		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
-		// ticket 145 row 3, which is a key the snapshot does not have.
+		// (panel.ResultChunk, composer.go:51-56); ticket 145's row 3 rides the
+		// snapshot's run section instead - the feed line below is its hop 1,
+		// the delta text verbatim.
 		fmt.Fprint(c.out, e.Text)
+		c.runFeed.ReasoningDelta(e.Text)
 	case agent.EvToolStart:
 		fmt.Fprintf(c.out, "\n[工具 %s]\n", e.ToolName)
 		changed = true
 	case agent.EvToolEnd:
 		fmt.Fprintf(c.out, "[工具 %s -> %s]\n", e.ToolName, e.Outcome)
+		// Ticket 145's tool row, hop 1: the event's own call id, tool name,
+		// outcome and result text, verbatim (run_feed_145.go's ToolRunRow).
+		c.runFeed.ToolEnded(e.CallID, e.ToolName, e.Outcome, e.Text)
 		changed = true
 	case agent.EvStuck:
 		fmt.Fprintf(c.out, "\n[停滞] %s\n", e.Text)
+		// Ticket 145's stuck row, hop 1: the loop's brake sentence plus the
+		// C22 rung the event carries.
+		c.runFeed.Stuck(e.Text, e.RepeatLevel)
 		changed = true
 	case agent.EvError:
 		if e.Err != nil {
 			fmt.Fprintf(c.out, "\n[错误 %s] %s\n", e.Err.Class, e.Err.Detail)
+			// Ticket 145's error row, hop 1: classified errors only. A
+			// notice-shaped EvError (loop.go's budget notices publish Text
+			// with no Err) writes nothing - the carrier's RunErrorRow doc
+			// names that shape as the constant-as-data trap, and inventing
+			// a class for a notice would be exactly it.
+			c.runFeed.Errored(string(e.Err.Class), e.Err.Detail, e.Text)
 		}
 		changed = true
 	case agent.EvWarn:
