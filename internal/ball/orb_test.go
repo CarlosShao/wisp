@@ -230,8 +230,9 @@ func TestOrbServingConstants(t *testing.T) {
 }
 
 // TestOrbWriteSite pins the materialization seam: the folder the virtual-host
-// mapping points at receives exactly the document the fallback path would
-// hand NavigateToString - one file, the entry name, meta CSP included.
+// mapping points at receives exactly the documents the fallback path would
+// hand NavigateToString - one file PER STYLE (the siri entry plus the jarvis
+// entry), meta CSP included.
 func TestOrbWriteSite(t *testing.T) {
 	dir := t.TempDir()
 	if err := orbWriteSite(dir); err != nil {
@@ -243,5 +244,197 @@ func TestOrbWriteSite(t *testing.T) {
 	}
 	if !bytes.Equal(got, orbPageDocument()) {
 		t.Error("site entry file differs from the served document")
+	}
+	jgot, err := os.ReadFile(filepath.Join(dir, jarvisEntryName))
+	if err != nil {
+		t.Fatalf("jarvis site entry file missing: %v", err)
+	}
+	if !bytes.Equal(jgot, orbJarvisDocument()) {
+		t.Error("jarvis site entry file differs from the served jarvis document")
+	}
+}
+
+// ------------------------------------------------------- jarvis style page
+// Ticket 65 second visual style: the cyber1443 jarvis component built into ONE
+// self-contained HTML by tools/jarvis-export (docs/evidence/s1/
+// 65-jarvis-style-integration.md). Same rulers as the siri page above, with
+// the jarvis page's own vocabulary.
+
+// jarvisUpstreamSHA256 pins the embedded jarvis build output
+// (assets/jarvis-orb.html). The asset is the tools/jarvis-export build of the
+// UNMODIFIED upstream component; a rebuild through the scaffold reproduces it
+// (update this pin in the same commit as the rebuilt asset).
+const jarvisUpstreamSHA256 = "e95e1d963139a08b50d0c6be1d460db137a005d602e05eb9451dc60a6d99ce62"
+
+// TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
+// embed is the scaffold's build of the upstream component with the entry's
+// own host seam, NOT a hand-authored imitation and NOT the siri page.
+func TestJarvisAssetShippedAsBuilt(t *testing.T) {
+	if len(jarvisPageHTML) == 0 {
+		t.Fatal("embedded jarvis page is empty")
+	}
+	if !bytes.HasPrefix(jarvisPageHTML, []byte("<!doctype html>")) {
+		t.Fatalf("embedded jarvis page does not start with the build doctype: %q", jarvisPageHTML[:32])
+	}
+	if bytes.Contains(jarvisPageHTML, []byte("\r\n")) {
+		t.Fatal("embedded jarvis page still contains CRLF; the asset must be LF")
+	}
+	page := string(jarvisPageHTML)
+	for _, marker := range []string{
+		"jarvisOrb",                // the entry's host seam object
+		"setState",                 // the state push entry
+		"Wisp Jarvis Orb",          // the build template's title
+		"Wisp Jarvis particle orb", // the entry's aria label
+	} {
+		if !strings.Contains(page, marker) {
+			t.Errorf("jarvis marker %q missing from the embedded page", marker)
+		}
+	}
+	// Seam isolation: the jarvis page must NOT carry the siri seam, and the
+	// siri page must NOT carry the jarvis seam - a crossed pair would push
+	// states at a page that ignores them.
+	if strings.Contains(page, "liquidOrb") {
+		t.Error("embedded jarvis page carries the siri seam (liquidOrb)")
+	}
+	// Offline by construction. The jarvis page bundles library code, so the
+	// siri page's raw "http://" ruler does not transfer verbatim: minified
+	// react-dom/three carry inert STRING CONSTANTS that contain the scheme
+	// (W3C namespace URIs passed to createElementNS/setAttributeNS, the
+	// react.dev error-decode prefix, one spec citation in a three.js comment)
+	// - DOM-API arguments and comments, never fetches. The transferable ruler
+	// is attribute-form resource references (src=/href= with a scheme) plus
+	// external link/import tags; the runtime cut stays the served CSP
+	// (connect-src 'none', default-src 'none').
+	for _, bad := range []string{`src="http`, `href="http`, "<link", "import(", `url(http`} {
+		if strings.Contains(page, bad) {
+			t.Errorf("embedded jarvis page contains a resource reference %q", bad)
+		}
+	}
+	sum := sha256.Sum256(jarvisPageHTML)
+	if got := fmt.Sprintf("%x", sum); got != jarvisUpstreamSHA256 {
+		t.Errorf("embedded jarvis page sha256 = %s, want the pinned build %s", got, jarvisUpstreamSHA256)
+	}
+}
+
+// TestJarvisStateMappingCoversAll20States: the jarvis page defines exactly
+// four state names; the entry IGNORES unknown names, but the mapping must
+// still land every frozen state on one of the page's own four.
+func TestJarvisStateMappingCoversAll20States(t *testing.T) {
+	all := []statemachine.State{
+		statemachine.StateFirstRun, statemachine.StateSleeping, statemachine.StateArmed,
+		statemachine.StateMuted, statemachine.StateListening, statemachine.StateThinking,
+		statemachine.StateActing, statemachine.StateSpeaking, statemachine.StateWarm,
+		statemachine.StateConversation, statemachine.StateConfirming,
+		statemachine.StateAwaitingApproval, statemachine.StateSettling,
+		statemachine.StateDownloading, statemachine.StateUnconfigured,
+		statemachine.StateNoNetwork, statemachine.StateError, statemachine.StateQueued,
+		statemachine.StateStuck, statemachine.StateWatchdogAlert,
+	}
+	if len(all) != 20 {
+		t.Fatalf("expected the 20 frozen states, got %d", len(all))
+	}
+	for _, s := range all {
+		if !statemachine.Valid(s) {
+			t.Fatalf("state %q is not valid per the frozen table", s)
+		}
+		switch jarvisStateFor(s) {
+		case "idle", "thinking", "success", "alert":
+		default:
+			t.Errorf("jarvisStateFor(%q) = %q, want one of the page's own names (idle|thinking|success|alert)", s, jarvisStateFor(s))
+		}
+	}
+}
+
+// TestJarvisStateMappingShape pins the jarvis mapping DECISIONS: the work
+// family keeps the siri partition's "thinking" set; the failure/attention
+// family lands on the page's own "alert" mood; Settling (the post-work
+// one-shot) lands on "success"; standby/ambient stays "idle".
+func TestJarvisStateMappingShape(t *testing.T) {
+	thinking := []statemachine.State{
+		statemachine.StateListening, statemachine.StateThinking, statemachine.StateActing,
+		statemachine.StateSpeaking, statemachine.StateConversation, statemachine.StateConfirming,
+		statemachine.StateAwaitingApproval, statemachine.StateQueued,
+	}
+	for _, s := range thinking {
+		if got := jarvisStateFor(s); got != "thinking" {
+			t.Errorf("jarvisStateFor(%q) = %q, want thinking", s, got)
+		}
+	}
+	alert := []statemachine.State{
+		statemachine.StateError, statemachine.StateNoNetwork,
+		statemachine.StateWatchdogAlert, statemachine.StateStuck, statemachine.StateUnconfigured,
+	}
+	for _, s := range alert {
+		if got := jarvisStateFor(s); got != "alert" {
+			t.Errorf("jarvisStateFor(%q) = %q, want alert", s, got)
+		}
+	}
+	if got := jarvisStateFor(statemachine.StateSettling); got != "success" {
+		t.Errorf("jarvisStateFor(Settling) = %q, want success", got)
+	}
+	idle := []statemachine.State{
+		statemachine.StateFirstRun, statemachine.StateSleeping, statemachine.StateArmed,
+		statemachine.StateMuted, statemachine.StateWarm, statemachine.StateDownloading,
+	}
+	for _, s := range idle {
+		if got := jarvisStateFor(s); got != "idle" {
+			t.Errorf("jarvisStateFor(%q) = %q, want idle", s, got)
+		}
+	}
+}
+
+// TestOrbJarvisStateScript pins the jarvis seam's ExecuteScript body: the
+// entry's own interface object, guarded for a page that never came up.
+func TestOrbJarvisStateScript(t *testing.T) {
+	got := orbJarvisStateScript("alert")
+	want := `window.jarvisOrb&&window.jarvisOrb.setState("alert")`
+	if got != want {
+		t.Errorf("orbJarvisStateScript = %q, want %q", got, want)
+	}
+}
+
+// TestOrbPageForStyle pins the per-style asset decision: glass serves the
+// siri page under the siri entry; jarvis serves the jarvis page under its own
+// entry; both entries share the one synthetic origin.
+func TestOrbPageForStyle(t *testing.T) {
+	doc, name, url := orbPageForStyle(StyleGlass)
+	if name != orbEntryName || url != orbEntryURL || !bytes.Equal(doc, orbPageDocument()) {
+		t.Errorf("orbPageForStyle(glass) = %s, %s (doc equal: %v)", name, url, bytes.Equal(doc, orbPageDocument()))
+	}
+	doc, name, url = orbPageForStyle(StyleJarvis)
+	if name != jarvisEntryName || url != jarvisEntryURL || !bytes.Equal(doc, orbJarvisDocument()) {
+		t.Errorf("orbPageForStyle(jarvis) = %s, %s (doc equal: %v)", name, url, bytes.Equal(doc, orbJarvisDocument()))
+	}
+	if jarvisEntryURL != "https://wisp.orb/jarvis.html" {
+		t.Errorf("jarvisEntryURL = %q", jarvisEntryURL)
+	}
+}
+
+// TestOrbJarvisServingConstants pins the jarvis document's injection: exactly
+// one CSP meta with the exfiltration cut, injected inside the head - the same
+// serving treatment both pages get - while the raw embed itself stays free of
+// the meta.
+func TestOrbJarvisServingConstants(t *testing.T) {
+	doc := string(orbJarvisDocument())
+	if got := strings.Count(doc, "http-equiv=\"Content-Security-Policy\""); got != 1 {
+		t.Errorf("served jarvis document carries %d CSP meta tags, want exactly 1", got)
+	}
+	for _, must := range []string{"connect-src 'none'", "default-src 'none'"} {
+		if !strings.Contains(doc, must) {
+			t.Errorf("served jarvis document CSP missing %q", must)
+		}
+	}
+	headEnd := strings.Index(doc, "<style>")
+	metaEnd := strings.Index(doc, "Content-Security-Policy")
+	if headEnd < 0 || metaEnd < 0 || metaEnd > headEnd {
+		t.Error("CSP meta is not inside the served jarvis document's head")
+	}
+	// The raw embed must NOT already carry the injected CSP meta (react-dom's
+	// own code contains the bare string "http-equiv" for meta handling, so
+	// the ruler is the exact injected attribute+policy pair, not the bare
+	// word): the injection is this repo's serving seam, and the asset file
+	// remains the untouched build output.
+	if strings.Contains(string(jarvisPageHTML), `http-equiv="Content-Security-Policy"`) {
+		t.Error("the embedded jarvis asset itself was modified with the CSP meta")
 	}
 }

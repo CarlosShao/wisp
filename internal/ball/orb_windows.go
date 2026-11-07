@@ -225,8 +225,20 @@ type orbWindow struct {
 	hwnd    windows.HWND
 	browser *orbedge.Chromium
 
+	// style is the visual family this window is currently SERVING (UI-thread
+	// owned, set at attach and updated by setStyle): it selects the pushed
+	// page's seam (window.liquidOrb for siri, window.jarvisOrb for jarvis)
+	// and whether audio bands exist at all (jarvis has no audio input).
+	style Style
+
+	// servedByMapping records that the virtual-host mapping came up and the
+	// page was delivered as https://wisp.orb/<entry> (vs the NavigateToString
+	// fallback) - the delivery shape setStyle must reproduce on a swap.
+	servedByMapping bool
+
 	// state is the last ball state this window was told about (UI-thread
-	// owned). pushAudio reads it to decide whether the mic drives the bands.
+	// owned). pushAudio reads it to decide whether the mic drives the bands,
+	// and setStyle re-pushes it after the page swap.
 	state statemachine.State
 }
 
@@ -265,7 +277,7 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 	// FULLY transparent - no black flash between window creation and attach.
 	enableDWMAlpha(windows.HWND(hwnd))
 
-	o := &orbWindow{sta: s, hwnd: windows.HWND(hwnd)}
+	o := &orbWindow{sta: s, hwnd: windows.HWND(hwnd), style: ActiveStyle()}
 
 	// Transparency, WebView2 layer, from BROWSER BIRTH: the documented cure
 	// for the API put's own known issue - "setting the color by API can
@@ -331,21 +343,23 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 	// pixels outside the orb are the window's transparency, not that fill.
 	browser.Init(orbPageBootstrap)
 
-	// Serving (D29), second shape - a REAL https origin, because the page's
-	// shader is WebGPU and the runtime only exposes navigator.gpu to a secure
-	// context (measured 2026-11-07: under NavigateToString the page ran fine -
-	// liquidOrb=object, ready=complete - but navigator.gpu was undefined and
-	// the page itself printed "WebGPU is not supported in this environment").
-	// The upstream page is materialized byte-for-byte (plus the injected CSP
-	// meta, orbasset.go) into a per-user folder and the synthetic host
-	// https://wisp.orb is mapped onto it with CORS denied - the offline
-	// no-socket shape survives: the mapping exists only inside THIS browser
-	// instance, the host name is under a TLD no resolver answers, and the
-	// meta CSP still cuts every network verb. The module's
+	// Serving (D29), second shape - a REAL https origin, because the SIRI
+	// page's shader is WebGPU and the runtime only exposes navigator.gpu to a
+	// secure context (measured 2026-11-07: under NavigateToString the page ran
+	// fine - liquidOrb=object, ready=complete - but navigator.gpu was
+	// undefined and the page itself printed "WebGPU is not supported in this
+	// environment"). The active style's page is materialized byte-for-byte
+	// (plus the injected CSP meta, orbasset.go) into a per-user folder - BOTH
+	// style entries are written so a runtime switch is a pure navigation -
+	// and the synthetic host https://wisp.orb is mapped onto it with CORS
+	// denied - the offline no-socket shape survives: the mapping exists only
+	// inside THIS browser instance, the host name is under a TLD no resolver
+	// answers, and the meta CSP still cuts every network verb. The module's
 	// SetVirtualHostNameToFolderMapping wrapper reports failure off the raw
 	// thread GetLastError (the same defect that broke the response seam), so
 	// a reported failure is logged and answered with the NavigateToString
-	// fallback rather than trusted blindly.
+	// fallback rather than trusted blindly. (The style itself was read into
+	// o.style at window creation, above.)
 	siteDir := filepath.Join(orbDataPath(), "site")
 	served := false
 	if err := orbWriteSite(siteDir); err != nil {
@@ -356,14 +370,18 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 		orbSiteHost, siteDir, orbedge.COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_DENY_CORS); err != nil {
 		slog.Warn("ball: orb virtual host mapping reported failure (the wrapper's raw-GetLastError check may lie); falling back to NavigateToString", "err", err)
 	} else {
-		browser.Navigate(orbEntryURL)
+		_, _, entryURL := orbPageForStyle(o.style)
+		browser.Navigate(entryURL)
 		served = true
+		o.servedByMapping = true
 	}
 	if !served {
-		// Degraded delivery: the page still loads (interface, states, audio
-		// all work) but the runtime hides navigator.gpu off this origin, so
-		// the page shows its own "WebGPU is not supported" face.
-		browser.NavigateToString(string(orbPageDocument()))
+		// Degraded delivery: the page still loads (interface, states all work)
+		// but the SIRI page's runtime hides navigator.gpu off this origin, so
+		// that page shows its own "WebGPU is not supported" face. The jarvis
+		// page is WebGL and renders off this origin too.
+		doc, _, _ := orbPageForStyle(o.style)
+		browser.NavigateToString(string(doc))
 	}
 
 	// Controller visibility: the module's Embed NEVER puts IsVisible(true)
@@ -398,10 +416,17 @@ func orbDataPath() string {
 	return filepath.Join(base, "wisp", "orb")
 }
 
-// pushState maps and pushes one ball state to the page (STA thread).
+// pushState maps and pushes one ball state to the SERVED page (STA thread).
+// The seam follows the window's style: the siri page exposes window.liquidOrb
+// (two names, throws on unknown - orbstate.go orbStateFor), the jarvis page
+// window.jarvisOrb (four names, ignores unknown - jarvisStateFor).
 func (o *orbWindow) pushState(s statemachine.State) {
 	o.state = s
 	if o.browser == nil {
+		return
+	}
+	if o.style == StyleJarvis {
+		o.browser.Eval(orbJarvisStateScript(jarvisStateFor(s)))
 		return
 	}
 	o.browser.Eval(orbStateScript(orbStateFor(s)))
@@ -409,13 +434,38 @@ func (o *orbWindow) pushState(s statemachine.State) {
 
 // pushAudio feeds one mic envelope to the page's bands (STA thread). The
 // caller (Ball.applyLevel) already gated this on the audio-driven family;
-// the double check here keeps the seam honest on its own.
+// the double check here keeps the seam honest on its own. The jarvis page is
+// skipped outright: the upstream component has no audio-band input (verified
+// states.ts/renderer.ts/JarvisOrb.tsx) and none is invented.
 func (o *orbWindow) pushAudio(level float32) {
-	if o.browser == nil || !orbAudioFor(o.state) {
+	if o.browser == nil || o.style == StyleJarvis || !orbAudioFor(o.state) {
 		return
 	}
 	l := float64(level)
 	o.browser.Eval(orbAudioScript(l, l, l, l))
+}
+
+// setStyle swaps the served page in place on a runtime style switch (STA
+// thread): a pure navigation between the two site entries (orbWriteSite wrote
+// both at attach), then a re-push of the window's own last state so the new
+// page opens on the face the ball is in. The re-push rides the same guarded
+// seam as attach-time seeding: if it lands before the page's module script
+// has defined the interface object the guard no-ops and the next SetState
+// corrects the face - the identical race the siri attach accepted and
+// measured benign. Served=false (the NavigateToString fallback) re-runs the
+// fallback with the other style's document.
+func (o *orbWindow) setStyle(style Style) {
+	if o.browser == nil || o.style == style {
+		return
+	}
+	o.style = style
+	doc, _, entryURL := orbPageForStyle(style)
+	if entryURL != "" && o.servedByMapping {
+		o.browser.Navigate(entryURL)
+	} else {
+		o.browser.NavigateToString(string(doc))
+	}
+	o.pushState(o.state)
 }
 
 // orbFollowGap is gone: the orb no longer floats BESIDE the ball (that
@@ -592,6 +642,24 @@ func (b *Ball) detachOrb() {
 	if o := b.orb.Swap(nil); o != nil {
 		o.destroy()
 	}
+}
+
+// ApplyStyle switches the style family AT RUNTIME: SetStyle (the process-wide
+// family the D2D renderer repaints from) plus the served page swap that makes
+// the WebView2 face follow it. Safe from any goroutine; returns false for a
+// name outside the vocabulary (styleGlassName|styleJarvisName) with nothing
+// changed. With the orb not attached (D2D fallback), only SetStyle runs - the
+// fallback face is the renderer's jarvis/glass branch, untouched here.
+func (b *Ball) ApplyStyle(name string) bool {
+	if !SetStyle(name) {
+		return false
+	}
+	b.sta.PostTask(func() {
+		if o := b.orb.Load(); o != nil {
+			o.setStyle(ActiveStyle())
+		}
+	})
+	return true
 }
 
 // followOrb is the ball-window move hook: keep the orb next to the ball.

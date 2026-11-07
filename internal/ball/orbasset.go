@@ -34,6 +34,28 @@ import (
 //go:embed assets/orb-siri.html
 var orbPageHTML []byte
 
+// jarvisPageHTML is the SECOND style family's page (ticket 65, owner-ordered
+// second visual style): the cyber1443/jarvis-ai-orb-web-animation component
+// (upstream MIT) built by tools/jarvis-export into ONE self-contained HTML -
+// react + react-dom + three + the component, inlined by inline.mjs. The
+// component source is unmodified; entry.tsx (the only integration-owned code)
+// mounts it and exposes window.jarvisOrb = { setState, getState } with the
+// page's own four state names (idle|thinking|success|alert). Built artifact,
+// build method and the three build-time pitfalls are recorded in
+// docs/evidence/s1/65-jarvis-style-integration.md; the sha pin lives in
+// orb_test.go (jarvisUpstreamSHA256), same discipline as orb-siri.html.
+//
+// Unlike the siri page this one is WebGL (not WebGPU), so it would render
+// even off the NavigateToString fallback; it is served through the SAME
+// virtual-host seam anyway so both styles share one no-socket shape.
+//
+// Audio: the upstream component has NO audio-band input (verified
+// states.ts/renderer.ts/JarvisOrb.tsx); none is invented - pushAudio skips
+// this style (orb_windows.go).
+//
+//go:embed assets/jarvis-orb.html
+var jarvisPageHTML []byte
+
 const (
 	// orbSiteHost is the synthetic host name the site folder is mapped onto
 	// (SetVirtualHostNameToFolderMapping takes the host WITHOUT the scheme).
@@ -43,12 +65,20 @@ const (
 	// (cmd/wisp/panel_control_windows.go panelOrigin).
 	orbSiteHost = "wisp.orb"
 
-	// orbOrigin / orbEntryName / orbEntryURL: the page's origin under the
-	// mapping and the one path the site folder serves.
+	// orbOrigin / orbEntryName / orbEntryURL: the SIRI page's origin under the
+	// mapping and its entry path. The jarvis page lives in the same folder
+	// under its own entry name (jarvisEntryName), so a runtime style switch is
+	// a pure navigation - no site rewrite, no browser rebuild.
 	orbOrigin    = "https://" + orbSiteHost
 	orbEntryName = "orb.html"
 
 	orbEntryURL = orbOrigin + "/" + orbEntryName
+
+	// jarvisEntryName / jarvisEntryURL: the jarvis page's entry under the same
+	// mapped folder (orbWriteSite materializes BOTH entries every attach).
+	jarvisEntryName = "jarvis.html"
+
+	jarvisEntryURL = orbOrigin + "/" + jarvisEntryName
 )
 
 // orbCSPHeaderValue is the policy the SERVED document carries as an injected
@@ -69,38 +99,51 @@ const orbCSPHeaderValue = "default-src 'none'; script-src 'unsafe-inline'; " +
 	"style-src 'unsafe-inline'; img-src data:; connect-src 'none'; " +
 	"frame-src 'none'; object-src 'none'; base-uri 'none'"
 
-// orbPageDocument returns the document actually served: the upstream page
-// byte-for-byte PLUS two injected head entries right after <head> - the only
-// transformations the serving seam applies on top of the embed, applied in
-// memory so the asset file stays the untouched upstream export (its sha is
-// pinned in orb_test.go). The first is the CSP <meta> (a response-header CSP
-// is not available to either delivery shape). The second is the transparent
-// background <style>: the script bootstrap (orbPageBootstrap) clears the
-// body fill through AddScriptToExecuteOnDocumentCreated, but that seam is a
-// RACE - the jchv wrapper passes a NULL completion handler and the
-// registration can land after the first document already loaded (measured
-// 2026-11-07 on real desktop runs: page alive, WebGPU running, corners
-// showing the upstream dark body fill for the whole process lifetime). A
-// declarative CSS override has no such seam: `transparent !important` beats
-// the upstream opaque body rule regardless of rule order, and
-// the pixels outside the orb become the window's transparency. If the
-// upstream head marker were ever missing the entries are injected after the
-// doctype instead: the policy is never silently dropped.
-func orbPageDocument() []byte {
+// orbPageDocument returns the SIRI document actually served: the upstream page
+// byte-for-byte PLUS the two injected head entries (orbServeDocument below).
+func orbPageDocument() []byte { return orbServeDocument(orbPageHTML) }
+
+// orbJarvisDocument returns the JARVIS document actually served: the same
+// injection applied to the built single-file page (jarvisPageHTML). The jarvis
+// asset ships with a transparent body background of its own (index.html
+// template); the injected transparent style stays as the same belt both pages
+// get, and the CSP meta is what makes the page offline by policy.
+func orbJarvisDocument() []byte { return orbServeDocument(jarvisPageHTML) }
+
+// orbServeDocument injects the two head entries into one embedded page right
+// after <head> - the only transformations the serving seam applies on top of
+// the embed, applied in memory so the asset files stay untouched upstream (or
+// untouched build output, for jarvis; their shas are pinned in orb_test.go).
+// The first is the CSP <meta> (a response-header CSP is not available to
+// either delivery shape). The second is the transparent background <style>:
+// the script bootstrap (orbPageBootstrap) clears the body fill through
+// AddScriptToExecuteOnDocumentCreated, but that seam is a RACE - the jchv
+// wrapper passes a NULL completion handler and the registration can land
+// after the first document already loaded (measured 2026-11-07 on real
+// desktop runs: page alive, WebGPU running, corners showing the upstream dark
+// body fill for the whole process lifetime). A declarative CSS override has
+// no such seam: `transparent !important` beats any opaque body rule
+// regardless of rule order, and the pixels outside the orb become the
+// window's transparency. If a page's head marker were ever missing the
+// entries are injected after the doctype instead: the policy is never
+// silently dropped.
+func orbServeDocument(page []byte) []byte {
 	meta := []byte("<head>\n  <meta http-equiv=\"Content-Security-Policy\" content=\"" +
 		orbCSPHeaderValue + "\" />" +
 		"\n  <style>html,body{background:transparent !important}</style>")
-	if doc := bytes.Replace(orbPageHTML, []byte("<head>"), meta, 1); len(doc) != len(orbPageHTML) {
+	if doc := bytes.Replace(page, []byte("<head>"), meta, 1); len(doc) != len(page) {
 		return doc
 	}
-	// Fallback (upstream head tag removed): inject after the doctype rather
-	// than serve an unpoliced document.
-	return bytes.Replace(orbPageHTML, []byte(">"), []byte(">\n<head>"+orbCSPHeaderValue+"</head>"), 1)
+	// Fallback (head tag removed): inject after the doctype rather than serve
+	// an unpoliced document.
+	return bytes.Replace(page, []byte(">"), []byte(">\n<head>"+orbCSPHeaderValue+"</head>"), 1)
 }
 
-// orbWriteSite materializes the served page into dir as the mapping's entry
-// file: the same bytes orbPageDocument hands NavigateToString, so both
-// delivery shapes serve ONE document shape. The folder lives under the orb's
+// orbWriteSite materializes BOTH style pages into dir as the mapping's entry
+// files: the same bytes the NavigateToString fallback would hand (orb.html =
+// orbPageDocument, jarvis.html = orbJarvisDocument), so both delivery shapes
+// serve ONE document shape per style, and a runtime style switch is a pure
+// navigation between the two entries. The folder lives under the orb's
 // per-user user-data path (orb_windows.go orbDataPath); writing it is
 // idempotent, done once per attach.
 func orbWriteSite(dir string) error {
@@ -108,6 +151,9 @@ func orbWriteSite(dir string) error {
 		return fmt.Errorf("ball: orb site mkdir: %w", err)
 	}
 	if err := os.WriteFile(filepath.Join(dir, orbEntryName), orbPageDocument(), 0o600); err != nil {
+		return fmt.Errorf("ball: orb site write: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, jarvisEntryName), orbJarvisDocument(), 0o600); err != nil {
 		return fmt.Errorf("ball: orb site write: %w", err)
 	}
 	return nil
@@ -140,6 +186,26 @@ const orbPageBootstrap = `(function () {
 // 20 frozen ball states, because the page throws on an unknown name.
 func orbStateScript(name string) string {
 	return fmt.Sprintf("window.liquidOrb&&window.liquidOrb.setState(%q)", name)
+}
+
+// orbJarvisStateScript is the jarvis page's twin of orbStateScript: the entry
+// (tools/jarvis-export/entry.tsx) exposes window.jarvisOrb = { setState,
+// getState } and IGNORES unknown names instead of throwing, so a stray push
+// can never kill the RAF loop; the mapping table (orbstate.go jarvisStateFor)
+// is pinned to the page's own four-name vocabulary by tests all the same.
+func orbJarvisStateScript(name string) string {
+	return fmt.Sprintf("window.jarvisOrb&&window.jarvisOrb.setState(%q)", name)
+}
+
+// orbPageForStyle resolves one style family to the page it serves: the siri
+// glass page for StyleGlass, the jarvis particle page for StyleJarvis. This
+// is the whole "which asset" decision - newOrbWindow navigates to entryURL
+// (or falls back to doc), orbWindow.setStyle re-navigates on a runtime switch.
+func orbPageForStyle(s Style) (doc []byte, entryName string, entryURL string) {
+	if s == StyleJarvis {
+		return orbJarvisDocument(), jarvisEntryName, jarvisEntryURL
+	}
+	return orbPageDocument(), orbEntryName, orbEntryURL
 }
 
 // orbAudioScript builds the ExecuteScript body for one audio-band push. The

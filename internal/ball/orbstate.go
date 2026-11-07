@@ -50,5 +50,42 @@ func orbStateFor(s statemachine.State) string {
 	return "idle"
 }
 
+// The jarvis page (ticket 65 second visual style, the cyber1443 component)
+// ships FOUR states of its own - idle|thinking|success|alert (its
+// STATE_TARGETS keys) - so the same 20 frozen ball states map onto the richer
+// native vocabulary by the SAME work-shape partition, with two extensions the
+// page's own states buy:
+//
+//	"thinking" - the identical orbActiveStates set as the siri mapping (the
+//	             work family; one partition, two vocabularies).
+//	"alert"    - the failure/attention family (Error, NoNetwork,
+//	             WatchdogAlert, Stuck, Unconfigured): the page's own warning
+//	             mood, which the siri page does not have. The D2D fallback
+//	             still renders its dedicated failure recipes when the orb is
+//	             not attached - nothing downstream changes.
+//	"success"  - Settling, the one-shot post-work rest transition: the
+//	             page's own "job done" mood.
+//	"idle"     - everything else (standby, ambient, Downloading) - unchanged
+//	             from the siri partition.
+//
+// jarvisStateFor's fallback is "idle" (the entry IGNORES unknown names, but
+// the mapping itself never produces one - pinned by tests over all 20 states).
+func jarvisStateFor(s statemachine.State) string {
+	if orbActiveStates[s] {
+		return "thinking"
+	}
+	switch s {
+	case statemachine.StateError,
+		statemachine.StateNoNetwork,
+		statemachine.StateWatchdogAlert,
+		statemachine.StateStuck,
+		statemachine.StateUnconfigured:
+		return "alert"
+	case statemachine.StateSettling:
+		return "success"
+	}
+	return "idle"
+}
+
 // orbAudioFor reports whether the orb should be audio-driven in s.
 func orbAudioFor(s statemachine.State) bool { return orbAudioStates[s] }
