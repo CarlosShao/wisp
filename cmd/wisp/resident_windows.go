@@ -86,6 +86,43 @@ func hotkeyReloadSource296(dataDir string) ball.HotkeyConfig {
 // //go:build windows files, so an untagged main.go could not type-check under
 // GOOS=linux. resident_other.go carries the refusal for every other platform.
 func runResident() {
+	// An exit request that arrives DURING boot is a request, not a crash, and
+	// the handler that answers it is armed from the FIRST statement of this
+	// function (ticket 246 AC#8). The handler that stops this process is
+	// installed inside RunEventLoop, and everything in front of it - proc.Boot,
+	// the log sink, the crash-marker sweep (a real store open), writeRunMarker,
+	// autostartSync, then the ball path (D2D factory, layered window, tray
+	// icon, four RegisterHotKey calls, 268ms on the bench machine: log stamps,
+	// sink installed 16:05:20.7746, ball booked 16:05:21.0424) - is a window in
+	// which a Ctrl+C delivered to nothing makes Go's console handler return 0
+	// (runtime/os_windows.go ctrlHandler), the default disposition kills the
+	// process with 0xc000013a, and the operator loses the whole D38(e) trail,
+	// the tray removal and the hot key release.
+	//
+	// The registration first sat here next to the boot-window check below,
+	// behind installLogSink - and that left the stretch between the sink's
+	// file appearing and the Notify as an unregistered window, which is
+	// exactly where the TestAC228ExitRequestDuringBootStillLeavesThroughD38E
+	// flake lived (1 red in 5 on the bench before this move: the case fires
+	// the break as soon as the sink file exists, the sweep between the two
+	// lines raced it, and the red run's sink held the file but ZERO records).
+	// Arming the handler before any of that work leaves nothing observable in
+	// front of it: the only unregistered instructions left are main's own
+	// dispatch and attachParentConsole.
+	//
+	// It stays registered for the rest of the function - the Stop defer is the
+	// FIRST one registered, so LIFO unwinds it last and the deferred chain
+	// below is covered by it end to end (a Ctrl+C during the shutdown sequence
+	// itself is held by the buffer instead of hitting the default disposition
+	// mid-teardown). os/signal forwards to every registered channel, so proc's
+	// own NotifyContext inside RunEventLoop still gets the signal once it
+	// exists, and the only gap left is the few instructions between the check
+	// below and NotifyContext inside RunEventLoop - which costs one more
+	// Ctrl+C, not an unclean death.
+	bootExit := make(chan os.Signal, 1)
+	signal.Notify(bootExit, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(bootExit)
+
 	printVersions("")
 
 	env, err := buildinfo.ResolveEnv()
@@ -208,28 +245,20 @@ func runResident() {
 	fmt.Printf("wisp: resident runtime booted (%s, data dir = %s, portable = %v, job object = on, single instance = %v)\n",
 		sum.EnvBadge(), sum.DataDir, sum.Portable, rt.Instance != nil)
 
-	// An exit request that arrives DURING boot is now a request, not a crash.
-	// The handler that stops this process is installed inside RunEventLoop, and
-	// the ball path in front of it - D2D factory, layered window, tray icon,
-	// four RegisterHotKey calls - measured 268ms on the bench machine
-	// (log stamps: sink installed 16:05:20.7746, ball booked 16:05:21.0424).
-	// Without this registration a Ctrl+C inside that window is delivered to
-	// nothing, so Go's console handler returns 0 (runtime/os_windows.go
-	// ctrlHandler), the default disposition kills the process with
-	// 0xc000013a, and the operator loses the whole D38(e) trail, the tray
-	// removal and the hot key release. Registering above, while the sink is
-	// already open and the shutdown defer is already in place, is what makes
-	// the deferred chain below the only way this function ends.
+	// The boot report has to match what happens next: if an exit request already
+	// arrived during the ball path, printing "resident event loop running" and
+	// then never entering the loop would be exactly the kind of sentence AC#7 exists
+	// for. The ball status and the task-source posture are true in either branch,
+	// so they print in either.
 	//
-	// It stays registered for the rest of the function: os/signal forwards to
-	// every registered channel, so proc's own context still gets the signal
-	// once it exists, and the only gap left is the few instructions between the
-	// check below and NotifyContext inside RunEventLoop - which costs one more
-	// Ctrl+C, not an unclean death.
-	bootExit := make(chan os.Signal, 1)
-	signal.Notify(bootExit, os.Interrupt, syscall.SIGTERM)
-	defer signal.Stop(bootExit)
-
+	// Since ticket 228 AC#11 there are TWO sources that can have arrived by now,
+	// and the answer lives in residentBootWindowExit228 rather than in a literal
+	// here: a test that re-typed this select would read green whichever way the
+	// gap was wired, which is the reading tickets 258 and 296 already refused for
+	// the two halves of the [hotkey] chain. The console half of the pair is
+	// registered at the top of this function (ticket 246 AC#8), so a Ctrl+C from
+	// the very first instruction on latches there instead of dying unhandled.
+	//
 	// Ticket 228 AC#11 ⓐ (mount 1 of the two this cell owes): the tray's door into
 	// this same window is taken HERE, next to the console handler, and on the same
 	// terms. proc.Boot built the stop-request bit, so a click of the tray's Exit
