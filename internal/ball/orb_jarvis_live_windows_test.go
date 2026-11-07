@@ -46,9 +46,12 @@ package ball
 // dark/no-cyan expiry is retryable, hard failures are Fatal.
 
 import (
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 
@@ -294,5 +297,163 @@ func testJarvisRuntimeStyleSwitch(t *testing.T, b *Ball) {
 	}
 	if got := OrbDebugLine(b.DebugOrbAttached(), b.DebugOrbState()); got != "orb-surface=webview2-orb orb-state=idle" {
 		t.Errorf("debug face after style round-trip = %q", got)
+	}
+}
+
+// TestBallLiveOrbJarvisServedPageAndOverlay: the two teeth the owner's
+// 2026-11-07 real-machine evidence demanded on top of the corner/particle
+// proof above (evidence 65-jarvis-transparent-in-product.md, sections 2-3).
+// Both run against the REAL product path - ball.New, a real WebView2 attach,
+// the served site folder - with no test-specific backdrop:
+//
+//  1. SERVED-PAGE TRANSPARENCY BY CONSTRUCTION: the exact jarvis.html file
+//     the product WebView2 loads (orbDataPath/site/jarvis.html, rewritten on
+//     every attach) must carry (a) the injected
+//     html,body{background:transparent !important} belt both orb pages share,
+//     (b) the page's OWN body rule as background: transparent (the
+//     2026-11-07 template rework - transparency no longer leans on the
+//     injection winning the cascade), and (c) no opaque #050913 backdrop
+//     rule anywhere in its CSS. Why this tooth and not a "corners equal the
+//     ambient desktop" variant: on the owner's real machine the desktop
+//     behind the orb is a LIVE GAME SURFACE whose pixels change between two
+//     samples, so an ambient-comparison corner read is unfalsifiable there
+//     (a transparent orb over the white game reads white - which IS the
+//     ambient color); the corner tooth over the known floor (the test above)
+//     stays the composited-pixel proof, and this served-page tooth closes
+//     the residual "the page itself paints a backdrop" class on ANY machine.
+//
+//  2. NO BADGE DISC ON THE JARVIS FACE: with the orb attached and the jarvis
+//     family active, the overlay branch must skip the step-11 D2D badge disc
+//     (renderer_windows.go) - the owner's red-dot-on-the-particle-sphere
+//     defect. The audit walks the ball window's ULW source DIB on the STA
+//     thread (serialized with drawFrame) for red-dominant pixels: Danger is
+//     #E07A70 (dark) / #BC544C (light), red >= 1.5x green AND blue in BOTH
+//     rows, a ratio invariant under premultiplied opacity scaling, and the
+//     ONLY element the overlay branch may legally paint in that hue band
+//     (the ring is near-white BorderSoft, the arc teal Accent, the queue dot
+//     blue Info, the silhouette alpha 1/255). Positive control: the same
+//     badge depth under the GLASS family must still paint the disc (>= 50
+//     red-dominant px), proving the audit can see it - so the jarvis zero is
+//     a style-scoped skip, not a blind audit.
+func TestBallLiveOrbJarvisServedPageAndOverlay(t *testing.T) {
+	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
+	if err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	requireQuietBallDesktop(t)
+	orbTestReapLeakedWebView2(t)
+
+	if !SetStyle(styleJarvisName) {
+		t.Fatal("SetStyle(jarvis) refused")
+	}
+	t.Cleanup(func() {
+		SetStyle(styleGlassName)
+	})
+
+	b, err := New(Options{
+		SizePx:      BallSizeDefaultPx,
+		Initial:     statemachine.StateSleeping,
+		Store:       store,
+		WindowTitle: liveBallTitle(t),
+		Hotkeys:     liveHotkeys(),
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	t.Cleanup(b.Close)
+
+	deadline := time.Now().Add(15 * time.Second)
+	for {
+		if b.DebugOrbHWND() != 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("orb window did not attach within 15s; face %q",
+				OrbDebugLine(b.DebugOrbAttached(), b.DebugOrbState()))
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	// Tooth 1: the served jarvis.html the product WebView2 actually loads.
+	served, err := os.ReadFile(filepath.Join(orbDataPath(), "site", jarvisEntryName))
+	if err != nil {
+		t.Fatalf("read served jarvis page: %v (orbWriteSite runs on every attach)", err)
+	}
+	page := string(served)
+	const injectedBelt = "<style>html,body{background:transparent !important}</style>"
+	if !strings.Contains(page, injectedBelt) {
+		t.Error("served jarvis page lost the injected transparent belt (orbServeDocument)")
+	}
+	if !strings.Contains(page, "background: transparent;") {
+		t.Error("served jarvis page body rule is not transparent by construction " +
+			"(tools/jarvis-export/index.html template rework missing from the build)")
+	}
+	if strings.Contains(page, "background: #050913") {
+		t.Error("served jarvis page still carries the opaque demo backdrop rule")
+	}
+	t.Logf("served jarvis page: injected belt present, body transparent by construction, no opaque backdrop rule (%d bytes)", len(served))
+
+	// Tooth 2 phase 1: jarvis overlay + real badge depth, zero red disc px.
+	// SetBadge posts to the STA thread, so the audit task queued behind it
+	// reads the settled frame (the glyph audit's established shape).
+	b.SetBadge(0)
+	b.SetBadge(3)
+	if n := jarvisOverlayDangerDiscPixels(b); n != 0 {
+		t.Fatalf("jarvis overlay frame carries %d red-dominant disc pixels: the D2D badge "+
+			"disc still rides the jarvis particle face (owner 2026-11-07 real-machine defect)", n)
+	}
+	t.Logf("jarvis overlay frame with badge depth 3: zero red-dominant disc pixels")
+
+	// Tooth 2 phase 2 (positive control): the SAME depth under glass paints
+	// the badge dot, so the zero above is the jarvis-scoped skip and not a
+	// blind audit. ApplyStyle swaps the page but does not repaint the D2D
+	// window, so the badge is re-set to force a fresh overlay frame.
+	if !b.ApplyStyle(styleGlassName) {
+		t.Fatal("ApplyStyle(glass) refused")
+	}
+	b.SetBadge(0)
+	b.SetBadge(3)
+	if n := jarvisOverlayDangerDiscPixels(b); n < 50 {
+		t.Fatalf("glass overlay frame carries only %d red-dominant disc pixels (want >=50): "+
+			"the audit cannot see the badge dot, so the jarvis zero proves nothing", n)
+	} else {
+		t.Logf("glass overlay frame keeps the badge dot under the same depth: %d red-dominant pixels (floor 50)", n)
+	}
+}
+
+// jarvisOverlayDangerDiscPixels walks the ball window's ULW source DIB on the
+// STA thread (serialized with drawFrame) and counts opaque red-dominant
+// pixels: alpha >= 100 and red >= 1.5x green AND blue (the Danger badge disc's
+// hue band, invariant under premultiplied opacity scaling and antialiasing).
+// Returns -1 when the audit could not run (no DIB) or timed out.
+func jarvisOverlayDangerDiscPixels(b *Ball) int {
+	done := make(chan int, 1)
+	b.sta.PostTask(func() {
+		r := b.rend
+		if r.bits == nil || r.w <= 0 || r.h <= 0 {
+			done <- -1
+			return
+		}
+		buf := unsafe.Slice((*uint32)(r.bits), int(r.w)*int(r.h))
+		n := 0
+		for _, px := range buf {
+			a := px >> 24 // BGRA little-endian: alpha is the top byte
+			if a < 100 {
+				continue
+			}
+			bl := int(px & 0xff)
+			g := int((px >> 8) & 0xff)
+			rr := int((px >> 16) & 0xff)
+			if rr*2 >= g*3 && rr*2 >= bl*3 {
+				n++
+			}
+		}
+		done <- n
+	})
+	select {
+	case n := <-done:
+		return n
+	case <-time.After(10 * time.Second):
+		return -1
 	}
 }
