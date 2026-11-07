@@ -55,11 +55,7 @@
 
 **唯一形态差异**：siri 页是上游原样 export（上游本来就有单文件形态）；jarvis 上游发布形态是 React 组件库，单文件 HTML 是我们用上游自己的组件 + 主流工具链（vite）构建出来的**集成产物**——组件源码零改动（甲案的核心纪律，与 A1594「ship the upstream page unmodified」同法）。
 
----
-
-## 步2 裁定：集成形态选甲（vite 构建独立单文件 HTML）
-
-**选甲。** 三条候选的裁定与代价（判据＝铁律 ⓪⓪⓪：最有价值＋最符合主流 harness；⛔ 动作最小不进判据）：
+## 步2 裁定：集成形态选甲（vite 构建独立单文件 HTML） 三条候选的裁定与代价（判据＝铁律 ⓪⓪⓪：最有价值＋最符合主流 harness；⛔ 动作最小不进判据）：
 
 ### 甲（选）：vite 构建 jarvis 单文件 HTML → `internal/ball/assets/jarvis-orb.html`
 
@@ -84,4 +80,42 @@
 1. **D32 待遇**：D32 静帧纪律管的是 D2D fallback 渲染器（`jarvis_windows.go`，本腿零触碰，继续静帧）。orb 窗是「真上游页面」面——siri 页 idle 本来就持续跑上游自己的 RAF（机主已签收的形状）；jarvis 页同待遇：跑上游自己的动画循环（其自带 reduced-motion 降级与离屏暂停）。这不是本腿发明的豁免，是既有 orb 面规则的对称适用。
 2. **音频带**：jarvis 上游**没有** setAudioBands 类接缝（组件与渲染器都没有音频输入），本腿**不做发明**——jarvis 风格下语音家族不推音频带（pushAudio 跳过），如实记录为该风格的已知边界；audio 驱动仍是 glass 风格的 siri 页能力。
 
-（步3 落地与验证见下文追加节。）
+---
+
+## 步3 落地：jarvis-orb.html 构建＋真渲染验证
+
+**产物**：`internal/ball/assets/jarvis-orb.html`（758,355 B，LF，sha256
+`e95e1d963139a08b50d0c6be1d460db137a005d602e05eb9451dc60a6d99ce62`，钉值进 `orb_test.go`）。
+**脚手架**：`tools/jarvis-export/`（entry.tsx ＝ 本腿唯一自有集成代码；node_modules/dist 已 gitignore；构建方法见其 README）。
+
+**真渲染验证（不是"文件生成了"）**：Tabbit 真浏览器打开产物页，`canvas:true`、
+`window.jarvisOrb` 接缝 `setState("thinking")`→`getState()` 回读 `"thinking"`，
+idle/thinking 两态截图：
+
+- `docs/evidence/s1/65-jarvis-orb-idle.png`（青色球核＋多椭圆轨道环＋粒子散点＋轴线）
+- `docs/evidence/s1/65-jarvis-orb-thinking.png`（teal 高能版，环更密、球核更实）
+
+**构建过程踩掉的三颗雷（复跑必读）**：
+
+1. **`String.replace` 字符串替换模式污染**：minified JS 里 `$'`/`$&` 序列被替换引擎解释，
+   把原 index.html 尾部（含外链 `src="/assets/…"`）拼进内联代码 ⇒ SyntaxError＋5 个假 script。
+   修＝函数式替换 `replace(m, () => s)`（inline.mjs 内注释钉住）。
+2. **双 React 实例**：`file:` 依赖是符号链接，上游克隆自己的 react devDep 抢走解析
+   ⇒ 组件 hooks 打到另一个 React 的 null dispatcher（`null (reading 'useRef')`）。
+   修＝vite `resolve.dedupe: ["react","react-dom"]`（vite 文档对此的标准修法）。
+3. **JSX classic runtime**：esbuild 默认 `React.createElement` 而入口未 import React
+   ⇒ `React is not defined`。修＝`esbuild: { jsx: "automatic" }`。
+
+**静态尺（与 siri 页同法）**：`src="http…|href="http…|fetch(` 全文仅 1 处命中＝vite 自带
+modulepreload polyfill 的代码标识符 `fetch(a.href)`（文档内无 modulepreload link，路径永不触达；
+serving 缝 CSP `connect-src 'none'` 运行时硬断）。无任何 http(s) URL 引用。bundle 内有
+react-dom SSR 模板的 `<script src=…>` 字符串字面量、无 `</script` 序列 ⇒ 内联解析安全。
+
+**机主自跑验证命令**（产物已入库后）：
+
+```
+python -m http.server 8923 --directory "D:\work\workspace\projects plans\Wisp\internal\ball\assets"
+# 浏览器开 http://127.0.0.1:8923/jarvis-orb.html —— 截图就看这个 URL
+```
+
+（步4 Go 接线见下文追加节。）
