@@ -137,3 +137,14 @@ AnySearch 文档 1 张、代理面板 1 张、本轮 tour 截图 3 张、小裁�
   0.000% 全黑，实验A排除 TRANSPARENT、实验B（守卫恢复）转绿锁定"球窗照画"与 in-suite 状态相互作用、
   standalone 4 连绿、末两轮全套 4 枚全绿（19.95%/12.47%）——摇摆未根除，如实报。门禁：gofumpt 空/vet rc0/
   build rc0（含 cmd/wisp、balldebug）/默认套件 ok 0.379s/d22scan clean。AC 勾与 Status 未动；⛔push
+
+- [2026-11-07T16:3x +08] agent=65-pixel-flake-fix did=Pixel 枚真 flake 治理（缺陷治理腿）。复现＋根因用读数钉死：
+  全套 count=10 第二回 **39/40**，像素非黑率逐轮坍塌 `40.6%×7 → 27.2 → 7.7 → 0.000×3发`＝**泄漏堆积**不是随机摇摆——
+  destroy() 从不关 controller（jchv 包装层 ICoreWebView2Controller 无 Close vtable）每轮泄漏 msedgewebview2
+  进程积 GPU 压力，standalone 连绿/in-suite 变红由此而来。修（测试侧，判据 1% 零改动）：①有界重建重试 3 发
+  （orbPixelAttempt 单发 25s 轮询原样，全黑拆整套重建，attach 失败仍硬 Fatal）；②**泄漏收割**
+  orbTestReapLeakedWebView2（Toolhelp 枚举：父 PID＝本测试进程 ∧ 映像名 msedgewebview2 才杀，测试开始＋每发
+  重建前各清一次，他应用 WebView2 零命中）。**判定牙：修后全套 count=10 ⇒ 40/40 全绿**（rc0，204.4s；
+  收割器每轮 reap 1 个＝机理读数自洽；非黑率 13-36% 零坍塌，区间移动是同树另一腿 b576c10a3 改渲染器所致）。
+  遗留：产码级根治（补 Close vtable，fork＋replace）另立票。门禁：gofumpt 空/vet rc0（含 winlive）/默认套件 ok/
+  d22scan clean。AC 勾与 Status 未动；证据 docs/evidence/s1/65-pixel-flake-fix.md；⛔push
