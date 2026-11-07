@@ -155,4 +155,47 @@ config 侧（`internal/config/settings_65_test.go`）：守卫写收据 `[ball.s
 
 ### 3.3 步2 落地读数
 
-（步2 commit 后追加）
+**并发对账（诚实记录）**：本腿步1 commit（`fe0f740d6`）落盘后，**另一条并发收口腿**把 §2「本腿落」清单整段 commit 了（`bc48ae6c7` 步3+4 ＋ `635922c76` 步5收件 ＋ `d86e591ba` 追加更正，即上文的 §4/§5/§6——故本文件节序为 §1§2§4§5§6§3，append-only 未重排）。四小段由本腿落（`1b25d931c` 步2a：knownWritableField 四表并集＋两附加缝＋composer 快照键＋pump reader＋新件 `ball_style_65.go`；`7858108a0` 步2b：run.go 注入——⚠ §6「仍差 run.go 注入」一句在写作时点属实，`7858108a0` 是 `d86e591ba` 的祖先，**终态 run.go 注入已在库**）。命名一处偏离 §2 占位：快照键落成 `BallStyle *BallStyleSection`/wire 名 `ballStyle`（对齐 `FieldBallStyle` 与 `[ball].style` 线名，§2 的 `OrbStyle` 是未定占位）。
+
+四小段落点（`1b25d931c`，6 件，gofumpt 空/build rc0/全 LF）：
+
+1. `config_handlers.go` `knownWritableField` ＝ `listedWritableField || additionalWritableField || writableField187 || writableField65`（四表并集，248/313/187 钉子原样）；
+2. `config_write_313.go` `acceptedWritableFields` 并入 `WritableFields65()`、`takesValueFor` 并入 `fields65TakesValue`（步1 新发现的两缝，187 三处全接同款）；
+3. `composer.go` `BallStyle *BallStyleSection`（指针+omitempty，`Q-51` 未声明红同既定程序）＋新件 `ball_style_65.go` 载体（Style/Vocabulary 两字段，零词表字面量）；
+4. `pump.go` `PumpSources.BallStyle` reader＋fill（nil 词表渲染 `[]`）；`run.go`（`7858108a0`）装配根注入 `BallStyle: func() panel.BallStyleSection`（读 `rt.settings` 同一个 `mgr` 的 `BallStyleOptions`）。
+
+### 3.4 步3 牙读数（panel 门级＋突变④逐字）
+
+新件 `internal/panel/ball_style_65_test.go`（3 测）＋`cmd/wisp/panel_ball_style_65_test.go`（run.go 源钉，213 同款）：roster 四表并集且三旧名册零污染／门级 `config.set ball_style` 直达 leg（applyCalls=1、值逐字、收据含 `ball.style`）＋空值门拒（正控）＋未列名拒（负控）／ballStyle 键 reader-gated 双向＋nil 词表渲染 `[]`。全部 PASS。
+
+**突变④（牙四条之一，逐字）**：临时把 `knownWritableField` 摘成三表（去掉 `|| writableField65(field)`）：
+
+```
+--- FAIL: Test65DoorAdmitsBallStyleAndRoutesItToTheLeg (0.00s)
+    ball_style_65_test.go:77: the door refused ball_style: panel: 配置字段不在可写名册内: "ball_style" 不在可写名册内；可写的只有 ball_style/model_context_window/model_price_in/model_price_out/model_row_create/model_row_delete/provider_api_key_ref/provider_base_url/provider_billing/provider_credential/provider_row_create/provider_row_create_custom/provider_row_delete/role_chat_model/role_chat_pair/role_chat_thinking/voice_cloud_asr_chain/voice_cloud_tts_chain/voice_realtime_model/voice_realtime_provider（requestId="r-65"）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.076s
+```
+
+`go test rc=1`。注意拒绝文案里 ball_style **仍在列**——这恰好证明 `acceptedWritableFields` 缝独立起作用（文案缝与门缝是两条），摘门缝只红门级行为。还原后 sha256 逐字节一致（`2048692e72db376c2cc41407c2191ac525b7e8bd83d38262fc23ac2a22817616`，突变前后同值），门级测试复绿。牙①②③由并发腿测试承担（§5 表，本腿复跑见 §3.5）。
+
+### 3.5 步4 终态门禁（组合态全量复跑，2026-11-07T19:5x +08）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| gofumpt | `/d/work/base/gopath/bin/gofumpt.exe -l`（本腿九件点名） | 空（rc0） |
+| vet | `go vet ./internal/panel ./internal/config ./internal/ball ./cmd/wisp` | rc0 |
+| build | 同四包 `go build` | rc0 |
+| panel | `go test ./internal/panel -count=1` | rc1（17.124s），**3 红逐枚归属**：`TestApprovalCardViewJSONKeysMatchFrontendTypes`/`TestComposerContractTypesMatchFrontend`（红行＝`Go Snapshot emits [commands modelSwitch ballStyle] that interface PanelSnapshot does not declare`——ballStyle 已按 Q-51 既定程序入列，UI 腿声明后转绿）＋`TestC21DesignTokensFourWayAgree`（ball tokens 面，本票零触碰） |
+| config | `go test ./internal/config -count=1` | ok 3.136s |
+| cmd/wisp | `go test ./cmd/wisp -run 'Test65\|TestStyle\|TestComposer' -count=1 -timeout 30m` | rc0，**5/5 PASS**（Test65SeedDefaultGlass / Test65SeedJarvis / Test65SeedUnreadable / Test65ApplySettingBallStyleFlipsActiveStyle / Test65AssemblyRootCarriesTheBallStyleReader；后两 pattern 在 cmd/wisp 无匹配函数，如实记） |
+| winlive | `go test -tags winlive ./internal/ball/ -run 'TestBallLiveOrb' -count=1 -timeout 25m` | **7/7 PASS rc0 56.819s**（含 `TestBallLiveOrbJarvisStyleRendersParticles`＝ApplyStyle 真窗往返，四角 (51,51,50) 判据未破） |
+| d22scan | `./tools/d22scan/d22scan.exe` | clean rc0（internal 956 Go＋cmd 234，注释与测试含） |
+
+**LF**：本腿全部触件核过，无 CRLF。
+
+### 3.6 收口终态（机主原话兑现路径）
+
+设置页外观项现在的完整链：**快照键 `ballStyle`**（`composer.go` ← pump reader ← `run.go` 注入 ← `config.BallStyleOptions`）→ 页面拿到当前风格＋词表（glass 在列）；**写**：`config.set ball_style` → 门 `knownWritableField` 放行 → `ApplySetting` case → `config.SetBallStyle`（枚举先拒后写，守卫路径）→ `applyBallStyle65` → `Ball.ApplyStyle`（进程级换家族＋STA 换页导航）→ **即时生效**（有球答 now；无球答 restart，boot 种子下次启动落地）。`ApplyStyle` 产品调用者＝**2**（boot 幂等复同步＋设置写入路径），不再是 0。默认＝玻璃球三重成立（config schema 默认＋ball 包默认＋新件零字面量）。
+
+本票收口链 commits（双腿交错，全只 commit 不 push）：`110e3bdcf`（步1+2 取证裁定）→ `fe0f740d6`（本腿步1）→ `bc48ae6c7`/`635922c76`/`d86e591ba`（并发腿步3+4/步5/更正）→ `1b25d931c`（步2a）→ `7858108a0`（步2b run.go）→ `432d5ab7b`（步3）→ 本笔（步4 收口读数＋log）。
