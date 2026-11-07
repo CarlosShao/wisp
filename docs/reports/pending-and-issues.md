@@ -31642,6 +31642,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★推送网络断（如实）**：`git push` 连发 8 次全失败，`git ls-remote` 报 `TLS connect error: error:0A000126:SSL routines::unexpected eof while reading` ⇒ 按纪律**本地照常 commit、网络恢复后统一推**。当前本地领先 origin/dev **8 笔**。
 - **撤销口令**：176 结票＝`git revert 99a5711e4`（会把文件名改回未 done）；Jarvis 集成＝`git revert b679fd072 29b3501d5 1652051d0`；69% 修＝`git revert 5d8751e70 c5cca231a`。
 
+## A1607（2026-11-07 18:5x，编排者）**213 名册上册（三发变异牙）｜188 取证把「票面现量整段过期」揪出｜★176 裁决腿把票面自己更正了两处**
+- **213 斜杠命令名册（`0e68772a0`，12 文件 +506/−17）**：`internal/panel/commands_roster_213.go`（载体）＋`cmd/wisp/panel_commands_213.go`（装配器）＋`composer.go` Snapshot 加键＋`pump.go` 读口＋`run.go:1023` 装配根。**名册今天 3 行**（`cancel`/`stop`/`mode`），无门的 6 条（compact/goal/plan/model/export/feedback）双侧测试钉死缺席。
+  - **★三发变异牙**：M1 摘装配根读口行 ⇒ `no longer carries the commands reader`；M2 装配器塞 `compact` 假行 ⇒ `rows = 4, roster rows = 3`；M3 摘 pump 接线 ⇒ `sent no commands key`。逐发红后 **sha256 两两一致还原**。
+  - **★我亲跑复核**：`go test ./cmd/wisp -run 'Test213' -count=1` ⇒ **ok 0.118s**。
+  - **交付 3 只做了 Go 侧一半**：`panel.Snapshot` 新增 reader-gated `commands` 键；**页面侧 TS 声明没做**（`frontend/**` 归外部 Q-51）⇒ `internal/panel` 有 **2 枚预定红**（逐字 `Go Snapshot emits [commands] that interface PanelSnapshot does not declare`）。
+- **188 监控栏取证（`9ad02eb50`，只读 54 行）**：★**票面「现量」整段过期**（09-28 锚）——票面 0 命中的子代理尺今天打 **19 枚文件**（197 落地整链：源→载体 `composer.go:91`→泵 `pump.go:355,372`→装配 `run.go:1019`→宿主映射 `panel_pump.go:189-247`）。
+  - **四字段真源表**：子代理 Status **有源有 reader（不缺）**；**根任务 Status 缺**（`MarkRoot` 刻意不落，`task.go:419` 注释＝A394 归 196；196 已 done 只落 memory 侧映射）⇒ 补它只需 `cmd/wisp/run.go:1855` **一行装配**；「已拒绝」行 **无源**（spawn 四处拒绝 `:254/:281/:288/:316` 全不留名册行，D43 借哪个名＝规格真空）；时间维 **规格真空**（`TaskOutput`/`TaskRow` 无钟点字段）。
+  - **AC#4 与 145 分账被 197 改写**：今天＝188 交源 · 197 交载体（已落）· **票 35 交出向传输（未落：`PostWebMessage|EvaluateScript|CreateWebMessageAsJson` 非 test 0 命中）** · 前端交页面读取（未落：`panel.ts:256` 已声明 `tasks?` 但 `.tasks` 读取 0 文件）。
+  - **裁定顺序**：①根任务状态维（一行装配，判据 `task_state_188_test.go` 现成）→②拒绝行（先裁 D43 借名再写）→③时间维＋「排队中」第二源（立票排后）。
+- **★176 裁决腿把票面自己更正了两处（诚实加分）**：① `run.go:1813` 已漂移→现 **1834**；② 175 票面旧判据件名 `bridge_mark_provenance_ticket175_test.go` 已不在盘，被 `ticket175r2_stamp_live_test.go`（`58db7400`）取代。**09-28 老台件过期**：`probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝`[build failed]`（`62d7d3b49` 188-r2 给 `TaskBackfill` 加了 `State` 字段）——**牙没钝、台件过期**，改用 r2 现派生副本。
+  - **裁定理由（我认可）**：AC#1 作废条款确已触发，但**触发者是本票自己的腿 176-r1 交付成功** ⇒ 主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相说谎。
+- **撤销口令**：213＝`git revert 0e68772a0`；188 证据件＝`git revert 9ad02eb50`。
+
 ## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
 - **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
 - **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
