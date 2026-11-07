@@ -53,6 +53,11 @@ func mustPush(t *testing.T, q *Queue, d tools.Decision) *qitem {
 
 func assertRow(t *testing.T, got LiveApproval, want tools.Decision, position int) {
 	t.Helper()
+	// Since ticket 148 Ⓑ the row's Decision is panelVerdict's whitelist
+	// projection: the six fields the panel reader names, nothing else. The
+	// correlation id travels on the wrapper (got.CorrelationID), not inside the
+	// Decision, so a row whose Decision still carries an id string is itself a
+	// whitelist breach, not a convenience.
 	if got.CorrelationID != want.CorrelationID {
 		t.Errorf("CorrelationID=%q，期望 %q", got.CorrelationID, want.CorrelationID)
 	}
@@ -64,9 +69,9 @@ func assertRow(t *testing.T, got LiveApproval, want tools.Decision, position int
 	if d.Tool != want.Tool {
 		t.Errorf("%s 的 Decision.Tool=%q，期望原样 %q", want.CorrelationID, d.Tool, want.Tool)
 	}
-	if d.CorrelationID != want.CorrelationID || d.TaskID != want.TaskID {
-		t.Errorf("%s 的行把 id 串到了别枚上：corr=%q task=%q",
-			want.CorrelationID, d.CorrelationID, d.TaskID)
+	if len(d.Args) != len(want.Args) || string(d.Args) != string(want.Args) {
+		t.Errorf("%s 的 Decision.Args=%q，期望原样 %q（panelArgs 从这枚读 argv）",
+			want.CorrelationID, string(d.Args), string(want.Args))
 	}
 	if d.Level != want.Level {
 		t.Errorf("%s 的 Level=%v，期望原样 %v（等级是卡片上那枚徽标）",
@@ -89,16 +94,39 @@ func assertRow(t *testing.T, got LiveApproval, want tools.Decision, position int
 	if d.Reason != want.Reason {
 		t.Errorf("%s 的 Reason=%q，期望原样 %q", want.CorrelationID, d.Reason, want.Reason)
 	}
-	if len(d.Paths) != len(want.Paths) || d.Paths[0] != want.Paths[0] {
-		t.Errorf("%s 的 Paths=%v，期望原样 %v", want.CorrelationID, d.Paths, want.Paths)
-	}
 	if d.SessionOverrideBlocked != want.SessionOverrideBlocked {
 		t.Errorf("%s 的 SessionOverrideBlocked=%v，期望原样 %v（R4 那枚标记，卡片据此说话）",
 			want.CorrelationID, d.SessionOverrideBlocked, want.SessionOverrideBlocked)
 	}
-	if d.Mode != want.Mode || d.ModeSilenced != want.ModeSilenced {
-		t.Errorf("%s 的 Mode=%v ModeSilenced=%v，期望原样 %v/%v",
-			want.CorrelationID, d.Mode, d.ModeSilenced, want.Mode, want.ModeSilenced)
+	// FORBIDDEN FIELDS, all zero: anything below that is non-zero on a returned
+	// row means the whitelist leaked a field the panel reader does not name.
+	if d.CorrelationID != "" || d.TaskID != "" || d.CallID != "" {
+		t.Errorf("%s 的行携带了 id 串（corr=%q task=%q call=%q）：白名单只允许经包装层送 CorrelationID",
+			want.CorrelationID, d.CorrelationID, d.TaskID, d.CallID)
+	}
+	if d.Params != nil {
+		t.Errorf("%s 的行携带了 Params（%v）：完整工具参数不是面板载荷，票 148 Ⓑ 收窄掉的就是它",
+			want.CorrelationID, d.Params)
+	}
+	if len(d.Paths) != 0 {
+		t.Errorf("%s 的行携带了 Paths（%v）：路径面属 PanelItem 投影，不属这枚行",
+			want.CorrelationID, d.Paths)
+	}
+	if len(d.Capabilities) != 0 {
+		t.Errorf("%s 的行携带了 Capabilities（%v）：能力位不是面板载荷", want.CorrelationID, d.Capabilities)
+	}
+	if d.Mode != 0 || d.ModeSilenced || d.ModeKept != "" {
+		t.Errorf("%s 的行携带了 Mode 面（%v/%v/%q）：权限模式是审计面，不是卡片载荷",
+			want.CorrelationID, d.Mode, d.ModeSilenced, d.ModeKept)
+	}
+	if d.Blacklist.Absolute != nil || d.Blacklist.Unlockable != nil || d.Blacklist.AlreadyUnlocked != nil ||
+		d.Blacklist.Class != 0 || d.Blacklist.Reason != "" || d.Blacklist.Unresolved != 0 {
+		t.Errorf("%s 的行携带了 Blacklist（%+v）：A/B 档证据不是面板载荷", want.CorrelationID, d.Blacklist)
+	}
+	if d.Refusal != tools.RefusalNone || d.DecisionColumn != "" || d.Provider != "" ||
+		d.PluginID != "" || d.Timeout != 0 {
+		t.Errorf("%s 的行携带了路由/来源字段（refusal=%q column=%q provider=%v plugin=%q timeout=%v）",
+			want.CorrelationID, d.Refusal, d.DecisionColumn, d.Provider, d.PluginID, d.Timeout)
 	}
 }
 

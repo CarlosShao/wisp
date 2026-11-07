@@ -621,7 +621,7 @@ func (q *Queue) replay(corr string) (tools.Decision, string, error) {
 		fresh.state = statePending
 		fresh.answer = make(chan answer, 1)
 		fresh.replayOf = it.Corr
-		d := it.Dec
+		d := cloneDecision(it.Dec)
 		d.CorrelationID = corr + "#replay"
 		if _, clash := q.byID[d.CorrelationID]; clash {
 			d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)

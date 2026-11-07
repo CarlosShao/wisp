@@ -1,6 +1,17 @@
 package approval
 
-// Ticket 146's guard for Queue.LiveApprovals (pending_read.go).
+// Ticket 146's guard for the full-decision copy primitive (pending_read.go's
+// cloneDecision), re-aimed by ticket 148.
+//
+// WHY THE SUBJECT MOVED OFF LiveApprovals. When ticket 146 landed, the probe
+// drove Queue.LiveApprovals() because that function handed out the whole
+// Decision. Ticket 148 Ⓑ narrowed that outbound to panelVerdict's whitelist
+// (the fields the panel reader names; Params is not on it), and ticket 148 AC#1
+// made Queue.replay the second caller of cloneDecision. The full eight-slot
+// copy promise therefore now lives on cloneDecision - the primitive BOTH doors
+// go through - and this file guards it there, by direct call. The whitelist
+// payload LiveApprovals hands out has its own fail-closed rulers in
+// ticket148_panel_whitelist_test.go.
 //
 // WHY THIS CASE EXISTS. pending_read.go's header promised "copies of verdicts"
 // while the implementation copied tools.Decision BY VALUE - and Decision itself
@@ -14,7 +25,7 @@ package approval
 //
 // THREE MECHANISMS, EACH REQUIRED TO GO RED FOR A DIFFERENT BREAKING SHAPE:
 //
-//	probe 1  names every reference-typed slot of the returned Decision whose
+//	probe 1  names every reference-typed slot of the cloned Decision whose
 //	         backing pointer is still the queue's. It walks by DECLARED TYPE
 //	         (reflect.TypeOf), not by value, so a ninth reference field on
 //	         tools.Decision is counted even when the fixture leaves it nil, and
@@ -28,23 +39,26 @@ package approval
 //	probe 2  is ticket 146 AC#2's literal assertion: write IN PLACE through every
 //	         one of those slots, then read the record back out of the queue
 //	         (its stored qitem.Dec, its own view()/head() projection, and a
-//	         second LiveApprovals() call) and require it unchanged. BEFORE the
-//	         write it also pins VALUE FIDELITY with reflect.DeepEqual: the
-//	         returned Decision must equal the queue's stored record field for
-//	         field. The backing-pointer check only proves the two do not SHARE
-//	         memory; DeepEqual is what proves the copy did not drop the values
-//	         on the way out (a cloneParamsMap that keeps keys and nils the
-//	         values, or a cloneBacking that allocates an empty slice, shares
-//	         nothing and so sails through probe 1 untouched).
+//	         second clone) and require it unchanged. BEFORE the write it also
+//	         pins VALUE FIDELITY with reflect.DeepEqual: the cloned Decision
+//	         must equal the queue's stored record field for field. The
+//	         backing-pointer check only proves the two do not SHARE memory;
+//	         DeepEqual is what proves the copy did not drop the values on the
+//	         way out (a cloneParamsMap that keeps keys and nils the values, or
+//	         a cloneBacking that allocates an empty slice, shares nothing and
+//	         so sails through probe 1 untouched).
 //
 // What is NOT claimed here: the copy is ONE level deep (see cloneDecision).
 // The containers reachable *through* Params' values - the []any / map[string]any
 // a JSON decode leaves inside it - are still shared, and this case does not
-// probe them. That limit is stated in pending_read.go's header, not hidden.
+// probe them. That limit is stated in pending_read.go's header, not hidden -
+// and ticket 148 Ⓑ closed the only outbound path that carried Params to a
+// reader (LiveApprovals), so the reachable shape is now Queue.replay's returned
+// Decision, consumed in-process by the approval flow.
 //
 // This file is `package approval` like pending_read_test.go (white box) because
 // probe 2 has to read the queue's own stored record, and no public path exposes
-// it - the whole point of the ticket is that the public path hands out an alias.
+// it - the whole point of the ticket is that the outbound hands out an alias.
 
 import (
 	"encoding/json"
@@ -204,22 +218,19 @@ func sorted(in []string) []string {
 	return out
 }
 
-// TestLiveApprovalsSharesNoReferenceSlotWithTheQueue is probe 1.
-func TestLiveApprovalsSharesNoReferenceSlotWithTheQueue(t *testing.T) {
+// TestCloneDecisionSharesNoReferenceSlotWithTheQueue is probe 1.
+func TestCloneDecisionSharesNoReferenceSlotWithTheQueue(t *testing.T) {
 	q := NewQueue(0, 0, 0, nil)
 	want := sharedDecision()
 	mustPush(t, q, want)
+	stored := mustFindLive(q, "corr-backing").Dec
+	clone := cloneDecision(stored)
 
-	got := q.LiveApprovals()
-	if len(got) != 1 {
-		t.Fatalf("期望 1 行，得 %d：%+v", len(got), got)
-	}
-
-	live := typeCensus(t, reflect.TypeOf(got[0].Decision))
+	live := typeCensus(t, reflect.TypeOf(clone))
 	found := live
 	expect := sorted(queueSlotPaths)
 	if len(found) != len(expect) {
-		t.Fatalf("返回值里的引用槽位数 %d (%v)，期望 %d (%v)。\n"+
+		t.Fatalf("拷贝里的引用槽位数 %d (%v)，期望 %d (%v)。\n"+
 			"数目不符说明 tools.Decision 增删了引用字段而 queueSlotPaths / cloneDecision 没跟上 —— 这条用例正是为此而红，"+
 			"必须和 tools.Decision 的字段表一起改，不许放宽。",
 			len(found), found, len(expect), expect)
@@ -230,11 +241,11 @@ func TestLiveApprovalsSharesNoReferenceSlotWithTheQueue(t *testing.T) {
 		}
 	}
 
-	stored := reflect.ValueOf(mustFindLive(q, "corr-backing").Dec)
+	storedV := reflect.ValueOf(stored)
 	var shared []string
 	for _, path := range found {
-		a := slotValue(t, reflect.ValueOf(got[0].Decision), path)
-		b := slotValue(t, stored, path)
+		a := slotValue(t, reflect.ValueOf(clone), path)
+		b := slotValue(t, storedV, path)
 		// The backing-pointer comparison below only has teeth on a non-empty
 		// slot: a nil or zero-length slice/map has a zero (or shared-empty)
 		// data pointer, so "pa != 0 && pa == pb" would report no alias even if
@@ -250,56 +261,53 @@ func TestLiveApprovalsSharesNoReferenceSlotWithTheQueue(t *testing.T) {
 		}
 	}
 	if len(shared) != 0 {
-		t.Errorf("AC#2 RED: LiveApprovals() 返回行里这些槽位与队列存储的那条记录共用底层：%v。\n"+
+		t.Errorf("AC#2 RED: cloneDecision() 交出的 Decision 里这些槽位与队列存储的那条记录共用底层：%v。\n"+
 			"pending_read.go 的注释说 copies，共用底层就是就地写会改掉已决断记录。\n"+
+			"两扇门都从这枚原语走（LiveApprovals 的白名单投影、票 148 AC#1 后的 Queue.replay），"+
 			"修法在 cloneDecision：给每一枚点名的槽位单独分配。", shared)
 	}
 }
 
-// TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord is probe 2, AC#2's
-// literal sentence: write in place through every reference slot of the returned
-// row, then read the record back out of the queue three ways and require it
+// TestCloneDecisionInPlaceWriteCannotReachTheQueueRecord is probe 2, AC#2's
+// literal sentence: write in place through every reference slot of the cloned
+// value, then read the record back out of the queue three ways and require it
 // unchanged. Under the pre-ticket-146 implementation all eight writes land in
 // the queue's own memory and every assertion below goes red.
-func TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord(t *testing.T) {
+func TestCloneDecisionInPlaceWriteCannotReachTheQueueRecord(t *testing.T) {
 	q := NewQueue(0, 0, 0, nil)
 	want := sharedDecision()
 	mustPush(t, q, want)
-
-	got := q.LiveApprovals()
-	if len(got) != 1 {
-		t.Fatalf("期望 1 行，得 %d：%+v", len(got), got)
-	}
-	row := got[0]
+	stored := mustFindLive(q, "corr-backing").Dec
+	row := cloneDecision(stored)
 
 	// VALUE FIDELITY, before anything is clobbered. "copies" is a two-sided
-	// promise: not only must the returned row not SHARE the queue's memory
+	// promise: not only must the clone not SHARE the queue's memory
 	// (probe 1's backing-pointer check), the copy must also CARRY the same
 	// values. A cloneParamsMap that keeps every key and nils every value, or a
 	// cloneBacking that allocates a fresh-but-empty slice, shares nothing - so
-	// probe 1 stays green - yet hands the panel a deformed verdict. DeepEqual on
-	// the returned Decision vs the queue's stored record is the one ruler that
+	// probe 1 stays green - yet hands the reader a deformed verdict. DeepEqual on
+	// the cloned Decision vs the queue's stored record is the one ruler that
 	// goes red for that shape, and it is checked here, before the in-place write
 	// below, so a genuine clobber is never mistaken for a lost value.
-	if !reflect.DeepEqual(row.Decision, mustFindLive(q, "corr-backing").Dec) {
-		t.Fatalf("AC#2 RED (值保真): LiveApprovals() 交出的 Decision 与队列存储的那条不逐字段相等。\n"+
+	if !reflect.DeepEqual(row, stored) {
+		t.Fatalf("AC#2 RED (值保真): cloneDecision() 交出的 Decision 与队列存储的那条不逐字段相等。\n"+
 			"返回值:  %+v\n存储项: %+v\n"+
 			"这就是注释里 \"copies\" 的第二半没人钉的形状：不共用底层，却把值拷丢了。\n"+
 			"修法在 cloneDecision／cloneBacking／cloneParamsMap：分配的每一份都得把原值带上。",
-			row.Decision, mustFindLive(q, "corr-backing").Dec)
+			row, stored)
 	}
 
 	// Clobber each slot IN PLACE, through the returned value only. No
 	// re-assignment of whole fields: that would prove nothing about aliasing.
-	row.Decision.Params["argv"] = "clobbered"
-	row.Decision.Params["injected-by-caller"] = true
-	copy(row.Decision.Args, []byte("XXXXXXXX"))
-	row.Decision.RulesHit[0] = risk.RuleID("R9")
-	row.Decision.Paths[0] = "C:/clobbered"
-	row.Decision.Capabilities[0] = tools.CapNotify
-	row.Decision.Blacklist.Absolute[0] = "C:/clobbered"
-	row.Decision.Blacklist.Unlockable[0] = "C:/clobbered"
-	row.Decision.Blacklist.AlreadyUnlocked[0] = "C:/clobbered"
+	row.Params["argv"] = "clobbered"
+	row.Params["injected-by-caller"] = true
+	copy(row.Args, []byte("XXXXXXXX"))
+	row.RulesHit[0] = risk.RuleID("R9")
+	row.Paths[0] = "C:/clobbered"
+	row.Capabilities[0] = tools.CapNotify
+	row.Blacklist.Absolute[0] = "C:/clobbered"
+	row.Blacklist.Unlockable[0] = "C:/clobbered"
+	row.Blacklist.AlreadyUnlocked[0] = "C:/clobbered"
 
 	// (1) The queue's own stored record, read white-box.
 	have := mustFindLive(q, "corr-backing").Dec
@@ -356,20 +364,18 @@ func TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord(t *testing.T) {
 		t.Errorf("view 与 head 对同一枚项报出不同位次 %d vs %d", item.Depth, head.Depth)
 	}
 
-	// (3) A second read: the pump re-reads on every state change, so the row it
-	// gets next must describe the queue, not the earlier caller's write.
-	again := q.LiveApprovals()
-	if len(again) != 1 {
-		t.Fatalf("第二次读期望 1 行，得 %d", len(again))
+	// (3) A second clone: every outbound door calls the primitive again on each
+	// read, so the value the NEXT reader gets must describe the queue, not the
+	// earlier caller's write.
+	again := cloneDecision(mustFindLive(q, "corr-backing").Dec)
+	if again.RulesHit[0] != risk.R2 {
+		t.Errorf("AC#2 RED: 第二次拷到 RulesHit[0]=%q，队列记录已被上一枚读者改掉", again.RulesHit[0])
 	}
-	if again[0].Decision.RulesHit[0] != risk.R2 {
-		t.Errorf("AC#2 RED: 第二次读到 RulesHit[0]=%q，队列记录已被上一枚读者改掉", again[0].Decision.RulesHit[0])
+	if again.Capabilities[0] != tools.CapShell {
+		t.Errorf("AC#2 RED: 第二次拷到 Capabilities[0]=%q", again.Capabilities[0])
 	}
-	if again[0].Decision.Capabilities[0] != tools.CapShell {
-		t.Errorf("AC#2 RED: 第二次读到 Capabilities[0]=%q", again[0].Decision.Capabilities[0])
-	}
-	if _, injected := again[0].Decision.Params["injected-by-caller"]; injected {
-		t.Errorf("AC#2 RED: 第二次读到的 Params 里带着别人塞的键")
+	if _, injected := again.Params["injected-by-caller"]; injected {
+		t.Errorf("AC#2 RED: 第二次拷到的 Params 里带着别人塞的键")
 	}
 
 	// And the mutation must not have cost the queue an item or a state change.

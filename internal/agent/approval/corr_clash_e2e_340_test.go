@@ -24,11 +24,14 @@ package approval_test
 //	   admitted through AdmitTextTask, D47) -> real Queue.push #1: no clash,
 //	   the item is filed under X itself.
 //	-> THIS case reads X back off the production queue face —
-//	   Queue.LiveApprovals()[0].Decision.CorrelationID — the corr as the
-//	   queue RECORDED the loop's mint — and hands that same decision to a
-//	   second real Gate.PendingApproval call. No corr string is typed by
-//	   this test at any point; the second push's input IS the first push's
-//	   booked value, byte for byte.
+//	   Queue.LiveApprovals()[0].CorrelationID (since ticket 148 Ⓑ the wrapper
+//	   carries the corr; the row's Decision no longer does) — the corr as the
+//	   queue RECORDED the loop's mint — and hands a decision carrying that
+//	   same corr to a second real Gate.PendingApproval call. No corr string
+//	   is typed by this test at any point; the second push's corr input IS
+//	   the first push's booked value, byte for byte, and the rest of the
+//	   re-dispatch decision rides the native card face (params, args, rules,
+//	   reason, task id), which is the surface a human actually answers.
 //	-> real Queue.push #2: byID[X] clash -> corr = fmt.Sprintf("%s#%d", X, 2)
 //	   => the stacked form, minted by the real minter AND rewritten by the
 //	   real clash branch, both running for real.
@@ -301,18 +304,30 @@ func TestQueueClashRewriteOfARealLoopCorrelationEndToEnd(t *testing.T) {
 	// Stage 1 — the real mint, the first real push. Wait for the loop's ONE
 	// fs.edit call to sit in the queue.
 	live := waitDepth(t, f.gate.Queue(), 1)
+	// Ticket 148 Ⓑ narrowed the queue face: a LiveApprovals row no longer
+	// carries the decision's id strings (the wrapper's CorrelationID IS the
+	// queue's own record, and the ids a human needs travel on the native
+	// prompt). Both reads below are production faces, so the corr chain this
+	// case names is still hand-built nowhere.
 	X := live[0].CorrelationID
-	booked := live[0].Decision.CorrelationID
-	taskID := live[0].Decision.TaskID
+	for spin := 0; spin < 200 && len(f.ui.cards()) < 1; spin++ {
+		time.Sleep(25 * time.Millisecond)
+	}
+	cards := f.ui.cards()
+	if len(cards) == 0 {
+		t.Fatal("the native UI never saw a card — the join below would prove nothing")
+	}
+	taskID := cards[0].TaskID
 	if taskID == "" {
-		t.Fatal("the queued decision carries no task id — the join below would prove nothing")
+		t.Fatal("the native card carries no task id — the join below would prove nothing")
 	}
 	// (1a) The first card is filed under the incoming corr itself (no clash
-	// yet) and the queue RECORDED that same corr on its item: X is then the
-	// corr the real callCorr minted, read off the production queue face —
-	// this value, byte for byte, is what stage 2 feeds back.
-	if X == "" || booked != X {
-		t.Fatalf("the first card must be filed under its own incoming corr: issued=%q booked=%q", X, booked)
+	// yet) and the wrapper's CorrelationID is the corr the queue recorded on
+	// its item: X is then the corr the real callCorr minted, read off the
+	// production queue face — this value, byte for byte, is what stage 2
+	// feeds back.
+	if X == "" {
+		t.Fatalf("the first card must be filed under its own incoming corr: got %q", X)
 	}
 	// (1b) The minter's arm A ran for real: X is the production shape
 	// <taskID>#<callID> over the provider id the replay carried, with exactly
@@ -328,15 +343,26 @@ func TestQueueClashRewriteOfARealLoopCorrelationEndToEnd(t *testing.T) {
 			X, dupCallID340)
 	}
 
-	// Stage 2 — the real clash rewrite of the real corr. The decision handed
-	// to the second PendingApproval IS the first push's booked decision read
-	// off the queue face (cloneDecision already copied it), so the corr the
-	// rewrite stacks onto is production-minted, never typed here.
-	reDispatched := live[0].Decision
-	if reDispatched.CorrelationID != X {
-		t.Fatalf("the queue face handed back a different incoming corr (%q vs %q) — the "+
-			"read side moved and the chain this case names would no longer be the one it runs",
-			reDispatched.CorrelationID, X)
+	// Stage 2 — the real clash rewrite of the real corr. Ticket 148 Ⓑ removed
+	// the queue face's full-decision read-back, so the decision handed to the
+	// second PendingApproval is rebuilt from the faces that stay
+	// production-shaped: the card a human was shown (params, args, level,
+	// rules, reason, task id) plus the queue's own issued key X. The corr
+	// chain — the only thing the rewrite keys on — is production bytes end to
+	// end; the risk payload rides the same card the user answered.
+	if cards[0].Level != "L2" {
+		t.Fatalf("the shown card is not the L2 verdict this chain is built on: level=%q", cards[0].Level)
+	}
+	reDispatched := tools.Decision{
+		Tool:          cards[0].Tool,
+		Provider:      tools.KindBuiltin,
+		Params:        cards[0].Params,
+		Args:          cards[0].Args,
+		Level:         risk.L2,
+		RulesHit:      cards[0].RulesHit,
+		Reason:        cards[0].Reason,
+		CorrelationID: X,
+		TaskID:        taskID,
 	}
 	answerCh := make(chan tools.Answer, 1)
 	wg.Add(1)
@@ -356,14 +382,12 @@ func TestQueueClashRewriteOfARealLoopCorrelationEndToEnd(t *testing.T) {
 
 	live = waitDepth(t, f.gate.Queue(), 2)
 	key0, key1 := live[0].CorrelationID, live[1].CorrelationID
-	in0, in1 := live[0].Decision.CorrelationID, live[1].Decision.CorrelationID
 
-	// (2a) The clash witness: BOTH items record the SAME incoming corr — the
-	// production X — which is the only condition the rewrite branch keys on.
-	if in0 == "" || in0 != in1 || in0 != X {
-		t.Fatalf("the two queued items must record the same incoming corr %q (the clash the "+
-			"rewrite keys on): got %q vs %q", X, in0, in1)
-	}
+	// (2a) The clash witness, restated for the narrowed face (ticket 148 Ⓑ): a
+	// LiveApprovals row no longer carries the decision's incoming corr, so the
+	// witness is the issued keys themselves — the re-dispatch above carried
+	// the production corr X (read off the card face and the wrapper), and the
+	// second push collided on it. The teeth for the rewrite live at (2b)-(2d).
 	// (2b) The rewrite: the second card is keyed "<X>#<seq>" with a distinct
 	// key and seq suffix 2 (this queue saw exactly two pushes; the clash
 	// branch stamps the item's own seq). This assertion is the FIRST pair of
@@ -407,7 +431,7 @@ func TestQueueClashRewriteOfARealLoopCorrelationEndToEnd(t *testing.T) {
 	for spin := 0; spin < 200 && len(f.ui.cards()) < 2; spin++ {
 		time.Sleep(25 * time.Millisecond)
 	}
-	cards := f.ui.cards()
+	cards = f.ui.cards()
 	if len(cards) != 2 {
 		t.Fatalf("the UI saw %d prompts, want 2 (the loop's card + the re-dispatched card)", len(cards))
 	}
