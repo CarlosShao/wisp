@@ -69,3 +69,22 @@ func (b *Ball) ApplyStyle(name string) bool {
 ### 撤销口令
 
 `git revert` 本腿 commits 即整体退回；单段退回＝删新增四件＋还原 resident_windows.go / panel_config_store.go 两处 hunk（`git log --oneline -- cmd/wisp/ball_style_65_windows.go` 找回滚点）。
+
+## 3. 步3-5 收口（2026-11-07T19:3x +08，接续腿现跑核实＋落地读数）
+
+### 3.1 步1 现跑核实（五问五答，判据可复跑）
+
+- **① `internal/panel/config_write_65.go` 全文已读（71 行，未跟踪）**：wave71 写的第四张名册件。内容＝`FieldBallStyle="ball_style"` 常量、`fields65` 名册（一项）、`fields65TakesValue`（一项 true）、`WritableFields65()`（排序 accessor）、`writableField65()`（本名册查询）。头注释自述：为什么是第四张名册（248/313/187 各被冻结钉＋互斥断言钉死，不能插行）；接线拆分如实声明；档位不在这里盖（applier 装了答 now，没球答 restart）。
+- **② `config_handlers.go:448-450` `knownWritableField` 现状**：`listedWritableField(field) || additionalWritableField(field) || writableField187(field)`——**三表并集，无 65**。⇒ `ball_style` 被门在 `config_handlers.go:384` 明确拒绝（`"不在可写名册内"`），这就是机主原话在活机上不可用的直接机制。
+- **③ 证据件 §2「接线拆分」原文**：留给下一腿四小段＝`composer.go` 加快照键（原文占位名 `OrbStyle *OrbStyleSection`）、`pump.go` 加 reader 字段+fill、`config_handlers.go` 并集加 `writableField65(field)`、`run.go` 注入 reader。
+- **④ config 侧 `[ball].style` schema/validate/默认（现跑复核）**：词表 `schema.go:97-98/:113`（`BallStyleGlass="glass"`/`BallStyleJarvis="jarvis"`/`ballStyles`），枚举拒绝 `validate.go:70-72`，默认 glass 由 `ball_style_65_test.go`（`TestBallStyleDefaultIsGlass`＋与 ball.StyleNames() 双向漂移钉）钉死。30d8f2e38 早已落，属实。
+- **⑤ cmd/wisp `ApplySetting`「already wired」真假**：**真，但在未提交盘面**。`git diff cmd/wisp/panel_config_store.go` 实见：`case panel.FieldBallStyle:` 调 `s.mgr.SetBallStyle(w.Value)`，写后按 `applyBallStyle65` 实测结果把档位从 restart 纠正为 now。配套在盘未提交件：`cmd/wisp/ball_style_65_windows.go`（种子 `ballStyleSeed65`＋进程级 applier 缝 `ballStyleApplier65`/`installBallStyleApplier65`/`applyBallStyle65`）、`resident_windows.go` 两处 hook（New 前 `ball.SetStyle` 无闪种子＋装配后 `ApplyStyle` 幂等复同步＋applier 安装）、`internal/config/settings_65.go`（守卫写 `SetBallStyle`＋读口 `BallStyleOptions`）、两枚测试件（`ball_style_65_windows_test.go` 牙①②③＋档位如实、`settings_65_test.go` 写路径四测）。`go build ./internal/panel ./internal/config ./cmd/wisp ./internal/ball` rc0——半成品自洽。
+- **★步1 新发现（简报与 §2 都没列的两处并集缝）**：`config_write_313.go` 里 `acceptedWritableFields()`（:150，拒绝文案「可写的只有 …」的清单＝三表并集硬拼接）与 `takesValueFor()`（:170，空值检查＝三表并集）。187 当年三处全接；65 只接 `knownWritableField` 一处的话，拒绝文案撒谎（不报 ball_style）、空值检查漏问（空值漏到 config 侧才被枚举拒绝，报错形状错层）。⇒ 本腿按 187 同款**三处全接**（写面扩到 config_write_313.go 的这两个函数体，文件本身无在飞 hunks，`git status` 实见干净）。
+
+### 3.2 冲突解除核实
+
+187 腿已落盘（`007de34f0`，13 枚），`git status --porcelain internal/panel` 现跑＝仅 `config_write_65.go` 未跟踪，`composer.go`/`pump.go`/`config_handlers.go`/`config_write_313.go` 全干净 ⇒ §2 预留的四小段现在可以动，无吞 hunk 风险。`cmd/wisp` 在盘未提交的 65 件与 323 测试件（`panel_resident_323*_test.go`，他腿）并存——本腿 commit 只点名 65 件，⛔ 吞 323。
+
+### 3.3 步2 落地读数
+
+（步2 commit 后追加）
