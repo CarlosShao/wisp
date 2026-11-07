@@ -275,6 +275,11 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		written, err = s.mgr.RemoveProviderRow(w.Provider)
 	case panel.FieldRoleChatPair:
 		written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
+	case panel.FieldBallStyle:
+		// 票 65: 外观风格切换。值＝风格词本身（glass|jarvis），枚举由 config 侧
+		// setter 在落盘前把关（320 裁定的同一条形状）；盘上的 [ball].style 键、
+		// 校验与 glass 默认是票 65 实现腿（30d8f2e38）早已落的，这里只接写入腿。
+		written, err = s.mgr.SetBallStyle(w.Value)
 	case panel.FieldProviderCredential:
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
 			fmt.Errorf("凭据值不走这条写入路径（它只写不回显，必须走 StoreCredential），字段 %q 未落盘", w.Field)
@@ -286,6 +291,16 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 	}
 	res.Written = written
 	res.Tier = panel.EffectiveRestart
+	if w.Field == panel.FieldBallStyle {
+		// 票 65：档位是这一写实测出来的，不是盖出来的（187 的 fieldTier187 能
+		// 静态标是因为它的读者行为固定；ball_style 的读者＝本进程有没有球）。
+		// applier 在（球活着）＝ApplyStyle 已把进程级家族与 orb 页面换过去，
+		// 如实答 now；applier 不在（无窗启动）＝没有东西可即时换，下次启动的
+		// 种子读取会落到它，答 restart（上面盖的默认档）。
+		if applyBallStyle65(strings.TrimSpace(w.Value)) {
+			res.Tier = panel.EffectiveNow
+		}
+	}
 	return res, nil
 }
 

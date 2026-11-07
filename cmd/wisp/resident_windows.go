@@ -403,10 +403,34 @@ func runResident() {
 	// (ticket 296). Hoisting is what makes the merge measurable: a re-typed copy
 	// of the closure inside a test reads green no matter what production does.
 	hotReload258 := func() ball.HotkeyConfig { return hotkeyReloadSource296(rt.Layout.DataDir) }
+	// Ticket 65: the [ball].style seed reads the same per-use shape hotCfg258
+	// reads [hotkey] with - the Manager does not exist yet at this point of the
+	// boot (the 258-a1 census order). SetStyle runs BEFORE startResidentBall
+	// because orbWindow seeds its served style from ActiveStyle at creation
+	// (orb_windows.go:280): a jarvis config never paints a glass first frame,
+	// the same order cmd/balldebug -style runs (main.go:130). The seed carries
+	// no family literal - an unreadable file leaves the ball package's own
+	// glass default standing, with the Warn naming the fallback
+	// (ball_style_65_windows.go).
+	ballStyleName65, ballStyleOK65 := ballStyleSeed65(rt.Layout.DataDir)
+	if ballStyleOK65 {
+		ball.SetStyle(ballStyleName65)
+	}
 	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
 		return holder.toggle(via)
 	}), withStopRequest(residentTrayStop228(rt)))
 	defer rb.stop()
+	// Ticket 65 continued: the runtime half. The applier seam is installed over
+	// the live ball so the settings page's ball_style write can switch the
+	// family without a restart (ApplySetting's case calls applyBallStyle65);
+	// the ApplyStyle call here is the boot's own idempotent re-sync - a no-op
+	// when the pre-New SetStyle already landed, the product-path caller that
+	// keeps the served page honest even if a future assembly change ever
+	// reordered the seed above it.
+	installBallStyleApplier65(rb.b)
+	if ballStyleOK65 && rb.b != nil {
+		rb.b.ApplyStyle(ballStyleName65)
+	}
 
 	// The gate is bound to the ball only if the ball exists, and it is detached
 	// BEFORE the window goes away: after Ball.Close posts WM_QUIT there is no STA
