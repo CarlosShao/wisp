@@ -1057,6 +1057,31 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// governs the shape: a reader that exists always sends the key, and
 		// an empty feed renders "tools":[] rather than a vanished key.
 		Run: rt.runFeed.Section,
+		// Ticket 187's picker read face: the chat role's pair and thinking
+		// tier as the live config holds them right now, the offerable
+		// catalog rows and the current model's own declared levels, read
+		// off this run's own Manager by internal/config's ChatSwitchOptions
+		// (the production reader the pump's field doc names) - the same
+		// Manager the settings leg above (rt.settings) writes through, so
+		// the picker shows what the next ApplySetting would act on. The
+		// values travel verbatim; this literal spells neither a provider
+		// nor a tier. Without this line the snapshot carries no
+		// "modelSwitch" key at all (the reader-gated 213 shape), which is
+		// the exact assembly gap the 187 carrier and write leg left owed.
+		ModelSwitch: func() panel.ModelSwitchSection {
+			v := mgr.ChatSwitchOptions()
+			models := make([]panel.ModelOption, 0, len(v.Models))
+			for _, opt := range v.Models {
+				models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model})
+			}
+			return panel.ModelSwitchSection{
+				Current:         panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel},
+				CurrentThinking: v.CurrentThinking,
+				Models:          models,
+				ThinkingLevels:  v.ThinkingLevels,
+				Reason:          v.Reason,
+			}
+		},
 		// Ticket 33 AC#8's naming split (33-r14): Publish keeps the blocking
 		// ledger entry by that name, and the AC#8 clamp-branch ruler drives the
 		// packet through tryBookPanelSnapshot when it needs a pass that cannot
