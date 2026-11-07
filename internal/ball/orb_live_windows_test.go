@@ -388,6 +388,15 @@ func orbTestNonDarkRatio(l, t, w, h int32) (float64, int) {
 // the old shape (all-dark window) and on any future regression that breaks
 // page delivery or WebGPU boot: "no error logged" is not a passing shape
 // here, painted pixels are.
+//
+// Flake treatment (ticket 65, 2026-11-07): the sampling already waits on the
+// real signal - painted screen pixels, polled - but one WebView2 cold boot is
+// occasionally wedged in-suite (measured: adjacent runs of the same binary
+// went 25s-never-light and 30s-to-first-light, so a fixed per-attempt budget
+// sometimes lands inside a real boot). The truth signal and the 1% floor are
+// untouched; what is new is a bounded retry: a window that stayed dark past
+// its budget is torn down WITH its WebView2 instance and rebuilt fresh, and
+// only three consecutive dark boots fail the regression.
 func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
 	if err != nil {
@@ -395,16 +404,47 @@ func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 	}
 	requireQuietBallDesktop(t)
 
-	b, err := New(Options{
-		SizePx:      BallSizeDefaultPx,
-		Initial:     statemachine.StateSleeping,
-		Store:       store,
-		WindowTitle: liveBallTitle(t),
-		Hotkeys:     liveHotkeys(),
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
+	const attempts = 3
+	var lastBest float64
+	var lastSamples int
+	for attempt := 1; attempt <= attempts; attempt++ {
+		b, err := New(Options{
+			SizePx:      BallSizeDefaultPx,
+			Initial:     statemachine.StateSleeping,
+			Store:       store,
+			WindowTitle: liveBallTitle(t),
+			Hotkeys:     liveHotkeys(),
+		})
+		if err != nil {
+			t.Fatalf("New: %v", err)
+		}
+		lit, best, samples := orbPixelAttempt(t, b, attempt)
+		if lit {
+			return
+		}
+		lastBest, lastSamples = best, samples
+		// A dark boot keeps its WebView2 instance; release it before the next
+		// attempt so the rebuild is genuinely fresh (Close is idempotent, the
+		// t.Cleanup below stays harmless).
+		b.Close()
+		if attempt < attempts {
+			t.Logf("attempt %d/%d stayed dark (best %.3f%% over %d sampled px); rebuilding ball and WebView2 instance",
+				attempt, attempts, best*100, samples)
+		}
 	}
+	t.Fatalf("orb window content stayed black after %d attempts: best non-dark ratio %.3f%% over %d sampled px (page did not render; delivery or WebGPU broken)",
+		attempts, lastBest*100, lastSamples)
+}
+
+// orbPixelAttempt runs one create-and-sample round against the LIVE desktop:
+// it waits for the orb window to attach, parks it centered over a known-black
+// backdrop, and polls the composited screen pixels until they light up or the
+// attempt budget expires. It returns (lit, best non-dark ratio, sample count)
+// and reports true the moment the page has painted; the caller owns the
+// retry decision. Fatal paths inside are hard regressions (attach loss,
+// window-API failure), not the cold-boot flake - only the dark-expiry return
+// is retryable.
+func orbPixelAttempt(t *testing.T, b *Ball, attempt int) (bool, float64, int) {
 	t.Cleanup(b.Close)
 
 	deadline := time.Now().Add(15 * time.Second)
@@ -415,7 +455,7 @@ func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 			break
 		}
 		if time.Now().After(deadline) {
-			t.Fatalf("orb window did not attach within 15s (WebView2 runtime missing or Embed refused)")
+			t.Fatalf("attempt %d: orb window did not attach within 15s (WebView2 runtime missing or Embed refused)", attempt)
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -450,7 +490,8 @@ func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 	// Known-black floor behind the orb, created and painted on the ui-sta
 	// thread (its pump is what makes the window actually paint). The floor
 	// went in topmost, so the orb must be re-asserted ABOVE it in the
-	// topmost band before any sampling.
+	// topmost band before any sampling. It is destroyed here - before the
+	// caller can Close the ball - because its pump is this ball's STA thread.
 	backdrop := make(chan uintptr, 1)
 	b.sta.PostTask(func() { backdrop <- orbTestCreateBackdrop(wr) })
 	bh := <-backdrop
@@ -459,17 +500,17 @@ func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 	}
 	pSetWindowPos.Call(uintptr(orbHWND), orbHwndTopmost, 0, 0, 0, 0,
 		uintptr(swpNoSize|swpNoMove|swpNoActivate))
-	t.Cleanup(func() {
+	defer func() {
 		done := make(chan struct{})
 		b.sta.PostTask(func() {
 			pDestroyWindow.Call(bh)
 			close(done)
 		})
 		<-done
-	})
+	}()
 
 	// WebGPU boot is not instant; poll until the orb lights up or the
-	// deadline proves it never will.
+	// deadline proves this attempt never will.
 	const budget = 25 * time.Second
 	deadline = time.Now().Add(budget)
 	best := 0.0
@@ -481,13 +522,12 @@ func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 			best = ratio
 		}
 		if ratio > 0.01 {
-			t.Logf("orb page rendered: %d/%d sampled px non-dark (%.2f%% > 1%% floor)",
-				int(ratio*float64(n)), n, ratio*100)
-			return
+			t.Logf("attempt %d: orb page rendered: %d/%d sampled px non-dark (%.2f%% > 1%% floor)",
+				attempt, int(ratio*float64(n)), n, ratio*100)
+			return true, best, samples
 		}
 		if time.Now().After(deadline) {
-			t.Fatalf("orb window content stayed black after %v: best non-dark ratio %.3f%% over %d sampled px (page did not render; delivery or WebGPU broken)",
-				budget, best*100, samples)
+			return false, best, samples
 		}
 		time.Sleep(300 * time.Millisecond)
 	}
