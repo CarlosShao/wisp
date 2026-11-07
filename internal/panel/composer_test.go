@@ -1031,10 +1031,12 @@ func TestComposerAttachmentsTravelFromTheIngestDoorToTheWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{`"stored":true`, `"artifact":"attachment-abc123.png"`,
+	for _, want := range []string{
+		`"stored":true`, `"artifact":"attachment-abc123.png"`,
 		// JSON escapes the quotes inside the sentence, so the tail without them
 		// is what a byte-level Contains can honestly look for.
-		`的类型不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime`} {
+		`的类型不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime`,
+	} {
 		if !strings.Contains(string(data), want) {
 			t.Errorf("the wire lost %q:\n%s", want, data)
 		}
