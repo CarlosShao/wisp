@@ -31466,3 +31466,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W33 PASS**（`721b4b00f`，cmd/wisp）：AC#6 严格 CSP 响应头逐字落地（200/404 都带、单一构造点 `panelResponseHeaders`）；AC#8ⓐ 钳制支装牙（`tryBookPanelSnapshot` TryLock）；`Hide()` 补关窗读数。7 新尺 14/14 PASS＋变异三发各红后还原。**剩余具名**：AC#7（生产走 Publish 非 Marshal，补假调用＝F-PUMP-4 之罪 ⇒ 要 owner 定"哪两个瞬间须一致"）、AC#8ⓑ（EvToolStart 零发射者，删/造假都被 F-PUMP-6 拒）、AC#1–5/9–14 归旧腿与 33-v2 终裁。
 - 派 **wave46**：verdict47（六 AC 复跑＋突变 M=摘 BuiltinTaskEntries 的 task.list 行）＋ verdict23＋verdict33。
 - 待拍板累积（机主）：65 玻璃签收／170 CLI veto 通道／163 unwired 文案／148 ⒶⒷ／264 甲乙不做／33 AC#7 两个瞬间。
+
+## A1590（2026-11-07 09:xx，编排者）收 wave46；47 结案(done292)；派 wave47（47装配+264甲+jarvis3）
+- **verdict47**（`3b4770bc2`）：六 AC 全 PASS closeable；突变 M=摘 task.list 行→名集钉红、还原绿。**47 编排者翻 6 框＋git mv -done（open=0/done=1、旧名=0）⇒ done 292。** 余债两枚具名：①**cmd/wisp 装配欠**（`run.go:653` `TaskDeps{Roster,Paths}` 无 Scheduler 字段→生产 task.list 仍 fail-closed）②面板任务列表/球 Queued 点归票 145。
+- **verdict23**（`b617ef3be`）：AC#1/2/4/5 PASS、AC#3 PARTIAL（后端闭、残余 3 枚全 frontend/真机：真 fixture 注入、真提权窗口、确认卡 UI）。**23 保持开**；R1-R3=frontend/owner-open-window、R4=owner 真机签收。
+- **verdict33-r14**（`f4a8b92c8`）：AC#6 CSP、AC#8ⓐ 钳制支两份 PASS；AC#7（生产 `.Marshal()` 13 枚全 `_test.go`，要 owner 定"哪两个瞬间须一致"）、AC#8ⓑ（EvToolStart 零发射者，删/留要 owner 一句）REMAINING。**33 保持开。**
+- **编排者技术自拍（铁律⓪⓪⓪，告知式＋撤销口令）**：**264 取甲**——`internal/agent/loop.go` `toolResultParts`(:1251) 咽喉一处掩码（只掩模型侧副本、用户侧 `EvToolEnd`/`res.Message` 不掩、保住 174r8 task.output 指针钉）；⛔ 103 点逐改（散 24 文件必漏）；不改契约文字/不花钱/不可逆 ⇒ 不摆机主。撤销口令「264 回退乙（只装仪器）」。
+- 派 **wave47**：W47assemble（cmd/wisp，`run.go:653` 给 `tools.TaskDeps` 加 Scheduler 字段＋装配，生产 task.list 转真答；因 cmd/wisp 有 323 未跟踪测试件⇒`clone --shared` 隔离）＋ W264a（internal/agent，咽喉脱敏甲）＋ W65jarvis3（internal/ball，jarvis 渲染器拆步重试，必须提交）。
