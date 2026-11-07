@@ -218,6 +218,17 @@ type PumpSources struct {
 	// key, with empty rows rendered as [] and a refusal (if the roster's own
 	// gate ever fired) traveling as the section's Reason.
 	Commands func() CommandRosterSection
+	// ModelSwitch reads the composer row's switchable model/tier dimension
+	// (ticket 187): the chat role's current pair and thinking tier, the
+	// offerable catalog rows and the current model's own declared levels,
+	// read off the live config by the assembly root (internal/config's
+	// ChatSwitchOptions is the production reader). It is a reader like every
+	// field above; a nil reader is the ONLY way the packet carries no
+	// "modelSwitch" key at all - the shape the four-key byte nails pin - and
+	// a reader that exists always sends the key, with empty lists rendered
+	// as [] and the no-offerable-rows shapes traveling as the section's
+	// Reason (never an empty menu dressed as a choice).
+	ModelSwitch func() ModelSwitchSection
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -398,6 +409,21 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			sec.Rows = []CommandRow{}
 		}
 		snap.Commands = &sec
+	}
+	if p.src.ModelSwitch != nil {
+		// Ticket 187: same reader-gated rule one block up - a reader that
+		// exists always sends the key, and nil lists still render as [] so a
+		// page never has to distinguish "no rows" from JSON null. The
+		// no-offerable-rows shapes arrive as the section's Reason from the
+		// config side; the pump carries them verbatim and invents nothing.
+		sec := p.src.ModelSwitch()
+		if sec.Models == nil {
+			sec.Models = []ModelOption{}
+		}
+		if sec.ThinkingLevels == nil {
+			sec.ThinkingLevels = []string{}
+		}
+		snap.ModelSwitch = &sec
 	}
 	return snap
 }

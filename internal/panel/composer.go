@@ -105,6 +105,26 @@ type Snapshot struct {
 	// field can fix, and no C17 method arrives with it - the section names
 	// doors, it opens none.
 	Commands *CommandRosterSection `json:"commands,omitempty"`
+	// ModelSwitch is ticket 187's carrier: the composer row's switchable
+	// model and thinking-tier dimension - the catalog rows a picker may
+	// offer, the pair and tier the chat role carries in the live config, and
+	// the levels the current model itself declares (see model_switch_187.go
+	// for the shape and the measured per-field tiers).
+	//
+	// It is a pointer with omitempty for the same reason the three fields
+	// above are: a pump assembled WITHOUT the reader sends no key, which is
+	// the exact shape the four-key byte nails pin, and a pump that has one
+	// always sends the key - empty lists rendered as [], and the
+	// no-offerable-rows shapes traveling as the section's Reason instead of
+	// an empty list dressed as "nothing to choose" (AC#4's 宁缺毋造). The
+	// page-side declaration for this key is not written yet (Q-51), so the
+	// two two-way reconciliations against frontend/src/lib/panel.ts name it
+	// as undeclared until the UI leg moves them: that red is the same
+	// procedure the commands key is already in, not a defect this field can
+	// fix. No C17 method arrives with it - the write half rides config.set's
+	// role_chat_thinking field (config_write_187.go) and the model half was
+	// already writable as role_chat_model / role_chat_pair.
+	ModelSwitch *ModelSwitchSection `json:"modelSwitch,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.

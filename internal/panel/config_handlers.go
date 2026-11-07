@@ -423,17 +423,30 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 		h.record(req, err, "write-refused")
 		return "", err
 	}
+	// Ticket 187's tier correction (AC#1/AC#8): the leg stamps EffectiveRestart
+	// on every [llm] write, which is measured-true for the model fields and
+	// false for the thinking tier, whose reader re-resolves per task from the
+	// live config. The 187 roster carries the measured tier per field and this
+	// correction applies only to names that roster owns - the bool return is
+	// what keeps an older field's leg stamp untouched. Without this, a next-task
+	// field would wear a restart sentence and the user would restart a process
+	// that did not need restarting (the same wrong-tier lie tierSentence's rule
+	// forbids in the other direction).
+	if tier, ok := writableFieldTier187(field); ok {
+		res.Tier = tier
+	}
 	h.record(req, nil, "write-accepted")
 	return renderSettingReceipt(res), nil
 }
 
-// knownWritableField asks the roster, not a copy of it. Since ticket 313 there
-// are two rosters (the ticket-248 table here and the 313 additions in
-// config_write_313.go) and this is the one place the door asks both: a field is
-// writable when either table carries it, and the frozen 248 pin keeps describing
-// the 248 table alone.
+// knownWritableField asks the rosters, not a copy of them. Since ticket 313
+// there are two rosters (the ticket-248 table here and the 313 additions in
+// config_write_313.go) and since ticket 187 a third (config_write_187.go);
+// this is the one place the door asks all three: a field is writable when any
+// roster carries it, and the frozen 248 pin keeps describing the 248 table
+// alone.
 func knownWritableField(field string) bool {
-	return listedWritableField(field) || additionalWritableField(field)
+	return listedWritableField(field) || additionalWritableField(field) || writableField187(field)
 }
 
 // listedWritableField is the ticket-248 table's own lookup, unchanged in shape.

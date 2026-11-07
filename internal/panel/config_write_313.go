@@ -143,18 +143,22 @@ func additionalWritableField(field string) bool {
 	return false
 }
 
-// acceptedWritableFields is the union of both rosters, sorted, for the refusal
-// text: a page told "可写的只有 ..." must be told about every name the door
-// would actually accept, or the sentence sends it chasing the wrong list.
+// acceptedWritableFields is the union of all three rosters, sorted, for the
+// refusal text: a page told "可写的只有 ..." must be told about every name the
+// door would actually accept, or the sentence sends it chasing the wrong list.
+// (Ticket 187's roster joined the two older ones; the union grew with it.)
 func acceptedWritableFields() []string {
 	out := append(WritableFields(), AdditionalWritableFields()...)
+	out = append(out, WritableFields187()...)
 	sort.Strings(out)
 	return out
 }
 
 // needsProviderFor / needsModelFor / takesValueFor answer one selector question
-// across both rosters, so the gate's three checks stay one loop-shaped question
-// each instead of growing a second branch per column.
+// across all three rosters, so the gate's three checks stay one loop-shaped
+// question each instead of growing a second branch per column. The 187 roster
+// (config_write_187.go) joins the two selector maps below; it carries no
+// provider/model selector and takes the plain value half.
 func needsProviderFor(field string) bool {
 	return fieldNeedsProvider[field] || fields313NeedsProvider[field]
 }
@@ -164,5 +168,5 @@ func needsModelFor(field string) bool {
 }
 
 func takesValueFor(field string) bool {
-	return fieldTakesValue[field] || fields313TakesValue[field]
+	return fieldTakesValue[field] || fields313TakesValue[field] || fields187TakesValue[field]
 }
