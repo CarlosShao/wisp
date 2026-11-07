@@ -102,3 +102,28 @@ html, body { margin: 0; padding: 0; background: #050913; ... }
 - ③ 旧断言已从本文件移除（`orbTestNonDarkRatio` 零引用）
 
 **保留段**：`testJarvisRuntimeStyleSwitch`（ApplyStyle glass→jarvis 往返、窗柄不变）原样保留；3 发有界重建＋泄漏 WebView2 收割的 flake 形状同族保留。文件自含探针常量（jarvisProbeInset/jarvisCornerTol/jarvisCyanGate/jarvisCyanBright/jarvisCyanFloor），不耦合 wave68 在 `orb_live_windows_test.go` 的在飞改动；只复用 HEAD 已有的原语（orbTestCreateColoredFloor/orbTestFloorColor/orbTestPixelAt/orbTestReapLeakedWebView2）。
+
+---
+
+## 步5 门禁全跑读数（2026-11-07 19:1x-19:2x +08，本腿实跑）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| gofumpt | `gofumpt.exe -l internal/ball`（绝对路径） | **空** |
+| go vet | `go vet ./internal/ball` | rc0 |
+| go vet(winlive) | `go vet -tags winlive ./internal/ball` | rc0 |
+| go build | `go build ./internal/ball ./cmd/wisp ./cmd/balldebug` | rc0 |
+| 默认套件 | `go test ./internal/ball -count=1` | ok 0.403s |
+| ★jarvis 新牙 | `go test -tags winlive ./internal/ball/ -run 'TestBallLiveOrbJarvis' -count=1 -timeout 20m` | **PASS** 8.65s：attempt 1 直过——四角 `[[51 51 50] [51 51 50] [51 51 50] [51 51 50]] within +/-12 of (51,51,50)`（精确零差）＋ `cyan-dominant 78/961 sampled px (8.12% > 2.00% floor)` |
+| ★winlive 全套 | `go test -tags winlive ./internal/ball/ -run 'TestBallLiveOrb' -count=1 -timeout 25m` | **6/6 PASS 63.471s**：JarvisStyleRendersParticles（四角精确零差＋cyan 80/961＝8.32%）＋AttachStateAndTeardown＋FollowPlacementDecision＋FollowStaysInsideWorkArea＋PageRendersPixels（siri 页，26.41s）＋**CornersReadTheDesktop PASS（四角 (51,51,50) 零差未破）**＋OverlayFrameHasNoGlyphPixels |
+| d22scan | `sh scripts/d22scan.sh` | **clean**（internal/ 952＋cmd/ 231 Go 文件零违规）。注：首跑曾 FAIL＝panel-187 在飞未收口件 `config_write_187.go:55` 幻影引用（其证据件当时未落盘）；该腿文件落盘后复跑即 clean——瞬态归因如实入档，非本腿写面 |
+
+## 诚实边界（本腿没做到/不改的）
+
+1. **orbasset.go 零改动**：裁定后不需要——注入层本来就两页同治（`transparent !important` 压过页面自身底色），jarvis 页自带深底走 siri 页同一条既有轨道，没有新 CSS 要注。
+2. **青色判据的判别力边界**：上游三内置色板全青系（states.ts:117-141），②钉「青系在画」不区分 cyan/aurora/ember（那是 entry.tsx 映射决策、另有钉子）；②杀的是白底洗白/灰白环/没在画。
+3. **产品内观感的剩余变量**：orb 窗透明叠加，粒子最终观感仍随用户桌面底色走（浅色桌面上加色混合粒子依旧会偏淡）——这是透明叠加架构的物理属性，不是缺陷；demo 观感的「正确底色」在产品里由桌面本身提供。
+4. **截图复核**：本腿以 winlive 像素读数为判据（四角零差＋青色占比），未另截浏览器图；机主复看可用 `65-jarvis-style-integration.md` 步3 的静态服务命令（重建后同一 URL 即深底青环）。
+5. **写面超派单清单如实**：`internal/ball/orb_test.go` 改了一行——`jarvisUpstreamSHA256` 钉值随重建产物同 commit 更换（README 钉值纪律：asset 变钉必须跟，测试强制），除此之外零改动。
+
+**Commits**（本腿全列）：`fe4fec342`（步1 调查）→ `d8da4e83e`（步2+3 底色重建＋换钉）→ `5762be0d9`（步4 判据加严）→ 本 commit（步5 门禁读数＋Progress log）。AC 勾与 Status 未动；⛔ push。
