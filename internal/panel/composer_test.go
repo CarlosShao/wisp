@@ -949,23 +949,24 @@ func TestComposerCurrentModelTravelsOnlyFromItsReader(t *testing.T) {
 	}
 }
 
-// TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists is ticket 145's
-// ruling on the two always-empty composer keys the AC#6 census named
-// (docs/evidence/s1/145-ac6-field-census.md §2): composer.attachments and
-// composer.attachmentError.
+// TestComposerAttachmentsTravelFromTheIngestDoorToTheWire is ticket 145's pin
+// on the two composer attachment keys, updated by ticket 214 for the fact 145's
+// census said was missing: the ingest door now EXISTS (cmd/wisp's
+// panel_attachment_214.go answers panel.attachment.add through the real broker
+// over the real artifacts store), so the keys the census named have a
+// production source and the pin's job changes shape.
 //
-// The census answer for both was "答不出" because no production code can give
-// them a value: the pump hands the constructor nil, and the only door that
-// could produce real rows - panel.attachment.add (bridge.go's whitelist,
-// ticket 92) - is refused by name at the inbound door, so the broker has no
-// production caller and nothing holds a draft list. Keeping the fields is the
-// choice: the page-side contract (ComposerState in frontend/src/lib/panel.ts)
-// already declares both keys, deleting them here would flip the contract test
-// in the extra-keys direction, and ticket 92's handler will need them. So the
-// empty state is pinned as intentional - honest "nothing was attached / nothing
-// was refused", the same shape as pending/results - and each arm below trips
-// if the pump or the constructor starts inventing a value without a reader.
-func TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists(t *testing.T) {
+// What stayed, because it was never about "no handler yet": a pump assembled
+// WITHOUT a draft reader must still emit the empty list and the blank sentence
+// - an assembly that has no ingest source says so, and never invents a value.
+// What is new, and is the whole point of 214: a pump WITH the reader carries
+// the rows and the refusal sentence VERBATIM to the wire (stored and refused
+// rows alike), a reader with nothing yet still renders [] rather than null, and
+// the constructor keeps travelling handed-in rows unchanged. Nothing here was
+// deleted to go green: every arm that was true of the unwired tree and is still
+// true of the wired one remains; only the stale premise ("until the ingest
+// handler exists") was replaced, and the replacement is a stronger assertion.
+func TestComposerAttachmentsTravelFromTheIngestDoorToTheWire(t *testing.T) {
 	// Arm 1: a bare pump still emits an empty list, never a nil that serialises
 	// as null - the renderer reads .length, the way pending/results are judged.
 	bare := NewSnapshotPump(PumpSources{}).Snapshot()
@@ -973,14 +974,13 @@ func TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists(t *testing.T) {
 		t.Errorf("composer.attachments = %#v, want an empty non-nil slice", bare.Composer.Attachments)
 	}
 	if bare.Composer.AttachmentReason != "" {
-		t.Errorf("composer.attachmentError = %q, want blank: nothing read means nothing was refused",
+		t.Errorf("composer.attachmentError = %q, want blank: no reader means nothing was refused",
 			bare.Composer.AttachmentReason)
 	}
 
-	// Arm 2: a fully loaded pump - every dimension that does have a reader
-	// attached - still carries empty attachments. The emptiness is not an
-	// artifact of an otherwise bare assembly; it is the absence of the ingest
-	// source itself.
+	// Arm 2: a fully loaded pump - every dimension that has a reader attached
+	// except the draft one - still carries empty attachments. The emptiness is
+	// the absence of the ingest source, not an artifact of a bare assembly.
 	loaded := NewSnapshotPump(PumpSources{
 		Mode:       func() risk.Mode { return risk.ModeAskEveryStep },
 		Git:        GitViewNotProbed,
@@ -995,24 +995,61 @@ func TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists(t *testing.T) {
 		t.Errorf("a loaded pump still invented a refusal sentence: %q", loaded.Composer.AttachmentReason)
 	}
 
-	// Arm 3: the constructor is the one door, and it does not bar the future -
-	// rows handed to it travel verbatim, so ticket 92's handler can wire a real
-	// source without this pin ever being relaxed. What the pin holds is the
-	// pump's nil, not the constructor's capability.
-	seeded := []AttachmentRef{{ID: "att-x", Name: "photo.png", MIME: "image/png", Kind: "image", Stored: true}}
-	withRow := NewComposerState(risk.ModeAskEveryStep, WorkspaceView{}, seeded, MaxAttachmentBytes)
-	if len(withRow.Attachments) != 1 || withRow.Attachments[0].ID != "att-x" {
-		t.Errorf("the constructor mangled a handed-in row: %#v", withRow.Attachments)
+	// Arm 3 (ticket 214's new fact): with the draft reader attached, the rows
+	// and the current refusal sentence travel VERBATIM - the stored row with
+	// its artifact name, the refused row with its reason, both on the wire.
+	rows := []AttachmentRef{
+		{
+			ID: "att-x", Name: "photo.png", MIME: "image/png", Kind: "image",
+			SizeBytes: 11, Artifact: "attachment-abc123.png", Stored: true,
+		},
+		{
+			ID: "att-y", Name: "notes.png", Stored: false,
+			Reason: `"notes.png" 的类型不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime`,
+		},
+	}
+	sent := `"notes.png" 的类型不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime`
+	wired := NewSnapshotPump(PumpSources{
+		Attachments:      func() []AttachmentRef { return rows },
+		AttachmentReason: func() string { return sent },
+	})
+	snap := wired.Snapshot()
+	if len(snap.Composer.Attachments) != 2 {
+		t.Fatalf("the wired pump carried %d rows, want the two the reader returned", len(snap.Composer.Attachments))
+	}
+	if got := snap.Composer.Attachments[0]; got.Artifact != "attachment-abc123.png" ||
+		!got.Stored || got.MIME != "image/png" || got.SizeBytes != 11 {
+		t.Errorf("the stored row was mangled in transit: %+v", got)
+	}
+	if got := snap.Composer.Attachments[1]; got.Stored || got.Reason != rows[1].Reason {
+		t.Errorf("the refused row was mangled in transit: %+v", got)
+	}
+	if snap.Composer.AttachmentReason != sent {
+		t.Errorf("composer.attachmentError = %q, want the reader's sentence verbatim", snap.Composer.AttachmentReason)
+	}
+	data, err := wired.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{`"stored":true`, `"artifact":"attachment-abc123.png"`,
+		// JSON escapes the quotes inside the sentence, so the tail without them
+		// is what a byte-level Contains can honestly look for.
+		`的类型不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime`} {
+		if !strings.Contains(string(data), want) {
+			t.Errorf("the wire lost %q:\n%s", want, data)
+		}
 	}
 
-	// Arm 4: the wire spells both facts the honest way - an empty JSON array,
-	// not null, and a blank string, not a made-up sentence.
-	data, err := NewSnapshotPump(PumpSources{}).Marshal()
+	// Arm 4: a reader that exists but has nothing yet still renders [] on the
+	// wire - a reader's nil is the pump's [], never null.
+	empty, err := NewSnapshotPump(PumpSources{
+		Attachments: func() []AttachmentRef { return nil },
+	}).Marshal()
 	if err != nil {
 		t.Fatal(err)
 	}
 	var wire map[string]json.RawMessage
-	if err := json.Unmarshal(data, &wire); err != nil {
+	if err := json.Unmarshal(empty, &wire); err != nil {
 		t.Fatal(err)
 	}
 	var composer map[string]json.RawMessage
@@ -1024,5 +1061,14 @@ func TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists(t *testing.T) {
 	}
 	if got := string(composer["attachmentError"]); got != `""` {
 		t.Errorf("wire composer.attachmentError = %s, want the literal empty string", got)
+	}
+
+	// Arm 5 (was 145's arm 3): the constructor is the one door, and it does not
+	// bar anything - rows handed to it travel verbatim, so an assembly that
+	// builds the section directly keeps working without this pin being relaxed.
+	seeded := []AttachmentRef{{ID: "att-x", Name: "photo.png", MIME: "image/png", Kind: "image", Stored: true}}
+	withRow := NewComposerState(risk.ModeAskEveryStep, WorkspaceView{}, seeded, MaxAttachmentBytes)
+	if len(withRow.Attachments) != 1 || withRow.Attachments[0].ID != "att-x" {
+		t.Errorf("the constructor mangled a handed-in row: %#v", withRow.Attachments)
 	}
 }

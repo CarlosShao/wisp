@@ -207,6 +207,25 @@ type PumpSources struct {
 	// (attachments.go:186), so the packet never advertises a ceiling that the
 	// store would not apply.
 	AttachmentMax int64
+	// Attachments reads the composer's draft attachment rows (ticket 214): every
+	// ingest attempt this process's panel made, stored and refused rows alike,
+	// each carrying its own name, sniffed mime, byte count, artifact name or
+	// refusal reason. It is a reader like every field above: the values are
+	// copies of rows the ingest handler already recorded, and the pump shapes
+	// nothing. nil means nobody handed the pump a draft source - an assembly
+	// without an ingest door - and the packet then carries the empty list, which
+	// is the honest state ticket 145 pinned; ticket 214's wiring is what makes
+	// that state the exception instead of the rule.
+	Attachments func() []AttachmentRef
+	// AttachmentReason reads the composer's current refusal sentence: the reason
+	// the MOST RECENT ingest attempt was refused, cleared by a later accepted
+	// one. That clearing is a ruling, not tidiness: an old refusal hanging over
+	// a fresh success is the lying-key family ticket 83 named, while every
+	// historical refusal still shows on its own row in Attachments, so nothing
+	// is lost by it. "" therefore means "the latest attempt was accepted, or
+	// none was made". nil behaves exactly like the field above: the packet
+	// stays blank instead of inventing a sentence.
+	AttachmentReason func() string
 	// Now is the clock for the generatedAt stamp. nil is time.Now. This is a
 	// display stamp and nothing else (panel.ts:132-134: "display only, never
 	// used to derive state"), so it is not a deadline and not a timeout.
@@ -306,6 +325,20 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		}
 		composer.Credential = state
 		composer.CredentialKnown = true
+	}
+
+	if p.src.Attachments != nil {
+		// Ticket 214: a pump with a draft reader carries the rows verbatim - the
+		// hop that gives composer.attachments a producer instead of the
+		// always-empty shape ticket 145 pinned on the unwired tree. A reader
+		// that exists always fills the key; nil rows from it still render as [].
+		composer.Attachments = p.src.Attachments()
+		if composer.Attachments == nil {
+			composer.Attachments = []AttachmentRef{}
+		}
+	}
+	if p.src.AttachmentReason != nil {
+		composer.AttachmentReason = p.src.AttachmentReason()
 	}
 
 	now := time.Now

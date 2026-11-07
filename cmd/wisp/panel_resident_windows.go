@@ -225,16 +225,22 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 // write that would race the page's own dispatch goroutine. Until the task source
 // binds it, the handler refuses by name - this process has no tree to switch to
 // yet, and saying so beats narrowing a scope nothing else uses.
-func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, error) {
+func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
 	// Said once per start, same posture the CLI seam takes: name the tier that was
 	// not taken rather than leave the operator to infer it.
 	auditf("%s", residentPanelHotReloadNote)
 	scope := panel.NewWorkspaceScopeHolder()
-	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm)
+	// Ticket 214: the draft-attachment ledger is created HERE, at the panel
+	// assembly, and returned next to the workspace holder - the ingest handler
+	// (built inside the chain) fills it, and the snapshot pump that must display
+	// the rows is built later by the task pipeline, so the ledger crosses that
+	// ordering the same way ticket 186's holder does.
+	drafts := newAttachmentDraftLedger()
+	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm, drafts)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return disp, scope, nil
+	return disp, scope, drafts, nil
 }
 
 // newResidentPanelManager is the assembly the resident leg uses. The chain is the
@@ -260,15 +266,15 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm
 // The returned holder is ticket 186's: the caller hands it to the task source,
 // which binds this process's runtime scope into it. The panel host itself keeps
 // knowing nothing about paths - it only remembers which object to bind.
-func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelManager, *panel.WorkspaceScopeHolder, error) {
+func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelManager, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
 	auditf := func(format string, args ...any) {
 		line := fmt.Sprintf(format, args...)
 		slog.Info("panel host: " + line)
 		fmt.Printf("wisp: %s\n", line)
 	}
-	disp, workspaceScope, err := newResidentComposerDispatch(dataDir, auditf, confirm)
+	disp, workspaceScope, drafts, err := newResidentComposerDispatch(dataDir, auditf, confirm)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	assets, aerr := panel.BuiltinAssets()
 	if aerr != nil {
@@ -285,7 +291,7 @@ func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelM
 	// it per window creation rather than holding it. Said once per start, in the
 	// same posture as the hot-reload note above.
 	auditf("%s", residentPanelGeometryNote)
-	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), workspaceScope, nil
+	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), workspaceScope, drafts, nil
 }
 
 // loop is the panel thread. Registry.Spawn owns the recover and the panic sink,

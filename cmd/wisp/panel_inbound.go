@@ -61,11 +61,12 @@ package main
 //     registered nail; the honest, smaller step is to keep the audit on stderr
 //     here (the "[audit]" family, same prefix rt.auditf uses) and let the sink
 //     decision be made when this leg grows into the resident process.
-//   - it answers two of the six whitelisted methods. The mode write is ticket
-//     114's leg and the settings read/write is ticket 248's; workspace/attachment/
-//     message handlers are ticket 186 / ticket 92 / ticket 35's land, so those
-//     three sockets stay nil and the router refuses them by name (ErrNoHandlerAttached)
-//     rather than pretending.
+//   - it answers three of the six whitelisted methods. The mode write is ticket
+//     114's leg, the settings read/write is ticket 248's, and since ticket 214
+//     the attachment door is answered by panel_attachment_214.go's ingest
+//     handler over the real artifacts store. workspace/message handlers are
+//     ticket 186 / ticket 35's land, so those two sockets stay nil and the
+//     router refuses them by name (ErrNoHandlerAttached) rather than pretending.
 //
 // EXIT CODES follow the same three-way split `wisp run` uses (SPEC-05 §3.4): 2 =
 // this leg could not assemble (no data root, unreadable config), 1 = at least one
@@ -233,7 +234,11 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 	// card, so handing this chain one would only teach it to widen unasked (the
 	// header's CONFIRM IS NIL note, and
 	// TestTicket114r2ANonNilLegAtTheCLISeamWouldUngateThePipe runs that shape).
-	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil)
+	// Third nil: no draft ledger - this one-shot process builds no snapshot
+	// pump, so ingest rows would have no reader; the ingest itself and its
+	// audit line work exactly the same (the nil-tolerance is the ledger's own
+	// contract, panel_attachment_214.go).
+	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil, nil)
 }
 
 // newComposerDispatchChain is the five-constructor body behind
@@ -261,7 +266,7 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 // not an oversight and not a stub - the CLI seam has no pipeline, and the router's
 // ErrNoHandlerAttached is the honest answer there rather than a handler wired to
 // a tree that does not exist.
-func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm) (*panel.ComposerDispatch, error) {
+func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm, drafts *attachmentDraftLedger) (*panel.ComposerDispatch, error) {
 	cfgPath := filepath.Join(dir, configFileName)
 	mgr, err := config.NewManager(cfgPath, nil)
 	if err != nil {
@@ -310,6 +315,20 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Audit: auditf,
 		Actor: actor,
 	}
+	// Ticket 214 AC#1: the attachment ingest door, answered. The handler opens
+	// the process's real artifacts store on the data root lazily, on the first
+	// ingest (panel_attachment_214.go), so a chain that never sees a file pays
+	// no database open, and a store that will not open refuses THAT INGEST -
+	// loudly and audited - instead of failing the whole chain's assembly. The
+	// sink is the real artifacts tree (tickets 76/79): the name guard, the
+	// O_EXCL write, the private DACL and the recursive quota all apply, and no
+	// second home for user bytes is created anywhere. The ceiling is the
+	// compiled default (max = 0 -> the broker applies MaxAttachmentBytes) -
+	// ticket 214's 09-29 ruling: no config key in this wiring, that is D36
+	// territory. drafts may be nil (the CLI seam): ingest and audit still
+	// work, only the snapshot rows have no reader in that process, which is
+	// honest there.
+	attachment := newAttachmentIngestHandler214(dir, drafts, auditf, actor)
 	// Ticket 320 AC#4: the fetch leg. It reads through the same Manager and the
 	// same secret store as the settings leg above, so "拉取模型列表" and the
 	// writes it feeds cannot disagree about which row or which key they mean.
@@ -325,10 +344,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	return &panel.ComposerDispatch{
 		Mode: modeWrites,
 		// Workspace is ticket 186's and answers where a holder was passed in;
-		// attachment = ticket 92, message = ticket 35, both still refused by name
-		// when they arrive.
-		Workspace:  workspace,
-		Attachment: nil,
+		// message = ticket 35, still refused by name when it arrives.
+		Workspace: workspace,
+		// Ticket 214 AC#1: the attachment door is answered by the ingest handler
+		// above - the broker's first production caller, on the assembly path.
+		Attachment: attachment,
 		Message:    nil,
 		// Ticket 248's two settings doors are answered by the leg above.
 		Config: configWrites,

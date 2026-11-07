@@ -47,3 +47,7 @@
 `frontend/**`、`design/**` 零写；`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`docs/specs/**` 一字不动；
 只 commit 不 push、显式 pathspec、禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；仓内不删东西。
 — 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
+
+## Progress log
+
+- 2026-11-07 17:5x 腿 214-attach-wire：接线落地——`ComposerDispatch.Attachment` 在 `cmd/wisp/panel_inbound.go` 挂上真受理器（`panel_attachment_214.go`：现成 broker＋真 memory.Store artifacts 树、懒开库、上限用编译默认零新增配置键）；`pump.go` 加 `Attachments`/`AttachmentReason` 两枚 reader＋run.go 装配根两枚 method value＋resident boot 绑 ledger（票 186 holder 同款）；145 钉子按新事实改名改断言为 `TestComposerAttachmentsTravelFromTheIngestDoorToTheWire`（未删断言，理由见 docs/evidence/s1/214-attachment-wiring.md）。AC#1 census 0→2；cmd/wisp 门禁子集全绿；internal/panel 余 2 红＝既有红（契约 files 键 page 侧未声明／C21 被 ball 在飞件牵红），归属与读数见证据件 §3。AC 勾未翻。

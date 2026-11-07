@@ -1,0 +1,18 @@
+214: 附件接线——panel.attachment.add 挂上真受理器，附件真传到落盘与快照
+
+cmd/wisp 装配路径上的第一枚 AttachmentBroker 生产调用者：ComposerDispatch.Attachment
+从 nil 换成 panel_attachment_214.go 的 ingest handler（现成 DecodeAttachmentPayload +
+AttachmentBroker.Ingest，sink = memory.Store 的 artifacts 树，票 76/79 同一棵；
+懒开库；上限用编译默认，零新增配置键——票面 09-29 定案）。每次尝试（收与拒）记入
+attachmentDraftLedger，pump.go 新增 Attachments/AttachmentReason 两枚 reader，
+run.go 装配根与 resident boot 绑定（票 186 holder 同款跨时序）。
+
+145 的 TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists 按新事实更新为
+TestComposerAttachmentsTravelFromTheIngestDoorToTheWire：保留全部仍真的空态臂，
+新增「行与拒句逐字上 wire」的更强调言——没有为绿删断言。
+
+AC#1 census 0 -> 2；Test214* 八条全绿（E2E：字节真落 artifacts、拒因真上快照、
+伪装 exe 按嗅探拒、路径拼写名拒、超限未读一字节即拒）。gofumpt/vet/build/d22scan clean。
+
+internal/panel 余 2 红＝既有红（契约 files 键 page 侧未声明；C21 被 internal/ball
+在飞件牵红），归属读数在 docs/evidence/s1/214-attachment-wiring.md §3。

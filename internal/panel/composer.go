@@ -271,20 +271,25 @@ type WorkspaceRequest struct {
 type ComposerState struct {
 	Mode      ModeView      `json:"mode"`
 	Workspace WorkspaceView `json:"workspace"`
-	// Attachments is the composer's draft rows. Today the pump hands the
-	// constructor nil (pump.go's assembly) and nothing else in production holds
-	// a draft list: the panel.attachment.add method is refused by name at the
-	// inbound door (cmd/wisp/panel_inbound.go, ticket 92's handler), and the
-	// broker has no production caller. Empty is therefore the intentional
-	// honest state - the same shape as pending/results, never null - until that
-	// handler exists. Pinned by TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists.
+	// Attachments is the composer's draft rows. Ticket 214 wired the ingest
+	// door: cmd/wisp's chain (panel_attachment_214.go) answers
+	// panel.attachment.add with the real broker (attachments.go) over the real
+	// artifacts store, records every attempt - stored and refused rows alike -
+	// into a draft ledger, and the pump reads that ledger through
+	// PumpSources.Attachments. An assembly without that reader (the bare pump, a
+	// console `wisp run`) still hands the constructor nil and the key stays the
+	// honest empty list - the same shape as pending/results, never null.
+	// Pinned by TestComposerAttachmentsTravelFromTheIngestDoorToTheWire,
+	// ticket 145's pin updated for the wired fact.
 	Attachments     []AttachmentRef `json:"attachments"`
 	AttachmentMIMEs []string        `json:"acceptedAttachmentMimes"`
 	MaxAttachmentB  int64           `json:"maxAttachmentBytes"`
-	// AttachmentReason is the last refusal sentence the composer would show. No
-	// ingest handler exists in this tree, so nobody produces a reason yet; ""
-	// on the wire means "nothing was refused", and it must never be an invented
-	// sentence. Same ruling, same nail, ticket 145.
+	// AttachmentReason is the composer's current refusal sentence: the reason the
+	// MOST RECENT ingest attempt was refused, cleared by a later accepted one.
+	// "" on the wire means "the latest attempt was accepted, or none was made" -
+	// never an invented sentence and never a stale refusal hanging over a fresh
+	// success; every historical refusal still shows on its own row in
+	// attachments. Same ruling, same nail, tickets 145 and 214.
 	AttachmentReason string `json:"attachmentError"`
 	// Git is the read-only git dimension (ticket 181). It is a NEW KEY on a
 	// section whose key set is pinned by the frontend contract, and the

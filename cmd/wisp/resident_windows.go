@@ -329,7 +329,7 @@ func runResident() {
 	// not at all without a console. panelModeConfirm is the same adapter run.go
 	// uses, and both close over confirmModeSwitchVia, so there is one card body and
 	// one sentence.
-	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
+	rp, panelScope, attachmentDrafts, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
 	// Ticket 319 AC#1: the assembly root's handle on the panel thread is a HOLDER
 	// now, not the thread itself. The one thing that changes in a visible way:
 	// after the thread has ended (any way at all - the owner's X, a system
@@ -486,6 +486,17 @@ func runResident() {
 	// honest statement that this process has no page to push to.
 	if src != nil && src.run != nil && rp != nil {
 		src.run.setPanelSnapshotHost(rp)
+	}
+	// Ticket 214 AC#2: the pump's draft-attachment readers get the ledger the
+	// panel's ingest handler records into. The bind sits on this line for the
+	// same reason setPanelSnapshotHost does - src.run is the first moment the
+	// runtime exists here - and the readers are method values, so publishes
+	// read the bound ledger, not the nil the field held at assembly time. A
+	// boot whose panel never built (drafts nil) leaves the field nil, which is
+	// the honest no-source state: the composer section keeps the empty shape
+	// ticket 145 pinned.
+	if src != nil && src.run != nil {
+		src.run.bindAttachmentDrafts(attachmentDrafts)
 	}
 
 	// Ticket 247 AC#1/AC#5: the capture leg. This is the line that makes

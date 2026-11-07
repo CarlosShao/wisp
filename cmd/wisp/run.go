@@ -461,6 +461,19 @@ type agentRuntime struct {
 	// while publishes read it from the approval UI's and the sink's goroutines.
 	instrMu     sync.Mutex
 	instrLoader *projctx.Loader
+	// attachments is ticket 214's draft-attachment ledger: every ingest attempt
+	// the panel's attachment door (panel_attachment_214.go) made this session,
+	// stored and refused rows alike, read by the snapshot pump's
+	// attachmentDraftRows / attachmentDraftReason. The panel chain that builds
+	// the ingest handler assembles BEFORE this runtime (resident_windows.go's
+	// panel host precedes startResidentTaskSource), so the resident boot binds
+	// the ledger here after assembly - the same crossing the workspace holder
+	// and setPanelSnapshotHost make. nil (a console `wisp run`) is the honest
+	// no-source state: the pump's readers answer nil / "" and the composer
+	// section keeps the empty shape ticket 145 pinned. attMu guards it because
+	// the boot writes it while publishes read it.
+	attMu       sync.Mutex
+	attachments *attachmentDraftLedger
 	// lastSnap / lastSnapBytes are the most recent packet this run built, kept
 	// for the same reason consoleApprovalUI.cards is kept: the production path
 	// records what it did, and a reader asks afterwards. The ledger cannot hold
@@ -983,6 +996,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// without this process ever having to show a key.
 		Credential: rt.settings.credentialStatus,
 		Results:    rt.stream.Chunks,
+		// ticket 214's composer attachment dimension: the draft rows and the
+		// current refusal sentence, read out of the ledger the panel's ingest
+		// handler records into (panel_attachment_214.go). Readers are method
+		// values on purpose - the resident boot binds the ledger after this
+		// literal runs, and the read must see the bound object, not the nil the
+		// field still held at assembly time.
+		Attachments:      rt.attachmentDraftRows,
+		AttachmentReason: rt.attachmentDraftReason,
 		// ticket 200 AC#7's second hop, closed by 200-r2: the carrier existed at
 		// r1 and NOTHING read it, which is the same shape as ledger A408's
 		// "文案在、控件不在" moved from the widget side to the wire side. This
