@@ -241,6 +241,12 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		written, err = s.mgr.SetModelPriceOut(w.Provider, w.Model, f)
 	case panel.FieldRoleChatModel:
 		written, err = s.mgr.SetRoleChatModel(w.Value)
+	case panel.FieldRoleChatThinking:
+		// 票 187：思考档。值＝枚举词本身，词表（含当前模型自报的 levels）由
+		// config 侧 setter 在落盘前把关（320 裁定的同一条形状）；档位是
+		// next_task，面板门在 187 名册里按 fieldTier187 改判，这里照 [llm]
+		// 各字段的同款先盖 restart 戳。
+		written, err = s.mgr.SetRoleChatThinking(w.Value)
 	case panel.FieldVoiceCloudASRChain:
 		written, err = s.mgr.SetVoiceCloudASRChain(splitChainValue(w.Value))
 	case panel.FieldVoiceCloudTTSChain:
