@@ -31874,3 +31874,36 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 ### 三、219 腿空返（如实记）
 - `wave79` 的 `t219` 返回**空字符串**，盘上核实：**无 commit、无 `docs/evidence/s1/219-ac2*` 证据件** ⇒ **腿失败，零产出**。**已重派**。
+## A1625（2026-11-07 23:4x，编排者）**★★设置页「球风格」切换器落地（`a3fdb50dd` 已推）｜机主要的那条入口成了｜我亲跑：typecheck rc0 ＋ 两枚对账尺由红转绿**
+
+### 机主要的那条（`A1622` 令二的落地）
+- **机主原话**：「两个都要，但是**设置项里面外观可以配置切换风格，默认就是玻璃球**，切换 Jarvis 才换球的风格」
+- **⇒ 今天成了**：设置页 → 左列「设置」→「外观」→ 新增行 **`ball.style` 悬浮球外观风格（玻璃 / Jarvis 粒子）**，选择器选 Jarvis 即切。
+
+### 落地内容（10 件 +490/−13）
+| 件 | 内容 |
+|---|---|
+| `frontend/src/lib/panel.ts` | `BallStyleSection`（照 Go json tag 逐字 style/vocabulary）＋**顺手收齐** `ModelSwitchSection`/`CommandsSection`/`FilesSection`/`RunSection`/`PluginsSection`，`PanelSnapshot` 补 **5 键**、`ComposerState` 补 `files` |
+| `frontend/src/components/settings-controls.tsx` | 新控件 `BallStylePicker`——照本文件既有 `Picker` 同款门禁形状，**零自创范式** |
+| `frontend/src/components/config-screen.tsx` | `APPEARANCE_ROWS` 加 `ball.style` 行（`blocked:\"\"`、`control:\"ballStyle\"`）；`moveBallStyle` 走 `performConfigWrite({field:\"ball_style\"})` **真写** |
+| `frontend/src/App.tsx` ＋ `harness/settings-page.tsx` | 快照 `ballStyle` 透传到外观屏（**无本地副本**） |
+| `frontend/scripts/render-config-screen.tsx`（新） | 渲染仪器：**6 组断言**（行上屏/picker 挂载/当前值到按钮/无读口诚实态/写路源级钉/涂出 markup 零 emoji） |
+| 证据件＋票 65/187/213 log | append-only，AC 勾与 Status 零触碰 |
+
+### ★我亲跑读数
+| 判据 | 读数 |
+|---|---|
+| **前端类型检查**（`npm run typecheck` ＝ `tsc -b`） | **rc=0** ✓ |
+| **`TestApprovalCardViewJSONKeysMatchFrontendTypes`** | **PASS 0.00s** ✓（原红） |
+| **`TestComposerContractTypesMatchFrontend`** | **PASS 0.01s** ✓（原红） |
+| `go test ./internal/panel` 全包 | **剩 1 红**：`TestC21DesignTokensFourWayAgree` |
+| **C21 红因我逐字核** | `tokens_fourway_test.go:726` 六行逐字：`docs/evidence/s1/c21-native-tokens.md:58/59/60/103/104/105: the table names Palette.GlassRing / GlassHi / GlassHiSoft, but internal/ball/tokens.go holds no such colour literal in DarkPalette()/LightPalette()` ⇒ **归 `internal/ball/tokens.go`（ball 面，A 腿写面）**，**非前端腿**。腿报「归他面」**属实**。 |
+
+### ★腿如实报的三条（我认可，⛔ 粉饰）
+1. **不是「3 枚转绿」而是「2 枚转绿＋1 枚归他面」**——派单写红 3 枚，两枚对账尺收绿，C21 红因在 `internal/ball/tokens.go`（冻结 tokens 表），**它碰不了，如实报归属**。
+2. **写入通道存在**（派单的降级分支未触发）：`requestConfigWrite → config.set → panel_config_store.go:284 SetBallStyle` **真落盘**。
+3. **中途盘上长出票 215 的 `plugins` 键**：其载体注释点名「TS 声明归 UI 腿」⇒ 腿照载体逐字声明并入，两枚尺收绿。
+4. **突变还原不是 sha256 一发到位**（sed 范围删除多伤两处，手工补回）——已写进 commit message 与证据件。
+
+### 撤销口令
+- 设置页 UI＝`git revert a3fdb50dd`。
