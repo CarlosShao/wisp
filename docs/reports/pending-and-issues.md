@@ -31766,3 +31766,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **我重建**：go build -o build/balldebug-orb.exe ./cmd/balldebug rc=0，exe 时间 **2026-11-07 20:23:58**。
 - **给机主的验收命令**：cd 到项目根，跑 .\build\balldebug-orb.exe -style jarvis ⇒ 应无红点；-style glass 或无参数 ⇒ 红点仍在（正确）。
 - **撤销口令**：无产码（本轮只重建＋记档）。
+
+## A1617（2026-11-07 20:3x，编排者）**★CLI 切球路径落地（wave74 ef00174ac 已推）＋我亲自真机实测五条全通：机主今天能切了**
+- **wave74（6 件 583 行）**：新件 cmd/wisp/config_cmd_65.go（get/set/list，封闭键名册）＋config_cmd_65_test.go（五牙）＋改 main.go（usage 行＋分发 case）＋leg_dispatch_gate_133_test.go（133 注册）＋证据件 docs/evidence/s1/65-ball-style-cli.md＋票 65 log 一行。
+- **★形状＝主流（我认可）**：照 git config / kubectl config set，**非自创**；非法值拒绝**照用 SetBallStyle 的枚举守卫**（⛔ 自造第二套）；**全 CLI 零 glass 字面量**（默认值走 schema 默认表）。
+- **★我亲自真机实测（重建根 wisp.exe rc=0 后逐条跑，读数逐字）**：
+  - config get ball.style ⇒ **glass**（默认值正确）
+  - config set ball.style jarvis ⇒ 收据：已写入 C:\Users\swq\AppData\Roaming\wisp-dev\config.toml：ball.style = jarvis ＋ **生效档位：重启档——下次 wisp 启动时换球；正在运行的 wisp 进程不会立刻换球（换球挂在面板写路径与本进程开机种子上，CLI 写的是文件）。要马上看到：重启 wisp。**
+  - get 复读 ⇒ **jarvis** ✓
+  - set ball.style glass ⇒ 写回 ⇒ get ⇒ **glass** ✓
+  - set ball.style 紫色 ⇒ **rc=1**，红字：wisp config: 拒绝写入：config: config: ball.style: 不在枚举内（glass|jarvis）；这一枚只接受这几种写法 ✓
+- **★腿如实报的诚实档位（我认可，⛔ 粉饰）**：CLI 写的是**配置文件**，**正在跑的 wisp 不会立刻换球，重启后才换**（换球只挂在设置页写路径和开机种子上）。收据里也这么写的。
+- **★腿如实报的三条**：①**设置页里那行还是没有**（frontend/** 归外部 agent Q-51）；②task 提示的 internal/config/panelwrite.go:168 **在盘上不存在**，真写盘链是 writeOneKey→WriteSection（已记进证据件）；③cmd/wisp 有两枚别人的未跟踪 323 测试件，**没碰没收**。
+- **★给机主的两条路（今天就能用）**：①**CLI**（推荐，一条命令）wisp.exe config set ball.style jarvis 然后重启 wisp；②手改 %APPDATA%\wisp-dev\config.toml 的 [ball] style。
+- **撤销口令**：CLI 路径＝git revert ef00174ac。
