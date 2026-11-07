@@ -235,3 +235,13 @@
 - **选型＝丙（保留＋具名测试钉住"恒空是有意的"）**，派单授权本程自拍（铁律 ⓪⓪⓪）：**甲无源可接**（`panel.attachment.add` handler 在 `cmd/wisp/panel_inbound.go:331` 显式 `Attachment: nil`＝票 92 未接线，`NewAttachmentBroker`／`.Ingest(` 非测试调用者 0，全仓无人持有草案附件列表）；**乙机械落地不了**（`composer_test.go:73-78` 双向尺会把 `[attachments attachmentError]` 两键打到 extra 方向新红，而 `frontend/**` 是零写面），且票 92 接线之日两键即真载体。AC#6 对这两枚由"答不出"变为"具名判据"。
 - **落地**：`composer.go:274-287` 两字段定义点注释（gofumpt 强制的同 struct 纯空白列宽重排含 `Mode`/`Workspace` 两行，无语义改动，`files` 键行零字节）＋ `composer_test.go:952` 追加 `TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists` 四臂（裸泵空非 nil／满配泵仍空＝空是"没有 ingest 源"不是"装配太穷"／构造器透传不拦票 92／线上字节字面 `[]` 与 `""`）。**`pump.go` 一字节未动**，`pump_test.go:124/:276` 解冻行未碰。
 - **门禁**：gofumpt 空、vet 净、`go build ./internal/panel ./cmd/wisp` 净（⚠ `go build ./...` 红在 `build/mut_rvw.go`＝HEAD 既有非本程引入，build/ 树干净）；全量 panel 测试改前改后**红逐名同册**（`TestComposerContractTypesMatchFrontend` 红在 `files` 键＋`TestC21DesignTokensFourWayAgree`；颜色尺今日两轮不在红册，照实记现量）；新用例单跑 PASS；两键仍 12 键双向 reconciled；`d22scan.sh` **clean rc=0**。
+
+### 11-07 20:3x–21:0x　wave 写腿（证据件 `docs/evidence/s1/145-snapshot-fields.md`；起手锚 `7202103f3`，起手 `internal/panel` porcelain 空）
+
+- **落的维数＝1 段 5 键（顶层 `run`，reader-gated＝213/187/65 同范式，零第四范式）**：`tools[]`(callId/name/outcome/resultText)＋`toolsDropped`＋`reasoning`＋`error`(class/detail/text)＋`stuck`(text/repeatLevel)；holder＝`RunFeed`（`run_feed_145.go`，收纯值不 import agent，两枚界逐出/省略全计数）。
+- **有真源才落**（AC#6 逐字段答句在证据件 §1a）：`EvToolEnd` 三发布点（loop.go:845/:988/:1023）、`EvReasoningDelta`（:645）、带分类错误的 `EvError`（:1047）、`EvStuck`（:576/:1038）。
+- **⛔ 登记不落**（证据件 §1b，宁缺毋造）：工具「运行中」态（`EvToolStart` 生产码零发布点——本程现量否证）、参数摘要/风险徽标/耗时、usage/cost（Execute 局部累加器、无活 holder；`EvDone` in/out 是无状态词半回声）、终结态词＋取消原因（`EvDone.Text=res.Text||msg`，取消时带的是部分回复文本，按它渲染＝造假）、phase/humanText/remainingMs/reasoningMs（纯无源）、position/occupancy（归 167）、composer.git（归 186）、view（AC#3 裁决维持）。
+- **三牙全绿**：reader-gated＋突变（摘 reader 键必缺席）＋空 feed `"tools":[]`＋逐字值来自事件脚本＋两界诚实计数（`run_feed_145_test.go:27/:55/:122`）。
+- **留给 cmd/wisp 的两跳**（本程零触碰）：console sink 既有四 case 各喂一行＋装配根 `PumpSources` 加 `Run:` 一根——落地前生产包不带 `run` 键（四键字节钉保持绿的形状）。
+- **门禁**：gofumpt（四枚点名件＋全 panel）空、vet rc0、build rc0；全量 panel 改后 RUN 310/PASS 204/FAIL 3，**改前基线用 `-overlay`（HEAD 版两文件、仓外副本 `probes/145/wave-leg/`）复跑红逐名同册**（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestC21DesignTokensFourWayAgree`＝在册，非本程引入；本程差量＝两枚已红尺点名列表多 `run` 一词，零新红）；`d22scan.sh` **rc=0 clean**（bans #1-5 internal/=386＋cmd/=63、ban #6 frontend/=116、ban #7 tools/=48、ban #10 risk/=21、ban #8 design/=39＋frontend/=116＋internal/=958＋cmd/=236）；四枚件 LF 核过。
+- **Git**：只 commit、未 push；显式 pathspec 逐枚点名；禁面（frontend/**、design/**、cmd/wisp/**、internal/ball/**、internal/config/**、thresholds/golden、docs/PLAN.md、docs/specs/**）零字节；仓内零删除。

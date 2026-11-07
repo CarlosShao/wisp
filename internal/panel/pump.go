@@ -238,6 +238,16 @@ type PumpSources struct {
 	// a reader that exists always sends the key, with the schema's vocabulary
 	// rendered as [] if it ever came back nil.
 	BallStyle func() BallStyleSection
+	// Run reads the working-state section (ticket 145): the ended tool rows,
+	// accumulated reasoning, last classified error and stuck sentence the
+	// assembly root's RunFeed holds. The console sink's event switch already
+	// receives every event the section carries, so the feed is filled by the
+	// host that publishes to the loop, and this reader hands the section
+	// through. It is a reader like every field above; a nil reader is the
+	// ONLY way the packet carries no "run" key at all - the shape the
+	// four-key byte nails pin - and a reader that exists always sends the
+	// key, with an empty feed rendered as "tools":[].
+	Run func() *RunSection
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -444,6 +454,14 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			sec.Vocabulary = []string{}
 		}
 		snap.BallStyle = &sec
+	}
+	if p.src.Run != nil {
+		// Ticket 145: same reader-gated rule one block up - a reader that
+		// exists always sends the key. The section carries the loop's event
+		// values through untouched and an empty feed already renders
+		// "tools":[] from the Section builder, so the pump invents nothing
+		// and normalizes nothing.
+		snap.Run = p.src.Run()
 	}
 	return snap
 }

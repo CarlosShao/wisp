@@ -141,6 +141,23 @@ type Snapshot struct {
 	// with it - the write half rides config.set's ball_style field
 	// (config_write_65.go).
 	BallStyle *BallStyleSection `json:"ballStyle,omitempty"`
+	// Run is ticket 145's working-state carrier: the tool calls that ended,
+	// the reasoning streamed so far, the last classified error and the loop's
+	// stuck sentence - the working-state rows the fourteen-row table asks the
+	// panel to render while a task runs. The values are the loop's OWN event
+	// values (see run_feed_145.go for the per-field sources and for the
+	// dimensions deliberately absent because no event carries them); RunFeed
+	// is the holder and the assembly root's event sink feeds it.
+	//
+	// It is a pointer with omitempty for the same reason the fields above are:
+	// a pump assembled WITHOUT the run reader sends no key, which is the exact
+	// shape the four-key byte nails pin, and a pump that has one always sends
+	// the key - an empty feed is "tools":[] plus blank strings, not a vanished
+	// key. The page-side declaration is not written yet (Q-51), so the
+	// two-way reconciliations against frontend/src/lib/panel.ts name "run" as
+	// undeclared: that red is the same procedure the commands, modelSwitch and
+	// ballStyle keys are already in, not a defect this field can fix.
+	Run *RunSection `json:"run,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.
