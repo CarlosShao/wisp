@@ -202,6 +202,7 @@ var legCovers133 = []legCover133{
 	{leg: "run", test: "TestAC2SealNoticeLandsInTheRunLegLogFile", entry: "runTextTask"},
 	{leg: "models", test: "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk", entry: "cmdModels"},
 	{leg: "secret", test: "TestAC3SecretLegBooksItsAuditRecordsOnDisk", entry: "cmdSecret"},
+	{leg: "config", test: "TestConfigLegGetSetGuarded65", entry: "cmdConfig"},
 	{leg: "no-args", test: "TestAC1ResidentLegInstallsItsLogListenerOnDisk", entry: "runResident", process: true},
 }
 

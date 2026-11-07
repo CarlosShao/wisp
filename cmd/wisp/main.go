@@ -52,6 +52,12 @@ Usage:
                    the capability probe suite into provider_health
   wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
                    blob without the key ever entering argv, a log line or chat
+  wisp config      config.toml keys from the console (ticket 65): get/set/list
+                   over the keys this CLI owns - today ball.style (glass|
+                   jarvis, the appearance switch 默认玻璃球), written through
+                   the same guarded setter the settings page uses; the receipt
+                   names the tier honestly (a CLI write lands in the file, a
+                   running wisp picks the new style up at next boot)
   wisp models      signed model store (C29, ticket 121 AC#2): list the verified
                    manifest, re-check an installed model, or make one available
                    through the Downloading hand-off and its re-verification
@@ -127,6 +133,15 @@ func main() {
 		}
 	case "secret":
 		os.Exit(cmdSecret(args[1:]))
+	case "config":
+		// Ticket 65: the operator's own surface for the ball style switch -
+		// get/set/list over the closed key roster (today ball.style). A console
+		// leg like `wisp secret`: it resolves the env and data root itself
+		// (cmdConfig), writes only through the guarded setter, and answers with
+		// the tier the write really lands at. Covered by the legCovers133 nail
+		// TestConfigLegGetSetGuarded65 -> cmdConfig.
+		attachParentConsole()
+		os.Exit(cmdConfig(args[1:], configIO{stdout: os.Stdout, stderr: os.Stderr}))
 	case "models":
 		// Ticket 121 AC#2: the model hand-off chain (models.Manager ->
 		// DownloadingBridge.Run -> VerifyInstalled) reaches the product through
