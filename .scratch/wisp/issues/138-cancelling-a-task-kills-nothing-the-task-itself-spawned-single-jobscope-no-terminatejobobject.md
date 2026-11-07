@@ -108,3 +108,15 @@ GAP-09 的原话是：「取消只有 `RunningTask.Cancel()`→root ctx；JobSco
   `./internal/plugin/...` count=1 rc0／manifestslot count=2 四数 RUN=94·PASS=82·FAIL=0·rc0 两轮名册差集空。
   AC 勾与 Status 零触碰（裁决者≠实现者）。证据＝`docs/evidence/s1/138-cascade-ruling.md`。
   commit 链 `8429d0e60`→`b3e990300`→`bf224be19`→`b576c10a3`→步5 本枚；⛔push。
+
+- [2026-11-07 20:4x +08] agent=wisp-writing-leg(138,r2,internal/tools面) did=wave75 派单四步：起手三核现跑
+  （r1 五枚 commit 链逐枚 cat-file 在盘：`8429d0e60`/`b3e990300`/`bf224be19`/`b576c10a3`/`9287d1179`；
+  件 tracked；牙自跑 PASS 1.97s）；AC#1 本面审计——internal/tools 唯一 spawn 面=launcher（web.open/file.open/app.launch），
+  而 `BuiltinWebEntries` 全树生产调用者=0（`cmd/wisp/run.go` 注册 FS/Task/System/Subagent/Plan 五族，
+  web 家族未接线）⇒ 本面"无入口踩得到"，非预留洞（接线归票 12/R12；接线后形状=StartInJob 进 C30 Job，
+  kill-on-close 已有牙 `Test22AppLaunchNotepadUnderRealJob:90-107`）；子代理不级联=票 197 §0 冻结设计
+  （钉 `subagent_197_test.go:729`/`:806`）；AC#2 裁定=本面零代码改动（app.launch 子进程=交付物，取消杀之毁交付；
+  per-task Job 已被 r1 裁定书 §2.2 否）⇒ 无新牙、无 SPEC-12 §5 新登记、无降级；
+  门禁：gofumpt 空／vet rc0／build rc0／`go test ./internal/tools` ok 36.674s／d22scan clean（448 生产 Go 文件，scope 齐）。
+  零 .go 改动；AC 勾与 Status 零触碰（裁决者≠实现者）。
+  证据＝`docs/evidence/s1/138-cancel-kills-cascade.md`。commit 本枚；⛔push。
