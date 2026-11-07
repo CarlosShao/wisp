@@ -31631,6 +31631,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - 分堆今日读数：甲已落 4／乙地基在 9／丙没货 5＋出向 5 枚独立；未落 16 枚产码＋测试双侧字面量全零。
 - **撤销口令**：214＝`git revert 3141b301d fc76d5d7e`；194 证据件＝`git revert 806d562f5`；176 证据件＝`git revert 12a6140d6`。
 
+## A1606（2026-11-07 18:4x，编排者）**★176 结票（裁决腿裁定乙，双名核 1）｜Jarvis 单文件 HTML 真生成（758KB）｜69% 去掉了但我亲见外圈青弧也没了｜★推送网络断**
+- **176 结票（`99a5711e4`，裁决腿）**：裁定＝**乙（按实落地结票）**。我现核：`git ls-tree HEAD --name-only .scratch/wisp/issues/ | grep 176-` ⇒ **恰 1 枚**，文件名 `.scratch/wisp/issues/176-no-spawner-zero-production-call-sites-done.md` ⇒ **rename 双名核＝0 ✓**（旧名已不在树）。
+- **Jarvis 集成（wave66，3 枚 commit）**：**裁定＝甲（vite 单文件）**；产物 `internal/ball/assets/jarvis-orb.html` **真生成 758355 B**（我 `ls -la` 现核，mtime 18:23）。步1 调查落盘 `1652051d0`／步2 裁定 `29b3501d5`／步3 落地 `b679fd072`。
+- **69% 徽标修掉（wave65 `c5cca231a`＋`5d8751e70`）**：`renderer_windows.go` 步骤 13 中心文本 `&& !r.overlayOnly`、步骤 11 badge 数字包 `!r.overlayOnly`、新增 `overlayGlyphPixels()` DIB 审计。选型＝**甲**（圆形进度环不遮球体）；乙排除（页面冻结 API 只有 `setState/setAudioBands`，无进度/文本通道，加通道要动 sha 钉死的 `orb-siri.html`）；丙排除（移球下方要动冻结窗口几何）。
+  - **★我亲跑复核**：`TestBallLiveOrbCornersReadTheDesktop|TestBallLiveOrbOverlayFrameHasNoGlyphPixels` ⇒ **两枚全 PASS（23.678s）**；四角仍 `[[51 51 50]×4]` 精确零差；腿报红→绿：新判据修前 **FAIL 计数 103**（文字像素确在）→ 修后 **PASS 计数 0**。
+- **★我亲见的新问题（腿没报，它只断言"无文字像素"没断言"弧还在"）**：重建 `balldebug-orb.exe` 真机截图放大 4 倍（`D:\tmp\wisp\20261107\orblab\orb-noglyph2.png`）——**「69%」确实没了 ✓，但外圈那圈亮青色进度弧也没了**，且球看起来比之前小。对照修前截图 `orb-FINAL.png`（有青弧＋球更大）差异明显。
+  - **读数佐证**：`CornersReadTheDesktop` 的 `page lit ratio` 从修前 **21.96%** 掉到 **3.02%**（腿自己在读数里写了，但没把它当问题）⇒ 页面亮的像素只剩 3% ＝ **外圈弧确实丢了**。
+  - ⇒ **派 wave68** 查：是 `!r.overlayOnly` 守卫把弧一起关掉了（步骤 9 之外还有别处画弧？），还是 overlay 模式下弧本来就该由 orb 页面画而页面没画。判据＝`page lit ratio` 必须回到 ~20% 量级且球面仍无文字。
+- **★推送网络断（如实）**：`git push` 连发 8 次全失败，`git ls-remote` 报 `TLS connect error: error:0A000126:SSL routines::unexpected eof while reading` ⇒ 按纪律**本地照常 commit、网络恢复后统一推**。当前本地领先 origin/dev **8 笔**。
+- **撤销口令**：176 结票＝`git revert 99a5711e4`（会把文件名改回未 done）；Jarvis 集成＝`git revert b679fd072 29b3501d5 1652051d0`；69% 修＝`git revert 5d8751e70 c5cca231a`。
+
 ## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
 - **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
 - **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
