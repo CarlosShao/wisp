@@ -349,6 +349,22 @@ func TestBallLiveEdgeDock(t *testing.T) {
 		return Rect{int(wr.l), int(wr.t), int(wr.r), int(wr.b)}, m
 	}
 
+	// The law holds on the live window: the drawn orb touches the work
+	// boundary along the dock axis and nothing else moved it.
+	//
+	// The radius here must be the one the position law is actually FED:
+	// dockGeometry hands DockPos the drawn body's radius (dockOrbRadius of
+	// the state visual's SizePx, R15#4/Q-4), not the window's
+	// half-edge-minus-margin. Computing the expected boundary from the
+	// window radius predates that fix and read the landed Sleeping tab 4px
+	// short of the work edge (the -4 debt of ticket 68-r2).
+	probe := make(chan Visual, 1)
+	b.sta.PostTask(func() { probe <- b.frameVisual() })
+	orbR := dockOrbRadius((<-probe).SizePx)
+	if orbR < 1 {
+		t.Fatalf("the Sleeping visual has no drawable body: SizePx %v", orbR)
+	}
+
 	for _, e := range []Edge{EdgeLeft, EdgeRight, EdgeTop, EdgeBottom} {
 		if !b.DebugDock(e) {
 			t.Fatalf("edge %d: DebugDock did not commit the dock", e)
@@ -361,13 +377,9 @@ func TestBallLiveEdgeDock(t *testing.T) {
 		if b.DebugTimersAlive() {
 			t.Fatalf("edge %d: docking armed a timer in Sleeping", e)
 		}
-		// The law holds on the live window: the drawn orb touches the work
-		// boundary along the dock axis and nothing else moved it.
 		wr, m := liveRect()
 		edgePx := wr.R - wr.L
-		marginPx := int32(RingMarginPx * float32(getDpiForWindow(b.hwnd)) / 96)
-		R := int32(edgePx/2) - marginPx
-		drawn := int(float32(R) * DockSquash(p))
+		drawn := int(float32(orbR) * DockSquash(p))
 		half := edgePx / 2
 		var got, want int
 		switch e {
@@ -426,9 +438,13 @@ func TestBallLiveEdgeDock(t *testing.T) {
 			t.Fatalf("edge %d: the dock ramp armed a timer", e)
 		}
 		// Fully out means fully visible: the whole orb inside the work area.
+		// The orb's extent is the drawn body's radius (orbR above), not the
+		// window's half edge: at ramp level 0 the window legitimately rides
+		// across the boundary by its transparent margin (DockPos's own law),
+		// while the orb itself must be fully reachable.
 		wr, m = liveRect()
-		x0, x1 := wr.L+half-int(R), wr.L+half+int(R)
-		y0, y1 := wr.T+half-int(R), wr.T+half+int(R)
+		x0, x1 := wr.L+half-int(orbR), wr.L+half+int(orbR)
+		y0, y1 := wr.T+half-int(orbR), wr.T+half+int(orbR)
 		if x0 < m.Work.L-2 || x1 > m.Work.R+2 || y0 < m.Work.T-2 || y1 > m.Work.B+2 {
 			t.Fatalf("edge %d: the popped-out orb is not fully visible: rect %+v work %+v", e, wr, m.Work)
 		}
