@@ -31567,3 +31567,14 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **190 收件（`286121205`）**：`files` 键**有读者**（`run.go:977`→`panel_pump.go:294-296`→`pump.go:288-290`→`composer.go:285` 产线全通）⇒ **乙（删键）否**；甲（页侧补声明）属 owner UI 腿（⛔ 本队零写面 frontend，台账 A1487 已裁）；**执行＝丙**：三枚线级用例钉死 Go 侧半边合同（无 reader 键不上线／键名恰 `files` 居顶层载荷恰 TreeView 七名／`not_chosen` 拒绝随键上线）。`Test190` 3/3 PASS。
 - **145 恒空两枚收件（`ecc4e83c8`＋`f5bbc97f7`）**：选型＝**丙（保留＋具名测试钉住"恒空是有意的"）**。甲不行（附件真源不存在：`panel_inbound.go:331` 显式 `Attachment: nil`、`NewAttachmentBroker`/`.Ingest(` 非测试调用者 **0 枚**）；乙不行（删 Go 两键会让合同尺新红 `[attachments attachmentError]`，而 frontend 零写面 ⇒ 机械落地不了）。新增 `TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists`（四臂回归绊线）。门禁：gofumpt 空/vet 净/build 净/新用例 PASS/d22scan clean；**在册红两枚未修未放宽**（合同尺 files 键＋C21 tokens 域）。
 - **撤销口令**：190 线级用例＝`git revert 286121205`；145 处置＝`git revert ecc4e83c8`＋`git revert f5bbc97f7`；回归修法＝`git revert` wave59 那笔。
+
+## A1601（2026-11-07 15:5x，编排者）**球窗回归修好（我亲自验证 WindowFromPoint 命中球窗）｜★新发现：orb 窗是黑底不透明，且球被画了两遍**
+- **226 AC#5 收件（`48abebc41`）**：`cmd/wisp/approval_revoke.go`（新）——`revoke` 动词走 `SetAllowedDirs`（**生产调用者 0→1**），拒绝三支全部出声，成功后复读内存断言规则真消失否则报 `REVOKE-FAILED`；三处接线（handle/help/开机横幅）；2 枚组装栈 E2E＋1 枚单元＋1 枚落库侧效果用例。★牙：突变"撤销不写" ⇒ happy E2E **红 41.87s**，恢复复绿。门禁：gofumpt 4 件空／vet+build ok／`internal/config` 全包 ok 2.537s／d22scan clean。腿如实报：`cmd/wisp` 全包 FAIL 45 枚**本腿 0 枚**（`TestTicket223` 单跑复量 ok＝时序假红；256/247/AC4Focus＝HEAD 态既有红；`tools/mockllm` 缓存损坏是 run2 那 7 枚假红的根因，重建后 rerun7 全绿）；腿自报一枚失误在案（全包在飞时并发跑对照测试加重了缓存损坏，第 3 轮起全部独跑）。
+- **球窗回归修好（`e24ae0c1e`，wave59，选型甲）**：删 `renderFrame`/`present` 两处 `orbLive()` 守卫（球窗恢复照常 ULW 画帧）＋ orb 窗 ex-style 增 `WS_EX_TRANSPARENT`。腿的诊断纠正了我先前的判断：orb 与球窗是**并排**两个顶层窗（`orbFollowXY` 几何），"orb 挡球"不成立；因＝守卫令球窗 0 帧 ⇒ 分层窗 alpha 恒 0 ⇒ OS hit-test 跳过 ⇒ 隐形＋穿透。乙被排除（`orb_live_windows_test.go:152` 钉死"orb 是第二窗不是替代品"）。
+  - **★我亲跑复核**：`TestLiveNeverStealsFocus|TestLiveTransparentCornerFallsThrough` ⇒ **ok 1.526s（两枚转绿）**；`TestBallLiveOrb` 四枚 ⇒ **4/4 PASS，像素 564/1764＝31.97%**。
+  - **★我亲自真机验证（EnumWindows + WindowFromPoint）**：「Wisp」hwnd=73403018 rect=(3316,1268)-(3416,1368) exStyle=`0x8080088`；「Wisp Orb」hwnd=118820898 rect=(3172,1260)-(3304,1392) exStyle=**`0x80800A8`**（多了 `0x20`＝`WS_EX_TRANSPARENT`）；**`WindowFromPoint(球心 3366,1318)` ⇒ 返回球窗 73403018** ⇒ **球可点，不再穿透**（修前穿透到第三方窗）。
+- **★新发现两枚真问题（我实测像素，⛔ 腿报）**：
+  1. **orb 窗是黑底不透明**：四角像素 RGB≈(30,24,29)/(38,33,40)，而桌面背景＝(51,51,50) ⇒ orb 窗没真透明，是**黑方块**盖在桌面上（截图里那个黑框）。
+  2. **球被画了两遍**：orb 窗里画了一个液态玻璃球，球窗自己也画了一个（截图为证）⇒ 两个球并排，不是"球＋装饰"。
+  - ⇒ **派 wave62** 修：orb 窗真透明（DWM/`SetLayeredWindowAttributes`/WebView2 `DefaultBackgroundColor` 全透明链）＋二选一（要么 orb 就是球、球窗不画；要么 orb 只画外圈装饰不画球）——腿自己拍并写理由。
+- **撤销口令**：球窗回归修＝`git revert e24ae0c1e`；226 AC#5＝`git revert 48abebc41`。
