@@ -126,6 +126,18 @@ config 侧（`internal/config/settings_65_test.go`）：守卫写收据 `[ball.s
 
 **AC 勾与 Status 未动；⛔ push（推送只由编排者做）。**
 
+## 6. 追加更正（2026-11-07T19:4x，append-only，§4 原文保留不改）
+
+本腿最后 commit（`635922c76`）落盘前后，**并发收口腿**已把 §4 留的四小段落掉了大半：
+
+- `fe0f740d6`（收口腿步1）：现跑核实本腿全部交付（含「门 384 拒 ball_style」的机制指认），并发现并集实为**三处缝**（`acceptedWritableFields`/`takesValueFor` 也在 `config_write_313.go`，187 先例三处全接）；
+- `1b25d931c`（收口腿步2a）：`knownWritableField` 并集接 `writableField65`（成四表并集）、两处附加并集缝同款接 65、`composer.go` 快照新键 `BallStyle`（reader-gated 指针+omitempty）、`pump.go` reader+fill、新件 `ball_style_65.go`，并把本腿 `config_write_65.go` 的过时拆段注释如实改为已落；
+- **仍差最后一段**：`cmd/wisp/run.go` 装配根把 `BallStyleOptions` 注进 PumpSources——该件此刻脏（另有腿在飞），收口腿尚未提交。
+
+组合态复跑（本腿现跑，非转述）：`go vet` 三包 rc0；`go test ./cmd/wisp -run 'Test65|TestStyle'` ok 0.212s（4/4）；`go test ./internal/config` ok 2.446s；panel 两契约红现读数＝`Go Snapshot emits [commands modelSwitch ballStyle]`——**ballStyle 已随收口腿进入同一 Q-51 未声明红**，属既定程序（UI 腿声明 frontend 侧后转绿），非缺陷。
+
+§4 写作时点（本腿 `bc48ae6c7`，~19:35）读数属实；盘面随收口腿推进，以本节为最新状态。
+
 ## 3. 步3-5 收口（2026-11-07T19:3x +08，接续腿现跑核实＋落地读数）
 
 ### 3.1 步1 现跑核实（五问五答，判据可复跑）
