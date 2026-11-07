@@ -1026,6 +1026,17 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// process (panel_commands_213.go) - the menu's members, not a second
 		// copy of them.
 		Commands: commandRosterSection213,
+		// Ticket 65's appearance dimension: the orb family the live config
+		// holds, read off this run's own Manager by internal/config's
+		// BallStyleOptions (the production reader) - the same Manager the
+		// settings leg above (rt.settings) writes through, so the picker
+		// shows what the next ApplySetting would act on. The vocabulary
+		// rides verbatim from the schema; this literal spells neither glass
+		// nor jarvis.
+		BallStyle: func() panel.BallStyleSection {
+			v := mgr.BallStyleOptions()
+			return panel.BallStyleSection{Style: v.Style, Vocabulary: v.Vocabulary}
+		},
 		// Ticket 33 AC#8's naming split (33-r14): Publish keeps the blocking
 		// ledger entry by that name, and the AC#8 clamp-branch ruler drives the
 		// packet through tryBookPanelSnapshot when it needs a pass that cannot
