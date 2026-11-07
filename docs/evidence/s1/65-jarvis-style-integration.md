@@ -57,4 +57,31 @@
 
 ---
 
-（步2 裁定与后续步骤见下文追加节；本文件随各步 commit 增量追加。）
+## 步2 裁定：集成形态选甲（vite 构建独立单文件 HTML）
+
+**选甲。** 三条候选的裁定与代价（判据＝铁律 ⓪⓪⓪：最有价值＋最符合主流 harness；⛔ 动作最小不进判据）：
+
+### 甲（选）：vite 构建 jarvis 单文件 HTML → `internal/ball/assets/jarvis-orb.html`
+
+- **为什么最有价值**：
+  1. **主流 harness 的形状**：上游自己给的标准用法就是「React 组件 + vite 页面」（examples/basic 原样）；把组件库变成可部署页面走前端工具链构建，是行业标准做法。产物与 orb-siri.html **同一个页面形状**（单文件自包含 HTML），宿主 Go 侧的 serving 缝、CSP 注入、透明链、状态推送、测试牙**全部复用已验证的那一条**，只加一个「按风格选 asset」的纯决策点。
+  2. **上游生命周期零 fork**：quality=auto 降档矩阵、prefers-reduced-motion 降级、离屏暂停、ResizeObserver、fallback 圆环——这 347 行宿主逻辑原样随组件走，上游更新时重新构建即可（组件源码零改动，与 A1594「ship the upstream page unmodified」同一条纪律）。
+  3. **体积代价如实入账**：react+react-dom+three+组件 minified 内联 ⇒ 产物 ~1 MB 量级，go:embed 后二进制增 ~1 MB（siri 页 88 KB 并存）。这是买「真粒子球＋全套自适应」的实价，不是浪费。
+- **边界（诚实）**：单文件 HTML 是我们用上游组件＋vite 构建的**集成产物**，不是上游的原始发布物；asset 顶部注释与证据件都写明来源与构建方法（脚手架随腿入库，可复跑）。
+
+### 乙（不选）：不用 React，vanilla 薄入口直调 renderer.ts（945 行）
+
+- **具体代价**：`renderer.ts` 确实框架无关，但 quality 解析矩阵（cores/memory/dpr/saveData → 四档全参数缩放）、reduced-motion 检测与 CSS fallback、ResizeObserver/IntersectionObserver/visibilitychange 三套 observer 生命周期、fallback 圆环——全部长在 `JarvisOrb.tsx`（347 行 React）里。乙案要**把这 347 行 fork 成 repo 自有代码长期自养**，上游一改就得跟。
+- **买到什么**：只省 minified ~140 KB 的 react+react-dom。按铁律「复杂必须买得到真价值」：这 347 行复杂度换 140 KB，买不到真价值，反而制造一个与上游组件并行的第二真相源。**不选。**
+
+### 丙（不选）：把 React+three 直接打进产品 Go 二进制（放弃单文件页形状）
+
+- **先纠正一个直觉**：甲也 embed 进 Go 二进制，体积代价与丙同量级——丙被拒**不是**因为体积（体积在甲里已如实入账），而是因为**形态**：丙意味着放弃「orb 页＝单文件 HTML」这条已验证 serving 缝，要为 JS 多文件建新的模块加载/资源服务面（Go 侧新 surface、新测试面），与 siri 页两条 serving 形状并存。
+- **买到什么**：零。同样的字节，拆成多文件只多出一条文件管理缝。这是铁律点名的「复杂但毫无收益」。**不选。**
+
+### 两条风格级设计裁定（随裁定一并定案）
+
+1. **D32 待遇**：D32 静帧纪律管的是 D2D fallback 渲染器（`jarvis_windows.go`，本腿零触碰，继续静帧）。orb 窗是「真上游页面」面——siri 页 idle 本来就持续跑上游自己的 RAF（机主已签收的形状）；jarvis 页同待遇：跑上游自己的动画循环（其自带 reduced-motion 降级与离屏暂停）。这不是本腿发明的豁免，是既有 orb 面规则的对称适用。
+2. **音频带**：jarvis 上游**没有** setAudioBands 类接缝（组件与渲染器都没有音频输入），本腿**不做发明**——jarvis 风格下语音家族不推音频带（pushAudio 跳过），如实记录为该风格的已知边界；audio 驱动仍是 glass 风格的 siri 页能力。
+
+（步3 落地与验证见下文追加节。）
