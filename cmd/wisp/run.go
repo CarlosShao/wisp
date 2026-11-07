@@ -1839,9 +1839,10 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	bg := loop.RunAsync(ctx, task)
 	// The root's own identity goes into the roster the moment its id exists, so
 	// the tree task.spawn builds has something to hang under (kind=root, no
-	// parent). State is deliberately NOT filed here: that producer rewiring is
-	// ticket 196's per ruling A394, so StateAnswer keeps saying 「宿主没有登记这一维」
-	// for a root row and only subagent rows carry a D43 name.
+	// parent). The root's own D43 state dimension is filed at the end of the
+	// run, with the backfill below (ticket 188 step 1): between here and there
+	// the row reads 「宿主没有登记这一维」, which is the honest shape until the
+	// task has an ending to name.
 	rt.tasks.MarkRoot(bg.ID, task)
 	res := bg.Wait()
 
@@ -1857,9 +1858,23 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	if rt.memoryL1 != nil {
 		rt.memoryL1.Record(memoryConversationFromHistory(res.TaskID, loop.History()))
 	}
+	// Ticket 188 step 1 (the 188-c2 verdict's first move): the root row's state
+	// dimension is filed here, with the backfill that lands the finished answer.
+	// The D43 name is NOT invented at this site: taskLogState spells the ending
+	// in ticket 196's memory vocabulary (all seven endings are on its roster),
+	// and memory.TaskStateFor is that roster's one read door into the D43 names
+	// - so the word that reaches the panel is a table lookup, never a switch
+	// written here. TaskBackfill still judges every name against
+	// statemachine.Valid before it files, so a future word falling off the
+	// roster would refuse the filing rather than leak a fifth legacy word into
+	// this dimension. Endings without a body (failures, brakes, cancellations)
+	// are refused whole by the backfill's own empty-text gate, unchanged here:
+	// the repair for those belongs to a different step of this ticket.
+	rootState, _ := memory.TaskStateFor(taskLogState(res.Status))
 	_, why := (tools.TaskBackfill{
 		Roster: rt.tasks,
 		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+		State:  rootState,
 	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
 	if why != "" {
 		rt.auditf("wisp run: 后台任务的输出没有进名册：%s", why)

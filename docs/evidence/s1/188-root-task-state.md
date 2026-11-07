@@ -71,7 +71,7 @@ _, why := (tools.TaskBackfill{
 }).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
 ```
 
-**import 增量：1 枚**＝`github.com/CarlosShao/wisp/internal/statemachine`（run.go 现量未引；`memory`/`tools` 已在——票面预估「1-2 行 import」的下限）。
+**import 增量：0 枚**——预判「需加 1 枚 `internal/statemachine`」被编译器现量否定：`rootState, _ := memory.TaskStateFor(...)` 是多返回值接法，`statemachine.State` 类型名不出现，import 加了即 `imported and not used`（首跑 rc=1 的真读数，§4）。`memory`/`tools`/`agent` 已在 run.go 现量 import 块里。票面预估「可能要多加 1-2 行 import/字段」的 import 部分现量归零；字段增量＝`State:` 一枚＋`rootState` 取名一行。
 
 为什么这个形状：
 
@@ -99,10 +99,42 @@ _, why := (tools.TaskBackfill{
 - 反向判据（AC#3）不新增：`TestTaskState188AC3PanelHasNoWriteLeg`（tools 包现量 `:351`）在场，面板包本程零触碰，判据照旧成立。
 - 预定红登记：`go test ./internal/panel` 里的 2 枚前端 TS 声明红（`Go Snapshot emits [commands]` 族）不是本程面，逐字登记不修。
 
-## 4. 门禁读数
+## 4. 门禁读数（真读数，逐字）
 
-（步4 后填）
+- **gofumpt**（`/d/work/base/gopath/bin/gofumpt.exe -l cmd/wisp/run.go cmd/wisp/task_state_188_test.go`）：**空**，rc=0。
+- **go vet ./cmd/wisp ./internal/panel**：**OK**，rc=0。
+- **go build ./cmd/wisp/ ./internal/panel/**：**OK**，rc=0。
+- **go test ./internal/panel -count=1**：**rc=1，4 枚红**（票面预告 2 枚，现量 4 枚，多出的 2 枚非本程）：
+  1. `TestApprovalCardViewJSONKeysMatchFrontendTypes` — `Go Snapshot emits [commands modelSwitch] that interface PanelSnapshot does not declare`（票面预告的 TS 声明预定红族＋213 的 modelSwitch 同族）；
+  2. `TestComposerContractTypesMatchFrontend` — `Go Snapshot emits [commands modelSwitch] …`＋`Go ComposerState emits [files] …`（同上族）；
+  3. `Test187PanelFilesTouchNoPermissionSurface` — `read model_switch_187.go: … The system cannot find the path specified`（**187 腿半落**：测试件在树、产码件 `internal/panel/model_switch_187.go` 盘上不存在）；
+  4. `TestC21DesignTokensFourWayAgree` — `the table names Palette.GlassRing/GlassHi/GlassHiSoft, but internal/ball/tokens.go holds no such colour literal`（**ball 在飞件** wave68/66 面，非本程零触碰包）。
+  归属判据：panel 包不 import cmd/wisp；本程零字节进 internal/panel；#3/#4 的标的名盘上均不在/属他包在飞件。
+- **go test ./cmd/wisp -run 'Test188|TestTaskState' -count=1 -timeout 30m**：**ok 3.607s，rc=0**（含既有 `Test365TaskLogStateSpeaksOneWordOnBothPaths`／`Test365RunRowsAStuckTaskAsStuck`／`Test365RunKeepsItsWordForTheControls`——365 判据与本程装配同点共存）。
+- **新用例绿路**：`Test188RootRowFilesTheD43NameTheLoopSpelled` — **PASS 4.95s**（首跑；一次编译拒绝读数见 §2）。
+- **牙 M1（摘装配）**：**rc=1**，红行逐字（存档 `.scratch/188r4/m1-red.log`，临时件只建不删）：
+  ```
+  --- FAIL: Test188RootRowFilesTheD43NameTheLoopSpelled (4.18s)
+      task_state_188_test.go:72: root row state = "", want "Settling" (completed -> done -> Settling): an empty state here is the pre-188 shape this step exists to close
+      task_state_188_test.go:77: root row state "" is not one of D43's 20 names
+      task_state_188_test.go:81: StateAnswer() = ("", "宿主没有登记这一维（fail-closed：不替任务编一个状态）"), want (Settling, empty)
+      task_state_188_test.go:99: panel row statusKnown = false (reason "宿主没有登记这一维（fail-closed：不替任务编一个状态）"): the roster has a name and the reader dropped it
+      task_state_188_test.go:103: panel row status = "", want "Settling"
+      task_state_188_test.go:106: panel row statusReason = "宿主没有登记这一维（fail-closed：不替任务编一个状态）" for a row the roster filed a name for
+  FAIL
+  FAIL	github.com/CarlosShao/wisp/cmd/wisp	4.349s
+  FAIL
+  ```
+  要点＝摘掉两行装配后，三面（名册记录／StateAnswer／面板行）全部回到「宿主没有登记这一维」的 pre-188 形状，用例必红；sha256 复原 `cmd/wisp/run.go: OK`，`grep -c rootState` 复原 = 2。
+- **d22scan（`sh scripts/d22scan.sh`）**：**rc=1，2 枚红**，同因非本程：`internal/panel/config_write_187.go:55: [phantom-citation] comment cites repo path "docs/evidence/s1/187-model-switchable.md" which does not exist on disk (ticket 212 ban #9)`。归属证据：`git log --oneline -1 -- internal/panel/config_write_187.go` **空读数**（187 腿在飞未提交件）＋该证据件盘上不存在（`ls` No such file）。同批 PASS 清单含 `TestScannerSelfScanOfRealRepoIsGreen` 之外的 43 枚过与两枚同名红（`TestScannerSelfScanOfRealRepoIsGreen`/`TestRealRepoLedgerIsHonest`），ban 计数未见本程新字节。
+- **197 载体钉实证**（本程邻件不打红的兑现）：`go test ./cmd/wisp -run 'TestRunPacketCarriesTheSubagentItsRosterRowFed' -count=1` — **ok 3.265s，rc=0**。
 
 ## 5. 诚收
 
-（收件时填）
+- 交付：`cmd/wisp/run.go`（import 0 增、装配 2 行：`rootState, _ := memory.TaskStateFor(taskLogState(res.Status))`＋`State: rootState`；MarkRoot 上方过期注释更正）＋ `cmd/wisp/task_state_188_test.go`（新，1 枚正例）＋ 本证据件 ＋ 票面 Progress log 一行。
+- 365 判据（`tasklogstate_365_test.go`）零触碰，全绿共存。
+- 预定红/在飞红登记：panel 4 枚＋d22scan 2 枚，全部归属他腿（§4 逐枚），不修、不挂本程头上；票面预告「panel 2 枚预定红」现量 4 枚，多出的 2 枚（187 半落、ball 在飞）如实记。
+- 本步没做（按裁定不归本步）：① 无正文终局（failed/stuck/cancelled）的根行仍无行——Backfill 既有 fail-closed 门，本程不修；② 运行态（MarkRoot→Backfill 之间）仍「未登记」；③ 取消/Backfill 拒绝分支的兜底写未做——①②③ 都归 188 后续步（方案乙需改判 197 根行钉，要编排者具名）。
+- AC 框、Status、阈值、golden、frontend/design、internal/ball、internal/tools、internal/config：**零字节**。
+- 只 commit 不 push；两处显式 pathspec；临时件 `.scratch/188r4/**` 只建不删；改动文件 LF。
+- 撤销口令：把 `cmd/wisp/run.go` 里 `rootState` 两行装配摘掉＋删 `cmd/wisp/task_state_188_test.go` 即回到 pre-188 形状（牙 M1 即是这口令的实证）。
