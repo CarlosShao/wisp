@@ -31789,3 +31789,16 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - **138-cancel**（internal/tools/** 独占）：票 138 取消任务杀不掉自己 spawn 的子进程。★主流 harness 做法＝**Job Object + JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE 或显式 TerminateJobObject**，⛔ 只杀直接子进程。牙必须断言**子进程真死**（核 pid 不在），⛔ 只断言 API 返回。
   - **68-parity**（internal/ball/** 独占）：票 68 球默认视觉 parity，**核心任务＝修那枚仍红的 TestBallLiveEdgeDock boundary -4**。
 - **撤销口令**：本轮零产码（只测量＋记档）。
+
+## A1619（2026-11-07 21:0x，编排者）**★wave75 三腿收件（已推）｜68 的既有红我亲跑转绿｜145 落了 run 段＋诚实拒落 8 类｜138 裁定「本面无缺口」（我亲核成立）**
+- **68-parity（9c507e812）**：修的是**测试的过期几何模型**（位置法喂 dockOrbRadius(SizePx)=17，测试仍按窗口半径 28 算 drawn ⇒ 11−7=4），**零生产行为改动**（dock_windows.go 突变-还原后 sha256 be0e093f… 与 HEAD 逐字节同）。牙＝突变回窗口半径 ⇒ live 测试当场红 boundary 4。
+  - **★我亲跑复核：TestBallLiveEdgeDock 由红转绿** —— 修前我现跑 FAIL 1.04s（edge 1: docked orb boundary -4, want the work edge 0），修后现跑 **PASS 1.24s**（Hover 也 PASS 0.49s）。⇒ **票 68 挂了很久的既有红今天清掉**。
+- **145-snapshot（079a3f529，6 件 +550 行）**：新件 internal/panel/run_feed_145.go（RunSection/ToolRunRow/RunErrorRow/RunStuckRow 载体＋RunFeed holder，纯值接缝、不 import agent）＋run_feed_145_test.go（三牙）＋composer.go:160 加 Run 指针段（json omitempty）＋pump.go:250/:458 reader-gated 填段＋证据件。
+  - **★腿的逐字段裁定（我认可，这是诚实做法的范本）**：**落了 5 键**（tools[] 来自 EvToolEnd×3、reasoning 来自 EvReasoningDelta、error{class,detail}、stuck{text,repeatLevel}）；**⛔ 登记不落 8 类**，其中两条是**现量否证**：①终结态＋取消原因——EvDone.Text=res.Text||msg，取消时带的是**部分回复文本**，按它渲染**＝造假**；②工具「运行中」态——EvToolStart **生产码零发布点**。其余：usage/cost（Execute 局部累加器无活 holder）、phase/humanText/remainingMs（纯无源）、position/occupancy（归 167）、composer.git（归 186）、view（AC#3 裁决）。
+  - **★基线诚实**：腿起手没先跑改前全量基线，**自己用 -overlay HEAD 版补测**，红名册逐名同册（TestApprovalCardViewJSONKeysMatchFrontendTypes／TestComposerContractTypesMatchFrontend／TestC21DesignTokensFourWayAgree），**零新红**。全量 panel 读数 RUN 310/PASS 204/FAIL 3。
+  - **★欠两跳（在 cmd/wisp，本波禁写面）**：console sink 四个 event case 各喂一行 RunFeed＋装配根 PumpSources 加 Run 一根 ⇒ **落地前生产包不带 run 键**（四键字节钉保持绿）。
+- **138-cancel（c10a7d834，2 件 +104 行，零 .go 改动）**：裁定＝**internal/tools 面「无入口踩得到」**，落裁定书 138-cancel-kills-cascade.md。
+  - **★我亲核腿的三条论据（全部成立）**：①BuiltinWebEntries（web.go:210 定义）**生产调用者＝0**（grep 只命中定义处与两枚测试）⇒ web 家族未接线，取消级联在该面无入口；②TerminateJobObject **生产已在** internal/plugin/manifestslot/command_job_windows.go:146；③kill-on-close 牙 Test22AppLaunchNotepadUnderRealJob（app_launch_windows_test.go:45）在盘。
+  - **★腿的 AC#2 裁定（我认可）**：本面**零代码改动**——app.launch 子进程＝**交付物**（取消杀之毁交付，主流分法＝工作进程级联杀＋交付物存续）；子代理不级联＝票 197 §0 **冻结设计**（钉 :729/:806）；per-task Job 已被 r1 裁定书 §2.2 否。⇒ **派单步2/步3 在本面没有可落对象，这是裁定的结果，不是省略**。
+  - **★腿如实报的自身错误**：先前报「CR 字节 37/52」是 **grep 引用姿势错的假阳性**（匹配成了字母 r），改用 grep -cP 复测＝**0**，commit 无需返工。
+- **撤销口令**：145＝git revert 079a3f529；138 裁定书＝git revert c10a7d834；68＝git revert 9c507e812。
