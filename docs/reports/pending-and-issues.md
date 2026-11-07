@@ -31666,6 +31666,15 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - ⇒ **派 wave70** 修：①页面底色改黑（上游 demo 是 `#0a0e14` 一类深底）；②粒子环回到青色；③**加严判据**：新用例必须断言**背景像素是暗的**（比如四角/边缘区域平均亮度 < 某阈值）＋**粒子是高饱和青色**（色相落在青区间），⛔ 只断言 non-dark > 1%。
 - **撤销口令**：Jarvis 集成＝`git revert 258abc528 d958d2af2 d902fbc6b 1853d1d87 b679fd072 29b3501d5 1652051d0`。
 
+## A1609（2026-11-07 19:1x，编排者）**★机主原始要求落档：外观设置项切换球风格，默认玻璃球｜现跑核实 ApplyStyle 产品调用者＝0（正是缺的那环）**
+- **机主逐字要求（2026-11-07 19:09）**：「两个都要，但是设置项里面外观可以配置切换风格，**默认就是玻璃球**，切换 Jarvis 才换球的风格」。★机主补一句：「这个其实一开始我就提过」⇒ **我漏了这条原始要求**，只做了两种风格没做切换入口。
+- **现跑核实（盘上事实）**：
+  - `ApplyStyle` **已存在**：`internal/ball/orb_windows.go:647` 起，注释「switches the style family AT RUNTIME」。
+  - **★产品调用者＝0**：`grep -rn ApplyStyle --include=*.go internal/ cmd/` ⇒ **只有测试**（`orb_jarvis_live_windows_test.go:83/:86`），产品代码零调用 ⇒ **这就是缺的那一环**。
+  - 风格页解析已就绪：`orbasset.go:204` `orbPageForStyle(s Style)`（siri 玻璃球 vs jarvis 粒子球），运行时切换走 `orbWindow.setStyle` 重新导航。
+- **派 wave71**：四段接线（①`internal/config` 加 `appearance.orb_style`（`glass` 默认 / `jarvis`）；②`cmd/wisp` 启动读并传 `SetStyle`；③面板设置项 reader-gated 暴露（照 213 模式）；④写入时调 `ApplyStyle` 即时生效）。**判据四条**：默认值 glass／设 jarvis 后 `ActiveStyle()` 真变／设回 glass 也变／突变摘掉 config 读取则默认值用例必须红。
+- **撤销口令**：wave71 的 commit 一 revert 即回「只有两种风格、无切换入口」状态。
+
 ## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
 - **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
 - **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
