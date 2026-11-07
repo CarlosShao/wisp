@@ -823,3 +823,83 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 		time.Sleep(300 * time.Millisecond)
 	}
 }
+
+// TestBallLiveOrbOverlayFrameHasNoGlyphPixels is the ticket-65 defect the
+// owner measured on the real desktop (2026-11-07): with the orb attached, the
+// ball window's overlay frame still drew the D2D center text override, so the
+// white "69%" download percent rode ON TOP of the glass web orb (evidence
+// screenshot D:\tmp\wisp\20261107\orblab\orb-FINAL.png). The overlay branch's
+// no-text law is asserted on the pixels the layered window actually presents:
+// the real ball runs the exact defect shape - Downloading at 69% plus the
+// same SetBadgeText call cmd/wisp's presenter uses - and then the DIB audit
+// runs on the STA thread (serialized with drawFrame, so the read is the
+// presented frame). It must find ZERO opaque near-white pixels: OnSolid is
+// the color every drawText call uses and the ONLY near-white element the
+// overlay branch may legally paint (the silhouette is alpha 1/255, the
+// progress ring is BorderSoft/Accent, the badge dot is BGInset/Danger, the
+// queue dot Info - none near-white), so any nonzero count is text or digit
+// pixels stamped on the ball's face.
+func TestBallLiveOrbOverlayFrameHasNoGlyphPixels(t *testing.T) {
+	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
+	if err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	requireQuietBallDesktop(t)
+	orbTestReapLeakedWebView2(t)
+
+	b, err := New(Options{
+		SizePx:      BallSizeDefaultPx,
+		Initial:     statemachine.StateSleeping,
+		Store:       store,
+		WindowTitle: liveBallTitle(t),
+		Hotkeys:     liveHotkeys(),
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	t.Cleanup(b.Close)
+
+	deadline := time.Now().Add(15 * time.Second)
+	for {
+		if b.DebugOrbHWND() != 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("orb window did not attach within 15s (WebView2 runtime missing or Embed refused); face %q",
+				OrbDebugLine(b.DebugOrbAttached(), b.DebugOrbState()))
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	// audit posts the DIB walk to the STA thread: the FIFO queue puts it
+	// behind every repaint the setters posted, so the count reads the settled
+	// overlay frame without polling or races.
+	audit := func() int {
+		done := make(chan int, 1)
+		b.sta.PostTask(func() { done <- b.rend.overlayGlyphPixels() })
+		select {
+		case n := <-done:
+			return n
+		case <-time.After(10 * time.Second):
+			t.Fatal("overlay glyph audit never ran on the STA thread")
+			return -1
+		}
+	}
+
+	// Phase 1: the measured defect shape. applyStateLocked resets the
+	// overlay fields, so state first, then the three host-only values the
+	// old branch painted over the face.
+	b.SetState(statemachine.StateDownloading)
+	b.SetProgress(0.69)
+	b.SetBadgeText("69%")
+	b.SetBadge(3)
+	if n := audit(); n != 0 {
+		t.Fatalf("overlay frame carries %d near-white glyph pixels ON the glass face: text/numbers still ride the orb window (ticket-65 \"69%%\" regression)", n)
+	}
+
+	// Phase 2: the resting frame is silhouette-only by law.
+	b.SetState(statemachine.StateSleeping)
+	if n := audit(); n != 0 {
+		t.Fatalf("sleeping overlay frame carries %d near-white glyph pixels", n)
+	}
+}

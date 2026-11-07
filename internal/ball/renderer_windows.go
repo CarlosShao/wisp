@@ -24,10 +24,10 @@ import (
 type renderer struct {
 	dcRT       unsafe.Pointer // ID2D1DCRenderTarget
 	hdcMem     uintptr
-	hbm        uintptr // DIB section handle
-	bits       uintptr // DIB memory (Windows heap - NOT a Go pointer; GC must not track it)
-	capW, capH uint32  // current DIB allocation
-	w, h       int32   // physical pixels
+	hbm        uintptr        // DIB section handle
+	bits       unsafe.Pointer // DIB memory (Windows heap - the allocation lives and dies with hbm; held typed so the overlay audit can read it vet-clean)
+	capW, capH uint32         // current DIB allocation
+	w, h       int32          // physical pixels
 	dpi        uint32
 
 	solid    unsafe.Pointer // single solid brush, SetColor per use
@@ -61,13 +61,17 @@ type renderer struct {
 	jarvis jarvisAssets
 
 	// overlayOnly (ticket 65 rework): the WebView2 orb window is the ball's
-	// visible face and overlays this window, so frames draw ONLY what the
-	// page cannot - the approval badge, progress ring, queue dot, text
-	// override - plus a near-invisible hit-test silhouette (the layered
-	// window is OS-hit-tested per pixel; all-zero alpha would make the ball
-	// unclickable, the measured ticket-65 regression). Set by the window
-	// before every draw (ball_windows.go); direct drawFrame callers (tests)
-	// default to the full D2D frame.
+	// visible face and overlays this window (sitting UNDER it in z-order, so
+	// every opaque pixel this window paints lands ON the glass face). Frames
+	// draw what the page cannot: the progress ring (step 9), the badge and
+	// queue-dot DISCS (digits suppressed - no text on the face), plus a
+	// near-invisible hit-test silhouette (the layered window is OS-hit-tested
+	// per pixel; all-zero alpha would make the ball unclickable, the measured
+	// ticket-65 regression). NO text of any kind: the owner-screenshot
+	// defect had the white "69%" percent stamped dead center on the orb
+	// (overlayGlyphPixels audits the law). Set by the window before every
+	// draw (ball_windows.go); direct drawFrame callers (tests) default to the
+	// full D2D frame.
 	overlayOnly bool
 }
 
@@ -130,7 +134,7 @@ func newRenderer(hwnd windows.HWND, w, h int32, dpi uint32) (*renderer, error) {
 		planes:   1,
 		bitCount: 32,
 	}
-	var bits uintptr
+	var bits unsafe.Pointer
 	hbm, _, err := pCreateDIBSection.Call(r.hdcMem, unsafePtr(&bmi), dibRGBColors, unsafePtr(&bits), 0, 0)
 	if hbm == 0 {
 		pDeleteDC.Call(r.hdcMem)
@@ -568,7 +572,12 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 		r.drawIcon(v, c, R, s)
 	}
 
-	// 11. Approval badge (top-right, danger disc + white digit).
+	// 11. Approval badge (top-right, danger disc + white digit). Orb mode
+	// keeps the danger disc as a DIGIT-FREE notification dot (mainstream
+	// badge-dot shape): the white digit is OnSolid text ON the glass face -
+	// the same ticket-65 defect class as the center percent below - so the
+	// depth number yields to the no-text-on-the-face law (the count stays on
+	// the panel and on the D2D fallback face).
 	if v.BadgeCount > 0 {
 		bx, by := c.x+R*0.82, c.y-R*0.82
 		br := BadgeDiameterPx * s / 2
@@ -576,9 +585,11 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 		r.fillEllipse(d2d1Point2F{bx, by}, br+BadgeBorderPx*s, br+BadgeBorderPx*s, r.solid)
 		r.setSolid(mulA(pal.Danger, v.Opacity))
 		r.fillEllipse(d2d1Point2F{bx, by}, br, br, r.solid)
-		r.setSolid(mulA(pal.OnSolid, v.Opacity))
-		r.drawText(fmt.Sprintf("%d", v.BadgeCount), r.badgeFmt,
-			d2d1RectF{bx - br, by - br, bx + br, by + br})
+		if !r.overlayOnly {
+			r.setSolid(mulA(pal.OnSolid, v.Opacity))
+			r.drawText(fmt.Sprintf("%d", v.BadgeCount), r.badgeFmt,
+				d2d1RectF{bx - br, by - br, bx + br, by + br})
+		}
 	}
 
 	// 12. Queued info dot (bottom-left).
@@ -592,7 +603,15 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	}
 
 	// 13. Center text override (L1 countdown seconds / download percent).
-	if v.BadgeText != "" {
+	// Orb mode draws NO text at all (ticket 65, owner-measured 2026-11-07:
+	// the white "69%" percent stamped dead center ON the glass web orb). The
+	// overlay window sits ABOVE the page, so every D2D glyph lands on the
+	// ball's face; the page's frozen API (window.liquidOrb: setState /
+	// setAudioBands only) has no text channel either, so suppression - not
+	// relocation - is the honest fix. Progress reads through the ring of step
+	// 9, which the page cannot draw; the countdown/percent reappears with the
+	// D2D fallback face (orb detached).
+	if v.BadgeText != "" && !r.overlayOnly {
 		r.setSolid(mulA(pal.OnSolid, v.Opacity))
 		r.drawText(v.BadgeText, r.microFmt, d2d1RectF{c.x - R, c.y - R, c.x + R, c.y + R})
 	}
@@ -796,6 +815,42 @@ func (r *renderer) drawText(s string, fmtPtr unsafe.Pointer, rc d2d1RectF) {
 		uintptr(r.solid), 0, 0)
 }
 
+// overlayGlyphPixels audits the ULW source DIB for TEXT pixels: opaque
+// near-white, the OnSolid color every drawText call uses (badge digits, the
+// center countdown/percent override). It is the mechanical form of the
+// ticket-65 no-text law (owner-measured 2026-11-07: the overlay frame's white
+// "69%" rode this window ABOVE the web orb's glass face). The predicate is
+// exact because the overlay branch's legal palette contains no other
+// near-white element: the hit-test silhouette is OrbBody at alpha 1/255, the
+// progress ring is BorderSoft/Accent, the badge dot BGInset/Danger, the queue
+// dot Info - all dark or colored. A nonzero count therefore means text or
+// digit pixels are stamped on the ball's face. Runs on the caller's thread;
+// the live test posts it to the STA thread, so the read is serialized with
+// drawFrame and cannot tear. Returns -1 when there is no DIB to audit.
+func (r *renderer) overlayGlyphPixels() int {
+	if r.bits == nil || r.w <= 0 || r.h <= 0 {
+		return -1
+	}
+	buf := unsafe.Slice((*uint32)(r.bits), int(r.w)*int(r.h))
+	n := 0
+	for _, px := range buf {
+		a := px >> 24 // BGRA little-endian: alpha is the top byte
+		if a < 128 {
+			continue
+		}
+		b := px & 0xff
+		g := (px >> 8) & 0xff
+		rr := (px >> 16) & 0xff
+		// Premultiplied near-white: every channel tracks alpha (white
+		// premultiplies to r=g=b=a exactly; the 40/255 slack covers the
+		// slight rounding of anti-aliased glyph interiors).
+		if int(rr) >= int(a)-40 && int(g) >= int(a)-40 && int(b) >= int(a)-40 {
+			n++
+		}
+	}
+	return n
+}
+
 // drawIcon renders the Lucide-style line glyphs (stroke IconStrokePx, color
 // OnSolid - or fg-secondary for the Muted slash per ball.html). Primitive
 // shapes only: lines, circles, ellipse fills.
@@ -902,7 +957,7 @@ func (r *renderer) ensureDCAndDIB(hdcScreen uintptr, w, h int32) error {
 		planes:   1,
 		bitCount: 32,
 	}
-	var bits uintptr
+	var bits unsafe.Pointer
 	hbm, _, err := pCreateDIBSection.Call(r.hdcMem, unsafePtr(&bmi), dibRGBColors, unsafePtr(&bits), 0, 0)
 	if hbm == 0 {
 		return fmt.Errorf("ball: CreateDIBSection(%dx%d): %v", w, h, err)

@@ -416,14 +416,18 @@ func (b *Ball) repaintCurrent() {
 
 // renderFrame draws and presents via UpdateLayeredWindow. With the WebView2
 // orb attached (ticket 65 rework), the ORB window is the ball's visible face
-// overlaying this window, and this window draws the overlay-only frame: the
-// near-invisible hit-test silhouette plus the badge/progress/text elements
-// the page has no API for (renderer_windows.go overlayOnly). The silhouette
-// keeps every alpha-carrying pixel the per-pixel OS hit test needs - the
-// first cut's "draw nothing" guard left this layered window alpha 0
-// everywhere, which made it invisible AND skipped by WindowFromPoint (the
-// measured ticket-65 regression). Without the orb (attach failed), the full
-// D2D frame draws exactly as before - the fallback is untouched.
+// overlaying this window (this window sits ABOVE it in z-order), and this
+// window draws the overlay-only frame: the near-invisible hit-test silhouette
+// plus the page-impossible overlays - the Downloading progress ring and the
+// badge/queue signal DISCS (digits suppressed). NO text of any kind: the
+// owner-measured ticket-65 defect had the white "69%" percent riding this
+// window on top of the glass face, and the page's frozen API has no text
+// channel either (renderer_windows.go overlayOnly). The silhouette keeps
+// every alpha-carrying pixel the per-pixel OS hit test needs - the first
+// cut's "draw nothing" guard left this layered window alpha 0 everywhere,
+// which made it invisible AND skipped by WindowFromPoint (the measured
+// ticket-65 regression). Without the orb (attach failed), the full D2D frame
+// draws exactly as before - the fallback is untouched.
 func (b *Ball) renderFrame() {
 	if b.rend == nil || b.rend.dcRT == nil {
 		return
