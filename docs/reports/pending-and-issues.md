@@ -31850,3 +31850,27 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★rename 第 13 次事故（当场纠正，如实记）**：`git mv` 之后我 `git add` 旧名报 `pathspec did not match`（正常，`git mv` 已把它从工作树移除），我改只点名新名提交 ⇒ **结果 HEAD 里同时存在旧名＋新名**（提交显示 `create mode` 而非 `rename`），双名核读数 **旧名=1 新名=2**。**纠正**：补一笔 `git commit` 点名旧名记录删除（`1d5b2041a`，90 deletions）⇒ 复核 **旧名=0 新名=1** ✓。
   - **★教训（第 13 次）**：`git mv` + 显式 pathspec 的正确姿势是——**`git mv` 之后 `git commit` 直接点名「新名」即可**（索引里已有 rename 记录），**⛔ 先 `git add` 新名**（那会把 rename 变成 add）；且**提交后必须现跑双名核**（我这次跑了才发现，否则就漏了）。
 - **撤销口令**：226 结案＝`git revert 1d5b2041a d76237575`（两笔一起 revert 才回到未结状态）。
+## A1624（2026-11-07 23:3x，编排者）**★★Jarvis 深色圆盘落地（`24167a4cc` 已推）｜机主要的那颗好看球成了｜215 清单落地｜219 腿空返重派**
+
+### 一、Jarvis 圆盘（机主原话「直接把 Jarvis 风格搞出来给我看算了」）——★成了
+- **腿的推理（我认可，这是铁律 ⓪⓪⓪ 的范本）**：用 **z 序法律**否掉 D2D 方案 —— `orb_windows.go follow()` 文档 + `newOrbWindow:398-403` 证明**球窗在 orb 窗之上**，D2D 圆盘会被画在粒子**上面**（把粒子盖住）；**页面是唯一在粒子之下的层** ⇒ 圆盘必须活在**被服务的页面**里（`#jarvis-disc`，`border-radius:50%`，固定居中，直径＝窗边长的 96%）。
+- **几何是推导的，不是拍脑袋**：四角探针（内缩 3px）落在对角线的 **66.5%** 处，**远在 48% 半径之外** ⇒ 四角仍读桌面色（±12 钉保持）；粒子最宽投影＝边长的 **37.1%**（camera 35°、z=4.1、sceneScale 0.82、最宽轨道半径 1.17）⇒ **完全被圆盘覆盖**，加色青粒子不再合成到桌面上。
+- **盘色**＝上游 demo 的深蓝系（`#101a2e → #0a1322 → #050913` 径向），**⛔ 纯黑**（照我的派单）。
+- **资产重建**：`jarvis-orb.html` **759,648B → 761,765B**，sha 钉同笔换成 `2cb15fc2…`（siri 的 `d93da649…` **零触碰**）。腿先证明脚手架基线**逐字节等于**已提交的 `66eb4b80…` 构建，所以 delta **恰好只有圆盘**。
+- **★我亲跑读数（决定性三数同时成立）**：`TestBallLiveOrbJarvisDarkDiscOverWhiteFloor`（**白底**＝机主缺陷的最极端形状）**PASS 13.13s**：
+  - `corners [[255 255 255] x4] within +/-12 of the WHITE floor` ⇒ **透明架构没破**
+  - `disc ring 8/8 non-particle samples averaging lum 17.9 (< 60)` ⇒ **深盘真实存在**
+  - `cyan-dominant 72/961 sampled px (7.49% > 2.00%)` ⇒ **粒子保住青色**
+- **★我亲跑静态牙 8/8 PASS**，含新增 `TestJarvisAssetShipsDarkDisc`、`TestJarvisServedDocumentKeepsDiscAndBelt`。
+- **★我重建 exe 并实机读数**：球心 `(14,24,41)` 深蓝／盘内左侧 `(8,15,28)` 深蓝／**左上角 `(255,255,255)` 纯白** ⇒ 三数一致。截图 `D:\tmp\wisp\20261107\orblab\JARVIS-WITH-DISC.png`。
+- **★腿如实报的「没做到」**：**尺寸 44..72 是冻结契约**（`PLAN.md:3557`、`SPEC-08 §2`、`internal/config/validate.go:62`、`tokens.go:524-528`），`internal/config` 与 `cmd/balldebug` **在本腿写面之外** ⇒ **120~160 的放大没有硬推**，它是**契约文字改动、要机主批**；深盘已在当前 100px 下消除洗灰缺陷。
+- **撤销口令**：`git revert 24167a4cc`。
+
+### 二、票 215 清单（`5341ead7a` + `40074c6c1`）
+- 新件 `internal/panel/plugins_inventory_215.go`（`PluginRow`＋`PluginInventorySection`＋两句 canonical 登记句）＋三牙测试＋`pump.go` 加 `PumpSources.Plugins`＋`composer.go` 加**第五枚 reader-gated 键** `plugins`＋证据件。
+- **★腿的关键判断（我认可）**：插件**有真源**⇒接（照 213/187/65 范式，**未造第五范式**）；**技能 0 键**⇒**⛔ 不造假数据**，只携 `SkillState` 登记句；「生效位」不存在 ⇒ `enabled=true` 与「零读者」句**同包永不分家**＝AC#2 正控长在形状里。
+- **★腿的牙抓到一枚真缺陷**：**原地排序会改写读者 slice** ⇒ 已改为**拷贝排序**。
+- **★欠**：生产装配根一行（`cmd/wisp/run.go` 接 `Plugins:`）未接（本波 cmd/wisp 被 219 腿独占）⇒ **装配根行落地前运行进程不发 `plugins` 键**。
+
+### 三、219 腿空返（如实记）
+- `wave79` 的 `t219` 返回**空字符串**，盘上核实：**无 commit、无 `docs/evidence/s1/219-ac2*` 证据件** ⇒ **腿失败，零产出**。**已重派**。
