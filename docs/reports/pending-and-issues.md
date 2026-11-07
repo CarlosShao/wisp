@@ -31600,3 +31600,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - **①档前 8 推荐序**：194（owner 已批 A381，代价表是面板方法面集线器）→ 214（owner 接单，票面自述"最便宜一枚"）→ 187（owner 点名功能票）→ 188（owner 放权"缺就补"）→ 213（判据明确，214/215 地基）→ 176（硬前置 175 已 done）→ 305（AC#0 归因已毕）→ 145（167/188/191/192 一串的载体前置）。
   - **★纪律提醒（腿给的）**：①档里 145/187/188/191/192/194/213/214/215/219/226 触 `internal/panel/**` 或 `cmd/wisp/**` ⇒ **每波每包只许一枚写腿，同包按上序串行**；本档**零枚 `internal/ball/**` 写面**（避开 wave62 在飞件）。
 - **撤销口令**：jchv fork＝`git revert 0291ba74e 2bb639e4e 0e0a48732`（注意 revert 会回退 `go.mod` replace 与整个 forks 目录）；triage 证据件＝`git revert 7863017d3`。
+
+## A1604（2026-11-07 17:4x，编排者）**★球的两个缺陷真修好（四角精确零差＋单球），我亲眼验收；★新发现球上叠了 D2D 的「69%」徽标**
+- **wave62 `orb-transparency-dedup`（`10d7cb3c3`，9 files +694/−133）**：
+  - **问题 A 真透明**：透明链重做——**去 LAYERED**、DWM blur-behind 空区域、env 出生透明、与球窗同 rect 中心叠加、z 序球上 orb 正下、`WM_NCHITTEST→HTTRANSPARENT` 兜底；`orbasset.go` **注入 `<style>html,body{background:transparent !important}</style>`**（asset 零字节动，sha 钉测照旧绿）。
+  - **问题 B 单球**：架构＝**甲**（orb＝可见面叠加球窗，球窗＝交互层只画 badge/进度/文本＋**alpha=1/255 命中轮廓**——腿指出全零 alpha 会被 OS 跳过＝上一腿那个回归的成因）。
+  - **★腿如实报的两个额外根因（比我的四层清单多）**：① jchv `AddScriptToExecuteOnDocumentCreated` 传 NULL handler＝**竞态缝**（bootstrap 可整段丢失，真机实测过）⇒ 改用注入 CSS（声明式无竞态）；② **API put 生效滞后**（文档明载 known issue）⇒ 改用 `WEBVIEW2_DEFAULT_BACKGROUND_COLOR` env（进程级）。
+- **★我独立复核（⛔ 抄腿读数）**：
+  - `sha256sum internal/ball/assets/orb-siri.html` ⇒ **`d93da649...` 逐位不变**（上游件未被改）。
+  - `gofumpt -l internal/ball` 空 rc=0／`go vet ./internal/ball` rc=0／`go build`（含 balldebug）rc=0／默认套件 **ok 0.235s**。
+  - **winlive `TestBallLiveOrb` ⇒ 5/5 PASS（39.611s）**，关键两行逐字：
+    - `orb page rendered: 359/961 sampled px non-dark (37.36% > 1% floor)`
+    - **`orb transparent over a known floor: corners [[51 51 50] [51 51 50] [51 51 50] [51 51 50]] within +/-12 of (51,51,50); page lit ratio 21.96%`** ⇒ **四角与桌面底板精确零差**。
+  - **★我亲自真机验证**：build `build/balldebug-orb.exe` 启动后 `EnumWindows` 枚举——「Wisp」rect=**(3316,1268)-(3416,1368)** 与「Wisp Orb」rect=**(3316,1268)-(3416,1368)** **完全重合** ⇒ 单球架构落实；截该区域放大 4 倍，**可见一枚完整液态玻璃球（球体＋彩虹光带＋边缘青色高光弧），无黑框、无第二个球**（图 `D:\tmp\wisp\20261107\orblab\orb-FINAL.png`）。
+- **★我新发现一枚真问题（腿没报）**：球面上叠着 **「69%」白色数字**——那是 D2D 渲染器的**进度徽标**（`renderer_windows.go` overlay 模式下球窗仍画 badge/进度/文本）。玻璃球上不该有这坨数字。
+  - ⇒ **派 wave65** 修：orb 模式下**不画进度数字**（或改成球外圈的细弧＝主流做法），判据＝截图里球面上无文字。
+- **撤销口令**：透明去重＝`git revert 10d7cb3c3`（回退即回上一腿的"黑框+双球"状态）。
