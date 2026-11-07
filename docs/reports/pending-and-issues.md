@@ -31732,3 +31732,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★截图方法坑（记下）**：机主的 **NBA2K 游戏窗口全屏盖着**（NBA2KOnline pid 36084，1926x1229，(-3,63) 起）⇒ CopyFromScreen 抓到的全是白色（连远处桌面都读 255,255,255）。**⛔ 不杀机主的游戏**；PrintWindow 对 WebView2 GPU 层抓空白 ⇒ **正确路径＝让机主自己看，或等游戏窗口不在前台时再抓**。
 - **⇒ 派 wave73**：①查 jarvis 页为何没被清成透明（对比 glass 页的注入层路径）；②jarvis 风格下不画 D2D badge 圆盘；③**判据必须覆盖真机白底**（现判据在测试环境过、真机白底，说明测试环境底板假设与产品不同）。
 - **撤销口令**：本轮零产码（只测量＋记档）。
+
+## A1614（2026-11-07 20:0x，编排者）**★外观切换 Go 侧全通（五牙 5/5 我亲跑），但★发现真缺口：前端设置页根本没有「球风格」这一行，且前端没声明 ballStyle 键 ⇒ 机主今天切不了**
+- **wave72 收口腿（5 笔已推）**：fe0f740d6 步1 五问核实／1b25d931c 步2a internal/panel 四小段／7858108a0 步2b run.go 装配根注入／432d5ab7b 步3 门级+快照键+源钉测试+突变牙④／007f1ee21 步4 终态门禁。与 wave71 交错完成同一目标，两腿已对账入证据件 §3.3/§6。
+  - **落地件**：internal/panel/config_handlers.go（knownWritableField 四表并集）＋config_write_313.go（acceptedWritableFields＋takesValueFor 同款接 65）＋composer.go（BallStyle *BallStyleSection reader-gated）＋pump.go（reader 字段＋fill）＋新 ball_style_65.go（载体）＋cmd/wisp/run.go（PumpSources 注入）。
+  - **★突变牙④（我认可）**：摘 writableField65 项 ⇒ 门级测试 FAIL rc=1，sha256 2048692e…1616 逐字节还原后复绿。
+- **★我亲跑五牙（5/5 PASS）**：Test65SeedDefaultGlass 0.01s／Test65SeedJarvis 0.01s／Test65SeedUnreadable 0.00s／Test65ApplySettingBallStyleFlipsActiveStyle 0.05s／**Test65AssemblyRootCarriesTheBallStyleReader 0.00s**（新增，钉装配根真注入）；go test ./internal/panel -run Test65 **ok 0.069s**。
+- **★快照键形状（页面能拿到什么）**：BallStyleSection{ Style string json=style; Vocabulary []string json=vocabulary } —— Style 是当前生效家族，Vocabulary 是 schema 自己的 glass|jarvis 列表（**不是拷贝**，与 validate 判、SetBallStyle 拒同一张表）。FieldBallStyle = ball_style。
+- **★真缺口（我现跑发现的，腿没报）**：
+  1. **前端 frontend/src/lib/panel.ts 只有 tasks? 一行声明**（:256），**ballStyle 与 modelSwitch 都没声明** ⇒ 页面读不到这个键（这是 internal/panel 那 3 枚「预定红」的根因，Q-51 外部 agent 面）。
+  2. **★设置页没有「球风格」这一行**：frontend/src/components/config-screen.tsx:85-94 的 APPEARANCE_ROWS 八行里，球相关三行是 ball.size / ball.opacity_idle / ball.click_through，**全部标着 blocked=那颗球是原生绘制的（D29），页面改不到** —— **ball.style 这一行根本不存在**。⇒ **机主今天在设置页找不到切换入口**。
+  3. **无 CLI 切换命令**：wisp 没有 config set 子命令（cmd/wisp/config*.go 全是 reload/readers，非 set）。⇒ 今天只能手改 %APPDATA%\wisp\config.toml 的 [ball] style 后重启。
+- **★诚实结论**：机主原话「设置项里面外观可以配置切换风格」——**Go 侧四段全通、即时生效机制成立、五牙全绿，但「设置项」这个界面入口今天不存在**。这不是腿的错（frontend/** 归外部 agent Q-51），但**对机主而言功能等于不可用**。
+- **⇒ 待办（我记下）**：①前端 panel.ts 声明 ballStyle；②config-screen.tsx 的 APPEARANCE_ROWS 加 ball.style 一行（带 glass|jarvis 选择器，blocked 应为空因为**这次页面真能改**）；③这是 Q-51 外部 agent 的写面，我不能碰 ⇒ 需机主决定是等外部 agent 还是我另找路子。
+- **撤销口令**：wave72＝git revert 007f1ee21 432d5ab7b 7858108a0 1b25d931c fe0f740d6。
