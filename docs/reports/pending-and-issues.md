@@ -31724,3 +31724,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **「回改 164/175 的条件」留给编排者**：164:57、175:19/:53/:67/:83 的历史 log 仍写旧零读数，但都自带「归票 176」指针，结票后指针自洽；逐字回改属 164/175 票面写面，编排者定夺（不改也不误导）。
 - 门禁四枚全绿：gofumpt 空／vet rc0／`go test ./internal/tools -count=1` ok 69.067s／d22scan clean rc0。零产码；`internal/**`、`cmd/**`、`frontend/**`、`design/**`、thresholds/golden 零字节；⛔push。
 - **撤销口令**：结票记账＝`git revert 3f02ff70b` ＋ 本条所在的结票 commit（`git log --oneline --grep "176 结票" -1` 可查）；票面名与 AC 勾的复原随 revert 走，若 revert 不含改名则以 `git mv` 退回旧名。
+
+## A1613（2026-11-07 20:0x，编排者）**★外观切换已通（四牙 4/4 我亲跑）但我实测抓到两枚真问题：①Jarvis 产品里白底不透明 ②球窗只画红点没画球**
+- **★我实测 -style jarvis 真渲染粒子**：启动 balldebug-orb.exe -style jarvis，两窗 rect 完全重合 (3316,1268)-(3416,1368)，截图放大 4 倍（D:\tmp\wisp\20261107\orblab\jarvis-live-final.png）——**青色粒子环＋轨道环线确实在画**，球心 RGB=(170,203,204) 青系 ✓。⇒ **风格切换的产码链路是通的**。
+- **★真问题①：Jarvis 产品里白底不透明**。同一张截图**左上角 RGB=(255,255,255)** ⇒ 产品里 jarvis 页面**没被清成透明**（glass 页的注入层 transparent !important 对 jarvis 页没生效，或 jarvis 页自带 #050913 深底把注入层顶掉）。对照：glass 的四角 ±12 判据在测试环境过，**但 jarvis 那条判据也是在测试环境（黑底板）过的，产品真机白底** ⇒ 判据与真机不一致。
+- **★真问题②：球窗只画红点**。PrintWindow 直接抓「Wisp」窗（pw-Wisp.png）：**只有一个红色圆点（badge），玻璃球本体没有** —— 球本体由「Wisp Orb」窗里的 WebView2 画（PrintWindow 抓不到 GPU 层，已知限制）。但**红色圆点在 jarvis 风格下也不对**：jarvis 页面上不该叠 D2D badge 圆盘（跟 69% 数字同类）。
+- **★截图方法坑（记下）**：机主的 **NBA2K 游戏窗口全屏盖着**（NBA2KOnline pid 36084，1926x1229，(-3,63) 起）⇒ CopyFromScreen 抓到的全是白色（连远处桌面都读 255,255,255）。**⛔ 不杀机主的游戏**；PrintWindow 对 WebView2 GPU 层抓空白 ⇒ **正确路径＝让机主自己看，或等游戏窗口不在前台时再抓**。
+- **⇒ 派 wave73**：①查 jarvis 页为何没被清成透明（对比 glass 页的注入层路径）；②jarvis 风格下不画 D2D badge 圆盘；③**判据必须覆盖真机白底**（现判据在测试环境过、真机白底，说明测试环境底板假设与产品不同）。
+- **撤销口令**：本轮零产码（只测量＋记档）。
