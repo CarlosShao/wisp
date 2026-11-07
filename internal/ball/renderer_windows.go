@@ -578,7 +578,15 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	// the same ticket-65 defect class as the center percent below - so the
 	// depth number yields to the no-text-on-the-face law (the count stays on
 	// the panel and on the D2D fallback face).
-	if v.BadgeCount > 0 {
+	//
+	// The JARVIS page is the owner's 2026-11-07 real-machine exception: the
+	// disc lands ON the particle sphere (the page's own top-right orbit region)
+	// and reads as an artifact, not a notification (evidence
+	// 65-jarvis-transparent-in-product.md §2). Overlay mode skips it for the
+	// jarvis family only; the glass family keeps the badge-dot, and the D2D
+	// fallback face (orb detached) keeps it for every style - depth still
+	// reaches the user through the panel.
+	if v.BadgeCount > 0 && !(r.overlayOnly && activeStyle == StyleJarvis) {
 		bx, by := c.x+R*0.82, c.y-R*0.82
 		br := BadgeDiameterPx * s / 2
 		r.setSolid(mulA(pal.BGInset, v.Opacity))

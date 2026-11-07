@@ -263,8 +263,11 @@ func TestOrbWriteSite(t *testing.T) {
 // jarvisUpstreamSHA256 pins the embedded jarvis build output
 // (assets/jarvis-orb.html). The asset is the tools/jarvis-export build of the
 // UNMODIFIED upstream component; a rebuild through the scaffold reproduces it
-// (update this pin in the same commit as the rebuilt asset).
-const jarvisUpstreamSHA256 = "740c486827e918f0993e63ea1f213ca217067ec1e9e942dbc04777897c5d2017"
+// (update this pin in the same commit as the rebuilt asset). 2026-11-07
+// real-machine follow-up rebuilt the template with body background
+// TRANSPARENT by construction (the product page must not paint any backdrop;
+// evidence 65-jarvis-transparent-in-product.md §2) - same build, new bytes.
+const jarvisUpstreamSHA256 = "66eb4b800e2f37c77ce2b3e9a7d3d4a6a11dd102b85097bc06d7732f2c9c856b"
 
 // TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
 // embed is the scaffold's build of the upstream component with the entry's

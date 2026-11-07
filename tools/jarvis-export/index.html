@@ -6,16 +6,25 @@
   <title>Wisp Jarvis Orb</title>
   <style>
     html, body, #root { width: 100%; height: 100%; margin: 0; }
-    /* Body background = the UPSTREAM DEMO's own host background
-       (jarvis-src/examples/basic/index.html:8, background: #050913) so the
-       standalone artifact renders exactly like the demo: AdditiveBlending
-       particles need a dark backdrop to read cyan (over white they wash out).
-       The Wisp product does NOT rely on this value: orbasset.go injects
-       html,body{background:transparent !important} into the served copy (same
-       belt both orb pages get), so inside the product the pixels outside the
-       orb stay the window's transparency regardless of what this template
-       ships - the siri page (orb-siri.html, body #030409) is the precedent. */
-    body { overflow: hidden; background: #050913; }
+    /* Body background TRANSPARENT by construction (ticket-65 real-machine
+       follow-up, 2026-11-07): the Wisp host window is a transparent WebView2
+       overlay (orb_windows.go DefaultBackgroundColor a=0), so the page's own
+       CSS must not paint ANY backdrop - the pixels outside the orb are the
+       window's transparency, full stop. The earlier template shipped the
+       upstream demo's #050913 and relied on orbasset.go's injected
+       html,body{background:transparent !important} to win the cascade (it
+       does - !important beats a plain author rule - and the live corners
+       proof read the floor with zero deviation); shipping transparent here
+       removes the injection from the load-bearing path entirely, so the
+       product page is transparent even if a future serving seam ever dropped
+       the injected belt. Cost (accepted): opening the standalone artifact in
+       a browser tab shows the particles over the tab's own background
+       (AdditiveBlending cyan reads washed-out over white) - the dark demo
+       look stays available in jarvis-src/examples; the artifact's only
+       consumer is the embedded product asset. The injected belt in
+       orbasset.go STAYS: it is the siri page's transparency mechanism too
+       and costs nothing. */
+    body { overflow: hidden; background: transparent; }
   </style>
 </head>
 <body>
