@@ -31780,3 +31780,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★腿如实报的三条**：①**设置页里那行还是没有**（frontend/** 归外部 agent Q-51）；②task 提示的 internal/config/panelwrite.go:168 **在盘上不存在**，真写盘链是 writeOneKey→WriteSection（已记进证据件）；③cmd/wisp 有两枚别人的未跟踪 323 测试件，**没碰没收**。
 - **★给机主的两条路（今天就能用）**：①**CLI**（推荐，一条命令）wisp.exe config set ball.style jarvis 然后重启 wisp；②手改 %APPDATA%\wisp-dev\config.toml 的 [ball] style。
 - **撤销口令**：CLI 路径＝git revert ef00174ac。
+
+## A1618（2026-11-07 20:3x，编排者）**现跑地面真相＋TestBallLiveEdgeDock 仍红（boundary -4）＋派 wave75 三条写腿**
+- **现跑地面真相**：HEAD 7202103f3，未推 **0**，tracked 脏 **0**，在飞 go 进程 **0**，票池 **总 393 / 未结 98**。
+- **★我现跑复核 TestBallLiveEdgeDock 仍红**：live_windows_test.go:384: edge 1: docked orb boundary -4, want the work edge 0 ⇒ **FAIL 1.04s**（TestBallLiveEdgeDockHover PASS 0.50s）。这是票 68-r2 的债，**今天仍在**。
+- **★派 wave75 三条写腿（写面互斥）**：
+  - **145-snapshot**（internal/panel/** 独占）：票 145 扩 Go 侧载体。★关键判断＝哪些字段今天就有真源、哪些没有（197/213/187/65 已各加一枚 reader-gated 键，**照同一范式⛔ 造第四个**）。
+  - **138-cancel**（internal/tools/** 独占）：票 138 取消任务杀不掉自己 spawn 的子进程。★主流 harness 做法＝**Job Object + JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE 或显式 TerminateJobObject**，⛔ 只杀直接子进程。牙必须断言**子进程真死**（核 pid 不在），⛔ 只断言 API 返回。
+  - **68-parity**（internal/ball/** 独占）：票 68 球默认视觉 parity，**核心任务＝修那枚仍红的 TestBallLiveEdgeDock boundary -4**。
+- **撤销口令**：本轮零产码（只测量＋记档）。
