@@ -53,6 +53,13 @@ func (b *Ball) applyLevel(level float32) {
 		return
 	}
 	b.liqRaw = level
+	// Ticket 65 (A1594): when the WebView2 orb is up, the mic drives ITS
+	// bands (setAudioBands) through the same scalar feed - one audio path,
+	// two renderers. The state family check inside pushAudio keeps a hot mic
+	// from moving an idle orb, exactly like the liquid gate below.
+	if o := b.orb.Load(); o != nil {
+		o.pushAudio(level)
+	}
 	if !liquidDriven(b.curState) {
 		// A state outside the session family must not be animated by the mic:
 		// the scalar is recorded (a later summon starts from it) and dropped,

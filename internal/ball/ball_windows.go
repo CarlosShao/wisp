@@ -112,6 +112,16 @@ type Ball struct {
 	lastMotion        time.Time
 	liquidTimerActive bool
 
+	// orb is the WebView2 liquid-glass renderer (ticket 65 integration leg,
+	// A1594). nil = the D2D fallback owns the pixels - the attach attempt
+	// failed (no WebView2 runtime, GPU-less session, ...) and NOTHING else
+	// changed: same window, same states, same D2D recipes as before. The
+	// pointer is stored once at attach and cleared at Close, so atomic load
+	// paths (renderFrame/present guards) never take a lock on the hot frame
+	// path; all mutating calls post to the ui-sta thread like every other
+	// surface in this package.
+	orb atomic.Pointer[orbWindow]
+
 	// Edge dock (ticket 62 item 2). UI-thread-only, like liq, and deliberately
 	// WITHOUT a timer of its own: lastDock is the monotonic anchor of its frame
 	// budget (dockFrameDt), and every step arrives on a mouse message or a
@@ -260,6 +270,14 @@ func (b *Ball) createOnSTA(s *staThread) error {
 		pShowWindow.Call(hwnd, swShownoactivate)
 	}
 
+	// WebView2 orb attach (ticket 65, A1594): best effort, never fatal. On
+	// failure b.orb stays nil and every path below behaves exactly as it did
+	// before this leg - the D2D fallback IS the fallback, not a third mode.
+	// The attach seeds the page with the initial state, so the orb never
+	// opens on a face the ball is not in.
+	b.attachOrb(s)
+	b.followOrb()
+
 	// Initial state render (no animation timers in static states).
 	b.applyStateLocked(b.opts.Initial)
 	// A position restored at a work-area edge comes back as the tab the user
@@ -310,7 +328,15 @@ func (b *Ball) resolveInitial(edge int32) (int32, int32) {
 // SetState switches the rendered state (the consumer drives this after its
 // statemachine dispatch). Safe from any goroutine.
 func (b *Ball) SetState(s statemachine.State) {
-	b.sta.PostTask(func() { b.applyStateLocked(s) })
+	b.sta.PostTask(func() {
+		b.applyStateLocked(s)
+		// Ticket 65 (A1594): the orb page renders the state it is PUSHED, so
+		// the mapped name rides along with every transition. Same STA-thread
+		// task as the D2D apply - no second pump round-trip.
+		if o := b.orb.Load(); o != nil {
+			o.pushState(s)
+		}
+	})
 }
 
 // SetBadge updates the approval-queue badge depth (AwaitingApproval).
@@ -390,6 +416,12 @@ func (b *Ball) repaintCurrent() {
 
 // renderFrame draws and presents via UpdateLayeredWindow.
 func (b *Ball) renderFrame() {
+	if b.orbLive() {
+		// The WebView2 orb owns the pixels (ticket 65, A1594). Painting the
+		// D2D frame into the layered window behind a transparent child would
+		// double-composite; the orb was pushed the state instead.
+		return
+	}
 	if b.rend == nil || b.rend.dcRT == nil {
 		return
 	}
@@ -519,6 +551,11 @@ func (b *Ball) repaintAnimated() {
 
 // present is renderFrame without the draw (used after manual draws).
 func (b *Ball) present() {
+	if b.orbLive() {
+		// Orb takeover: the WebView2 surface composites on its own; nothing
+		// here may put a D2D frame behind it (orb_windows.go).
+		return
+	}
 	var wr rect
 	pGetWindowRect.Call(uintptr(b.hwnd), unsafePtr(&wr))
 	dst := point{wr.l, wr.t}
@@ -632,6 +669,7 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 		} else if !b.dockClickOut() {
 			b.fire(b.opts.Events.OnClickBall)
 		}
+		b.followOrb()
 		return 0
 
 	case wmMouseLeave:
@@ -708,6 +746,7 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 		b.rend.setAssets(b.curVisual)
 		b.dockCommit() // tab geometry is physical px: re-derive it at the new DPI
 		b.renderFrame()
+		b.followOrb()
 		return 0
 
 	case wmDisplayChange:
@@ -998,6 +1037,7 @@ func (b *Ball) Close() {
 		defer close(done)
 		b.stopAnimTimer()
 		b.stopLiquidTimer()
+		b.detachOrb() // ticket 65 (A1594): the WebView2 orb dies with the ball
 		unregisterAll(b.hwnd)
 		if b.tray != nil {
 			b.tray.remove()
