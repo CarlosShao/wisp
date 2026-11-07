@@ -31473,3 +31473,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **verdict33-r14**（`f4a8b92c8`）：AC#6 CSP、AC#8ⓐ 钳制支两份 PASS；AC#7（生产 `.Marshal()` 13 枚全 `_test.go`，要 owner 定"哪两个瞬间须一致"）、AC#8ⓑ（EvToolStart 零发射者，删/留要 owner 一句）REMAINING。**33 保持开。**
 - **编排者技术自拍（铁律⓪⓪⓪，告知式＋撤销口令）**：**264 取甲**——`internal/agent/loop.go` `toolResultParts`(:1251) 咽喉一处掩码（只掩模型侧副本、用户侧 `EvToolEnd`/`res.Message` 不掩、保住 174r8 task.output 指针钉）；⛔ 103 点逐改（散 24 文件必漏）；不改契约文字/不花钱/不可逆 ⇒ 不摆机主。撤销口令「264 回退乙（只装仪器）」。
 - 派 **wave47**：W47assemble（cmd/wisp，`run.go:653` 给 `tools.TaskDeps` 加 Scheduler 字段＋装配，生产 task.list 转真答；因 cmd/wisp 有 323 未跟踪测试件⇒`clone --shared` 隔离）＋ W264a（internal/agent，咽喉脱敏甲）＋ W65jarvis3（internal/ball，jarvis 渲染器拆步重试，必须提交）。
+
+## A1591（2026-11-07 09:xx，编排者）机主裁定：65 玻璃可验收；148 取Ⓑ白名单；其余全按推荐
+- **机主原话**："第一个可以验收，148选B，然后别的都按推荐来"。
+- **① 65**：机主验玻璃球＝**可验收**（AC#6 人判 PASS）。#3/#5 两枚真机数字件由编排者有界尝试（`-diff Sleeping` 4s 采样+gate）补；补到即 6 格齐闭案，补不到则记"owner 已人判、数字件待真机"。
+- **④ 148 Ⓑ**：面板载荷取**白名单**（机主选 B＋推荐）；**Ⓐ** 浅拷贝 bug 按推荐一并修（`queue.go:624` `d:=it.Dec`→`cloneDecision`）。
+- **② 170**：**批**——给 CLI 加专属否决通道（契约加一句＋`cmd/wisp` 一行，≈1 天；机械面已就绪、不解冻）。
+- **③ 163**：**批**——预先授权实现落地那天改 `internal/config/unwired.go:63` 文案、**不删守卫**。
+- **⑤ 264**：保持**甲**（wave47 在写）。
+- **⑥ 33**：AC#7 采编排者默认（**审批队列深度 & 结果列表同帧，其余各自独立**）；AC#8ⓑ **删** `run.go:2170` 零发射者 case（撤销「33 留」）。
+- **下波待派**（wave47 释放 cmd/wisp＋internal/agent 面后，按面互斥串行）：148-r3（Ⓐ+Ⓑ白名单，internal/agent/approval）＋ 170-impl（cmd/wisp）＋（另一面补位）；33-impl 再下一波（同占 cmd/wisp）。
