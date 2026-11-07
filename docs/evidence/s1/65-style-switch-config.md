@@ -70,6 +70,62 @@ func (b *Ball) ApplyStyle(name string) bool {
 
 `git revert` 本腿 commits 即整体退回；单段退回＝删新增四件＋还原 resident_windows.go / panel_config_store.go 两处 hunk（`git log --oneline -- cmd/wisp/ball_style_65_windows.go` 找回滚点）。
 
+## 3. 步3 落地（commit `bc48ae6c7`）
+
+| 件 | 形状 |
+|---|---|
+| `internal/config/settings_65.go`（新） | `SetBallStyle`（`writeOneKey` 守卫写，键路径 `ball.style`，枚举在 config 侧把关＝320 裁定同形；`validate()` 照跑）＋`BallStyleOptions` reader（`BallStyleView{Style, Vocabulary}`，读 `Manager.Config()` 活内存，词表＝schema 的 `ballStyles` 原列表）。**零玻璃球字面量**。 |
+| `internal/panel/config_write_65.go`（新） | `FieldBallStyle = "ball_style"`＋本腿 roster（`WritableFields65`/`writableField65`），照 187 roster 形状独立成件防冻结钉连锁红。**未接 `knownWritableField` 并集**（187 冲突区，见 §4）。 |
+| `cmd/wisp/ball_style_65_windows.go`（新） | `ballStyleSeed65`（照 `hotCfg258` 按次 `config.LoadFile`，不可读答 `("", false)`＋Warn 说 fallback，无本地默认）＋`ballStyleApplier65` 注入缝＋`installBallStyleApplier65`（挂 `Ball.ApplyStyle`）＋`applyBallStyle65`。 |
+| `cmd/wisp/resident_windows.go`（hunk，`runResident` 内） | `startResidentBall` **前**：seed＋`ball.SetStyle(name)`（orbWindow:280 创建种子 `ActiveStyle` ⇒ jarvis 配置第一帧即粒子球，无闪；balldebug `-style` 同序）；`startResidentBall` **后**：`installBallStyleApplier65(rb.b)`＋`rb.b.ApplyStyle(name)` 幂等复同步＝**`ApplyStyle` 产品调用方从 0 变实**（两处：启动复同步＋设置写入路径）。 |
+| `cmd/wisp/panel_config_store.go`（hunk，`ApplySetting`） | `case panel.FieldBallStyle: written, err = s.mgr.SetBallStyle(w.Value)`＋档位实测：applier 在＝`EffectiveNow`（真换过了），不在＝`EffectiveRestart`（上面盖的默认档）——187 的静态 `fieldTier187` 标法不适用，因为这一档取决于本进程有没有球，不是读者行为固定的字段。 |
+
+⓪⓪⓪ 复核：选甲的代价已写清（§2）；`ApplyStyle` 机器是已建成能力，接线是买真价值；未把任何技术选择题丢给机主——默认玻璃球是他逐字令，其余形状（守卫写、roster 独立、reader-gated、档位实测）全部照仓里既有主流形状（248/313/187/320/258）接。
+
+## 4. 如实边界（⚠ 未整段完成的部分）
+
+**面板快照键与门准入＝留给下一腿**，四小段，187/188 落盘后各一处小改：
+
+1. `internal/panel/composer.go`：`Snapshot` 加 `OrbStyle *OrbStyleSection`（指针+omitempty，同 ModelSwitch 形状）；
+2. `internal/panel/pump.go`：`PumpSources` 加 reader 字段＋`Snapshot()` fill；
+3. `internal/panel/config_handlers.go`：`knownWritableField` 并集加 `|| writableField65(field)`（`takesValueFor` 同理加 `fields65TakesValue`）；
+4. `cmd/wisp/run.go`：装配根把 `BallStyleOptions`（config 侧 reader 已就绪）注进 PumpSources。
+
+**为什么留着**：这四个文件是 187 腿未提交 hunks 的载体（`git status --porcelain` 实见 composer/pump/config_handlers 脏；`git add` 按文件点名会吞他们的 hunks，派单纪律明令禁）。**因此今天的状态是**：面板设置页上还看不到外观选择项（门会拒 `ball_style`，快照无键）；但 `wisp run` 启动已按 `[ball].style` 换球风格、手改 config.toml 的 `style = "jarvis"` 即时生效于下次启动、写入路径（setter→applier→`ApplyStyle`）已全线打通并有测试钉——**收件三把尺里「ApplyStyle 产品调用者＝0」这条缺陷已消除，验证口径见 §5 的两处调用点**。
+
+## 5. 步4+5 判据读数（全部现跑，2026-11-07T19:3x +08）
+
+四牙（`cmd/wisp/ball_style_65_windows_test.go`，改名为 `Test65*` 对齐派单门禁 `-run 'Test65|TestStyle'`）：
+
+| 牙 | 用例 | 读数 |
+|---|---|---|
+| ①默认值是 glass | `Test65SeedDefaultGlass` | 无 style 行的合法 config ⇒ seed 返回 `(glass, true)`——glass 来自 schema 默认，本腿新件零字面量 |
+| ②设 jarvis 真变 | `Test65SeedJarvis`＋`Test65ApplySettingBallStyleFlipsActiveStyle` | 写路径（真 Manager 守卫写→applier）后 `ball.ActiveStyle()==StyleJarvis` |
+| ③设回 glass 真变 | 同上 | 第二次写 glass ⇒ `ActiveStyle()==StyleGlass`，收据/档位逐枚断言 |
+| ④突变 | 摘 `ballStyleSeed65` 的 config 读取（临时 return `"", false`） | `Test65SeedDefaultGlass` **FAIL**＋`Test65SeedJarvis` **FAIL**（`Unreadable` 仍 PASS＝失败路径语义独立）；还原后全绿，突变用例逐字复跑 |
+
+config 侧（`internal/config/settings_65_test.go`）：守卫写收据 `[ball.style]`／盘上 canonical 单引号行 `style = 'jarvis'`／词表外四值拒绝且 config.toml 字节不变／信封空格修剪而大小写折叠拒绝（load 枚举是精确小写）／nil Manager 读口词表完整。
+
+门禁读数表：
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| gofumpt | `/d/work/base/gopath/bin/gofumpt.exe -l`（七件点名） | 空（rc0） |
+| vet | `go vet ./internal/config ./internal/ball ./internal/panel ./cmd/wisp` | rc0 |
+| build | 同四包 `go build` | rc0 |
+| config | `go test ./internal/config -count=1` | ok 2.197s |
+| ball | `go test ./internal/ball -count=1` | ok 0.242s |
+| panel | `go test ./internal/panel -count=1` | rc1，**3 红逐枚归属他腿**：两枚预定红（`TestApprovalCardViewJSONKeysMatchFrontendTypes`/`TestComposerContractTypesMatchFrontend`，红行＝`Go Snapshot emits [commands modelSwitch]`——213 的 commands＋187 在飞的 modelSwitch，**无本腿键**）；`TestC21DesignTokensFourWayAgree`＝c21-native-tokens.md 与 `internal/ball/tokens.go` DarkPalette 缺 GlassRing/GlassHi/GlassHiSoft——ball tokens 面，本腿零触碰 |
+| cmd/wisp | `go test ./cmd/wisp -run 'Test65\|TestStyle' -count=1 -timeout 30m` | ok 0.226s，4/4 PASS |
+| winlive | `go test -tags winlive ./internal/ball/ -run 'TestBallLiveOrb' -count=1 -timeout 25m` | **7/7 PASS 50.797s**（含 `TestBallLiveOrbJarvisStyleRendersParticles`＝ApplyStyle 往返真窗验证、四角 (51,51,50) 精确零差未破） |
+| d22scan | `./tools/d22scan/d22scan.exe`（全量） | clean rc0（internal 954 Go＋cmd 233 含注释与测试） |
+
+**LF**：七个触件 `file` 逐一核过，无 CRLF。
+
+**Bug 榜（写腿自报，两处）**：①config 断言初版用了 `style = "jarvis"` 双引号形状，canonical 写盘是单引号——测试红了才看读写盘真形状（守卫写本身无缺陷），已按真形状改钉；②初版测试名 `TestBallStyleSeed65…` 不含 `Test65` 子串，派单门禁 `-run 'Test65|TestStyle'` 选不中——改名对齐门禁后再跑。
+
+**AC 勾与 Status 未动；⛔ push（推送只由编排者做）。**
+
 ## 3. 步3-5 收口（2026-11-07T19:3x +08，接续腿现跑核实＋落地读数）
 
 ### 3.1 步1 现跑核实（五问五答，判据可复跑）
