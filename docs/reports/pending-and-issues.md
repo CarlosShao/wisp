@@ -31655,6 +31655,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - **裁定理由（我认可）**：AC#1 作废条款确已触发，但**触发者是本票自己的腿 176-r1 交付成功** ⇒ 主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相说谎。
 - **撤销口令**：213＝`git revert 0e68772a0`；188 证据件＝`git revert 9ad02eb50`。
 
+## A1608（2026-11-07 19:0x，编排者）**★Jarvis 粒子球集成完成（我复跑 PASS 10.41%）｜★但产品页是白底灰球，不是黑底青球**
+- **wave66 `jarvis-integrate`（7 枚 commit，全部已推）**：`1652051d0` 步1 调查／`29b3501d5` 步2 裁定甲／`b679fd072` 步3 产物＋截图＋`tools/jarvis-export/` 7 件脚手架／`1853d1d87` 步4 Go 接线（`orbasset.go`＋`orbstate.go`＋`orb_windows.go`＋`orb_test.go`）／`d902fbc6b` 步5 winlive 判据（新文件 `orb_jarvis_live_windows_test.go`，避让 overlay 腿）／`d958d2af2` 步6 收尾／`258abc528` lockfile。
+  - **裁定＝甲（vite 单文件）**：乙（vanilla 直调 renderer.ts）要自养上游 347 行组件宿主逻辑（quality 降档矩阵/reduced-motion/三套 observer）只买 140KB ⇒ 复杂买不到真价值；丙（字节拆多文件）只多一条文件管理缝＝零收益。
+  - **★我独立复核**：`assets/orb-siri.html` sha256 **`d93da649...` 逐位不变**（禁触面零命中，六笔 commit grep `renderer_windows|ball_windows|orb-siri|frontend/|design/|thresholds|golden`＝0）；`jarvis-orb.html` **758355 B** 在盘；`orb_jarvis_live_windows_test.go` 3609 B 在盘。
+  - **★我亲跑复核**：`TestBallLiveOrbJarvisStyleRendersParticles` ⇒ **PASS 11.73s**，读数逐字 `attempt 1: orb page rendered: 100/961 sampled px non-dark (10.41% > 1% floor)` ⇒ **粒子真渲染，不是"页面加载了"**。
+  - **腿如实报三条欠账**：① jarvis 风格**无音频驱动**（上游组件没有音频接缝，未发明）；② **`ApplyStyle` 运行时切换的产品调用方未接**（当前经 `balldebug -style` 与测试可达，面板/配置一键切换属下一腿）；③ 构建踩掉三颗雷已留档（`String.replace` `$` 模式污染／双 React 实例 dedupe／JSX automatic）。
+- **★我亲见的新问题（腿的判据只断言"非黑像素 >1%"，没断言"黑底青球"）**：我用 node 静态服务器（端口 8925，脚本 `D:\tmp\wisp\20261107\orblab\static-serve.js`）起 `jarvis-orb.html`，Edge `--app` 打开截图（`D:\tmp\wisp\20261107\orblab\jarvis-product.png`）——**背景是白的、粒子环是灰白色**，跟上游 demo 的**黑底青色**（`jarvis-4variants.png`）差得很远。
+  - **⇒ 判据太弱是根因**：`non-dark > 1%` 这条尺在**白底**下当然过（白底本身全是 non-dark）⇒ 腿的牙对"底色错了"完全无感。
+  - ⇒ **派 wave70** 修：①页面底色改黑（上游 demo 是 `#0a0e14` 一类深底）；②粒子环回到青色；③**加严判据**：新用例必须断言**背景像素是暗的**（比如四角/边缘区域平均亮度 < 某阈值）＋**粒子是高饱和青色**（色相落在青区间），⛔ 只断言 non-dark > 1%。
+- **撤销口令**：Jarvis 集成＝`git revert 258abc528 d958d2af2 d902fbc6b 1853d1d87 b679fd072 29b3501d5 1652051d0`。
+
 ## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
 - **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
 - **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
