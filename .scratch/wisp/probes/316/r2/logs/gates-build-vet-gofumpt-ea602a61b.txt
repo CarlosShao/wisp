@@ -1,0 +1,6 @@
+=== gofumpt（绝对路径，双件） ===
+gofumpt-rc=0
+=== build ===
+build-rc=0
+=== vet ===
+vet-rc=0

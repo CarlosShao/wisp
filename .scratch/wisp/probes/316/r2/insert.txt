@@ -1,0 +1,2 @@
+	fmt.Fprintf(rt.stdout,
+		"wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）。原因：上一版横幅。涉及：app.autostart / app.language / app.single_instance。注意两件事都没发生：文件里的新值没有被丢掉。\n")

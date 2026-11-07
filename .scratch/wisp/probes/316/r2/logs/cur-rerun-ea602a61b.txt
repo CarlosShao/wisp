@@ -1,0 +1,4 @@
+2026-11-07 15:59:48 cur-start
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.928s
+cur-rc=0
+2026-11-07 16:00:09 cur-end

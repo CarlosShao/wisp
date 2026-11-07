@@ -1,0 +1,33 @@
+2026-11-07 16:00:27 family-start
+--- PASS: TestTicket223RefusedLooseningKeepsOldValues (6.65s)
+=== RUN   TestTicket223TighteningRaisesNoCard
+--- PASS: TestTicket223TighteningRaisesNoCard (4.54s)
+=== RUN   TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+--- PASS: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (6.44s)
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (3.80s)
+=== RUN   TestTicket223FailureSentencesAreDistinct
+=== RUN   TestTicket223FailureSentencesAreDistinct/缺失
+=== RUN   TestTicket223FailureSentencesAreDistinct/语法错
+=== RUN   TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面
+=== RUN   TestTicket223FailureSentencesAreDistinct/schema未知键
+--- PASS: TestTicket223FailureSentencesAreDistinct (14.50s)
+=== RUN   TestTicket223PanelInboundSaysHotReloadIsDisabled
+--- PASS: TestTicket223PanelInboundSaysHotReloadIsDisabled (0.01s)
+=== RUN   TestTicket223PermissionDeniedSitsInItsOwnSentence
+--- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (3.28s)
+=== RUN   TestTicket223R2FailureSentenceRouting
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1
+=== RUN   TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动
+=== RUN   TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移
+=== RUN   TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句
+--- PASS: TestTicket223R2FailureSentenceRouting (0.63s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	48.825s
+family-rc=0
+2026-11-07 16:01:25 family-end

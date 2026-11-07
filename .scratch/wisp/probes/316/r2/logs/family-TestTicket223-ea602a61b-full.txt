@@ -1,0 +1,289 @@
+time=2026-11-07T16:05:20.139+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RunArmsTheReloadTick
+time=2026-11-07T16:05:21.676+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:21 mockllm: serving on http://127.0.0.1:52829 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:21.715+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-11-07T16:05:21.746+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:21.754+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:21Z duration_ms=8
+time=2026-11-07T16:05:21.762+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:21.768+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:21Z duration_ms=5
+time=2026-11-07T16:05:21.775+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:21.781+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:21Z duration_ms=6
+time=2026-11-07T16:05:21.790+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:21.797+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:21Z duration_ms=7
+time=2026-11-07T16:05:21.797+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:21.804+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:21.810+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:21Z duration_ms=4
+time=2026-11-07T16:05:21.818+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RunArmsTheReloadTick3313446095\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:21.823+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:21Z duration_ms=5
+time=2026-11-07T16:05:21.827+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:21.830+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:22.868+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=7ae85f95-606d-439e-ab46-0189cbeaa72e
+--- PASS: TestTicket223RunArmsTheReloadTick (2.75s)
+=== RUN   TestTicket223HandEditedFsLooseningCostsAnL2Card
+time=2026-11-07T16:05:24.223+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:24 mockllm: serving on http://127.0.0.1:64636 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:24.255+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:24.282+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:24.290+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:24Z duration_ms=6
+time=2026-11-07T16:05:24.298+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:24.304+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:24Z duration_ms=6
+time=2026-11-07T16:05:24.313+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:24.320+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:24Z duration_ms=6
+time=2026-11-07T16:05:24.330+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:24.337+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:24Z duration_ms=7
+time=2026-11-07T16:05:24.337+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:24.347+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:24.355+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:24Z duration_ms=7
+time=2026-11-07T16:05:24.366+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223HandEditedFsLooseningCostsAnL2Card600642196\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:24.372+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:24Z duration_ms=5
+time=2026-11-07T16:05:24.378+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:24.382+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:25.385+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+time=2026-11-07T16:05:25.417+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=98da0094-c0da-4ed6-b910-f12923aa7a7d
+--- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (2.55s)
+=== RUN   TestTicket223RefusedLooseningKeepsOldValues
+time=2026-11-07T16:05:26.791+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:26 mockllm: serving on http://127.0.0.1:51287 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:26.827+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:26.855+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:26.864+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:26Z duration_ms=8
+time=2026-11-07T16:05:26.871+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:26.878+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:26Z duration_ms=6
+time=2026-11-07T16:05:26.888+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:26.893+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:26Z duration_ms=4
+time=2026-11-07T16:05:26.907+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:26.918+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:26Z duration_ms=9
+time=2026-11-07T16:05:26.919+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:26.928+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:26.935+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:26Z duration_ms=6
+time=2026-11-07T16:05:26.944+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RefusedLooseningKeepsOldValues4174436010\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:26.951+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:26Z duration_ms=6
+time=2026-11-07T16:05:26.956+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:26.960+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:27.964+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+time=2026-11-07T16:05:30.998+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=4b216ba5-2ee1-4bec-ade5-e4ff8c41abda
+--- PASS: TestTicket223RefusedLooseningKeepsOldValues (5.60s)
+=== RUN   TestTicket223TighteningRaisesNoCard
+time=2026-11-07T16:05:33.115+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:33 mockllm: serving on http://127.0.0.1:51234 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:33.146+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:33.169+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:33.176+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:33Z duration_ms=6
+time=2026-11-07T16:05:33.184+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:33.191+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:33Z duration_ms=6
+time=2026-11-07T16:05:33.199+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:33.206+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:33Z duration_ms=6
+time=2026-11-07T16:05:33.214+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:33.225+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:33Z duration_ms=10
+time=2026-11-07T16:05:33.225+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:33.236+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:33.242+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:33Z duration_ms=5
+time=2026-11-07T16:05:33.253+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223TighteningRaisesNoCard4253148521\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:33.259+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:33Z duration_ms=6
+time=2026-11-07T16:05:33.263+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:33.265+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:34.267+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+time=2026-11-07T16:05:34.279+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=6d13d8dc-1489-41e8-9080-066753b71bc9
+--- PASS: TestTicket223TighteningRaisesNoCard (3.25s)
+=== RUN   TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+time=2026-11-07T16:05:35.623+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:35 mockllm: serving on http://127.0.0.1:64389 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:35.653+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:35.677+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:35.684+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:35Z duration_ms=7
+time=2026-11-07T16:05:35.691+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:35.697+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:35Z duration_ms=5
+time=2026-11-07T16:05:35.705+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:35.711+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:35Z duration_ms=5
+time=2026-11-07T16:05:35.720+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:35.727+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:35Z duration_ms=7
+time=2026-11-07T16:05:35.727+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:35.736+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:35.742+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:35Z duration_ms=5
+time=2026-11-07T16:05:35.751+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3179777202\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:35.757+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:35Z duration_ms=5
+time=2026-11-07T16:05:35.762+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:35.763+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:36.767+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+time=2026-11-07T16:05:36.799+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=f7cb1807-976b-433f-b215-d93fe4e77c3b
+--- PASS: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (2.52s)
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-11-07T16:05:38.116+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:38 mockllm: serving on http://127.0.0.1:57170 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:38.148+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:38.179+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:38.189+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:38Z duration_ms=10
+time=2026-11-07T16:05:38.198+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:38.204+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:38Z duration_ms=5
+time=2026-11-07T16:05:38.211+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:38.217+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:38Z duration_ms=6
+time=2026-11-07T16:05:38.228+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:38.236+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:38Z duration_ms=8
+time=2026-11-07T16:05:38.237+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:38.247+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:38.253+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:38Z duration_ms=6
+time=2026-11-07T16:05:38.262+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223RestartTierSaysItWillNotApply256047529\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:38.269+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:38Z duration_ms=6
+time=2026-11-07T16:05:38.274+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:38.276+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:39.289+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=504248cc-4a39-47cb-9790-f91a6df95189
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (2.49s)
+=== RUN   TestTicket223FailureSentencesAreDistinct
+=== RUN   TestTicket223FailureSentencesAreDistinct/缺失
+time=2026-11-07T16:05:40.588+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:40 mockllm: serving on http://127.0.0.1:54145 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:40.617+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:40.639+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:40.646+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:40Z duration_ms=6
+time=2026-11-07T16:05:40.654+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:40.659+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:40Z duration_ms=5
+time=2026-11-07T16:05:40.666+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:40.674+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:40Z duration_ms=5
+time=2026-11-07T16:05:40.684+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:40.691+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:40Z duration_ms=7
+time=2026-11-07T16:05:40.691+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:40.701+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:40.708+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:40Z duration_ms=5
+time=2026-11-07T16:05:40.718+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct缺失818388408\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:40.723+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:40Z duration_ms=5
+time=2026-11-07T16:05:40.728+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:40.730+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:41.763+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=8a4e1193-d6fd-41ab-89bc-c083310ccce8
+=== RUN   TestTicket223FailureSentencesAreDistinct/语法错
+time=2026-11-07T16:05:42.999+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:43 mockllm: serving on http://127.0.0.1:58655 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:43.030+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:43.055+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:43.063+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:43Z duration_ms=6
+time=2026-11-07T16:05:43.072+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:43.079+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:43Z duration_ms=6
+time=2026-11-07T16:05:43.087+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:43.094+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:43Z duration_ms=6
+time=2026-11-07T16:05:43.103+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:43.112+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:43Z duration_ms=8
+time=2026-11-07T16:05:43.112+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:43.124+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:43.134+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:43Z duration_ms=8
+time=2026-11-07T16:05:43.142+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct语法错3584403253\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:43.147+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:43Z duration_ms=5
+time=2026-11-07T16:05:43.152+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:43.154+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:44.167+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=0c8ee409-a115-4efe-80b5-3bac98da1378
+=== RUN   TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面
+time=2026-11-07T16:05:45.736+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:45 mockllm: serving on http://127.0.0.1:57008 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:45.772+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:45.798+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:45.807+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:45Z duration_ms=7
+time=2026-11-07T16:05:45.815+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:45.821+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:45Z duration_ms=5
+time=2026-11-07T16:05:45.829+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:45.836+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:45Z duration_ms=6
+time=2026-11-07T16:05:45.846+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:45.855+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:45Z duration_ms=9
+time=2026-11-07T16:05:45.855+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:45.865+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:45.872+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:45Z duration_ms=6
+time=2026-11-07T16:05:45.882+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinct声明了版本但坏1139648589\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:45.888+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:45Z duration_ms=6
+time=2026-11-07T16:05:45.894+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:45.896+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:46.910+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=db45c1e1-8669-488f-bc94-3138739e52c6
+=== RUN   TestTicket223FailureSentencesAreDistinct/schema未知键
+time=2026-11-07T16:05:48.285+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:48 mockllm: serving on http://127.0.0.1:65524 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:48.318+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:48.344+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:48.352+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:48Z duration_ms=8
+time=2026-11-07T16:05:48.359+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:48.366+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:48Z duration_ms=6
+time=2026-11-07T16:05:48.374+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:48.386+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:48Z duration_ms=11
+time=2026-11-07T16:05:48.395+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:48.403+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:48Z duration_ms=7
+time=2026-11-07T16:05:48.403+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:48.413+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:48.420+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:48Z duration_ms=5
+time=2026-11-07T16:05:48.429+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223FailureSentencesAreDistinctschema未知键711424351\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:48.437+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:48Z duration_ms=8
+time=2026-11-07T16:05:48.443+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:48.446+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:49.521+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=f187e7ca-ae60-4f3d-9dda-964e17b8ad9c
+--- PASS: TestTicket223FailureSentencesAreDistinct (10.23s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/缺失 (2.47s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/语法错 (2.40s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面 (2.74s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/schema未知键 (2.61s)
+=== RUN   TestTicket223PanelInboundSaysHotReloadIsDisabled
+--- PASS: TestTicket223PanelInboundSaysHotReloadIsDisabled (0.01s)
+=== RUN   TestTicket223PermissionDeniedSitsInItsOwnSentence
+time=2026-11-07T16:05:50.843+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/07 16:05:50 mockllm: serving on http://127.0.0.1:65527 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-07T16:05:50.875+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-07T16:05:50.900+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-07T16:05:50.907+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-07T08:05:50Z duration_ms=6
+time=2026-11-07T16:05:50.915+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-07T16:05:50.922+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-07T08:05:50Z duration_ms=6
+time=2026-11-07T16:05:50.930+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-07T16:05:50.936+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-07T08:05:50Z duration_ms=6
+time=2026-11-07T16:05:50.945+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-07T16:05:50.953+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-07T08:05:50Z duration_ms=7
+time=2026-11-07T16:05:50.953+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-07T16:05:50.962+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-07T16:05:50.969+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-07T08:05:50Z duration_ms=6
+time=2026-11-07T16:05:50.979+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\TestTicket223PermissionDeniedSitsInItsOwnSentence3601750053\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-07T16:05:50.984+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-07T08:05:50Z duration_ms=5
+time=2026-11-07T16:05:50.989+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-07T16:05:50.992+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-07T16:05:52.018+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=c799c9aa-5338-4a1e-85c6-f99925a26611
+--- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (2.52s)
+=== RUN   TestTicket223R2FailureSentenceRouting
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_注释以方括号开头_C1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_CRLF_E1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_无空格_G1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_缩进版本行_L1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1
+    config_sentences_223r2_test.go:123: ROUTING "声明未来版_正文语法坏_J1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动
+    config_sentences_223r2_test.go:123: ROUTING "读不出版本_A1_基线不动"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移
+    config_sentences_223r2_test.go:123: ROUTING "声明旧版_坏表头_A2_仍归迁移"
+          raw err = config: config.toml: cannot migrate from schema version 1: not valid TOML: toml: expected character ]; the file was left untouched - fix or restore it manually, it will never be silently reset
+          PRODUCTION LINE = cause=migration detail="config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+=== RUN   TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错
+    config_sentences_223r2_test.go:123: ROUTING "解析得开_未知键_不抢语法错"
+          raw err = config: config.toml: unknown key "this_key_does_not_exist" at line 3
+          PRODUCTION LINE = cause=unknown-key detail="config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。本次运行继续用内存里的旧配置"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句
+    config_sentences_223r2_test.go:123: ROUTING "声明未来版_正文解析得开_归更高版本自己那句"
+          raw err = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=newer-build detail="config.toml 是由一个更新的 Wisp 写出来的（它声明的 schema_version 比这份程序懂得的高；这一条不说语法错，也不说值不合法，因为它还没走到校验）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+--- PASS: TestTicket223R2FailureSentenceRouting (0.61s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句 (0.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	32.666s
