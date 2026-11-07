@@ -31760,3 +31760,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★腿如实报的判据局限（我认可）**：「四角==环境桌面色」这条牙在**真机活动游戏面上不可证伪**（采样间像素自变）⇒ 替代＝**served-page 牙**（读产品实际加载的文件，任何桌面都成立）＋四角已知地板牙保持。这是正确取舍。
 - **★腿如实报的一枚 SKIP**：TestLiveNeverStealsFocus 第 1/2 次 SKIP-LOUD（环境拒 SetCursorPos），第 3 次同命令 **PASS 1.21s** —— 拒绝假绿，正确。
 - **撤销口令**：wave73＝git revert 0e546341c f90d1ba41 3fe067218 3104ac37a。
+
+## A1616（2026-11-07 20:2x，编排者）**badge 跳过落点我亲核＋exe 已重建（20:23:58）**
+- **落点逐字**：renderer_windows.go:589 —— if v.BadgeCount > 0 && !(r.overlayOnly && activeStyle == StyleJarvis) —— jarvis 的 overlay 模式不画红点；glass 不受影响（阳性对照 245 红像素已证）。
+- **我重建**：go build -o build/balldebug-orb.exe ./cmd/balldebug rc=0，exe 时间 **2026-11-07 20:23:58**。
+- **给机主的验收命令**：cd 到项目根，跑 .\build\balldebug-orb.exe -style jarvis ⇒ 应无红点；-style glass 或无参数 ⇒ 红点仍在（正确）。
+- **撤销口令**：无产码（本轮只重建＋记档）。
