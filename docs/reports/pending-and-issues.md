@@ -31809,3 +31809,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★教训（第 23 处同类错误）**：我在同一批派单里同时踩了两条我自己写在派单模板里的纪律。根因＝派单时**只想着「把欠账清掉」，没逐条对照写面互斥表**。⇒ 以后派单前必须逐腿写「写面包」并两两比对，⛔ 凭记忆。
 - **★三枚 TS 契约红（commands/modelSwitch/allStyle）的处置改为**：**不派腿改 frontend**，而是**把这件事列入「等机主拍板」清单**——那是外部 agent 的活，我能做的是把 Go 侧备好（已完成）＋写清前端需要加什么（证据件已有）。
 - **撤销口令**：无产码（wave76 已叫停，零 commit）。
+
+## A1621（2026-11-07 21:2x，编排者）**★wave76b 两腿收件（已推）｜145 两跳闭合＋187 末行 case 落地｜我亲跑五牙全 PASS｜★现核出最后一枚装配缺口：ModelSwitch 仍未接**
+- **145-wiring（1a0ba0ef2，2 件）**：cmd/wisp/run.go +48/−6 —— gentRuntime.runFeed 字段；ssembleRuntime 构造 feed＋PumpSources 加 Run: rt.runFeed.Section（:1059）；consoleSink 加 unFeed 字段；Publish 四个 case 各喂一行；xecute() sink 构造接上。＋cmd/wisp/panel_run_145_test.go（142 行三牙）。
+  - **★腿的诚实形状翻转（我认可）**：接线后**生产包现在带 un 键**（空 feed 渲 	ools:[]）；派单里「生产包不带 run 键」是**落地前**状态的描述，本腿落地即翻转，commit message 已写明。
+  - **★牙②按字面做不到，腿落了两枚突变替代（这是好判断）**：派单写「摘掉 sink 喂线键必须缺席」，但 landed 设计是 reader-gated（键存在＝reader 存在），只摘喂线而 reader 还在 ⇒ 键**在场但空**。腿落 M1（摘喂线，reader 留）⇒ 键在场、四区全空、	ools:[] 字节级钉死；M2（摘 reader）⇒ wire 字节里**完全没有 un 键**。两枚都 PASS。
+- **187-case（7817ad09a，4 件）**：cmd/wisp/panel_config_store.go +6 行 —— case panel.FieldRoleChatThinking: written, err = s.mgr.SetRoleChatThinking(w.Value)（照 FieldRoleChatModel 同款形状）。＋panel_config_187_test.go（145 行三牙）＋证据件＋票面 log。**此前该字段走 default 被如实拒，现在真能落盘**。
+- **★我亲跑五牙（全 PASS，go test ./cmd/wisp -run 'Test145|Test187' -v）**：Test187ApplySettingThinkingLandsTheKey 0.03s／Test187ApplySettingThinkingRefusesOutsideVocabulary 0.01s／Test145SinkFeedLinesCarryTheEventsIntoTheRunKey 0.00s／**Test145MutationSinkWithoutItsFeedLinesWritesNothing 0.00s**／**Test145MutationReaderRemovedSendsNoRunKeyAtAll 0.00s**。整套 ok 0.169s。
+- **★我现核出最后一枚装配缺口**：grep -rn ModelSwitch --include=*.go cmd/wisp/ ⇒ **零命中**。而 BallStyle（un.go:1049）与 Run（un.go:1059）都已接 ⇒ **只有 ModelSwitch 没接**（187 腿自己如实报了这条，我核实成立）。⇒ 活机上 modelSwitch 快照键不出（读口在 internal/panel/pump.go:231/:432 已就位）。
+- **★腿如实报的自身错误**：187 腿改用例时把票面 Progress log 行首误粘过一次，**当场发现当场修复**，提交前 diff 复核为纯追加一行。
+- **撤销口令**：145 接线＝git revert 1a0ba0ef2；187 case＝git revert 7817ad09a。
