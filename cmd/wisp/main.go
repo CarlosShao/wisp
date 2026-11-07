@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	sherpa "github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx"
 )
@@ -183,12 +184,48 @@ func cmdRun(args []string) int {
 			"wisp run: 本机没有可交互控制台，本轮没有人能答复卡片："+
 				"L2 卡会等到超时后按拒绝处理，L1 窗口没有人能否决（要能当场答复，请在终端里跑）")
 	}
-	return runTextTask(runSpec{
+	spec := runSpec{
 		argv:   args,
 		stdout: os.Stdout,
 		stderr: os.Stderr,
 		reply:  reply,
-	})
+	}
+	// Ticket 170 form 甲 (owner-approved): a console whose stdin is a real TTY
+	// IS a host that owns a cancel transport, so this leg declares one - but
+	// ONLY then. The declaration is the host's statement, not the assembly's
+	// inference: assembleRuntime cannot tell a TTY from a scripted test reader
+	// (the injection seam AGENTS.md §1.3 names for `wisp run`), so the TTY fact
+	// is carried by interactiveStdin here and lands on the gate through
+	// runSpec.replyVeto, the same one door the ball/Esc-hook leg uses. A pipe,
+	// a script or CI keeps the pre-170 posture: no veto channel declared, one
+	// loud audit line at assembly (run.go's CLI-VETO-NONE), no pretended 停.
+	if reply != nil {
+		spec.replyVeto = declareConsoleCancelTransport()
+	}
+	return runTextTask(spec)
+}
+
+// consoleCancelKey is the key THIS host really holds for the cancel slot: on a
+// console leg the operator stops an L1 window by feeding the reply stream - a
+// bare Enter included (approval_reply.go's live-window veto). The card names
+// the key through approval's read-time spelling seam, so what it prints is what
+// this process really delivers, never a phantom Esc.
+const consoleCancelKey = "回车"
+
+func consoleCancelKeySpelling() string { return consoleCancelKey }
+
+// declareConsoleCancelTransport is the two statements every host owes together
+// (approval_reply.go: declaring a transport IS asserting it is up): the channel
+// slot is returned for runSpec.replyVeto, and the cancel-key spelling is
+// installed here so the card renders 「按 回车 键」 instead of naming a global
+// Esc hook this process never registered. The slot itself is one of SPEC-06
+// §2's closed four - the cancel-KEY channel (esc) - because the set is frozen
+// and inventing a fifth selector is exactly the M-7/C-3 shape the approval
+// package refuses; what the console borrows is the SLOT, and the spelling seam
+// is what keeps the borrowed label honest.
+func declareConsoleCancelTransport() approval.Channel {
+	_ = approval.SetCancelKeySpelling(consoleCancelKeySpelling)
+	return approval.ChannelEsc
 }
 
 // printVersions writes the common version block (prefix used by callers).

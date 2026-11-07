@@ -51,11 +51,17 @@ package main
 // task - so a ball click handed to this gate today would be a listener with no
 // questioner, in a process that never asks. The veto CHANNELS are the honest
 // limit of what a console can claim: SPEC-06 §2's four are 单击球 / Esc / KWS
-// 否决词 / 面板拒绝, none of which exists in a terminal. This file therefore
-// calls Gate.Veto with the channel the HOST declares (hostVetoChannel, empty on
-// the console leg) and lets the gate's own ChannelRegistry answer - it invents
-// no fifth channel and claims no loaded one, so nothing here can render an
-// unavailable channel as available (B1).
+// 否决词 / 面板拒绝, and none of them is a ball, a global hook, a panel or a
+// speech model. Ticket 170 (form 甲, owner-approved) changed the EMPTY half of
+// that sentence and nothing else: when interactiveStdin proved the process
+// really owns a console input buffer, cmdRun declares the cancel-KEY slot
+// (esc) as this host's transport and names the key it really holds through the
+// read-time spelling seam (「按 回车 键」) - a terminal's cancel key IS the Enter
+// the operator hits to feed this stream. A non-TTY stdin keeps the empty
+// declaration, and run.go books CLI-VETO-NONE so the posture is said, not
+// implied. Either way this file calls Gate.Veto with the channel the HOST
+// declared and lets the gate's own ChannelRegistry answer - it invents no fifth
+// channel and claims no produced-but-unloaded one (B1).
 
 import (
 	"bufio"
@@ -450,6 +456,7 @@ func (rt *agentRuntime) attachReplyListener(in io.Reader, vetoChannel approval.C
 		})
 	fmt.Fprintf(rt.stdout,
 		"wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；"+
+			"L1 确认窗口存活期间，敲任意内容或直接回车＝停（票 170）；"+
 			"面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、"+
 			"head / view <编号> 看卡片；quit 退出监听。\n")
 }
@@ -503,6 +510,10 @@ func (rt *agentRuntime) newReplySurface(root *observe.Root, vetoChannel approval
 	// channel here, so this line cannot load a channel that process does not own.
 	if vetoChannel != "" {
 		rt.gate.Channels().SetLoaded(vetoChannel, true)
+		// Ticket 170: the armed posture is said, not implied - the mirror of the
+		// CLI-VETO-NONE line run.go books when a host declares nothing.
+		rt.auditf("approval: CLI-VETO-ARMED channel=%s（票 170：本装配声明了 L1 否决通道，"+
+			"窗口存活期间输入即停）", vetoChannel)
 	}
 	return surface
 }
@@ -528,6 +539,18 @@ func runReplyLoop(ctx context.Context, s *replySurface, in io.Reader, out io.Wri
 			return
 		}
 		line := strings.TrimSpace(sc.Text())
+		// Ticket 170 form 甲: while an L1 block window is live on this gate, ANY
+		// input the operator feeds this stream is the console's 停 - a bare
+		// Enter included, which is exactly the key the card names on this leg
+		// (main.go's consoleCancelKey). quit keeps its control meaning: it stops
+		// the listener, it does not answer a window. When no window is live the
+		// line falls through to the verb grammar untouched, so an L2 reply typed
+		// a moment too late is still parsed as before.
+		if line != "quit" && !strings.HasPrefix(line, "quit ") {
+			if s.vetoLiveL1Windows(out) {
+				continue
+			}
+		}
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
@@ -548,6 +571,43 @@ func runReplyLoop(ctx context.Context, s *replySurface, in io.Reader, out io.Wri
 	if err := sc.Err(); err != nil && !errors.Is(err, io.EOF) {
 		fmt.Fprintf(out, "wisp run: 答复输入流已断（%v），本轮之后无人能再答复\n", err)
 	}
+}
+
+// vetoLiveL1Windows is ticket 170 form 甲's mechanism, and it is deliberately
+// the dumbest possible reading of 说「停」: if the gate is holding an L1 block
+// window open right now, whatever just arrived on the operator's stream cancels
+// it - the operator does not have to remember a verb or a card number in a
+// 2-second window, they just have to say stop. It cancels EVERY live window, so
+// one Enter stops everything currently asking (the fail direction of a mistake
+// here is "the write did not happen", never "it did").
+//
+// What this is NOT: it never consumes a line when no window is live (the return
+// value is the only thing that reroutes a line away from the verb grammar), it
+// never claims a channel - the veto still travels through Replies.Veto on the
+// channel THIS host declared, so an undeclared host hears the same registry
+// refusal as before (which is the AC#5 reverse reading: pull the declaration
+// out and the same input executes) - and it never touches an L2 card: the queue
+// is not a window, and an L2 answer keeps its verb grammar.
+func (s *replySurface) vetoLiveL1Windows(out io.Writer) bool {
+	if s == nil || s.gate == nil {
+		return false
+	}
+	wins := s.gate.LiveL1Windows()
+	if len(wins) == 0 {
+		return false
+	}
+	for _, w := range wins {
+		text, err := s.veto(w.CorrelationID)
+		if err != nil {
+			// The window may have expired between the listing above and this
+			// veto, or the host never declared a channel; s.veto already booked
+			// the refusal in the audit, so here it is only said out loud.
+			fmt.Fprintf(out, "wisp run: 答复未被接受（L1 窗口否决）：%v\n", err)
+			continue
+		}
+		fmt.Fprintf(out, "wisp run: %s\n", text)
+	}
+	return true
 }
 
 // handle maps one verb onto the surface. The verbs are the host's own grammar -
@@ -575,6 +635,7 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 	case "help":
 		return "yes/session/no/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
 			"always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
+			"L1 窗口存活时任意输入（含回车）＝否决（票 170）· " +
 			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
 		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/panel-no/panel-yes/head/view/help/quit）", verb)

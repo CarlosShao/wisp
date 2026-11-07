@@ -140,11 +140,15 @@ type runSpec struct {
 	// because the subsystem here IS a human typing at this terminal.
 	reply io.Reader
 	// replyVeto is the veto channel this host's cancel transport really is
-	// (ticket 201). Production leaves it empty because a console run wires none
-	// of SPEC-06 §2's four channels, and an empty value makes Gate.Veto say that
-	// back instead of letting this process claim a cancel path it does not have.
-	// A host that DOES own one - the ball click, the global Esc hook - names it
-	// here and marks it loaded in the same step.
+	// (ticket 201). Since ticket 170 (form 甲, owner-approved) the production
+	// console entry fills it when - and only when - interactiveStdin proved the
+	// process owns a real console input buffer: a TTY is a host that owns a
+	// cancel transport (main.go's declareConsoleCancelTransport, the esc slot
+	// with the 回车 spelling), and anything else - pipe, script, CI, or a test
+	// reader that declares nothing - keeps the empty value, which makes
+	// Gate.Veto say that back instead of letting this process claim a cancel
+	// path it does not have. A host that DOES own one - the ball click, the
+	// global Esc hook - names it here and marks it loaded in the same step.
 	replyVeto approval.Channel
 	// gate, ui and cards are ticket 246 AC#7's injection points, and they exist
 	// for exactly one reason: a process may hold ONE approval gate. The resident
@@ -714,10 +718,17 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// Ticket 201 changed one half of that sentence and left the other half
 	// standing: the console can now ANSWER a card (a reply source, attached at
 	// the end of this function), so an L2 card no longer has to be a question
-	// nobody hears. What it still cannot do is veto an L1 window, because none
-	// of SPEC-06 §2's four veto channels (ball / Esc / KWS / panel) exists in a
-	// terminal - so NewChannels() stays empty and runSpec.replyVeto stays unset,
-	// and approval_reply.go says what both of those choices protect.
+	// nobody hears. Ticket 170 (form 甲, owner-approved) changed the other half
+	// CONDITIONALLY: when the host's entry (cmdRun) proved stdin is a real TTY,
+	// it declares the cancel-KEY slot as this leg's own veto transport through
+	// runSpec.replyVeto, and attachReplyListener marks it loaded in the same
+	// step - so an L1 window can now be stopped by anything the operator feeds
+	// the stream (approval_reply.go's live-window veto). The declaration stays
+	// the HOST's, not this assembly's inference: a scripted test reader or a
+	// pipe must not claim a transport it does not have, so a run whose
+	// replyVeto arrives empty keeps NewChannels() empty, books CLI-VETO-NONE
+	// below, and its L1 windows resolve exactly as before. See
+	// approval_reply.go for what both of those choices protect.
 	// Ticket 224's two injections of the SAME ledger, split by which side of the
 	// boundary they serve: the approval layer may only WRITE a session rule (a
 	// native click produced it), the bridge may only READ one (it decides whether
@@ -871,6 +882,17 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// gate's own registry, and attachReplyListener re-binds with the channel this
 		// host really wired when (and if) it has one.
 		rt.liveCards.bind(rt.gate, "", "", "")
+		// Ticket 170's loud half: an assembly that declared no veto channel says
+		// so in the audit, instead of letting the pre-170 posture read as a
+		// decision somebody made. The polarity is unchanged on both branches -
+		// an unopposed window still executes (SPEC-06 §2 row L1), and ticket
+		// 375's answerability guard still refuses the route when nobody can
+		// answer at all; this line only names which of the two postures this
+		// run is in.
+		if s.replyVeto == "" {
+			rt.auditf("approval: CLI-VETO-NONE reply_attached=%v（票 170：本装配没有声明任何 L1 否决通道；"+
+				"TTY 终端由入口 cmdRun 声明回车通道，非交互支路不假装有否决）", s.reply != nil)
+		}
 	}
 
 	// The permission mode (ticket 90's storage, wired here by ticket 101). This
