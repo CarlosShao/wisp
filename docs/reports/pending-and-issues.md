@@ -31506,3 +31506,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **落地腿**：wave53 `orb-integrate` 在飞——把 `orb-siri.html` 作为产品资源落位 ＋ 新建 WebView2 透明置顶点击穿透悬浮窗渲染器 ＋ 与 `internal/ball` 状态机对接 ＋ 保留 D2D 作 fallback（⛔ 删 D2D）。
 - **撤销口令**：`git revert` 该落地腿的 commit；球回 D2D＝`02182e1e8`。
 - **对机主的三件事**（⛔ 技术选择题，只有"钱/契约/不可逆"才摆他）：① 看集成后的球是否"这次对了"（唯一验收判据，票 65 AC#7 原文）；② 若要 100% 像素级一致 ⇒ 只能买 wensity 付费组件（**花钱**，摆他）；③ 撤销口令已给。
+
+## A1595（2026-11-07 12:4x，编排者）**342 结案（第 293 枚）＋ 330 翻三格 ＋ 长度门 RED→GREEN 真修**
+- **342 结案**：裁决腿 `342-v4`（`da547c31b`）判 AC#1/**PASS**、AC#4/**PASS（升格）**——两平台成对读数零＋liveness 同发在场（POSIX `provedLinkCycles=177/172`、`pinnedParentBeforeOpen=20/19`；Windows `provedReparse=11/10`、`formBLegRefusals=3/4`）；★变异有牙 M-A/M-B 亲放三态齐（M-B 双平台红、M-A Windows 红／POSIX 构造性 no-op 如实记、还原复绿）。我按判语翻两格 ⇒ **7/7** ⇒ 加 `-done`（rename 提交 `36d8169fc` **双名同时字面点名**，收尾现跑 `git ls-tree HEAD | grep -c "342-"`＝**1 枚新名、旧名消失**）。
+- **330 翻三格**：裁决腿 `330-verdict`（`d1e978caf`）判 AC#0/#1/#2 **PASS**——★G1 那一发它**亲重放**：sed 打 golden `:12`＋镜像 `:38` 成 `plan.presentX`、真名册零字节 ⇒ **FAIL rc=1 红在 `:128`**，红句具名 22 枚全名单；还原后 sha256 逐位回基线。我按判语翻三格 ⇒ **6/8**（`d833d8fbe`）。
+- **330 两格仍未闭（如实）**：AC#5（整包四数作差＝0）裁决腿判**部分**（它补跑整包 rc=1、死点 6 枚具名，四数未取）⇒ 已派 wave54 `330-ac5` 在仓外导出树补做；AC#7（"必须排在 329 之后"）★**字面前提已死**：裁决腿亲核 `git log` 80 枚＋全历史 grep＝**零枚 329 落地提交** ⇒ 该格前提不成立，解释性处置归编排者（下一步按"无撞面事实"改判或改票面文字）。
+- **★长度门 RED→GREEN 真修**（我自己动手，`532f936d6`）：`scripts/check-path-length-budget.sh` 的 roster 6 条**过期条目跟 `-done` 改名**（135/136/150/179/182/185）。修前 `VERDICT RED`（65 超预算里 6 条名册指向旧名），修后 **`VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`**，65/65 全覆盖。这是 342-r3 报出的真缺陷，⛔ 记到 342 头上。
+- **246 AC#8 已落地**（写腿 `c56d8d90b`）：`signal.Notify(bootExit…)`＋Stop defer 从修前 `:229-231` 提到 `runResident` 第一句。**正控两次读数**：修前 `-count=5` ⇒ **5 发 1 红**（exit `0xc000013a`）；修后 `-count=10` ⇒ **10/10 绿零枚 0xc000013a**。真修三无（无 t.Skip／无放宽／无加大超时）。我独立复跑 `-count=5` ⇒ **ok 35.9s**。
+- **两笔裁决腿的"部分"判语我认可**（⛔ 粉饰）：330 AC#5 四数未取、AC#7 前提死；342 那发容器日志 AC1 行是 `155/20/10` 而腿报引 `270/36/37`＝同字节不同发（形状逐字同，日志留档纪律问题，⛔ 计入判据）。
+- **撤销口令**：342 结案＝`git revert 36d8169fc`（票回 `-done` 前）；330 翻三格＝`git revert d833d8fbe`；长度门＝`git revert 532f936d6`。
