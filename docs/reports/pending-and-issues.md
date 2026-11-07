@@ -31537,3 +31537,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ⇒ **这两枚都是"球看不见"的成因，缺一不可**。wave55 只修出屏；**响应创建这枚另派**（见下）。
 - **我的判断（技术选型，铁律 ⓪⓪⓪）**：`ERROR_INVALID_REFERENCE` 通常出在**环境/controller 生命周期与 STA 线程亲和性**（`CreateWebResourceResponse` 必须在 `ICoreWebView2Environment` 的有效线程上、且 controller 已 ready）。修法优先序：① 把响应创建**移到 `WebResourceRequested` 回调线程内**（COM 对象线程亲和）② 若仍失败，改用**不拦截请求**的方案（把页面走 `NavigateToString` 或 `SetVirtualHostNameToFolderMapping` 指向本地目录），彻底绕开 response 构造。
 - **撤销口令**：修腿 commit `git revert`。
+
+## A1598（2026-11-07 13:2x，编排者）**330 结案（第 294 枚）＋ 145/174 筛查三格定档**
+- **330 结案（8/8）**：AC#5 由 wave54 `330-ac5` 腿补做（`1fe53bad8`）——**仓外 `git clone --shared` 两棵导出树**（终态/起手），`cmd/wisp` 两树 `status --porcelain` 各 0 行；两发整包各 ~292s：终态 RUN 297 / PASS_TOP 229 / FAIL 0 / PANIC 0，起手 RUN 290 / PASS 222 / FAIL 0 / PANIC 0 ⇒ **红名册作差＝0 达成**（判据原文满足）。
+  - ★腿**如实报的硬事实我认**：整包在两树各只跑到 230/223 顶层（`-list` 名册 507），**`Test330DockPinsTheWireNameToTheAssembledRoster` 两发都在"未到"名册里**（`plan_*` 文件序在 `panel_*` 之后，进程死在 panel 区）；死点两发**不同名**（终态 `TestBallPanelGesturesReachThePanelThread` ⇄ 起手 `TestAC13BringUpSurvivesAReusedThreadQuit`，同 `panel_resident_windows_test.go` 真窗族）⇒ 截断点非确定，四数差全由截断漂移造成、**无任何用例变色**。
+  - ⇒ 我的裁定：**AC#5 按判据原文（红名册作差＝0）达成翻勾**；"整包 witness 覆盖 dock"这一层**本机整包台面到不了**（环境上限，非本票缺陷），dock 色证据仍在 330-r1 正向 rc=0／330-verdict 重放红 `:128`＋正向 rc=0。
+- **AC#7 死前提裁定（我拍）**：该格字面"必须排在票 329 之后"——非实现者裁决腿亲核 `git log` 80 枚＋全历史 grep＝**零枚 329 落地提交** ⇒ 前提不成立。按「无撞面事实」裁定达成：`cmd/wisp` 写面本波仅 `edad424fe` 一枚（上一枚同面＝`766bf71f4` 票 170），**判据实质（同一共享编译面每波只许一枚写腿）已被遵守**。裁定原文已写进票面那格。
+- **330 rename 结案**（`d438e4d2e`）：**双名同时字面点名**，收尾现跑 `git ls-tree HEAD | grep -c "330-"`＝**1 枚新名、旧名消失**。
+- **145 筛查三格定档**（`7fee04f1f`，只读零产码）：AC#2 → **②归口票 35 ＋ ③残角挂 Q-51**（出向那一跳 Go→页生产码 0 枚、`lastPanelSnapshot()` 非 test 读者 0、双向尺 `TestComposerContractTypesMatchFrontend` 现红＝`files` 键）；AC#6 → **①能做可派**（只读取证程半天、零产码、零写面冲突；验收表"与 AC#2 互为条件"已被 r3 两键落地推翻）；AC#2b → **②归口票 187**（A393 已推翻两前提）。
+- **174 筛查两格定档**（`5df833f5f`，只读零产码）：AC#4 → **能做，要人环节已于 A1571 解除**（机主对 B 桶全批含 174、逐字"改契约文字那步照批"）⇒ 推荐 `PLAN.md:431` 与 `:2564` **零字节不改**，AC#4 降为"写一句裁定＋引 A1571"的文书格；AC#5 → **归口编排者闭环节，零要人**（A1279 对 175 同源格已裁"动词是写明、无归 X"）。
+- **撤销口令**：330 结案＝`git revert d438e4d2e`；AC#5/#7 翻格裁定＝改回那两格。
