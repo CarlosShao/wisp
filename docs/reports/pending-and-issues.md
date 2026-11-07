@@ -31907,3 +31907,37 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 ### 撤销口令
 - 设置页 UI＝`git revert a3fdb50dd`。
+## A1626（2026-11-08 00:0x，编排者）**★我亲自跑面板验收：`ball.style` 那行**上屏了**，但显示「本机没有装配球风格读口」——★根因我现跑挖到：`NewSnapshotPump` 生产码**只有 `run.go:998` 一处调用**，常驻 leg 走另一条路**
+
+### 一、我亲自做过的验收步骤（逐条读数）
+1. **`npm run typecheck`（`tsc -b`）** ⇒ **rc=0** ✓
+2. **`npm run build`** ⇒ **rc=0**，产物 `dist/assets/index-Dn9XNmNv.js` 626,251 B / `index-Dxt2y5oW.css` 65,088 B ✓
+3. **`go build -o wisp.exe ./cmd/wisp`** ⇒ **rc=0**（★关键：前端 bundle 经 `frontend.Dist()` 嵌入二进制，**改前端后必须重编 wisp.exe**，否则看到的是旧页面）
+4. **bundle 里确含 `ball.style`**：`Select-String dist/assets/index-Dn9XNmNv.js -Pattern "ball.style"` 命中逐字：`…D29），页面改不到。外观风格（玻璃 / Jarvis）已能切：去「外观」类的 ball.style 行，走设置写入通路落盘（票 65）。…`
+5. **起 `wisp.exe` → 发 `Ctrl+Alt+P`** ⇒ 「Wisp panel」窗出现 `(312,312)-(952,572)` ✓
+6. **点「设置」→「外观」** ⇒ **★`ball.style` 行真的上屏了**：位于 `ball.click_through` 与 `panel.width` 之间，标签逐字「**`ball.style` 悬浮球外观风格（玻璃 / Jarvis 粒子）**」。截图 `D:\tmp\wisp\20261107\orblab\PANEL-BALLSTYLE.png`。
+
+### 二、★但那一行显示的是「不可用」态（我如实记，⛔ 粉饰）
+- 行右侧逐字：**`快照里还没有球风格这一节（本机没有装配球风格读口）`**，控件显示 **`缺省`**。
+- ⇒ **前端那半是诚实的**（它按「无读口」的诚实态渲染，不是假装能切），**缺的是后端读口在常驻 leg 没接**。
+
+### 三、★根因（我现跑挖到，非猜）
+| 现跑命令 | 读数 |
+|---|---|
+| `grep -rn "NewSnapshotPump" --include=*.go cmd/ internal/ \| grep -v _test` | **只有两行**：`cmd/wisp/run.go:998` 与 `internal/panel/pump.go:313`（定义） |
+| ⇒ 结论 | **生产码里只有 `wisp run` 那一条 leg 建了 pump** |
+| `BallStyle:` 注入点 | `cmd/wisp/run.go:1049`（在 `run.go:998` 那个 pump 字面量里） |
+| 常驻 leg 的 panel | `cmd/wisp/resident_windows.go:304` 走 `NewPanelManager`，**没有 pump 字面量** |
+
+⇒ **`wisp.exe`（常驻、带球和面板的那个进程）的面板快照不走 `NewSnapshotPump`**，所以 `ballStyle`/`modelSwitch`/`commands`/`plugins`/`run` **五枚 reader-gated 键在常驻进程里全都不出**。
+
+### 四、这意味着什么（诚实评估）
+- **`wisp config set ball.style jarvis` 那条 CLI 路径是好的**（我实测过，写文件 + 重启生效）——机主今天仍能用它切球。
+- **设置页那个下拉框在常驻进程里点不动**（显示「缺省」），因为它拿不到当前值。
+- ⇒ **这是「前端已就绪、后端读口在常驻 leg 缺失」的半成品**，⛔ 我不说它「已可用」。
+
+### 五、下一步（已派）
+- 派腿在常驻 leg 补 pump（或补等价读口注入）。★**技术选择我拍**：照 `run.go:998` 那套 `PumpSources` 字面量同款接到常驻 leg，⛔ 造第二套。
+
+### 六、撤销口令
+- 本条是验收记录，无产码。
