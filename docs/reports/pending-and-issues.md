@@ -31616,3 +31616,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★我新发现一枚真问题（腿没报）**：球面上叠着 **「69%」白色数字**——那是 D2D 渲染器的**进度徽标**（`renderer_windows.go` overlay 模式下球窗仍画 badge/进度/文本）。玻璃球上不该有这坨数字。
   - ⇒ **派 wave65** 修：orb 模式下**不画进度数字**（或改成球外圈的细弧＝主流做法），判据＝截图里球面上无文字。
 - **撤销口令**：透明去重＝`git revert 10d7cb3c3`（回退即回上一腿的"黑框+双球"状态）。
+
+## A1605（2026-11-07 18:0x，编排者）**214 附件接线真落地（8/8 绿）｜★176 暴露筛档错：票面写"未落地"但码早在盘上｜194 代价表把 A384③ 追平**
+- **214 附件接线（`fc76d5d7e`＋`3141b301d`，13 文件 +956/−67）**：`cmd/wisp/panel_attachment_214.go`（新，受理器＋草稿账本）、`panel_inbound.go` 的 `Attachment: nil` → **真 handler**（`:351` 装配路径）、`pump.go` 加两枚 reader、`composer.go` 仅注释、`composer_test.go` 更新 145 钉子。
+  - **★AC#1 census 现跑**：`NewAttachmentBroker`/`.Ingest(` 非测试调用者 **改前 0 → 改后 2**（`panel_attachment_214.go:204` 建器＋`:243` Ingest）。
+  - **★我亲跑复核**：`go test ./cmd/wisp -run 'Test214' -count=1` ⇒ **ok 2.240s**。
+  - **AC 完成度如实**：AC#1/2/3/4/6 有牙 PASS（超限拒在未读一字节前／MZ 头按嗅探拒且 0 落盘／`../evil.png` 拒／E2E 字节逐位落盘 artifacts）；**AC#5 半边未做**——C25 盖戳的宿主是 message 门，该 socket 仍 nil（票 35 地盘），只交付 `ForAgent` 渲染形状。
+  - **腿报的两枚既有红均非它面**：`TestComposerContractTypesMatchFrontend`（Go 侧多 `files` 键＝票 190 载体，前端 Q-51 写面）／`TestC21DesignTokensFourWayAgree`（wave62 在飞件牵出的色面对账红）。
+- **★176 暴露筛档错（我认，第 24 处）**：`roster-triage` 把 176 当"未落地"排派，但 **176-r1 已于 09-28 落地并提交**——产码 `internal/tools/task_backfill.go`（`06dae8316`）＋判据 `ticket176r1_start_port_test.go`（`00f640a22`）＋组合根 `cmd/wisp/run.go:1813`（`RunAsync → Wait → MarkRoot → Backfill`），**今天真在盘上**（我 `ls -la` 现核：7784B / 12047B，mtime 10-22/10-21）。腿按铁律 ⓪⓪⓪③ 转独立复核腿，**零产码**。
+  - **★腿给的新鲜读数**：`RunAsync` 生产调用点 **2**（run.go:1813＋subagent_197.go:372）、`Record` 生产写者 **4** ⇒ **票面 AC#1 的作废条件早已触发**（176-r1 自己已如实上报过）。硬前置票 175 现核 done（`provenance.go:94` `SrcTaskOutput`＋`:102` 入名册＋`bridge.go:744` 闸门）。
+  - **★腿今天新鲜两发突变牙**：M3 摘 `Stopped` 守卫 ⇒ L-3 红 rc1 三断言齐响；M1 摘 `ArtifactPath` 赋值 ⇒ L-1 红 rc1「只截不指」；对照无 overlay 双 PASS ⇒ **176-r1 的牙今天仍咬**。门禁：gofumpt 空／vet rc0／build rc0／`./internal/tools` **ok 34.995s**／d22scan clean（ban#7=48）。
+  - **⇒ 我的裁定（铁律 ⓪⓪⓪：重复实现＝无收益复杂度，不选）**：176 **不重做**，按票面原文「作废并回改 164/175 条件」处理；AC#2-5 的对应物全在盘上（175 判据✓、取消红绿✓、形状禁区✓、契约轴零字节✓）⇒ **由裁决腿翻勾结票**，我不用再派写腿。
+- **194 代价表（`806d562f5`，只读 81 行）**：★**把 A384③「先片B后名册」追平**——代码侧名册 **4 → 7 枚**（248 落 `config.get`/`config.set`、320 落 `config.models.list`）；`Handle` 生产调用者 **0 → 2**（`panel_host_windows.go:955`、`panel_inbound.go:173`）；规格∩代码交集 **零 → 3 枚**；`config.set` 地基**已建**（195 号票 `Manager.WriteSection`，`internal/config/panelwrite.go:168`）⇒ **本票从"收件类"回可派写腿**。
+  - 分堆今日读数：甲已落 4／乙地基在 9／丙没货 5＋出向 5 枚独立；未落 16 枚产码＋测试双侧字面量全零。
+- **撤销口令**：214＝`git revert 3141b301d fc76d5d7e`；194 证据件＝`git revert 806d562f5`；176 证据件＝`git revert 12a6140d6`。
