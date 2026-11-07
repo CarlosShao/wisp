@@ -672,6 +672,14 @@ func orbTestPixelAt(hdc uintptr, x, y int32) (int32, int32, int32) {
 	return int32(c & 0xff), int32((c >> 8) & 0xff), int32((c >> 16) & 0xff)
 }
 
+// The probe constants the corners regression samples with (wave68 moved them
+// to file scope so the bounded-retry wrapper and its final Fatal share them).
+const (
+	orbCornerInset  = int32(3)  // the orchestrator's probe: 3 px inside the rect
+	orbCornerTol    = int32(12) // per-channel distance from the floor color
+	orbPageDiffGate = 25        // a page pixel differs from the floor by more than this
+)
+
 // TestBallLiveOrbCornersReadTheDesktop is the transparency regression (ticket
 // 65 rework, orchestrator-measured black corners on the first cut: left-up
 // (30,24,29) / right-up (38,33,40) / left-down (26,21,32) / right-down
@@ -682,6 +690,13 @@ func orbTestPixelAt(hdc uintptr, x, y int32) (int32, int32, int32) {
 // differing from the floor by more than 25), so a dead-page window cannot
 // pass by being invisible. Both readings poll to a deadline: WebGPU boot is
 // not instant.
+//
+// Flake treatment (wave68, the file's established shape): a dark WebView2
+// boot fails the life half with page lit ratio 0.000% while the corners still
+// read the floor - the page simply never painted inside the budget (measured
+// on this box 2026-11-07, the A1602 dark-boot family). orbPixelAttempt's
+// bounded rebuild is the in-file cure, test-side, zero assertion changes: up
+// to three fresh ball+WebView2 instances before the hard fail below.
 func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
 	if err != nil {
@@ -690,16 +705,48 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 	requireQuietBallDesktop(t)
 	orbTestReapLeakedWebView2(t)
 
-	b, err := New(Options{
-		SizePx:      BallSizeDefaultPx,
-		Initial:     statemachine.StateSleeping,
-		Store:       store,
-		WindowTitle: liveBallTitle(t),
-		Hotkeys:     liveHotkeys(),
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
+	const attempts = 3
+	var lastReadings [4][3]int32
+	lastLit := 0.0
+	for attempt := 1; attempt <= attempts; attempt++ {
+		b, err := New(Options{
+			SizePx:      BallSizeDefaultPx,
+			Initial:     statemachine.StateSleeping,
+			Store:       store,
+			WindowTitle: liveBallTitle(t),
+			Hotkeys:     liveHotkeys(),
+		})
+		if err != nil {
+			t.Fatalf("New: %v", err)
+		}
+		ok, readings, lit := orbCornerAttempt(t, b)
+		if ok {
+			return
+		}
+		lastReadings, lastLit = readings, lit
+		// A dark boot keeps its WebView2 instance; release it and reap every
+		// leaked browser process (the measured accumulation mechanism) so the
+		// next attempt starts genuinely fresh.
+		b.Close()
+		orbTestReapLeakedWebView2(t)
+		if attempt < attempts {
+			t.Logf("attempt %d/%d did not clear both halves (page lit ratio %.3f%%); rebuilding ball and WebView2 instance",
+				attempt, attempts, lastLit*100)
+		}
 	}
+	t.Fatalf("orb transparency regression after %d attempts: corners read %v (want each channel within +/-%d of (51,51,50)); page lit ratio %.3f%% (want > 1%%)",
+		attempts, lastReadings, orbCornerTol, lastLit*100)
+}
+
+// orbCornerAttempt runs one create-and-sample round of the transparency
+// regression against the LIVE desktop: it waits for the orb window to attach,
+// centers the overlay over a known (51,51,50) floor, and polls until BOTH
+// halves clear - the four corners reading the floor within tolerance AND the
+// page compositing somewhere - or the attempt budget expires. Hard failures
+// (attach loss, window-API breakage) are Fatal regressions, not retryable;
+// only the dark-expiry return drives the caller's rebuild. It returns
+// (cleared, last corner readings, last lit ratio).
+func orbCornerAttempt(t *testing.T, b *Ball) (bool, [4][3]int32, float64) {
 	t.Cleanup(b.Close)
 
 	deadline := time.Now().Add(15 * time.Second)
@@ -754,31 +801,25 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 	}
 	pSetWindowPos.Call(fh, uintptr(orbHWND), 0, 0, 0, 0,
 		uintptr(swpNoSize|swpNoMove|swpNoActivate))
-	t.Cleanup(func() {
+	defer func() {
 		done := make(chan struct{})
 		b.sta.PostTask(func() {
 			pDestroyWindow.Call(fh)
 			close(done)
 		})
 		<-done
-	})
+	}()
 
-	const (
-		budget       = 25 * time.Second
-		cornerInset  = int32(3)  // the orchestrator's probe: 3 px inside the rect
-		cornerTol    = int32(12) // per-channel distance from the floor color
-		pageDiffGate = 25        // a page pixel differs from the floor by more than this
-	)
 	corners := [4][2]int32{
-		{wr.l + cornerInset, wr.t + cornerInset},
-		{wr.r - cornerInset - 1, wr.t + cornerInset},
-		{wr.l + cornerInset, wr.b - cornerInset - 1},
-		{wr.r - cornerInset - 1, wr.b - cornerInset - 1},
+		{wr.l + orbCornerInset, wr.t + orbCornerInset},
+		{wr.r - orbCornerInset - 1, wr.t + orbCornerInset},
+		{wr.l + orbCornerInset, wr.b - orbCornerInset - 1},
+		{wr.r - orbCornerInset - 1, wr.b - orbCornerInset - 1},
 	}
 	fr := int32(orbTestFloorColor & 0xff)
 	fg := int32((orbTestFloorColor >> 8) & 0xff)
 	fb := int32((orbTestFloorColor >> 16) & 0xff)
-	deadline = time.Now().Add(budget)
+	deadline = time.Now().Add(25 * time.Second)
 	lit := 0.0
 	var readings [4][3]int32
 	for {
@@ -791,7 +832,7 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 		for i, pt := range corners {
 			r, g, bl := orbTestPixelAt(hdc, pt[0], pt[1])
 			readings[i] = [3]int32{r, g, bl}
-			if absi(int(r-fr)) > int(cornerTol) || absi(int(g-fg)) > int(cornerTol) || absi(int(bl-fb)) > int(cornerTol) {
+			if absi(int(r-fr)) > int(orbCornerTol) || absi(int(g-fg)) > int(orbCornerTol) || absi(int(bl-fb)) > int(orbCornerTol) {
 				cornersOK = false
 			}
 		}
@@ -802,7 +843,7 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 			for x := wr.l + 4; x < wr.r-4; x += 3 {
 				r, g, bl := orbTestPixelAt(hdc, x, y)
 				total++
-				if absi(int(r-fr)) > pageDiffGate || absi(int(g-fg)) > pageDiffGate || absi(int(bl-fb)) > pageDiffGate {
+				if absi(int(r-fr)) > orbPageDiffGate || absi(int(g-fg)) > orbPageDiffGate || absi(int(bl-fb)) > orbPageDiffGate {
 					lit++
 				}
 			}
@@ -813,14 +854,57 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 		}
 		if cornersOK && lit > 0.01 {
 			t.Logf("orb transparent over a known floor: corners %v within +/-%d of (51,51,50); page lit ratio %.2f%%",
-				readings, cornerTol, lit*100)
-			return
+				readings, orbCornerTol, lit*100)
+			return true, readings, lit
 		}
 		if time.Now().After(deadline) {
-			t.Fatalf("orb transparency regression: corners read %v (want each channel within +/-%d of (51,51,50)); page lit ratio %.3f%% (want > 1%%)",
-				readings, cornerTol, lit*100)
+			return false, readings, lit
 		}
 		time.Sleep(300 * time.Millisecond)
+	}
+}
+
+// overlayArcTealPixels audits the ULW source DIB for the Downloading progress
+// arc (renderer_windows.go step 9): the pal.Accent teal stroke is the ONLY
+// green/teal-dominant element the overlay branch may legally paint - the badge
+// disc is Danger (red-dominant), the queue dot Info (blue-dominant), the ring
+// background BorderSoft (near-white at alpha ~26), the hit-test silhouette
+// (alpha 1/255) - so a hue-relative predicate pins the arc's presence on the
+// presented frame. The predicate compares PREMULTIPLIED channel/alpha ratios,
+// which stay invariant under opacity scaling and antialiasing: Accent must
+// have r<=0.6a, g>=0.4a and b<g, which admits both theme rows of --accent
+// (#86C2B9 dark / #3E837A light) and rejects every other overlay element.
+// Runs on the STA thread (serialized with drawFrame, the same shape the glyph
+// audit uses). Returns -1 when there is no DIB to audit.
+func overlayArcTealPixels(b *Ball) int {
+	done := make(chan int, 1)
+	b.sta.PostTask(func() {
+		r := b.rend
+		if r.bits == nil || r.w <= 0 || r.h <= 0 {
+			done <- -1
+			return
+		}
+		buf := unsafe.Slice((*uint32)(r.bits), int(r.w)*int(r.h))
+		n := 0
+		for _, px := range buf {
+			a := px >> 24 // BGRA little-endian: alpha is the top byte
+			if a < 100 {
+				continue
+			}
+			bl := int(px & 0xff)
+			g := int((px >> 8) & 0xff)
+			rr := int((px >> 16) & 0xff)
+			if rr*10 <= int(a)*6 && g*10 >= int(a)*4 && bl < g {
+				n++
+			}
+		}
+		done <- n
+	})
+	select {
+	case n := <-done:
+		return n
+	case <-time.After(10 * time.Second):
+		return -1
 	}
 }
 
@@ -839,6 +923,15 @@ func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
 // progress ring is BorderSoft/Accent, the badge dot is BGInset/Danger, the
 // queue dot Info - none near-white), so any nonzero count is text or digit
 // pixels stamped on the ball's face.
+//
+// Wave68 adds the OTHER half the first cut missed (the owner's real-desktop
+// follow-up: the outer cyan progress arc of orb-FINAL.png must survive the
+// no-text law): the same Downloading frame must still carry the step-9
+// progress arc, because step 9 is unguarded in overlay mode ON PURPOSE - the
+// arc is the progress signal the page's frozen API cannot draw. A future
+// guard that "cleans up" the overlay branch by suppressing step 9 would pass
+// every glyph audit while silently removing the arc; the teal audit below
+// turns that shape red.
 func TestBallLiveOrbOverlayFrameHasNoGlyphPixels(t *testing.T) {
 	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
 	if err != nil {
@@ -895,6 +988,16 @@ func TestBallLiveOrbOverlayFrameHasNoGlyphPixels(t *testing.T) {
 	b.SetBadge(3)
 	if n := audit(); n != 0 {
 		t.Fatalf("overlay frame carries %d near-white glyph pixels ON the glass face: text/numbers still ride the orb window (ticket-65 \"69%%\" regression)", n)
+	}
+	// Phase 1b: the SAME frame carries the Downloading progress arc (step 9,
+	// the outer cyan stroke - the only teal element the overlay branch may
+	// paint). No-text means no GLYPHS, not no progress: the arc is the signal
+	// the page cannot draw and its suppression is the silent regression the
+	// owner's orb-FINAL vs orb-noglyph2 comparison hunted (wave68).
+	if n := overlayArcTealPixels(b); n < 50 {
+		t.Fatalf("overlay Downloading frame carries only %d progress-arc pixels (want >=50): the outer cyan arc the page cannot draw is suppressed (ticket-65 arc regression)", n)
+	} else {
+		t.Logf("overlay Downloading frame keeps the progress arc: %d teal pixels (floor 50)", n)
 	}
 
 	// Phase 2: the resting frame is silhouette-only by law.
