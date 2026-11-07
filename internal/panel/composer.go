@@ -269,12 +269,23 @@ type WorkspaceRequest struct {
 
 // ComposerState is the composer section of a snapshot.
 type ComposerState struct {
-	Mode             ModeView        `json:"mode"`
-	Workspace        WorkspaceView   `json:"workspace"`
-	Attachments      []AttachmentRef `json:"attachments"`
-	AttachmentMIMEs  []string        `json:"acceptedAttachmentMimes"`
-	MaxAttachmentB   int64           `json:"maxAttachmentBytes"`
-	AttachmentReason string          `json:"attachmentError"`
+	Mode      ModeView      `json:"mode"`
+	Workspace WorkspaceView `json:"workspace"`
+	// Attachments is the composer's draft rows. Today the pump hands the
+	// constructor nil (pump.go's assembly) and nothing else in production holds
+	// a draft list: the panel.attachment.add method is refused by name at the
+	// inbound door (cmd/wisp/panel_inbound.go, ticket 92's handler), and the
+	// broker has no production caller. Empty is therefore the intentional
+	// honest state - the same shape as pending/results, never null - until that
+	// handler exists. Pinned by TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists.
+	Attachments     []AttachmentRef `json:"attachments"`
+	AttachmentMIMEs []string        `json:"acceptedAttachmentMimes"`
+	MaxAttachmentB  int64           `json:"maxAttachmentBytes"`
+	// AttachmentReason is the last refusal sentence the composer would show. No
+	// ingest handler exists in this tree, so nobody produces a reason yet; ""
+	// on the wire means "nothing was refused", and it must never be an invented
+	// sentence. Same ruling, same nail, ticket 145.
+	AttachmentReason string `json:"attachmentError"`
 	// Git is the read-only git dimension (ticket 181). It is a NEW KEY on a
 	// section whose key set is pinned by the frontend contract, and the
 	// declaration that matches it on the page side is not this session's to

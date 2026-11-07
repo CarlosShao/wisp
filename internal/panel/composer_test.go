@@ -948,3 +948,81 @@ func TestComposerCurrentModelTravelsOnlyFromItsReader(t *testing.T) {
 		t.Errorf("the exit bytes do not carry the reader's model:\n%s", data)
 	}
 }
+
+// TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists is ticket 145's
+// ruling on the two always-empty composer keys the AC#6 census named
+// (docs/evidence/s1/145-ac6-field-census.md §2): composer.attachments and
+// composer.attachmentError.
+//
+// The census answer for both was "答不出" because no production code can give
+// them a value: the pump hands the constructor nil, and the only door that
+// could produce real rows - panel.attachment.add (bridge.go's whitelist,
+// ticket 92) - is refused by name at the inbound door, so the broker has no
+// production caller and nothing holds a draft list. Keeping the fields is the
+// choice: the page-side contract (ComposerState in frontend/src/lib/panel.ts)
+// already declares both keys, deleting them here would flip the contract test
+// in the extra-keys direction, and ticket 92's handler will need them. So the
+// empty state is pinned as intentional - honest "nothing was attached / nothing
+// was refused", the same shape as pending/results - and each arm below trips
+// if the pump or the constructor starts inventing a value without a reader.
+func TestComposerAttachmentsStayEmptyUntilTheIngestHandlerExists(t *testing.T) {
+	// Arm 1: a bare pump still emits an empty list, never a nil that serialises
+	// as null - the renderer reads .length, the way pending/results are judged.
+	bare := NewSnapshotPump(PumpSources{}).Snapshot()
+	if bare.Composer.Attachments == nil || len(bare.Composer.Attachments) != 0 {
+		t.Errorf("composer.attachments = %#v, want an empty non-nil slice", bare.Composer.Attachments)
+	}
+	if bare.Composer.AttachmentReason != "" {
+		t.Errorf("composer.attachmentError = %q, want blank: nothing read means nothing was refused",
+			bare.Composer.AttachmentReason)
+	}
+
+	// Arm 2: a fully loaded pump - every dimension that does have a reader
+	// attached - still carries empty attachments. The emptiness is not an
+	// artifact of an otherwise bare assembly; it is the absence of the ingest
+	// source itself.
+	loaded := NewSnapshotPump(PumpSources{
+		Mode:       func() risk.Mode { return risk.ModeAskEveryStep },
+		Git:        GitViewNotProbed,
+		Model:      func() string { return "glm-5" },
+		Credential: func() CredentialState { return CredentialUnknown },
+		Now:        fixedClock(time.Date(2026, 11, 7, 13, 0, 0, 0, time.UTC)),
+	}).Snapshot()
+	if len(loaded.Composer.Attachments) != 0 || loaded.Composer.Attachments == nil {
+		t.Errorf("a loaded pump still invented attachments: %#v", loaded.Composer.Attachments)
+	}
+	if loaded.Composer.AttachmentReason != "" {
+		t.Errorf("a loaded pump still invented a refusal sentence: %q", loaded.Composer.AttachmentReason)
+	}
+
+	// Arm 3: the constructor is the one door, and it does not bar the future -
+	// rows handed to it travel verbatim, so ticket 92's handler can wire a real
+	// source without this pin ever being relaxed. What the pin holds is the
+	// pump's nil, not the constructor's capability.
+	seeded := []AttachmentRef{{ID: "att-x", Name: "photo.png", MIME: "image/png", Kind: "image", Stored: true}}
+	withRow := NewComposerState(risk.ModeAskEveryStep, WorkspaceView{}, seeded, MaxAttachmentBytes)
+	if len(withRow.Attachments) != 1 || withRow.Attachments[0].ID != "att-x" {
+		t.Errorf("the constructor mangled a handed-in row: %#v", withRow.Attachments)
+	}
+
+	// Arm 4: the wire spells both facts the honest way - an empty JSON array,
+	// not null, and a blank string, not a made-up sentence.
+	data, err := NewSnapshotPump(PumpSources{}).Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wire map[string]json.RawMessage
+	if err := json.Unmarshal(data, &wire); err != nil {
+		t.Fatal(err)
+	}
+	var composer map[string]json.RawMessage
+	if err := json.Unmarshal(wire["composer"], &composer); err != nil {
+		t.Fatal(err)
+	}
+	if got := string(composer["attachments"]); got != "[]" {
+		t.Errorf("wire composer.attachments = %s, want the literal [] - null would break .length readers", got)
+	}
+	if got := string(composer["attachmentError"]); got != `""` {
+		t.Errorf("wire composer.attachmentError = %s, want the literal empty string", got)
+	}
+}
