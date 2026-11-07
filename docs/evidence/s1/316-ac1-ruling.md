@@ -56,4 +56,26 @@
 - **牙证（突变后必须红）＝本腿现跑，非引旧读数**：M 突变（HEAD `ea602a61b` 为 base，overlay 重建）→ **FAIL 2.85s，红 `:676` arm1，红句 dump 第三条＝横幅同名句逐字**（步1 节＋`probes/316/r2/logs/M-rerun-ea602a61b.txt`）；正控 cur PASS 3.928s rc=0；家族不回归见步4。
 - 写面终态：`cmd`／`internal` 已跟踪件 **0 行改动**（本腿全部突变走 overlay，产码与测试尺零字节触碰）。
 
+## 步4 门禁（本腿亲跑，2026-11-07 15:59–16:05；log 在 `probes/316/r2/logs/`）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| gofumpt | `/d/work/base/gopath/bin/gofumpt.exe -l cmd/wisp/config_reload.go cmd/wisp/config_reload_223_test.go`（绝对路径，派单要求） | **空，rc=0**（`logs/gates-build-vet-gofumpt-ea602a61b.txt`） |
+| build | `go build ./cmd/wisp/` | **rc=0** |
+| vet | `go vet ./cmd/wisp/` | **rc=0** |
+| 家族最小集 | `go test -count=1 -run 'TestTicket223' -v ./cmd/wisp` | **rc=0，`--- PASS`×10 / `--- FAIL`×0，ok 32.666s**（`logs/family-TestTicket223-ea602a61b-full.txt`；与 r1 的 PASS=10 同值） |
+| d22scan | `sh scripts/d22scan.sh` | **rc=0，clean**；正控 runtests.sh 先行（含 `TestDeferredRegistryIsBidirectional` PASS）；`cmd/=226`、`internal/=941` 全 examined（`logs/d22scan-ea602a61b.txt`） |
+| 写面终态 | `git status --porcelain -- cmd internal`（已跟踪件） | **0 行**；在飞未跟踪件 3 枚系他腿（见文首） |
+
+- 环境：每发测试前 `unset GOTMPDIR TMPDIR TEMP TMP`＋`export PATH=$PWD/build:$PWD/third_party/sherpa-onnx:$PATH`（逐发执行）。
+- 编码：本件与 `probes/316/r2/**` 全部 LF（`sed -n "/\r/p" | wc -l`＝0）。
+
+## 没做到的（如实）
+
+1. **未落任何新断言／未加用例**——派单步3 的字面动作（"落地你选的那条＋加用例"）没有对应物可落：三候选现读分别为已在盘／空操作／判红真绿；落任何一个都违判据②③④之一。本腿以"现跑复证 arm1 咬合"替代（M overlay FAIL 2.85s）。
+2. **未跑整包**（314 死区在册；派单只要求相关包 `./cmd/wisp`）。
+3. **票面 Status 与 AC 勾零触碰**（⛔ 纪律）；撤票事实基础经本腿独立现跑**今天仍成立**——编排者 2026-10-14 的撤票裁定（与 272 重复）在 HEAD `ea602a61b` 上站得住。
+4. 前腿遗留 8 枚件随步1 commit 一并入库（pathspec 目录级收进，非本腿所建），来历与处置已声明（三核②补记）。
+
+
 
