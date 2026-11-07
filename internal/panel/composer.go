@@ -158,6 +158,20 @@ type Snapshot struct {
 	// undeclared: that red is the same procedure the commands, modelSwitch and
 	// ballStyle keys are already in, not a defect this field can fix.
 	Run *RunSection `json:"run,omitempty"`
+	// Plugins is ticket 215a's carrier: the Tier-2 plugin inventory the live
+	// config holds (see plugins_inventory_215.go for the shape, the 215b
+	// skill-half registration, and the honest "enabled is not running"
+	// sentence). It is a pointer with omitempty for the same reason the five
+	// fields above are: a pump assembled WITHOUT the reader sends no key,
+	// which is the exact shape the four-key byte nails pin, and a pump that
+	// has one always sends the key. The page-side declaration is not written
+	// yet (Q-51), so the two-way reconciliations against frontend/src/lib/
+	// panel.ts name "plugins" as undeclared: that red is the same procedure
+	// the commands, modelSwitch, ballStyle and run keys are already in, not a
+	// defect this field can fix. No C17 method arrives with it - the flip
+	// half (switching from the menu) is registered as not wired in the
+	// carrier's own evidence, not smuggled in as a write field.
+	Plugins *PluginInventorySection `json:"plugins,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.

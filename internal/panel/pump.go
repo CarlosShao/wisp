@@ -65,6 +65,7 @@ package panel
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -248,6 +249,20 @@ type PumpSources struct {
 	// four-key byte nails pin - and a reader that exists always sends the
 	// key, with an empty feed rendered as "tools":[].
 	Run func() *RunSection
+	// Plugins reads the Tier-2 plugin inventory the live config holds (ticket
+	// 215a): the master switch, one row per [plugins.<id>] entry with the
+	// config's own grant lists, and the two honest-state sentences (engine
+	// consumes nothing today; the skill dimension has no config keys at all).
+	// The production reader is internal/config's knowledge of its own
+	// [plugins] section, injected by the assembly root; internal/panel does
+	// not import internal/config, so the section arrives pre-shaped exactly
+	// like Commands/ModelSwitch/BallStyle above. It is a reader like every
+	// field above; a nil reader is the ONLY way the packet carries no
+	// "plugins" key at all - the shape the four-key byte nails pin - and a
+	// reader that exists always sends the key, with an empty config rendered
+	// as "rows":[] and the two sentences traveling with it (never a bare
+	// empty list dressed as "no plugins").
+	Plugins func() PluginInventorySection
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -462,6 +477,30 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// "tools":[] from the Section builder, so the pump invents nothing
 		// and normalizes nothing.
 		snap.Run = p.src.Run()
+	}
+	if p.src.Plugins != nil {
+		// Ticket 215a: same reader-gated rule one block up - a reader that
+		// exists always sends the key. Rows sort by ID because the config
+		// layer stores [plugins.<id>] in a Go map: two publishes of one
+		// config must marshal byte-identically (a menu whose rows reshuffle
+		// every push is an audit defect). The sort works on a COPY - sorting
+		// in place would reorder the reader's own slice (its backing array is
+		// shared), and a pump that writes back into its sources is not a
+		// reader-gated pump. A nil list renders as [] so the page never meets
+		// JSON null, and the two honest-state sentences travel verbatim - the
+		// pump invents neither, so a dishonest reader's blank arrives blank
+		// (a visible hole) instead of being papered over here.
+		sec := p.src.Plugins()
+		if len(sec.Rows) > 1 {
+			sorted := make([]PluginRow, len(sec.Rows))
+			copy(sorted, sec.Rows)
+			sort.Slice(sorted, func(i, j int) bool { return sorted[i].ID < sorted[j].ID })
+			sec.Rows = sorted
+		}
+		if sec.Rows == nil {
+			sec.Rows = []PluginRow{}
+		}
+		snap.Plugins = &sec
 	}
 	return snap
 }
