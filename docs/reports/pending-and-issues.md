@@ -31529,3 +31529,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - ⇒ **派 wave55 `orb-fix-offscreen`** 修：按 `rcWork`（不是 rcMonitor，要避任务栏）选边，右放不下放左、左也放不下则夹紧；垂直同夹紧；保留 WS_EX 语义；回归用例必须断言**真实坐标**落在 rcWork 内（⛔ 只断言"调用了 follow"）。
 - **腿如实报的 6 条我都认**（⛔ 粉饰）：① 视觉签收未发生（AC 六条一个未勾，人眼"这次对了"才是完成判据）；② D32 预算未在 webview2 渲染器上重测；③ D2D 对象仍创建（帧不画，守卫挡住）；④ 音频只送标量（四带等值，分带是音频腿的缝）；⑤ 票面原带 NUL 字节（追加时清零）；⑥ 禁区全零改动。
 - **撤销口令**：`git revert a2e535674`（单提交，回滚即回 D2D）；出屏修法＝`git revert` wave55 那笔。
+
+## A1597（2026-11-07 13:1x，编排者）**★球集成第 2 枚真 bug：WebView2 响应创建 3 次全败 ⇒ 球是黑的**
+- **实测（我亲跑 `build/balldebug-orb.exe` 抓 stdout）**：`level=WARN msg="ball: orb response create retry" attempt=1 err="An attempt was made to reference a token that does not exist."`
+- **含义**：`orbBuildResponse`（`internal/ball/orb_windows.go:266-286`）已经做了 **3 次重试**（注释说面板宿主 2026-10-13 量过"冷启动首次会误报 1008"），但**三次全失败**⇒ 不是"冷启动首报"，是**真的拿不到 `CreateWebResourceResponse`**。后果链：页面资源（`https://wisp.orb`）发不出去 ⇒ WebView2 里没有 HTML ⇒ **球窗全黑**（我截图证实：把 orb 窗移进屏幕内后仍是纯黑）。
+- **叠加第 1 枚 bug**：orb 窗被 `follow()` 无条件放在球右边，球停靠右边缘时 orb **出屏 120px**（A1596 已记，wave55 修）。
+- ⇒ **这两枚都是"球看不见"的成因，缺一不可**。wave55 只修出屏；**响应创建这枚另派**（见下）。
+- **我的判断（技术选型，铁律 ⓪⓪⓪）**：`ERROR_INVALID_REFERENCE` 通常出在**环境/controller 生命周期与 STA 线程亲和性**（`CreateWebResourceResponse` 必须在 `ICoreWebView2Environment` 的有效线程上、且 controller 已 ready）。修法优先序：① 把响应创建**移到 `WebResourceRequested` 回调线程内**（COM 对象线程亲和）② 若仍失败，改用**不拦截请求**的方案（把页面走 `NavigateToString` 或 `SetVirtualHostNameToFolderMapping` 指向本地目录），彻底绕开 response 构造。
+- **撤销口令**：修腿 commit `git revert`。
