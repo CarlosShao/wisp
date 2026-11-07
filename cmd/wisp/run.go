@@ -47,6 +47,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/agent/approval"
+	"github.com/CarlosShao/wisp/internal/agent/scheduler"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/llm"
@@ -302,6 +303,15 @@ type agentRuntime struct {
 	// thing task.output reads. v1 keeps no roster across restarts (票 164
 	// 定案②), so a restart answers "查不到这个任务" rather than empty.
 	tasks *tools.TaskRoster
+	// scheduler is ticket 47's C20 TaskScheduler, constructed by THIS assembly
+	// root (the composition half bridge.go's disposition note assigns to
+	// run.go): task.list walks its rows and task.cancel's scheduler branch
+	// stops a row, both through the two narrow faces NewBridgeDeps wraps onto
+	// it. The composition root owns the lifetime - close() shuts the door
+	// (D38e step 1) - and nothing submits to it yet, so a task.list over the
+	// empty production queue answers 「队列为空」：a real answer, not the
+	// fail-closed refusal the unwired shape used to give.
+	scheduler *scheduler.Scheduler
 	// loopOpt / loopOptSet are ticket 197's derivation seam: the agent.Options
 	// the CURRENT root loop was assembled with, kept so task.spawn builds its
 	// child from the SAME host wiring (same C5 provider, same admission hook,
@@ -650,7 +660,20 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// "查不到这个任务" - loud, per 票 164 定案②, and never an empty success that
 	// would read as "the task printed nothing".
 	rt.tasks = tools.NewTaskRoster()
-	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+	// The C20 scheduler instance (ticket 47's assembly half, per
+	// internal/agent/scheduler/bridge.go's disposition note: the scheduler is
+	// created HERE, the adapter is wrapped around the bridge, the entries
+	// register through the existing TaskDeps seam). Options zero value is the
+	// production shape on purpose: observe.Default is the registry every other
+	// D38b goroutine name in this process is booked under, and the PathLock is
+	// left unwired until a production caller exists to acquire holds - a lock
+	// nobody acquires detects nothing and would only look wired.
+	rt.scheduler = scheduler.New(scheduler.Options{})
+	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{
+		Roster:    rt.tasks,
+		Paths:     rt.paths,
+		Scheduler: scheduler.NewBridgeDeps(rt.scheduler),
+	}) {
 		if err := reg.Register(e); err != nil {
 			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
 			return rt, 2
@@ -1267,6 +1290,14 @@ func (rt *agentRuntime) close() {
 	// a deny, so shutting down can never be the moment a loosening slips in.
 	if rt.reloadRoot != nil {
 		rt.reloadRoot.Cancel()
+	}
+	// Shut the C20 scheduler's door (ticket 47, D38e step 1): after Close,
+	// Submit answers ErrClosed, so the shutdown sequence can never be followed
+	// by a freshly accepted task. No wait here - Close is the door only, and
+	// the resident leg's own D38e step-1 producer (its task-source door) stays
+	// the hook that walks the ordered sequence.
+	if rt.scheduler != nil {
+		rt.scheduler.Close()
 	}
 	if rt.store != nil {
 		_ = rt.store.Close()
