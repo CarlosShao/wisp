@@ -414,18 +414,22 @@ func (b *Ball) repaintCurrent() {
 	b.renderFrame()
 }
 
-// renderFrame draws and presents via UpdateLayeredWindow. The D2D ball paints
-// in EVERY mode, orb included (ticket 65 regression fix): the orb window is a
-// separate top-level surface BESIDE the ball, not a child, so the two windows
-// composite independently and no double-composite exists to avoid. The old
-// orbLive guard left this layered window with alpha 0 everywhere - invisible,
-// and skipped by the OS hit test (WindowFromPoint fell through to whatever
-// sat beneath the ball).
+// renderFrame draws and presents via UpdateLayeredWindow. With the WebView2
+// orb attached (ticket 65 rework), the ORB window is the ball's visible face
+// overlaying this window, and this window draws the overlay-only frame: the
+// near-invisible hit-test silhouette plus the badge/progress/text elements
+// the page has no API for (renderer_windows.go overlayOnly). The silhouette
+// keeps every alpha-carrying pixel the per-pixel OS hit test needs - the
+// first cut's "draw nothing" guard left this layered window alpha 0
+// everywhere, which made it invisible AND skipped by WindowFromPoint (the
+// measured ticket-65 regression). Without the orb (attach failed), the full
+// D2D frame draws exactly as before - the fallback is untouched.
 func (b *Ball) renderFrame() {
 	if b.rend == nil || b.rend.dcRT == nil {
 		return
 	}
 	t0 := time.Now()
+	b.rend.overlayOnly = b.orb.Load() != nil
 	b.rend.drawFrame(b.frameVisual(), b.animPhase)
 	if d := time.Since(t0); d > 30*time.Millisecond {
 		slog.Warn("ball: slow drawFrame", "dur", d.String(), "state", string(b.curState))
@@ -545,6 +549,7 @@ func (b *Ball) repaintAnimated() {
 	if b.badgeText != "" {
 		v.BadgeText = b.badgeText
 	}
+	b.rend.overlayOnly = b.orb.Load() != nil
 	b.rend.drawFrame(v, b.animPhase)
 	b.present()
 }
@@ -633,6 +638,11 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 				pSetWindowPos.Call(hwnd, 0,
 					uintptr(wr.l+dx), uintptr(wr.t+dy), 0, 0,
 					uintptr(swpNoSize|swpNoZOrder|swpNoActivate))
+				// The orb is the ball's visible face overlaying this window
+				// (ticket 65 rework): it tracks the drag frame by frame, not
+				// only at drag end - a face left at the grab origin while the
+				// interaction window moves would read as a second ball.
+				b.followOrb()
 				// The push toward an edge IS the shrink animation: this message
 				// carries the frame, so the dock needs no timer (D32).
 				b.dockProximity()

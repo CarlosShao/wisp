@@ -138,6 +138,22 @@ AnySearch 文档 1 张、代理面板 1 张、本轮 tour 截图 3 张、小裁�
   standalone 4 连绿、末两轮全套 4 枚全绿（19.95%/12.47%）——摇摆未根除，如实报。门禁：gofumpt 空/vet rc0/
   build rc0（含 cmd/wisp、balldebug）/默认套件 ok 0.379s/d22scan clean。AC 勾与 Status 未动；⛔push
 
+- [2026-11-07T17:30+08] agent=65-transparency-dedup did=修编排者真机实测两缺陷。**A 真透明**：根因三层——
+  ①首因＝orb 窗挂 LAYERED 却从不 ULW/SLWA，顶层重定向表面是未初始化黑层；②jchv `AddScriptToExecuteOnDocumentCreated`
+  传 NULL handler＝竞态缝，bootstrap 可整段丢失（真机实测页面活+WebGPU 跑而四角整生命周期显示 body 底色）；
+  ③`PutDefaultBackgroundColor` API 生效滞后（文档明载 known issue）。修＝主流 Tauri/tao 配方：去 LAYERED＋
+  `DwmEnableBlurBehindWindow` 空区域＋`WEBVIEW2_DEFAULT_BACKGROUND_COLOR=0x00FFFFFF` 出生即透明＋served 副本注入
+  `<style>html,body{background:transparent !important}</style>`（声明式无竞态，asset 字节零动 sha 钉测绿）。
+  **B 单球选型甲**（orb＝可见面与球窗同 rect 中心叠加＋工作区夹紧；球窗＝交互层只画 badge/进度环/文本＋alpha=1/255
+  hit-test 轮廓——全零 alpha 会被 OS 按像素跳过＝上腿实测回归；z 序＝球上 orb 正下，因实测非 layered 的
+  WS_EX_TRANSPARENT 窗不被 WindowFromPoint 跳过；乙裁页面毁票值/丙搬交互毁冻结契约均排除并留档）。新回归
+  TestBallLiveOrbCornersReadTheDesktop（(51,51,50) 已知底板上四角每通道差 ≤12 断言）多轮实测**四角精确零差**，
+  balldebug 二进制测试外复核同读数；EnumWindows 实测两窗 rect 完全重合＝单球，截图两枚入档。门禁：gofumpt 空/
+  vet rc0/build internal/ball+balldebug rc0/**cmd/wisp 被并发 214/323 腿在飞 8 文件压红（非本腿，如实）**/默认套件
+  ok/winlive TestBallLiveOrb 5/5＋可点性 2/2 PASS/d22scan clean。写面偏离如实：orbasset.go（CSS 注入落点＝编排者
+  问题A第4条点名之路）与 renderer_windows.go（overlay 分支内聚处）超出派单清单，均在 internal/ball 独占区。
+  证据 docs/evidence/s1/65-orb-transparency-dedup.md。next=编排者收件三把尺＋人眼签收（AC#7）；AC 勾与 Status 未动；⛔push
+
 - [2026-11-07T16:3x +08] agent=65-pixel-flake-fix did=Pixel 枚真 flake 治理（缺陷治理腿）。复现＋根因用读数钉死：
   全套 count=10 第二回 **39/40**，像素非黑率逐轮坍塌 `40.6%×7 → 27.2 → 7.7 → 0.000×3发`＝**泄漏堆积**不是随机摇摆——
   destroy() 从不关 controller（jchv 包装层 ICoreWebView2Controller 无 Close vtable）每轮泄漏 msedgewebview2

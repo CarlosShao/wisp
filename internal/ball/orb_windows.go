@@ -8,14 +8,39 @@ package ball
 // instead of re-authoring a D2D shader, which is exactly what this host does:
 // it puts that page on screen and pushes state/audio at it. Nothing here draws.
 //
-// Shape of the window (the frozen ball set, SPEC-08 §2): WS_POPUP +
-// WS_EX_LAYERED|TOPMOST|TOOLWINDOW|NOACTIVATE, fixed edge = the configured orb
-// edge, transparency via ICoreWebView2Controller2::DefaultBackgroundColor(a=0)
-// on top of the page's own premultiplied-alpha canvas. The WebView2 machinery
-// is the jchv/go-webview2 module the panel host already ships with; the one
-// controller extension used, ICoreWebView2Controller2, is already bound by the
-// module (ICoreWebView2Controller.GetICoreWebView2Controller2) - no new COM
-// binding is written in this repo.
+// Shape of the window (the frozen ball set, SPEC-08 §2, minus LAYERED):
+// WS_POPUP + WS_EX_TRANSPARENT|TOPMOST|TOOLWINDOW|NOACTIVATE, fixed edge =
+// the SAME WindowEdgePx edge the ball window uses, transparency via
+// ICoreWebView2Controller2::DefaultBackgroundColor(a=0) on top of the page's
+// own premultiplied-alpha canvas, with the window side of the chain made
+// per-pixel-alpha-capable by DwmEnableBlurBehindWindow's empty-region form.
+// The WebView2 machinery is the jchv/go-webview2 module the panel host
+// already ships with; the one controller extension used,
+// ICoreWebView2Controller2, is already bound by the module
+// (ICoreWebView2Controller.GetICoreWebView2Controller2) - no new COM binding
+// is written in this repo.
+//
+// Transparency chain (ticket 65, orchestrator-measured black corners on the
+// first cut, 2026-11-07): four layers each had to be right. The page layer
+// was already correct (premultiplied canvas, clear a=0, injected bootstrap
+// clears the body fill); the WebView2 layer was already correct
+// (DefaultBackgroundColor a=0, documented as supported in windowed hosting
+// since 1.0.774.44). The WINDOW layer was the broken one: the first cut
+// carried WS_EX_LAYERED but never called SetLayeredWindowAttributes or
+// UpdateLayeredWindow, so the top-level's own redirection surface stayed an
+// uninitialized (black) layer UNDER the WebView2 child - the page's alpha-0
+// pixels composited over that black square. WS_EX_LAYERED buys nothing here
+// (this window never presents a ULW bitmap - that is the ball window's D2D
+// shape), so it is GONE, and the mainstream Tauri/tao+wry recipe for a
+// transparent WebView2 host takes its place: DwmEnableBlurBehindWindow with
+// an empty region (CreateRectRgn(0,0,-1,-1), DWM_BB_ENABLE|DWM_BB_BLURREGION)
+// makes the window's redirection surface alpha-aware without any blur, which
+// is exactly how tao builds transparent windows for wry's windowed WebView2
+// (tao window.rs on_create: "making the window transparent"). The DWM layer
+// of the chain is therefore satisfied by the same single call; no
+// DwmExtendFrameIntoClientArea and no DWMWA_SYSTEMBACKDROP_TYPE are needed
+// (those route through the same alpha-aware-surface requirement this call
+// already meets).
 //
 // Threading (D38a/D38b): the orb window is created on, owned by, and torn down
 // on the ONE ui-sta thread - no new goroutine exists in this leg. Everything
@@ -52,14 +77,24 @@ package ball
 // up here, this file logs one line and returns an error; the caller leaves
 // b.orb nil and the D2D path keeps rendering exactly as before.
 //
-// Clickability (ticket 65 regression fix): the ball window keeps painting its
-// D2D frames in every mode (the old render guards rest on a wrong premise -
-// the orb is not a child of the ball window, so nothing double-composites),
-// and THIS window is a pure decoration overlay: WS_EX_TRANSPARENT hands every
-// mouse hit to whatever sits beneath, so the orb can never eat a click meant
-// for the ball or any other window - the mainstream Windows overlay shape
-// (layered + transparent + topmost + no-activate), with all interaction
-// staying on the ball window's frozen hit-test/drag/dock semantics.
+// Clickability + single-ball architecture (ticket 65 rework, 2026-11-07): the
+// orb window IS the ball's visible surface - it overlays the ball window's
+// rect (follow() center-aligns the two) and carries the whole picture, while
+// the BALL window stays the interaction layer: it keeps every frozen
+// hit-test/drag/dock/click semantic and stops painting its D2D body when the
+// orb is attached (ball_windows.go renderFrame's overlay mode), drawing only
+// what the page cannot (approval badge, progress ring, text overrides) plus a
+// near-invisible hit-test silhouette. That is the mainstream overlay shape -
+// one visible layer (this window) over one interaction layer (the ball
+// window) - and it kills the "two balls side by side" state the side-by-side
+// follow geometry produced (orchestrator-measured 2026-11-07).
+//
+// THIS window is and stays pure passthrough: WS_EX_TRANSPARENT hands every
+// mouse hit to whatever sits beneath, and the wndproc answers HTTRANSPARENT
+// to WM_NCHITTEST on top of that, so the orb can never eat a click meant for
+// the ball (or any other window) whether or not the system's WindowFromPoint
+// honors WS_EX_TRANSPARENT on a non-layered window - all interaction stays on
+// the ball window's frozen semantics.
 
 import (
 	"fmt"
@@ -82,20 +117,17 @@ const (
 	// name, and the live tests' quiet-desktop rule is written against the
 	// ball class only.
 	orbWindowClassName = "WispOrbWindow"
-
-	// orbWindowEdge is the fixed square edge of the orb host window (96-dpi
-	// px, scaled by the destination monitor's DPI like the ball edge). The
-	// page's shader fits the orb to min(w,h) with a soft margin, so a little
-	// extra room around the configured size is what keeps the glow band and
-	// the contour deform inside the window. 1.5x, rounded.
-	orbWindowEdgeBase = BallSizeMaxPx*96/64 + 24
 )
 
-// orbWindowExStyle: the ball's frozen set plus WS_EX_TRANSPARENT - layered
-// (the page composites per-pixel), transparent (every mouse hit falls through
-// to whatever sits beneath: the orb is decoration, it must never eat a click),
-// topmost, tool window (no taskbar button), never activates.
-const orbWindowExStyle = uintptr(wsExLayered | wsExTransparent | wsExTopmost | wsExToolWindow | wsExNoActivate)
+// orbWindowExStyle: the ball's frozen set MINUS WS_EX_LAYERED, plus
+// WS_EX_TRANSPARENT - transparent (every mouse hit falls through to whatever
+// sits beneath: the orb is pure passthrough, it must never eat a click),
+// topmost, tool window (no taskbar button), never activates. LAYERED is
+// deliberately absent: this window never presents a ULW bitmap and never
+// calls SetLayeredWindowAttributes, so the bit only served to keep an
+// uninitialized black redirection surface under the WebView2 child (the
+// transparency-chain note in the file header).
+const orbWindowExStyle = uintptr(wsExTransparent | wsExTopmost | wsExToolWindow | wsExNoActivate)
 
 // orbShowCommand: same never-activate show the ball uses.
 const orbShowCommand = swShownoactivate
@@ -106,6 +138,54 @@ const (
 	wmWindowPosChanged = 0x0047
 	wsExTransparent    = 0x00000020
 )
+
+// dwmapi plumbing for the window side of the transparency chain: the
+// empty-region blur-behind call that makes the top-level's redirection
+// surface per-pixel-alpha-aware (Tauri/tao's exact transparent-window recipe,
+// file header). The DWM_BLURBEHIND layout is x64-ABI: four 32-bit fields with
+// the HRGN aligned inside.
+var (
+	modDwmapi                  = windows.NewLazySystemDLL("dwmapi.dll")
+	pDwmEnableBlurBehindWindow = modDwmapi.NewProc("DwmEnableBlurBehindWindow")
+	pCreateRectRgn             = modGDI32.NewProc("CreateRectRgn")
+)
+
+const (
+	dwmBBEnable     = 0x00000001
+	dwmBBBlurRegion = 0x00000002
+)
+
+// dwmBlurBehind is DWM_BLURBEHIND.
+type dwmBlurBehind struct {
+	dwFlags                uint32
+	fEnable                uint32 // BOOL
+	hRgnBlur               windows.Handle
+	fTransitionOnMaximized uint32 // BOOL
+}
+
+// enableDWMAlpha turns the window's redirection surface alpha-aware via
+// DwmEnableBlurBehindWindow's empty-region form (CreateRectRgn(0,0,-1,-1) is
+// the empty region tao uses - no blur is actually requested, only the alpha
+// path). A failure is logged, not fatal: without it the window composites
+// black where the page is transparent (the measured first-cut defect), but
+// the ball still works.
+func enableDWMAlpha(hwnd windows.HWND) {
+	region, _, _ := pCreateRectRgn.Call(0, 0, ^uintptr(0), ^uintptr(0)) // (0,0,-1,-1): empty
+	if region == 0 {
+		slog.Warn("ball: orb CreateRectRgn(empty) failed")
+		return
+	}
+	defer pDeleteObject.Call(region)
+	bb := dwmBlurBehind{
+		dwFlags:  dwmBBEnable | dwmBBBlurRegion,
+		fEnable:  1,
+		hRgnBlur: windows.Handle(region),
+	}
+	if hr, _, _ := pDwmEnableBlurBehindWindow.Call(uintptr(hwnd), unsafePtr(&bb)); hr != 0 {
+		// HRESULT: 0 = S_OK.
+		slog.Warn("ball: orb DwmEnableBlurBehindWindow failed; window may composite black outside the page", "hr", hr)
+	}
+}
 
 // HWND_TOPMOST as a uintptr literal ((HWND)-1).
 const orbHwndTopmost = ^uintptr(0)
@@ -152,18 +232,20 @@ type orbWindow struct {
 
 // newOrbWindow creates the orb host window and the WebView2 inside it. It
 // MUST run on the ui-sta thread (window + WebView2 + Embed's internal pump
-// are all thread-bound). Every failure mode returns an error and nothing
-// else: the D2D fallback decision is the caller's, made from b.orb == nil.
-func newOrbWindow(s *staThread, sizePx int, dpi uint32) (*orbWindow, error) {
+// are all thread-bound). ballHWND is the ball window the orb slots beneath
+// (the z-law in follow()'s doc). Every failure mode returns an error and
+// nothing else: the D2D fallback decision is the caller's, made from
+// b.orb == nil.
+func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (*orbWindow, error) {
 	if err := registerOrbClass(); err != nil {
 		return nil, err
 	}
 
-	// Fixed square edge at the destination monitor's DPI (same scaling rule
-	// as WindowEdgePx for the ball; the orb window has no ring margins of its
-	// own, so the base is this file's constant scaled linearly).
-	edge := int32(int(orbWindowEdgeBase) * int(dpi) / 96)
-	_ = sizePx // the window is one fixed square; the page fits the orb itself
+	// Same fixed square edge as the ball window, at the destination monitor's
+	// DPI: the orb is the ball's visible face, so its host overlays the ball
+	// window's rect exactly (follow() center-aligns the two; with equal edges
+	// the unclamped alignment is the identical rect).
+	edge := int32(WindowEdgePx(sizePx, dpi))
 
 	clsName := utf16(orbWindowClassName)
 	title := utf16("Wisp Orb")
@@ -177,8 +259,31 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32) (*orbWindow, error) {
 	if hwnd == 0 {
 		return nil, fmt.Errorf("ball: orb CreateWindowExW: %v", callErr)
 	}
+	// Window side of the transparency chain: alpha-aware redirection surface
+	// (the removed WS_EX_LAYERED never provided one). Before the WebView2
+	// child composites, an alpha-aware surface with nothing painted in it is
+	// FULLY transparent - no black flash between window creation and attach.
+	enableDWMAlpha(windows.HWND(hwnd))
 
 	o := &orbWindow{sta: s, hwnd: windows.HWND(hwnd)}
+
+	// Transparency, WebView2 layer, from BROWSER BIRTH: the documented cure
+	// for the API put's own known issue - "setting the color by API can
+	// still leave the app with a white flicker before the
+	// DefaultBackgroundColor takes effect" (WebView2 docs,
+	// ICoreWebView2Controller2.put_DefaultBackgroundColor). Measured
+	// 2026-11-07 on real desktop boots: some instances composited the page
+	// over an opaque WHITE default for their whole lifetime despite the
+	// successful API put below. The environment variable applies the
+	// transparent default when the browser process is born; the API put
+	// stays as the belt (get returns the env value; later updates go
+	// through the API). Process-wide by nature: the panel host's WebView2
+	// shares this process env, and its own page paints an opaque CSS
+	// background, so an undefined-background window is not a shape it ever
+	// shows.
+	if err := os.Setenv("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", "0x00FFFFFF"); err != nil {
+		slog.Warn("ball: orb default-background env not set; white boot possible", "err", err)
+	}
 
 	browser := orbedge.NewChromium()
 	// MessageCallback stays nil on purpose: the upstream page never posts to
@@ -272,10 +377,11 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32) (*orbWindow, error) {
 		slog.Warn("ball: orb controller Show failed", "err", err)
 	}
 
-	// Never-activate show, then one explicit topmost re-assert so the orb
-	// lands in the same topmost band as the ball that owns it.
+	// Never-activate show, then one z-order slot: DIRECTLY BELOW the ball
+	// window (the z-law in follow()'s doc - the ball is the top layer, the
+	// orb its face beneath it). The first follow() re-slots after every move.
 	pShowWindow.Call(hwnd, orbShowCommand)
-	pSetWindowPos.Call(hwnd, orbHwndTopmost, 0, 0, 0, 0,
+	pSetWindowPos.Call(hwnd, uintptr(ballHWND), 0, 0, 0, 0,
 		uintptr(swpNoSize|swpNoMove|swpNoActivate))
 	return o, nil
 }
@@ -312,21 +418,24 @@ func (o *orbWindow) pushAudio(level float32) {
 	o.browser.Eval(orbAudioScript(l, l, l, l))
 }
 
-// orbFollowGap is the horizontal breathing room between the ball and the orb
-// (px, same value the first orb leg shipped).
-const orbFollowGap = int32(12)
+// orbFollowGap is gone: the orb no longer floats BESIDE the ball (that
+// geometry drew a second ball on screen - orchestrator-measured, ticket 65).
+// The orb overlays the ball window's rect; see orbOverlayXY.
 
-// follow places the orb beside the ball's current window rect. Runs on the
-// ui-sta thread (ball drag end / DPI change / attach), which is why no lock
-// guards the window geometry.
+// follow places the orb over the ball's current window rect (center-aligned,
+// work-area clamped) and slots it DIRECTLY BELOW the ball window in z-order.
+// Runs on the ui-sta thread (ball drag move/end, DPI change, attach), which is
+// why no lock guards the window geometry.
 //
-// Side choice (ticket 65 off-screen fix, orchestrator-measured: a ball docked
-// at the right screen edge put the orb 120 px past the virtual screen edge):
-// the orb goes to the RIGHT of the ball when the ball's monitor WORK area has
-// room for it, else to the LEFT, else clamped fully inside the work area. The
-// WORK area, not the monitor rect, is the boundary - the taskbar is not orb
-// space. The vertical axis keeps the ball-aligned top when it fits and clamps
-// when it does not.
+// Z-law (ticket 65 rework, measured): the ball window is the TOP layer and
+// the orb sits immediately beneath it. The pointer therefore always lands on
+// the ball first (WindowFromPoint at the ball centre must answer the ball -
+// the frozen interaction contract), the ball's own transparent pixels let the
+// orb show through, and the orb's WS_EX_TRANSPARENT + HTTRANSPARENT wndproc
+// remain as passthrough belts for real input routing. The reverse order
+// measured broken: a non-layered WS_EX_TRANSPARENT window is NOT skipped by
+// WindowFromPoint, so an orb above the ball answered WindowFromPoint(centre)
+// the moment follow() aligned the two.
 func (o *orbWindow) follow(ballHWND windows.HWND) {
 	if o.browser == nil || o.hwnd == 0 {
 		return
@@ -341,33 +450,32 @@ func (o *orbWindow) follow(ballHWND windows.HWND) {
 		return
 	}
 	work, workOk := monitorRectsForWindow(ballHWND)
-	x, y := orbFollowXY(wr, or.width(), orbFollowGap, work.Work, workOk)
-	pSetWindowPos.Call(uintptr(o.hwnd), orbHwndTopmost,
+	x, y := orbOverlayXY(wr, or.width(), work.Work, workOk)
+	// hWndInsertAfter = the ball window: the orb slots DIRECTLY BELOW it
+	// (the z-law above), never at the topmost band's head.
+	pSetWindowPos.Call(uintptr(o.hwnd), uintptr(ballHWND),
 		uintptr(x), uintptr(y), 0, 0,
 		uintptr(swpNoSize|swpNoActivate))
 }
 
-// orbFollowXY is the pure placement decision follow() applies, split out so
-// the suite can pin it against real work-area shapes without windows. A
-// workOk=false result (no monitor info available) keeps the legacy right-side
-// placement rather than guessing a boundary that was never read.
-func orbFollowXY(ball rect, orbEdge, gap int32, work Rect, workOk bool) (int32, int32) {
+// orbOverlayXY is the pure placement decision follow() applies, split out so
+// the suite can pin it against real work-area shapes without windows. The orb
+// is centered on the ball window's rect (equal edges make that the identical
+// rect), then clamped fully inside the work area when monitor info exists.
+// A workOk=false result (no monitor info available) keeps the raw alignment
+// rather than guessing a boundary that was never read.
+func orbOverlayXY(ball rect, orbEdge int32, work Rect, workOk bool) (int32, int32) {
+	x := (ball.l+ball.r)/2 - orbEdge/2
+	y := (ball.t+ball.b)/2 - orbEdge/2
 	if !workOk {
-		return ball.r + gap, ball.t
+		return x, y
 	}
-	x := ball.r + gap
 	if x+orbEdge > int32(work.R) {
-		// Right does not fit: left of the ball when the ball leaves room.
-		if left := ball.l - gap - orbEdge; left >= int32(work.L) {
-			x = left
-		} else if clamp := int32(work.R) - orbEdge; clamp > int32(work.L) {
-			// Neither side fits (narrow screen): clamp inside the work area.
-			x = clamp
-		} else {
-			x = int32(work.L)
-		}
+		x = int32(work.R) - orbEdge
 	}
-	y := ball.t
+	if x < int32(work.L) {
+		x = int32(work.L)
+	}
 	if y+orbEdge > int32(work.B) {
 		y = int32(work.B) - orbEdge
 	}
@@ -388,6 +496,25 @@ func (o *orbWindow) destroy() {
 	if activeOrb.Load() == o {
 		activeOrb.Store(nil)
 	}
+	// Ticket 65 (docs/evidence/s1/65-jchv-controller-leak.md): the WebView2
+	// controller must be CLOSED - not just unreferenced - before the host
+	// window dies. Without controller.Close the browser process tree
+	// (msedgewebview2) outlives the orb, and every create/destroy round leaks
+	// another set of processes; across a count=10 live suite that accumulation
+	// degraded rendering round over round until pages could not paint at all.
+	// Close (fork wrapper, third_party/go-webview2) unregisters handlers and
+	// lets the browser processes exit; Release drops the controller's COM
+	// reference the wrapper's AddRef-side of Embed took. Both run on this STA
+	// thread, before o.browser is dropped, so no other call can reach the
+	// dying controller in between.
+	if o.browser != nil {
+		if c := o.browser.GetController(); c != nil {
+			if err := c.Close(); err != nil {
+				slog.Warn("ball: orb controller Close failed", "err", err)
+			}
+			c.Release()
+		}
+	}
 	o.browser = nil
 	if o.hwnd != 0 {
 		if r, _, err := pDestroyWindow.Call(uintptr(o.hwnd)); r == 0 {
@@ -407,6 +534,16 @@ func orbWndProc(hwnd, msg, wParam, lParam uintptr) uintptr {
 		return r
 	}
 	switch msg {
+	case wmNCHitTest:
+		// Pure passthrough, second belt: the system's hit-test walk asks this
+		// window first (WindowFromPoint consults WM_NCHITTEST top-down) and
+		// HTTRANSPARENT sends it to whatever sits beneath - the same answer
+		// the ball window gives outside its clickable circle. WS_EX_TRANSPARENT
+		// already asks for this; on a NON-layered window the system's honoring
+		// of that bit for top-level hit tests is not something to bet on, and
+		// the answer here makes the passthrough a property of THIS wndproc
+		// instead of a style-interpretation detail.
+		return htTransparentResult()
 	case wmDestroy:
 		// The owner (Ball.Close) drives teardown; this arm only stops the
 		// library's per-thread quit from being posted twice - the window is
@@ -431,7 +568,7 @@ func orbWndProc(hwnd, msg, wParam, lParam uintptr) uintptr {
 // ui-sta thread. NEVER fails the ball - a failure logs one line and leaves
 // b.orb nil, which keeps the D2D fallback rendering (A1594 ③).
 func (b *Ball) attachOrb(s *staThread) {
-	o, err := newOrbWindow(s, b.opts.SizePx, getDpiForWindow(b.hwnd))
+	o, err := newOrbWindow(s, b.opts.SizePx, getDpiForWindow(b.hwnd), b.hwnd)
 	if err != nil {
 		slog.Warn("ball: webview orb not attached; D2D fallback stays active", "err", err)
 		return

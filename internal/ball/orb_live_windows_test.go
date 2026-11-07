@@ -88,20 +88,42 @@ func TestBallLiveOrbAttachStateAndTeardown(t *testing.T) {
 
 	// Attach contract: the orb window is a real window, of the orb class's
 	// process, sized as ONE fixed square, shown without activation, topmost.
+	// WS_EX_LAYERED is asserted ABSENT (ticket 65 transparency fix): the orb
+	// never presents a ULW bitmap, so the layered bit only kept an
+	// uninitialized black redirection surface under the WebView2 child - the
+	// measured "black square" defect. The per-pixel alpha path is
+	// DwmEnableBlurBehindWindow's empty region instead (Tauri/tao's recipe).
 	if r, _, _ := pIsWindow.Call(uintptr(orbHWND)); r == 0 {
 		t.Fatalf("DebugOrbHWND is not a live window: %v", orbHWND)
 	}
 	exStyle, _, _ := orbTestGetWindowLongPtrW.Call(uintptr(orbHWND), uintptr(gwlExStyleTest))
-	const wantEx = wsExLayered | wsExTopmost | wsExToolWindow | wsExNoActivate
+	const wantEx = wsExTransparent | wsExTopmost | wsExToolWindow | wsExNoActivate
 	if exStyle&wantEx != wantEx {
 		t.Errorf("orb ex-style %#x missing bits of %#x", exStyle, wantEx)
 	}
-	var wr rect
-	if r, _, _ := pGetWindowRect.Call(uintptr(orbHWND), unsafePtr(&wr)); r == 0 {
+	if exStyle&wsExLayered != 0 {
+		t.Errorf("orb ex-style %#x carries WS_EX_LAYERED: the bit is the black-square defect, not transparency", exStyle)
+	}
+	// Overlay contract (ticket 65 rework): the orb is the ball's visible face,
+	// so its rect must cover the ball window's rect (equal WindowEdgePx edges
+	// make the unclamped alignment the identical rect).
+	ballHWND := uintptr(b.DebugHWND())
+	var bwr, owr rect
+	if r, _, _ := pGetWindowRect.Call(ballHWND, unsafePtr(&bwr)); r == 0 {
+		t.Fatal("GetWindowRect(ball) failed")
+	}
+	if r, _, _ := pGetWindowRect.Call(uintptr(orbHWND), unsafePtr(&owr)); r == 0 {
 		t.Fatal("GetWindowRect(orb) failed")
 	}
-	if w, h := wr.width(), wr.height(); w != h || w <= 0 {
-		t.Errorf("orb window is not a square: %dx%d", w, h)
+	if bwr.width() != owr.width() || bwr.height() != owr.height() {
+		t.Errorf("orb window edge %dx%d differs from the ball window edge %dx%d: the overlay is mis-sized",
+			owr.width(), owr.height(), bwr.width(), bwr.height())
+	}
+	work, workOk := monitorRectsForWindow(windows.HWND(ballHWND))
+	wantX, wantY := orbOverlayXY(bwr, owr.width(), work.Work, workOk)
+	if owr.l != wantX || owr.t != wantY {
+		t.Errorf("orb rect (%d,%d) is not the overlay position follow() computes (%d,%d)",
+			owr.l, owr.t, wantX, wantY)
 	}
 
 	// The takeover contract, on the REAL surface: the debug face names the
@@ -149,8 +171,10 @@ func TestBallLiveOrbAttachStateAndTeardown(t *testing.T) {
 		}
 	}
 
-	// The ball window itself is still alive and still the ball: the orb is a
-	// SECOND window, not a replacement.
+	// The ball window itself is still alive and still the interaction layer:
+	// the orb window is its visible FACE (overlaying it), not a replacement
+	// for it - the whole frozen hit-test/drag/dock/click set lives here, and
+	// the D2D fallback reclaims the picture if the orb ever fails to attach.
 	if r, _, _ := pIsWindow.Call(uintptr(b.DebugHWND())); r == 0 {
 		t.Fatal("ball window died while the orb was attached")
 	}
@@ -167,13 +191,13 @@ func TestBallLiveOrbAttachStateAndTeardown(t *testing.T) {
 	}
 }
 
-// TestBallLiveOrbFollowPlacementDecision pins the pure side-choice math behind
-// follow() against real work-area shapes, including the off-screen shapes the
-// orchestrator measured (ticket 65): a ball docked flush at the right work
-// edge must flip the orb to the LEFT, and a ball too centered for either side
-// must clamp the orb fully inside the work area.
+// TestBallLiveOrbFollowPlacementDecision pins the pure placement math behind
+// follow() against real work-area shapes (ticket 65 rework): the orb overlays
+// the ball (center-aligned), clamped fully inside the work area when monitor
+// info exists - including the flush-docked shapes where the raw alignment
+// would push the orb's glow past the screen edge - and raw when it does not.
 func TestBallLiveOrbFollowPlacementDecision(t *testing.T) {
-	const edge, gap = 132, 12
+	const edge = 132
 	work := Rect{L: 0, T: 0, R: 3440, B: 1320}
 	cases := []struct {
 		name   string
@@ -183,28 +207,38 @@ func TestBallLiveOrbFollowPlacementDecision(t *testing.T) {
 		wantX  int32
 		wantY  int32
 	}{
-		{"room on the right keeps the legacy side", rect{l: 3000, t: 100, r: 3100, b: 200}, work, true, 3112, 100},
-		{"docked right edge flips to the left", rect{l: 3307, t: 100, r: 3440, b: 200}, work, true, 3307 - gap - edge, 100},
-		{"docked bottom clamps the vertical axis", rect{l: 3307, t: 1220, r: 3440, b: 1320}, work, true, 3307 - gap - edge, 1320 - edge},
-		{"ball above the work top clamps down", rect{l: 1000, t: -50, r: 1100, b: 50}, work, true, 1112, 0},
-		{"narrow screen clamps instead of flipping", rect{l: 60, t: 100, r: 200, b: 200}, Rect{L: 0, T: 0, R: 260, B: 1320}, true, 260 - edge, 100},
-		{"no monitor info keeps the legacy shape", rect{l: 3000, t: 100, r: 3100, b: 200}, work, false, 3112, 100},
+		// 100x100 ball at (3000,100): center (3050,150), orb centered on it.
+		{"free ball centers the orb on it", rect{l: 3000, t: 100, r: 3100, b: 200}, work, true, 3050 - edge/2, 150 - edge/2},
+		// Ball flush at the right work edge: raw alignment x=3390-66=3324
+		// overhangs (3324+132=3456 > 3440), so the clamp pulls it back.
+		{"docked right edge clamps into the work area", rect{l: 3340, t: 100, r: 3440, b: 200}, work, true, 3440 - edge, 150 - edge/2},
+		// Ball flush at the bottom: raw y=1290-66=1224 overhangs (1224+132=1356
+		// > 1320), so the clamp pulls it back; x needs no clamp.
+		{"docked bottom clamps the vertical axis", rect{l: 1000, t: 1260, r: 1100, b: 1320}, work, true, 1050 - edge/2, 1320 - edge},
+		// Ball half above the work top: raw y=(0)-66=-66 < 0, clamped to 0.
+		{"ball above the work top clamps down", rect{l: 1000, t: -50, r: 1100, b: 50}, work, true, 1050 - edge/2, 0},
+		// Narrow work area narrower than the orb: both x-clamp rules hit; the
+		// left-edge rule wins last.
+		{"narrow screen clamps instead of overhanging", rect{l: 0, t: 100, r: 200, b: 200}, Rect{L: 0, T: 0, R: 100, B: 1320}, true, 0, 150 - edge/2},
+		// No monitor info: raw center alignment, never a guessed boundary.
+		{"no monitor info keeps the raw alignment", rect{l: 3340, t: 100, r: 3440, b: 200}, work, false, 3390 - edge/2, 150 - edge/2},
 	}
 	for _, tc := range cases {
-		gotX, gotY := orbFollowXY(tc.ball, edge, gap, tc.work, tc.workOk)
+		gotX, gotY := orbOverlayXY(tc.ball, edge, tc.work, tc.workOk)
 		if gotX != tc.wantX || gotY != tc.wantY {
-			t.Errorf("%s: orbFollowXY() = (%d,%d), want (%d,%d)", tc.name, gotX, gotY, tc.wantX, tc.wantY)
+			t.Errorf("%s: orbOverlayXY() = (%d,%d), want (%d,%d)", tc.name, gotX, gotY, tc.wantX, tc.wantY)
 		}
 	}
 }
 
 // TestBallLiveOrbFollowStaysInsideWorkArea is the off-screen regression
-// (ticket 65, orchestrator-measured): with the ball parked flush against the
-// bottom-right corner of its monitor's WORK area, follow() must land the orb
-// FULLY inside that work area at real coordinates. The pre-fix behavior
-// (unconditional wr.r+12) starts the orb 12 px outside the work area here, so
-// this test is red on the old code and green on the fix - the assertions read
-// the actual window rects, never "follow was called".
+// (ticket 65, orchestrator-measured), re-pinned for the rework: with the ball
+// parked flush against the bottom-right corner of its monitor's WORK area,
+// follow() must land the orb EXACTLY over the ball (equal edges make the
+// center alignment the identical rect - both rects end flush at the work
+// edges) and never outside the work area. The pre-rework side-by-side shape
+// and any raw overhang both fail here: the assertions read the actual window
+// rects, never "follow was called".
 func TestBallLiveOrbFollowStaysInsideWorkArea(t *testing.T) {
 	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
 	if err != nil {
@@ -273,19 +307,12 @@ func TestBallLiveOrbFollowStaysInsideWorkArea(t *testing.T) {
 		t.Fatalf("orb vertically outside the work area: work.B=%d orb=(%d,%d)-(%d,%d)",
 			work.B, orb.l, orb.t, orb.r, orb.b)
 	}
-	// Exact coordinates, not just containment: a flush-right ball with room on
-	// its left must flip the orb to the LEFT (orb.r == ball.l - gap) and clamp
-	// its bottom to the work bottom.
-	edge := orb.width()
-	if left := br.l - orbFollowGap - edge; left >= int32(work.L) {
-		if orb.r != br.l-orbFollowGap {
-			t.Errorf("orb did not flip to the left of the docked-right ball: want orb.r=%d, got orb=(%d,%d)-(%d,%d)",
-				br.l-orbFollowGap, orb.l, orb.t, orb.r, orb.b)
-		}
-	}
-	if br.b >= int32(work.B) && orb.b != int32(work.B) {
-		t.Errorf("orb bottom was not clamped to the work bottom: want orb.b=%d, got %d",
-			int32(work.B), orb.b)
+	// Exact overlay coordinates, not just containment: the orb and the ball
+	// share one WindowEdgePx edge, so the flush-docked ball's rect IS the
+	// aligned overlay position - no gap, no overhang, no side flip.
+	if orb.l != br.l || orb.t != br.t || orb.r != br.r || orb.b != br.b {
+		t.Errorf("orb did not overlay the ball exactly: ball=(%d,%d)-(%d,%d) orb=(%d,%d)-(%d,%d)",
+			br.l, br.t, br.r, br.b, orb.l, orb.t, orb.r, orb.b)
 	}
 }
 
@@ -577,6 +604,221 @@ func orbPixelAttempt(t *testing.T, b *Ball, attempt int) (bool, float64, int) {
 		}
 		if time.Now().After(deadline) {
 			return false, best, samples
+		}
+		time.Sleep(300 * time.Millisecond)
+	}
+}
+
+// orbTestCreateSolidBrush: this file's handle to the GDI entry the colored
+// transparency floor below needs (its KNOWN floor is not black).
+var orbTestCreateSolidBrush = modGDI32.NewProc("CreateSolidBrush")
+
+// orbTestFloorColor is the known floor of the transparency regression, as a
+// COLORREF (0x00BBGGRR): the desktop gray the orchestrator measured (51,51,50).
+const orbTestFloorColor = 0x00323333
+
+// orbTestColoredFloorWndProc: the colored floor never handles anything itself.
+func orbTestColoredFloorWndProc(hwnd, msg, wParam, lParam uintptr) uintptr {
+	r, _, _ := pDefWindowProcW.Call(hwnd, msg, wParam, lParam)
+	return r
+}
+
+var (
+	orbTestColoredFloorProcPtr = windows.NewCallback(orbTestColoredFloorWndProc)
+	orbTestColoredFloorOnce    sync.Once
+	orbTestColoredFloorErr     error
+)
+
+// orbTestCreateColoredFloor registers (once) and shows a (51,51,50) WS_POPUP
+// window covering the orb's rect - the transparency regression's KNOWN floor.
+// A BLACK floor cannot serve: transparent-over-black and the black-square
+// defect both read (0,0,0), so the reading could not tell the fix from the
+// defect. Same creation law as orbTestCreateBackdrop: topmost (the orb is
+// re-asserted above it), created and painted on the ui-sta thread via
+// Ball.sta.PostTask - a window on a thread nobody pumps never paints.
+func orbTestCreateColoredFloor(wr rect) uintptr {
+	orbTestColoredFloorOnce.Do(func() {
+		brush, _, _ := orbTestCreateSolidBrush.Call(orbTestFloorColor)
+		wc := wndClassEx{
+			size:      uint32(unsafe.Sizeof(wndClassEx{})),
+			wndProc:   orbTestColoredFloorProcPtr,
+			instance:  windows.Handle(moduleHandle()),
+			cursor:    windows.Handle(loadArrowCursor()),
+			bkgnd:     windows.Handle(brush),
+			className: utf16("WispOrbPxClearFloor"),
+		}
+		if r, _, _ := pRegisterClassExW.Call(unsafePtr(&wc)); r == 0 {
+			orbTestColoredFloorErr = fmt.Errorf("RegisterClassExW(clear-floor) failed")
+		}
+	})
+	if orbTestColoredFloorErr != nil {
+		return 0
+	}
+	hwnd, _, _ := pCreateWindowExW.Call(0x8, // WS_EX_TOPMOST, below the re-asserted orb
+		unsafePtr(utf16("WispOrbPxClearFloor")), unsafePtr(utf16("Wisp Orb Clear Floor")),
+		uintptr(wsPopup),
+		uintptr(wr.l), uintptr(wr.t), uintptr(wr.width()), uintptr(wr.height()),
+		0, 0, uintptr(moduleHandle()), 0)
+	if hwnd == 0 {
+		return 0
+	}
+	pShowWindow.Call(hwnd, swShownoactivate)
+	return hwnd
+}
+
+// orbTestPixelAt samples one composited screen pixel, as (r,g,b).
+func orbTestPixelAt(hdc uintptr, x, y int32) (int32, int32, int32) {
+	c, _, _ := orbTestGetPixel.Call(hdc, uintptr(x), uintptr(y))
+	return int32(c & 0xff), int32((c >> 8) & 0xff), int32((c >> 16) & 0xff)
+}
+
+// TestBallLiveOrbCornersReadTheDesktop is the transparency regression (ticket
+// 65 rework, orchestrator-measured black corners on the first cut: left-up
+// (30,24,29) / right-up (38,33,40) / left-down (26,21,32) / right-down
+// (38,31,38) against a (51,51,50) desktop). The orb is parked over a KNOWN
+// (51,51,50) floor, and the four corners of the orb window - sampled 3 px
+// inside, exactly the orchestrator's probe shape - must read the floor within
+// 12 per channel. The page must ALSO actually be alive (some sampled pixel
+// differing from the floor by more than 25), so a dead-page window cannot
+// pass by being invisible. Both readings poll to a deadline: WebGPU boot is
+// not instant.
+func TestBallLiveOrbCornersReadTheDesktop(t *testing.T) {
+	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
+	if err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	requireQuietBallDesktop(t)
+	orbTestReapLeakedWebView2(t)
+
+	b, err := New(Options{
+		SizePx:      BallSizeDefaultPx,
+		Initial:     statemachine.StateSleeping,
+		Store:       store,
+		WindowTitle: liveBallTitle(t),
+		Hotkeys:     liveHotkeys(),
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	t.Cleanup(b.Close)
+
+	deadline := time.Now().Add(15 * time.Second)
+	var orbHWND windows.HWND
+	for {
+		orbHWND = b.DebugOrbHWND()
+		if orbHWND != 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("orb window did not attach within 15s (WebView2 runtime missing or Embed refused)")
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	mon, ok := monitorRectsForWindow(windows.HWND(b.DebugHWND()))
+	if !ok {
+		t.Fatal("monitorRectsForWindow(ball) returned no monitor")
+	}
+	work := mon.Work
+
+	// Center the overlay in the work area: the ball window is the anchor the
+	// orb follows, so move the BALL to the center and let follow() align the
+	// orb over it.
+	ballHWND := uintptr(b.DebugHWND())
+	var bwr rect
+	if r, _, _ := pGetWindowRect.Call(ballHWND, unsafePtr(&bwr)); r == 0 {
+		t.Fatal("GetWindowRect(ball) failed")
+	}
+	cx := (int32(work.L) + int32(work.R)) / 2
+	cy := (int32(work.T) + int32(work.B)) / 2
+	pSetWindowPos.Call(ballHWND, 0,
+		uintptr(cx-bwr.width()/2), uintptr(cy-bwr.height()/2), 0, 0,
+		uintptr(swpNoSize|swpNoZOrder|swpNoActivate))
+	b.followOrb()
+
+	var wr rect
+	if r, _, _ := pGetWindowRect.Call(uintptr(orbHWND), unsafePtr(&wr)); r == 0 {
+		t.Fatal("GetWindowRect(orb) failed")
+	}
+
+	// Known floor below the orb, created and painted on the ui-sta thread.
+	// Z-order for the sampling: ball > orb > floor - the floor goes in
+	// topmost (above everything), then slots DIRECTLY BELOW the orb
+	// (hWndInsertAfter = orb), which leaves the ball > orb > floor stack the
+	// z-law in orb_windows.go follow() holds on the live desktop.
+	floor := make(chan uintptr, 1)
+	b.sta.PostTask(func() { floor <- orbTestCreateColoredFloor(wr) })
+	fh := <-floor
+	if fh == 0 {
+		t.Fatal("colored floor window failed to create")
+	}
+	pSetWindowPos.Call(fh, uintptr(orbHWND), 0, 0, 0, 0,
+		uintptr(swpNoSize|swpNoMove|swpNoActivate))
+	t.Cleanup(func() {
+		done := make(chan struct{})
+		b.sta.PostTask(func() {
+			pDestroyWindow.Call(fh)
+			close(done)
+		})
+		<-done
+	})
+
+	const (
+		budget       = 25 * time.Second
+		cornerInset  = int32(3)  // the orchestrator's probe: 3 px inside the rect
+		cornerTol    = int32(12) // per-channel distance from the floor color
+		pageDiffGate = 25        // a page pixel differs from the floor by more than this
+	)
+	corners := [4][2]int32{
+		{wr.l + cornerInset, wr.t + cornerInset},
+		{wr.r - cornerInset - 1, wr.t + cornerInset},
+		{wr.l + cornerInset, wr.b - cornerInset - 1},
+		{wr.r - cornerInset - 1, wr.b - cornerInset - 1},
+	}
+	fr := int32(orbTestFloorColor & 0xff)
+	fg := int32((orbTestFloorColor >> 8) & 0xff)
+	fb := int32((orbTestFloorColor >> 16) & 0xff)
+	deadline = time.Now().Add(budget)
+	lit := 0.0
+	var readings [4][3]int32
+	for {
+		hdc, _, _ := pGetDC.Call(0)
+		if hdc == 0 {
+			t.Fatal("GetDC(NULL) failed")
+		}
+		// Transparency half: all four corners read the floor color.
+		cornersOK := true
+		for i, pt := range corners {
+			r, g, bl := orbTestPixelAt(hdc, pt[0], pt[1])
+			readings[i] = [3]int32{r, g, bl}
+			if absi(int(r-fr)) > int(cornerTol) || absi(int(g-fg)) > int(cornerTol) || absi(int(bl-fb)) > int(cornerTol) {
+				cornersOK = false
+			}
+		}
+		// Life half: the page must be compositing something somewhere.
+		lit = 0
+		total := 0
+		for y := wr.t + 4; y < wr.b-4; y += 3 {
+			for x := wr.l + 4; x < wr.r-4; x += 3 {
+				r, g, bl := orbTestPixelAt(hdc, x, y)
+				total++
+				if absi(int(r-fr)) > pageDiffGate || absi(int(g-fg)) > pageDiffGate || absi(int(bl-fb)) > pageDiffGate {
+					lit++
+				}
+			}
+		}
+		pReleaseDC.Call(0, hdc)
+		if total > 0 {
+			lit /= float64(total)
+		}
+		if cornersOK && lit > 0.01 {
+			t.Logf("orb transparent over a known floor: corners %v within +/-%d of (51,51,50); page lit ratio %.2f%%",
+				readings, cornerTol, lit*100)
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("orb transparency regression: corners read %v (want each channel within +/-%d of (51,51,50)); page lit ratio %.3f%% (want > 1%%)",
+				readings, cornerTol, lit*100)
 		}
 		time.Sleep(300 * time.Millisecond)
 	}

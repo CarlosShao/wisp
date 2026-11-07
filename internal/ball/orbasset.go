@@ -70,15 +70,26 @@ const orbCSPHeaderValue = "default-src 'none'; script-src 'unsafe-inline'; " +
 	"frame-src 'none'; object-src 'none'; base-uri 'none'"
 
 // orbPageDocument returns the document actually served: the upstream page
-// byte-for-byte PLUS one injected CSP <meta> right after <head> - the only
-// transformation the serving seam applies on top of the embed, applied in
+// byte-for-byte PLUS two injected head entries right after <head> - the only
+// transformations the serving seam applies on top of the embed, applied in
 // memory so the asset file stays the untouched upstream export (its sha is
-// pinned in orb_test.go). If the upstream head marker were ever missing the
-// meta is injected after the doctype instead: the policy is never silently
-// dropped.
+// pinned in orb_test.go). The first is the CSP <meta> (a response-header CSP
+// is not available to either delivery shape). The second is the transparent
+// background <style>: the script bootstrap (orbPageBootstrap) clears the
+// body fill through AddScriptToExecuteOnDocumentCreated, but that seam is a
+// RACE - the jchv wrapper passes a NULL completion handler and the
+// registration can land after the first document already loaded (measured
+// 2026-11-07 on real desktop runs: page alive, WebGPU running, corners
+// showing the upstream dark body fill for the whole process lifetime). A
+// declarative CSS override has no such seam: `transparent !important` beats
+// the upstream opaque body rule regardless of rule order, and
+// the pixels outside the orb become the window's transparency. If the
+// upstream head marker were ever missing the entries are injected after the
+// doctype instead: the policy is never silently dropped.
 func orbPageDocument() []byte {
 	meta := []byte("<head>\n  <meta http-equiv=\"Content-Security-Policy\" content=\"" +
-		orbCSPHeaderValue + "\" />")
+		orbCSPHeaderValue + "\" />" +
+		"\n  <style>html,body{background:transparent !important}</style>")
 	if doc := bytes.Replace(orbPageHTML, []byte("<head>"), meta, 1); len(doc) != len(orbPageHTML) {
 		return doc
 	}

@@ -59,6 +59,16 @@ type renderer struct {
 	// halo and the fixed-seed particle layout. Baked only when the active
 	// style is the jarvis family; released with the rest.
 	jarvis jarvisAssets
+
+	// overlayOnly (ticket 65 rework): the WebView2 orb window is the ball's
+	// visible face and overlays this window, so frames draw ONLY what the
+	// page cannot - the approval badge, progress ring, queue dot, text
+	// override - plus a near-invisible hit-test silhouette (the layered
+	// window is OS-hit-tested per pixel; all-zero alpha would make the ball
+	// unclickable, the measured ticket-65 regression). Set by the window
+	// before every draw (ball_windows.go); direct drawFrame callers (tests)
+	// default to the full D2D frame.
+	overlayOnly bool
 }
 
 // liquidLadder is the angular resolution of the pre-baked blob positions.
@@ -456,7 +466,27 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	R := v.SizePx / 2
 	s := float32(r.dpi) / 96 // token px -> physical px scale
 
-	if v.Glass {
+	if r.overlayOnly {
+		// The orb window owns the picture; this window draws the hit-test
+		// silhouette plus the host-only overlays further down. The
+		// silhouette's radius is HitTest's clickable circle verbatim (the
+		// state body + click tolerance, extended to the 0.75-edge halo law):
+		// every pixel the user can see and click must carry nonzero alpha or
+		// the OS skips this window before WM_NCHITTEST is consulted. Alpha
+		// 1/255 is invisible (0.4% blend) but nonzero, which is what the
+		// per-pixel hit test reads. The silhouette's alpha byte must be
+		// EXACTLY 1 - WithAlpha replaces the token alpha outright, because
+		// mulA(OrbBody, 1/255) would scale 0.62 down to a byte that rounds
+		// to zero, and an all-zero-alpha layered window is skipped by the
+		// OS hit test entirely (the measured ticket-65 regression).
+		r.setSolid(pal.OrbBody.WithAlpha(1.0 / 255.0))
+		orbPx := float64(v.SizePx) * float64(s)
+		hr := orbPx/2 + float64(ClickTolerancePx)*float64(s)
+		if e := math.Ceil(orbPx * 0.75); e > hr {
+			hr = e
+		}
+		r.fillEllipse(c, float32(hr), float32(hr), r.solid)
+	} else if v.Glass {
 		// The style family picks the material: glass draws the ticket-62/68
 		// glass body (with the wensity band as its default treatment), jarvis
 		// draws the ticket-65 particle orb (jarvis_windows.go).
@@ -482,8 +512,9 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 		r.circle(c, R-0.75*s, 1*s)
 	}
 
-	// 6. State ring.
-	if v.RingColor.A > 0 {
+	// 6. State ring. (Skipped in orb mode: the page renders the state; a D2D
+	// ring around the web orb would draw the state twice.)
+	if !r.overlayOnly && v.RingColor.A > 0 {
 		ringAlpha := v.Opacity
 		if v.RingPulse {
 			// Danger pulse: 2s cycle, alpha swells and decays (ball.html).
@@ -493,8 +524,9 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 		r.circle(c, R+5*s, v.RingWidth*s)
 	}
 
-	// 7. Listening waves: three staggered expanding rings.
-	if v.Icon == IconAudioLines {
+	// 7. Listening waves: three staggered expanding rings. (Orb mode: the
+	// page's audio bands are the audio face.)
+	if !r.overlayOnly && v.Icon == IconAudioLines {
 		for i := 0; i < 3; i++ {
 			t := math.Mod(phase+float64(i)/3, 1)
 			alpha := v.Opacity * float32(1-t) * 0.8
@@ -506,7 +538,8 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	}
 
 	// 8. Thinking light band: 2px accent band flowing at the orb bottom.
-	if v.Sweep {
+	// (Orb mode: the page's thinking state is the face.)
+	if !r.overlayOnly && v.Sweep {
 		bw := v.SizePx * 0.4
 		x := -bw + float32(math.Mod(phase, 1))*(v.SizePx+bw)
 		r.setSolid(mulA(pal.Accent, 0.9*v.Opacity))
@@ -529,8 +562,9 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	// 10. Icon line-art. The wensity glass look has NO glyphs (the reference is
 	// a minimal dark orb); state reads through the ring and band behaviour, not
 	// the prototype's line icons (triangle/bars/mic - what made it look like a
-	// media button). Blob and generic styles keep their icons.
-	if !(v.Glass && wensityActive()) {
+	// media button). Blob and generic styles keep their icons. (Orb mode: the
+	// page carries the face; no icon.)
+	if !r.overlayOnly && !(v.Glass && wensityActive()) {
 		r.drawIcon(v, c, R, s)
 	}
 
