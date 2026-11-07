@@ -31515,3 +31515,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **246 AC#8 已落地**（写腿 `c56d8d90b`）：`signal.Notify(bootExit…)`＋Stop defer 从修前 `:229-231` 提到 `runResident` 第一句。**正控两次读数**：修前 `-count=5` ⇒ **5 发 1 红**（exit `0xc000013a`）；修后 `-count=10` ⇒ **10/10 绿零枚 0xc000013a**。真修三无（无 t.Skip／无放宽／无加大超时）。我独立复跑 `-count=5` ⇒ **ok 35.9s**。
 - **两笔裁决腿的"部分"判语我认可**（⛔ 粉饰）：330 AC#5 四数未取、AC#7 前提死；342 那发容器日志 AC1 行是 `155/20/10` 而腿报引 `270/36/37`＝同字节不同发（形状逐字同，日志留档纪律问题，⛔ 计入判据）。
 - **撤销口令**：342 结案＝`git revert 36d8169fc`（票回 `-done` 前）；330 翻三格＝`git revert d833d8fbe`；长度门＝`git revert 532f936d6`。
+
+## A1596（2026-11-07 13:0x，编排者）**球集成腿收件（`a2e535674`）＋ 我亲跑抓到一枚真 bug（orb 出屏）**
+- **收件三把尺（我自己跑，⛔ 抄腿）**：
+  1. 提交真在：`a2e535674`，11 枚文件（9 新 2 挂接），+1477/−1。
+  2. **件真在＋逐字节核**：`internal/ball/assets/orb-siri.html` sha256＝`d93da649d11bc4bc3ab91c006777bbadce1c2eb7d0ffc9d91608ad8d866e3bc6`，与上游导出页 `/d/tmp/wisp/20261107/orblab/exported/orb-siri.html` **sha256 逐位相同**、89660 字节、**CR 计数 0** ⇒ 确实是"拿来的现成件"，⛔ 仿制品。
+  3. 自己复跑：`gofumpt -l` 空 rc=0／`go vet ./internal/ball` rc=0／`go build ./internal/ball ./cmd/wisp ./cmd/balldebug` rc=0／`go test ./internal/ball -count=1` **ok 0.206s**／`go test -tags winlive ./internal/ball/ -run TestBallLiveOrb` **ok 1.289s**／`sh scripts/d22scan.sh` **clean**。
+- **★我亲跑抓到一枚真 bug（腿没报、它的 winlive 用例也没抓到）**：我 build `build/balldebug-orb.exe` 启动后，用 `EnumWindows` 枚举该进程窗口，读数：
+  - 「Wisp Orb」rect＝**(3428,1268)-(3560,1400)**，132×132，`exStyle=0x8080088`（LAYERED+TOPMOST+TOOLWINDOW+NOACTIVATE 全对）
+  - 「Wisp」球窗 rect＝(3316,1268)-(3416,1368)
+  - **虚拟屏宽 3440 ⇒ orb 右边缘 3560 超出屏幕 120 像素，肉眼几乎看不见**。
+  - **根因（我读码确认）**：`internal/ball/orb_windows.go` 的 `follow()`（:311-324）**无条件**把 orb 放球的右边（`wr.r+gap`），不看工作区边界。球停靠右边缘（票 62 的 dock 行为）时 orb 必然出屏。
+  - ⇒ **派 wave55 `orb-fix-offscreen`** 修：按 `rcWork`（不是 rcMonitor，要避任务栏）选边，右放不下放左、左也放不下则夹紧；垂直同夹紧；保留 WS_EX 语义；回归用例必须断言**真实坐标**落在 rcWork 内（⛔ 只断言"调用了 follow"）。
+- **腿如实报的 6 条我都认**（⛔ 粉饰）：① 视觉签收未发生（AC 六条一个未勾，人眼"这次对了"才是完成判据）；② D32 预算未在 webview2 渲染器上重测；③ D2D 对象仍创建（帧不画，守卫挡住）；④ 音频只送标量（四带等值，分带是音频腿的缝）；⑤ 票面原带 NUL 字节（追加时清零）；⑥ 禁区全零改动。
+- **撤销口令**：`git revert a2e535674`（单提交，回滚即回 D2D）；出屏修法＝`git revert` wave55 那笔。
