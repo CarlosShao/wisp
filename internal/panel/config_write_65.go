@@ -10,14 +10,15 @@ package panel
 // the door asks ALL FOUR (knownWritableField's union), and every older pin
 // keeps meaning exactly what it meant.
 //
-// WIRING SPLIT, HONESTLY STATED (docs/evidence/s1/65-style-switch-config.md §2).
-// Ticket 187's in-flight leg owns uncommitted hunks in config_handlers.go, so
-// this leg must not edit that file's union - the one-line admission
-// (`|| writableField65(field)` in knownWritableField) lands with the next leg,
-// together with the snapshot key (composer.go/pump.go are the same conflict
-// zone). Until then the settings door refuses ball_style, while the write leg
-// underneath it (cmd/wisp's ApplySetting case and the guarded config setter)
-// is already wired and exercised by its own tests.
+// WIRING SPLIT, NOW CLOSED (docs/evidence/s1/65-style-switch-config.md §2/§3).
+// Ticket 187's in-flight leg once owned uncommitted hunks in
+// config_handlers.go, so this roster's admission rode a separate leg: the
+// one-line union admission (`|| writableField65(field)` in
+// knownWritableField, config_handlers.go) landed with the closing leg
+// together with the snapshot key (ball_style_65.go's carrier, composer.go's
+// field, pump.go's reader) and run.go's injection - the same commit family
+// that carries cmd/wisp's ApplySetting case. The settings door admits
+// ball_style from here on.
 //
 // THE TIER IS THE WRITE LEG'S ANSWER, NOT A STAMP HERE. 187 could carry a
 // static per-field tier because its reader's behavior is fixed (per-task
@@ -60,7 +61,8 @@ func WritableFields65() []string {
 }
 
 // writableField65 asks this file's roster, not a copy of it. The door's union
-// does not consult it YET (see the wiring-split note above).
+// (knownWritableField, config_handlers.go) consults it - the one place the
+// four rosters are asked together.
 func writableField65(field string) bool {
 	for _, f := range fields65 {
 		if f == field {

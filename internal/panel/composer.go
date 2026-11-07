@@ -125,6 +125,22 @@ type Snapshot struct {
 	// role_chat_thinking field (config_write_187.go) and the model half was
 	// already writable as role_chat_model / role_chat_pair.
 	ModelSwitch *ModelSwitchSection `json:"modelSwitch,omitempty"`
+	// BallStyle is ticket 65's carrier: the orb appearance family the live
+	// config holds and the vocabulary the appearance switch may offer (the
+	// owner's ask, verbatim: 默认就是玻璃球，切换 Jarvis 才换球的风格).
+	// See ball_style_65.go for the shape.
+	//
+	// It is a pointer with omitempty for the same reason the four fields
+	// above are: a pump assembled WITHOUT the reader sends no key, which is
+	// the exact shape the four-key byte nails pin, and a pump that has one
+	// always sends the key. The page-side declaration for this key is not
+	// written yet (Q-51), so the two two-way reconciliations against
+	// frontend/src/lib/panel.ts name it as undeclared until the UI leg moves
+	// them: that red is the same procedure the commands and modelSwitch keys
+	// are already in, not a defect this field can fix. No C17 method arrives
+	// with it - the write half rides config.set's ball_style field
+	// (config_write_65.go).
+	BallStyle *BallStyleSection `json:"ballStyle,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.

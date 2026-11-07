@@ -441,12 +441,13 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 
 // knownWritableField asks the rosters, not a copy of them. Since ticket 313
 // there are two rosters (the ticket-248 table here and the 313 additions in
-// config_write_313.go) and since ticket 187 a third (config_write_187.go);
-// this is the one place the door asks all three: a field is writable when any
-// roster carries it, and the frozen 248 pin keeps describing the 248 table
-// alone.
+// config_write_313.go), since ticket 187 a third (config_write_187.go), and
+// since ticket 65 a fourth (config_write_65.go); this is the one place the
+// door asks all four: a field is writable when any roster carries it, and the
+// frozen 248 pin keeps describing the 248 table alone.
 func knownWritableField(field string) bool {
-	return listedWritableField(field) || additionalWritableField(field) || writableField187(field)
+	return listedWritableField(field) || additionalWritableField(field) ||
+		writableField187(field) || writableField65(field)
 }
 
 // listedWritableField is the ticket-248 table's own lookup, unchanged in shape.

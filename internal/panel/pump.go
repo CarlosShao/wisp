@@ -229,6 +229,15 @@ type PumpSources struct {
 	// as [] and the no-offerable-rows shapes traveling as the section's
 	// Reason (never an empty menu dressed as a choice).
 	ModelSwitch func() ModelSwitchSection
+	// BallStyle reads the snapshot's appearance dimension (ticket 65): the
+	// orb family the live config holds and the schema's own vocabulary,
+	// read off the live config by the assembly root (internal/config's
+	// BallStyleOptions is the production reader). It is a reader like every
+	// field above; a nil reader is the ONLY way the packet carries no
+	// "ballStyle" key at all - the shape the four-key byte nails pin - and
+	// a reader that exists always sends the key, with the schema's vocabulary
+	// rendered as [] if it ever came back nil.
+	BallStyle func() BallStyleSection
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -424,6 +433,17 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			sec.ThinkingLevels = []string{}
 		}
 		snap.ModelSwitch = &sec
+	}
+	if p.src.BallStyle != nil {
+		// Ticket 65: same reader-gated rule one block up - a reader that
+		// exists always sends the key, and a nil vocabulary still renders as
+		// [] so the picker never meets JSON null. The family word itself
+		// travels verbatim from the config side; the pump invents nothing.
+		sec := p.src.BallStyle()
+		if sec.Vocabulary == nil {
+			sec.Vocabulary = []string{}
+		}
+		snap.BallStyle = &sec
 	}
 	return snap
 }
