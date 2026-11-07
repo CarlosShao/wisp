@@ -31547,3 +31547,14 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **145 筛查三格定档**（`7fee04f1f`，只读零产码）：AC#2 → **②归口票 35 ＋ ③残角挂 Q-51**（出向那一跳 Go→页生产码 0 枚、`lastPanelSnapshot()` 非 test 读者 0、双向尺 `TestComposerContractTypesMatchFrontend` 现红＝`files` 键）；AC#6 → **①能做可派**（只读取证程半天、零产码、零写面冲突；验收表"与 AC#2 互为条件"已被 r3 两键落地推翻）；AC#2b → **②归口票 187**（A393 已推翻两前提）。
 - **174 筛查两格定档**（`5df833f5f`，只读零产码）：AC#4 → **能做，要人环节已于 A1571 解除**（机主对 B 桶全批含 174、逐字"改契约文字那步照批"）⇒ 推荐 `PLAN.md:431` 与 `:2564` **零字节不改**，AC#4 降为"写一句裁定＋引 A1571"的文书格；AC#5 → **归口编排者闭环节，零要人**（A1279 对 175 同源格已裁"动词是写明、无归 X"）。
 - **撤销口令**：330 结案＝`git revert d438e4d2e`；AC#5/#7 翻格裁定＝改回那两格。
+
+## A1599（2026-11-07 13:5x，编排者）**★球三枚真 bug 全修完，产品里真渲染出来了（33.67% 非黑像素）**
+- **三笔修腿全部收件并独立复核（⛔ 抄腿读数）**：
+  1. `a2e535674`（集成，11 枚文件）：资产 sha256＝`d93da649...` **逐位等于上游导出页**、89660 字节、CR=0。
+  2. `d687dd910`（出屏修，wave55）：`follow()` 拆纯函数 `orbFollowXY`，`MonitorFromWindow`+`GetMonitorInfoW` 取 **rcWork**（避任务栏）、右放不下翻左、两侧都放不下夹紧、取不到显示器信息回退旧形状。回归两枚（六形状表测＋真窗回归）。
+  3. `8fb821bba`（黑屏修，wave56）：**三层根因，各有实测读数**——① 响应构造缝：直读 COM vtbl 探针拿到 `errno=1008 但 directHRESULT=0x00000000(S_OK)、directResponseNonNil=true` ⇒ **COM 调用其实成功，jchv 包装拿裸 GetLastError 判错并丢弃活对象** ⇒ 页面永远发不出去；整个缝拆除。② controller 从未 `PutIsVisible(true)`，实测三个合成子窗全 hidden；`browser.Show()` 一击命中。③ WebGPU 需真 origin：页面侧报 `url=about:blank liquidOrb=object gpu=undefined`，换 `SetVirtualHostNameToFolderMapping`（https://wisp.orb → `%LOCALAPPDATA%\wisp\orb\site`，DENY_CORS）后 WebGPU 起来。
+- **★我亲跑复核读数**：`gofumpt -l internal/ball` 空 rc=0／`go vet` rc=0／`go build`（三目标）rc=0／默认套件 `ok 0.231s`／**winlive 四枚全 PASS**，其中 `TestBallLiveOrbPageRendersPixels` 打印 **`orb page rendered: 594/1764 sampled px non-dark (33.67% > 1% floor)`** ⇒ **球真的画出了像素**（不是"没报错"）。
+- **★我亲眼验收**：build `build/balldebug-orb.exe` 启动，`EnumWindows` 枚举到「Wisp Orb」rect＝**(3172,1260)-(3304,1392)**，右缘 3304 < 屏宽 3440 ⇒ **完全在屏内**（修前是 3560，出屏 120px）；截取该窗口 132×132 放大 4 倍，**可见完整液态玻璃球：球体、彩虹光带、边缘高光、内部折射全在**（图 `D:\tmp\wisp\20261107\orblab\orb-FIXED.png`）。
+- **★这是票 65 的关键进展**：机主两次否掉的"手写 D2D 玻璃球"已被**开源成熟件（LerSent001/orb，MIT，749 星）**替代，并在产品自己的窗口里真渲染。**但 AC#6（owner 第二次看并说"这次对了"）仍归机主，⛔ 我不翻**。
+- **腿如实报的边界我认**：① 像素读数可能被别的置顶悬浮件抬（证据件有注脚）；② jchv 模块同款 `GetLastError` 判错缺陷仍在 `SetVirtualHostNameToFolderMapping` 等包装里，本腿按"告警+降级"防御，模块级修复属上游票；③ 新增每用户磁盘面 `%LOCALAPPDATA%\wisp\orb\site\orb.html`（幂等重写，含 CSP）；④ wave55 报告 commit 裹挟了黑屏腿 4 行（`controller2Ready` 字段，HEAD 里无使用点、编译中性，仓外导出树验证 HEAD 可编译可测）。
+- **撤销口令**：`git revert 8fb821bba`（黑屏修）；`git revert d687dd910`（出屏修）；`git revert a2e535674`（整个 orb 集成，回 D2D）。
