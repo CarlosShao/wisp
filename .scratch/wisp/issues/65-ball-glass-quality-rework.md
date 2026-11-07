@@ -88,3 +88,13 @@ AnySearch 文档 1 张、代理面板 1 张、本轮 tour 截图 3 张、小裁�
   顺手修掉 destroy 顺序竞态（实测 panic+窗口泄漏）；门禁 gofumpt空/vet rc0/build rc0(含 cmd/wisp,balldebug)/
   d22scan clean。证据 docs/evidence/s1/65-orb-integration.md。next=owner 人眼签收（AC 六条未勾，
   D32 预算需在 webview2 渲染器上重测——见证据件"已知边界"）
+
+- [2026-11-07T13:1xZ] agent=orb-fix-offscreen did=修 A1596 出屏 bug（编排者亲跑实测：球停靠右缘时
+  「Wisp Orb」rect 右边缘超出虚拟屏 120px）。follow() 拆纯函数 orbFollowXY：MonitorFromWindow+GetMonitorInfoW
+  取 rcWork（复用既有 monitorRectsForWindow，零新绑定），右放得下保持右、放不下翻左、两侧都放不下夹紧
+  进工作区，垂直同夹紧；WS_EX/Topmost/NoActivate 语义零改动，D2D fallback 与上游 orb-siri.html 零字节动。
+  回归两枚（orb_live_windows_test.go）：orbFollowXY 六形状表测 + 真窗用例把球 SetWindowPos 到工作区右下角
+  贴边调 followOrb，断言 orb 真实 rect 完全落在 rcWork 内且坐标精确（翻左 orb.r=ball.l-12、垂直夹紧
+  orb.b=work.B-edge）——修前形状在此摆位必红。门禁：gofumpt 空/vet rc0/build rc0(含 cmd/wisp,balldebug)/
+  默认套件 ok/winlive TestBallLiveOrb ok/d22scan clean。证据 docs/evidence/s1/65-orb-follow-clamp.md。
+  next=编排者收件三把尺＋裁决（审计者≠实现者）；AC 与出屏无交集，未翻任何格

@@ -163,3 +163,125 @@ func TestBallLiveOrbAttachStateAndTeardown(t *testing.T) {
 		t.Errorf("handle growth beyond the one-time attach budget: base=%d end=%d", baseHandles, got)
 	}
 }
+
+// TestBallLiveOrbFollowPlacementDecision pins the pure side-choice math behind
+// follow() against real work-area shapes, including the off-screen shapes the
+// orchestrator measured (ticket 65): a ball docked flush at the right work
+// edge must flip the orb to the LEFT, and a ball too centered for either side
+// must clamp the orb fully inside the work area.
+func TestBallLiveOrbFollowPlacementDecision(t *testing.T) {
+	const edge, gap = 132, 12
+	work := Rect{L: 0, T: 0, R: 3440, B: 1320}
+	cases := []struct {
+		name   string
+		ball   rect
+		work   Rect
+		workOk bool
+		wantX  int32
+		wantY  int32
+	}{
+		{"room on the right keeps the legacy side", rect{l: 3000, t: 100, r: 3100, b: 200}, work, true, 3112, 100},
+		{"docked right edge flips to the left", rect{l: 3307, t: 100, r: 3440, b: 200}, work, true, 3307 - gap - edge, 100},
+		{"docked bottom clamps the vertical axis", rect{l: 3307, t: 1220, r: 3440, b: 1320}, work, true, 3307 - gap - edge, 1320 - edge},
+		{"ball above the work top clamps down", rect{l: 1000, t: -50, r: 1100, b: 50}, work, true, 1112, 0},
+		{"narrow screen clamps instead of flipping", rect{l: 60, t: 100, r: 200, b: 200}, Rect{L: 0, T: 0, R: 260, B: 1320}, true, 260 - edge, 100},
+		{"no monitor info keeps the legacy shape", rect{l: 3000, t: 100, r: 3100, b: 200}, work, false, 3112, 100},
+	}
+	for _, tc := range cases {
+		gotX, gotY := orbFollowXY(tc.ball, edge, gap, tc.work, tc.workOk)
+		if gotX != tc.wantX || gotY != tc.wantY {
+			t.Errorf("%s: orbFollowXY() = (%d,%d), want (%d,%d)", tc.name, gotX, gotY, tc.wantX, tc.wantY)
+		}
+	}
+}
+
+// TestBallLiveOrbFollowStaysInsideWorkArea is the off-screen regression
+// (ticket 65, orchestrator-measured): with the ball parked flush against the
+// bottom-right corner of its monitor's WORK area, follow() must land the orb
+// FULLY inside that work area at real coordinates. The pre-fix behavior
+// (unconditional wr.r+12) starts the orb 12 px outside the work area here, so
+// this test is red on the old code and green on the fix - the assertions read
+// the actual window rects, never "follow was called".
+func TestBallLiveOrbFollowStaysInsideWorkArea(t *testing.T) {
+	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
+	if err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	requireQuietBallDesktop(t)
+
+	b, err := New(Options{
+		SizePx:      BallSizeDefaultPx,
+		Initial:     statemachine.StateSleeping,
+		Store:       store,
+		WindowTitle: liveBallTitle(t),
+		Hotkeys:     liveHotkeys(),
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	t.Cleanup(b.Close)
+
+	deadline := time.Now().Add(10 * time.Second)
+	for b.DebugOrbHWND() == 0 {
+		if time.Now().After(deadline) {
+			t.Fatalf("orb window did not attach within 10s (WebView2 runtime missing or Embed refused)")
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	ballHWND := uintptr(b.DebugHWND())
+	mon, ok := monitorRectsForWindow(windows.HWND(ballHWND))
+	if !ok {
+		t.Fatal("monitorRectsForWindow(ball) returned no monitor")
+	}
+	work := mon.Work
+
+	// Park the ball flush against the bottom-right corner of the work area:
+	// ball.r == work.R and ball.b == work.B, so BOTH legacy axes point
+	// outside and the fix has to flip the side AND clamp vertically.
+	var br rect
+	if r, _, _ := pGetWindowRect.Call(ballHWND, unsafePtr(&br)); r == 0 {
+		t.Fatal("GetWindowRect(ball) failed")
+	}
+	pSetWindowPos.Call(ballHWND, 0,
+		uintptr(int32(work.R)-br.width()), uintptr(int32(work.B)-br.height()), 0, 0,
+		uintptr(swpNoSize|swpNoZOrder|swpNoActivate))
+	// Re-read where the ball really settled (the wndproc arms inside the
+	// SetWindowPos above run synchronously on the STA thread), so the exact
+	// assertions below measure against the settled rect.
+	if r, _, _ := pGetWindowRect.Call(ballHWND, unsafePtr(&br)); r == 0 {
+		t.Fatal("GetWindowRect(ball) after the move failed")
+	}
+
+	b.followOrb()
+
+	var orb rect
+	if r, _, _ := pGetWindowRect.Call(uintptr(b.DebugOrbHWND()), unsafePtr(&orb)); r == 0 {
+		t.Fatal("GetWindowRect(orb) failed")
+	}
+	t.Logf("work=%+v ball=(%d,%d)-(%d,%d) orb=(%d,%d)-(%d,%d)",
+		work, br.l, br.t, br.r, br.b, orb.l, orb.t, orb.r, orb.b)
+
+	if orb.l < int32(work.L) || orb.r > int32(work.R) {
+		t.Fatalf("orb horizontally outside the work area: work.R=%d orb=(%d,%d)-(%d,%d)",
+			work.R, orb.l, orb.t, orb.r, orb.b)
+	}
+	if orb.t < int32(work.T) || orb.b > int32(work.B) {
+		t.Fatalf("orb vertically outside the work area: work.B=%d orb=(%d,%d)-(%d,%d)",
+			work.B, orb.l, orb.t, orb.r, orb.b)
+	}
+	// Exact coordinates, not just containment: a flush-right ball with room on
+	// its left must flip the orb to the LEFT (orb.r == ball.l - gap) and clamp
+	// its bottom to the work bottom.
+	edge := orb.width()
+	if left := br.l - orbFollowGap - edge; left >= int32(work.L) {
+		if orb.r != br.l-orbFollowGap {
+			t.Errorf("orb did not flip to the left of the docked-right ball: want orb.r=%d, got orb=(%d,%d)-(%d,%d)",
+				br.l-orbFollowGap, orb.l, orb.t, orb.r, orb.b)
+		}
+	}
+	if br.b >= int32(work.B) && orb.b != int32(work.B) {
+		t.Errorf("orb bottom was not clamped to the work bottom: want orb.b=%d, got %d",
+			int32(work.B), orb.b)
+	}
+}

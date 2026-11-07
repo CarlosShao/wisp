@@ -119,6 +119,10 @@ type orbWindow struct {
 	// state is the last ball state this window was told about (UI-thread
 	// owned). pushAudio reads it to decide whether the mic drives the bands.
 	state statemachine.State
+
+	// controller2Ready records whether the transparency QI + background put
+	// both succeeded (diagnostics only).
+	controller2Ready bool
 }
 
 // newOrbWindow creates the orb host window and the WebView2 inside it. It
@@ -305,9 +309,21 @@ func (o *orbWindow) pushAudio(level float32) {
 	o.browser.Eval(orbAudioScript(l, l, l, l))
 }
 
-// follow places the orb to the right of the ball's current window rect. Runs
-// on the ui-sta thread (from the ball's WM_WINDOWPOSCHANGED arm), which is
-// why no lock guards the window geometry.
+// orbFollowGap is the horizontal breathing room between the ball and the orb
+// (px, same value the first orb leg shipped).
+const orbFollowGap = int32(12)
+
+// follow places the orb beside the ball's current window rect. Runs on the
+// ui-sta thread (ball drag end / DPI change / attach), which is why no lock
+// guards the window geometry.
+//
+// Side choice (ticket 65 off-screen fix, orchestrator-measured: a ball docked
+// at the right screen edge put the orb 120 px past the virtual screen edge):
+// the orb goes to the RIGHT of the ball when the ball's monitor WORK area has
+// room for it, else to the LEFT, else clamped fully inside the work area. The
+// WORK area, not the monitor rect, is the boundary - the taskbar is not orb
+// space. The vertical axis keeps the ball-aligned top when it fits and clamps
+// when it does not.
 func (o *orbWindow) follow(ballHWND windows.HWND) {
 	if o.browser == nil || o.hwnd == 0 {
 		return
@@ -317,10 +333,45 @@ func (o *orbWindow) follow(ballHWND windows.HWND) {
 	if r == 0 {
 		return
 	}
-	gap := int32(12)
+	var or rect
+	if r, _, _ := pGetWindowRect.Call(uintptr(o.hwnd), unsafePtr(&or)); r == 0 {
+		return
+	}
+	work, workOk := monitorRectsForWindow(ballHWND)
+	x, y := orbFollowXY(wr, or.width(), orbFollowGap, work.Work, workOk)
 	pSetWindowPos.Call(uintptr(o.hwnd), orbHwndTopmost,
-		uintptr(wr.r+gap), uintptr(wr.t), 0, 0,
+		uintptr(x), uintptr(y), 0, 0,
 		uintptr(swpNoSize|swpNoActivate))
+}
+
+// orbFollowXY is the pure placement decision follow() applies, split out so
+// the suite can pin it against real work-area shapes without windows. A
+// workOk=false result (no monitor info available) keeps the legacy right-side
+// placement rather than guessing a boundary that was never read.
+func orbFollowXY(ball rect, orbEdge, gap int32, work Rect, workOk bool) (int32, int32) {
+	if !workOk {
+		return ball.r + gap, ball.t
+	}
+	x := ball.r + gap
+	if x+orbEdge > int32(work.R) {
+		// Right does not fit: left of the ball when the ball leaves room.
+		if left := ball.l - gap - orbEdge; left >= int32(work.L) {
+			x = left
+		} else if clamp := int32(work.R) - orbEdge; clamp > int32(work.L) {
+			// Neither side fits (narrow screen): clamp inside the work area.
+			x = clamp
+		} else {
+			x = int32(work.L)
+		}
+	}
+	y := ball.t
+	if y+orbEdge > int32(work.B) {
+		y = int32(work.B) - orbEdge
+	}
+	if y < int32(work.T) {
+		y = int32(work.T)
+	}
+	return x, y
 }
 
 // destroy tears the browser and the window down (STA thread). Order matters,
