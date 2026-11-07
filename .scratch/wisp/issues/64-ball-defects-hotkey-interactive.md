@@ -232,5 +232,12 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
   所以这次的数字来自 `grep -c "^- \[x\]"` 与 `grep -c "^- \[ \]"` 两条命令，不是我心算。
   **唯一剩下的未勾框是 `:62` 多显示器真拖**：本机没有第二块屏，按票面规则保持未勾并写明所需硬件
   ⇒ 本票**不能**置 done，`Status` 继续留 `review`，等一次有副屏的桌面批次（与票 68 AC#3、票 07 `:60` 同批最省）。
+- [2026-11-07T13:5xZ] agent=64-evidence-leg（wave 只读取证腿，零产码）did=按 2026-11-07 盘上现量逐条复裁票面全部缺陷，裁定表落 `docs/evidence/s1/64-ball-defects-verdict.md`：
+  A1 接线**已修**（生产调用者今天存在：`cmd/wisp/resident_ball_windows.go:396` 建球 + `:444` 经 `NewHotkeyReloader` 1s 轮询接桥，R12「生产触发者不存在」已被 258/296 闭掉，但形状=每 tick `LoadFile`（`hotkeyReloadSource296`）而非 R12 处方的 `config.NewManager`——承诺等价，diff 前零 Win32 churn）；
+  失败四族语义、默认 Q + `docs/HOTKEYS.md` 均**已修**（非 winlive 复跑 `TestDefaultHotkeys`/`TestRegisterAllSplitsFailureFamilies`/`TestDefaultHotkeysIdlePassHoldsNoEsc` ×2 全 PASS, ok 0.062s）；
+  A2 交互四项/A3 零定时器**测试在盘、2026-09-21 有逐跑记录**（本腿未重跑 winlive：桌面独占且 62 腿本波独占 `internal/ball`）；
+  A4 多屏**仍未勾**（`enumMonitors` 注入接缝仍缺席）；
+  A16 zip 形状未消（`hotkey_windows.go:44`+`:481-492`），维持挂票 39 同批。
+  ⚠ 票面锚点大量过期如实登记：`RebindHotkeys` :693→`ball_windows.go:862`；**`len(live)==4` 已过期、现断 ==3**（245-r1 起 cancel 稳态 Standby）；`hotkey_test.go:55`→:63；配对钉 :225/:241→`hotkey_status_test.go:486/:502`；`SKIP-LOUD` 8→9 处；`manager.go:203`→:306；balldebug :171→:221/:269。AC 勾与 Status 零触碰。门禁：零 Go 改动 ⇒ gofumpt/d22scan 无对象可扫（如实登记）。⛔push
 
 
