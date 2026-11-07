@@ -31837,3 +31837,16 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★我实测抓到的真问题（必须修，⛔ 糊弄）**：**球只有 100px**（-size 上限 72），且**透明叠加在桌面上** ⇒ 背后是白色窗口时，Jarvis 的粒子被洗成灰白（我截的 JARVIS-PRODUCT-REAL.png 就是这样）。**上游 demo 好看的前提是「大尺寸 ＋ 深底」**，我们两个都不满足。
 - **⇒ 结论（我拍，铁律 ⓪⓪⓪）**：要让 Jarvis **好看**，必须给它**自己的深色圆盘底**（不是全窗黑底——那会破坏透明叠加架构），即**球面画一个深色圆形 backdrop，粒子画在它上面**。这是主流做法（Jarvis/Siri 类 orb UI 都是「深盘 + 亮粒子」），且**不改透明架构**（盘外的窗口区域仍透明）。
 - **撤销口令**：本条是政策记录，无产码；若要收回 frontend 授权，机主说一句「frontend 收回归外部」即可，我恢复零写面。
+
+## A1623（2026-11-07 22:4x，编排者）**★票 226 结案（六格全勾＋`-done`）｜AC#5 我现跑复认后翻｜★rename 又踩一次并当场纠正（第 13 次）**
+
+- **★AC#5 翻勾依据（我现跑，非实现者）**：票面那句「今天 `SetAllowedDirs` 零调用者零用例」**已过期**：
+  - 生产调用者 **0 → 1**（`cmd/wisp/approval_revoke.go:84` `s.rt.mgr.SetAllowedDirs(listWithoutDir(...))`）
+  - 用例 **0 → 5**（`cmd/wisp/approval_revoke_226_test.go` 三枚 `:97`/`:157`/`:196`；`internal/config` 两枚 `writeguard_226_test.go:308`/`writeguard_revoke_226_test.go:22`）
+  - **答复语法注册点**＝`cmd/wisp/approval_reply.go:641` → `s.revokeRule(strings.TrimSpace(corr + " " + arg))`（commit `48abebc41`）
+  - **我现跑 5/5 PASS**（`internal/config` `ok 0.127s`；`cmd/wisp` `ok 4.888s`）
+  - 裁定表＝`docs/evidence/s1/226-ac5-revoke-verdict.md`（4000 B）
+- **★写进裁定表的诚实边界**：**撤销的生效档位是「下一次启动」，不是立即**。源码自述逐字（`approval_revoke.go:110-112`）：`本次运行仍按旧名单判定（撤销与「一直」同轨，生效都在下一次启动）`。这是与加宽路径同轨的**设计**（`PLAN.md:1645-1646` 冻结的再确认只针对**放宽**），不是缺陷。**要「立刻生效」＝改生效档位＝改契约语义 ⇒ 须另开票**。
+- **★rename 第 13 次事故（当场纠正，如实记）**：`git mv` 之后我 `git add` 旧名报 `pathspec did not match`（正常，`git mv` 已把它从工作树移除），我改只点名新名提交 ⇒ **结果 HEAD 里同时存在旧名＋新名**（提交显示 `create mode` 而非 `rename`），双名核读数 **旧名=1 新名=2**。**纠正**：补一笔 `git commit` 点名旧名记录删除（`1d5b2041a`，90 deletions）⇒ 复核 **旧名=0 新名=1** ✓。
+  - **★教训（第 13 次）**：`git mv` + 显式 pathspec 的正确姿势是——**`git mv` 之后 `git commit` 直接点名「新名」即可**（索引里已有 rename 记录），**⛔ 先 `git add` 新名**（那会把 rename 变成 add）；且**提交后必须现跑双名核**（我这次跑了才发现，否则就漏了）。
+- **撤销口令**：226 结案＝`git revert 1d5b2041a d76237575`（两笔一起 revert 才回到未结状态）。
