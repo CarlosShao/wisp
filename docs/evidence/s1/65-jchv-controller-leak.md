@@ -75,13 +75,14 @@ func (o *orbWindow) destroy() {
 
 ---
 
-## §2 步2 裁定：选甲（fork 到仓内 `third_party/go-webview2` + `replace`）
+## §2 步2 裁定：选甲（fork 到仓内 `forks/go-webview2` + `replace`；落点更正见甲条★）
 
 按铁律 ⓪⓪⓪（判据＝最有价值＋最符合主流 harness，⛔ 不是动作最小）：
 
 **选甲。** Go 生态对"依赖缺一个小方法"的主流做法就是 vendor/fork 补丁（`go mod vendor` 后就地补，或 `replace` 指向仓内 fork 副本）；本例 fork 副本仅 565K/40 文件，补丁是两个 7 行包装方法，成本极低。
 
-- **甲（选）**：全模块拷入 `third_party/go-webview2`（⛔ 不动上游 module cache），`go.mod` 加 `replace github.com/jchv/go-webview2 => ./third_party/go-webview2`，fork 内补 `Close()`/`Release()`。
+- **甲（选）**：全模块拷入仓内 `forks/go-webview2`（⛔ 不动上游 module cache），`go.mod` 加 `replace github.com/jchv/go-webview2 => ./forks/go-webview2`，fork 内补 `Close()`/`Release()`。
+  - ★更正（16:4x 现核）：初判写的是放 `third_party/`，现跑读 `.gitignore` 发现 `third_party/` 整目录被忽略（fetch-deps 拉取区）且 `*.dll` 全局忽略——fork 放那里在别的克隆不存在＝replace 悬空构建坏。故落点改 **tracked 的 `forks/go-webview2/`**，并对 fork 内三枚被 `go:embed` 的 `WebView2Loader.dll`（构建必需输入，共 370KB）加 `.gitignore` 白名单三行。
   - 为什么最有价值：①类型安全——Close 走的是 jchv 自己已映射好的 vtbl 槽，不新增 unsafe 声明面；②修复面共享——`cmd/wisp` panel 家族与 `internal/ball` 全部 jchv 使用者同享，panel 关窗路径将来也能用同一方法；③未来再撞绑定缺口（`ICoreWebView2_4+` 等）可就地补，不必再开票等待上游；④已钉 pseudo-version，无自动漂移风险，上游更新＝手动同步一次。
   - 代价（如实）：仓内多一份 565K 依赖副本；上游演进需手动跟。
 - **乙（不选）**：在 Wisp 产码里用 unsafe 自声明一份 25 槽 COM vtbl 布局、对 `GetController()` 返回的指针做转型调槽。
@@ -91,9 +92,30 @@ func (o *orbWindow) destroy() {
 
 ---
 
-## §3 步3 落地读数
+## §3 步3 落地读数（2026-11-07 16:4x 现跑）
 
-（步3 完成后回填）
+### 3.1 fork 副本与补丁
+
+- `forks/go-webview2/`：上游 module cache 全量拷贝（40 个 `.go` + `webviewloader/sdk/{x86,x64,arm64}/WebView2Loader.dll`，561K，排除 `.github/`），LF 核过（`.gitattributes` 钉 `*.go eol=lf`）。★更正：初放 `third_party/` 撞 `.gitignore`（整目录忽略），移 tracked 的 `forks/`；三枚 embed 用的 DLL 加白名单。
+- 补丁就一处：`pkg/edge/ICoreWebView2Controller.go` 新增两个包装方法（各走已映射好的 vtbl 槽，不新增任何 vtbl 声明）：
+  - `Close() error` — `i.vtbl.Close.Call(uintptr(unsafe.Pointer(i)))`，`err != windows.ERROR_SUCCESS` 时返回 err；
+  - `Release() uintptr` — 同形。
+- `go.mod`：`replace github.com/jchv/go-webview2 => ./forks/go-webview2`（注释注明票65与同步方式）；上游 module cache 零触碰。`go list -m` 现跑确认生效（落点更正后复核）：`v0.0.0-20260205173254-56598839c808 => ./forks/go-webview2`。
+
+### 3.2 产码改动（`internal/ball/orb_windows.go` `destroy()`）
+
+`o.browser = nil` 之前插入：`o.browser.GetController()` 非空时 `c.Close()`（失败 `slog.Warn` 一行继续）＋ `c.Release()`；随后照旧 nil＋`DestroyWindow`。全程 STA 线程内、`activeOrb` 已先清，无并发触达死 controller 的窗口。⚠ wave62 在飞腿正改同一文件其他区域（newOrbWindow/follow/orbWndProc，与本函数零重叠，hunk 清单见本件§1 前现跑记录）——destroy() hunk 待其落盘后单独 commit，避免 pathspec commit 把他人未落盘改动吞进本票提交。
+
+### 3.3 量法（可复跑判据，自含探针不依赖他腿文件）
+
+```
+go test -tags winlive ./internal/ball/ -run 'TestOrbControllerCloseStopsBrowserProcessLeak' -count=1 -v
+```
+
+- 探针：`internal/ball/orb_close_leak_probe_winlive_test.go`（新文件，`windows && winlive` 标签，自含计数/收割两个 helper，父PID＋映像名双条件）。5 轮完整 ball create→attach→Close，进程表要求本进程名下 `msedgewebview2` 回到基线。
+- 修后实测：**5 轮 create/destroy，baseline=0 → after=0，PASS（10.3s）**——`msedgewebview2` 进程数零增长，判据达成。
+- 阴性对照（修前形状）不需本腿复演：前腿 `9a11eff81` 的收割器读数已证修前每轮 reap 1 组泄漏进程（40/40 坍塌证据链）。
+- 附带读数：探针日志有 `orb DwmEnableBlurBehindWindow failed` WARN——属透明链环境读数（wave62 修 orb 透明的射程），与本票 Close 判据无关，如实登记不归因。
 
 ## §4 步4 门禁读数
 

@@ -13,6 +13,15 @@ third_party/
 deps/
 build/
 
+# Ticket 65 (docs/evidence/s1/65-jchv-controller-leak.md): the repo-local
+# go-webview2 FORK lives tracked under forks/ (replace target in go.mod). The
+# per-arch WebView2Loader.dll copies are build inputs go:embed'ed by
+# webviewloader, so the global *.dll rule is negated for exactly those three;
+# everything else under *.dll stays ignored.
+!forks/go-webview2/webviewloader/sdk/x86/WebView2Loader.dll
+!forks/go-webview2/webviewloader/sdk/x64/WebView2Loader.dll
+!forks/go-webview2/webviewloader/sdk/arm64/WebView2Loader.dll
+
 # --- Frontend (built artifacts only; frontend/ source is tracked) ---
 node_modules/
 # dist/ is a build product, but go:embed needs the directory to exist in a clean

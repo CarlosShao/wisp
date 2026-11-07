@@ -16,6 +16,13 @@ require (
 	modernc.org/sqlite v1.59.0
 )
 
+// Ticket 65 (docs/evidence/s1/65-jchv-controller-leak.md §2): the upstream
+// pseudo-version maps ICoreWebView2Controller's Close vtable slot but never
+// wraps it, so production teardown cannot shut the browser process tree down.
+// This repo-local fork adds the missing Close/Release wrappers; sync with
+// upstream by hand (the version is pinned, nothing auto-drifts).
+replace github.com/jchv/go-webview2 => ./forks/go-webview2
+
 require (
 	github.com/dlclark/regexp2/v2 v2.11.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
