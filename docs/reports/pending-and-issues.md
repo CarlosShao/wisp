@@ -31578,3 +31578,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   2. **球被画了两遍**：orb 窗里画了一个液态玻璃球，球窗自己也画了一个（截图为证）⇒ 两个球并排，不是"球＋装饰"。
   - ⇒ **派 wave62** 修：orb 窗真透明（DWM/`SetLayeredWindowAttributes`/WebView2 `DefaultBackgroundColor` 全透明链）＋二选一（要么 orb 就是球、球窗不画；要么 orb 只画外圈装饰不画球）——腿自己拍并写理由。
 - **撤销口令**：球窗回归修＝`git revert e24ae0c1e`；226 AC#5＝`git revert 48abebc41`。
+
+## A1602（2026-11-07 16:3x，编排者）**像素 flake 根因挖到（WebView2 controller 泄漏，非首帧时机）｜138 级联有牙｜★316 是撤票——我筛票失误**
+- **★像素 flake 真根因（wave61 `pixel-flake` 腿，决定性读数）**：`TestBallLiveOrbPageRendersPixels` 的偶发红**不是"首帧时机"浅判**，是**泄漏堆积**——修前全套 `count=10` 实测 **39/40**，像素非黑率**逐轮坍塌**：`40.6%×7 → 27.2 → 7.7 → 0.000×3发`。根因：产码 `destroy()` **从不关 WebView2 controller**（jchv 包装层根本没有 `ICoreWebView2Controller::Close` 方法），每轮泄漏一组 `msedgewebview2` 进程积 GPU 压力 ⇒ standalone 连绿／in-suite 连跑变红由此而来。
+  - **修法（测试侧，1% 判据零改动）**：①有界重建重试 3 发；②**收割器** `orbTestReapLeakedWebView2`：Toolhelp 枚举，**父 PID＝本测试进程 ∧ 映像名＝msedgewebview2** 双条件才杀，测试开始＋每发重建前各清一次，**他应用 WebView2 零命中**。
+  - **修后读数**：全套 `count=10` ⇒ **40/40 全绿**（204.4s），非黑率曲线 `36.2/13.4/31.0/26.5/13.9/20.3/25.0/29.2/22.9/30.8` **零坍塌零重试**；收割器 10 轮各 reap 1 个泄漏进程＝机理自洽。
+  - **★腿如实报的产码级欠账我认**：`destroy()` 泄漏 controller 是**真实缺陷**，根治需 fork jchv 补 `Close` vtable（超腿射程）⇒ **建议另立票**，本治理拆掉的是它的测试可见后果。
+- **138 级联（5 枚 commit）**：AC#2 裁定＝**不叠 per-task Job**（per-call Job 已占位，层级复杂买不到真价值）；修法＝钉取消半边的牙＋非 Windows 去静默。**★AC#3 突变核心读数**：M1＝`stopwatch.go:23` `WithDeadline(parent)`→`WithDeadline(Background)`（摘父链）⇒ **牙转红 FAIL 15.24s，红在 `command_138_cancel_test.go:94`**（"Exec did not return within 15s of the caller's cancel"——正是"停了任务留挂死 CLI"的形状）⇒ 还原 diff 空 ⇒ 复绿 PASS 1.02s。门禁：gofumpt 空／vet rc0／build rc0／d22scan clean（437 产码）／manifestslot `count=2` 四数 RUN=94·PASS=82·FAIL=0·rc0，两轮名册 47×2 差集空。
+- **★316 是撤票——我筛票失误（第 23 处）**：腿现读发现 `Status: withdrawn`（编排者 2026-10-14 13:38 撤，**与票 272 重复**，台账 A924）。腿**没有硬翻勾**，而是把撤票事实基础在今天 HEAD 上全部现跑重核——**成立**：M 突变复跑 FAIL 2.85s 红 `:676` arm1、正控 PASS 3.928s、家族 `TestTicket223` rc=0（10 PASS/0 FAIL）。三选一逐支现读＝(a) 已在盘 `:748`／(b) 空操作／(c) 结构性误伤 ⇒ **维持撤票，三支全不落地**。
+  - ⇒ **我的教训**：筛票纪律要求"排除 `Status: withdrawn`/已撤票＝第 22 处"，我这次只读了未勾格正文、**没读 Status 行** ⇒ 派了一条本该跳过的腿。已记。
+- **撤销口令**：像素 flake 治理＝`git revert 1cab5ed6a 79fdc5a8b ea602a61b`；138＝`git revert 9287d1179 b576c10a3 bf224be19 b3e990300 8429d0e60`；316＝`git revert 72b04c503 bb01676c3 82d8a0b7e 13a5a7eb9 9a8ba042f`。
