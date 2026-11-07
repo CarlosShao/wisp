@@ -59,9 +59,11 @@ name that works - and a name that is missing here is a capability this machine
 does not have yet (/compact, /goal, /plan, /model, /export, /feedback: see the
 ticket's census for why each one is still out).
 
-The page has no reader for this list yet: there is no snapshot key and no C17
-method that delivers it to the chat box, so today the roster is visible here and
-executable from the command line only. Ticket 213 AC#4 says exactly that.
+The roster also rides the snapshot now (panel.Snapshot's commands key, ticket
+213 交付 3's Go half, wired at the assembly root). The page-side TypeScript
+declaration is still unwritten (Q-51), and ringing these from the page stays
+where it was: mode's door is the one C17 route the page could already reach,
+and the control words have no page entry at all today.
 `
 
 // commandsIO is this leg's whole world: two streams, no store. It is injectable for
@@ -149,9 +151,11 @@ func commandsFooter(entries []command.Command) string {
 		fmt.Fprintf(&b, "      一行一封套：%s\n", commandsEnvelope(method))
 		b.WriteString("      没有 -data 就按票 128 AC#2 拒绝启动，一个字节都不写。\n")
 	}
-	b.WriteString("\n界面点不了：聊天框加号菜单今天还读不到这张表（panel.Snapshot 没有 commands 键、\n" +
-		"C17 没有列名册的路由）。接上那一跳的腿要动快照契约尺的两侧，属票 213 交付 3，\n" +
-		"到了那一天，这一行和 internal/command 的包注释要一起改。\n")
+	b.WriteString("\n名册在快照里：panel.Snapshot 现在携带 commands 键（票 213 交付 3 的 Go 侧一半，装配根\n" +
+		"接了读口），页面侧的 TypeScript 声明（frontend/src/lib/panel.ts）还没人写（Q-51）：两侧\n" +
+		"同批的两枚契约尺红着等它，那是界面那支的落笔。\n" +
+		"执行照旧：mode 的门本就是页面可达的 C17 既有路由；控制词（取消/停）今天只有命令行——\n" +
+		"页面文本到不了 agent.Loop（message 门未接），D11(1) 的入口仍是本控制台。\n")
 	return b.String()
 }
 

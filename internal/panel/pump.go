@@ -28,6 +28,13 @@ package panel
 // "which screen" one - is Q-51 territory and ticket 145 AC#3 already answered it:
 // not in this slice.
 //
+// (That paragraph predates three reader-gated sections: instructions (200-r2),
+// tasks (197-r3) and commands (213 交付 3) each joined the top-level key set
+// afterwards, each behind a nil reader that keeps the four-key byte nails below
+// green - what those nails pin is the no-reader shape, not the absence of
+// sections. The two-way reconciliation against panel.ts is still the ruler that
+// moves on both sides; a key the page has not declared reds it by design.)
+//
 // Ticket 248 did move keys - two of them, inside the composer SECTION and not at
 // the top level, which is the placement its ruling named (the credential dimension
 // goes where currentModel/modelKnown already live). That is the change the same
@@ -202,6 +209,15 @@ type PumpSources struct {
 	// from cards alone, i.e. exactly ticket 197's behaviour. It never reports "no
 	// window is waiting", because nothing read the windows to find out.
 	L1Windows func() []L1WindowWait
+	// Commands reads the command roster this machine can execute (ticket 213
+	// 交付 3): rows derived from internal/command's production table by the
+	// assembly root, each row naming the door that executes it. It is a reader
+	// like every field above; a nil reader is the ONLY way the packet carries
+	// no "commands" key at all - the shape the four-key byte nails and the
+	// 197/200 absence tests pin - and a reader that exists always sends the
+	// key, with empty rows rendered as [] and a refusal (if the roster's own
+	// gate ever fired) traveling as the section's Reason.
+	Commands func() CommandRosterSection
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -370,6 +386,18 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			waits = p.src.L1Windows()
 		}
 		snap.Tasks = taskRosterSectionFrom(p.src.Tasks(), cards, waits)
+	}
+	if p.src.Commands != nil {
+		// Ticket 213 交付 3: same rule as the two sections above - a reader
+		// that exists always sends the key, nil rows still render as [], and
+		// a Reason travels alone with empty rows when the roster's own AC#2
+		// gate refused the production table (a defect, named on the wire,
+		// never an empty menu dressed as "no commands").
+		sec := p.src.Commands()
+		if sec.Rows == nil {
+			sec.Rows = []CommandRow{}
+		}
+		snap.Commands = &sec
 	}
 	return snap
 }

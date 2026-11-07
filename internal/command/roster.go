@@ -56,12 +56,17 @@
 // caller - cmd/wisp's `wisp commands` leg prints this roster, so Production() is
 // reached from a binary rather than from this package's tests (roster_test.go
 // measures that off the disk, because "a test calls it" and "the product calls it"
-// are different facts). What still does not exist is the PAGE's own path: no
-// snapshot key, no C17 method, no row in ComposerState, so the menu's members are
-// readable on the command line and unreadable in the chat box. Whoever adds that
-// key owns it and the two rulers it moves (ticket 213's "交付 3"), and updates this
-// paragraph and cmd/wisp/commands.go's footer, which says the same thing to the
-// operator.
+// are different facts). The page's own half is now the Go-side key ticket 213
+// 交付 3 named: panel.Snapshot carries a reader-gated commands section
+// (internal/panel/commands_roster_213.go), filled by cmd/wisp's assembly root
+// from this package's Production() - still no C17 method, and still no route a
+// page could ring a control word on. The section's page-side declaration
+// (frontend/src/lib/panel.ts) is not written yet (Q-51), so the two two-way
+// reconciliations red on that key until the UI leg moves them; that red is
+// 交付 3's own procedure, recorded in the ticket, not a defect this package
+// can fix. Whoever changes the section's shape owns moving those rulers, and
+// updates this paragraph and cmd/wisp/commands.go's footer, which say the same
+// thing to the operator.
 package command
 
 import (

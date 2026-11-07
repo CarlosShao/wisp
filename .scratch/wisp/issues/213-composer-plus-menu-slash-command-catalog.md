@@ -59,3 +59,7 @@
 `frontend/**`、`design/**` 零写（连内容都不转述）；不新增 C17 方法名（要先 `A##`）；不动 D34 工具表（命令≠工具，别把 `/compact` 做成模型可自调的工具）；
 `internal/tools/bridge.go` 的天花板、`thresholds.go`、golden、`allowlist.txt`、`PLAN.md`、`docs/specs/**` 一字不动；只 commit 不 push、显式 pathspec、禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`。
 — 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
+
+## Progress log
+
+- [2026-11-07 18:3x +08] agent=213-d3-roster did=**交付 3 的 Go 侧一半落地**：`panel.Snapshot` 新增 reader-gated 顶层键 `commands`（载体 `internal/panel/commands_roster_213.go`＋`pump.go` 读口＋装配根 `cmd/wisp/run.go:1023` 一行），行由 `command.Production()` 逐行派生（装配器零字面命令名，与控制台腿同一张表）；无读口⇒键不在线（三枚四键字节钉原样绿），有读口⇒行逐字段 verbatim，AC#2 闸若拒表⇒线上携 Reason 句＋空 rows（缺陷不上妆成空菜单）；`wisp commands` footer＋usage＋`internal/command` 包注释三处旧话同步（名册在快照里／TS 声明未写 Q-51／控制词执行照旧只有命令行）。三发变异牙逐发红后还原（M1 摘装配根读口行／M2 塞 compact 假行／M3 摘 pump 接线；M3 第一发 python 不可用刀未落上、那发 ok 作废，sed 重打真红）。门禁：gofumpt 点名 10 枚**空**／vet·build rc0／`go test ./cmd/wisp -run 'Test213|TestComposer'` 4 枚 PASS／`internal/command` ok／d22scan clean／LF。`internal/panel` 整包 rc1 恰 3 红＝两枚**预定红**（逐字 `Go Snapshot emits [commands] that interface PanelSnapshot does not declare`＝交付 3 程序，等界面腿写 panel.ts）＋`TestC21DesignTokensFourWayAgree` **既存红**（读 ball/tokens.go＋c21 证据件，两件 diff HEAD 空、ball 有 wave65/66 在飞件，归因读数见 evidence §①.3）。C17 七枚零新增、`internal/tools`·`internal/ball`·frontend 零字节、AC 框与 Status 零触碰；`internal/command/roster.go` 一枚超出派单写面（纯注释同步，被 ac4 代码注释自己点名的义务）具名报备。证据件 `docs/evidence/s1/213-slash-roster.md`；⛔ push。

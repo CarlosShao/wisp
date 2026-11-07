@@ -109,11 +109,15 @@ func Test213CommandsLegPrintsTheProductionRoster(t *testing.T) {
 		t.Errorf("footer names the panel-inbound leg without its -data requirement: that leg refuses to start without a root (ticket 128 AC#2)")
 	}
 
-	// (5) AC#4's named half. The terminal state is "visible on the command line,
-	// not clickable in the page", and this leg says so out loud rather than leaving
-	// the operator to infer it from a missing menu entry.
-	if !strings.Contains(text, "界面点不了") {
-		t.Errorf("output does not say the page cannot ring these commands yet: AC#4's terminal state is 名册可见 + 命令行可执行, 界面点不了")
+	// (5) The roster's reachability, said out loud on both halves: the
+	// snapshot now CARRIES the roster (ticket 213 交付 3's Go half, wired at
+	// the assembly root), and the page-side declaration is still unwritten -
+	// the footer names both instead of leaving either half to be inferred.
+	if !strings.Contains(text, "名册在快照里") || !strings.Contains(text, "commands 键") {
+		t.Errorf("output does not say the snapshot carries the roster (ticket 213 交付 3's Go half): the roster's reachability changed and this leg must say so")
+	}
+	if !strings.Contains(text, "Q-51") {
+		t.Errorf("footer does not name the missing page-side declaration (Q-51): a contract half that is still unwritten must be named, not blurred")
 	}
 
 	// (6) AC#2 read off the production output: capabilities this machine does not

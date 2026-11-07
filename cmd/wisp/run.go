@@ -1021,6 +1021,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// L1 confirmation windows this run's gate is holding open right now, read
 		// off the gate itself - see panel_pump.go's liveL1WindowWaits.
 		L1Windows: rt.liveL1WindowWaits,
+		// ticket 213 交付 3's reader: the command roster this machine can
+		// execute, derived from internal/command's production table once per
+		// process (panel_commands_213.go) - the menu's members, not a second
+		// copy of them.
+		Commands: commandRosterSection213,
 		// Ticket 33 AC#8's naming split (33-r14): Publish keeps the blocking
 		// ledger entry by that name, and the AC#8 clamp-branch ruler drives the
 		// packet through tryBookPanelSnapshot when it needs a pass that cannot

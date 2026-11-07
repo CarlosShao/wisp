@@ -89,6 +89,22 @@ type Snapshot struct {
 	// declare, which is that ruler doing the job ticket 77 pinned it for, and the
 	// page-side declaration is the UI leg's to write (Q-51, ledger A383).
 	Tasks *TaskRosterSection `json:"tasks,omitempty"`
+	// Commands is ticket 213 交付 3's carrier: the roster of commands this
+	// machine can execute, one row per command, every row naming the door that
+	// executes it (see commands_roster_213.go for the shape and the rulings).
+	//
+	// It is a pointer with omitempty for the same reason the two fields above
+	// are: a pump assembled WITHOUT the roster reader sends no key, which is
+	// the exact shape the three four-key byte nails pin (pump_test.go:123,
+	// :291, subagent_roster_197_test.go:214), and a pump that has one always
+	// sends the key - a machine with no commands is not the same fact as a
+	// host that never read the roster. The page-side declaration for this key
+	// is not written yet (Q-51), so the two two-way reconciliations against
+	// frontend/src/lib/panel.ts name it as undeclared until the UI leg moves
+	// them: that red is ticket 213 交付 3's own procedure, not a defect this
+	// field can fix, and no C17 method arrives with it - the section names
+	// doors, it opens none.
+	Commands *CommandRosterSection `json:"commands,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.
