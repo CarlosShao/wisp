@@ -44,11 +44,11 @@ func (r *renderer) setWensity(v Visual) {
 		}
 		r.band[i] = r.radialBrush([]d2d1GradientStop{
 			{0.00, colorF(col)},
-			{0.42, colorF(mulA(col, 0.72))},
-			{0.78, colorF(mulA(col, 0.18))},
+			{0.55, colorF(mulA(col, 0.90))},
+			{0.85, colorF(mulA(col, 0.32))},
 			{1.00, colorF(mulA(col, 0))},
 		}, p, d2d1Point2F{0, 0},
-			R*WensityBandWidthFrac, R*WensityBandWidthFrac*0.62)
+			R*WensityBandWidthFrac, R*WensityBandWidthFrac*0.74)
 	}
 
 	// The white core: the band's bright centre cluster (measured centroid
@@ -56,10 +56,10 @@ func (r *renderer) setWensity(v Visual) {
 	core := mulA(wb.StopWhite, v.Opacity)
 	r.bandCore = r.radialBrush([]d2d1GradientStop{
 		{0.00, colorF(core)},
-		{0.50, colorF(mulA(core, 0.55))},
+		{0.58, colorF(mulA(core, 0.72))},
 		{1.00, colorF(mulA(core, 0))},
 	}, d2d1Point2F{x: c.x - R*0.08, y: c.y - R*WensityBandCenterFrac + R*0.07},
-		d2d1Point2F{0, 0}, R*0.45, R*0.32)
+		d2d1Point2F{0, 0}, R*0.55, R*0.40)
 
 	// Weak neutral bottom inner glow (below 0.75R, the "floor" reading).
 	glow := mulA(wb.BottomGlow, v.Opacity)
@@ -94,7 +94,7 @@ func (r *renderer) drawWensityBand(v Visual, c d2d1Point2F, R, dockX, dockY floa
 			continue
 		}
 		t := (float32(i) + 0.5) / wensityBandSegs
-		ry := R * WensityBandWidthFrac * 0.62 * (1 + wensityBandDeform(v.SpectrumMid))
+		ry := R * WensityBandWidthFrac * 0.74 * (1 + wensityBandDeform(v.SpectrumMid))
 		r.fillEllipse(d2d1Point2F{
 			x: c.x + R*wensityBandAxisX(t)*dockX,
 			y: c.y - R*wensityBandAxisY(t)*dockY + def,
