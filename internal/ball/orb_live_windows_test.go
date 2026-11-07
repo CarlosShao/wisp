@@ -378,6 +378,45 @@ func orbTestNonDarkRatio(l, t, w, h int32) (float64, int) {
 	return float64(nonDark) / float64(total), total
 }
 
+// orbTestReapLeakedWebView2 terminates every msedgewebview2.exe process whose
+// PARENT is this test process and reports how many it killed. Ticket 65
+// (measured 2026-11-07): the jchv wrapper's ICoreWebView2Controller has no
+// Close method, so production destroy() leaks each orb's browser processes;
+// across a count=10 suite those leaks degrade rendering round over round
+// (40.6% -> 27.2% -> 7.7% -> three all-black attempts) until the page cannot
+// paint. Reaping OUR OWN children - matched by image name AND parent PID, so
+// no other application's WebView2 can ever match - removes that accumulated
+// pressure without touching any other process on the desktop.
+func orbTestReapLeakedWebView2(t *testing.T) {
+	t.Helper()
+	snap, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
+	if err != nil {
+		t.Logf("orb flake-fix: process snapshot failed (leak reaping skipped): %v", err)
+		return
+	}
+	defer windows.CloseHandle(snap)
+	mine := windows.GetCurrentProcessId()
+	killed := 0
+	var pe windows.ProcessEntry32
+	pe.Size = uint32(unsafe.Sizeof(pe))
+	err = windows.Process32First(snap, &pe)
+	for err == nil {
+		if pe.ParentProcessID == mine &&
+			windows.UTF16ToString(pe.ExeFile[:]) == "msedgewebview2.exe" {
+			if h, oerr := windows.OpenProcess(windows.PROCESS_TERMINATE, false, pe.ProcessID); oerr == nil {
+				if terr := windows.TerminateProcess(h, 1); terr == nil {
+					killed++
+				}
+				windows.CloseHandle(h)
+			}
+		}
+		err = windows.Process32Next(snap, &pe)
+	}
+	if killed > 0 {
+		t.Logf("orb flake-fix: reaped %d leaked WebView2 browser process(es) parented by this test process", killed)
+	}
+}
+
 // TestBallLiveOrbPageRendersPixels is the black-orb regression (ticket 65,
 // orchestrator-measured 2026-11-07): the first serving seam answered the
 // entry document through a CreateWebResourceResponse the jchv wrapper
@@ -390,19 +429,27 @@ func orbTestNonDarkRatio(l, t, w, h int32) (float64, int) {
 // here, painted pixels are.
 //
 // Flake treatment (ticket 65, 2026-11-07): the sampling already waits on the
-// real signal - painted screen pixels, polled - but one WebView2 cold boot is
-// occasionally wedged in-suite (measured: adjacent runs of the same binary
-// went 25s-never-light and 30s-to-first-light, so a fixed per-attempt budget
-// sometimes lands inside a real boot). The truth signal and the 1% floor are
-// untouched; what is new is a bounded retry: a window that stayed dark past
-// its budget is torn down WITH its WebView2 instance and rebuilt fresh, and
-// only three consecutive dark boots fail the regression.
+// real signal - painted screen pixels, polled - so the wait shape was never
+// the problem. The measured red mechanism is ACCUMULATION: every WebView2
+// instance this process ever embedded leaks its browser processes (the jchv
+// wrapper's ICoreWebView2Controller has no Close method, so production
+// destroy() cannot shut the runtime down gracefully), and the full-suite
+// count=10 run showed the render degrading round over round - non-dark ratio
+// 40.6% x7 rounds, then 27.2%, 7.7%, then three consecutive all-black
+// attempts - i.e. leaked browser processes pile up GPU pressure until a new
+// instance cannot paint at all. Two bounded countermeasures, both test-side,
+// both zero assertion changes: reap the leaked msedgewebview2.exe children of
+// this process (at test start and before every rebuild - they are OUR
+// orphans, parented by us, so no other app's WebView2 can ever match), and
+// keep the fresh-instance rebuild so a single wedged boot still gets a
+// second chance.
 func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
 	requireQuietBallDesktop(t)
+	orbTestReapLeakedWebView2(t)
 
 	const attempts = 3
 	var lastBest float64
@@ -423,10 +470,12 @@ func TestBallLiveOrbPageRendersPixels(t *testing.T) {
 			return
 		}
 		lastBest, lastSamples = best, samples
-		// A dark boot keeps its WebView2 instance; release it before the next
-		// attempt so the rebuild is genuinely fresh (Close is idempotent, the
-		// t.Cleanup below stays harmless).
+		// A dark boot keeps its WebView2 instance; release it and reap every
+		// leaked browser process this test process has accumulated (the
+		// measured red mechanism) before the rebuild is genuinely fresh
+		// (Close is idempotent, the t.Cleanup below stays harmless).
 		b.Close()
+		orbTestReapLeakedWebView2(t)
 		if attempt < attempts {
 			t.Logf("attempt %d/%d stayed dark (best %.3f%% over %d sampled px); rebuilding ball and WebView2 instance",
 				attempt, attempts, best*100, samples)
