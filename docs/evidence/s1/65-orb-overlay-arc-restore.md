@@ -101,3 +101,59 @@ if v.Progress >= 0 {
 ## 撤销口令
 
 - 钉子测试＋证据件：`git revert <本腿 commit>`（产码 `renderer_windows.go` 零改动，无产码回退面）。
+
+---
+
+## 读数表（全部本腿现跑，2026-11-07 18:4x–19:1x +08；逐字 log 可复跑）
+
+### 派单三条判据
+
+| 判据 | 读数 | 结论 |
+|---|---|---|
+| ①球面无文字：`TestBallLiveOrbOverlayFrameHasNoGlyphPixels` | **PASS**（终态复跑 1.47s；全套内 0.90s）——Downloading 69%+"69%"+badge3 缺陷形状帧**不透明近白像素＝0**（近白判据自 wave65 红103→绿0，未动） | ✅ |
+| ①b 弧存在（本腿新钉子，同一帧） | **`overlay Downloading frame keeps the progress arc: 283 teal pixels (floor 50)`** | ✅ 弧在 |
+| ② `page lit ratio` 回 ~20% 量级 | 修前基线 21.96%（A1604）；本腿 HEAD 现跑 4 发正常启动：**25.91% / 24.77% / 5.20%**（首过线快照，同语义）＋0.000%（黑启动 FAIL，3 发重建重试治愈）；终态全套 7/7 PASS | ✅（页面满渲染值 ~20-26% 与修前同量级；该 log 行本身＝「corners ok ∧ lit>1% 首次过线即返回」的快照，修前 21.96% 亦是同语义快照——21.96 vs 3.02 当稳态对比从未成立；0%/3.02%/5.20%＝同一时序族，与弧无关） |
+| ③ 四角零差 | 全部 PASS 发均为 **`corners [[51 51 50] [51 51 50] [51 51 50] [51 51 50]] within +/-12 of (51,51,50)`** 精确零差 | ✅ 透明未破 |
+
+### 3.02% 与 0.000% 的归因（诚实记录，不粉饰）
+
+- 3.02%（编排者引）与本腿第 2 发 0.000%（FAIL）同一族：**WebView2 黑启动/早采样时序**，
+  非 renderer 回归——证据链：①Corners 全程 Sleeping、从不设 Progress，D2D 弧在该测试从未画过；
+  ②HEAD 含 c5cca231a 的正常启动发读 25.91%/24.77%（高于修前 21.96%）；③同页非黑率宽区间
+  在案（A1602 count=10 曲线 13.4–40.6%）。④本腿给 Corners 补了 orbPixelAttempt 同型的
+  **3 发有界重建重试（断言零改动）**，全套内黑启动发被重建治愈。
+- 「修后判据变红的可能性」（派单如实条款）：不适用——本腿**没有恢复任何被关的绘制**
+  （因为没有东西被关），文字判据与弧判据在同一帧上同时成立（近白 0 ∧ teal 283）。
+
+### 红牙证明（判据有牙）
+
+- 突变：临时给步骤9 加 `&& !r.overlayOnly`（模拟「弧被关」）⇒
+  `--- FAIL: TestBallLiveOrbOverlayFrameHasNoGlyphPixels`，红字逐字：
+  `overlay Downloading frame carries only 0 progress-arc pixels (want >=50): the outer cyan arc the page cannot draw is suppressed (ticket-65 arc regression)`；
+  **同帧近白审计仍 0**（弧判据变红不连带文字判据，两判据正交）。
+- 还原：`git diff internal/ball/renderer_windows.go` 空（备份比对逐字节还原）。
+
+### 真机证据（屏上，非 DIB）
+
+- HEAD 重建 `build/balldebug-orb.exe -shots` 跑完 20 态循环（handles 全程 445→471 稳定）：
+  **`13-Downloading.png`＝球环上有青色进度弧（teal 高亮段）、球心无任何文字数字**——
+  与 orb-FINAL.png 的差别只有「69% 文字没了」，弧没有丢。档：`D:\tmp\wisp\wave68\shots\`。
+
+### 门禁（终态）
+
+| 门禁 | 读数 |
+|---|---|
+| `/d/work/base/gopath/bin/gofumpt.exe -l internal/ball` | 空 |
+| `go vet ./internal/ball` | rc0 |
+| `go build ./internal/ball ./cmd/wisp ./cmd/balldebug` | rc0 |
+| `go test ./internal/ball -count=1` | **ok 0.581s**（终态） |
+| `go test -tags winlive -run TestBallLiveOrb -count=1` | **7/7 PASS 69.888s（终态全套）**：Jarvis 11.75s / Attach 1.21s / Placement 0.00s / FollowStays 0.31s / PageRenders 31.22s（6.87% 首过线）/ Corners 24.03s（5.20% 首过线，四角精确零差）/ Glyph+弧 0.84s（近白 0 ∧ teal 283） |
+| `go test -tags winlive -run 'TestLiveNeverStealsFocus\|TestLiveTransparentCornerFallsThrough'` | **2/2 PASS**（1.88s / 0.58s） |
+| `sh scripts/d22scan.sh` | 真仓扫描 **1 发现＝`internal/panel/config_write_187.go:55` phantom-citation（票 187 腿 untracked 在飞件引了未落盘的证据件）——非本腿写面（⛔ internal/panel），本腿写面 internal/ball 零发现（ban#8 扫 951 Go 文件含新测试件）；按「每包一腿」纪律不碰，归票 187 腿收口时自愈** |
+
+### 落点与写面
+
+- 写面：`internal/ball/orb_live_windows_test.go`（Corners 3 发重建重试＋Glyph 测试弧断言＋
+  `overlayArcTealPixels` 助手）＋本证据件＋票 65 Progress log。**产码 `renderer_windows.go` 零改动**。
+- commits：`91c0532d2`（取证+裁定）＋本表随测试件与结笔 commit。
+
