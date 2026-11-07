@@ -31,18 +31,19 @@
 //     own first paragraph, and 342-v1's i01 rows), so "0 on old" is equally consistent with "never
 //     damaged" and with "damaged and then removed".
 //
-// ★WHAT THIS LEG MEASURED, AND THE DEFECT IT FOUND IN THIS GATE. Three paired runs of 1500 attempts
-// (leg 342-r2, golang:1.27 container, CGO_ENABLED=0) put the OLD side at truncated=0 deleted=0
-// untouched=1500 - yet its pinnedParentBeforeOpen was 32/25/18, NON-ZERO, which the pre-400 route
-// cannot have. The reason is the harness, not the landing: newAncWorld342r1 calls the LANDING-side
-// exports (pinPlacement, sameObjectPinned) directly, so an "old" tree built by reverting the
-// production hunk still measures the landing's pin. The old side's zero is therefore NOT evidence of
-// a closed window and this file may not read it as one. The attribution branch below keeps that
-// statement machine-checked on every run instead of leaving it as a note: an old-side row whose
-// pinnedParentBeforeOpen > 0 fails as "not attributable", which is a TRUE observation about the
-// bench. The pre-fix numerator for this leg stays where it was measured on a really old tree -
-// 342-v1's VPROD/VBASE rows (deleted 65..86/1500 with pinnedParentBeforeOpen=0, 4/4 runs) - and this
-// leg does not claim to have re-taken it.
+// ★WHAT THE RUNS MEASURED, AND HOW THE ATTRIBUTION BELOW IS JUDGED (corrected by leg 342-r3 on this
+// branch's first-ever execution: the branch was committed without a runtime run and its original
+// wording described the opposite trigger of the one coded below). The pin walk and the seal-side
+// walk share one wording (winsec_other.go's pinPlacement answers both), so the classifier splits
+// them by whether the refusal names the caller's leaf: a parent-side answer never does. Measured on
+// pre-landing bytes (leg 342-r3, golang:1.27 container, reverted to the by-name route):
+// pinnedParentBeforeOpen=0 with the seal-side walk still answering 44 attempts AFTER the open and
+// deleted=92/1500 - the attribution HOLDS on the old side, and the pre-fix numerator WAS re-taken
+// there (342-v1's VPROD/VBASE rows: deleted 65..86/1500, 4/4 runs). A row without the landing's own
+// before-open numerator is nevertheless RED in this gate, because what this gate certifies is the
+// LANDING: truncated==0 and deleted==0 with liveness can only be certified by bytes that carry the
+// pin, and reading an old-side row as "the window was already closed" would be the exact mistake
+// ticket 342 AC#1 forbids.
 //
 // JUDGED:
 //  1. the route must never DAMAGE the foreign object through a flipped ancestor: the witness either
@@ -86,17 +87,19 @@ func TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342
 
 	// ATTRIBUTION FIRST: a row that cannot say which route produced it is not a reading, and the
 	// landing requirement below would silently accept an old-side row that names a leg its bytes do
-	// not have (the defect this leg found - see the file header).
+	// not have. pinnedParentBeforeOpen is the landing's own numerator: the pre-landing route cannot
+	// raise it, and the landing's liveness gate requires it, so a row carrying 0 there is not a
+	// landing-side reading either way - on pre-landing bytes it is the pre-fix reading, and in this
+	// gate that is red, because what this gate certifies is the landing.
 	if !landed {
-		t.Errorf("AC#1 RED attribution: the parent pin answered %d attempts BEFORE any open, so this row "+
-			"was produced by bytes that DO carry the pinned route (pinnedParentBeforeOpen is the landing's "+
-			"own numerator and the pre-400 route cannot raise it) - truncated=%d deleted=%d untouched=%d "+
-			"here is therefore NOT a reading about the old route, and reading its zero as 'the window was "+
-			"already closed' would be the exact mistake ticket 342 AC#1 forbids. The pre-fix numerator for "+
-			"this leg stands where a really old tree measured it (342-v1 VPROD/VBASE: deleted>0 in 4/4 "+
-			"runs, pinnedParentBeforeOpen=0); this bench cannot re-take it because the harness calls the "+
-			"landing-side pin directly (provedLinkCycles=%d, attempts=%d, flipErrs=%d, first %q)",
-			st.pinnedParentLeg, st.truncated, st.deleted, st.untouched, st.provedLinkCycles, st.attempts,
+		t.Errorf("AC#1 RED (not a landing reading): pinnedParentBeforeOpen answered %d attempts, and that "+
+			"numerator is the landing's own - the pre-landing route cannot raise it and the landing's "+
+			"liveness gate requires it - so this row cannot certify the landing's closed window either way. "+
+			"On pre-landing bytes these numbers are the pre-fix reading (342-v1's VPROD/VBASE measured "+
+			"deleted 65..86/1500 there; leg 342-r3 re-took deleted=%d of %d on the by-name route), and "+
+			"reading any zero among them as 'the window was already closed' is the exact mistake ticket "+
+			"342 AC#1 forbids (provedLinkCycles=%d, attempts=%d, flipErrs=%d, first %q)",
+			st.pinnedParentLeg, st.deleted, st.attempts, st.provedLinkCycles, st.attempts,
 			st.flipErrs, st.firstFlip)
 		return
 	}
