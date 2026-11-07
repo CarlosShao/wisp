@@ -1248,17 +1248,26 @@ func toolResultMessageParts(id string, parts []llm.Content, isErr bool) llm.Mess
 // replaced by a sentence, never by silence: a model that believes it saw a
 // screen it never received will describe pixels out of thin air, and a
 // screenshot's alt text is exactly the kind of claim a user reads back.
+//
+// Ticket 264 (form 甲): this function is the ONE chokepoint every
+// model-visible tool answer crosses, so the machine-path mask runs here - on
+// the model's copy only. The user-facing side (the EvToolEnd event and
+// res.ToolLog above) was fed from log.Text before this call and keeps the real
+// path; the 174 pointer ("全文见 <artifact>") is exempt so the model keeps its
+// road back to a spilled output (see pathmask.go for the exact rule).
 func toolResultParts(l *Loop, text string, images []ImageAttachment) []llm.Content {
 	parts := make([]llm.Content, 0, 1+len(images))
-	parts = append(parts, llm.TextPart{Text: text})
+	parts = append(parts, llm.TextPart{Text: maskOutboundPaths(text)})
 	for _, img := range images {
 		if l.images == nil {
-			parts = append(parts, llm.TextPart{Text: imageDropNotice(img.Alt, errImageStoreMissing)})
+			parts = append(parts, llm.TextPart{Text: maskOutboundPaths(
+				imageDropNotice(img.Alt, errImageStoreMissing))})
 			continue
 		}
 		ref, err := l.images.put(img.MimeType, img.Data, img.Alt)
 		if err != nil {
-			parts = append(parts, llm.TextPart{Text: imageDropNotice(img.Alt, err)})
+			parts = append(parts, llm.TextPart{Text: maskOutboundPaths(
+				imageDropNotice(img.Alt, err))})
 			continue
 		}
 		parts = append(parts, llm.ImagePart{
