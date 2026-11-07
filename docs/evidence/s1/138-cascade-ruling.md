@@ -149,3 +149,45 @@
 
 ---
 
+## §3 步4：AC#3 的牙与突变读数（★本票核心）
+
+### 3.1 牙是什么
+
+`Test138TaskCancelKillsTheProcessTree`（`internal/plugin/manifestslot/command_138_cancel_test.go`）：
+真进程用例——fixture CLI（测试二进制自体）以 `hang` 模式被包运行，先拉起一个**孙进程**（写 pid 文件）再永久阻塞；
+用例用**调用方 cancel**（120s 预算 ≠ 演员，只有 cancel 能结束调用），断言：
+
+1. Exec 在 15s 内返回（`:87-95`）；
+2. **孙进程 pid 已死**（`:97-109`）——只杀直接子进程的假实现恰好会留下这个 pid。
+
+时间线：先证孙进程活着（`:70-82`，"从未咬过活树的牙证明不了任何事"），再 cancel（`:85`）。
+它钉的是级联的**取消半边**；预算半边已有牙（`Test52TimeoutKillsTheProcessTree`，`command_52_test.go:708`）。
+
+### 3.2 突变 M1：把级联摘掉（预算从父 ctx 上摘下）
+
+| 步 | 读数（现跑，2026-11-07 16:17–16:20 +08） |
+|---|---|
+| 突变前尺 | `git grep -n 'context.WithDeadline(parent, total.Deadline())' -- internal/plugin/manifestslot/stopwatch.go` ⇒ **`stopwatch.go:23`** |
+| pristine 存档 | `.scratch/wisp/probes/138/r1/stopwatch.go.pristine`（只建不删） |
+| 突变落地 | `:23` `context.WithDeadline(parent, …)` → **`context.WithDeadline(context.Background(), …)`**（摘掉父链；预算仍会自己到期，但调用方 cancel 不再传播） |
+| 落地证明 | `git grep -n` ⇒ `stopwatch.go:23` 新形状在盘；`git diff` 五行 hunk 在案；`go build ./internal/plugin/manifestslot` **rc=0**（票面 AC#3"先证变异落地再读数"过） |
+| 突变下跑牙 | `go test -count=1 -run Test138TaskCancelKillsTheProcessTree -v ./internal/plugin/manifestslot` ⇒ **FAIL 15.244s，rc=1** |
+| **红在哪一行** | **`command_138_cancel_test.go:94`** —— `t.Fatalf("Exec did not return within 15s of the caller's cancel: the cancel cascade never reached the child (stopwatch budget detached from its parent?)")`。机制：摘掉父链后 `childCtx.Done()` 对调用方 cancel 永不触发 ⇒ 预算守望的 `kill()` 不被调用 ⇒ Exec 永不返回 ⇒ 15s 守望开火。**这正是"被停的任务留下挂死的 CLI 在跑"的形状**（孙进程也还在，只是用例先死在第一断言） |
+| 还原 | `Copy-Item pristine → stopwatch.go` ⇒ `git diff -- internal/plugin/manifestslot/stopwatch.go` **空**；`git status` tracked 干净 |
+| 复绿 | 同命令 ⇒ **PASS 1.02s，rc=0**（16:19:58） |
+
+### 3.3 过程干扰登记（三核③ 逐条）
+
+- 突变期间 `go build ./internal/...` 一度红在 `internal/ball/orb_windows.go:246`（undefined: orbWindowEdgeBase）——
+  **另一条在飞写腿**当时正在改 `internal/ball/orb_windows.go`＋`orb_live_windows_test.go`（` M` 在案，我零触碰）；
+  数十秒后复跑 rc=0。突变判定不受影响：突变红绿读数全部取自 `./internal/plugin/manifestslot` 包作用域。
+- 上轮遗留的未跟踪测试件（3657 B）已在步3 收编进 tracked（commit `bf224be19`），其证据件引用指向本裁定书 §3。
+
+### 3.4 牙的约束自查（票面 AC#3 警句）
+
+- 无 `t.Skip`、无阈值放水、无断言迁就：断言写的是"孙进程 pid 必须死"，突变后红因是**实现失去级联**，非用例松动。
+- 牙的窗口参数：孙进程存活确认轮询 ≤10s、cancel 后返回守望 15s、pid 死亡确认 ≤2s（100×20ms）——全部在用例内可见。
+
+---
+
+
