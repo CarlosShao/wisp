@@ -366,14 +366,11 @@ CSS 侧消费者、接线的票），"暂未使用"不算。
 | `Palette.InfoLine` | 原生侧 info 只有队列点，取 `Palette.Info` 单色；`--info-line` 在 CSS 也只被 `base.css` 引用一次，是面板描边色 |
 | `Palette.OrbShadow` | 球的接地阴影由 `looks[*].Caustic × GlassCaustic` 画（`renderer_windows.go` 的 caustic brush），`--orb-shadow` 是 CSS 侧 approval/ball 两屏的投影色 |
 | `Palette.TintAccentHi` | v2 把球面渐变收敛成「核心色 + 高光色」，accent 态实际取 `Palette.Accent`（`statevisual.go`），`--tint-accent-hi` 在 `tokens.css` 之外零引用（死色镜像） |
-| `Palette.TintSuccessHi` | success 态取 `Palette.Success`/`SuccessLine`，`--tint-success-hi` 全仓无引用（`design/` 实测 0 处 `var()`）⇒ 只作为 CSS 声明的镜像保留 |
 | `Palette.TintSuccessLo` | 同上：`--tint-success-lo` 无 CSS 消费者，原生 success  glow 走 `SuccessLine`；v1 三段 tint 在 v2 已收敛（`tokens.css:115` 注释自述） |
 | `Palette.TintWarmHi` | Warm 态取 `Palette.Warm` + `WarmOpacityLow/High` 的整窗 alpha 呼吸，`--tint-warm-hi` 无引用；本行值与 `TintWarnHi` 同字面量（`#F0DCB8`）是 CSS 事实，不是抄错 |
 | `Palette.TintWarmLo` | `--tint-warm-lo` 在 `tokens.css:117` 只声明不使用，原生 Warm 双色端点由 looks 表接管（票 62） |
 | `Palette.TintWarnHi` | warn 态（Unconfigured/Watchdog/Stuck）取 `Palette.Warn`/`WarnLine`；`--tint-warn-hi` 与 `TintWarmHi` 同为 `#F0DCB8`，CSS 侧两者都没有 `var()` 消费者 |
 | `Palette.TintWarnLo` | `--tint-warn-lo` 零引用（`tokens.css:118/273`），原生侧无 warn 双色渐变路径 |
-| `Palette.TintDangerHi` | danger 态取 `Palette.Danger` + `DangerLine`，`ConfirmingPulseMs` 的脉冲环用单色；`--tint-danger-hi` 在 CSS 与原生两侧都无消费者 |
-| `Palette.TintDangerLo` | 同上，`--tint-danger-lo` 零引用；v2 的「核心发光色」两档里 lo 端已被液面的 `Caustic` 取代（票 62） |
 | `Palette.TintNeutralHi` | neutral 态只有 `-mid` 有人用（`statevisual.go` 的 `Palette.TintNeutralMid` + `ball.html:195`），hi/lo 两端在 v2 无消费者 |
 | `Palette.TintNeutralLo` | `--tint-neutral-lo` 零引用；NoNetwork/Nonetwork 态用 `Danger`/`BGOverlay` 单色，不铺 neutral 三段渐变 |
 | `looks[*].Deep` | `LiquidLook` 九个字段里唯一没人读的（其余八个 `renderer_windows.go` 都在画，含 `activeLook.Hi`）：票 62 留的第二层折射，属票 65「质感仍是赝品」的返工项；删字段要连带删 4 行 look 表 = 缩契约，交 owner |

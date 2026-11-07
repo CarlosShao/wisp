@@ -585,3 +585,45 @@ const (
 	FontSizeMicroPx = 11                   // --t-micro (digits/latin only)
 	CountdownFontPx = 10                   // micro countdown digits under the ring
 )
+
+// ------------------------------------------------ ticket 65 Jarvis particles
+
+// JarvisPalette is the quantified token set of the jarvis particle-orb style
+// (65-style-direction §1.2: every value is a pixel-sampled measurement of the
+// reference tile grid, not an eyeball number). The jarvis branch of the
+// renderer consumes ONLY this struct plus the C21 Palette (the alert/success
+// semantics derive from the state tint tokens) - zero colour literals anywhere
+// else (C21, TestNoHardcodedColorsInBallPackage).
+//
+// Two families ship, exactly as measured: the cyan family (hue ~187deg, every
+// stock tile) and the violet variant (#9F63FF p90, the custom-palette proof).
+// State overrides ride their own rows (the thinking tile measured a brighter
+// p90 and a pure-white core).
+type JarvisPalette struct {
+	BgGlow           Color // tile base glow (the dark backdrop every tile shares)
+	Core             Color // cyan family core highlight (idle tile brightest pixel)
+	ParticleDim      Color // cyan family particle body (idle mean #1B7C86)
+	ParticleBright   Color // cyan family p90 bright particle (#36E7F5)
+	ParticleThinking Color // thinking tile p90 bright particle (#5EFAFF)
+	CoreThinking     Color // thinking tile core (pure white)
+	VioletDim        Color // violet variant particle body (#562D98, hue ~265)
+	VioletBright     Color // violet variant p90 bright particle (#9F63FF)
+	VioletCore       Color // violet variant core highlight
+}
+
+// jarvisTokens is the Jarvis token value (one style, one value; the families
+// are selected at read time by jarvisFamilyColors, jarvis.go).
+var jarvisTokens = JarvisPalette{
+	BgGlow:           hex(0x050913, 0.90),
+	Core:             hex(0xC6FFFF, 1),
+	ParticleDim:      hex(0x1B7C86, 1),
+	ParticleBright:   hex(0x36E7F5, 1),
+	ParticleThinking: hex(0x5EFAFF, 1),
+	CoreThinking:     hex(0xFFFFFF, 1),
+	VioletDim:        hex(0x562D98, 1),
+	VioletBright:     hex(0x9F63FF, 1),
+	VioletCore:       hex(0xFFFFFF, 1),
+}
+
+// JarvisTokens returns the Jarvis token set (renderer/test seam).
+func JarvisTokens() JarvisPalette { return jarvisTokens }

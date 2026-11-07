@@ -54,6 +54,11 @@ type renderer struct {
 	band        [wensityBandSegs]unsafe.Pointer
 	bandCore    unsafe.Pointer
 	wensityGlow unsafe.Pointer
+
+	// Jarvis particle material (ticket 65): the base tile glow, the core
+	// halo and the fixed-seed particle layout. Baked only when the active
+	// style is the jarvis family; released with the rest.
+	jarvis jarvisAssets
 }
 
 // liquidLadder is the angular resolution of the pre-baked blob positions.
@@ -252,6 +257,9 @@ func (r *renderer) setAssets(v Visual) {
 			r.setWensity(v)
 		}
 	}
+	if activeStyle == StyleJarvis {
+		r.setJarvis(v)
+	}
 }
 
 // lipOf is the specular colour: the look's highlight, which reads on top of
@@ -330,6 +338,7 @@ func (r *renderer) dropAssets() {
 	for i := 0; i < wensityBandSegs; i++ {
 		comRelease(&r.band[i])
 	}
+	r.dropJarvis()
 	for bi := 0; bi < 3; bi++ {
 		for i := 0; i < liquidLadder; i++ {
 			comRelease(&r.liq[bi].brushes[i])
@@ -435,7 +444,14 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	s := float32(r.dpi) / 96 // token px -> physical px scale
 
 	if v.Glass {
-		r.drawGlass(v, c, R, s)
+		// The style family picks the material: glass draws the ticket-62/68
+		// glass body (with the wensity band as its default treatment), jarvis
+		// draws the ticket-65 particle orb (jarvis_windows.go).
+		if activeStyle == StyleJarvis {
+			r.drawJarvis(v, c, R, s, phase)
+		} else {
+			r.drawGlass(v, c, R, s)
+		}
 	} else {
 		// Legacy flat body (kept for non-glass visuals).
 		hr, hg := r.haloExtents(R)
