@@ -31675,6 +31675,21 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **派 wave71**：四段接线（①`internal/config` 加 `appearance.orb_style`（`glass` 默认 / `jarvis`）；②`cmd/wisp` 启动读并传 `SetStyle`；③面板设置项 reader-gated 暴露（照 213 模式）；④写入时调 `ApplyStyle` 即时生效）。**判据四条**：默认值 glass／设 jarvis 后 `ActiveStyle()` 真变／设回 glass 也变／突变摘掉 config 读取则默认值用例必须红。
 - **撤销口令**：wave71 的 commit 一 revert 即回「只有两种风格、无切换入口」状态。
 
+## A1610（2026-11-07 19:2x，编排者）**★我判错了——「青弧丢了」是假警报：弧从未被关（`:562` 无守卫），我拿两个不同状态对比。腿用读数纠正了我**
+- **wave68（`91c0532d2`→`81c60c650`→`52bf693b4`，已推）结论：初步定位不成立，弧从未被关、也不需要恢复；产码 `renderer_windows.go` 零改动。**
+- **★我亲自复核腿的三条关键论据（⛔ 只读腿报）**：
+  1. **步骤9 进度弧无守卫**：`renderer_windows.go:562` `r.arc(c, R+5*s, -90, -90+360*v.Progress, 2*s)`，上文只有 `:560 if v.Progress > 0`，**没有 `!r.overlayOnly`** ⇒ overlay 模式下一直在画。
+  2. **`:521` 关的是状态环不是进度弧**：现读 `:519-521` 原文 `// 6. State ring. (Skipped in orb mode: the page renders the state; a D2D ring around the web orb would draw the state twice.)` ＋ `if !r.overlayOnly && v.RingColor.A > 0` ⇒ 出生 commit＝`10d7cb3c3`（与 overlay 架构同生），**恢复它＝在页面状态面之上双重画状态环**。
+  3. **`page lit ratio` 21.96%→3.02% 与弧无关**：`TestBallLiveOrbCornersReadTheDesktop` 全程 `Initial: StateSleeping`（`:695`）、**从不 `SetProgress`** ⇒ 该测试里 D2D 进度弧**从来没画过**；且该读数是 `cornersOK && lit > 0.01` **首次过线即返回**（`:814`）⇒ 21.96 与 3.02 都是早采样快照，**当稳态对比从未成立**。
+- **★我的误判根因（如实认）**：`orb-FINAL.png`（修前）是 balldebug 20 态循环的 **Downloading 步**（有 69% 文字＋进度弧）；`orb-noglyph2.png`（修后）拍的是**非 Downloading 态**（那个态本来无进度、无弧、页面液面也不同）⇒ **我拿两个不同状态的截图对比，把"态差"误判成"回归"**。这违反了我自己定的「裁决者≠实现者、读数优先」原则的反面——**我用了肉眼但没控变量**。
+- **★我亲自看真机证据并复跑**：
+  - `D:\tmp\wisp\wave68\shots\13-Downloading.png`（7237B，腿跑 20 态循环逐态截图）——**放大可见：右上 partway 青弧在，球心无任何文字**。对照 `orb-FINAL.png` 的差别只有「69% 文字没了」。
+  - 我复跑 `TestBallLiveOrbOverlayFrameHasNoGlyphPixels` ⇒ **PASS 1.19s**，读数逐字 `overlay Downloading frame keeps the progress arc: 283 teal pixels (floor 50)` ⇒ **弧有 283 像素**。
+- **★腿真正落的价值（比"修弧"值钱）**：wave65 只断言「无文字像素」，**没断言「进度弧还在」** ⇒ 将来谁在步骤9 上加守卫，现有判据全绿、弧静默消失。腿补了 `TestBallLiveOrbOverlayFrameKeepsProgressArc`（`overlayArcTealPixels` DIB 审计，Accent 青像素 ≥50）把这颗牙钉死，**并做了红牙证明**：临时给步骤9 加 `&& !r.overlayOnly` ⇒ FAIL 逐字 `carries only 0 progress-arc pixels (want >=50): the outer cyan arc the page cannot draw is suppressed (ticket-65 arc regression)`，同帧近白审计仍 0（两判据正交）；还原后 `git diff` 空。
+- **★腿顺带治的 flake**：给 `Corners` 补 3 发有界重建重试（断言零改动），全套内黑启动发被重建治愈；终态全套 `TestBallLiveOrb` **7/7 PASS 69.888s**。
+- **★腿如实报的一枚非它面发现**：d22scan 真仓扫到 **1 发现＝`internal/panel/config_write_187.go:55` phantom-citation**（票 187 腿 untracked 在飞件引了未落盘的证据件）——归 187 腿收口自愈。
+- **撤销口令**：wave68＝`git revert 52bf693b4 81c60c650 91c0532d2`（产码零改动，只回退钉子测试与证据件）。
+
 ## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
 - **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
 - **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
