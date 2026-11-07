@@ -440,7 +440,10 @@ type Spawner interface {
 }
 
 // OSCommandSpawner is the real spawner: exec.Cmd with an explicit argv vector,
-// a sealed environment, and (Windows) a per-child Job Object.
+// a sealed environment, and (Windows) a per-child Job Object. Where no Job
+// Object exists (non-Windows) the tree kill degrades to the direct child, and
+// Spawn prints that degradation before the child starts instead of staying
+// silent about it (ticket 138 AC#2③).
 type OSCommandSpawner struct{}
 
 // Spawn implements Spawner.
@@ -472,9 +475,14 @@ func (OSCommandSpawner) Spawn(_ context.Context, spec SpawnSpec) (ChildProcess, 
 		child.job = job
 		return child, nil
 	}
+	// No Job Object on this platform (jobErr says which): the kill degrades to
+	// the DIRECT CHILD only - descendants a CLI spawns survive it. Ticket 138
+	// AC#2③: this degradation is announced on the reachable path, never left
+	// as a silent no-op.
 	if err := cmd.Start(); err != nil {
 		return nil, err
 	}
+	fmt.Fprintf(os.Stderr, "manifestslot: %v; descendants of pid %d will survive a kill on this platform\n", jobErr, cmd.Process.Pid)
 	return child, nil
 }
 

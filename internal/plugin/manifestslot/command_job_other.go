@@ -20,6 +20,11 @@ func (j *childJob) Start(cmd *exec.Cmd) error { return cmd.Start() }
 
 func (j *childJob) WaitExited() {}
 
+// Kill is a no-op here because it is UNREACHABLE, not because the tree kill is
+// silent: osChild.job is only set when openChildJob succeeded, and on this
+// platform it never does (openChildJob returns errNoJobObject). The reachable
+// degradation notice lives in OSCommandSpawner.Spawn's fallback (command.go),
+// which prints what the kill will and will not reach before the child starts.
 func (j *childJob) Kill() {}
 
 func (j *childJob) Close() {}
