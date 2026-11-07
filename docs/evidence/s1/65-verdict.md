@@ -1,5 +1,8 @@
 # 65 — 非实现者裁决（玻璃码半格 + [ball].style 配置）
 
+> ★**2026-11-07 追加：A1594 改道后的第二轮裁决见 §7（orb 集成三腿 a2e535674/d687dd910/8fb821bba）。
+> §1–§6 是 wave43（D2D wensity/jarvis 路线）的历史裁决，原样保留。**
+
 **Status:** code-verdict-complete（**非最终验收**——AC#6 是人判，65 不可由本件结案）
 **裁决腿:** verdict65（wave43；非实现者，裁决者≠实现者 D22 双角色）
 **被裁决:** `30d8f2e38`（W65-impl 码）＋ `629d6a422`（实现腿交付表）；两 commit 均在 dev
@@ -86,3 +89,78 @@
 4. **AC#3 三张并排**：同一区域同底色 截 现状（glass 默认 wensity）/ 旧 look 对照（`-look aurora`）/ 参考图 `probes/65/refs/wensity-siri-orb.png`
 5. **AC#6 人判**：`build\balldebug.exe -tour -style glass`——owner 亲眼看，说「这次对了」（或哪里不对，改 token 不改码）
 6. 通过后编排者方可摘 SPEC-08 §2 INTERIM、结 65；jarvis 渲染腿（wave43 W65-jarvis）另算
+
+---
+
+## 7. 【2026-11-07 追加】第二轮裁决 —— A1594 改道（集成 LerSent001/orb）后 orb 三腿
+
+**裁决腿:** verdict（A1594 改道后第 65 票第二轮；非实现者，裁决者≠实现者）
+**被裁决:** `a2e535674`（orb 集成腿）＋ `d687dd910`（出屏修复腿）＋ `8fb821bba`（黑窗修复腿）
+**裁决时 HEAD:** `f5bbc97f7`（已核：`df331ec09..f5bbc97f7` 期间 3 笔 commit 全部只碰 composer/145/190 证据面，`git diff --stat df331ec09..HEAD -- internal/ball/` = 空，被裁内容零影响）
+**环境:** Go 1.27.1 windows/amd64 · gofumpt `D:\work\base\gopath\bin\gofumpt.exe` · GOTMPDIR/TMPDIR/TEMP/TMP unset · PATH 前插 build+sherpa-onnx · 双突变在做完即还（`git status --porcelain internal/ball/` 复归空读数）
+**隔离:** 探针/基线全在仓外 clone（`/d/tmp/wisp/20261107/verdict-pre-orb` @`a2e535674^`、`/d/tmp/wisp/20261107/verdict-head` @HEAD）；共享工作树只发生过两次已还原的突变，其余零写。
+
+### 7.1 实现腿声明逐条独立复跑
+
+| # | 声明 | 独立复跑读数 | 判 |
+|---|---|---|---|
+| 1 | 资产=上游件逐字节 | `sha256sum internal/ball/assets/orb-siri.html` = `d93da649d11bc4bc3ab91c006777bbadce1c2eb7d0ffc9d91608ad8d866e3bc6`，与钉死值一致；`git log --all -- <asset>` 仅 a2e535674 一笔；`git diff a2e535674..HEAD -- <asset>` 空；89660 字节 | **PASS** |
+| 2 | 像素回归真有牙 | 基线亲跑 `go test -tags winlive ./internal/ball/ -run TestBallLiveOrbPageRendersPixels -count=1 -v` → **PASS 625/1764 = 35.43% 非黑**（实现腿自报 594/1764=33.67%，同量级）；★突变①注释 `browser.Show()` → **FAIL：best non-dark ratio 0.000% / 1764 采样**，25s 内全黑；还原后 diff 空 | **PASS（有牙）** |
+| 3 | 出屏回归真有牙 | 基线亲跑 TestBallLiveOrbFollowStaysInsideWorkArea → **PASS，读数 work={0,0,3440,1392} ball=(3340,1292)-(3440,1392) orb=(3196,1260)-(3328,1392)**（全内，翻左+垂直夹紧）；★突变②`orbFollowXY` 首行改回无条件 `return ball.r + gap, ball.t` → **FAIL：orb=(3452,1292)-(3584,1424) 双轴出屏**（水平右缘 3452>3440，垂直底缘 1424>1392——精确复现 A1596 的 bug 形状）；还原后 diff 空 | **PASS（有牙）** |
+| 4 | AC#4 行为断言未改 | 三笔 commit 触碰文件清单均无 `dock_test.go`/`live_windows_test.go`；`git diff a2e535674^..HEAD -- internal/ball/dock_test.go internal/ball/live_windows_test.go` = **0 字节**；dock_test.go 现存 12 枚 Test func（62 计 11，只增未删）；11 枚 dock 测试在 winlive 全套里逐枚亲见 PASS | **PASS** |
+| 5 | 实现腿门禁自报 | gofumpt 空（亲跑含 cmd/wisp+cmd/balldebug）/ vet rc0 / build rc0 / 默认套件 ok 0.482s / d22scan clean（939+224 Go files，亲跑）——全部复跑一致 | **PASS** |
+
+### 7.2 门禁读数表（本裁决亲跑）
+
+| 门 | 读数 |
+|---|---|
+| `gofumpt.exe -l internal/ball/ cmd/wisp/ cmd/balldebug/` | 空（rc0） |
+| `go vet ./internal/ball ./cmd/wisp ./cmd/balldebug` | rc0 |
+| `go build ./internal/ball ./cmd/wisp ./cmd/balldebug` | rc0 |
+| `go test ./internal/ball -count=1 -timeout 20m` | ok 0.482s |
+| `go test -tags winlive ./internal/ball/ -count=1 -timeout 20m` | **4 FAIL / 5 SKIP / 其余 PASS**（4.3 逐枚归因） |
+| `sh scripts/d22scan.sh` | clean（internal/=939、cmd/=224 Go files，零 violation） |
+
+### 7.3 winlive 全套 4 FAIL 逐枚归因（本裁决的核心发现）
+
+基线对照用仓外 clone `a2e535674^`（pre-orb）＋同机同时段复跑：
+
+| 测试 | HEAD | pre-orb 基线 | 归因 |
+|---|---|---|---|
+| TestBallLiveEdgeDock | FAIL（`edge 1: docked orb boundary -4, want the work edge 0`） | **FAIL（同一读数 -4 vs 0）** | **存量环境失败**（dock 判据 vs 本机任务栏/缩放几何，与 orb 三腿无关） |
+| TestLiveConfirmingCancelAndEscReturned | FAIL（Esc 未取消 Confirming） | **FAIL（同形）** | **存量环境失败**（Esc 全局借用受桌面环境干扰，与 orb 无关） |
+| TestLiveNeverStealsFocus | FAIL（WFP=第三方窗） | **PASS** | **orb 集成引入的真回归**（见下） |
+| TestLiveTransparentCornerFallsThrough | FAIL（WFP=第三方窗） | **PASS** | **orb 集成引入的真回归**（同根，见下） |
+| （SKIP 5 枚） | SKIP-LOUD（热键被占/指针被拒的明文跳过） | 同 | 环境条件跳过，非失败 |
+
+**真回归的机制（探针实证，非推断）**：a2e535674 在 `ball_windows.go:419`（renderFrame）与 `:554`（present）加了 `if b.orbLive() { return }` 守卫——orb 挂上后 D2D 帧停画，**但没有任何代码再往分层球窗 ULW 一帧**。分层窗从进程启动起从未提交过内容 ⇒ 每像素 alpha 恒 0 ⇒ OS 把整窗当全透明：看不见、WindowFromPoint 直接穿透。探针读数（同一停靠位 (3316,1268)-(3416,1368)，同机同分钟）：
+
+- pre-orb clone：`WFP(球心) = WispBallWindow（isBall=true）`
+- HEAD clone：`WFP(球心) = "Hermes"(pid 30436) / Tabbit(pid 13996)`——球被 OS 跳过（两枚第三方窗只是恰好压在穿透落点上，**不是**它们挡了球：它们均非 topmost，且 pre-orb 同屏同位下 WFP 照样返回球）
+
+**后果评级**：球不可见+不可点＝产品级视觉回归。像素用例（TestBallLiveOrbPageRendersPixels）之所以仍 PASS，是因为它量的是 **orb 窗**自己的合成像素（WebView2 内容在画），量不到**球窗**已透明这件事——两扇窗，两回事。此发现与三枚实现腿的自证证据不矛盾（它们各自声明范围内属实），是**集成面缺口**：a2e535674 的证据件"已知边界"只写了"D2D 对象仍创建是无害浪费"，没写"球窗从此不画"。
+
+**裁决意见**：orb 窗与球窗的可见/点击关系需要一条收尾腿定形状（方向候选：orb 接管像素的同时把 D2D 静态帧 ULW 一次保底 / 或由球窗继续画一帧再让 orb 覆盖 / 或 orb 窗收编球窗职责）——本裁决只定性，不开方、不动码（裁决者≠实现者）。
+
+### 7.4 票面 6 格 AC 判（A1594 改道后口径）
+
+| # | AC | 判 | 读数/依据 |
+|---|---|---|---|
+| 1 | 参考图入库＋逐条量化分析 | **沿用 §4 判**（替代件 65-style-direction.md 判 PASS 在案）+ 本轮补充：本路线上游件 LerSent001/orb 的 13 预设导出页本身即"参考实现"，逐字节上舰（§7.1#1） | 沿用 PASS |
+| 2 | 属性映射 tokens；零新增硬编码色值 | **部分（改道后口径待收）** | 本路线：页内色值在**上游 HTML 资产内**（集成路线的正当形态，资产零改动是本票的硬要求）；宿主侧 Go 代码（orb_windows.go/orbasset.go 等 6 件）人工复读：色值仅 CSP 字符串与注释，零绘制字面量。但"映射到 C21 DesignTokens"这条 AC 在集成路线下的**对应物**（页面参数如何经 setState/setAudioBands 对齐 C21）尚未有任何腿登记——不改判历史格，改道后的归属留给编排者 |
+| 3 | 并排差分产物在档 | **真桌面件，未跑** | 机器侧像素证据已在（像素用例 35.43%）；三张并排（现状/返工后/参考图）仍需机主桌面趟 |
+| 4 | 票 62 dock 测试仍绿且行为断言未改 | **部分** | "未改"=**PASS**（§7.1#4，0 字节 diff）；"仍绿"=dock_test.go 12 枚确定性测试全 PASS，但 live 侧 TestBallLiveEdgeDock 存量红（基线同红，非本票引入）且**球窗透明让"dock 的球"这一可点击实体在 orb 场景失义**（§7.3）——判部分，落点=收尾腿 |
+| 5 | Sleeping 差分重跑（timers=no / cpu≤0.5% / WS≤25MB / px_delta≥2120） | **未跑——且基线已换渲染器，读数将整表重定义** | D2D 路径的旧差分对 WebView2 渲染器无效（集成腿证据件"已知边界"自报同点）；webview2 常驻 GPU 合成面的空闲功耗必须仪器重测，本裁决不代跑不估读 |
+| 6 | **owner 第二次看 `-tour` 并说"这次对了"** | **归机主**（⛔ 本裁决不判） | 集成腿的 tour 入口=balldebug（20 态循环）；判据仍是人眼判决。在此之前 SPEC-08 §2 INTERIM 不摘 |
+
+### 7.5 判语总表
+
+- **a2e535674（集成腿）**：实现腿声明范围内**全部属实**（资产逐字节/映射钉死/回退结构/门禁）；但留下**集成面真回归**——球窗被守卫停画后全透明不可点（§7.3，探针实证）。
+- **d687dd910（出屏腿）**：**PASS 全格**。基线 PASS（orb=(3196,1260)-(3328,1392) 全内）＋突变 ②必红（(3452,1292)-(3584,1424) 双轴出屏）＋纯函数表测六形状＋WS_EX 语义零动，复跑与自报一致。
+- **8fb821bba（黑窗腿）**：**PASS 全格**。三层根因证据链自洽；像素用例基线 35.43%＋突变 ①0.000% 全黑必红——**证明像素回归有牙**；资产 sha 复测一致；CSP 以 meta 形态保住（文档 API 只紧不松，形态合法）。
+- **票 65 整体**：不结案。AC#3/#5 真桌面件未跑；AC#6 归机主；**新增收尾项：球窗透明回归（§7.3）须由实现腿修复后再走桌面趟**。
+
+### 7.6 撤销口令
+
+- 集成整体：`git revert a2e535674 d687dd910 8fb821bba`（球回 D2D wensity 路线）。
+- 仅黑窗修：`git revert 8fb821bba`；仅出屏修：`git revert d687dd910`。

@@ -110,3 +110,19 @@ AnySearch 文档 1 张、代理面板 1 张、本轮 tour 截图 3 张、小裁�
   （sha d93da649... 复测一致）。回归：TestBallLiveOrbPageRendersPixels（黑底窗 topmost+屏幕 DC 采样，
   断言非黑像素占比>1%，实测 634/1764=35.94%）。门禁全绿。证据 docs/evidence/s1/65-orb-black-window-fix.md。
   next=编排者收件三把尺＋裁决（审计者≠实现者）；未翻任何 AC 格/Status
+
+- [2026-11-07T14:30+08] agent=verdict（裁决腿，非实现者）did=独立复跑 orb 三腿（a2e535674/d687dd910/8fb821bba）
+  全部声明：资产 sha256 逐字节=d93da649... 一致；像素用例亲跑 PASS 625/1764=35.43%＋★突变①（注释
+  browser.Show()）→0.000% 全黑 FAIL 有牙；出屏用例亲跑 PASS orb=(3196,1260)-(3328,1392) 全内＋★突变②
+  （orbFollowXY 改回无条件 wr.r+gap）→orb=(3452,1292)-(3584,1424) 双轴出屏 FAIL 有牙；两突变做完即还
+  （git status internal/ball 复归空）；票 62 dock 测试 0 字节 diff（12 枚 Test func 只增未删）；门禁全套
+  gofumpt 空/vet rc0/build rc0/默认套件 ok/d22scan clean（939+224 files）。★核心发现：winlive 全套
+  4 FAIL 逐枚归因——TestBallLiveEdgeDock 与 TestLiveConfirmingCancelAndEscReturned 存量环境失败
+  （pre-orb 仓外 clone 基线同红同读数）；TestLiveNeverStealsFocus 与 TestLiveTransparentCornerFallsThrough
+  基线 PASS ⇒ **orb 集成引入真回归**：a2e535674 的 orbLive() 守卫（ball_windows.go:419/:554）让球窗
+  在 orb 场景从未 ULW 一帧 ⇒ 分层窗 alpha 恒 0 ⇒ 球不可见+点击穿透（探针实证：同位同分钟，
+  pre-orb WFP(球心)=WispBallWindow，HEAD WFP=第三方窗被穿透）。判语：a2e535674 声明属实但留集成面
+  回归；d687dd910/8fb821bba PASS 全格；AC#1 沿用 PASS/#2 部分/#3/#5 真桌面未跑（#5 基线已换渲染器
+  整表待重测）/#4 部分（断言未改 PASS，"仍绿"被球透明回归压住）/**#6 归机主**。证据
+  docs/evidence/s1/65-verdict.md §7（§1-§6 历史裁决原样保留）。next=球窗透明回归收尾腿（实现腿做，
+  裁决只定性不开方）→编排者重派桌面趟（AC#3/#5/#6）。未翻任何 AC 勾/Status；⛔push
