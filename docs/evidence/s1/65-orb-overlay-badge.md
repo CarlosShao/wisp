@@ -90,8 +90,8 @@ $env:GOTMPDIR=""; & "D:\work\soft\Git\bin\bash.exe" -lc 'cd "/d/work/workspace/p
 | `go test ./internal/ball -count=1` | ok 0.645s |
 | ★`go test -tags winlive -run 'TestBallLiveOrb' -count=1 -timeout 20m` | **6/6 PASS**（含新增用例）：Attach 2.51s / FollowPlacement 0.00s / FollowStaysInside 0.27s / PageRendersPixels 29.77s / **CornersReadTheDesktop 30.84s PASS**（四角 (51,51,50) 法则未破）/ OverlayFrameHasNoGlyphPixels 1.27s |
 | ★`TestLiveTransparentCornerFallsThrough` | PASS（0.26s） |
-| ★`TestLiveNeverStealsFocus` | 见 §七.2（物理指针被占，SKIP-LOUD 重试环，后台在飞） |
-| `sh scripts/d22scan.sh` | 见 §七.3（后台在飞，落盘后补行） |
+| ★`TestLiveNeverStealsFocus` | **PASS（1.65s）**——重试环第 2 发拿到判行（首几发物理指针被占用 SKIP-LOUD：SKIP 前样式位 `WS_EX_NOACTIVATE`/`MA_NOACTIVATE`/前台不变三断言已过；第 1 发无判行输出＝票面已记的"二进制静默死亡"同形状，第 2 发正常判） |
+| `sh scripts/d22scan.sh` | **clean**（ban #8: internal/=944 Go files、cmd/=230、frontend/=116；首跑 FAIL＝tools/d22scan 自模块 1 枚，与本腿文件无关、系并发腿并行污染，隔离复跑 ok 73s，全量复跑 clean） |
 
 **红→绿证据链**：修复未应用时新用例 **FAIL，计数 103**（`overlay frame carries 103 near-white
 glyph pixels`）＝「69%」的文字像素确实在球窗帧里；修复后同用例 **PASS，计数 0**。判据有牙
@@ -112,9 +112,11 @@ glyph pixels`）＝「69%」的文字像素确实在球窗帧里；修复后同�
 1. **进度百分比在 orb 模式下当前无数字读数**（甲的代价，如实）：orb 模式进度＝外圈弧形
    （底环＋进度弧比例可目读），具体数字要看面板。页面 API 冻结（sha 钉死）是硬边界，
    数字要上玻璃面只能等「上游页加通道或换页」的票（那要动票面钉死的 sha，属改契约）。
-2. **TestLiveNeverStealsFocus 在腿内未拿到 PASS 判行**：该用例的 SKIP-LOUD 纪律在
-   SetCursorPos 被拒时拒绝伪绿（本机物理指针被占用——编排者/机主在用）。已按其既有
-   语义挂后台重试环（6 发×20s），腿内未结的以本节如实报，收件以复跑为准。
-3. d22scan 结果后台在飞，本文件提交前若未落盘则以 ticket Progress log 同步补记。
+2. **TestLiveNeverStealsFocus 收尾读数已落**：后台重试环（60s 间隔）第 2 发 **PASS 1.65s**
+   （物理 SetCursorPos+点击真跑过、前台窗口未变）。首几发 SKIP-LOUD＝本机物理指针被占用
+   （编排者/机主在用鼠标），该 SKIP 纪律拒绝伪绿、非测试缺陷；第 1 发曾无判行输出
+   （票面在记的 winlive 二进制静默死亡同形状，未复现第二次）。
+3. ~~d22scan 后台在飞~~ → **已落：clean**（首跑 FAIL＝tools/d22scan 自模块测试 1 枚，
+   与本腿无关；当轮与后台焦点重试环并行，隔离复跑 ok 73s，全量复跑 clean 读数见 §五）。
 4. 工作树上有一枚**并发 jarvis 腿的在飞未跟踪件** `internal/ball/assets/jarvis-orb.html`
    （commits 1652051d0/29b3501d5 的后续 WIP）：非本腿产物，pathspec 点名时不带它。
