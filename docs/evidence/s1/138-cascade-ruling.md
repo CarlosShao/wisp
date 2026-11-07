@@ -99,3 +99,53 @@
 - 138 r1 证据件 §AC#1③ 量过「builtin 工具族零子进程」，本件不重算；本件增量＝票 52 之后的世界。
 
 ---
+
+## §2 步2：AC#2 裁定——修法形状与理由（先裁再写）
+
+### 2.1 裁定
+
+**不新建"每轮任务一枚 Job Object"，不新增任何级联通道；修法＝三件小实体：**
+
+1. **钉牙（核心）**：新增 `Test138TaskCancelKillsTheProcessTree`（`internal/plugin/manifestslot/command_138_cancel_test.go`），
+   钉住「调用方 cancel（= 任务取消的形状）⇒ 被包 CLI 的**整棵进程树**（含孙进程）死」。
+   这是级联的取消半边的第一枚牙（预算半边的牙已由票 52 的 `Test52TimeoutKillsTheProcessTree` 提供）。
+2. **非 Windows 半边去静默（AC#2③ 点名的形状）**：
+   - `command_job_other.go` 的 `childJob.Kill()` 从静默 no-op 改为**留一行可见 stderr 告警**
+     （"no Job Object on this platform; the tree kill degrades to the direct child"）；
+   - `command.go` 的 Spawn fallback（`openChildJob` 报 `errNoJobObject` 后走 `cmd.Start()` 处）加同一句可见告警——
+     这是非 Windows 上**真实可达**的路径，告警落在真实路径才算"可见"；
+   - `command.go:442-444` 的 OSCommandSpawner doc 注释校准（"a Windows Job Object" → 准确表述两平台语义）。
+3. **本裁定零改动面**：`internal/agent/loop.go`、`internal/proc/**`、`internal/risk/**`、`cmd/wisp/**` 一概不动；
+   `cancelled` 文案与错误分类零触碰（AC#2④ 前件不成立，不触发停手）。
+
+### 2.2 为什么不是"每轮任务一枚 Job Object"（票面修法族的字面）
+
+- 票面写「修法只许落在"每轮任务一枚自己的 Job Object、取消时级联"这一族」——那是 **09-24 开票时**的形状，
+  当时仓里零枚 `TerminateJobObject`、ctx 级联没有执行器。**票 52 落地后该族已经被更细的形状占据**：
+  每条命令子进程一枚 Job（归属单位＝一次命令调用，比"每轮任务"更细），杀树执行器＝`TerminateJobObject` 在位。
+- 在它之上再叠一枚 per-task Job 买到的新价值＝**0**（同一棵树、同一个取消源、同一次 kill），
+  付出的复杂度是真金白银：一个进程同时挂 per-call Job 与 per-task Job 需要 Windows 8+ 的 Job 层级
+  （`AssignProcessToJobObject` 嵌套、`KILL_ON_JOB_CLOSE` 在层级下的继承/breakaway 语义）——
+  **复杂买不到真价值，不选**（铁律③：复杂本身不加分）。
+- 「取消时级联」这半边今天已经存在且形状正确：Go context 的自上而下取消（§1.1 四环）
+  × 预算守望的 `childCtx.Done() → kill()`（§1.2 第 9 环）。**它缺的只是证明**——这正是 AC#3 的牙。
+
+### 2.3 为什么非 Windows 半边选"显式无此能力＋可见告警"、不选"等价实现"
+
+- AC#2③ 给两条路：等价实现（Unix 进程组杀树）或明确声明无此能力＋可见告警。
+- 等价实现（`Setpgid` + `syscall.Kill(-pid)`）是主流形状，但**本宿主（Windows）无法给它配牙**：
+  AC#3 的标准是"突变转红、逐名记红行"——一个我无法在本宿主跑出红读数的实现是**没有牙的代码**，
+  与本仓"不许一步存在却从不产出结论"的文化冲突。D7 只 ship Windows，非 Windows 半边今天的真实消费者
+  是交叉 vet/build。⇒ 选显式声明＋可见告警；等价实现留给真有 Unix 交付面的一天（届时必须带牙）。
+
+### 2.4 AC#2 四条件逐一过
+
+| 条件 | 过法 |
+|---|---|
+| ① 不动 D4/C19 门控判定（risk 侧零字） | 修法面＝`command_job_other.go`＋`command.go` 注释/告警＋新测试件；`internal/risk/**`、`rules_gateway.go` 零触碰（§4 门禁读数复核） |
+| ② 不新增重量级依赖 | 零新依赖：标准库 `fmt`/`os`＋已有 `golang.org/x/sys/windows` |
+| ③ Windows API 留 `_windows.go`；非 Windows 有等价或可见告警 | Windows API 全部在 `command_job_windows.go`（未动）；非 Windows 从静默 no-op 改为可见告警（§2.1 第 2 条） |
+| ④ 若要改 `cancelled` 文案/错误分类 ⇒ 停手 | 判定：不需要（级联已通，本票只钉牙＋去静默，零文案改动）——不触发 |
+
+---
+
