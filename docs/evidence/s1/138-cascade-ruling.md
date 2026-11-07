@@ -190,4 +190,28 @@
 
 ---
 
+## §4 步5：门禁读数（2026-11-07 16:22–16:2x +08，全部现跑）
+
+| 门禁 | 命令（要点） | 读数 |
+|---|---|---|
+| gofumpt | `D:\work\base\gopath\bin\gofumpt.exe -l internal/plugin/ internal/plugin/manifestslot/`（绝对路径） | **空表**，rc=0 |
+| go vet | `go vet ./internal/plugin/...`（包作用域；`cmd/wisp` 交叉 vet 本底 rc=1 的 sherpa 约束与被审对象无关，票面 AC#4 已注） | **rc=0** |
+| build | `go build ./internal/... ./cmd/... ./tools/...`（`./...` 全树版红在 git-ignored 的本机残件 `build/mut_rvw.go`，与树无关，见 §3.3 同类判定） | **rc=0** |
+| d22scan | `sh scripts/d22scan.sh` | **clean rc=0**；scope 读数齐：437 生产 Go 文件（internal 378＋cmd 59）、ban#6 frontend=116、ban#7 tools=48、ban#8 internal=941/cmd=226/design=39、ban#10 risk=21——各 scope 无降 |
+| 相关包 count=1 | `go test -count=1 ./internal/plugin/...` | `internal/plugin ok 8.053s` ＋ `internal/plugin/manifestslot ok 10.503s`，**rc=0** |
+| 两形四数＋名册差集 | `go test -count=2 -v ./internal/plugin/manifestslot`（日志 `.scratch/wisp/probes/138/r1/manifestslot-count2.log`，只建不删） | **RUN=94 / PASS=82 / FAIL=0 / rc=0**；两轮 top-level 名册 47×2，**差集空** |
+
+## §5 交付清单与边界
+
+- 本腿 commit（五枚，只 commit 不 push）：`8429d0e60`（步1）→ `b3e990300`（步2）→ `bf224be19`（步3）→ `b576c10a3`（步4）→ 本枚（步5）。
+- 写面：`docs/evidence/s1/138-cascade-ruling.md` ＋ `internal/plugin/manifestslot/command_138_cancel_test.go`（新增）
+  ＋ `command.go`／`command_job_other.go`（可见告警与注释）＋ 票面 Progress log 一行。
+- 未做／边界（如实）：
+  - **AC 勾与 Status 零触碰**（裁决者≠实现者；AC#2/AC#3 的翻勾留给验收程复算本件读数后定）；
+  - `internal/agent/loop.go:342` 的 Cancel 本体未动（裁定：不需要——级联已通，见 §2.2）；
+  - `internal/ball/**`（他腿在飞两文件）、`internal/panel/composer.go`、`cmd/wisp/approval_*.go`、`frontend/**`、
+    `design/**`、thresholds/golden：零触碰；
+  - 非 Windows 等价实现（进程组杀树）**未做**——裁定理由 §2.3（本宿主无法给它配牙；留待真有 Unix 交付面时带牙落）。
+
+
 

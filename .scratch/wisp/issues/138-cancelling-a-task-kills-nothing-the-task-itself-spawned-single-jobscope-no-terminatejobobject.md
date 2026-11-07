@@ -97,3 +97,14 @@ GAP-09 的原话是：「取消只有 `RunningTask.Cancel()`→root ctx；JobSco
   >    但**我的派单正文在盘上没有凭据**（`.scratch/wisp/dispatches/` 的规矩当时只归档"授予范围／解冻／例外"那类，普通实现派单不入盘）
   >    ⇒ 所以"我派单里没这句"是**我对上下文的回忆、不是一件可核的物证**。甲／乙／丙／丁四支**一支都不能定罪**。
   >    ⇒ 制度已改：**从本行起，每一枚派单正文落盘进 `dispatches/`**（见该目录 README 末段追加的那条），今后这类争议有物证可查。
+
+- [2026-11-07 16:3x +08] agent=wisp-writing-leg(138) did=按派单五步落完：步1 裁定书前半现跑
+  （票52(`5438d104e`,11-03)已把 D46 命令插件落地——每子进程 Job＋`TerminateJobObject`（`command_job_windows.go:146`），
+  票面 §0"全仓 0 处"失效；`loop.go:300`→`:342` 行漂体同）；步2 AC#2 裁定＝**不叠 per-task Job**
+  （票 52 后 per-call Job 已占位，层级复杂买不到真价值；修法＝钉取消半边的牙＋非 Windows 去静默 no-op，
+  四条件逐一过，AC#2④ 不触发）；步3 修法落地（Spawn fallback 可见降级告警＋`Kill()` 据实注释＋收编上轮 null 腿
+  遗物测试件）；步4 突变 M1（`stopwatch.go:23` 摘父链）⇒ 牙转红 **FAIL 15.24s 红在 `command_138_cancel_test.go:94`** ⇒
+  还原 diff 空 ⇒ 复绿 PASS 1.02s；步5 门禁：gofumpt 空／vet rc0／build rc0（scoped）／d22scan clean（437 生产 Go 文件）／
+  `./internal/plugin/...` count=1 rc0／manifestslot count=2 四数 RUN=94·PASS=82·FAIL=0·rc0 两轮名册差集空。
+  AC 勾与 Status 零触碰（裁决者≠实现者）。证据＝`docs/evidence/s1/138-cascade-ruling.md`。
+  commit 链 `8429d0e60`→`b3e990300`→`bf224be19`→`b576c10a3`→步5 本枚；⛔push。
