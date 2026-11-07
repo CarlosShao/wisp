@@ -6,7 +6,16 @@
   <title>Wisp Jarvis Orb</title>
   <style>
     html, body, #root { width: 100%; height: 100%; margin: 0; }
-    body { overflow: hidden; background: transparent; }
+    /* Body background = the UPSTREAM DEMO's own host background
+       (jarvis-src/examples/basic/index.html:8, background: #050913) so the
+       standalone artifact renders exactly like the demo: AdditiveBlending
+       particles need a dark backdrop to read cyan (over white they wash out).
+       The Wisp product does NOT rely on this value: orbasset.go injects
+       html,body{background:transparent !important} into the served copy (same
+       belt both orb pages get), so inside the product the pixels outside the
+       orb stay the window's transparency regardless of what this template
+       ships - the siri page (orb-siri.html, body #030409) is the precedent. */
+    body { overflow: hidden; background: #050913; }
   </style>
 </head>
 <body>

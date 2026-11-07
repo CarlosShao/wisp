@@ -6,7 +6,16 @@
   <title>Wisp Jarvis Orb</title>
   <style>
     html, body, #root { width: 100%; height: 100%; margin: 0; }
-    body { overflow: hidden; background: transparent; }
+    /* Body background = the UPSTREAM DEMO's own host background
+       (jarvis-src/examples/basic/index.html:8, background: #050913) so the
+       standalone artifact renders exactly like the demo: AdditiveBlending
+       particles need a dark backdrop to read cyan (over white they wash out).
+       The Wisp product does NOT rely on this value: orbasset.go injects
+       html,body{background:transparent !important} into the served copy (same
+       belt both orb pages get), so inside the product the pixels outside the
+       orb stay the window's transparency regardless of what this template
+       ships - the siri page (orb-siri.html, body #030409) is the precedent. */
+    body { overflow: hidden; background: #050913; }
   </style>
   <script type="module">
 (function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const a of document.querySelectorAll('link[rel="modulepreload"]'))i(a);new MutationObserver(a=>{for(const r of a)if(r.type==="childList")for(const s of r.addedNodes)s.tagName==="LINK"&&s.rel==="modulepreload"&&i(s)}).observe(document,{childList:!0,subtree:!0});function n(a){const r={};return a.integrity&&(r.integrity=a.integrity),a.referrerPolicy&&(r.referrerPolicy=a.referrerPolicy),a.crossOrigin==="use-credentials"?r.credentials="include":a.crossOrigin==="anonymous"?r.credentials="omit":r.credentials="same-origin",r}function i(a){if(a.ep)return;a.ep=!0;const r=n(a);fetch(a.href,r)}})();var x_={exports:{}},sf={};/**

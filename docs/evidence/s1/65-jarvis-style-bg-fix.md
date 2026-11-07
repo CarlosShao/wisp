@@ -58,3 +58,23 @@ html, body { margin: 0; padding: 0; background: #050913; ... }
 1. **产品架构＝透明叠加窗**（1.5 五条证据），orb 页面在产品里**必须有透明底**——但这一点由 `orbasset.go` 的注入层保证，**不依赖页面自己写 transparent**。
 2. 白底灰环的唯一根源＝**导出页 body 写了 `background:transparent`**：浏览器/截图场景透出白、加色混合洗白；这与「页面该不该透明」无关——页面自带什么底，产品里都会被注入层清成透明。
 3. 判据缺陷确认：现 `orb_jarvis_live_windows_test.go` 唯一牙齿＝`orbTestNonDarkRatio > 1%`（orb_live_windows_test.go:385 定义，any channel > 30 计 non-dark）——**页面若真把白底画出来，non-dark 接近 100%，照样绿**；对「底色错了」完全无感，对「粒子是不是青的」也无感。
+
+---
+
+## 步2 裁定：导出页自带 demo 深底 #050913，产品透明零改动（铁律 ⓪⓪⓪）
+
+**底色裁定：jarvis 导出页 body 自带 `background:#050913`（上游 demo 原值，非截图估值 #0a0e14）。**
+
+- **为什么这不是"硬塞黑底破坏透明架构"**：产品的透明契约**从来不由页面自己提供**——`orbasset.go` 对两页统一注入 `html,body{background:transparent !important}`（声明级 `!important` 压过页面任何非 important 底色，orbasset.go:125 注释逐字），再加 JS 引导双保险。**siri 页就是这个形状**：自带 `#030409` 深底（其上游导出目标也是浏览器 tab），产品里被注入层清成透明，`TestBallLiveOrbCornersReadTheDesktop` 四角 (51,51,50) ±12 长期钉死透明没被破坏。jarvis 页自带深底＝对称适用同一条既有规则。
+- **为什么有价值**：单文件 artifact 的直接观感场景（浏览器直开、静态服务截图、人眼验收）从「白底灰环＝看起来坏了」变成「上游 demo 原貌＝深黑底＋亮青环」；产品内行为字节级不变（注入层照清）。
+- **被否的备选**：保持 transparent——产品没问题但任何人浏览器直开永远白底灰环，机主实测凭据里的「差得很远」原样保留，等于没修；在 orbasset.go 加条件注入/按风格区分——复杂且毫无收益（注入层本来就两页同治，siri 页先例已验证）。
+- **配色裁定：产码零改动。** palette 已显式传 cyan（entry.tsx:26-31）；three 的 toneMapping/outputColorSpace 与 demo 是同一段代码（同一组件、入口与 vite 配置不碰 three 初始化）。变灰唯一根源是底色，底色修掉后加色混合自然显青。
+- **撤销口令**：`git revert` 本腿的 tools/jarvis-export/index.html 那笔 commit 并重建（或把 body background 改回 transparent）。
+
+## 步3 重建产物（2026-11-07 19:1x +08 实跑）
+
+- 改 `tools/jarvis-export/index.html`（body `transparent`→`#050913`，注释写明底色来源与产品注入层的关系）。
+- `npm run build`（vite build + inline.mjs）：`inline: wrote …dist\jarvis-orb.html (759031 bytes)`，6.78s；三颗历史雷防护（inline.mjs 函数式替换 / vite resolve.dedupe / esbuild jsx automatic）全部在位未触发。
+- 拷贝 `dist/jarvis-orb.html` → `internal/ball/assets/jarvis-orb.html`：759,031 B（旧 758,355 B，差值=模板注释＋底色行），**CR=0 / LF=4332**（纯 LF，PowerShell 逐字节复核）。
+- 新 sha256 `740c486827e918f0993e63ea1f213ca217067ec1e9e942dbc04777897c5d2017`，钉值 `orb_test.go jarvisUpstreamSHA256` 同 commit 换钉（README 钉值纪律）。
+- 静态尺现跑：`grep -c 'src="https?://|href="https?://'` = **0 命中**（离线不破）。

@@ -264,7 +264,7 @@ func TestOrbWriteSite(t *testing.T) {
 // (assets/jarvis-orb.html). The asset is the tools/jarvis-export build of the
 // UNMODIFIED upstream component; a rebuild through the scaffold reproduces it
 // (update this pin in the same commit as the rebuilt asset).
-const jarvisUpstreamSHA256 = "e95e1d963139a08b50d0c6be1d460db137a005d602e05eb9451dc60a6d99ce62"
+const jarvisUpstreamSHA256 = "740c486827e918f0993e63ea1f213ca217067ec1e9e942dbc04777897c5d2017"
 
 // TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
 // embed is the scaffold's build of the upstream component with the entry's
