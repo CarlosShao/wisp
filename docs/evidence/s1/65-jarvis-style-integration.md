@@ -82,6 +82,52 @@
 
 ---
 
+## 步4 Go 接线：orb 宿主按风格选 asset（commit `1853d1d87`）
+
+写面＝`orbasset.go`＋`orbstate.go`＋`orb_windows.go`＋`orb_test.go`（`renderer_windows.go`/`ball_windows.go` 零触碰；wave65 的 overlay 腿 WIP 在飞时全程避让，其落盘 `c5cca231a` 在本腿步4 commit 之前）。
+
+| 文件 | 改了什么 |
+|---|---|
+| `orbasset.go` | ① embed 第二页 `jarvisPageHTML`（`//go:embed assets/jarvis-orb.html`）；② `orbPageDocument()` 拆成 `orbServeDocument(page)` 通用注入＋两个薄壳（`orbPageDocument`/`orbJarvisDocument`）；③ `orbWriteSite` 每次物化**两枚**入口（`orb.html`＋`jarvis.html`）⇒ 运行时切换＝纯导航；④ 新 `orbPageForStyle(Style)` 纯决策（glass→siri 页/entry，jarvis→jarvis 页/entry）；⑤ 新 `orbJarvisStateScript`（`window.jarvisOrb&&…setState("…")`） |
+| `orbstate.go` | 新 `jarvisStateFor`：同 `orbActiveStates` 工作族→thinking；失败/注意族（Error/NoNetwork/WatchdogAlert/Stuck/Unconfigured）→**alert**；Settling→**success**；其余→idle。20 冻结态全覆盖（测试钉） |
+| `orb_windows.go` | ① `orbWindow` 加 `style`＋`servedByMapping` 字段（attach 时读 `ActiveStyle()`）；② serving 按风格选 entryURL／NavigateToString 文档；③ `pushState` 按风格分派接缝（liquidOrb／jarvisOrb）；④ `pushAudio` 对 jarvis 风格**整段跳过**（上游无音频接缝，不发明）；⑤ 新 `orbWindow.setStyle`（原地导航换页＋回推当前态）与 `Ball.ApplyStyle(name)`（= SetStyle ＋ STA PostTask 换页；词表外返回 false；orb 未附着时只 SetStyle） |
+| `orb_test.go` | jarvis 钉子 6 枚：sha 钉（`e95e1d96…`）＋资产完整性/接缝隔离/离线尺（见步3 静态尺注记；react-dom/three 的 W3C 命名空间 URI 是 DOM API 实参字符串常量，尺用 `src="http`/`href="http`/`<link`/`import(`/`url(http`）＋jarvis 映射全 20 态＋映射形状（alert/success 决策钉死）＋接缝脚本字面量＋`orbPageForStyle` 双向＋jarvis serving 常量（CSP 恰 1 枚、注入在 head、raw embed 无 meta——尺用完整 `http-equiv="Content-Security-Policy"` 对，因 react-dom 自身代码含裸词 http-equiv） |
+
+**钉值契约**：`jarvisUpstreamSHA256` 与 siri 页同一纪律——重建产物变 sha 必须同一 commit 换钉（测试强制，防止静默换资产）。
+
+## 步5 winlive 判据（commit `d902fbc6b`）
+
+新文件 `orb_jarvis_live_windows_test.go`（避让 wave65 已落盘的 `orb_live_windows_test.go`，零改动它）：
+
+- **`TestBallLiveOrbJarvisStyleRendersParticles`**：SetStyle(jarvis) → 真建球+orb → 复用 `orbPixelAttempt`（已知黑底板上采样合成像素）→ **非黑率 >1% 才算渲染**（3 发有界重建重试，attach 失败硬 Fatal）——「页面加载了」零价值，牙在像素上。通过后追加 `ApplyStyle(glass)`→`ApplyStyle(jarvis)` 往返断言：**窗柄不变**（原地导航，不是销毁重建）。风格全局在 Cleanup 还原 glass，进程内后续测试不受污染。
+- 既有 `TestBallLiveOrbPageRendersPixels`（siri 页）零改动零重跑污染：glass 是默认风格，其资产/服务路径字节级未动。
+
+## 步6 门禁读数（本腿实跑，2026-11-07 18:39-18:45 +08）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| gofumpt | `gofumpt.exe -l internal/ball` | **空** |
+| go vet | `go vet ./internal/ball` | rc0 |
+| go vet(winlive) | `go vet -tags winlive ./internal/ball` | rc0 |
+| go build | `go build ./internal/ball ./cmd/wisp ./cmd/balldebug` | rc0 |
+| 默认套件 | `go test ./internal/ball -count=1` | ok 0.368s |
+| ★winlive 全套 | `go test -tags winlive ./internal/ball/ -run 'TestBallLiveOrb' -count=1 -timeout 20m` | **7/7 PASS** 62.6s：Jarvis 像素 10.09%（新）＋AttachStateAndTeardown＋FollowPlacementDecision＋FollowStaysInsideWorkArea＋PageRendersPixels＋CornersReadTheDesktop（四角 (51,51,50) 未破）＋OverlayFrameHasNoGlyphPixels |
+| ★焦点/穿透 | `go test -tags winlive ./internal/ball/ -run 'TestLiveNeverStealsFocus\|TestLiveTransparentCornerFallsThrough' -count=1` | **2/2 PASS** 2.6s |
+| d22scan | `sh scripts/d22scan.sh` | **clean**（internal/ 945 文件过扫零 violation） |
+
+**jarvis 像素读数**：attempt 1 直接过，97/961 采样像素非黑（10.09% > 1% 牙线）＝真画出了粒子球（球核+轨道环+散点）。
+
+## 诚实边界（本腿不做/没做到的）
+
+1. **音频**：jarvis 风格无音频驱动（上游组件无接缝，不发明）；语音家族在 jarvis 风格下只有状态动画。
+2. **config 接线**：`[ball] style` 配置键此前已入 config 面（jarvis leg 3），但 `ball.ApplyStyle` 的**运行时**调用方（面板/调试入口）本腿未接——当前经 `balldebug -style` 与测试可达；产品内一键切换留下一腿（非本票范围）。
+3. **D2D fallback 的 jarvis 面**：仍是 jarvis leg 3 的静帧仿品（D32 纪律），本腿零触碰；真粒子只在 orb 宿主（WebView2 attach 成功）可见。
+4. **产物形态**：jarvis-orb.html 是构建产物非上游原始文件（构建方法/三颗雷见步3；脚手架随库可复跑）。
+
+**Commits**（本腿全列）：`1652051d0`（步1）→ `29b3501d5`（步2）→ `b679fd072`（步3）→ `1853d1d87`（步4）→ `d902fbc6b`（步5）→ 本 commit（步6 证据收尾）。AC 勾与 Status 未动；⛔ push。
+
+---
+
 ## 步3 落地：jarvis-orb.html 构建＋真渲染验证
 
 **产物**：`internal/ball/assets/jarvis-orb.html`（758,355 B，LF，sha256
@@ -118,4 +164,4 @@ python -m http.server 8923 --directory "D:\work\workspace\projects plans\Wisp\in
 # 浏览器开 http://127.0.0.1:8923/jarvis-orb.html —— 截图就看这个 URL
 ```
 
-（步4 Go 接线见下文追加节。）
+（步4-6 见下文追加节。）
