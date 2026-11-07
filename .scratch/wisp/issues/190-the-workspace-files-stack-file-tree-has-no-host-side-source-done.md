@@ -46,3 +46,5 @@
 - [2026-11-04 15:40 +08] agent=编排者+微粒细胞：Go 核心落地（6 commit：types/reader/屯据/接线1/接线2），build 三包+vet 绿；panel 整包红2=C21(既有)+TestComposerContractTypesMatchFrontend(新,页侧待UI腿)。余 AC#4 三形+AC#2/#3 判据未做，未收。
 
 - [2026-11-04 16:00 +08] agent=编排者：补 AC#4 三形+AC#3 只读+AC#2 not_chosen 判据（commit 5229a5e41），Tree190 6/6 绿，d22scan clean。host 侧功能完；余：文件名 scrub（硬化项）、契约 files 键页侧待 UI 腿、正式非实现者判语（核验腿 dud 下轮重派）。未 -done。
+
+- [2026-11-07 14:1x +08] agent=190 files 键 reader 腿：修法裁决＝甲（页侧补声明）方向正确但归 owner UI 腿（A1487、待机主解闸项③），乙（删键）否——读者在（run.go:977→panel_pump.go:294-296→pump.go:288-290）；本腿交付线级具名用例三枚（新件 internal/panel/composer_files_190_test.go：无 reader 键不上线／键名层级与七名载荷／not_chosen 拒绝随键上线）3/3 绿＋裁决件 docs/evidence/s1/190-files-key-line-verdict.md。门禁现跑：vet rc=0、build rc=0、d22scan clean、整包红=2 照实（合同尺本键页侧待声明＋C21 既有）；composer.go 的 gofumpt 脏＝145 腿未提交在飞件所致（该件 HEAD 版 gofumpt 干净已证），本腿对 composer.go/composer_test.go 零写入零提交。
