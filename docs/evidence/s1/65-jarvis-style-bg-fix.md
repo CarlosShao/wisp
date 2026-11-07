@@ -78,3 +78,27 @@ html, body { margin: 0; padding: 0; background: #050913; ... }
 - 拷贝 `dist/jarvis-orb.html` → `internal/ball/assets/jarvis-orb.html`：759,031 B（旧 758,355 B，差值=模板注释＋底色行），**CR=0 / LF=4332**（纯 LF，PowerShell 逐字节复核）。
 - 新 sha256 `740c486827e918f0993e63ea1f213ca217067ec1e9e942dbc04777897c5d2017`，钉值 `orb_test.go jarvisUpstreamSHA256` 同 commit 换钉（README 钉值纪律）。
 - 静态尺现跑：`grep -c 'src="https?://|href="https?://'` = **0 命中**（离线不破）。
+
+---
+
+## 步4 判据加严：`orb_jarvis_live_windows_test.go` 整牙重铸（本票核心价值）
+
+**旧牙（废）**：`orbTestNonDarkRatio > 1%`（any channel > 30 计 non-dark，黑底板）——白底页面 non-dark≈100% 恒过，对底色错误完全无感（步1 §1.6 结论）。
+
+**新牙（三条读数全要）**：
+
+| # | 牙 | 判据 | 为什么 |
+|---|---|---|---|
+| ① | **背景必须＝桌面（透明形态）** | orb 停在已知 **(51,51,50)** 底板上（`orbTestCreateColoredFloor`；黑板不可用——透明压黑板与黑方块缺陷读数同为 (0,0,0)），窗四角内缩 3px（编排者探针形状）逐通道 **±12** 内必须读出底板色 | 产品 orb 窗是透明 WebView2 叠加（orb_windows.go DefaultBackgroundColor a=0／无 LAYERED；orbasset.go 注入 transparent !important）⇒ 按「与桌面底板一致」形态（TestBallLiveOrbCornersReadTheDesktop 同法），**不是**绝对亮度阈值——绝对「暗<40」会把透明架构改成黑底架构，正是任务令点名禁止的破坏 |
+| ② | **粒子必须是青色** | 全窗采样（内缩 4px 步长 3px）中**青色主导像素**（`g-r ≥ 12 且 b-r ≥ 12 且 b ≥ 80`）占比 **> 2%** | 上游 cyan 色板 primary 0x38f4ff／secondary 0x19a8ff／tertiary 0x7fffee（states.ts:117-123）：每个粒子色 g、b 都远高于 r；加色混合压在灰底板上青色主导保持。白底洗白的灰白环 g-r≈0 → 归零；重上色页面（非青系）也归零。阈值 2% ＝ 实测健康读数 7.91-8.32% 的 ~4 倍余量 |
+| ③ | **旧「non-dark > 1%」断言废除** | 本测试不再引用 orbTestNonDarkRatio；「页面活着」由 ② 蕴含（青像素存在＝真画了） | 任务令点名：那条在白底下恒真 |
+
+**诚实边界（②的判别力范围）**：上游三个内置色板 **cyan/aurora/ember 全是青系**（states.ts:117-141，aurora/ember 只是青色微调，demo 里的紫色是 App.tsx 自定义色板）⇒ ②钉的是「页面自身青系词汇真的在画」，不区分三块内置色板（那是 entry.tsx 的映射决策，已由 orb_test.go 的映射钉子管住）；②真正杀的是**白底洗白／灰白环／没在画**三类缺陷。
+
+**实测读数（本腿实跑，2026-11-07 19:15-19:16 +08，attempt 1 即过）**：
+
+- ① `corners [[51 51 50] [51 51 50] [51 51 50] [51 51 50]] within +/-12 of (51,51,50)` —— **四角与底板精确零差**（透明未破）
+- ② `cyan-dominant 80/961 sampled px (8.32% > 2.00% floor)`（首跑 1% 牙线读数 76/961＝7.91%，提线到 2% 后复跑 8.32%）
+- ③ 旧断言已从本文件移除（`orbTestNonDarkRatio` 零引用）
+
+**保留段**：`testJarvisRuntimeStyleSwitch`（ApplyStyle glass→jarvis 往返、窗柄不变）原样保留；3 发有界重建＋泄漏 WebView2 收割的 flake 形状同族保留。文件自含探针常量（jarvisProbeInset/jarvisCornerTol/jarvisCyanGate/jarvisCyanBright/jarvisCyanFloor），不耦合 wave68 在 `orb_live_windows_test.go` 的在飞改动；只复用 HEAD 已有的原语（orbTestCreateColoredFloor/orbTestFloorColor/orbTestPixelAt/orbTestReapLeakedWebView2）。
