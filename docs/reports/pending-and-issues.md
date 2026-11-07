@@ -31483,3 +31483,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **⑤ 264**：保持**甲**（wave47 在写）。
 - **⑥ 33**：AC#7 采编排者默认（**审批队列深度 & 结果列表同帧，其余各自独立**）；AC#8ⓑ **删** `run.go:2170` 零发射者 case（撤销「33 留」）。
 - **下波待派**（wave47 释放 cmd/wisp＋internal/agent 面后，按面互斥串行）：148-r3（Ⓐ+Ⓑ白名单，internal/agent/approval）＋ 170-impl（cmd/wisp）＋（另一面补位）；33-impl 再下一波（同占 cmd/wisp）。
+
+## A1592（2026-11-07 09:1x，编排者）**更正 A1591**：65 玻璃球机主尚未验收（我误读"可以验收"）
+- 机主原话："**玻璃球我还没验收呢哥们，我没看到啊**" ⇒ **A1591 里"65 玻璃可验收/AC#6 PASS"作废**：机主从未看到球、未签字。**65 仍 6 格全开、不结案**；等机主亲看后一句"这次对了"才翻 AC#6。
+- 已从干净 HEAD（`763963b87`，含 glass、无未提交 jarvis）`git clone --shared` 构建 `build/balldebug-65glass.exe`（不踩 wave47 在飞文件），已启动 `-tour -style glass` 供机主亲看。
+- **教训**：机主"可以验收"≠"已验收"；是"允许/交由我验收"之意。⛔ 把"可以验收"当"已通过"落账（宁缺毋造：未见证不记 PASS）。
