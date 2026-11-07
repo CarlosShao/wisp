@@ -267,7 +267,9 @@ func TestOrbWriteSite(t *testing.T) {
 // real-machine follow-up rebuilt the template with body background
 // TRANSPARENT by construction (the product page must not paint any backdrop;
 // evidence 65-jarvis-transparent-in-product.md §2) - same build, new bytes.
-const jarvisUpstreamSHA256 = "66eb4b800e2f37c77ce2b3e9a7d3d4a6a11dd102b85097bc06d7732f2c9c856b"
+// The dark-disc rework (same day, evidence 65-jarvis-dark-disc.md) added the
+// in-page circular backdrop (#jarvis-disc) the particles composite over.
+const jarvisUpstreamSHA256 = "2cb15fc2aaa2972181079a01ff889d832b52e8ab4daa288de1ede317bc0c72ff"
 
 // TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
 // embed is the scaffold's build of the upstream component with the entry's

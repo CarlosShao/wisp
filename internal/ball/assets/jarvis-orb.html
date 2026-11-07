@@ -25,6 +25,41 @@
        orbasset.go STAYS: it is the siri page's transparency mechanism too
        and costs nothing. */
     body { overflow: hidden; background: transparent; }
+    /* The DARK DISC (ticket 65 jarvis dark-disc leg, 2026-11-07): a circular
+       backdrop UNDER the particle canvas, INSIDE the page - the mainstream
+       orb-UI shape (Jarvis/Siri/Cortana class: dark disc + bright particles).
+       Why a disc and not a body backdrop: the transparency architecture
+       (orb_windows.go) keeps the window's corners composited against the
+       desktop - the live corner teeth sample 3 px inside the rect and must
+       keep reading the floor color. The disc therefore lives in a CIRCLE
+       centered on the window: diameter 96% of the window edge, so the corner
+       probe (diagonal 66.5% of the half-edge at 3 px inset on the 100 px
+       window; 70.7% asymptotically) stays far outside the disc's 96%-radius
+       (48% of the edge) and the corners keep showing the desktop. Coverage
+       math from the upstream component (jarvis-ai-web-animation dist):
+       PerspectiveCamera(35deg) at z=4.1 with sceneScale 0.82 puts the widest
+       particle element (orbit radius 1.17 rings; particle shell radius 1.05
+       with its 0.88-1.14 jitter) at 76% of the canvas half-edge - the disc
+       radius (96% of the half-edge) covers it all, so AdditiveBlending
+       cyan never composites over the desktop again: over the owner's white
+       window surface it was washed to grey-white (JARVIS-PRODUCT-REAL.png);
+       over the dark disc the same particles keep the upstream demo contrast.
+       Colour: the demo's own dark-blue family (deep #050913 base, subtle
+       centre lift) - NOT pure black, which sits harshly on light desktops.
+       Stacking: #root must sit ABOVE the disc (position:relative;z-index:1)
+       because the React canvas renders the particles. */
+    #jarvis-disc {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 96%;
+      height: 96%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 42%, #101a2e 0%, #0a1322 40%, #050913 100%);
+      z-index: 0;
+    }
+    #root { position: relative; z-index: 1; }
   </style>
   <script type="module">
 (function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const a of document.querySelectorAll('link[rel="modulepreload"]'))i(a);new MutationObserver(a=>{for(const r of a)if(r.type==="childList")for(const s of r.addedNodes)s.tagName==="LINK"&&s.rel==="modulepreload"&&i(s)}).observe(document,{childList:!0,subtree:!0});function n(a){const r={};return a.integrity&&(r.integrity=a.integrity),a.referrerPolicy&&(r.referrerPolicy=a.referrerPolicy),a.crossOrigin==="use-credentials"?r.credentials="include":a.crossOrigin==="anonymous"?r.credentials="omit":r.credentials="same-origin",r}function i(a){if(a.ep)return;a.ep=!0;const r=n(a);fetch(a.href,r)}})();var x_={exports:{}},sf={};/**
@@ -4336,6 +4371,7 @@ three/build/three.module.js:
 </script>
 </head>
 <body>
+  <div id="jarvis-disc" aria-hidden="true"></div>
   <div id="root"></div>
 </body>
 </html>
