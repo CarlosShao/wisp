@@ -372,7 +372,6 @@ CSS 侧消费者、接线的票），"暂未使用"不算。
 | `Palette.TintWarnHi` | warn 态（Unconfigured/Watchdog/Stuck）取 `Palette.Warn`/`WarnLine`；`--tint-warn-hi` 与 `TintWarmHi` 同为 `#F0DCB8`，CSS 侧两者都没有 `var()` 消费者 |
 | `Palette.TintWarnLo` | `--tint-warn-lo` 零引用（`tokens.css:118/273`），原生侧无 warn 双色渐变路径 |
 | `Palette.TintNeutralHi` | neutral 态只有 `-mid` 有人用（`statevisual.go` 的 `Palette.TintNeutralMid` + `ball.html:195`），hi/lo 两端在 v2 无消费者 |
-| `Palette.TintNeutralLo` | `--tint-neutral-lo` 零引用；NoNetwork/Nonetwork 态用 `Danger`/`BGOverlay` 单色，不铺 neutral 三段渐变 |
 | `looks[*].Deep` | `LiquidLook` 九个字段里唯一没人读的（其余八个 `renderer_windows.go` 都在画，含 `activeLook.Hi`）：票 62 留的第二层折射，属票 65「质感仍是赝品」的返工项；删字段要连带删 4 行 look 表 = 缩契约，交 owner |
 | `BallSizeSmallPx` / `BallSizeLargePx` | `--ball-sm`/`--ball-lg` 在 `ball.html` 各 6 处是**档位参照**，原生侧只有连续尺寸 + `BallSizeMinPx`/`BallSizeMaxPx` 钳位，没有"小/大档"开关 ⇒ 保留镜像等档位开关 |
 | `DurFastMs` / `DurBaseMs` / `DurSlowMs` | 三档驱动 CSS 过渡（`base.css` 11 处、`ball.html` 3 处）；原生动效时长是**逐态**常量 `BorderOpenMs` 220 / `BorderCloseMs` 180 / `SettlingFadeMs` 260 —— 票 69 的 D12 已记下 180 与 260 同值但不同源，改 CSS 档不会改它们 |

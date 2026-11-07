@@ -241,6 +241,19 @@ func (r *renderer) setAssets(v Visual) {
 		{0.58, colorF(mulA(pal.OrbBody2, v.Opacity))},
 		{0.84, colorF(mulA(pal.OrbBody2, 0))},
 	}, r.center(), d2d1Point2F{0, 0}, v.SizePx/2, v.SizePx/2)
+	// Wensity dark glass body (ticket 65): the reference orb is a near-black
+	// translucent sphere, not the white prototype shell (pal.OrbBody is white
+	// .30 - that is what made it read as a pale media button). Built from
+	// existing C21 dark tokens (BGInset / TintNeutralLo) so no palette/CSS row
+	// change is needed; only the glass body is affected.
+	if wensityActive() {
+		r.body = r.radialBrush([]d2d1GradientStop{
+			{0.00, colorF(mulA(pal.BGInset, v.Opacity))},
+			{0.50, colorF(mulA(pal.TintNeutralLo, 0.94*v.Opacity))},
+			{0.90, colorF(mulA(pal.BGInset, 0.96*v.Opacity))},
+			{1.00, colorF(mulA(pal.BGInset, 0))},
+		}, r.center(), d2d1Point2F{0, 0}, v.SizePx/2, v.SizePx/2)
+	}
 	r.hi = r.radialBrush([]d2d1GradientStop{
 		{0.00, colorF(mulA(lipOf(v), v.Opacity))},
 		{0.46, colorF(mulA(lipOf(v), 0))},
@@ -513,8 +526,13 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 		}
 	}
 
-	// 10. Icon line-art.
-	r.drawIcon(v, c, R, s)
+	// 10. Icon line-art. The wensity glass look has NO glyphs (the reference is
+	// a minimal dark orb); state reads through the ring and band behaviour, not
+	// the prototype's line icons (triangle/bars/mic - what made it look like a
+	// media button). Blob and generic styles keep their icons.
+	if !(v.Glass && wensityActive()) {
+		r.drawIcon(v, c, R, s)
+	}
 
 	// 11. Approval badge (top-right, danger disc + white digit).
 	if v.BadgeCount > 0 {
@@ -586,6 +604,12 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	if permille > 1000 {
 		permille = 1000
 	}
+	// The wensity look is a DARK sphere (reference sits on near-black bg); the
+	// bright prototype halo (850) reads as a pale disc washing the orb out.
+	// Keep only a faint lift for separation from the desktop.
+	if wensityActive() {
+		permille = 320
+	}
 	// Snap onto the cached 25-permille ladder (<=18 variants over the whole
 	// audio-driven range): glowBrush creates a missing key on demand, and an
 	// animated frame must not COM-create brushes (D32 CPU discipline) - after
@@ -627,9 +651,13 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 			v.SizePx*0.70*dockX, v.SizePx*0.70*dockY, r.core)
 	}
 
-	// 5. Specular highlight (upper-left), the glass cue.
-	r.fillEllipse(d2d1Point2F{c.x - R*0.30, c.y - R*0.38},
-		R*0.46*dockX, R*0.36*dockY, r.hi)
+	// 5. Specular highlight (upper-left), the glass cue. The wensity look omits
+	// this big white blob (the reference carries a thin TOP ARC instead, laid by
+	// drawWensityEdges); a large pale specular is what washed the ball out.
+	if !wensityActive() {
+		r.fillEllipse(d2d1Point2F{c.x - R*0.30, c.y - R*0.38},
+			R*0.46*dockX, R*0.36*dockY, r.hi)
+	}
 
 	// 6. Rim: dark edge light (contrast on white) + bright inner lip. The
 	// rings follow the dock squash with the shell they outline.
