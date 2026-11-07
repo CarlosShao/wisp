@@ -31746,3 +31746,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★诚实结论**：机主原话「设置项里面外观可以配置切换风格」——**Go 侧四段全通、即时生效机制成立、五牙全绿，但「设置项」这个界面入口今天不存在**。这不是腿的错（frontend/** 归外部 agent Q-51），但**对机主而言功能等于不可用**。
 - **⇒ 待办（我记下）**：①前端 panel.ts 声明 ballStyle；②config-screen.tsx 的 APPEARANCE_ROWS 加 ball.style 一行（带 glass|jarvis 选择器，blocked 应为空因为**这次页面真能改**）；③这是 Q-51 外部 agent 的写面，我不能碰 ⇒ 需机主决定是等外部 agent 还是我另找路子。
 - **撤销口令**：wave72＝git revert 007f1ee21 432d5ab7b 7858108a0 1b25d931c fe0f740d6。
+
+## A1615（2026-11-07 20:2x，编排者）**★腿纠正我第二处误判：jarvis 四角读白是 NBA2K 游戏面不是页面白底（注入层对两 style 一视同仁）｜真缺陷只有红 badge，已修＋我复跑双牙 PASS**
+- **wave73（4 笔本地已 commit，网络断未推）**：3104ac37a 证据§1／3fe067218 模板 transparent 重建（759648B，sha 换钉 66eb4b80…）＋renderer badge 跳过／f90d1ba41 两颗产品态牙／0e546341c 证据§2-§5＋票面 log。
+- **★我亲自复核腿的核心论据（⛔ 只读腿报）**：
+  1. **注入层两 style 共用同一函数**：orbasset.go:104 orbPageDocument()=orbServeDocument(orbPageHTML)／:111 orbJarvisDocument()=orbServeDocument(jarvisPageHTML) —— **同一注入函数**，:133 注入串同为 html,body{background:transparent !important} ⇒ **jarvis 页在产品里本来就是真透明**。
+  2. **jarvis 页底色只剩注入那条**：现跑 grep body 规则于 jarvis-orb.html ⇒ **只输出 body{background:transparent !important}**（重建后模板已把 #050913 拿掉，改成构造即透明）。
+  3. **orb-siri.html sha 未破**：d93da649d11bc4bc3ab91c006777bbadce1c2eb7d0ffc9d91608ad8d866e3bc6 逐位不变 ✓；jarvis-orb.html 759648B，sha 66eb4b80…。
+- **★我复跑双牙（PASS，读数逐字）**：
+  - TestBallLiveOrbJarvisStyleRendersParticles **PASS 7.76s**：corners [[43 47 51] [51 51 50] [51 51 50] [51 51 50]] within +/-12 of (51,51,50); cyan-dominant 72/961 sampled px (7.49% > 2.00% floor)
+  - TestBallLiveOrbJarvisServedPageAndOverlay **PASS 0.87s**：三行读数 —— served jarvis page: injected belt present, body transparent by construction, no opaque backdrop rule (759931 bytes)／jarvis overlay frame with badge depth 3: zero red-dominant disc pixels／**glass overlay frame keeps the badge dot under the same depth: 245 red-dominant pixels (floor 50)** ← **阳性对照，证明审计不瞎**。
+- **★我的误判根因（第二次，如实认）**：我看到四角 RGB=(255,255,255) 就断言「页面白底不透明」，**没意识到那是我自己记录的「NBA2K 盖屏时连远处桌面都读 255」同一个事实** —— 白是**游戏面**透出来的，不是页面底。腿的反证很硬：若注入失败四角应读**暗色 (5,9,19)**，不可能是白。**教训：同一现象我已记录过原因，却又拿它当新证据。**
+- **★腿如实报的判据局限（我认可）**：「四角==环境桌面色」这条牙在**真机活动游戏面上不可证伪**（采样间像素自变）⇒ 替代＝**served-page 牙**（读产品实际加载的文件，任何桌面都成立）＋四角已知地板牙保持。这是正确取舍。
+- **★腿如实报的一枚 SKIP**：TestLiveNeverStealsFocus 第 1/2 次 SKIP-LOUD（环境拒 SetCursorPos），第 3 次同命令 **PASS 1.21s** —— 拒绝假绿，正确。
+- **撤销口令**：wave73＝git revert 0e546341c f90d1ba41 3fe067218 3104ac37a。
