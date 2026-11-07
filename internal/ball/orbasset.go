@@ -22,7 +22,10 @@ package ball
 // integration surface.
 
 import (
+	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	_ "embed"
@@ -32,33 +35,72 @@ import (
 var orbPageHTML []byte
 
 const (
-	// orbOrigin is the synthetic origin the page is served under, spelled in
-	// ONE place. ".orb" is a name no DNS resolver can answer, so a request
-	// that ever escaped the WebResourceRequested filter fails OFFLINE instead
-	// of reaching a real host - the same no-socket shape the panel host uses
+	// orbSiteHost is the synthetic host name the site folder is mapped onto
+	// (SetVirtualHostNameToFolderMapping takes the host WITHOUT the scheme).
+	// ".orb" is a TLD no DNS resolver answers, so even a request that escaped
+	// the mapping fails OFFLINE instead of reaching a real host - the same
+	// no-socket shape the panel host uses
 	// (cmd/wisp/panel_control_windows.go panelOrigin).
-	orbOrigin = "https://wisp.orb"
+	orbSiteHost = "wisp.orb"
 
-	// orbEntryName is the one path this embed serves; everything else 404s.
+	// orbOrigin / orbEntryName / orbEntryURL: the page's origin under the
+	// mapping and the one path the site folder serves.
+	orbOrigin    = "https://" + orbSiteHost
 	orbEntryName = "orb.html"
 
-	orbEntryURL           = orbOrigin + "/" + orbEntryName
-	orbAssetFilterPattern = orbOrigin + "/*"
+	orbEntryURL = orbOrigin + "/" + orbEntryName
 )
 
-// orbCSPHeaderValue is the policy every served response carries as a response
-// HEADER (never an injected <meta> the page could strip). The export page is
-// one self-contained document: one inline module script, one inline style
-// block, a data: favicon, and WebGPU - which needs no CSP grant. No network
-// verb of any kind: default-src 'none' with connect-src 'none' is the
-// exfiltration cut, same shape as the panel's serving policy.
+// orbCSPHeaderValue is the policy the SERVED document carries as an injected
+// <meta http-equiv="Content-Security-Policy"> (orbPageDocument below). The
+// first cut of this leg carried the same policy as a response HEADER on a
+// WebResourceRequested-constructed response; that seam measured black (the
+// jchv CreateWebResourceResponse wrapper misreports success off the raw
+// GetLastError, orb_windows.go header), so delivery moved to a virtual-host
+// mapping - and neither that nor NavigateToString offers a response-header
+// channel. The meta form is the CSP the HTML standard itself defines for
+// this case: enforced at parse time, and a document API can TIGHTEN it but
+// never LOOSEN it, so the page cannot strip the exfiltration cut at runtime.
+// The export page is one self-contained document: one inline module script,
+// one inline style block, a data: favicon, and WebGPU - which needs no CSP
+// grant. No network verb of any kind: default-src 'none' with connect-src
+// 'none' is the exfiltration cut, same shape as the panel's serving policy.
 const orbCSPHeaderValue = "default-src 'none'; script-src 'unsafe-inline'; " +
 	"style-src 'unsafe-inline'; img-src data:; connect-src 'none'; " +
 	"frame-src 'none'; object-src 'none'; base-uri 'none'"
 
-// orbCSPHeader is the header LINE handed to CreateWebResourceResponse. It is
-// on every response this filter answers - 200 and 404 alike.
-const orbCSPHeader = "Content-Security-Policy: " + orbCSPHeaderValue
+// orbPageDocument returns the document actually served: the upstream page
+// byte-for-byte PLUS one injected CSP <meta> right after <head> - the only
+// transformation the serving seam applies on top of the embed, applied in
+// memory so the asset file stays the untouched upstream export (its sha is
+// pinned in orb_test.go). If the upstream head marker were ever missing the
+// meta is injected after the doctype instead: the policy is never silently
+// dropped.
+func orbPageDocument() []byte {
+	meta := []byte("<head>\n  <meta http-equiv=\"Content-Security-Policy\" content=\"" +
+		orbCSPHeaderValue + "\" />")
+	if doc := bytes.Replace(orbPageHTML, []byte("<head>"), meta, 1); len(doc) != len(orbPageHTML) {
+		return doc
+	}
+	// Fallback (upstream head tag removed): inject after the doctype rather
+	// than serve an unpoliced document.
+	return bytes.Replace(orbPageHTML, []byte(">"), []byte(">\n<head>"+orbCSPHeaderValue+"</head>"), 1)
+}
+
+// orbWriteSite materializes the served page into dir as the mapping's entry
+// file: the same bytes orbPageDocument hands NavigateToString, so both
+// delivery shapes serve ONE document shape. The folder lives under the orb's
+// per-user user-data path (orb_windows.go orbDataPath); writing it is
+// idempotent, done once per attach.
+func orbWriteSite(dir string) error {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("ball: orb site mkdir: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, orbEntryName), orbPageDocument(), 0o600); err != nil {
+		return fmt.Errorf("ball: orb site write: %w", err)
+	}
+	return nil
+}
 
 // orbPageBootstrap is injected with AddScriptToExecuteOnDocumentCreated, so
 // it runs before the page's own module script. The upstream page ships an

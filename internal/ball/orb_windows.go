@@ -21,10 +21,32 @@ package ball
 // on the ONE ui-sta thread - no new goroutine exists in this leg. Everything
 // from other threads arrives through Ball's existing PostTask/uiRun paths.
 //
-// Serving (D29): no socket, no port. The page is answered out of the embed by
-// a WebResourceRequested filter under a synthetic origin that no resolver can
-// answer, and every served response carries the CSP header with connect-src
-// 'none' - the same no-network shape the panel host uses.
+// Serving (D29): no socket, no port, and no response-construction seam. The
+// entry document is delivered under the synthetic host https://wisp.orb via
+// ICoreWebView2_3.SetVirtualHostNameToFolderMapping onto a per-user site
+// folder written from the embed (orbasset.go), with CORS denied; the CSP
+// rides INSIDE the document as an injected <meta http-equiv> (a response-
+// header CSP is not available to either delivery shape). A mapping failure
+// degrades to NavigateToString, which loses only the WebGPU origin.
+//
+// The serving history this shape replaced, measured black on 2026-11-07: the
+// first cut served the page out of the embed through a WebResourceRequested
+// filter, and the jchv wrapper for ICoreWebView2Environment.
+// CreateWebResourceResponse reports success by reading the RAW thread
+// GetLastError after the COM call - on the orb's STA thread that value reads
+// ERROR_NO_TOKEN (1008) persistently, while a direct-vtbl probe read
+// HRESULT = S_OK and a live response object in the out param (evidence doc).
+// The wrapper discards both and returns nil, the filter served nothing, the
+// page never loaded, the window stayed black. Neither current delivery path
+// contains a GetLastError success check.
+//
+// Visibility: the module's Embed never puts IsVisible(true) and the current
+// runtimes hand the controller to the app with the composition children
+// HIDDEN - measured 2026-11-07: without the explicit browser.Show() below
+// the orb window composited nothing (the desktop showed straight through
+// it), with it the page's pixels appear. The panel host gets away without
+// the call because its window is activated+focused at creation; the orb's
+// never-activate show path needs the explicit put.
 //
 // Fallback (A1594 ③): the D2D renderer is untouched. If WebView2 cannot come
 // up here, this file logs one line and returns an error; the caller leaves
@@ -37,7 +59,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -83,12 +104,10 @@ const orbHwndTopmost = ^uintptr(0)
 // pointer that routes its messages to the one live orb window - the same
 // dispatcher shape the ball window uses (activeBall/wndProcPtr).
 var (
-	orbWndProcPtr   = windows.NewCallback(orbWndProc)
-	activeOrb       atomic.Pointer[orbWindow]
-	orbClassOnce    sync.Once
-	orbClassErr     error
-	orbModKernel    = windows.NewLazySystemDLL("kernel32.dll")
-	orbSetLastError = orbModKernel.NewProc("SetLastError")
+	orbWndProcPtr = windows.NewCallback(orbWndProc)
+	activeOrb     atomic.Pointer[orbWindow]
+	orbClassOnce  sync.Once
+	orbClassErr   error
 )
 
 // registerOrbClass registers the orb window class once per process.
@@ -119,10 +138,6 @@ type orbWindow struct {
 	// state is the last ball state this window was told about (UI-thread
 	// owned). pushAudio reads it to decide whether the mic drives the bands.
 	state statemachine.State
-
-	// controller2Ready records whether the transparency QI + background put
-	// both succeeded (diagnostics only).
-	controller2Ready bool
 }
 
 // newOrbWindow creates the orb host window and the WebView2 inside it. It
@@ -196,16 +211,56 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32) (*orbWindow, error) {
 		return nil, fmt.Errorf("ball: orb PutDefaultBackgroundColor: %v", err)
 	}
 
-	// Serving: the embed answers everything under the synthetic origin; a miss
-	// is an empty 404 with the CSP header on it.
-	browser.WebResourceRequestedCallback = o.serve
-	browser.AddWebResourceRequestedFilter(orbAssetFilterPattern, orbedge.COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL)
-
 	// The bootstrap runs BEFORE the page's module script (document-created
 	// injection): it clears the export page's own dark tab background so the
 	// pixels outside the orb are the window's transparency, not that fill.
 	browser.Init(orbPageBootstrap)
-	browser.Navigate(orbEntryURL)
+
+	// Serving (D29), second shape - a REAL https origin, because the page's
+	// shader is WebGPU and the runtime only exposes navigator.gpu to a secure
+	// context (measured 2026-11-07: under NavigateToString the page ran fine -
+	// liquidOrb=object, ready=complete - but navigator.gpu was undefined and
+	// the page itself printed "WebGPU is not supported in this environment").
+	// The upstream page is materialized byte-for-byte (plus the injected CSP
+	// meta, orbasset.go) into a per-user folder and the synthetic host
+	// https://wisp.orb is mapped onto it with CORS denied - the offline
+	// no-socket shape survives: the mapping exists only inside THIS browser
+	// instance, the host name is under a TLD no resolver answers, and the
+	// meta CSP still cuts every network verb. The module's
+	// SetVirtualHostNameToFolderMapping wrapper reports failure off the raw
+	// thread GetLastError (the same defect that broke the response seam), so
+	// a reported failure is logged and answered with the NavigateToString
+	// fallback rather than trusted blindly.
+	siteDir := filepath.Join(orbDataPath(), "site")
+	served := false
+	if err := orbWriteSite(siteDir); err != nil {
+		slog.Warn("ball: orb site materialization failed; WebGPU origin unavailable", "err", err)
+	} else if w3 := browser.GetICoreWebView2_3(); w3 == nil {
+		slog.Warn("ball: orb ICoreWebView2_3 unavailable; WebGPU origin unavailable")
+	} else if err := w3.SetVirtualHostNameToFolderMapping(
+		orbSiteHost, siteDir, orbedge.COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_DENY_CORS); err != nil {
+		slog.Warn("ball: orb virtual host mapping reported failure (the wrapper's raw-GetLastError check may lie); falling back to NavigateToString", "err", err)
+	} else {
+		browser.Navigate(orbEntryURL)
+		served = true
+	}
+	if !served {
+		// Degraded delivery: the page still loads (interface, states, audio
+		// all work) but the runtime hides navigator.gpu off this origin, so
+		// the page shows its own "WebGPU is not supported" face.
+		browser.NavigateToString(string(orbPageDocument()))
+	}
+
+	// Controller visibility: the module's Embed NEVER puts IsVisible(true)
+	// and on the current runtimes the controller comes up with the children
+	// hidden - measured 2026-11-07: without this call the orb window
+	// composited NOTHING (screen showed straight through it), with it the
+	// page's own pixels appear. The panel host gets away without it because
+	// its window is activated+focused at creation; the orb's never-activate
+	// show path needs the explicit put.
+	if err := browser.Show(); err != nil {
+		slog.Warn("ball: orb controller Show failed", "err", err)
+	}
 
 	// Never-activate show, then one explicit topmost re-assert so the orb
 	// lands in the same topmost band as the ball that owns it.
@@ -225,68 +280,6 @@ func orbDataPath() string {
 		base = os.TempDir()
 	}
 	return filepath.Join(base, "wisp", "orb")
-}
-
-// serve answers one intercepted request. Same contract as the panel host:
-// the entry document out of the embed, an EMPTY 404 for every other path
-// (never a fallback document), the CSP header on every response.
-func (o *orbWindow) serve(request *orbedge.ICoreWebView2WebResourceRequest, args *orbedge.ICoreWebView2WebResourceRequestedEventArgs) {
-	uri, err := request.GetUri()
-	if err != nil {
-		slog.Warn("ball: orb resource request without a readable URI", "err", err)
-		return
-	}
-	if !strings.HasPrefix(uri, orbOrigin) {
-		// Unreachable through the filter pattern; left alone rather than
-		// answered by a guess.
-		return
-	}
-	status, reason, contentType := 404, "Not Found", ""
-	data := []byte(nil)
-	if strings.HasPrefix(uri, orbEntryURL) {
-		data, status, reason, contentType = orbPageHTML, 200, "OK", "text/html; charset=utf-8"
-	}
-	env := o.browser.Environment()
-	if env == nil {
-		slog.Warn("ball: orb request with no environment to build a response", "uri", uri)
-		return
-	}
-	response, err := orbBuildResponse(env, data, status, reason, orbResponseHeaders(status, contentType))
-	if err != nil {
-		slog.Warn("ball: orb CreateWebResourceResponse failed", "uri", uri, "err", err)
-		return
-	}
-	if err := args.PutResponse(response); err != nil {
-		slog.Warn("ball: orb PutResponse failed", "uri", uri, "err", err)
-	}
-}
-
-// orbResponseHeaders is the header LINE one served response carries. 200 gets
-// the Content-Type Resolve decided; every response gets the CSP.
-func orbResponseHeaders(status int, contentType string) string {
-	if status == 200 {
-		return "Content-Type: " + contentType + "\r\n" + orbCSPHeader
-	}
-	return orbCSPHeader
-}
-
-// orbBuildResponse wraps env.CreateWebResourceResponse with the bounded retry
-// the panel host measured (2026-10-13): that helper reports failure off a
-// stale GetLastError and a SUCCESSFUL call can read errno 1008 on its first
-// invocation per cold start. Retry, loudly; the stale value is not stable.
-func orbBuildResponse(env *orbedge.ICoreWebView2Environment, data []byte, status int, reason, headers string) (*orbedge.ICoreWebView2WebResourceResponse, error) {
-	const attempts = 3
-	var lastErr error
-	for attempt := 1; attempt <= attempts; attempt++ {
-		orbSetLastError.Call(0)
-		response, err := env.CreateWebResourceResponse(data, status, reason, headers)
-		if err == nil {
-			return response, nil
-		}
-		lastErr = err
-		slog.Warn("ball: orb response create retry", "attempt", attempt, "err", err)
-	}
-	return nil, fmt.Errorf("ball: orb CreateWebResourceResponse after %d attempts: %w", attempts, lastErr)
 }
 
 // pushState maps and pushes one ball state to the page (STA thread).

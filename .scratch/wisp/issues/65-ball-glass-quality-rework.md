@@ -98,3 +98,15 @@ AnySearch 文档 1 张、代理面板 1 张、本轮 tour 截图 3 张、小裁�
   orb.b=work.B-edge）——修前形状在此摆位必红。门禁：gofumpt 空/vet rc0/build rc0(含 cmd/wisp,balldebug)/
   默认套件 ok/winlive TestBallLiveOrb ok/d22scan clean。证据 docs/evidence/s1/65-orb-follow-clamp.md。
   next=编排者收件三把尺＋裁决（审计者≠实现者）；AC 与出屏无交集，未翻任何格
+- [2026-11-07T13:55+08] agent=ball-orb-fix-leg did=修编排者实测的 orb 全黑（球未渲染）。三层根因逐一实测定位：
+  ①响应构造缝——jchv 包装用裸 GetLastError 判 CreateWebResourceResponse 成败，orb STA 线程上 errno=1008
+  持续（直接 vtbl 探针读 HRESULT=0x00000000/S_OK、out 参数持活对象），3 次重试全灭，页面永远发不出去；
+  ②控制器可见性——jchv Embed 从不 PutIsVisible(true)，当前运行时控制器带着隐藏的合成子窗上车，
+  orb 的 never-activate show 路径必须显式 browser.Show()（面板宿主因创建即激活聚焦而幸免）；
+  ③WebGPU origin——NavigateToString 下页面活着（liquidOrb=object ready=complete）但 navigator.gpu=undefined，
+  页面自报 "WebGPU is not supported in this environment"，换 ICoreWebView2_3.SetVirtualHostNameToFolderMapping
+  把 https://wisp.orb 映到 %LOCALAPPDATA%\wisp\orb\site（DENY_CORS），WebGPU 起来，球真渲染（截图可视证据）。
+  CSP 保住：注入 <meta http-equiv>（connect-src 'none' 等全套）进 served 副本，asset 文件字节零动
+  （sha d93da649... 复测一致）。回归：TestBallLiveOrbPageRendersPixels（黑底窗 topmost+屏幕 DC 采样，
+  断言非黑像素占比>1%，实测 634/1764=35.94%）。门禁全绿。证据 docs/evidence/s1/65-orb-black-window-fix.md。
+  next=编排者收件三把尺＋裁决（审计者≠实现者）；未翻任何 AC 格/Status

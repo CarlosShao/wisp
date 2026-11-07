@@ -8,11 +8,20 @@ package ball
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
+
+// orbUpstreamSHA256 is the sha256 of the embedded upstream export page
+// (assets/orb-siri.html, LF-normalised as shipped), pinned so no later leg
+// can edit the upstream file and keep the marker test above green.
+const orbUpstreamSHA256 = "d93da649d11bc4bc3ab91c006777bbadce1c2eb7d0ffc9d91608ad8d866e3bc6"
 
 // TestOrbAssetShippedUnmodified pins the integration's core claim: the embed
 // is LerSent001/orb's own export page, byte-for-byte (CRLF->LF aside), NOT a
@@ -174,26 +183,65 @@ func TestOrbDebugLine(t *testing.T) {
 	}
 }
 
-// TestOrbServingConstants pins the serving seam: synthetic origin no resolver
-// can answer, one entry path, CSP with the exfiltration cut, and the injected
-// bootstrap that clears the export page's tab background (the ONLY byte this
-// integration adds on top of upstream).
+// TestOrbServingConstants pins the serving seam AFTER the black-orb fix
+// (ticket 65): the site is served under the synthetic https://wisp.orb origin
+// (host + entry URL spelled in orbasset.go), the document handed to BOTH
+// delivery shapes (virtual-host folder + NavigateToString fallback) carries
+// the CSP as an injected <meta http-equiv> with the exfiltration cut intact,
+// and the upstream embed itself stays byte-identical to the pinned sha256
+// (the injection happens at serve time, never in the asset file).
 func TestOrbServingConstants(t *testing.T) {
+	if orbSiteHost != "wisp.orb" {
+		t.Errorf("orbSiteHost = %q", orbSiteHost)
+	}
 	if orbOrigin != "https://wisp.orb" {
 		t.Errorf("orbOrigin = %q", orbOrigin)
 	}
 	if orbEntryURL != "https://wisp.orb/orb.html" {
 		t.Errorf("orbEntryURL = %q", orbEntryURL)
 	}
-	if orbAssetFilterPattern != "https://wisp.orb/*" {
-		t.Errorf("orbAssetFilterPattern = %q", orbAssetFilterPattern)
+	doc := string(orbPageDocument())
+	if got := strings.Count(doc, "http-equiv=\"Content-Security-Policy\""); got != 1 {
+		t.Errorf("served document carries %d CSP meta tags, want exactly 1", got)
 	}
 	for _, must := range []string{"connect-src 'none'", "default-src 'none'"} {
-		if !strings.Contains(orbCSPHeaderValue, must) {
-			t.Errorf("orb CSP missing %q", must)
+		if !strings.Contains(doc, must) {
+			t.Errorf("served document CSP missing %q", must)
 		}
+	}
+	// The meta must sit inside the head, before the upstream style block.
+	headEnd := strings.Index(doc, "<style>")
+	metaEnd := strings.Index(doc, "Content-Security-Policy")
+	if headEnd < 0 || metaEnd < 0 || metaEnd > headEnd {
+		t.Error("CSP meta is not inside the served document's head")
+	}
+	// The RAW embed must NOT already contain the meta: the injection is this
+	// repo's serving seam, and the asset file remains the upstream export.
+	if strings.Contains(string(orbPageHTML), "http-equiv") {
+		t.Error("the embedded asset itself was modified with the CSP meta")
+	}
+	sum := sha256.Sum256(orbPageHTML)
+	if got := fmt.Sprintf("%x", sum); got != orbUpstreamSHA256 {
+		t.Errorf("embedded orb page sha256 = %s, want the pinned upstream %s", got, orbUpstreamSHA256)
 	}
 	if !strings.Contains(orbPageBootstrap, `b.style.background = "transparent"`) {
 		t.Error("orb bootstrap does not clear the body background")
+	}
+}
+
+// TestOrbWriteSite pins the materialization seam: the folder the virtual-host
+// mapping points at receives exactly the document the fallback path would
+// hand NavigateToString - one file, the entry name, meta CSP included.
+func TestOrbWriteSite(t *testing.T) {
+	dir := t.TempDir()
+	if err := orbWriteSite(dir); err != nil {
+		t.Fatalf("orbWriteSite: %v", err)
+	}
+	got, err := os.ReadFile(filepath.Join(dir, orbEntryName))
+	if err != nil {
+		t.Fatalf("site entry file missing: %v", err)
+	}
+	if !bytes.Equal(got, orbPageDocument()) {
+		t.Error("site entry file differs from the served document")
 	}
 }

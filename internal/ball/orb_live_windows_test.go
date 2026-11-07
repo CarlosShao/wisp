@@ -17,9 +17,12 @@ package ball
 // a decision the harness reads (OrbDebugLine), never a guess.
 
 import (
+	"fmt"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 
@@ -283,5 +286,209 @@ func TestBallLiveOrbFollowStaysInsideWorkArea(t *testing.T) {
 	if br.b >= int32(work.B) && orb.b != int32(work.B) {
 		t.Errorf("orb bottom was not clamped to the work bottom: want orb.b=%d, got %d",
 			int32(work.B), orb.b)
+	}
+}
+
+// orbTestGetPixel / orbTestGetStockObject: this file's own handles to the two
+// GDI entries the pixel regression below needs (screen-DC sampling and the
+// black class brush).
+var (
+	orbTestGetPixel       = modGDI32.NewProc("GetPixel")
+	orbTestGetStockObject = modGDI32.NewProc("GetStockObject")
+)
+
+// GetStockObject(BLACK_BRUSH).
+const orbTestBlackBrush = 4
+
+// orbTestBackdropWndProc: the backdrop window never handles anything itself.
+func orbTestBackdropWndProc(hwnd, msg, wParam, lParam uintptr) uintptr {
+	r, _, _ := pDefWindowProcW.Call(hwnd, msg, wParam, lParam)
+	return r
+}
+
+var (
+	orbTestBackdropProcPtr = windows.NewCallback(orbTestBackdropWndProc)
+	orbTestBackdropOnce    sync.Once
+	orbTestBackdropErr     error
+)
+
+// orbTestCreateBackdrop registers (once) and shows a plain black WS_POPUP
+// window covering the orb's rect, so the screen pixels the regression samples
+// have a KNOWN floor behind the orb: through the orb's transparent pixels the
+// sample reads black, not whatever wallpaper happens to sit on this desktop.
+// It is created TOPMOST (below the orb, which the test re-asserts afterwards)
+// so ordinary application windows can never composite above the floor and
+// contaminate the reading. It MUST be called on the ui-sta thread (via
+// Ball.sta.PostTask) - a window on a thread nobody pumps never paints, and
+// the whole point is painted black pixels.
+func orbTestCreateBackdrop(wr rect) uintptr {
+	orbTestBackdropOnce.Do(func() {
+		brush, _, _ := orbTestGetStockObject.Call(orbTestBlackBrush)
+		wc := wndClassEx{
+			size:      uint32(unsafe.Sizeof(wndClassEx{})),
+			wndProc:   orbTestBackdropProcPtr,
+			instance:  windows.Handle(moduleHandle()),
+			cursor:    windows.Handle(loadArrowCursor()),
+			bkgnd:     windows.Handle(brush),
+			className: utf16("WispOrbPxBackdrop"),
+		}
+		if r, _, _ := pRegisterClassExW.Call(unsafePtr(&wc)); r == 0 {
+			orbTestBackdropErr = fmt.Errorf("RegisterClassExW(backdrop) failed")
+		}
+	})
+	if orbTestBackdropErr != nil {
+		return 0
+	}
+	hwnd, _, _ := pCreateWindowExW.Call(0x8, // WS_EX_TOPMOST: above every normal window, below the re-asserted orb
+		unsafePtr(utf16("WispOrbPxBackdrop")), unsafePtr(utf16("Wisp Orb Px Backdrop")),
+		uintptr(wsPopup),
+		uintptr(wr.l), uintptr(wr.t), uintptr(wr.width()), uintptr(wr.height()),
+		0, 0, uintptr(moduleHandle()), 0)
+	if hwnd == 0 {
+		return 0
+	}
+	pShowWindow.Call(hwnd, swShownoactivate)
+	return hwnd
+}
+
+// orbTestNonDarkRatio samples the SCREEN DC (the composited desktop, i.e.
+// exactly what a screenshot of the orb region shows) across the orb rect and
+// returns (fraction of sampled pixels with any channel > 30, sample count).
+// It is the pixel-truth reading the regression's teeth are made of.
+func orbTestNonDarkRatio(l, t, w, h int32) (float64, int) {
+	hdc, _, _ := pGetDC.Call(0)
+	if hdc == 0 {
+		return 0, 0
+	}
+	defer pReleaseDC.Call(0, hdc)
+	const step = 3 // px between samples
+	nonDark, total := 0, 0
+	for y := t; y < t+h; y += step {
+		for x := l; x < l+w; x += step {
+			c, _, _ := orbTestGetPixel.Call(hdc, uintptr(x), uintptr(y))
+			total++
+			if c&0xff > 30 || (c>>8)&0xff > 30 || (c>>16)&0xff > 30 {
+				nonDark++
+			}
+		}
+	}
+	if total == 0 {
+		return 0, 0
+	}
+	return float64(nonDark) / float64(total), total
+}
+
+// TestBallLiveOrbPageRendersPixels is the black-orb regression (ticket 65,
+// orchestrator-measured 2026-11-07): the first serving seam answered the
+// entry document through a CreateWebResourceResponse the jchv wrapper
+// misreported as failed, the page NEVER loaded, and the window stayed pure
+// black. This test puts the orb on-screen over a KNOWN black backdrop and
+// requires the composited screen pixels to actually light up - at least 1% of
+// the sampled orb-area pixels carrying a channel above 30. It fails loudly on
+// the old shape (all-dark window) and on any future regression that breaks
+// page delivery or WebGPU boot: "no error logged" is not a passing shape
+// here, painted pixels are.
+func TestBallLiveOrbPageRendersPixels(t *testing.T) {
+	store, err := OpenPositionStore(filepath.Join(t.TempDir(), "ballpos.json"))
+	if err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	requireQuietBallDesktop(t)
+
+	b, err := New(Options{
+		SizePx:      BallSizeDefaultPx,
+		Initial:     statemachine.StateSleeping,
+		Store:       store,
+		WindowTitle: liveBallTitle(t),
+		Hotkeys:     liveHotkeys(),
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	t.Cleanup(b.Close)
+
+	deadline := time.Now().Add(15 * time.Second)
+	var orbHWND windows.HWND
+	for {
+		orbHWND = b.DebugOrbHWND()
+		if orbHWND != 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("orb window did not attach within 15s (WebView2 runtime missing or Embed refused)")
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	mon, ok := monitorRectsForWindow(windows.HWND(b.DebugHWND()))
+	if !ok {
+		t.Fatal("monitorRectsForWindow(ball) returned no monitor")
+	}
+	work := mon.Work
+
+	// Park the ball at the work-area corner so nothing of ours overlaps the
+	// sampled region, and center the orb in the work area so every sampled
+	// pixel is on-screen.
+	ballHWND := uintptr(b.DebugHWND())
+	pSetWindowPos.Call(ballHWND, 0,
+		uintptr(int32(work.L)+8), uintptr(int32(work.T)+8), 0, 0,
+		uintptr(swpNoSize|swpNoZOrder|swpNoActivate))
+	var wr rect
+	if r, _, _ := pGetWindowRect.Call(uintptr(orbHWND), unsafePtr(&wr)); r == 0 {
+		t.Fatal("GetWindowRect(orb) failed")
+	}
+	edge := wr.width()
+	ox := (int32(work.L) + int32(work.R)) / 2
+	oy := (int32(work.T) + int32(work.B)) / 2
+	pSetWindowPos.Call(uintptr(orbHWND), orbHwndTopmost,
+		uintptr(ox-edge/2), uintptr(oy-edge/2), 0, 0,
+		uintptr(swpNoSize|swpNoActivate))
+	if r, _, _ := pGetWindowRect.Call(uintptr(orbHWND), unsafePtr(&wr)); r == 0 {
+		t.Fatal("GetWindowRect(orb) after the move failed")
+	}
+
+	// Known-black floor behind the orb, created and painted on the ui-sta
+	// thread (its pump is what makes the window actually paint). The floor
+	// went in topmost, so the orb must be re-asserted ABOVE it in the
+	// topmost band before any sampling.
+	backdrop := make(chan uintptr, 1)
+	b.sta.PostTask(func() { backdrop <- orbTestCreateBackdrop(wr) })
+	bh := <-backdrop
+	if bh == 0 {
+		t.Fatal("black backdrop window failed to create")
+	}
+	pSetWindowPos.Call(uintptr(orbHWND), orbHwndTopmost, 0, 0, 0, 0,
+		uintptr(swpNoSize|swpNoMove|swpNoActivate))
+	t.Cleanup(func() {
+		done := make(chan struct{})
+		b.sta.PostTask(func() {
+			pDestroyWindow.Call(bh)
+			close(done)
+		})
+		<-done
+	})
+
+	// WebGPU boot is not instant; poll until the orb lights up or the
+	// deadline proves it never will.
+	const budget = 25 * time.Second
+	deadline = time.Now().Add(budget)
+	best := 0.0
+	var samples int
+	for {
+		ratio, n := orbTestNonDarkRatio(wr.l+4, wr.t+4, wr.width()-8, wr.height()-8)
+		samples = n
+		if ratio > best {
+			best = ratio
+		}
+		if ratio > 0.01 {
+			t.Logf("orb page rendered: %d/%d sampled px non-dark (%.2f%% > 1%% floor)",
+				int(ratio*float64(n)), n, ratio*100)
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("orb window content stayed black after %v: best non-dark ratio %.3f%% over %d sampled px (page did not render; delivery or WebGPU broken)",
+				budget, best*100, samples)
+		}
+		time.Sleep(300 * time.Millisecond)
 	}
 }
