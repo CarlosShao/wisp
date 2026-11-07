@@ -9,6 +9,17 @@
    Which rows work is decided by whether the panel owns the thing being
    changed:
 
+     ball.style       WORKS as a config write (ticket 65, 2026-11-07). The
+                       write rides config.set's ball_style field through the
+                       settings door, and the snapshot's ballStyle section is
+                       its read half: the picker's rows are the vocabulary the
+                       snapshot carried, the current family is what the live
+                       config holds, and an accepted write re-reads the view
+                       instead of patching a local copy. Note this row is NOT
+                       in the alpha/motion class - those two restyle this
+                       page's own document; this one leaves the WebView as a
+                       real config write.
+
      the opacity row  WORKS. The frost is a CSS custom property in this
                       document (the generated table's alpha knob), and moving
                       it is a style write on this page. It is not a config
@@ -20,14 +31,14 @@
 
      everything else  DORMANT, and says so instead of showing a number.
                       Theme / font size / panel width belong to Go's config
-                      and need a C17 read plus a route back; the ball keys
+                      and need a C17 read plus a route back; the ball size, opacity and click-through keys
                       belong to the native ball, which is Direct2D and cannot
                       be reached from a page at all (D29). Rendering an
                       editable box with a made-up value in it would be owner's
                       P9 red line, so those rows carry no value.
 
-   The gap that closes the dormant rows is one field on the snapshot and one
-   method on the bridge; it belongs to ticket 35's pump, not to this file.
+   The dormant rows still wait on their own feed; ball.style left that queue
+   today (ticket 65 closed it 2026-11-07).
 
    Spelling note that is load-bearing: the dotted key labels are stored in two
    halves (group / name) and joined only at render time, because
@@ -49,6 +60,10 @@ import {
   readMotionTier,
   type MotionTier,
 } from "@/lib/motion";
+import { performConfigWrite } from "@/lib/config-actions";
+import { BallStylePicker, FeedbackLine } from "@/components/settings-controls";
+import type { BallStyleSection } from "@/lib/panel";
+import type { Feedback } from "@/lib/config-feedback";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
 const ALPHA_VAR = "--panel-alpha";
@@ -78,7 +93,7 @@ interface Row {
   /** Why this row is not editable yet. Empty string = the panel owns it. */
   blocked: string;
   /** Which live control this row draws when `blocked` is empty. */
-  control?: "alpha" | "motion";
+  control?: "alpha" | "motion" | "ballStyle";
 }
 
 /** The appearance rows, in the demo owner's original order. */
@@ -90,12 +105,17 @@ const APPEARANCE_ROWS: readonly Row[] = [
   { group: "ball", name: "size", desc: "悬浮球直径（44-72）", blocked: "那颗球是原生绘制的（D29），页面改不到" },
   { group: "ball", name: "opacity_idle", desc: "空闲时悬浮球不透明度", blocked: "同上" },
   { group: "ball", name: "click_through", desc: "空闲时鼠标穿透悬浮球", blocked: "同上" },
+  { group: "ball", name: "style", desc: "悬浮球外观风格（玻璃 / Jarvis 粒子）", blocked: "", control: "ballStyle" },
   { group: "panel", name: "width", desc: "面板宽度（px）", blocked: "窗口尺寸在宿主手里" },
 ];
 
-/** The effect badge: live rows green, dormant rows neutral. The two words are
-    the instrument's needles (render-nav counts them), so they stay verbatim. */
-function EffectBadge({ live }: { live: boolean }) {
+/** The effect badge: the two page-local rows say 即时 (they restyle this
+    document and nothing else), the config-write row says 能改 (its effect
+    tier is the receipt's to state - now when the ball is alive, restart when
+    it is not), dormant rows say 未接线. 即时 and 未接线 are this screen's
+    own needle words; 能改 joins them only because calling a restart-tier
+    write 即时 would be the lie the receipt exists to correct. */
+function EffectBadge({ live, word }: { live: boolean; word?: string }) {
   return (
     <span
       className={cn(
@@ -103,14 +123,15 @@ function EffectBadge({ live }: { live: boolean }) {
         live ? "bg-green-tint text-green" : "bg-field text-ink-2",
       )}
     >
-      {live ? "即时" : "未接线"}
+      {live ? (word ?? "即时") : "未接线"}
     </span>
   );
 }
 
 export function ConfigScreen({
   heading = "设置",
-  lede = "外观一节的八行键。能动的只有面板不透明度和界面动画两行，其余各行今天没有数据源，所以它们不显示数字。",
+  lede = "外观一节九行键。悬浮球风格、面板不透明度和界面动画三行能动，其余各行今天没有数据源，所以它们不显示数字。",
+  ballStyle = null,
 }: {
   /** The heading this screen prints for itself. Defaults to 设置 because that
       is what it says standalone (?harness=2 and the render harnesses). The
@@ -120,11 +141,21 @@ export function ConfigScreen({
   heading?: string;
   /** The sentence under the heading. Same reason: the page has its own lede. */
   lede?: string;
+  /** The snapshot's ballStyle section (ticket 65): the read half of the
+      ball.style row. Null means this pump has no ballStyle reader - a
+      different fact from an empty style, and the picker says which one. */
+  ballStyle?: BallStyleSection | null;
 }) {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
   // Read the tier back off the document rather than mirroring it: a tier set
   // anywhere (a test, a future bridge field) is the tier the control shows.
   const [motion, setMotion] = useState<MotionTier>(() => readMotionTier());
+  // The ball.style write's receipt. The control itself stays a pure reader of
+  // the snapshot section - no local mirror of the family is kept, so what the
+  // picker shows is what the host read, and the next snapshot push refreshes
+  // it. The receipt sentence below is the write's fact (PLAN.md:1044).
+  const [ballFeedback, setBallFeedback] = useState<Feedback | null>(null);
+  const [ballBusy, setBallBusy] = useState(false);
 
   function moveAlpha(next: number) {
     document.documentElement.style.setProperty(ALPHA_VAR, `${next}%`);
@@ -134,6 +165,19 @@ export function ConfigScreen({
   function moveMotion(next: MotionTier) {
     applyMotionTier(next);
     setMotion(next);
+  }
+
+  /** The ball.style write: one config.set with the field's value, answered as
+      the receipt sentence. Local validation first - an empty pick cannot be
+      sent, because an empty value is refused by name on the Go side and the
+      page can say so before anything leaves. */
+  function moveBallStyle(next: string) {
+    if (ballBusy || next === "") return;
+    setBallBusy(true);
+    void performConfigWrite({ field: "ball_style", value: next }).then((fb) => {
+      setBallFeedback(fb);
+      setBallBusy(false);
+    });
   }
 
   return (
@@ -192,21 +236,36 @@ export function ConfigScreen({
                       <span className="text-[11px] text-ink-3">%</span>
                     </>
                   )
+                ) : live && row.control === "ballStyle" ? (
+                  <BallStylePicker
+                    section={ballStyle}
+                    onSelect={moveBallStyle}
+                    className="w-[180px] shrink-0"
+                  />
                 ) : live ? (
                   <span className="text-xs text-ink-3">此行缺控件定义</span>
                 ) : (
                   <span className="text-xs text-ink-3">{row.blocked}</span>
                 )}
-                <EffectBadge live={live} />
+                <EffectBadge live={live} word={row.control === "ballStyle" ? "能改" : undefined} />
               </div>
             </div>
           );
         })}
       </div>
 
+      {/* The ball.style receipt line: the write's own answer, never a local
+          echo of the family word. It lives under the whole row block so a
+          refusal lands where the eye already is. */}
+      {ballFeedback ? (
+        <div className="mt-1 flex flex-col gap-1">
+          <FeedbackLine feedback={ballFeedback} />
+        </div>
+      ) : null}
+
       <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
         「即时」那两行改的是这个页面自己的一层样式：关掉面板就回到 token 表里的默认值。
-        要让它们记住，缺的是 C17 快照上的一个字段和一条回写的方法，不是这里的代码。
+        悬浮球风格那一行不同：它走设置写入通路真正落盘，收据句会写明是立即生效还是重启后生效。
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">

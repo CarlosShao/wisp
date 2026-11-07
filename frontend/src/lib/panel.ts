@@ -132,6 +132,9 @@ export interface ComposerState {
       below. */
   credentialState?: CredentialState;
   credentialKnown?: boolean;
+  /** The working-tree file list (ticket 190; internal/panel TreeView), as the
+      host read it. Absent when the pump was assembled without the reader. */
+  files?: FilesSection;
 }
 
 /** One credential-dimension state (internal/panel/config_handlers.go). Never a
@@ -236,6 +239,161 @@ export interface ResultChunkView {
   done: boolean;
 }
 
+/* --------------------------------------------------------------------------
+   Reader-gated snapshot sections (tickets 213 / 187 / 65 / 190 / 145 / 215)
+   --------------------------------------------------------------------------
+   The five interfaces below are the page-side half of the reader-gated
+   top-level sections internal/panel adds to Snapshot (composer.go). The Go
+   shapes live in commands_roster_213.go, model_switch_187.go,
+   ball_style_65.go, tree_types_190.go and run_feed_145.go; the JSON key sets
+   are reconciled in BOTH directions by TestComposerContractTypesMatchFrontend
+   and TestApprovalCardViewJSONKeysMatchFrontendTypes, so a key that Go emits
+   and this file does not declare goes red on the Go side - these declarations
+   are that ruler's page half.
+
+   One shared rule, stated once: every section below is OPTIONAL on the wire
+   exactly the way the Go field is a pointer with omitempty. Key ABSENT means
+   "this pump was assembled without that reader" (a different fact from any
+   empty value), and key PRESENT means the reader exists and the section says
+   what it read - including its empty shapes. Nothing here is guessed at.
+   -------------------------------------------------------------------------- */
+
+/** One command roster row (internal/panel/commands_roster_213.go CommandRow).
+    name carries no slash; args is the roster's own argument shape; approval
+    and door are the row's own sentences, shared with the console. The roster
+    names doors, it opens none - nothing here is an execution path. */
+export interface CommandRowView {
+  name: string;
+  summary: string;
+  args: string;
+  approval: string;
+  door: string;
+}
+
+/** The commands section (internal/panel CommandRosterSection). Empty rows
+    means this machine executes none - never "unknown"; a set reason means
+    the roster table itself refused to assemble (a defect, not an empty menu). */
+export interface CommandsSection {
+  rows: CommandRowView[];
+  reason?: string;
+}
+
+/** One offerable catalog row (internal/panel/model_switch_187.go ModelOption):
+    the pair a role_chat_pair write addresses, nothing else. */
+export interface ModelOptionView {
+  provider: string;
+  model: string;
+}
+
+/** The modelSwitch section (internal/panel ModelSwitchSection): the
+    switchable half of the composer row's model dimension. current is the
+    pair the live config holds RIGHT NOW; thinkingLevels lists only what the
+    current model itself declares (possibly none - the page then offers no
+    tier choices, it does not invent the four-value vocabulary); an empty
+    models list with a reason is the measured "no rows can be offered". */
+export interface ModelSwitchSection {
+  current: ModelOptionView;
+  currentThinking: string;
+  models: ModelOptionView[];
+  thinkingLevels: string[];
+  reason?: string;
+}
+
+/** The ballStyle section (internal/panel/ball_style_65.go BallStyleSection):
+    the orb appearance family the live config holds RIGHT NOW, plus the
+    vocabulary the appearance picker may offer - the schema's own list, in
+    schema order. Empty style means no Manager backed the read; the page then
+    says "not configured" rather than inventing a family. The write half rides
+    config.set's ball_style field (no C17 method arrives with this key). */
+export interface BallStyleSection {
+  style: string;
+  vocabulary: string[];
+}
+
+
+/** One working-tree file entry (internal/panel TreeEntry). */
+export interface TreeEntryView {
+  path: string;
+  isDir: boolean;
+  size: number;
+}
+
+/** The files section (internal/panel TreeView, ticket 190): the working-tree
+    file list as the host read it. kind is one of the TreeView states
+    ("counted" | "not_repo" | "no_git" | "not_chosen" | "unreadable" |
+    "permission_denied" | "link_outside" | "too_large") - the refusals are
+    states of their own, never a silently shorter list. */
+export interface FilesSection {
+  kind: string;
+  reason: string;
+  entries: TreeEntryView[];
+  filesTotal: number;
+  filesTruncated: boolean;
+  bytesTotal: number;
+  recoverPointer: string;
+}
+
+/** One ENDED tool call (internal/panel/run_feed_145.go ToolRunRow). Rows are
+    written by EvToolEnd only, in end order; there is no "running" chip state
+    on this wire because no production event publishes one. */
+export interface ToolRunRowView {
+  callId: string;
+  name: string;
+  outcome: string;
+  resultText?: string;
+}
+
+/** The last classified error (internal/panel RunErrorRow). A notice-shaped
+    error event writes nothing here - inventing a class for it would be a
+    constant dressed as data. */
+export interface RunErrorRowView {
+  class: string;
+  detail?: string;
+  text?: string;
+}
+
+/** The loop's last stuck sentence and its C22 rung (internal/panel
+    RunStuckRow). */
+export interface RunStuckRowView {
+  text: string;
+  repeatLevel: number;
+}
+
+/** The run section (internal/panel RunSection, ticket 145): the working-state
+    rows rendered while a task runs. An empty feed renders "tools":[] - the
+    key's presence is the reader's existence, never a vanished key. */
+export interface RunSection {
+  tools: ToolRunRowView[];
+  toolsDropped?: number;
+  reasoning?: string;
+  error?: RunErrorRowView | null;
+  stuck?: RunStuckRowView | null;
+}
+
+/** One plugin inventory row (internal/panel/plugins_inventory_215.go
+    PluginRow): one [plugins.<id>] entry as the live config holds it. enabled
+    is a configuration fact, NOT "running" - engineState on the section says
+    what it means on this wire. */
+export interface PluginRowView {
+  id: string;
+  enabled: boolean;
+  capabilities: string[];
+  netAllowlist: string[];
+  hostApi: string[];
+}
+
+/** The plugins section (internal/panel PluginInventorySection, ticket 215a):
+    the Tier-2 plugin inventory the config declares, with the two honest-state
+    sentences carried verbatim. Rows empty means the config declares no plugin
+    entries; skillState registers that the skills dimension has no config keys
+    to enumerate (215b) instead of rendering an empty list. */
+export interface PluginsSection {
+  tier2Enabled: boolean;
+  rows: PluginRowView[];
+  engineState: string;
+  skillState: string;
+}
+
 /** What the host pushes on every state change (ticket 35 owns the pump). */
 export interface PanelSnapshot {
   pending: ApprovalCardView[];
@@ -254,6 +412,25 @@ export interface PanelSnapshot {
       how much of each work page the stream log dropped to keep its bound
       (ticket 197). Same optionality rule as instructions. */
   tasks?: TaskRosterSection;
+  /** The roster of commands this machine can execute (ticket 213 交付 3).
+      Display data only: rows name doors, they open none. */
+  commands?: CommandsSection;
+  /** The composer row's switchable model and thinking-tier dimension
+      (ticket 187): what a picker may offer, and what the live config holds
+      right now. Writes ride config.set, not a new route. */
+  modelSwitch?: ModelSwitchSection;
+  /** The orb appearance family the live config holds and the vocabulary an
+      appearance picker may offer (ticket 65). The settings page's ball.style
+      row reads this; its write rides config.set's ball_style field. */
+  ballStyle?: BallStyleSection;
+  /** The working-state rows rendered while a task runs (ticket 145): ended
+      tool calls, the reasoning streamed so far, the last classified error
+      and the loop's stuck sentence. */
+  run?: RunSection;
+  /** The Tier-2 plugin inventory the config declares (ticket 215), with the
+      engine/skill honest-state sentences carried verbatim. Display data:
+      no toggle arrives with this key. */
+  plugins?: PluginsSection;
 }
 
 /** Shape of the object WebView2 installs on the host page (C17). */

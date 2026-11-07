@@ -25,6 +25,7 @@ import { ModelSettings } from "@/components/model-settings";
 import { VoiceSettings } from "@/components/voice-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
+import type { BallStyleSection } from "@/lib/panel";
 
 /** One category: what it is, and what it is still waiting for. The second
     sentence is the reason this table exists rather than a bare label list. */
@@ -105,10 +106,12 @@ const CATEGORIES: readonly Category[] = [
     // 球状态 was a row in the left sidebar until 2026-09-28. Owner: 「这个球
     // 是识别语音才会出来的，特么要是球的设置，那就放设置里去，要是球本身，那
     // 就不应该出现在主面板」. The ball itself is a native Direct2D surface
-    // (D29) and has no business being navigated to; its SETTINGS are here.
+    // (D29) and has no business being navigated to; its SETTINGS are here -
+    // and since ticket 65 (2026-11-07) the appearance family actually switches
+    // from the 外观 category's ball.style row.
     name: "悬浮球",
     purpose: "球的大小、空闲透明度、鼠标穿透、唤醒词、热键。",
-    waiting: "还没读到球的配置。球是原生画的（D29），页面改不到它——这几项归原生侧，面板只读不写。",
+    waiting: "大小、透明度、穿透还是原生画的（D29），页面改不到。外观风格（玻璃 / Jarvis）已能切：去「外观」类的 ball.style 行，走设置写入通路落盘（票 65）。唤醒词与热键还没有数据源。",
   },
 ];
 
@@ -116,10 +119,15 @@ export function SettingsPage({
   activeSection,
   onSelectSection,
   onClose,
+  ballStyle = null,
 }: {
   activeSection: string;
   onSelectSection: (section: string) => void;
   onClose: () => void;
+  /** The snapshot's ballStyle section (ticket 65), handed straight to the
+      appearance screen. Null when this pump has no reader - the picker then
+      says so instead of guessing. */
+  ballStyle?: BallStyleSection | null;
 }) {
   // An unknown name is not guessed at: it lands on the first category, the
   // same way an unknown view does. A rail that lights nothing is worse.
@@ -201,6 +209,7 @@ export function SettingsPage({
             <ConfigScreen
               heading={cat.name}
               lede={cat.purpose}
+              ballStyle={ballStyle}
             />
           ) : cat.control === "model" ? (
             <ModelSettings heading={cat.name} lede={cat.purpose} />

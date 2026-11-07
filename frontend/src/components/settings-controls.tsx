@@ -18,6 +18,7 @@ import { cn } from "@/lib/cn";
 import { useDismiss } from "@/lib/use-dismiss";
 import type { Feedback, Tone } from "@/lib/config-feedback";
 import type { ConfigViewProvider } from "@/lib/config-view";
+import type { BallStyleSection } from "@/lib/panel";
 
 /* ---------------------------------------------------------------------------
    Card + labels.
@@ -203,6 +204,52 @@ export function Picker({
         </div>
       ) : null}
     </div>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   Ball style picker (ticket 65: the settings page's ball.style row).
+   --------------------------------------------------------------------------- */
+
+/** The appearance-family picker: one row per vocabulary entry the snapshot
+    carried, the current family checked, and the pick handed to the parent as
+    a value - this control performs no write itself, the same division the
+    rest of this file keeps (controls show and pass intent; lib/config-actions
+    is where a request goes out).
+
+    The vocabulary and the current value come from the snapshot verbatim; this
+    file spells neither family name, so the schema list stays the one source.
+    A snapshot with a vocabulary but an empty style renders the picker with
+    nothing checked (the page says "not configured" beside it); a null
+    section renders the honest no-reader sentence, never a guessed family. */
+export function BallStylePicker({
+  section,
+  onSelect,
+  className,
+}: {
+  section: BallStyleSection | null;
+  onSelect: (next: string) => void;
+  className?: string;
+}) {
+  if (section === null) {
+    return (
+      <span className={cn("flex h-[30px] items-center text-[11.5px] text-ink-3", className)}>
+        快照里还没有球风格这一节（本机没有装配球风格读口）
+      </span>
+    );
+  }
+  const options = section.vocabulary.map((v) => ({ value: v }));
+  const checked = options.some((o) => o.value === section.style);
+  return (
+    <Picker
+      ariaLabel="球风格"
+      className={className}
+      emptyText="配置里没有可切换的风格"
+      onSelect={onSelect}
+      options={options}
+      placeholder={checked ? "选择风格" : "未设置；选择一个"}
+      value={section.style}
+    />
   );
 }
 
