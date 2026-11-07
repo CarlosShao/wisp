@@ -183,6 +183,9 @@ func (n *nativeCards) waitingState() (statemachine.State, bool) {
 //	                           approval_grant row per path the card named.
 //	panelReject / panelAllow   the panel route, DecideFromPanel only.
 //	head / view                the panel's read side (PanelAPI), no grant, no allow.
+//	revoke                     the 长期 rule's undo (ticket 226 AC#5, approval_revoke.go):
+//	                           no card, no grant - it only ever SHRINKS the
+//	                           allowlist, through Manager.SetAllowedDirs.
 //
 // There is no method here that lets a panel-sourced decision execute anything,
 // and no path that mints or forwards a grant to the panel route. That is not a
@@ -458,7 +461,9 @@ func (rt *agentRuntime) attachReplyListener(in io.Reader, vetoChannel approval.C
 		"wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；"+
 			"L1 确认窗口存活期间，敲任意内容或直接回车＝停（票 170）；"+
 			"面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、"+
-			"head / view <编号> 看卡片；quit 退出监听。\n")
+			"head / view <编号> 看卡片；"+
+			"revoke <规则或目录> 撤销一条长期规则（票 226，只减不加，help 看写法）；"+
+			"quit 退出监听。\n")
 }
 
 // newReplySurface builds this run's answer side and returns it, WITHOUT starting
@@ -628,6 +633,12 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 		return s.panelAllow(corr)
 	case "always":
 		return s.always(corr)
+	case "revoke":
+		// Ticket 226 AC#5: the rule text (or the bare directory) arrives spread
+		// across the corr and arg slots - splitReplyLine cuts on single spaces,
+		// and a rule text is full of them. Rejoin before parsing: a revocation
+		// names a line, it does not answer a card.
+		return s.revokeRule(strings.TrimSpace(corr + " " + arg))
 	case "head":
 		return s.head()
 	case "view":
@@ -635,10 +646,12 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 	case "help":
 		return "yes/session/no/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
 			"always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
+			"revoke <规则或目录>（撤销一条长期规则：revoke [fs] allowed_dirs += \"D:/某目录\" 或 revoke D:/某目录，" +
+			"只减不加、下一次启动生效，票 226）· " +
 			"L1 窗口存活时任意输入（含回车）＝否决（票 170）· " +
 			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
-		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/panel-no/panel-yes/head/view/help/quit）", verb)
+		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/revoke/panel-no/panel-yes/head/view/help/quit）", verb)
 	}
 }
 
