@@ -31630,3 +31630,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **194 代价表（`806d562f5`，只读 81 行）**：★**把 A384③「先片B后名册」追平**——代码侧名册 **4 → 7 枚**（248 落 `config.get`/`config.set`、320 落 `config.models.list`）；`Handle` 生产调用者 **0 → 2**（`panel_host_windows.go:955`、`panel_inbound.go:173`）；规格∩代码交集 **零 → 3 枚**；`config.set` 地基**已建**（195 号票 `Manager.WriteSection`，`internal/config/panelwrite.go:168`）⇒ **本票从"收件类"回可派写腿**。
   - 分堆今日读数：甲已落 4／乙地基在 9／丙没货 5＋出向 5 枚独立；未落 16 枚产码＋测试双侧字面量全零。
 - **撤销口令**：214＝`git revert 3141b301d fc76d5d7e`；194 证据件＝`git revert 806d562f5`；176 证据件＝`git revert 12a6140d6`。
+
+## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
+- **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
+- **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
+- **对 176-r2 两处更正**：`run.go:1813` 行漂移→现 **1834**；175 票面旧判据件名已被 `ticket175r2_stamp_live_test.go`（`58db7400`）取代。
+- **「回改 164/175 的条件」留给编排者**：164:57、175:19/:53/:67/:83 的历史 log 仍写旧零读数，但都自带「归票 176」指针，结票后指针自洽；逐字回改属 164/175 票面写面，编排者定夺（不改也不误导）。
+- 门禁四枚全绿：gofumpt 空／vet rc0／`go test ./internal/tools -count=1` ok 69.067s／d22scan clean rc0。零产码；`internal/**`、`cmd/**`、`frontend/**`、`design/**`、thresholds/golden 零字节；⛔push。
+- **撤销口令**：结票记账＝`git revert 3f02ff70b` ＋ 本条所在的结票 commit（`git log --oneline --grep "176 结票" -1` 可查）；票面名与 AC 勾的复原随 revert 走，若 revert 不含改名则以 `git mv` 退回旧名。

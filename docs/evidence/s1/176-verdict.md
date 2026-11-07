@@ -50,9 +50,9 @@
 
 | 门禁 | 读数 |
 |---|---|
-| `/d/work/base/gopath/bin/gofumpt.exe -l internal/tools/` | （见本表提交后追加） |
-| `go vet ./internal/tools/` | （同上） |
-| `go test ./internal/tools -count=1` | （同上） |
-| `sh scripts/d22scan.sh` | （同上） |
+| `/d/work/base/gopath/bin/gofumpt.exe -l internal/tools/` | **空**，rc=0 |
+| `go vet ./internal/tools/` | rc=0 |
+| `go test ./internal/tools -count=1` | **ok 69.067s**（同日早前第一次跑 ok 33.962s，两次全绿） |
+| `sh scripts/d22scan.sh` | **clean**，rc=0（bans #1-5 internal/=379、cmd/=61；#7 internal/tools/=48；#8 internal/=944、cmd/=230、frontend/=116、design/=39；随行 runtests PASS=45 FAIL=0 SKIP=0） |
 
 - ⛔ push；零产码；本腿写面＝票面 `176-*.md`＋本表＋台账 A1606，`internal/**`、`cmd/**`、`frontend/**`、`design/**`、thresholds/golden 零字节。

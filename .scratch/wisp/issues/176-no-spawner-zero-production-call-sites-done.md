@@ -1,6 +1,6 @@
 # 176 — **没有一个起跑口**：`RunAsync` 生产零调用点、`TaskRoster.Record` 零写者 ⇒ 票 164 的 AC#4 没有对象、票 175 的"洗掉来源"那条路等着自动通、`task.output` 永远只能回答"查不到这个任务"——**而这件"谁去把后台任务真跑起来"的事，票池里没有一张票认领**
 
-- Status: **立而不派**（编排者排程：**排在票 175 的落地腿之后**——那枚写者一动手就必须与本票同批，见 AC#2；且它与票 163／165 抢同一批 `internal/tools/**` 文件，串行）。
+- Status: **done**（2026-11-07 18:1x 裁决腿结票。原「立而不派」已过期：起跑口 176-r1 已于 09-28 落地并提交（产码 `internal/tools/task_backfill.go` `06dae8316`＋判据 `internal/tools/ticket176r1_start_port_test.go` `00f640a22`＋组合根接线 `41e8873bd`）；裁定＝乙「按实落地翻勾结票」，读数与理由＝`docs/evidence/s1/176-verdict.md`，台账 `A1606`）
 - 来源：**编排者本轮排程时自己撞出来的**：我为了执行 `A344` 里那句"票 175 必须与写者同批落地"去现量"那位写者归哪张票"，**结果发现归不到任何一张**——我此前一直把这件事记在票 163 名下，**那是错的**（票 163 是"常驻终端会话"，另一码事，见 `A345` 的自纠）。台账 `A345`。
 - 关联：票 164（AC#4 的被测对象在这里诞生）· 票 175（**洗戳那条路今天不通只因为没人写**）· 票 154（已 `-done`，RESERVED＋触发门：宿主自带 task id 那一形"至今没人关"）· 票 163（**不是**本票，别再混）· `PLAN.md:1531`（`task.list`/`task.cancel` 五字段 DEFERRED 行）· D31（并发与审批模型）· D42
 
@@ -25,11 +25,11 @@
 
 ## AC（每格都要答"这一发在**未修码**上响不响"）
 
-- [x] **AC#1 先把"没有起跑口"量成可复制的两个数**（不是新判断，是**把本票的存在钉在读数上**）：`RunAsync` 生产调用点枚数、`TaskRoster.Record` 生产写者枚数（两枚都要**排测试**的口径＋命令原文）。⚠ 若任一枚变成"≥1"，**本票作废、回来改票 164/175 的条件**，不许留着。
-- [ ] **AC#2 与票 175 同批（硬约束，不是建议）**：本票任何落地腿，**必须与"外来的读回来要盖戳"那枚判据在同一次交付里存在**。⚠ 写者落了、戳还没有 ⇒ 那次交付**判不通过**（判据本体在票 175 AC#3，落地形状＝常驻正控用例，非尺子腿——这一条由 `175-c1` 现量裁出：`gate-clauses.sh` 那一族**没有任何 CI 步骤会跑它**）。
-- [ ] **AC#3 取消语义在本票诞生**（票 164 AC#4 等的就是这个对象）：起跑口一落地，"任务被取消之后不许还有人在写它的输出"必须**同批**做成红／绿两向判据——⚠ 不许再写成"等 164 那格以后再说"（那是票 164 定案⑤登记过的同一枚形状）。
-- [ ] **AC#4 落点形状禁区（逐条自证）**：(i) **不许**给 `internal/agent.Loop` 加"收 `taskID` 的导出方法"（票 164 定案④＋`gate-clauses.sh` 的 G3 腿 pattern，现量在 `:363-366` 一带，行号自己量）；(ii) **不许**把宿主内部 artifacts 写入做成受门控的 Tool（`AGENTS §1.2` 逐字禁止项）；(iii) 裸 `go func(` 一律走 `observe` 那套 owner/recover（`tools/d22scan` 的 `bare-goroutine`）；(iv) 非 `risk.PathResolver` 之外不许用 `filepath.Clean|Abs` 做文件系统决策（同一条）。
-- [ ] **AC#5 契约轴**：`docs/PLAN.md`（含 `:1531` 那行 DEFERRED 的**完成判据列**若要改）、`docs/specs/**` 一字节不许动，动＝owner 单独批准＋批准原文落台账；`internal/risk/**`、`internal/panel/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` 零字节。⚠ 若实现程认为 D31/S7 的哪一句与本票冲突 ⇒ **停手上报**，不自填。
+- [x] **AC#1 先把"没有起跑口"量成可复制的两个数**（不是新判断，是**把本票的存在钉在读数上**）：`RunAsync` 生产调用点枚数、`TaskRoster.Record` 生产写者枚数（两枚都要**排测试**的口径＋命令原文）。⚠ 若任一枚变成"≥1"，**本票作废、回来改票 164/175 的条件**，不许留着。★11-07 裁定：作废条件确已触发（裁决腿现量 **RunAsync 生产调用点＝2**（`run.go:1834`＋`subagent_197.go:372`）、**TaskRoster.Record 生产写者＝4**（`task_backfill.go:141`＋`task.go:411/:424`＋`subagent_197.go:462`）），但触发者是**本票自己的腿（176-r1）交付成功**——按铁律 ⓪⓪⓪ 结 done 不作废，理由全文＝`docs/evidence/s1/176-verdict.md` §0/§2；「回改 164/175」半句登记给编排者（verdict §5、台账 `A1606`）。
+- [x] **AC#2 与票 175 同批（硬约束，不是建议）**：本票任何落地腿，**必须与"外来的读回来要盖戳"那枚判据在同一次交付里存在**。⚠ 写者落了、戳还没有 ⇒ 那次交付**判不通过**（判据本体在票 175 AC#3，落地形状＝常驻正控用例，非尺子腿——这一条由 `175-c1` 现量裁出：`gate-clauses.sh` 那一族**没有任何 CI 步骤会跑它**）。★11-07 裁定：对应物在盘＝`internal/tools/ticket175r2_stamp_live_test.go`（commit `58db7400`，五腿，git 跟踪现核）＋票 175 本身已 `-done`；⚠ 175 票面所引旧件名 `bridge_mark_provenance_ticket175_test.go` 已被本件取代（盘上不在，verdict §4）；时序上 175-r2 判据先落、176-r1 后落（09-28）⇒「写者落了、戳还没有」未发生。
+- [x] **AC#3 取消语义在本票诞生**（票 164 AC#4 等的就是这个对象）：起跑口一落地，"任务被取消之后不许还有人在写它的输出"必须**同批**做成红／绿两向判据——⚠ 不许再写成"等 164 那格以后再说"（那是票 164 定案⑤登记过的同一枚形状）。★11-07 裁定：对应物在盘＝`internal/tools/ticket176r1_start_port_test.go` 四枚（`:69` L-1 真路径／`:128` L-2 命名空间／`:217` L-3 取消后不写／`:249` L-4 终态载体显式排除）；牙 11-07 本腿亲咬——对照 PASS、M3 摘守卫 ⇒ L-3 FAIL 三断言齐响、M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」（读数＝verdict §1#8/§3）。
+- [x] **AC#4 落点形状禁区（逐条自证）**：(i) **不许**给 `internal/agent.Loop` 加"收 `taskID` 的导出方法"（票 164 定案④＋`gate-clauses.sh` 的 G3 腿 pattern，现量在 `:363-366` 一带，行号自己量）；(ii) **不许**把宿主内部 artifacts 写入做成受门控的 Tool（`AGENTS §1.2` 逐字禁止项）；(iii) 裸 `go func(` 一律走 `observe` 那套 owner/recover（`tools/d22scan` 的 `bare-goroutine`）；(iv) 非 `risk.PathResolver` 之外不许用 `filepath.Clean|Abs` 做文件系统决策（同一条）。★11-07 裁定：r1 交付面四条全静——生产 Loop 导出方法抓 taskID＝0 命中、`task_backfill.go` 无 `Tool|Register`（不是受门控 Tool）、无裸 `go func(`、无 `filepath.Clean|Abs`（verdict §1#6）。
+- [x] **AC#5 契约轴**：`docs/PLAN.md`（含 `:1531` 那行 DEFERRED 的**完成判据列**若要改）、`docs/specs/**` 一字节不许动，动＝owner 单独批准＋批准原文落台账；`internal/risk/**`、`internal/panel/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` 零字节。⚠ 若实现程认为 D31/S7 的哪一句与本票冲突 ⇒ **停手上报**，不自填。★11-07 裁定：r1 三 commit 触碰面＝`cmd/wisp/run.go`（`41e8873bd`）＋`internal/tools/task_backfill.go`（`06dae8316`）＋`internal/tools/ticket176r1_start_port_test.go`（`00f640a22`），契约轴零字节（verdict §1#5）。
 
 ## 本票**不**解决
 
@@ -90,3 +90,13 @@
 - 预算：**超了**——硬顶 45，实际停在第 **68** 次左右（超出全部花在派单 §4 那发端到端的定位上：SSE 缺 usage／台件字段缺失／拒因取数）。取数前后各失败过：无被拒的工具调用；无删除命令；无 push。
 
 - 11-07 17:0x｜**176-r2（复核腿·零产码，未勾任何框）**：派单前提过期——起跑口 176-r1 已于 09-28 落地并提交（产码 06dae8316＋判据 00f640a22＋cmd/wisp/run.go:1813 接线），本程未重复实现，转独立现量。读数表＝docs/evidence/s1/176-background-launch.md：①票 175 接口真在盘上（SrcTaskOutput=provenance.go:94、bridge.go:744 名册闸门）；②AC#1 作废条件早已触发——RunAsync 生产调用点 2 枚（run.go:1813＋subagent_197.go:372）、Record 生产写者 4 枚（task_backfill.go:141＋task.go:411/:424＋subagent_197.go:462）；③门禁五枚全绿（gofumpt 空／vet rc0／build rc0／tools 全包 ok 34.995s／d22scan clean）；④★牙今日新鲜两发（-overlay，跟踪文件零改动）：M3 摘 Stopped 守卫→L-3 红 rc1 三断言、M1 摘 ArtifactPath 赋值→L-1 红 rc1「只截不指」；AC 勾与 Status 零触碰；本波 internal/tools 只有本腿一枚写腿；⛔push。
+
+### 11-07 18:1x +08｜176-裁决腿（非实现者非复核者；翻勾结票＝裁决腿特权，本段即裁定）
+
+- 锚点＝本段现跑 `29b3501d5`；独立读数表＝`docs/evidence/s1/176-verdict.md`（commit `3f02ff70b`），**全部自跑**（⛔ 抄 176-r2）：三件在场且 git 跟踪｜`RunAsync` 生产调用点 **2**（`run.go:1834`＋`subagent_197.go:372`）｜`TaskRoster.Record` 生产写者 **4**（`task_backfill.go:141`＋`task.go:411/:424`＋`subagent_197.go:462`；另 5 枚 `.Record(` 是 grants/memory/approval 卡等别的类型不计入）｜`go test ./internal/tools -count=1` **ok 33.962s**｜判据四枚真名 `:69/:128/:217/:249`。
+- **裁定＝乙（按实落地翻勾结票，Status: done，文件名加 `-done` 后缀）**。理由三条（verdict §0）：①核心交付是本票自己的腿做的——r1 三 commit 全部自报名号 176-r1 且逐一 `git show --stat` 现核；②AC#1 作废条款写在实现之前、防的是「被别人抢先交付还挂着」，本票的触发者是**自己交付成功**——主流 harness 语义＝close as completed，不是 withdrawn；③`-done` 后缀是防重领唯一键，上一轮 roster-triage 恰因未结票而错派（A1605 自认第 24 处），结票防第三次空派。AC#1-5 逐格裁定已写进各格（★11-07 标注＋具名对应物）。
+- **对 176-r2 的两处更正**（verdict §4）：①`run.go:1813` 行漂移→现行号 **1834**；②175 票面引的 `bridge_mark_provenance_ticket175_test.go` 已不在盘，被 `ticket175r2_stamp_live_test.go`（`58db7400`）取代。
+- **牙（本腿自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）**：对照无 overlay `-run 176r1` **ok 0.415s**；M3 摘 `:123-125` 守卫 ⇒ **L-3 FAIL 三断言齐响**；M1 `:138` 赋值→`_ = sp.Path` ⇒ **L-1+L-2 FAIL「只截不指」**；每发后 `git status --porcelain -- internal/tools/` 空。⚠ 09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝**[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段，老 mut 副本编不过）——**牙没钝，台件过期**；复跑须用现派生副本（verdict §3）。
+- **门禁**（结票 commit 前现跑，env 先 unset GOTMPDIR/TMPDIR/TEMP/TMP＋PATH 加 build+sherpa-onnx）：`/d/work/base/gopath/bin/gofumpt.exe -l internal/tools/` 空／`go vet ./internal/tools/` rc=0／`go test ./internal/tools -count=1` ok／`sh scripts/d22scan.sh` clean——逐项读数在 verdict §6 与收件回禀。
+- **给编排者**：①「回改 164/175 的条件」——164:57、175:19/:53/:67/:83 的历史 log 仍写旧零读数，但都自带「归票 176」指针，本票结票后指针自洽；逐字回改属 164/175 写面，由编排者定夺。②台账已追加 `A1606`（含撤销口令）。
+- 零产码；`internal/**`、`cmd/**`、`frontend/**`、`design/**`、thresholds/golden 零字节；零删除命令；⛔push。
