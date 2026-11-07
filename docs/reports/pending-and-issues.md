@@ -31704,6 +31704,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **214 AC#5 取证（`726136e1e`，只读）**：裁定＝**乙**，且带坏消息——**票 35 没有那一格**（它的 AC 八枚全是传输层：白名单 fuzz/correlationId/resync/背压，**无一格覆盖 handler 本体**）⇒ 需**立新票**（消息门 handler 本体）。好消息：盖戳引擎（`run.go:330 c25`）、附件读者（`pump.go:235/244`）、`ForAgent` 渲染都已备好，未来票净新增面＝handler 本体＋盖戳一跳＋回执。落点唯一＝`panel_inbound.go:352`。
 - **撤销口令**：Jarvis 底色＝`git revert 8a3194f35 5762be0d9 d8da4e83e fe4fec342`；188＝`git revert fa5c9b6c8`；187＝`git revert 007de34f0`；214 取证＝`git revert 726136e1e`。
 
+## A1612（2026-11-07 19:5x，编排者）**★外观切换真正落地：ApplyStyle 产品调用者 0→实（6 笔已推），四牙我亲跑 4/4 PASS**
+- **wave71 实际落了 6 笔（不是它中途报的"只有证据件"）**：`fe0f740d6` 收口腿五问核实／`1b25d931c` 设置门收口（internal/panel）／`bc48ae6c7` 步3+4 接线落地／`7858108a0` 步2b（cmd/wisp＋internal/config）／`635922c76` 步5 收件／`d86e591ba` 追加更正（并发收口腿推进后的组合态复核）。
+  - **新件**：`internal/config/settings_65.go`（`SetBallStyle` 守卫写＋`BallStyleOptions` reader）＋`internal/config/settings_65_test.go`＋`internal/panel/config_write_65.go`（roster `FieldBallStyle`）＋`internal/panel/ball_style_65.go`（carrier）＋`cmd/wisp/ball_style_65_windows.go`（种子读取＋applier 注入缝）＋`cmd/wisp/ball_style_65_windows_test.go`。
+  - **hunk**：`cmd/wisp/resident_windows.go`（启动 `ball.New` 前 `SetStyle`＋装配后 `ApplyStyle` 幂等复同步）＋`cmd/wisp/panel_config_store.go`（`ApplySetting` 加 `ball_style` case＋档位实测）。
+- **★我独立复核（关键三条，⛔ 抄腿报）**：
+  1. **`ApplyStyle` 产品调用者 0 → 实**：现读 `cmd/wisp/ball_style_65_windows.go:65` `ballStyleApplier65 = func(name string) bool { return b.ApplyStyle(name) }` ＋ `cmd/wisp/resident_windows.go:426` 开机幂等复同步 ＋ `panel_config_store.go:297` 写入路径注释「applier 在（球活着）＝ApplyStyle 已把进程级家族与 orb 页面换过去」。
+  2. **设置门四表并集落地**：`internal/panel/config_handlers.go:450` `writableField187(field) || writableField65(field)`。
+  3. **快照键落地**：`internal/panel/composer.go:143` `BallStyle *BallStyleSection \`json:"ballStyle,omitempty"\``（reader-gated，照 213/187 同款）；`pump.go:240` `BallStyle func() BallStyleSection` 读口＋`:437` 接线。
+- **★我亲跑四牙（4/4 PASS，`go test ./cmd/wisp -run Test65 -v`）**：`Test65SeedDefaultGlass` PASS 0.00s／`Test65SeedJarvis` PASS 0.00s／`Test65SeedUnreadable` PASS 0.00s／**`Test65ApplySettingBallStyleFlipsActiveStyle` PASS 0.02s**（★这一枚就是「设置项切风格真生效」的牙）。整套 `ok 0.149s`。
+- **词表**：`internal/config/schema.go:97` `BallStyleGlass = "glass"`／`:98` `BallStyleJarvis = "jarvis"`／`:113` `ballStyles = []string{BallStyleGlass, BallStyleJarvis}`；漂移钉 `internal/config/ball_style_65_test.go:17` `TestBallStyleVocabularyMatchesBall`。
+- **★默认值现状（如实）**：`%APPDATA%\wisp\config.toml` **今天还不存在**（程序没跑起来建过）⇒ 默认 `glass` 由**代码层**保证（schema 默认流出，新件零字面量），四条测试覆盖；配置文件首次生成时会带默认。
+- **撤销口令**：外观切换全套＝`git revert d86e591ba 635922c76 7858108a0 bc48ae6c7 1b25d931c fe0f740d6`（回退即回「两种风格但无切换入口、ApplyStyle 产品调用者 0」）。
+
 ## A1606（2026-11-07 18:2x，176 裁决腿）**176 结票＝done（裁决腿翻勾）；票面加 `-done` 后缀；AC#1 作废条款的处置裁定**
 - **裁定＝乙「按实落地翻勾结票」**（非实现者非复核者的裁决腿独立作出，读数全部自跑 ⛔ 抄 176-r2）：AC#1-5 五格全翻 `[x]`＋Status: done，票面改名 `176-no-spawner-zero-production-call-sites-done.md`。**AC#1 作废条款（任一枚 ≥1 ⇒ 作废）确已触发**（RunAsync 生产调用点 **2**、TaskRoster.Record 生产写者 **4**，裁决腿现量），但触发者是**本票自己的腿 176-r1 交付成功**（三 commit `41e8873bd`/`06dae8316`/`00f640a22` 全部自报名号）——主流 harness 语义＝close as completed 而非 withdrawn；按字面自我作废会让「池里 withdrawn 票 × 盘上以它命名的活 commit＋今天仍咬的判据」互相矛盾。判据：铁律 ⓪⓪⓪（最有价值＋最符合盘上事实）。
 - **读数表**＝`docs/evidence/s1/176-verdict.md`（`3f02ff70b`＋结票 commit）。牙两发裁决腿亲咬（自己的 overlay json＋r2 现派生副本，diff 现核只差目标一刀）：对照 PASS／M3 摘守卫 ⇒ L-3 FAIL 三断言／M1 摘 ArtifactPath ⇒ L-1+L-2 FAIL「只截不指」。⚠ **09-28 老台件 `probes/176/r1/mut/*.overlay.json` 在今天 HEAD 上＝[build failed]**（`62d7d3b49` 188-r2 给 `TaskBackfill` 加 `State` 字段）——牙没钝、台件过期，复跑须用现派生副本。
