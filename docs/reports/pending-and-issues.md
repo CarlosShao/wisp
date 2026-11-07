@@ -31588,3 +31588,15 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **★316 是撤票——我筛票失误（第 23 处）**：腿现读发现 `Status: withdrawn`（编排者 2026-10-14 13:38 撤，**与票 272 重复**，台账 A924）。腿**没有硬翻勾**，而是把撤票事实基础在今天 HEAD 上全部现跑重核——**成立**：M 突变复跑 FAIL 2.85s 红 `:676` arm1、正控 PASS 3.928s、家族 `TestTicket223` rc=0（10 PASS/0 FAIL）。三选一逐支现读＝(a) 已在盘 `:748`／(b) 空操作／(c) 结构性误伤 ⇒ **维持撤票，三支全不落地**。
   - ⇒ **我的教训**：筛票纪律要求"排除 `Status: withdrawn`/已撤票＝第 22 处"，我这次只读了未勾格正文、**没读 Status 行** ⇒ 派了一条本该跳过的腿。已记。
 - **撤销口令**：像素 flake 治理＝`git revert 1cab5ed6a 79fdc5a8b ea602a61b`；138＝`git revert 9287d1179 b576c10a3 bf224be19 b3e990300 8429d0e60`；316＝`git revert 72b04c503 bb01676c3 82d8a0b7e 13a5a7eb9 9a8ba042f`。
+
+## A1603（2026-11-07 17:0x，编排者）**★WebView2 controller 泄漏根治（fork jchv＋replace，我复跑探针 baseline=0 after=0）｜全票池 97 枚逐枚筛档完成（拦住 3 枚撤票）**
+- **jchv controller 泄漏根治（3 枚 commit，wave63 `jchv-close` 腿）**：
+  - **★决定性新读数（推翻票面预估）**：vtable **已经映射了 Close 槽**——`ICoreWebView2Controller.go:33` 已有 `Close ComProc`，紧跟 `NotifyParentWindowPositionChanged`，**与官方头序一致**；票面"第 6 号槽左右"**不成立**（实际在尾部第 22 号）。**全模块 grep `func.*Close`＝0 命中** ⇒ 缺的只是一个 7 行 Go 包装方法（`vtbl` 字段不导出，Wisp 侧够不着）。`Chromium.GetController()` 公开访问器已存在（`chromium.go:328`）⇒ **不需要 QueryInterface**。
+  - **裁定＝甲：fork 到 tracked 的 `forks/go-webview2/` ＋ `go.mod replace`**（主流 harness 做法）。乙（产码 unsafe 自声明 25 槽 COM 布局）＝**双真相源静默腐坏**；丙（不修只记文档）＝动作最小 ⇒ 均按铁律 ⓪⓪⓪ 否。★中途更正：初判放 `third_party/` 撞 `.gitignore` 整目录忽略（replace 会悬空）⇒ 移 `forks/` 并给三枚被 `go:embed` 的 Loader DLL 加白名单。
+  - **★我亲跑复核（⛔ 抄腿）**：`forks/go-webview2/` **真在**（30 个 .go 文件）；`Close()` 包装在 `ICoreWebView2Controller.go:63`；`go.mod:24` `replace github.com/jchv/go-webview2 => ./forks/go-webview2` **已生效**；探针 `TestOrbControllerCloseStopsBrowserProcessLeak` ⇒ **PASS 4.06s**，读数逐字：`probe: 5 create/destroy rounds, own-parented msedgewebview2 baseline=0 after=0 (no growth - controller Close verified)`。
+  - **腿如实报的两条 open 我认**：① `destroy()` 产码 hunk **还在工作区未 commit**（`orb_windows.go` 混着 wave62 的 191/72 行 WIP，pathspec commit 会吞别人的活）⇒ 等 wave62 落盘后单独 commit；② `count=5` **5/5 未认证**（第 2 轮 Pixel 起跑处测试二进制静默死亡，无 FAIL 行无 panic；仓外纯净场探针 PASS；Pixel 复跑被外来 `balldebug-65verify.exe` 挡在 quiet-desktop 守卫外）⇒ **暂无法归因**（同树压着 wave62 四文件 WIP，既不能归它也不能归他）。
+- **★全票池 97 枚逐枚筛档（`7863017d3`，只读零产码，142 行）**：分档结果 **①能做 28 枚／②归口等票 16 枚／③不适用要人 32 枚／已撤⛔ 3 枚／需人工判读 7 枚**。
+  - **★这次拦住了 3 枚撤票**（249 WITHDRAWN A503 自撤／269 就地撤销／316 withdrawn 与 272 重复）——**正是我上一轮踩的坑类型，本次靠逐枚扫 Status 三种写法＋撤字样全部拦住**。
+  - **①档前 8 推荐序**：194（owner 已批 A381，代价表是面板方法面集线器）→ 214（owner 接单，票面自述"最便宜一枚"）→ 187（owner 点名功能票）→ 188（owner 放权"缺就补"）→ 213（判据明确，214/215 地基）→ 176（硬前置 175 已 done）→ 305（AC#0 归因已毕）→ 145（167/188/191/192 一串的载体前置）。
+  - **★纪律提醒（腿给的）**：①档里 145/187/188/191/192/194/213/214/215/219/226 触 `internal/panel/**` 或 `cmd/wisp/**` ⇒ **每波每包只许一枚写腿，同包按上序串行**；本档**零枚 `internal/ball/**` 写面**（避开 wave62 在飞件）。
+- **撤销口令**：jchv fork＝`git revert 0291ba74e 2bb639e4e 0e0a48732`（注意 revert 会回退 `go.mod` replace 与整个 forks 目录）；triage 证据件＝`git revert 7863017d3`。
