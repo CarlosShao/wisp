@@ -414,14 +414,14 @@ func (b *Ball) repaintCurrent() {
 	b.renderFrame()
 }
 
-// renderFrame draws and presents via UpdateLayeredWindow.
+// renderFrame draws and presents via UpdateLayeredWindow. The D2D ball paints
+// in EVERY mode, orb included (ticket 65 regression fix): the orb window is a
+// separate top-level surface BESIDE the ball, not a child, so the two windows
+// composite independently and no double-composite exists to avoid. The old
+// orbLive guard left this layered window with alpha 0 everywhere - invisible,
+// and skipped by the OS hit test (WindowFromPoint fell through to whatever
+// sat beneath the ball).
 func (b *Ball) renderFrame() {
-	if b.orbLive() {
-		// The WebView2 orb owns the pixels (ticket 65, A1594). Painting the
-		// D2D frame into the layered window behind a transparent child would
-		// double-composite; the orb was pushed the state instead.
-		return
-	}
 	if b.rend == nil || b.rend.dcRT == nil {
 		return
 	}
@@ -551,11 +551,6 @@ func (b *Ball) repaintAnimated() {
 
 // present is renderFrame without the draw (used after manual draws).
 func (b *Ball) present() {
-	if b.orbLive() {
-		// Orb takeover: the WebView2 surface composites on its own; nothing
-		// here may put a D2D frame behind it (orb_windows.go).
-		return
-	}
 	var wr rect
 	pGetWindowRect.Call(uintptr(b.hwnd), unsafePtr(&wr))
 	dst := point{wr.l, wr.t}

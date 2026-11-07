@@ -50,9 +50,16 @@ package ball
 //
 // Fallback (A1594 ③): the D2D renderer is untouched. If WebView2 cannot come
 // up here, this file logs one line and returns an error; the caller leaves
-// b.orb nil and the D2D path keeps rendering exactly as before. The render
-// guard is three early returns (renderFrame/present), and the D2D code below
-// them is dead while the orb is up, not deleted.
+// b.orb nil and the D2D path keeps rendering exactly as before.
+//
+// Clickability (ticket 65 regression fix): the ball window keeps painting its
+// D2D frames in every mode (the old render guards rest on a wrong premise -
+// the orb is not a child of the ball window, so nothing double-composites),
+// and THIS window is a pure decoration overlay: WS_EX_TRANSPARENT hands every
+// mouse hit to whatever sits beneath, so the orb can never eat a click meant
+// for the ball or any other window - the mainstream Windows overlay shape
+// (layered + transparent + topmost + no-activate), with all interaction
+// staying on the ball window's frozen hit-test/drag/dock semantics.
 
 import (
 	"fmt"
@@ -84,18 +91,21 @@ const (
 	orbWindowEdgeBase = BallSizeMaxPx*96/64 + 24
 )
 
-// orbWindowExStyle: the ball's frozen set minus nothing - layered (the page
-// composites per-pixel through ULW-style transparency), topmost, tool window
-// (no taskbar button), never activates.
-const orbWindowExStyle = uintptr(wsExLayered | wsExTopmost | wsExToolWindow | wsExNoActivate)
+// orbWindowExStyle: the ball's frozen set plus WS_EX_TRANSPARENT - layered
+// (the page composites per-pixel), transparent (every mouse hit falls through
+// to whatever sits beneath: the orb is decoration, it must never eat a click),
+// topmost, tool window (no taskbar button), never activates.
+const orbWindowExStyle = uintptr(wsExLayered | wsExTransparent | wsExTopmost | wsExToolWindow | wsExNoActivate)
 
 // orbShowCommand: same never-activate show the ball uses.
 const orbShowCommand = swShownoactivate
 
-// WM_WINDOWPOSCHANGED: the hook the ball's window forwards so the orb follows
-// a dragged/docked/DPI-moved ball. Not in win32_windows.go's set, so it is
-// named here (this leg's only message constant).
-const wmWindowPosChanged = 0x0047
+// WM_WINDOWPOSCHANGED / WS_EX_TRANSPARENT: not in win32_windows.go's set, so
+// they are named here (this file's own message/style constants).
+const (
+	wmWindowPosChanged = 0x0047
+	wsExTransparent    = 0x00000020
+)
 
 // HWND_TOPMOST as a uintptr literal ((HWND)-1).
 const orbHwndTopmost = ^uintptr(0)
@@ -453,11 +463,6 @@ func (b *Ball) followOrb() {
 		o.follow(b.hwnd)
 	}
 }
-
-// orbLive is the render guard: while the orb owns the pixels, the D2D
-// renderer must not paint into the layered window behind the transparent
-// WebView2 child.
-func (b *Ball) orbLive() bool { return b.orb.Load() != nil }
 
 // DebugOrbHWND exposes the orb window handle (debug harness/evidence only;
 // zero when the D2D fallback is active).

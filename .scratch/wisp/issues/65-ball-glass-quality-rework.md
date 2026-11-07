@@ -126,3 +126,14 @@ AnySearch 文档 1 张、代理面板 1 张、本轮 tour 截图 3 张、小裁�
   整表待重测）/#4 部分（断言未改 PASS，"仍绿"被球透明回归压住）/**#6 归机主**。证据
   docs/evidence/s1/65-verdict.md §7（§1-§6 历史裁决原样保留）。next=球窗透明回归收尾腿（实现腿做，
   裁决只定性不开方）→编排者重派桌面趟（AC#3/#5/#6）。未翻任何 AC 勾/Status；⛔push
+
+- [2026-11-07T15:07 +08] agent=65-ball-clickability-fix did=球窗可点性回归修复（wave59 实现腿）。红句亲跑复现
+  （:343/:371 两枚 FAIL）→诊断：orb 与球窗是**并排顶层窗**（orbFollowXY 几何，出屏测试钉死），"orb 挡球"不成立，
+  因果＝orbLive 守卫令球窗 0 帧⇒分层窗 alpha 恒 0⇒OS hit-test 跳过⇒隐形＋穿透。选型**甲**（铁律 ⓪⓪⓪）：球窗照常画
+  （删 renderFrame/present 两处守卫，原"transparent child double-composite"前提证伪——orb 非 child）＋orb 窗增
+  WS_EX_TRANSPARENT 纯装饰全穿透（主流 overlay 形状：装饰层全穿透＋交互实窗承载全部冻结语义）；**乙排除**＝与
+  orb_live_windows_test.go:152 "SECOND window, not a replacement" 正面冲突且要改断言；断言**零改动**两枚转绿
+  （修复后 5 轮全绿）。判别实验在册（docs/evidence/s1/65-ball-clickability-fix.md §5）：Pixel 枚 in-suite 曾三连红
+  0.000% 全黑，实验A排除 TRANSPARENT、实验B（守卫恢复）转绿锁定"球窗照画"与 in-suite 状态相互作用、
+  standalone 4 连绿、末两轮全套 4 枚全绿（19.95%/12.47%）——摇摆未根除，如实报。门禁：gofumpt 空/vet rc0/
+  build rc0（含 cmd/wisp、balldebug）/默认套件 ok 0.379s/d22scan clean。AC 勾与 Status 未动；⛔push
