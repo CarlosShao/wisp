@@ -2,12 +2,15 @@
 // resident process, `wisp run` and `wisp doctor` are console subcommands whose
 // output goes through AttachConsole.
 //
-// Ticket 03 scope: the no-args path boots the runtime skeleton (Job Object,
-// per-session single instance, goroutine registry - the init-time self-checks)
-// and runs an empty event loop until an exit signal, then exits through the
-// frozen D38(e) 10-step shutdown order. The floating ball GUI is ticket 07.
-// `wisp run` still echoes its task text as a placeholder (agent loop: ticket
-// 10); `wisp doctor` reports the toolchain/DLL self-check (ticket 01).
+// The no-args path (ticket 03 first, extended since) boots the runtime
+// skeleton (Job Object, per-session single instance, goroutine registry - the
+// init-time self-checks) and runs the resident event loop until an exit
+// signal or a stop request fires, then exits through the frozen D38(e)
+// 10-step shutdown order. The floating ball is not a pending ticket: the
+// resident leg of this same process assembles it at startup
+// (startResidentBall in resident_ball_windows.go, called from runResident).
+// `wisp run` runs one task end to end through the agent loop (ticket 12);
+// `wisp doctor` reports the toolchain/DLL self-check (ticket 01).
 package main
 
 import (
@@ -32,8 +35,9 @@ Usage:
                    tasks from the operator's console when this process really
                    owns one (ticket 246 AC#7: no interactive console means the
                    task entry says so out loud and the ball keeps running;
-                   Ctrl+C stops the process, and the tray's Exit item still has
-                   no stop path attached to it)
+                   Ctrl+C stops the process, and so does the tray's Exit item,
+                   which asks the resident loop for the orderly D38(e) shutdown
+                   instead of exiting in place (ticket 228 AC#11))
   wisp run "task"  run one task end to end through the agent loop (ticket 12:
                    the S1 text path - streamed reply + notification + exit code
                    that reflects the error class)
