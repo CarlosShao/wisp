@@ -53,11 +53,36 @@ package ball
 // The 2026-11-08 deep-color leg (owner's ruling verbatim: "太淡了，颜色深
 // 一点，粒子颜色") added the DEPTH teeth below teeth 3-4: the pale build
 // passed all four existence teeth while washing out, so the same white-floor
-// cyan population must now also read DARK (mean luminance < 120 vs the pale
-// baseline's 174.0) and MORE CHROMATIC (mean min(g-r,b-r) > 44.2, the pale
-// baseline's measured value), cover > 20% of the white-floor rect, and cover
-// > 6% of the black-floor rect; see the constants block for the provenance
-// of every number.
+// cyan population must also read DARK and MORE CHROMATIC, cover > 20% of the
+// white-floor rect, and cover > 6% of the black-floor rect.
+//
+// The 2026-11-08 sharp-fine leg (owner's ruling verbatim: "太糊了，根本不像
+// 人家那个demo里那样高清" + "粒子有点粗") RE-CALIBRATED the depth teeth and
+// added the FINE-GRAIN teeth, because the shape the teeth sample changed
+// physics, not quality: the shipped field went from giant blobs (point floor
+// 7.00, ~8 connected components averaging 420.9 px on a static white-floor
+// capture) to fine grains (upstream point 1.08, render dpr 3.5 supersample,
+// 1652 particles). Measured on the static white-floor captures (116x116,
+// finegrain.py, same cyan gate): coarse build share 25.02% / mean row-run
+// 10.52px / 8 components at 420.9px; sharp-fine build share 17.35% / mean
+// run 2.59px / 175 components at 13.34px. A fine-grain field is
+// intrinsically EDGE-DOMINATED: a ~2px dot is mostly partial-alpha blend
+// pixels over white, so the population's mean luminance sits above the blob
+// build's and its mean chroma below - the old blob-era numbers (lum < 120,
+// chroma > 44.2, share > 20%) are not properties of the new shape. The
+// re-calibrated teeth still bite their own defects with measured margins:
+//   - share > 14% (measured 17.35; the pale deep-less build's 12.28-13.63%
+//     sits under the floor; particle loss collapses toward 0);
+//   - mean luminance < 135 (measured 122.9; the pale build read 174.0, and
+//     an alpha-floor mutation 0.92 -> 0.24 pushes fine-dot blend pixels
+//     toward ~230);
+//   - mean chroma > 34 (measured 39.7; the saturation mutation 1.9 -> 1.0
+//     drops the framebuffer's pure color g-r by ~19%, landing near 32 - red).
+// The FINE-GRAIN teeth are new and pin exactly the two words of the owner's
+// ruling: mean cyan row-run length must stay SHORT (measured 2.59px static;
+// the coarse blob build measured 10.52px - the mutation back to the 7.00
+// point floor re-lands there) and the row-run COUNT must stay HIGH (fine
+// grains fragment the field; blobs merge it).
 //
 // Mutation evidence (dispatch tooth 4, RUN 2026-11-08, honest result): the
 // blending-mode mutation does NOT turn these teeth red. Setting
@@ -186,19 +211,46 @@ const (
 // the floor - the chroma tooth goes red while the darkening comes from the
 // palette hexes and the alpha/point floors.
 const (
-	// white floor: cyan-dominant share must beat the pure-particle leg's 2%
-	// existence floor by an order of magnitude (wash-out collapses coverage;
-	// the deep build measures ~2x this floor).
-	jarvisDeepWhiteRatioFloor = 0.20
+	// white floor: cyan-dominant share. RE-CALIBRATED by the sharp-fine leg
+	// (2026-11-08): the blob-era 20% floor was calibrated on a field of
+	// giant points whose interiors dominate; the fine-grain field measures
+	// 17.35% on the static white-floor capture, and the pale deep-less
+	// build's 12.28-13.63% sits under the new floor. Particle loss still
+	// collapses the share toward 0, which is what this tooth bites.
+	jarvisDeepWhiteRatioFloor = 0.14
 	// black floor: the deep build's dots cover far more than the
 	// bright-palette build's measured 3.3-3.5% share.
 	jarvisDeepBlackRatioFloor = 0.06
-	// mean luminance of the white-floor cyan population: the pale baseline
-	// measured 174.0; the deep build must read DARKER than this.
-	jarvisDeepLumCeiling = 120.0
-	// mean min(g-r,b-r) of the white-floor cyan population must beat the
-	// pre-leg asset's measured 44.2.
-	jarvisDeepChromaFloor = 44.2
+	// mean luminance of the white-floor cyan population. RE-CALIBRATED by
+	// the sharp-fine leg: fine grains are edge-dominated (partial-alpha
+	// blends over white), so the same deep color reads brighter than in the
+	// blob build - measured 122.9 on the static capture. Still bites: the
+	// pale build read 174.0 and an alpha-floor mutation pushes fine-dot
+	// blend pixels toward ~230.
+	jarvisDeepLumCeiling = 135.0
+	// mean min(g-r,b-r) of the white-floor cyan population. RE-CALIBRATED
+	// by the sharp-fine leg: the blob-era 44.2 measured a field of
+	// interior-dominated points; the fine-grain field measures 39.7. Still
+	// bites: the saturation mutation (1.9 -> 1.0) drops the pure color's
+	// g-r ~19%, landing near 32 - red.
+	jarvisDeepChromaFloor = 34.0
+)
+
+// Sharp-fine fine-grain teeth (2026-11-08, owner's ruling verbatim "粒子
+// 有点粗" + "太糊了"): the coarse blob build measured a mean cyan row-run of
+// 10.52px with only 8 connected components (static white-floor capture); the
+// sharp-fine build measures 2.59px mean run and hundreds of fragments. The
+// teeth pin that shape: short runs (fine grains, not blobs) and many runs
+// (dense grains, not a sparse film). Sampling is 1px-stride rows so a run is
+// a real particle cross-section, unlike the 3px-stride share sampler.
+const (
+	// mean cyan run length across the sampled rows must stay SHORT.
+	jarvisFineRunLenCeiling = 6.0
+	// total cyan runs across the sampled rows must stay HIGH (a window-full
+	// of separate grains, not a merged mass or an empty field).
+	jarvisFineRunsFloor = 100
+	// rows sampled at 1px stride for the fine-grain metrics.
+	jarvisFineRows = 20
 )
 
 // pureReport carries one attempt's readings for the failure line.
@@ -209,6 +261,8 @@ type pureReport struct {
 	whiteCyan   float64
 	whiteLum    float64
 	whiteChroma float64
+	fineRuns    int
+	fineRunLen  float64
 	blackCyan   float64
 	blackLum    float64
 	blackChroma float64
@@ -260,16 +314,19 @@ func TestBallLiveOrbJarvisPureParticlesOverWhiteAndBlackFloors(t *testing.T) {
 				attempt, attempts, rep.ringLum, rep.ringOK, rep.whiteCyan*100, rep.whiteLum, rep.whiteChroma, rep.blackCyan*100)
 		}
 	}
-	t.Fatalf("jarvis pure-particle deep-color regression after %d attempts: corners %v (want each channel within +/-%d of the floor: still transparent on BOTH floors); "+
+	t.Fatalf("jarvis sharp-fine pure-particle regression after %d attempts: corners %v (want each channel within +/-%d of the floor: still transparent on BOTH floors); "+
 		"white-floor ring non-particle average luminance %.1f (want > %d with >=%d/%d non-particle samples: NO dark backdrop may return); "+
-		"white-floor cyan-dominant ratio %.2f%% (want > %.2f%% existence and > %.2f%% deep), particle mean luminance %.1f (want < %.0f: DEEPER than the pale 174.0 baseline) "+
-		"and mean chroma %.1f (want > %.1f: MORE saturated than the pale 44.2 baseline); "+
+		"white-floor cyan-dominant ratio %.2f%% (want > %.2f%% existence and > %.2f%% deep), particle mean luminance %.1f (want < %.0f) "+
+		"and mean chroma %.1f (want > %.1f); "+
+		"fine grains: %d cyan runs (want >= %d) with mean run length %.2fpx (want < %.1f: the coarse 7.00-floor build measured 10.52px, "+
+		"the sharp-fine build 2.59px on the static capture); "+
 		"black-floor cyan-dominant ratio %.2f%% (want > %.2f%% existence and > %.2f%% deep: particles visible on any background)",
 		attempts, last.corners, jarvisCornerTol,
 		last.ringLum, jarvisPureRingLumFloor, jarvisPureRingMinSamples, jarvisPureRingProbeCount,
 		last.whiteCyan*100, jarvisCyanFloor*100, jarvisDeepWhiteRatioFloor*100,
 		last.whiteLum, jarvisDeepLumCeiling,
 		last.whiteChroma, jarvisDeepChromaFloor,
+		last.fineRuns, jarvisFineRunsFloor, last.fineRunLen, jarvisFineRunLenCeiling,
 		last.blackCyan*100, jarvisCyanFloor*100, jarvisDeepBlackRatioFloor*100)
 }
 
@@ -399,20 +456,25 @@ func orbPurePixelAttempt(t *testing.T, b *Ball, attempt int) (bool, pureReport) 
 		if rep.ringOK {
 			rep.ringLum = float64(lumSum) / float64(nonParticle)
 		}
-		// Tooth 3 + deep-color teeth: cyan particles keep their hue over
-		// WHITE, and the field is DEEP - large, dark, more chromatic than
-		// the pale pre-leg baseline.
+		// Tooth 3 + deep-color teeth + fine-grain teeth: cyan particles keep
+		// their hue over WHITE, the field is DEEP (re-calibrated for the
+		// fine-grain shape), and the grains are FINE - short runs, many
+		// runs, exactly the owner's "粒子有点粗"/"太糊了" inverted.
 		rep.whiteCyan, rep.whiteLum, rep.whiteChroma, rep.samples = orbPureParticleStats(hdc, wr)
+		rep.fineRuns, rep.fineRunLen = orbPureFineGrainStats(hdc, wr)
 		pReleaseDC.Call(0, hdc)
 		if cornersOK && rep.ringOK && rep.ringLum > float64(jarvisPureRingLumFloor) &&
 			rep.whiteCyan > jarvisCyanFloor &&
 			rep.whiteCyan > jarvisDeepWhiteRatioFloor &&
 			rep.whiteLum < jarvisDeepLumCeiling &&
-			rep.whiteChroma > jarvisDeepChromaFloor {
-			t.Logf("attempt %d: white-floor phase: corners %v within +/-%d of WHITE; ring %d/%d non-particle samples averaging lum %.1f (> %d: no backdrop); cyan-dominant %.2f%% (existence > %.2f%%, deep > %.2f%%); particle lum %.1f (< %.0f) chroma %.1f (> %.1f)",
+			rep.whiteChroma > jarvisDeepChromaFloor &&
+			rep.fineRunLen < jarvisFineRunLenCeiling &&
+			rep.fineRuns >= jarvisFineRunsFloor {
+			t.Logf("attempt %d: white-floor phase: corners %v within +/-%d of WHITE; ring %d/%d non-particle samples averaging lum %.1f (> %d: no backdrop); cyan-dominant %.2f%% (existence > %.2f%%, deep > %.2f%%); particle lum %.1f (< %.0f) chroma %.1f (> %.1f); fine grains: %d runs (want >= %d) mean run %.2fpx (want < %.1f)",
 				attempt, rep.corners, jarvisCornerTol, nonParticle, jarvisPureRingProbeCount,
 				rep.ringLum, jarvisPureRingLumFloor, rep.whiteCyan*100, jarvisCyanFloor*100, jarvisDeepWhiteRatioFloor*100,
-				rep.whiteLum, jarvisDeepLumCeiling, rep.whiteChroma, jarvisDeepChromaFloor)
+				rep.whiteLum, jarvisDeepLumCeiling, rep.whiteChroma, jarvisDeepChromaFloor,
+				rep.fineRuns, jarvisFineRunsFloor, rep.fineRunLen, jarvisFineRunLenCeiling)
 			break
 		}
 		if time.Now().After(deadline) {
@@ -507,4 +569,40 @@ func orbPureParticleStats(hdc uintptr, wr rect) (ratio, lumMean, chromaMean floa
 		float64(lumSum) / float64(cyan) / 3.0,
 		float64(chromaSum) / float64(cyan),
 		total
+}
+
+// orbPureFineGrainStats samples jarvisFineRows evenly spaced rows of the orb
+// rect at 1px stride (a run is a real particle cross-section, unlike the
+// share sampler's 3px grid) and returns the total number of cyan runs and
+// their mean length in px - the sharp-fine teeth's ruler: the coarse 7.00
+// point-floor build merges the field into few long runs (static capture:
+// 10.52px mean), the sharp-fine build keeps hundreds of short ones (2.59px
+// mean). A row with no cyan at all contributes nothing; the runs floor in
+// the caller keeps a empty/merged field from passing on a technicality.
+func orbPureFineGrainStats(hdc uintptr, wr rect) (runs int, meanRunLen float64) {
+	top, bottom := wr.t+8, wr.b-8
+	lenSum := 0
+	for i := 0; i < jarvisFineRows; i++ {
+		y := top + (bottom-top)*int32(i)/int32(jarvisFineRows-1)
+		inRun := false
+		for x := wr.l + 8; x < wr.r-8; x++ {
+			r, g, bl := orbTestPixelAt(hdc, x, y)
+			cy := int(g)-int(r) >= jarvisCyanGate &&
+				int(bl)-int(r) >= jarvisCyanGate &&
+				bl >= jarvisCyanBright
+			if cy {
+				lenSum++
+				if !inRun {
+					runs++
+					inRun = true
+				}
+				continue
+			}
+			inRun = false
+		}
+	}
+	if runs == 0 {
+		return 0, 0
+	}
+	return runs, float64(lenSum) / float64(runs)
 }

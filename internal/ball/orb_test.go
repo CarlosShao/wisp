@@ -278,8 +278,19 @@ func TestOrbWriteSite(t *testing.T) {
 // through the extended wisp-jarvis-bright-particles plugin: deeper teal
 // palette hexes, raised alpha floor and point floor, luma-mix saturates on
 // every color site, deep-teal halo stops and a lowered avatar dpr (evidence
-// 65-jarvis-pure-deep-color.md).
-const jarvisUpstreamSHA256 = "e9026f175a6f5fd6508d537603af7942afb619a732688d6e4d5a03f2aac156f9"
+// 65-jarvis-pure-deep-color.md). The SAME DAY's sharp-fine leg (owner's ruling
+// verbatim: "太糊了，根本不像人家那个demo里那样高清" + "粒子有点粗") removed the
+// point-size blow-up (upstream 1.08 ships unpatched again) and the preset
+// dpr 2.0 patch (upstream dpr: 3.5 restored), pinned the entry to
+// quality="ultra" (a 100px window is always "narrow", so "auto" silently
+// downgraded to balanced's maxDpr 2.5) and added a render-dpr supersample
+// patch (renderDpr takes the preset value instead of WebView2's
+// devicePixelRatio cap) plus a density patch (avatar particleCount 165 ->
+// 1400, calibrated live: 389 particles cover 6.52% of the white-floor rect,
+// 1003 cover 12.51%, 1652 cover 17.35%) - fine grains kept visible on white
+// by DEEP COLOR + DENSITY, never by bigger points (evidence
+// 65-jarvis-sharp-fine.md).
+const jarvisUpstreamSHA256 = "3310439910954d301dfc9c72c55eee17a997ead15ea900068ea17e1ca418a069"
 
 // TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
 // embed is the scaffold's build of the upstream component with the entry's
@@ -328,6 +339,31 @@ func TestJarvisAssetShippedAsBuilt(t *testing.T) {
 	sum := sha256.Sum256(jarvisPageHTML)
 	if got := fmt.Sprintf("%x", sum); got != jarvisUpstreamSHA256 {
 		t.Errorf("embedded jarvis page sha256 = %s, want the pinned build %s", got, jarvisUpstreamSHA256)
+	}
+	// Sharp-fine source pins (2026-11-08, owner's ruling "太糊了" + "粒子有点粗"):
+	// the two defects were build-time patch constants, so the shipped page
+	// itself carries the proof. The GLSL survives minification verbatim (it is
+	// a string literal), and the preset object literal keeps its property
+	// names - so the pinned substrings are exact and deterministic:
+	//   - the density patch landed (avatar particleCount 330, minified form);
+	//   - the avatar preset dpr is the upstream 3.5 again (the removed patch
+	//     shipped dpr:2.0; hero/panel's own dpr:2 / dpr:2.25 are upstream
+	//     originals and stay);
+	//   - the particle point size is the upstream fine floor 1.08 with the
+	//     upstream twinkle gain 1.38 (the coarse 7.00 floor must stay gone).
+	for _, want := range []string{
+		"particleCount:1400",
+		"dpr:3.5",
+		"gl_PointSize = uPixelRatio * uPointScale * (1.08 + twinkle * 1.38 + uPulse * 0.48)",
+	} {
+		if !strings.Contains(page, want) {
+			t.Errorf("embedded jarvis page lost the sharp-fine pin %q", want)
+		}
+	}
+	for _, gone := range []string{"7.00 + twinkle", "particleCount:165"} {
+		if strings.Contains(page, gone) {
+			t.Errorf("embedded jarvis page still carries the coarse-build constant %q", gone)
+		}
 	}
 }
 

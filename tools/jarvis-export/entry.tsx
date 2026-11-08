@@ -38,12 +38,21 @@ if (!container) {
 const root = createRoot(container);
 
 function render(): void {
+  // quality="ultra" is deliberate (2026-11-08, owner's ruling "太糊了，根本
+  // 不像人家那个demo里那样高清"): quality="auto" downgrades to "balanced"
+  // whenever window.innerWidth < 768, and a 100px orb window is ALWAYS
+  // narrow - balanced caps the avatar preset at maxDpr 2.5 and scales the
+  // particle count by 0.86. Ultra keeps the preset's dpr 3.5 (avatar ultra
+  // maxDpr is 4, so scalePreset leaves 3.5 standing) and the full count;
+  // the scaffold's render-dpr patch then makes renderDpr take that preset
+  // value instead of WebView2's devicePixelRatio cap. Cost at 100px is
+  // trivial.
   root.render(
     <JarvisOrb
       size="avatar"
       state={current}
       palette={PALETTE_FOR_STATE[current]}
-      quality="auto"
+      quality="ultra"
       breathing
       interactive={false}
       ariaLabel="Wisp Jarvis particle orb"

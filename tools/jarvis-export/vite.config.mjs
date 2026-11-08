@@ -94,11 +94,6 @@ const jarvisBrightPatches = [
     patch: "vAlpha = (0.92 + twinkle * 0.08) * (0.78 + uEnergy * 0.38 + uPulse * 0.32);",
   },
   {
-    name: "particle point size floor",
-    site: "gl_PointSize = uPixelRatio * uPointScale * (1.08 + twinkle * 1.38 + uPulse * 0.48)",
-    patch: "gl_PointSize = uPixelRatio * uPointScale * (7.00 + twinkle * 1.90 + uPulse * 0.48)",
-  },
-  {
     name: "particle saturation",
     site: "vec3 color = mix(uPrimary, uAccent, vMix * 0.5);",
     patch:
@@ -167,20 +162,64 @@ const jarvisBrightPatches = [
     patch: `gradient.addColorStop(0.48, "rgba(0,155,203,0.55)");`,
   },
   {
-    // The avatar preset renders the canvas at dpr 3.5 (min 2.75) and the host
-    // window downscales it ~3.5x; measured r3-r9, the downscale averaging
-    // caps every sampled particle pixel's coverage at f ~0.6 no matter the
-    // alpha floor or point size - the white background bleeds through the
-    // averaged canvas pixels and that white floor is what keeps the field
-    // pale. Dropping the supersample factor sharpens the dots (each screen
-    // pixel averages fewer canvas pixels), which raises the field's real
-    // coverage. Render-quality knob: geometry, orbit radii and particle
-    // counts are untouched.
-    name: "avatar dpr sharpen",
-    site: `dpr: 3.5,
-    minDpr: 2.75`,
-    patch: `dpr: 2.0,
-    minDpr: 1.5`,
+    // THE SHARPNESS FIX (2026-11-08, owner's ruling verbatim: "太糊了，根本
+    // 不像人家那个demo里那样高清" + "粒子有点粗"). The upstream avatar preset
+    // says dpr: 3.5 / minDpr: 2.75, but TWO hidden caps sit between that
+    // constant and the framebuffer when the component renders in a ~100px
+    // WebView window, and both were found by reading the upstream dist:
+    //   1. quality="auto" downgrades to "balanced" whenever
+    //      window.innerWidth < 768 (resolveQuality's `narrow` branch) - a
+    //      100px orb window is ALWAYS narrow, so the avatar preset's dpr 3.5
+    //      is clamped by balanced's maxDpr 2.5 and its particleCount 165 is
+    //      scaled by 0.86 -> 142. The full-screen demo never takes this
+    //      branch, so the owner's "like the demo" reference frame renders at
+    //      a resolution the embedded window can never reach on its own.
+    //   2. the final `renderDpr` line caps the render resolution at
+    //      window.devicePixelRatio: inside WebView2 that is the display
+    //      scale (1.0-1.5 typical), NOT the preset value, so the canvas
+    //      draws at 100-150px for a 100px window - the physical blur floor.
+    //      (An earlier patch of this leg set the PRESET dpr to 2.0, which
+    //      moved a value the two caps had already clamped away - it neither
+    //      caused nor fixed the real blur; that patch is removed here, so
+    //      the preset site ships the upstream bytes dpr: 3.5 / minDpr: 2.75
+    //      unpatched.)
+    // The fix renders the demo's own hi-dpi path deterministically: the
+    // entry pins quality="ultra" (avatar maxDpr 4 -> min(3.5,4) = 3.5, so
+    // the preset dpr survives scalePreset) and this patch makes renderDpr
+    // take the preset value instead of the WebView's devicePixelRatio cap.
+    // The canvas then draws at 350x350 for a 100px window and the compositor
+    // downscales - the same supersample path the demo runs on a hi-dpi
+    // screen, which is exactly the sharpness the owner pointed at. Render-
+    // quality knob only: geometry, orbit radii, palette and materials are
+    // untouched here. Cost: a 350x350 buffer (~0.12 MP) - trivial for the
+    // GPUs WebView2 already runs.
+    name: "avatar render dpr supersample",
+    site: `const renderDpr = Math.max(1, Math.min(window.devicePixelRatio || 1, renderPreset.dpr));`,
+    patch: `const renderDpr = renderPreset.dpr;`,
+  },
+  {
+    // THE FINE-GRAIN + DENSITY FIX (same owner's ruling: "粒子有点粗" + the
+    // "细而密" direction). Two halves:
+    //   - point size: the previous leg's "particle point size floor" patch
+    //     (1.08 -> 7.00, a 6.5x blow-up) is REMOVED from this list, so the
+    //     upstream vertex shader's own `1.08 + twinkle * 1.38` point size
+    //     ships unpatched. Smaller points are the whole answer to "粗".
+    //   - density: with 1.08-sized dots the white-floor coverage drops, and
+    //     the mainstream answer for keeping a fine-grained field visible on
+    //     an UNKNOWN background is density, never bigger points. The avatar
+    //     preset's particleCount 165 rises to 1400 (the upstream's own
+    //     compact pointScale 1.55 and shell radius stay untouched, so the
+    //     dots do not grow to fill the space - the COUNT does). With the
+    //     entry's quality="ultra" particleScale 1.18 the effective count is
+    //     round(1400*1.18) = 1652 particles in the same shell. Measured
+    //     calibration (static white-floor captures, 2026-11-08): 389
+    //     particles cover 6.52% of the orb rect (mean fine-grain run
+    //     1.66px), 1003 cover 12.51% (run 2.16px); 1652 is the step that
+    //     fills the field the way the demo's particle shell reads while the
+    //     dots stay separate grains.
+    name: "avatar particle density",
+    site: `particleCount: 165,`,
+    patch: `particleCount: 1400,`,
   },
   {
     // The upstream's OWN built palettes (states.ts, shipped in its dist as
