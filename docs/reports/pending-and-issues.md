@@ -32381,3 +32381,48 @@ export WISP_LIVE_MIC=1
 ### 七、撤销口令
 - 第二根因修复＝`git revert eec09a028`（会退回「整包跑不完」状态，⛔ 建议）。
 - 若只想退「有界等待」＝单独 revert 测试件那半（产码 `orbBootDataDir` 保留）。
+## A1642（2026-11-08 19:2x，编排者）**★wave95 三腿收件（两条落地＋一条「派单前提过期」）｜wave96 三腿放出（我裁定的两条残余＋145 真落点）**
+
+### 一、★219 AC#6 追补落地（`37df1ec64` 源码 ＋ `678a3b638` 收件）
+**字段全在，不缺**（腿现读 `internal/panel/subagent_roster_197.go`）：
+- 池号＝`InFlightSlots`/`PoolCap`（`:162-163`，我已现读核实）
+- 行级三数＝`streamTruncated`/`streamElidedRunes`/`streamDropped`（`:140-142`）
+- section 级整卷三数（`:166-183`）
+⇒ **上一腿担心的「Go 侧没字段」不成立。**
+
+| 落点 | 形状 |
+|---|---|
+| **池号** | 子智能体组标题右侧「在跑 3 / 上限 8」，**读 wire 计数不从行数现数**（Go 注释写明槽先于行，两数是两个真相） |
+| **行级截断标** | 行尾小字「省 N 字」／「流已丢」（丢弃压过折界），叠加在状态字旁，**不参与状态判断** |
+| **整卷告示** | 「流已截断：省略 N 字，已丢 M 条」——**仅在真截断时显示**。★腿的裁定理由我认可：**常态显示 0 是告警噪音**（同本仓 App.tsx 对审批 chip 的既有论据：永远亮着的 badge 训练人忽略它），主流 harness 告警只异常点亮 |
+| **诚实空态** | 无 `tasks` 键 ⇒ 三处全不画，**绝不显示假 0** |
+
+- **牙扩四齿为九齿**（`render-task-roster.tsx`）。
+- **门禁双跑全 rc0**：typecheck／build／render:roster／lint／d22scan clean（frontend 121 files）／`go build wisp.exe` rc0（51MB，bundle 重嵌）。
+- **★腿自报一次红并自查**：导出树 d22scan 首跑红（121 vs 122）——根因是**它自己**为跑 npm 门禁在导出树建的 `node_modules` junction 被 Windows WalkDir 当成文件数进（**仪器盲区**）。
+- **活体**：同一 bundle 供真 Chromium，五个落点一次上屏；负例同跑（无 tasks 键）程序化断言无假 0。截图 `docs/evidence/s1/219-ac6-roster-pool-truncation-live.png`。
+
+### 二、★票 145 判定程（`6cda28b72`，零产码）——**派单前提又过期了（第 22 次）**
+| 核 | 读数 |
+|---|---|
+| ① 我派单说的「Snapshot 四字段」 | **过期**：现量顶层 **11 枚**字段（`composer.go:57-174`），`PumpSources` **21 面读口全部在装配根接线**（`run.go:998-1127`） |
+| ② 权威名册（census r1 §4.2 甲组 12 行） | **9 行已落／裁走**：reasoning、stuck、tools(callId/name/outcome)、error(class/detail/text)、pending 十字段、注入 reason、L1Windows id-join；Depth 裁给 167 |
+| ③ **AC#2b 两维＝票 187 已落** | 模型清单（enabled-only）＋思考档位集都在 `modelSwitch` 段 ⇒ **⛔ 重做** |
+| ④ 剩 5 族有源未落，**落点全在我上一波写面外** | usage/cost 活值、终结态（§2.14 取向未裁）、工具「运行中」态（`EvToolStart` 生产码**零发布点**）、ArgsJSON、Retryable ⇒ 接线点在 `consoleSink.Publish` 喂线行（`run.go:2346-2404`）或 `internal/agent` 发布点 |
+| ⑤ 门禁（导出树 HEAD `38628bee2`） | gofumpt 空／vet rc0／build rc0／d22scan clean；panel 全量 RUN 313／PASS 208／FAIL 2 ⇒ ★**在册三红现量只剩一枚**（两枚契约尺在 HEAD 已绿，TS 声明已入库） |
+
+⇒ **按「宁缺毋造」落地集＝空，零产码。** 腿把下一程派单要素写进证据件 §7 末尾。
+
+### 三、wave96 三腿（已放出，**写面已按 145 腿的判定开到位**）
+| 腿 | 任务 | 我的裁定依据 |
+|---|---|---|
+| `webview2-nil-guard` | ★`forks/go-webview2` 加 **nil-env 守卫**：`EnvironmentCompleted` 拿 `S_OK`+`env=0x0` ⇒ **不上报成功、上报具名错误**，让上层走 D2D 降级 | **主流 harness 都做这个守卫**；WebView2 起不来时降级 D2D 是**正确产品行为**，⛔ 测试作弊 |
+| `wait-bounded` | ★把 `ball.New` 里**产码那半的无限等**改成**有界等待**（`context.WithTimeout` + `select`；★D22 禁令「墙钟时间差」需腿现读射程后自拍）＋到点**返回具名错误** | **无限等本身就是 bug**。`eec09a028` 只在测试件有界化，**产码仍无限等** ⇒ 产品在 WebView2 起不来时永远挂住 |
+| `145-fields-v2` | 5 族有源字段落地，★**写面开到 `cmd/wisp/run.go` 的 `consoleSink.Publish` 喂线行（`:2346-2404`）＋`PumpSources` 装配点（`:998-1127`）＋`internal/agent` 发布点** | 上一腿明说「下一程派单必须把这些行开进写面，否则加了就是 AC#6 答不出的装饰品」⇒ 我开了 |
+
+### 四、★腿报的一个仪器盲区（我裁：开票，本波不修）
+`tools/d22scan` 的 WalkDir 把 **Windows junction 当文件数**（导出树里 `node_modules` junction 导致 121 vs 122 假红）⇒ **仪器盲区**。**我裁：开票，⛔ 本波修**（仪器工程代价大，且不影响本次 clean 读数）。
+
+### 五、撤销口令
+- 219 追补＝`git revert 678a3b638 37df1ec64`。
+- 145 判定程＝`git revert 6cda28b72`（零产码，纯证据件）。
