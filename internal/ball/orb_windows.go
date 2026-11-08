@@ -97,10 +97,13 @@ package ball
 // the ball window's frozen semantics.
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -404,16 +407,125 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 	return o, nil
 }
 
-// orbDataPath picks a per-user user-data folder for THIS browser instance.
-// Sharing the panel's folder would tie two surfaces to one runtime state, and
-// the library's %AppData%\<exe> default would collide with the panel's. An
-// empty LOCALAPPDATA falls back to the temp dir rather than a relative path.
+// orbDataPath picks a PER-PROCESS user-data folder for THIS browser instance.
+// History: it used to hand EVERY process the same folder
+// (%LocalAppData%\wisp\orb), so `go test ./cmd/wisp` - several ball window
+// tests, each booting WebView2, across several processes - self-collided on
+// one user-data folder: a contended CreateEnvironment completed with S_OK and
+// a NULL environment out-param, the panic died on the recover boundary, the
+// STA thread was gone and ball.New waited forever (whole-package timeout,
+// ticket 408). WebView2's guidance for multiple instances is one user-data
+// folder per process, so the folder is now <base>\wisp\orb\<pid>-<8 hex>.
+// Decision record (ticket 408): pid alone - candidate 甲 - still collides
+// when Windows reuses a pid and hands the new process a dead predecessor's
+// folder with its stale locks; the random suffix buys that class away. The
+// exe name - candidate 丙 - adds no uniqueness among live processes and
+// lengthens the path, so it was dropped. The path MUST be stable for the
+// process lifetime: one attach reads it twice (browser.DataPath above and
+// the site folder below), so the value is computed exactly once.
 func orbDataPath() string {
+	orbDataPathOnce.Do(func() {
+		orbDataDir, orbDataLock = acquireOrbDataDir()
+	})
+	return orbDataDir
+}
+
+var (
+	orbDataPathOnce sync.Once
+	orbDataDir      string
+	// orbDataLock is held OPEN from before the folder exists until process
+	// exit - that open handle IS the sweep's liveness signal.
+	orbDataLock windows.Handle
+)
+
+// orbDataBase is the folder root: LOCALAPPDATA, falling back to the temp dir
+// when unset (the old fallback, kept byte-for-byte).
+func orbDataBase() string {
 	base := os.Getenv("LOCALAPPDATA")
 	if base == "" {
 		base = os.TempDir()
 	}
-	return filepath.Join(base, "wisp", "orb")
+	return base
+}
+
+// orbDataDirFor is the pure form of the path: the leaf this process would use,
+// rooted at base. Tests drive it directly so the leaf shape and the base
+// fallback have teeth without re-exec.
+func orbDataDirFor(base string) string {
+	return filepath.Join(base, "wisp", "orb", fmt.Sprintf("%d-%s", os.Getpid(), orbInstanceSuffix()))
+}
+
+func acquireOrbDataDir() string {
+	base := orbDataBase()
+	root := filepath.Join(base, "wisp", "orb")
+	orbSweepStaleDirs(root)
+	if err := os.MkdirAll(root, 0o755); err != nil {
+		slog.Warn("ball: orb user-data root mkdir failed", "err", err)
+	}
+	dir := orbDataDirFor(base)
+	// Lock FIRST, folder second: the sweep's only liveness signal is an
+	// exclusively held lock file, so a folder must never be observable
+	// without its lock (a sweep would otherwise race the creator). The
+	// handle stays open until process exit. A failure here logs and
+	// continues - uniqueness still holds; only this dir's own sweep
+	// protection is lost.
+	h, err := windows.CreateFile(dir+".lock", windows.GENERIC_READ|windows.GENERIC_WRITE,
+		0 /* no sharing: any second opener reads the owner as alive */, nil,
+		windows.OPEN_ALWAYS, windows.FILE_ATTRIBUTE_NORMAL, 0)
+	if err != nil {
+		slog.Warn("ball: orb user-data lock not held; this dir is invisible to the stale sweep", "err", err)
+	} else {
+		orbDataLock = h
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		slog.Warn("ball: orb user-data dir mkdir failed", "err", err)
+	}
+	return dir
+}
+
+// orbSweepStaleDirs bounds the garbage the per-process folder leaves behind:
+// an entry whose lock file can be opened EXCLUSIVELY has a dead owner - the
+// owner holds that lock from before the folder exists until process exit -
+// so it is removed, lock and all. A busy lock (an alive owner, including
+// this process) and a folder with no lock at all are skipped. The pid in the
+// name is never consulted, so pid reuse cannot strand an entry forever.
+// Best-effort by design: any failure leaves the entry for the next attach.
+func orbSweepStaleDirs(root string) {
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		return
+	}
+	for _, entry := range entries {
+		name := entry.Name()
+		if !orbDataLeafRe.MatchString(name) {
+			continue
+		}
+		h, err := windows.CreateFile(filepath.Join(root, name+".lock"), windows.GENERIC_READ,
+			0, nil, windows.OPEN_EXISTING, windows.FILE_ATTRIBUTE_NORMAL, 0)
+		if err != nil {
+			continue // alive owner or unreadable: conservative skip
+		}
+		windows.CloseHandle(h)
+		if entry.IsDir() {
+			os.RemoveAll(filepath.Join(root, name))
+		}
+		os.Remove(filepath.Join(root, name+".lock"))
+	}
+}
+
+// orbDataLeafRe matches the per-process leaf `<pid>-<8 hex>` and its `.lock`
+// file spelling; anything else under the root (the pre-fix shared layout's
+// own EBWebView/site children, say) is foreign and never touched.
+var orbDataLeafRe = regexp.MustCompile(`^\d{1,10}-[0-9a-f]{8}(\.lock)?$`)
+
+func orbInstanceSuffix() string {
+	var b [4]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		// Unreachable in practice; pid-level uniqueness among live processes
+		// still holds, and the lock-based sweep keeps pid reuse safe.
+		return "00000000"
+	}
+	return hex.EncodeToString(b[:])
 }
 
 // pushState maps and pushes one ball state to the SERVED page (STA thread).
