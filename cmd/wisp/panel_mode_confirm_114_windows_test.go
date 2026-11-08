@@ -113,7 +113,7 @@ func TestTicket114r2ResidentPanelChainFromRefusalToTheWriteLeg(t *testing.T) {
 	// The read side is unchanged: this Store has no confirmation channel, so its
 	// effective档 is ask_every_step (perm's store_372_test.go).
 	beforeDir := newInboundDataDir33(t, "ask_every_step")
-	beforeDisp, _, _, err := newResidentComposerDispatch(beforeDir, auditQuiet114r2, nil)
+	beforeDisp, _, _, _, err := newResidentComposerDispatch(beforeDir, auditQuiet114r2, nil)
 	if err != nil {
 		t.Fatalf("the resident chain did not assemble: %v", err)
 	}
@@ -130,7 +130,7 @@ func TestTicket114r2ResidentPanelChainFromRefusalToTheWriteLeg(t *testing.T) {
 	// same request now costs exactly one card and lands.
 	afterDir := newInboundDataDir33(t, "ask_every_step")
 	leg := &countingPermConfirm{}
-	afterDisp, _, _, err := newResidentComposerDispatch(afterDir, auditQuiet114r2, panelModeConfirm(leg.fn()))
+	afterDisp, _, _, _, err := newResidentComposerDispatch(afterDir, auditQuiet114r2, panelModeConfirm(leg.fn()))
 	if err != nil {
 		t.Fatalf("the resident chain did not assemble with a leg: %v", err)
 	}
@@ -249,7 +249,7 @@ func TestTicket114r2ANonNilLegAtTheCLISeamStillOwesAnAnsweredCard(t *testing.T) 
 	ctx := context.Background()
 	dir := newInboundDataDir33(t, "ask_every_step")
 	leg := &countingPermConfirm{fail: errors.New("这条管子上没有可以出示卡片的表面")}
-	disp, err := newComposerDispatchChain(dir, auditQuiet114r2, panelInboundActor, nil, panelModeConfirm(leg.fn()), nil)
+	disp, _, err := newComposerDispatchChain(dir, auditQuiet114r2, panelInboundActor, nil, panelModeConfirm(leg.fn()), nil)
 	if err != nil {
 		t.Fatalf("the chain did not assemble: %v", err)
 	}

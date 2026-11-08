@@ -38,12 +38,28 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
 
-// liveVerdicts reads the approvals that are pending right now.
+// liveVerdicts reads the approvals that are pending right now, off the gate
+// this run was assembled with. The mapping itself lives on
+// nativeVerdictsFromGate below, which the resident leg's pump shares.
+func (rt *agentRuntime) liveVerdicts() []panel.NativeVerdict {
+	if rt == nil || rt.gate == nil {
+		return nil
+	}
+	return nativeVerdictsFromGate(rt.gate)
+}
+
+// nativeVerdictsFromGate is the mapping from one gate's live approvals to the
+// packet's pending section. It is a free function (not a method) because TWO
+// pumps read it: the run's (rt.liveVerdicts, over the pipeline's gate) and the
+// resident leg's (panel_resident_pump.go, over ra.gate) - the same gate object
+// in the console shape, so a card on the orb and a card in either packet cannot
+// disagree about what the queue admitted.
 //
 // The mapping is a copy, not a judgement: Level/RulesHit/Reason/
 // SessionOverrideBlocked are the fields internal/risk put on the queue item
@@ -59,11 +75,11 @@ import (
 // ["session","agent-loop",tool] would put a sentence no producer wrote onto a
 // security card, so the packet reports the gap instead and the gap is registered
 // in this ticket's evidence file.
-func (rt *agentRuntime) liveVerdicts() []panel.NativeVerdict {
-	if rt == nil || rt.gate == nil {
+func nativeVerdictsFromGate(g *approval.Gate) []panel.NativeVerdict {
+	if g == nil {
 		return nil
 	}
-	items := rt.gate.Queue().LiveApprovals()
+	items := g.Queue().LiveApprovals()
 	out := make([]panel.NativeVerdict, 0, len(items))
 	for _, it := range items {
 		out = append(out, panel.NativeVerdict{

@@ -329,7 +329,7 @@ func runResident() {
 	// not at all without a console. panelModeConfirm is the same adapter run.go
 	// uses, and both close over confirmModeSwitchVia, so there is one card body and
 	// one sentence.
-	rp, panelScope, attachmentDrafts, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
+	rp, cfgMgr65, panelScope, attachmentDrafts, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
 	// Ticket 319 AC#1: the assembly root's handle on the panel thread is a HOLDER
 	// now, not the thread itself. The one thing that changes in a visible way:
 	// after the thread has ended (any way at all - the owner's X, a system
@@ -521,6 +521,37 @@ func runResident() {
 	// ticket 145 pinned.
 	if src != nil && src.run != nil {
 		src.run.bindAttachmentDrafts(attachmentDrafts)
+	}
+
+	// Ticket 65: the resync-on-show publisher - the frozen contract's half no leg
+	// had wired (PLAN.md:2982, SPEC-08 §5.1: "面板每次 show 必须发 panel.resync，
+	// 由 Go 侧全量推状态"). Exactly ONE publisher is selected per boot:
+	//   - the pipeline assembled (src.run != nil, the console shape): its pump is
+	//     the fuller packet - it carries the run/results/tasks dimensions this
+	//     leg has no source for - and its publishers already reach the host
+	//     through setPanelSnapshotHost above;
+	//   - the pipeline never assembled (the shipping -H=windowsgui shape, where
+	//     interactiveStdin() answers nil and startResidentTaskSource returns nil
+	//     before assembleRuntime): the resident pump takes over, reading the
+	//     dimensions this leg REALLY holds - ra.gate's live cards, the chain
+	//     Manager's ballStyle/modelSwitch/plugins, the production command
+	//     roster, the ingest ledger - and honestly omitting the run-shaped
+	//     dimensions it has no source for (panel_resident_pump.go).
+	// showOnThread fires it after every successful Show, so opening the panel
+	// always costs one fresh packet. A boot whose panel never built (rp nil)
+	// has no window to resync and wires nothing.
+	if rp != nil {
+		switch {
+		case src != nil && src.run != nil:
+			holder.setSnapshotPublish(src.run.publishPanelSnapshot)
+		default:
+			holder.setSnapshotPublish(newResidentPanelPump(ra.gate, cfgMgr65, rp.disp, attachmentDrafts, rp).publish)
+			// Said in the LOG, not only stdout: a -H=windowsgui boot has no
+			// console, and this line is the operator's one record of which
+			// publisher this process selected.
+			slog.Info("panel host: 面板快照读口已接入（本进程无任务管线形状）：ballStyle/modelSwitch/commands/plugins 取真源，run/results/tasks 无源不冒充")
+			fmt.Printf("wisp: 面板快照读口已接入（本进程无任务管线形状）：ballStyle/modelSwitch/commands/plugins 取真源，run/results/tasks 无源不冒充\n")
+		}
 	}
 
 	// Ticket 247 AC#1/AC#5: the capture leg. This is the line that makes
@@ -861,6 +892,13 @@ type panelHolder struct {
 	// for" is an observable fact instead of an inference from behaviour.
 	spawn func(*observe.Registry, *PanelManager) *residentPanel
 	rp    *residentPanel
+
+	// snapshotPublish is the resync-on-show publisher the boot selected
+	// (resident_windows.go's selection, ticket 65). The holder owns it - not
+	// the thread - because the holder is the ONE object that outlives thread
+	// restarts: it stamps the live thread when the boot wires it, and stamps
+	// every fresh thread start() spawns after a 319-style recreate.
+	snapshotPublish func()
 }
 
 // newPanelHolder builds the holder around the manager the boot assembled. A nil
@@ -885,6 +923,33 @@ func (h *panelHolder) start() {
 		return
 	}
 	h.rp = h.spawn(h.reg, h.mgr)
+	h.stampPublishLocked()
+}
+
+// setSnapshotPublish books the boot's resync-on-show publisher (ticket 65) and
+// stamps it onto the live thread if one exists. Threads spawned later are
+// stamped by start/toggle/show through stampPublishLocked, so a 319-style
+// recreate carries the publisher too.
+func (h *panelHolder) setSnapshotPublish(fn func()) {
+	if h == nil {
+		return
+	}
+	h.mu.Lock()
+	h.snapshotPublish = fn
+	rp := h.rp
+	h.mu.Unlock()
+	if rp != nil {
+		rp.setSnapshotPublish(fn)
+	}
+}
+
+// stampPublishLocked hands the holder's publisher to a freshly spawned thread.
+// Called with h.mu held (every spawn site holds it); the thread's own lock
+// serialises the field write against showOnThread's read.
+func (h *panelHolder) stampPublishLocked() {
+	if h.snapshotPublish != nil {
+		h.rp.setSnapshotPublish(h.snapshotPublish)
+	}
 }
 
 // toggle is the one executor the ball's two panel gestures, the panel hot key
@@ -917,6 +982,7 @@ func (h *panelHolder) toggle(via string) bool {
 			why = "no panel thread had been started"
 		}
 		h.rp = h.spawn(h.reg, h.mgr)
+		h.stampPublishLocked()
 		slog.Info("panel host: starting a fresh panel thread for this gesture",
 			"via", via, "why", why)
 	}
@@ -976,6 +1042,7 @@ func (h *panelHolder) show(via string) bool {
 			why = "no panel thread had been started"
 		}
 		h.rp = h.spawn(h.reg, h.mgr)
+		h.stampPublishLocked()
 		slog.Info("panel host: starting a fresh panel thread for this request",
 			"via", via, "why", why)
 	}

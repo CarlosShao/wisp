@@ -238,7 +238,13 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 	// pump, so ingest rows would have no reader; the ingest itself and its
 	// audit line work exactly the same (the nil-tolerance is the ledger's own
 	// contract, panel_attachment_214.go).
-	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil, nil)
+	// The Manager is returned alongside the router: the resident leg's snapshot
+	// pump reads the appearance/model/plugin dimensions off the SAME Manager
+	// this chain writes through (panel_resident_pump.go), so a read and the
+	// next write can never disagree about which object holds the truth. The
+	// CLI seam discards it - a one-shot pipe builds no snapshot pump.
+	disp, _, err := newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil, nil)
+	return disp, err
 }
 
 // newComposerDispatchChain is the five-constructor body behind
@@ -266,11 +272,17 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 // not an oversight and not a stub - the CLI seam has no pipeline, and the router's
 // ErrNoHandlerAttached is the honest answer there rather than a handler wired to
 // a tree that does not exist.
-func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm, drafts *attachmentDraftLedger) (*panel.ComposerDispatch, error) {
+// THE MANAGER IS PART OF THE RETURN on purpose (ticket 65's resident read face):
+// the snapshot pump the resident boot assembles reads BallStyle/ModelSwitch/
+// Plugins off the SAME Manager this chain writes through, so the panel's read
+// and write halves hold one config truth per process (the rule this file's
+// header already states for the档: loading it twice is the split state
+// SPEC-03 §3.1 prevents).
+func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm, drafts *attachmentDraftLedger) (*panel.ComposerDispatch, *config.Manager, error) {
 	cfgPath := filepath.Join(dir, configFileName)
 	mgr, err := config.NewManager(cfgPath, nil)
 	if err != nil {
-		return nil, fmt.Errorf("配置未就绪（%s）：%w", cfgPath, err)
+		return nil, nil, fmt.Errorf("配置未就绪（%s）：%w", cfgPath, err)
 	}
 	// Ticket 223 AC#4's hot-reload sentence is the CLI leg's own and moved up into
 	// newPanelInboundDispatch with it, so this shared body says nothing about a
@@ -287,7 +299,7 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Logf:    auditf,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("权限档位不可用：%w", err)
+		return nil, nil, fmt.Errorf("权限档位不可用：%w", err)
 	}
 	modeWrites := &panel.ModeWriteHandler{
 		Modes: store,
@@ -308,7 +320,7 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// writes it cannot persist.
 	secrets, err := secret.NewStore(dir)
 	if err != nil {
-		return nil, fmt.Errorf("凭据存储不可用（%s）：%w", dir, err)
+		return nil, nil, fmt.Errorf("凭据存储不可用（%s）：%w", dir, err)
 	}
 	configWrites := &panel.ConfigWriteHandler{
 		Store: newConfigStore(mgr, secrets, auditf, actor),
@@ -355,7 +367,7 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		// Ticket 320 AC#4's read-only door is answered by the fetch leg above.
 		Models: modelsList,
 		Audit:  auditf,
-	}, nil
+	}, mgr, nil
 }
 
 // storeConfirmFromPanel narrows the panel handler's ModeConfirm into perm's

@@ -135,6 +135,17 @@ type residentPanel struct {
 	// that reaches Run() after a stop was already asked would otherwise pump
 	// forever with nobody left to send WM_QUIT.
 	stopRequested atomic.Bool
+
+	// snapshotPublish is the resync-on-show publisher (PLAN.md:2982, SPEC-08
+	// §5.1: "面板每次 show 必须发 panel.resync，由 Go 侧全量推状态") - the frozen
+	// contract no leg had wired. The boot sets it once after it knows which
+	// publisher this process has (the pipeline's pump when the task source
+	// assembled, the resident pump when it did not - resident_windows.go's
+	// selection); showOnThread calls it after a successful Show, so every
+	// opening of the panel costs one full packet built from current state.
+	// Guarded by mu: the boot writes it from the main goroutine while the
+	// panel thread may already be serving show requests.
+	snapshotPublish func()
 }
 
 // startResidentPanel builds the thread but NOT the window: nothing is created
@@ -225,7 +236,7 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 // write that would race the page's own dispatch goroutine. Until the task source
 // binds it, the handler refuses by name - this process has no tree to switch to
 // yet, and saying so beats narrowing a scope nothing else uses.
-func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
+func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm) (*panel.ComposerDispatch, *config.Manager, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
 	// Said once per start, same posture the CLI seam takes: name the tier that was
 	// not taken rather than leave the operator to infer it.
 	auditf("%s", residentPanelHotReloadNote)
@@ -236,11 +247,16 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm
 	// the rows is built later by the task pipeline, so the ledger crosses that
 	// ordering the same way ticket 186's holder does.
 	drafts := newAttachmentDraftLedger()
-	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm, drafts)
+	// The Manager rides out next to the router (ticket 65's resident read face):
+	// the no-pipeline shape's snapshot pump reads the appearance/model/plugin
+	// dimensions off this SAME object the settings door writes through
+	// (panel_resident_pump.go), so a read and the next write hold one config
+	// truth. No second Manager is built anywhere in this leg.
+	disp, mgr, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm, drafts)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
-	return disp, scope, drafts, nil
+	return disp, mgr, scope, drafts, nil
 }
 
 // newResidentPanelManager is the assembly the resident leg uses. The chain is the
@@ -266,15 +282,15 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm
 // The returned holder is ticket 186's: the caller hands it to the task source,
 // which binds this process's runtime scope into it. The panel host itself keeps
 // knowing nothing about paths - it only remembers which object to bind.
-func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelManager, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
+func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelManager, *config.Manager, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
 	auditf := func(format string, args ...any) {
 		line := fmt.Sprintf(format, args...)
 		slog.Info("panel host: " + line)
 		fmt.Printf("wisp: %s\n", line)
 	}
-	disp, workspaceScope, drafts, err := newResidentComposerDispatch(dataDir, auditf, confirm)
+	disp, cfgMgr, workspaceScope, drafts, err := newResidentComposerDispatch(dataDir, auditf, confirm)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	assets, aerr := panel.BuiltinAssets()
 	if aerr != nil {
@@ -291,7 +307,7 @@ func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelM
 	// it per window creation rather than holding it. Said once per start, in the
 	// same posture as the hot-reload note above.
 	auditf("%s", residentPanelGeometryNote)
-	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), workspaceScope, drafts, nil
+	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), cfgMgr, workspaceScope, drafts, nil
 }
 
 // loop is the panel thread. Registry.Spawn owns the recover and the panic sink,
@@ -451,6 +467,7 @@ func (rp *residentPanel) showOnThread(via string) {
 	if err == nil {
 		fmt.Printf("wisp: panel window is up (%s, cold %.1f ms, hot path %.1f ms)\n",
 			via, rp.mgr.LastColdMs(), rp.mgr.LastHotMs())
+		rp.publishOnShow()
 		return
 	}
 	slog.Error("panel host: show failed on the panel thread", "via", via, "err", err)
@@ -460,6 +477,29 @@ func (rp *residentPanel) showOnThread(via string) {
 		slog.Error("panel thread: retiring without a panel window after a named refusal",
 			"via", via, "err", err, "shows", rp.shows.Load())
 		fmt.Printf("wisp: panel thread will take no further requests: %v\n", err)
+	}
+}
+
+// setSnapshotPublish books the resync-on-show publisher. Called once by the
+// boot, after it knows which pump this process has; a show request that raced
+// the wiring finds nil and skips (the pre-ticket shape for that instant), the
+// same honesty convention setPanelSnapshotHost documents.
+func (rp *residentPanel) setSnapshotPublish(fn func()) {
+	rp.mu.Lock()
+	rp.snapshotPublish = fn
+	rp.mu.Unlock()
+}
+
+// publishOnShow drives the packet the frozen contract owes every show. The
+// publisher is whichever pump the boot selected; both shapes' publish calls are
+// safe from this thread (the readers take their own objects' locks, and the
+// push lands through evalPanelJS's Dispatch).
+func (rp *residentPanel) publishOnShow() {
+	rp.mu.Lock()
+	fn := rp.snapshotPublish
+	rp.mu.Unlock()
+	if fn != nil {
+		fn()
 	}
 }
 

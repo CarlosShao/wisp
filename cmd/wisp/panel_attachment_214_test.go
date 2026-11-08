@@ -41,7 +41,7 @@ func auditQuiet214(string, ...any) {}
 
 func newChain214(t *testing.T, dir string, drafts *attachmentDraftLedger) *panel.ComposerDispatch {
 	t.Helper()
-	disp, err := newComposerDispatchChain(dir, auditQuiet214, panelInboundActor, nil, nil, drafts)
+	disp, _, err := newComposerDispatchChain(dir, auditQuiet214, panelInboundActor, nil, nil, drafts)
 	if err != nil {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}
