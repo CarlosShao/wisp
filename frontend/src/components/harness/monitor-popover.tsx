@@ -31,6 +31,15 @@ export interface MonitorAgentRow {
   statusKnown: boolean;
   /** The host's own sentence for a status it did not file (wire statusReason). */
   statusReason?: string;
+  /** This row's own work page cost, verbatim off the wire (TaskRowView's
+      stream triple, internal/panel/subagent_roster_197.go:140-142). A DISPLAY
+      suffix, never a status input: "少了一段" rides beside the status word,
+      it does not replace or recolour it. Undefined = the wire did not carry
+      the row-level numbers (older hosts), which renders nothing - a missing
+      reading is never drawn as a zero. */
+  streamTruncated?: boolean;
+  streamElidedRunes?: number;
+  streamDropped?: boolean;
 }
 
 /** The dot's vocabulary - a DISPLAY tier, not a status judgement. blocked is
@@ -94,6 +103,36 @@ const DOT_CLASS: Record<AgentDot, string> = {
   idle: "bg-ink-3",
 };
 
+/** The row's own truncation suffix, or null when this row's stream is whole.
+    Dropped outranks truncated: a dropped stream is not "partly shown", the
+    page for that row is GONE. Only an actual loss renders anything - a clean
+    row stays clean, because a permanent "0 字省略" chip on every row would be
+    alarm fatigue (the same argument App's header uses for the approval chip:
+    a badge that is always on trains you to ignore it). */
+function rowBoundLabel(row: MonitorAgentRow): string | null {
+  if (row.streamDropped) return "流已丢";
+  if (row.streamTruncated) return `省 ${row.streamElidedRunes ?? 0} 字`;
+  return null;
+}
+
+/** The whole log's truncation sentence off the SECTION numbers (wire
+    TaskRosterSection's streamTruncated/streamElidedRunes/droppedCount, Go
+    :166-183), or null on a clean log. Same display rule as the row suffix:
+    abnormal states only. Both facts when both hold, in one line. */
+function sectionBoundLine(
+  truncated: boolean,
+  elidedRunes: number | undefined,
+  droppedCount: number | undefined,
+): string | null {
+  const dropped = droppedCount ?? 0;
+  if (truncated && dropped > 0) {
+    return `流已截断：省略 ${elidedRunes ?? 0} 字，已丢 ${dropped} 条`;
+  }
+  if (truncated) return `流已截断：省略 ${elidedRunes ?? 0} 字`;
+  if (dropped > 0) return `已丢 ${dropped} 条流`;
+  return null;
+}
+
 export interface MonitorPopoverProps {
   open: boolean;
   env: readonly MonitorEnvRow[];
@@ -103,6 +142,21 @@ export interface MonitorPopoverProps {
       is a different fact from an empty roster - the empty line says which one
       it is instead of leaving both looking the same. */
   rosterPresent?: boolean;
+  /** The roster pool numbers (wire inFlightSlots/poolCap, Go :162-163), read
+      off the roster's own counter - NOT counted from the rows, because a slot
+      is reserved before its row exists (Go TaskRosterState's comment). Either
+      one undefined = the snapshot carried no tasks key: nothing pool-shaped
+      renders at all, and NEVER a "在跑 0 / 上限 0" that would dress an absent
+      reading up as data. */
+  poolInFlight?: number;
+  poolCap?: number;
+  /** The whole-log truncation triple (wire streamTruncated/streamElidedRunes/
+      droppedCount). All three undefined = no tasks key on the snapshot; a
+      clean log (all false/zero) is the normal case and renders no line - the
+      warning exists for the day the bound actually bites. */
+  streamTruncated?: boolean;
+  streamElidedRunes?: number;
+  streamDroppedCount?: number;
   onPin?: () => void;
 }
 
@@ -124,8 +178,20 @@ function StateDot({ state }: { state: AgentDot }) {
   return <span aria-hidden="true" className={cn("size-1.5 shrink-0 rounded-full", DOT_CLASS[state])} />;
 }
 
-export function MonitorPopover({ open, env, agents, rosterPresent, onPin }: MonitorPopoverProps) {
+export function MonitorPopover({
+  open,
+  env,
+  agents,
+  rosterPresent,
+  poolInFlight,
+  poolCap,
+  streamTruncated,
+  streamElidedRunes,
+  streamDroppedCount,
+  onPin,
+}: MonitorPopoverProps) {
   if (!open) return null;
+  const boundLine = sectionBoundLine(streamTruncated ?? false, streamElidedRunes, streamDroppedCount);
   return (
     <div
       className="w-[300px] rounded-card border border-line bg-surface p-3 shadow-overlay"
@@ -162,11 +228,23 @@ export function MonitorPopover({ open, env, agents, rosterPresent, onPin }: Moni
         ))}
       </div>
 
-      {/* 子智能体：渐变圆点头像 + 名 + 状态字 + 状态点。零行时把「没有带名册」
-          和「名册在、还没有子任务」分开说，绝不共用一句含糊话。 */}
-      <p className="px-1 pb-1 pt-2.5 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
-        子智能体
-      </p>
+      {/* 子智能体：渐变圆点头像 + 名 + 截断标 + 状态字 + 状态点。零行时把「没有带名册」
+          和「名册在、还没有子任务」分开说，绝不共用一句含糊话。池号在组标题右侧：
+          读的是名册自己的计数（wire inFlightSlots/poolCap），不从行数现数——
+          槽在行之前就被占住，两数偶尔不同是 Go 侧写明的真相，页面不替它挑一个。 */}
+      <div className="flex items-center justify-between gap-2 px-1 pb-1 pt-2.5">
+        <p className="text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
+          子智能体
+        </p>
+        {poolInFlight !== undefined && poolCap !== undefined ? (
+          <span
+            className="shrink-0 font-mono text-[11px] tabular-nums text-ink-3"
+            title="名册池：宿主正占着的槽位与上限"
+          >
+            在跑 {poolInFlight} / 上限 {poolCap}
+          </span>
+        ) : null}
+      </div>
       <div className="flex flex-col gap-0.5">
         {agents.length === 0 ? (
           <p className="px-1.5 py-1.5 text-[11.5px] leading-relaxed text-ink-3">
@@ -175,12 +253,21 @@ export function MonitorPopover({ open, env, agents, rosterPresent, onPin }: Moni
         ) : (
           agents.map((agent) => {
             const display = agentDisplay(agent);
+            const bound = rowBoundLabel(agent);
             return (
               <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row key={agent.id}>
                 <AgentAvatar />
                 <span className="min-w-0 flex-1 truncate text-ink-2" title={agent.name}>
                   {agent.name}
                 </span>
+                {bound ? (
+                  <span
+                    className="shrink-0 font-mono text-[10.5px] tabular-nums text-warn"
+                    title={bound === "流已丢" ? "这一行的流页已被日志丢弃" : "这一行的流被日志折界，页面上少这么多字"}
+                  >
+                    {bound}
+                  </span>
+                ) : null}
                 <span
                   className={cn(
                     "shrink-0 text-[11px] tabular-nums",
@@ -194,6 +281,9 @@ export function MonitorPopover({ open, env, agents, rosterPresent, onPin }: Moni
             );
           })
         )}
+        {boundLine ? (
+          <p className="px-1.5 py-1.5 text-[11.5px] leading-relaxed text-warn">{boundLine}</p>
+        ) : null}
       </div>
     </GlideMenu>
     </div>

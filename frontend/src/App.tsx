@@ -84,12 +84,14 @@ const TIER_NAMES: Record<string, string> = {
 };
 
 /** The task monitor's roster rows, straight off the wire (ticket 197/220: the
-    fields are copied verbatim - blockedOnApproval is the host's own join, and
-    status is a D43 name this file neither judges nor fills in; the display
-    words live in the popover that draws them). Until this derivation existed
-    the monitor was fed a bare empty array and every pushed row died unseen. An
-    absent tasks key stays distinguishable from an empty roster: the popover is
-    told which one it got (lib/panel.ts's optionality rule). */
+    fields are copied verbatim - blockedOnApproval is the host's own join,
+    status is a D43 name this file neither judges nor fills in, and the row's
+    stream triple rides as-is (the popover draws it as a suffix, never a
+    status); the display words live in the popover that draws them). Until
+    this derivation existed the monitor was fed a bare empty array and every
+    pushed row died unseen. An absent tasks key stays distinguishable from an
+    empty roster: the popover is told which one it got (lib/panel.ts's
+    optionality rule). */
 export function monitorAgents(tasks: TaskRosterSection | undefined): MonitorAgentRow[] {
   return (tasks?.rows ?? []).map((row) => ({
     id: row.taskId,
@@ -98,6 +100,9 @@ export function monitorAgents(tasks: TaskRosterSection | undefined): MonitorAgen
     status: row.status,
     statusKnown: row.statusKnown,
     statusReason: row.statusReason,
+    streamTruncated: row.streamTruncated,
+    streamElidedRunes: row.streamElidedRunes,
+    streamDropped: row.streamDropped,
   }));
 }
 
@@ -263,6 +268,11 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                   ]}
                   agents={monitorAgents(snapshot.tasks)}
                   rosterPresent={snapshot.tasks !== undefined}
+                  poolInFlight={snapshot.tasks?.inFlightSlots}
+                  poolCap={snapshot.tasks?.poolCap}
+                  streamTruncated={snapshot.tasks?.streamTruncated}
+                  streamElidedRunes={snapshot.tasks?.streamElidedRunes}
+                  streamDroppedCount={snapshot.tasks?.droppedCount}
                   onPin={() => undefined}
                 />
               </div>

@@ -23,6 +23,20 @@
         roster never arrived (a different sentence from "nothing spawned"),
         and neither shape crashes - with or without the key, App renders.
 
+    Extended by the same wave's follow-up leg (the two data landing spots the
+    15:1x leg named as left behind, both fed straight off snapshot.tasks):
+
+      5. the roster pool numbers (wire inFlightSlots/poolCap) read 「在跑 3 /
+         上限 8」 whenever the tasks key exists, and render NOTHING when the
+         key is absent - never a fake 「在跑 0 / 上限 0」;
+      6. stream truncation warns ONLY when a bound actually bit, section level
+         (streamTruncated/streamElidedRunes/droppedCount, one sentence naming
+         both losses when both hold) and row level (the TaskRowView stream
+         triple as a suffix beside the status word: 省字 for a folded stream,
+         流已丢 for a dropped one) - a clean log and whole rows render no
+         truncation text at all, because a permanent zero-loss chip is alarm
+         fatigue, the same argument App's header makes for the approval chip.
+
    What this harness CANNOT see (stated so nobody over-reads the green):
    the popover mounts only on a click, so react-dom/server cannot reach it
    through App; the three teeth above render the real production popover
@@ -272,6 +286,134 @@ check(
 );
 
 /* ---------------------------------------------------------------------------
+   6. The two data landing spots the 15:1x leg named as left behind: the
+      roster pool numbers and the stream truncation numbers, both fed by App
+      straight off snapshot.tasks.
+   --------------------------------------------------------------------------- */
+
+// Tooth five: a present tasks key paints the pool numbers the WIRE carries
+// (never a count of rows - a slot is reserved before its row exists).
+const pooledHtml = renderToStaticMarkup(
+  <MonitorPopover open env={ENV} agents={[]} rosterPresent poolInFlight={3} poolCap={8} />,
+);
+check("the pool numbers must read 在跑 3 / 上限 8", pooledHtml.includes(esc("在跑 3 / 上限 8")));
+check("the pool markup must hold zero emoji", !EMOJI_RE.test(pooledHtml));
+
+// Tooth six (section level): a bound that bit warns; both losses when both
+// hold; a CLEAN log renders no truncation text at all - the warning exists
+// for the day the bound bites, not as permanent furniture.
+const bothHtml = renderToStaticMarkup(
+  <MonitorPopover open env={ENV} agents={[]} rosterPresent streamTruncated streamElidedRunes={421} streamDroppedCount={2} />,
+);
+check(
+  "a truncated log with drops must name both losses in one line",
+  bothHtml.includes(esc("流已截断：省略 421 字，已丢 2 条")),
+);
+check("the truncation markup must hold zero emoji", !EMOJI_RE.test(bothHtml));
+
+const truncatedOnlyHtml = renderToStaticMarkup(
+  <MonitorPopover open env={ENV} agents={[]} rosterPresent streamTruncated streamElidedRunes={421} />,
+);
+check(
+  "a truncated log must show the elision count",
+  truncatedOnlyHtml.includes(esc("流已截断：省略 421 字")),
+);
+check("truncated-only must not claim dropped streams it does not have", !truncatedOnlyHtml.includes(esc("已丢")));
+
+const droppedOnlyHtml = renderToStaticMarkup(
+  <MonitorPopover open env={ENV} agents={[]} rosterPresent streamDroppedCount={1} />,
+);
+check(
+  "dropped streams must warn even when nothing was elided",
+  droppedOnlyHtml.includes(esc("已丢 1 条流")) && !droppedOnlyHtml.includes(esc("省略")),
+);
+
+const cleanBoundHtml = renderToStaticMarkup(
+  <MonitorPopover open env={ENV} agents={[]} rosterPresent streamTruncated={false} streamElidedRunes={0} streamDroppedCount={0} />,
+);
+check(
+  "a clean log must render no truncation warning (no fake zero, no noise)",
+  !cleanBoundHtml.includes(esc("流已截断")) && !cleanBoundHtml.includes(esc("已丢")) && !cleanBoundHtml.includes(esc("省略")),
+);
+
+// Tooth seven (row level): the row's own stream triple is a suffix beside the
+// status word - dropped outranks truncated, whole rows stay clean.
+const truncatedRowHtml = renderToStaticMarkup(
+  <MonitorPopover
+    open
+    env={ENV}
+    agents={monitorAgents(roster([row({ taskId: "child-11", label: "流被折界的子任务", streamTruncated: true, streamElidedRunes: 900 })]))}
+    rosterPresent
+  />,
+);
+check(
+  "a folded row must show its elided count beside the status word",
+  truncatedRowHtml.includes(esc("省 900 字")) && truncatedRowHtml.includes(esc("流被折界的子任务")),
+);
+
+const droppedRowHtml = renderToStaticMarkup(
+  <MonitorPopover
+    open
+    env={ENV}
+    agents={monitorAgents(roster([row({ taskId: "child-12", label: "流页被丢的子任务", streamDropped: true })]))}
+    rosterPresent
+  />,
+);
+check(
+  "a dropped row must say its page is gone, not a fake elision count",
+  droppedRowHtml.includes(esc("流已丢")) && !droppedRowHtml.includes(esc("省 ")),
+);
+check("the row-suffix markup must hold zero emoji", !EMOJI_RE.test(droppedRowHtml));
+
+check(
+  "a whole row must show no truncation suffix",
+  !freeHtml.includes(esc("省 ")) && !freeHtml.includes(esc("流已丢")),
+);
+
+// The honest empty state again, now for the new numbers: no tasks key means
+// nothing pool- or truncation-shaped renders at all - never a fake 0.
+const noNumbersHtml = renderToStaticMarkup(
+  <MonitorPopover open env={ENV} agents={[]} rosterPresent={false} />,
+);
+check(
+  "with no tasks key nothing pool-shaped may render",
+  !noNumbersHtml.includes(esc("在跑")),
+);
+check(
+  "with no tasks key nothing truncation-shaped may render",
+  !noNumbersHtml.includes(esc("流已截断")) && !noNumbersHtml.includes(esc("已丢")) && !noNumbersHtml.includes(esc("省 ")),
+);
+
+// App level: a truncated roster pushes through without crashing, and the
+// wiring is at source level what static markup cannot click through.
+const truncatedSection: TaskRosterSection = {
+  ...roster([BLOCKED_ROW]),
+  streamTruncated: true,
+  streamElidedRunes: 421,
+  droppedCount: 2,
+};
+const appBoundHtml = renderToStaticMarkup(<App snapshot={snapshotWith(truncatedSection)} />);
+check("App with a truncated roster must render without crashing", appBoundHtml.includes("一缕"));
+
+check(
+  "the monitor must be fed the pool numbers straight off snapshot.tasks",
+  appSrc.includes("poolInFlight={snapshot.tasks?.inFlightSlots}") &&
+    appSrc.includes("poolCap={snapshot.tasks?.poolCap}"),
+);
+check(
+  "the monitor must be fed the whole-log truncation triple straight off snapshot.tasks",
+  appSrc.includes("streamTruncated={snapshot.tasks?.streamTruncated}") &&
+    appSrc.includes("streamElidedRunes={snapshot.tasks?.streamElidedRunes}") &&
+    appSrc.includes("streamDroppedCount={snapshot.tasks?.droppedCount}"),
+);
+check(
+  "the derivation must carry the row stream triple verbatim",
+  appSrc.includes("streamTruncated: row.streamTruncated") &&
+    appSrc.includes("streamElidedRunes: row.streamElidedRunes") &&
+    appSrc.includes("streamDropped: row.streamDropped"),
+);
+
+/* ---------------------------------------------------------------------------
    The verdict.
    --------------------------------------------------------------------------- */
 
@@ -283,5 +425,6 @@ if (failures.length > 0) {
 console.error(
   "render-roster: OK, the task monitor consumes snapshot.tasks " +
     "(等批准 is its own tier from blockedOnApproval, D43 words verbatim, " +
-    "unfiled status shows the host's sentence, absent key is an honest empty state)",
+    "unfiled status shows the host's sentence, absent key is an honest empty state, " +
+    "pool numbers and stream truncation land on the page and warn only when a bound bit)",
 );
