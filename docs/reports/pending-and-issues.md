@@ -32095,3 +32095,28 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 ### 撤销口令
 - 三笔＝`git revert df7489080 4df9964d1 c7a5101b2`（可单退）。122 删项若误删，`git revert 4df9964d1` 整体回滚。
+## A1634（2026-11-08 15:1x，编排者）**★wave87 三腿收官（219 AC#6 前端 / 122 批2 / 301 门禁，四笔已推）｜★我把「界面对等批准 0 维」真修了｜★我拍 UDF 唯一化并派腿**
+
+### 一、四笔落地（已推 origin/dev，未推=0）
+| commit | 票 | 内容 |
+|---|---|---|
+| `e62877c60` | 219 AC#6 | **前端真消费 `snapshot.tasks`**：`App.tsx:93 monitorAgents()`＋`:264 agents={monitorAgents(snapshot.tasks)}`＋`monitor-popover.tsx:82` **「等批准」成独立档**（橙色、压过 D43 状态字）＋D43 二十状态中文显示表＋未登记状态显示宿主原句＋「没带名册/名册空」两句诚实空话 |
+| `dbb9f1e70` | 219 AC#6 | 裁决表＋票 log |
+| `1ebfec199` | 122 批2 | U1000 **删 11 条**（逐条全仓 grep 零引用）；windows **109→98**、linux 20→14；★**5 条现核推翻批1判断**（`argInt`/`argBool` 有真调用点、`orbHwndTopmost` winlive 4 处引用…）⇒ **宁留勿误删**，如实登记 |
+| `aa6367fb6` | 301 AC#4/4b | d22scan rc=0 clean；`portable-tests --scope=census` **rc=1 GUARD D 红 5 枚**（如实报：`cmd/balldebug 1`/`internal/agent/scheduler 2`/`internal/command 1`/`internal/plugin/manifestslot 7`/`internal/speech 16`，引入 commit 具名 4 枚，**非本腿造成**）；★**更正票面**：census 档**根本没有 STALE 腿**（`:406→:559 exit 0` 先于 `:757` 循环） |
+
+### 二、★我现跑复核前端修复（非只信腿）
+- `grep -rn "agents={\[\]}" frontend/src/` ⇒ **0 命中**（原 1 处写死）
+- `grep -rn "monitorAgents\|blockedOnApproval" frontend/src/` ⇒ `App.tsx:93/:97/:264/:265`、`monitor-popover.tsx:22/:29/:82`
+- `.tasks` 命中 **2**（原 0）⇒ **`snapshot.tasks` 真被消费了**
+- ⇒ **「卡在等批准」界面上从 0 维变有维**（这是 220 点名的「界面还差哪一跳」的**取数跳**，已通）
+
+### 三、★我拍的技术裁定：UDF 按进程唯一化（铁律 ⓪⓪⓪，已派 wave88）
+- **真根因现读**：`internal/ball/orb_windows.go:411-417` `orbDataPath()` 返回 `filepath.Join(base, "wisp", "orb")` —— **所有进程共用一枚 UDF**。整包连跑多球窗测试**自己挤自己** ⇒ fork 的 `EnvironmentCompleted` 拿 `S_OK`+NULL env 空指针崩 ⇒ STA 死 ⇒ `ball.New` 无限等 ⇒ 整包必超时。
+- **裁定＝按进程唯一化 UDF**（主流：WebView2 多实例隔离 UDF 是官方推荐）；**⛔ 靠串行 test 绕过**（藏复杂度、不买价值）。
+- **派 wave88**：改 `orbDataPath()`（pid/实例段）＋**退出/启动清陈旧目录**（⛔ 留垃圾）＋四牙（同进程幂等/跨进程不同/落 LOCALAPPDATA/突变）＋**★关键读数＝整包能不能跑完**。
+
+### 四、撤销口令
+- 前端任务名册＝`git revert dbb9f1e70 e62877c60`。
+- 122 批2 删项若误删＝`git revert 1ebfec199`。
+- UDF 若改坏＝`git revert <wave88 commit>`。
