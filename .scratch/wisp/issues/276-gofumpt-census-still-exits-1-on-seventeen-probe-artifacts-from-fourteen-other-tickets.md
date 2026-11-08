@@ -39,3 +39,4 @@
 - **残缺表现（不做的代价，写清给下一任）**：`.github/workflows/ci.yml:235` 那一步在 dev 上**永远不会绿** ⇒ 任何"CI 全绿"式的收档判据在这一列上必须先读名册再判红；"这一步红了先看名单"的人工流程**在本票落地前不可撤销**。
 
 - [2026-11-05 19:3x +08，编排者裁定 A1556] **276 不做/moot**：门今天 green（362 在 attrib.sh:577 加 exclude .scratch/**，其 P3 已收「.scratch 脏件不许列」）；本票 AC#1 要求 .scratch 脏件也红＝与 362 P3 相反裁定（在册两票同轴相反期望）。A669/A1496 已两度裁「不做」。production 面 gofumpt=0（29 枚脏全在 .scratch probe 台件）。⇒ 维持 362 的 exclude、本票不派写腿、留「不做」（非结案）。将来若要枚举式例外名单须派带 attrib.sh 写面的腿（scripts/** 做不到）。
+- 2026-11-08 22:4x +08（写腿）：A1556 复认＝维持「不做/moot」：attrib.sh:577 exclude 在生效、17 枚普查件 17/17 仍在（未删未格式化）。★但 A1556 的「门今天 green」前提已再变：现跑 attrib.sh --tracked-only＝RED(rc=1)，红点换成 forks/go-webview2 8 枚（最后触碰 2bb639e4e 11-07 CarlosShao，已推 origin/dev），.scratch 侧 0 枚——fork 直搬件与 gofumpt 门对撞，同一族病的 forks 版。forks/** 禁区零触碰，归口待编排者裁（票 70 或新立案）。读数=docs/evidence/s1/276-moot-recert.md。

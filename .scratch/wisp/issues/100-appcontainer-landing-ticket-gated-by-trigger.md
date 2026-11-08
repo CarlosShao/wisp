@@ -86,3 +86,4 @@
   因为今天**没有可降权的对象**（工具的读全部发生在主进程内）。
   next= **不派单**。门（AC#0）一开——即 `shell.exec` 或 Tier-1 插件在生产路径起子进程——立刻派，
   且派单简报的第一句就是"先跑 AC#0 的 grep 证明门开着"。
+- 2026-11-08 22:4x +08（写腿）：AC#0 触发门复判＝**门未开，保持 RESERVED**。判据两半现跑（本树 17fb41455＋clone --shared 导出树 8c897dcf5 双读数一致）：①grep 非测试命中 6 处/3 文件（launcher_other.go:27,30,71；launcher_windows.go:113,116；manifestslot/command.go:454）——9-21 的「只有 mockllm/SLO/doctor」已过期（票 22 launcher 与票 52 Tier-1 runner 已落码），但 ②「被 bridge 调到」不成立：BuiltinWebEntries(web.go:210) 与 NewCommandRuntime(manifestslot/command.go:92) 非测试调用方均=0，cmd/wisp/run.go 生产注册面只五族 FS(:659)/Task(:697)/System(:728)/Subagent(:1206)/Plan(:1245)。逐行读数=docs/evidence/s1/100-trigger-gate-ac0.md。门开条件一句话：run.go 注册 BuiltinWebEntries 或 plugin host 接入 CommandRuntime 之日即门开之日。
