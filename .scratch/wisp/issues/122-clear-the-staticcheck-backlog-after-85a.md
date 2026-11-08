@@ -130,3 +130,5 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   测试 manifestslot/speech ok，tools 1 条环境红（TestTicket252R1 短名前置，基线树逐字同红，零新增红）。
   **SA1019 剩 1 条（risk/proccpu_windows_test.go:20）：不修——`internal/risk/**` 冻结，本腿无写面，待编排者/机主裁是否解冻。**
   next=编排者推送后取 CI `lint` job staticcheck 步读数（期望 linux 14 / windows 98，须同报版本）关 AC#6。
+
+- [2026-11-08 15:2x +08] agent=122-sa1-census did=risk 那条 SA1019 取证腿交件（只读＋出件，零 .go 改动；表 `docs/evidence/s1/122-sa1019-risk-verdict.md`）：API=`windows.GetCurrentProcess`（x/sys v0.49.0 `syscall_windows.go:483-484` 逐字 Deprecated→`CurrentProcess`，"same Handle without the nil error"，error 恒 nil）；修法=改 `:20` 一行＋删 `:21-23` 死码分支，行为逐位不变；该文件是纯测试 helper 件（票 86 `4d0e2577d` 立的仪器，仅 `pathresolver_budget_norace_test.go` 5 处调用，零产码引用）；冻结出处如实核过＝PLAN/specs 无「risk 冻结」字面，权威＝台账 A35（`pending-and-issues.md:883` 冻结区首裁）＋各票禁改列，防的是 C18/C19/C25/C26 语义漂移；**裁决建议＝甲：具名解冻 `proccpu_windows_test.go` 这一枚文件这一条，让批 2/3 顺手修**（drop-in、有批 1 speech 先例 `4df9964d1`、票 216「非测试字节零动」同形先例；单开票对 1 行是负价值、留着永久背 1 条红兑不了 AC#6 读数）；解冻授权在编排者——须具名落派单＋台账补 A##，措辞照票 126 教训。 next=编排者裁甲/乙/丙；若甲，批 2/3 修后 windows 读数 98→97。
