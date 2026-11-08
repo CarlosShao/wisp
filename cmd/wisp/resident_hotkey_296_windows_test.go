@@ -155,7 +155,7 @@ func Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots(t *testing.T) {
 	hotCfg := func() ball.HotkeyConfig { return loadHotkey258(t, dir) }
 	hotReload := func() ball.HotkeyConfig { return hotkeyReloadSource296(dir) }
 
-	rb := startResidentBall(observe.NewRegistry(), nil, hotCfg, hotReload)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, hotCfg, hotReload)
 	if rb == nil || rb.b == nil {
 		t.Skipf("SKIP-LOUD: this host cannot bring up a ball window, so the rebind has no Win32 to land in: %q", rb.verdictStatusLineFor258())
 	}
@@ -200,7 +200,7 @@ func Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable(t *testing.T) {
 	hotCfg := func() ball.HotkeyConfig { return loadHotkey258(t, bootDir) }
 	hotReload := func() ball.HotkeyConfig { return hotkeyReloadSource296(reloadDir) }
 
-	rb := startResidentBall(observe.NewRegistry(), nil, hotCfg, hotReload)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, hotCfg, hotReload)
 	if rb == nil || rb.b == nil {
 		t.Skipf("SKIP-LOUD: no ball window on this host, so the rebind has no Win32 to land in: %q", rb.verdictStatusLineFor258())
 	}

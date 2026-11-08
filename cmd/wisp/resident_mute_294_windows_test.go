@@ -99,7 +99,7 @@ mute = "Ctrl+Alt+X"
 cancel = "Esc"
 panel = "Ctrl+Alt+P"`)
 	src := func() ball.HotkeyConfig { return loadHotkey258(t, dir) }
-	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, src, src)
 	if rb == nil || rb.b == nil {
 		t.Skipf("SKIP-LOUD: this host cannot bring up a ball window (headless service session), so the mute registration has no real Win32 to land in: %q", rb.verdictStatusLineFor258())
 	}

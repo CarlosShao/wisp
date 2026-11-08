@@ -304,7 +304,15 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 	// the host, and the library's MessageReceived arm would bounce every
 	// message back into the page. Nothing arrives on this channel; if a
 	// future leg needs page->host messages, that is a NEW seam, not this one.
-	browser.DataPath = orbDataPath()
+	bootDir, bootDirErr := orbBootDataDir()
+	if bootDirErr != nil {
+		// The per-boot leaf could not be created: fall back to the per-process
+		// folder (the r1 shape) rather than failing the attach - the D2D
+		// fallback is not the point of a mkdir failure.
+		slog.Warn("ball: orb per-boot user-data dir mkdir failed; falling back to the per-process dir", "err", bootDirErr)
+		bootDir = orbDataPath()
+	}
+	browser.DataPath = bootDir
 	o.browser = browser
 
 	if !browser.Embed(uintptr(o.hwnd)) {
@@ -362,7 +370,7 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 	// a reported failure is logged and answered with the NavigateToString
 	// fallback rather than trusted blindly. (The style itself was read into
 	// o.style at window creation, above.)
-	siteDir := filepath.Join(orbDataPath(), "site")
+	siteDir := filepath.Join(bootDir, "site")
 	served := false
 	if err := orbWriteSite(siteDir); err != nil {
 		slog.Warn("ball: orb site materialization failed; WebGPU origin unavailable", "err", err)
@@ -406,22 +414,39 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 	return o, nil
 }
 
-// orbDataPath picks a PER-PROCESS user-data folder for THIS browser instance.
-// History: it used to hand EVERY process the same folder
-// (%LocalAppData%\wisp\orb), so `go test ./cmd/wisp` - several ball window
-// tests, each booting WebView2, across several processes - self-collided on
-// one user-data folder: a contended CreateEnvironment completed with S_OK and
-// a NULL environment out-param, the panic died on the recover boundary, the
-// STA thread was gone and ball.New waited forever (whole-package timeout,
-// ticket 408). WebView2's guidance for multiple instances is one user-data
-// folder per process, so the folder is now <base>\wisp\orb\<pid>-<8 hex>.
-// Decision record (ticket 408): pid alone - candidate 甲 - still collides
-// when Windows reuses a pid and hands the new process a dead predecessor's
-// folder with its stale locks; the random suffix buys that class away. The
-// exe name - candidate 丙 - adds no uniqueness among live processes and
-// lengthens the path, so it was dropped. The path MUST be stable for the
-// process lifetime: one attach reads it twice (browser.DataPath above and
-// the site folder below), so the value is computed exactly once.
+// orbDataPath picks a PER-PROCESS user-data folder ROOT for this host's orb
+// browsers: <base>\wisp\orb\<pid>-<8 hex>. History: it used to hand EVERY
+// process the same folder (%LocalAppData%\wisp\orb), so `go test ./cmd/wisp` -
+// several ball window tests, each booting WebView2, across several processes -
+// self-collided on one user-data folder: a contended CreateEnvironment
+// completed with S_OK and a NULL environment out-param, the panic died on the
+// recover boundary, the STA thread was gone and ball.New waited forever (whole-
+// package timeout, ticket 408). WebView2's guidance for multiple instances is
+// one user-data folder per process, so the r1 ruling (ticket 408) made the
+// folder per-process; decision record (ticket 408 r1): pid alone - candidate
+// 甲 - still collides when Windows reuses a pid and hands the new process a
+// dead predecessor's folder with its stale locks; the random suffix buys that
+// class away. The exe name - candidate 丙 - adds no uniqueness among live
+// processes and lengthens the path, so it was dropped.
+//
+// The r2 ruling (ticket 408, measured 2026-11-08) goes one level deeper: the
+// per-process folder is the ROOT, and every orb ATTACH gets its own leaf
+// underneath it (orbBootDataDir below). The measured reason: WebView2 SHARES
+// one browser process across environments that name the same user-data folder
+// with the same options, and in the whole-package run the previous attach's
+// browser process is still tearing down when the next attach boots - the new
+// environment then JOINS a dying process, and the wrapper's Embed waits for a
+// controller-completed callback that never fires (measured: one predecessor
+// ball in the process already cost 7.9s vs 1.3s single; under whole-package
+// load the wait never resolved and ball.New hung 10-17 minutes, the second
+// dead point of the same ticket). One folder per attach makes sharing
+// physically impossible: no two environments can ever name the same folder.
+// The garbage story is unchanged in shape - boot leaves live under the
+// per-process dir, whose lock is held until process exit, so a dead process's
+// whole tree (leaves included) is swept by the next process's first attach.
+//
+// The path MUST be stable for the process lifetime - it is the PARENT the
+// per-boot leaves hang off and the lock-file anchor the sweep keys on.
 func orbDataPath() string {
 	orbDataPathOnce.Do(func() {
 		orbDataDir = acquireOrbDataDir()
@@ -482,6 +507,27 @@ func acquireOrbDataDir() string {
 		slog.Warn("ball: orb user-data dir mkdir failed", "err", err)
 	}
 	return dir
+}
+
+// orbBootSeq numbers the per-boot leaves within this process.
+var orbBootSeq atomic.Uint64
+
+// orbBootDataDir hands ONE orb attach its own user-data leaf:
+// <per-process dir>\boot-<n>. The r2 ruling's shape (see orbDataPath): two
+// attaches never share a folder, so WebView2's same-folder browser-process
+// sharing can never seat a new environment on a predecessor's dying process.
+// The counter is process-scoped and the parent carries the pid, so the leaf
+// is unique among live hosts by construction; no lock of its own is needed -
+// the parent's lock is the sweep's liveness signal and a dead owner's whole
+// tree goes away with it. The site folder hangs INSIDE the leaf (each attach
+// materializes its own copy), which keeps the one-attach-reads-it-twice
+// property: both readers take the same local value.
+func orbBootDataDir() (string, error) {
+	dir := filepath.Join(orbDataPath(), fmt.Sprintf("boot-%d", orbBootSeq.Add(1)))
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return "", err
+	}
+	return dir, nil
 }
 
 // orbSweepStaleDirs bounds the garbage the per-process folder leaves behind:

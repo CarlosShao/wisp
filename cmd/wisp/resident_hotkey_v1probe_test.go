@@ -54,7 +54,7 @@ func Test258V1ProbeSummonEditRebindsLiveBall(t *testing.T) {
 		return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
 	}
 
-	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, src, src)
 	if rb == nil || rb.b == nil {
 		t.Fatalf("258-v1 PROBE: no ball window on this host - the positive control cannot run headless (verdict line: %q)", rb.verdictStatusLineFor258())
 	}

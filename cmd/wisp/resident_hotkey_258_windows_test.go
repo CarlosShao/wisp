@@ -275,7 +275,7 @@ cancel = "Esc"
 panel = "Ctrl+Alt+P"`)
 	src := func() ball.HotkeyConfig { return loadHotkey258(t, dir) }
 
-	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, src, src)
 	if rb == nil || rb.b == nil {
 		t.Skipf("SKIP-LOUD: this host cannot bring up a ball window (headless service session), so the live rebind has no Win32 to land in: %q", rb.verdictStatusLineFor258())
 	}
@@ -338,7 +338,7 @@ panel = "Ctrl+Alt+P"`)
 	src := func() ball.HotkeyConfig { return loadHotkey258(t, dir) }
 	// hotCfg = src (the construction still reads config), hotReload = nil: this
 	// is exactly the wiring the mutation removes.
-	rb := startResidentBall(observe.NewRegistry(), nil, src, nil)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, src, nil)
 	if rb == nil || rb.b == nil {
 		t.Skipf("SKIP-LOUD: no ball window on this host (%q)", rb.verdictStatusLineFor258())
 	}
@@ -381,7 +381,7 @@ mute = "Ctrl+Alt+M"
 cancel = "Esc"
 panel = "Ctrl+Alt+P"`)
 	src := func() ball.HotkeyConfig { return loadHotkey258(t, dir) }
-	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+	rb := startResidentBallBounded(t, observe.NewRegistry(), nil, src, src)
 	if rb == nil || rb.b == nil {
 		t.Skipf("SKIP-LOUD: no ball window on this host (%q)", rb.verdictStatusLineFor258())
 	}
