@@ -1082,6 +1082,43 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 				Reason:          v.Reason,
 			}
 		},
+		// Ticket 215a's assembly-root line - the hop the panel leg's evidence
+		// (docs/evidence/s1/215-skills-plugins-inventory.md) records as owed:
+		// the Tier-2 plugin inventory read off this run's own Manager.
+		// internal/config has no PluginsOptions-style reader (only
+		// BallStyleOptions/ChatSwitchOptions carry one), so the mapping runs
+		// here, exactly as pump.go's Plugins field doc says: internal/panel
+		// must not import internal/config, so the section arrives pre-shaped
+		// like Commands/ModelSwitch/BallStyle above. mgr.Config() returns a
+		// deep copy under the Manager's lock - the same face the settings leg
+		// writes through - so a reload ticking under us cannot race the read.
+		// Row content travels verbatim; the pump owns the ID ordering (its
+		// copy-sort) and renders nil rows as []. The two sentences are the
+		// carrier's own constants, not forked prose: no consumer of the
+		// [plugins] keys exists today (the ticket 50/51 engine is unbuilt;
+		// unwired.go's lockedKeyDisposition names the rows "not built"), so
+		// enabled=true means configured, never running, and the sentence
+		// rides every packet to keep that distinction visible. Without this
+		// reader the pump sends no "plugins" key at all (the reader-gated
+		// 213/187/65 shape); with it the key always arrives.
+		Plugins: func() panel.PluginInventorySection {
+			c := mgr.Config()
+			sec := panel.PluginInventorySection{
+				Tier2Enabled: c.Plugins.Tier2Enabled,
+				EngineState:  panel.PluginEngineNotWired215,
+				SkillState:   panel.SkillsNotInConfigModel215,
+			}
+			for id, e := range c.Plugins.Entries {
+				sec.Rows = append(sec.Rows, panel.PluginRow{
+					ID:           id,
+					Enabled:      e.Enabled,
+					Capabilities: e.Capabilities,
+					NetAllowlist: e.NetAllowlist,
+					HostAPI:      e.HostAPI,
+				})
+			}
+			return sec
+		},
 		// Ticket 33 AC#8's naming split (33-r14): Publish keeps the blocking
 		// ledger entry by that name, and the AC#8 clamp-branch ruler drives the
 		// packet through tryBookPanelSnapshot when it needs a pass that cannot

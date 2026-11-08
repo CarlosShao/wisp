@@ -1,0 +1,47 @@
+215 assembly-root wiring: run.go's PumpSources literal gains the Plugins reader
+(the one line the panel leg's evidence doc ⑥.2 recorded as owed).
+
+The reader is the assembly-root pre-shape pump.go:252-264's field doc names:
+internal/config has no PluginsOptions-style reader (Options family is exactly
+BallStyleOptions/ChatSwitchOptions, grepped), internal/panel must not import
+internal/config, so mgr.Config() (deep copy under the Manager lock, the same
+face the settings leg writes through) maps the live [plugins] section into
+panel.PluginInventorySection with the carrier's own two canonical sentences
+riding verbatim - enabled=true travels with "the [plugins] keys have no
+consumer today" on the same packet, the shape the carrier's AC#2 positive
+control pins. Row content verbatim; the pump owns ID ordering and nil->[].
+Without this reader the running process sent no "plugins" key at all (the
+reader-gated 213/187/65 shape); with it the key always arrives - 215a's wire
+half is closed end to end.
+
+Tests: cmd/wisp/panel_plugins_215_test.go, the 187 three-tooth shape -
+(1) the byte nail on run.go's literal; (2) the wired reading against a real
+Manager (plugins215Base = the 187 base + [plugins] with two entries, fed
+through config.NewManager; hardcoded expectations: rows exactly [clip zed] in
+the pump's sort order, every field DeepEqual verbatim including the absent
+grant lists as nil, tier2Enabled verbatim, both sentences beside enabled=true);
+(3) the mutation: no reader means the wire bytes carry no "plugins" key.
+M1 ran as a real disk mutation: sed-stripped the wiring block, the nail went
+FAIL with its own message, cmp-verified byte-identical restore (md5 reset),
+re-green. An earlier attempt swapped run.go via -overlay and did NOT red -
+recorded as void, not counted: the nail reads the on-disk file, not the
+overlay build view.
+
+Gates: gofumpt -l (both named files, absolute gofumpt) empty; go vet ./cmd/wisp
+rc0 and go build ./cmd/wisp rc0 (raw; see below); go test ./cmd/wisp -run
+'Test215|TestPlugins' -count=1 3/3 PASS 0.087s; go test ./internal/panel
+-count=1 exactly one red before = after (TestC21DesignTokensFourWayAgree, ball
+family, pre-existing, zero relation); d22scan clean (internal 963 + cmd 241 +
+frontend 117 + design 39); all four touched files CR=0.
+
+Honest note on shared-package concurrency: raw vet went red twice mid-leg
+(undefined: sync, then undefined: repoRoot219) - both from ticket 219's
+in-flight approval_always_219ac2_test.go being edited live on disk (mtime
+00:01:22, after this leg's 23:41 baseline vet rc0; untracked, not my write
+surface, zero bytes touched). Isolated it with go test/build -overlay into a
+package stub (62-v1 precedent, working tree untouched, pieces under
+.scratch/wisp/probes/215/r1/) to prove my own face; raw vet/build rc0 again by
+commit time as their file healed on disk.
+
+Also: docs/evidence/s1/215-plugins-assembly.md (verdict table) and ticket 215
+Progress log one line. AC boxes and Status untouched; commit only, no push.
