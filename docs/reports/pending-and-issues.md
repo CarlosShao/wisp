@@ -32626,3 +32626,51 @@ export WISP_LIVE_MIC=1
 - 整包路由＝`git revert 17fb41455`。
 - 211 结案＝`git revert 1ed6b1a68 b4db9ea86 6f0fa0e08`。
 - cmd/wisp 文案＝`git revert eccae1fd7 9aaf601c8`。
+## A1647（2026-11-08 23:2x，编排者）**★★票 409 结案（语音族全绿）｜census GUARD D 归零｜354-r1 成对去牙交件｜100 AC#0 判完门未开｜wave101 三腿放出**
+
+### 一、★★票 409 结案（`a37b74b7c`＋`6887b5709`）
+- **三个 AC 全部由我（裁决者）翻**：实现腿只加 Progress log，**盘上读数全部满足**。
+  - AC#1 carrier 真跑：`bash scripts/speech-tests.sh` ⇒ **PASS=89/FAIL=0/SKIP=0，RUN=106，rc=0**，日志「1.17.1」**零命中**（我自己复跑）。
+  - AC#2 载入来源：`TestSingleOnnxruntimeInstance` PASS 0.26s（`EnumProcessModules` 断言进程内确来自 stage 目录 1.28.2）。
+  - AC#3 门禁：gofumpt 空／vet rc0／build rc0／d22scan clean／LF。
+- **★双名核**：旧名=0、新名=1、脏=0 ✓（★**又踩了一次「只点新名 ⇒ 旧名删除留脏」**，补 `6887b5709` 才干净——**配方已两次验证：`git mv` 后旧名删除必须单独一笔**）。
+
+### 二、★census GUARD D 归零（`25ad83737`＋`c121390a3`＋`d07d5298c`）
+**4 枚洞逐枚分类＝全是甲（有测试、无人认领），零乙零丙**：
+| 包 | windows 编译测试 | 引入票 | 去处 | 理由 |
+|---|---|---|---|---|
+| `cmd/balldebug` | 1/0 | 71 | **windows 档** | 测试 `//go:build windows`，进 core 会被 ubuntu 腿 GUARD A 当天拒 |
+| `agent/scheduler` | 2/0 | 47 | **core 档** | 零 tag/skip/getenv/exec；且是票 111 登记过的 DEFERRED 桩义务 |
+| `internal/command` | 1/0 | 213 | **core 档** | 同杆全零，linux 测试二进制编译＋vet 双过 |
+| `plugin/manifestslot` | 7/0 | 50/51/52/138 | **windows 档** | 测试 exec tasklist、探 SystemRoot——恰好撞 core 档「零 exec.Command」量杆 |
+- **验收**：`unclaimed-with-tests=0`，rc0，**GUARD D 剩 0**；speech 路由未破坏（**PASS=89**）；**selftest 32 case / 0 失败 GREEN**。
+- **★腿如实三条**：① **中途自己红过一次，门救了**——第一版 scope 行误把父包 `./internal/plugin/` 顶掉，GUARD C 首跑当场点名（Pinned 13/Resolved 12），修复为父子并存 ② **core/windows 档本机全量红＝存量**（判据 `git diff 2077416a5..HEAD -- "*.go"`＝**0 行**，红集合全是既有成员源字节，无一是它加的）③ vet/build 首发被别腿 untracked 杂件 `build/mut_rvw.go` 染红，挪出后 rc0。
+
+### 三、★票 354-r1 成对去牙交件（`393430dc9`＋`921263112`）
+- **AC#2 确定性仪器**：新件 `internal/winsec/leftstanding_354_windows_test.go`，分子 `leftStandingForeignName` 逐字采用票面名。确定性按构造交：世界构造**逐字复用零新接缝**；固定 64 字节 body 且**长度断言进用例**；夹具名带轮内序号（`shot<N>`）；**逐字节断言**（幸存名必须读回 `size 64 body [an object the caller never named, standing in the same directory]` 且外来对象自身名 `absent`）。首发 `entered=3/3, leftStandingForeignName=3`，负控 `name=absent`。
+- **AC#3 成对去牙**（只在导出树做，落 commit 字节零去牙）：
+  - **牙 A＝摘复验块**（`pinnedleaf_342_windows.go:277-283`）：分子 **3/3 → 0/3 断言红**；353r1 主案 **DAMAGE 回到 3/3**——票面「回到 damage>0」逐字命中；两枚负控照旧 PASS。
+  - **牙 B＝摘 Remove 行**（`:284`，落点不同）：**两枚负控齐红**（`present: size 0 body []`）；★**主分子照绿＝腿如实报**——该分子量的是复验留下的形，看见牙 B 的是负控。**成对判据成立**。
+- **★腿明确要求派 `354-v1`（非实现者裁）** ⇒ wave101 已派。
+
+### 四、★票 100 AC#0 判完（`2077416a5`）：**门未开，保持 RESERVED**
+- **第一半（grep 非测试命中）成立且比 9-21 变多了**：**6 处/3 文件**——`internal/tools/launcher_windows.go:113`、`launcher_other.go:71`（票 22 web 族）、`internal/plugin/manifestslot/command.go:454`（票 52 Tier-1 `OSCommandSpawner`）。「只有 mockllm/SLO/doctor」已过期。
+- **第二半（被 bridge 调到）不成立**：`BuiltinWebEntries`、`NewCommandRuntime` **非测试调用方均＝0**；`cmd/wisp/run.go` 生产注册面只五族 FS/Task/System/Subagent/Plan。
+- **门开条件一句话**：run.go 注册 `BuiltinWebEntries` 或 plugin host 接入 `CommandRuntime` 之日＝门开之日。
+
+### 五、★票 276 复认：维持不做，但**抓到新事实**
+- A1556 复认全对上：`attrib.sh:577` exclude 在生效、17 枚普查件 17/17 仍在未动。
+- **★A1556 的「门今天 green」已再变**：现跑 `attrib.sh --tracked-only`＝**RED rc=1**，红点换成 **`forks/go-webview2` 8 枚**（`2bb639e4e` 11-07 CarlosShao，已推 origin/dev）——**fork 直搬件与 gofumpt 门对撞**，同一族病的 forks 版。⇒ wave101 派腿治。
+
+### 六、wave101 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `354-v1-verdict` | ★**裁决腿**（非实现者）：独立复跑 AC#2 确定性（判三条：无 `t.Parallel`／无时序依赖／断言逐字节）＋AC#3 成对（判牙 A/B 落点真不同＋**牙 B 主分子照绿票面允许吗**）；★**裁决腿的价值全在「敢说不成立」** |
+| `forks-gofumpt` | ★治 `forks/go-webview2` **8 枚 gofumpt 红**；三条路自拍——甲＝格式化 fork（**永久分叉上游，代价大**）／**乙＝把 `forks/**` 加进 exclude（我倾向，vendored 代码不进格式化门禁是主流）**／丙＝单独一档；★**必须解释「exclude vendored 不是为凑绿放宽」**（判据＝那些文件本仓无作者权） |
+| `next-batch-2` | ★**验上一腿「池里没有第三枚禁区外纯读可落」的结论**＋从空闲面包（`internal/agent`/`tools`/`audio`/`observe`/`llm`/`memory`/`risk`/`cmd/balldebug`）找票做掉≥1 枚 |
+
+### 七、撤销口令
+- 409 结案＝`git revert 6887b5709 a37b74b7c`。
+- census claim＝`git revert d07d5298c c121390a3 25ad83737`（census 回 4 洞）。
+- 354-r1＝`git revert 921263112 393430dc9`。
+- 100 AC#0＝`git revert 2077416a5`。
