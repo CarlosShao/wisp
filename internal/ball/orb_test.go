@@ -273,8 +273,13 @@ func TestOrbWriteSite(t *testing.T) {
 // wisp-jarvis-normal-blending vite plugin rewrites the upstream's ten
 // AdditiveBlending material sites to NormalBlending at build time, so the
 // particles composite by their own alpha on ANY background (evidence
-// 65-jarvis-pure-particles.md).
-const jarvisUpstreamSHA256 = "754037b9a4c393de03800483cba81d718b91dd6b5075ff89b1d421e6d07a5163"
+// 65-jarvis-pure-particles.md). The SAME DAY's deep-color leg (owner's
+// ruling verbatim: "太淡了，颜色深一点，粒子颜色") rebuilt the asset again
+// through the extended wisp-jarvis-bright-particles plugin: deeper teal
+// palette hexes, raised alpha floor and point floor, luma-mix saturates on
+// every color site, deep-teal halo stops and a lowered avatar dpr (evidence
+// 65-jarvis-pure-deep-color.md).
+const jarvisUpstreamSHA256 = "e9026f175a6f5fd6508d537603af7942afb619a732688d6e4d5a03f2aac156f9"
 
 // TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
 // embed is the scaffold's build of the upstream component with the entry's

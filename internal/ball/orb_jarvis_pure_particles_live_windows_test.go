@@ -50,6 +50,15 @@ package ball
 //     reading, and it pins the palette coverage (cores bright enough) from
 //     BOTH sides.
 //
+// The 2026-11-08 deep-color leg (owner's ruling verbatim: "太淡了，颜色深
+// 一点，粒子颜色") added the DEPTH teeth below teeth 3-4: the pale build
+// passed all four existence teeth while washing out, so the same white-floor
+// cyan population must now also read DARK (mean luminance < 120 vs the pale
+// baseline's 174.0) and MORE CHROMATIC (mean min(g-r,b-r) > 44.2, the pale
+// baseline's measured value), cover > 20% of the white-floor rect, and cover
+// > 6% of the black-floor rect; see the constants block for the provenance
+// of every number.
+//
 // Mutation evidence (dispatch tooth 4, RUN 2026-11-08, honest result): the
 // blending-mode mutation does NOT turn these teeth red. Setting
 // jarvisBlendingPatch back to the additive string, rebuilding and re-running
@@ -159,14 +168,51 @@ const (
 	jarvisPureBlackBudgetSec = 20   // black-phase poll budget
 )
 
+// Ticket 65 deep-color leg (2026-11-08, owner's ruling verbatim: "太淡了，
+// 颜色深一点，粒子颜色"): the four teeth above prove EXISTENCE and hue, not
+// DEPTH - the pinned pre-leg asset (sha 754037b9...) passed all four while
+// its white-floor particle field read pale. Measured on that committed asset
+// over a white floor (the owner's defect shape at its extreme): particle
+// mean luminance 174.0, mean min(g-r,b-r) chroma 44.2, ball-center luminance
+// 172. These constants pin the DEPTH the owner asked for, from the same
+// composited-screen samples: the white-floor cyan population must be LARGE
+// (wash-out collapses coverage), DARK (mean luminance well under the pale
+// baseline) and MORE CHROMATIC than the baseline (the pale wash desaturates
+// toward grey); the black-floor population must cover far more than the
+// bright-palette build's measured 3.3-3.5%. Separating mutation (measured,
+// evidence 65-jarvis-pure-deep-color.md): reverting the build's saturation
+// factor 1.9 -> 1.0 drops the field's pure-color chroma (0,88,158) ->
+// (0,71,105) in the framebuffer, dragging the composited chroma mean under
+// the floor - the chroma tooth goes red while the darkening comes from the
+// palette hexes and the alpha/point floors.
+const (
+	// white floor: cyan-dominant share must beat the pure-particle leg's 2%
+	// existence floor by an order of magnitude (wash-out collapses coverage;
+	// the deep build measures ~2x this floor).
+	jarvisDeepWhiteRatioFloor = 0.20
+	// black floor: the deep build's dots cover far more than the
+	// bright-palette build's measured 3.3-3.5% share.
+	jarvisDeepBlackRatioFloor = 0.06
+	// mean luminance of the white-floor cyan population: the pale baseline
+	// measured 174.0; the deep build must read DARKER than this.
+	jarvisDeepLumCeiling = 120.0
+	// mean min(g-r,b-r) of the white-floor cyan population must beat the
+	// pre-leg asset's measured 44.2.
+	jarvisDeepChromaFloor = 44.2
+)
+
 // pureReport carries one attempt's readings for the failure line.
 type pureReport struct {
-	corners   [4][3]int32
-	ringLum   float64
-	ringOK    bool
-	whiteCyan float64
-	blackCyan float64
-	samples   int
+	corners     [4][3]int32
+	ringLum     float64
+	ringOK      bool
+	whiteCyan   float64
+	whiteLum    float64
+	whiteChroma float64
+	blackCyan   float64
+	blackLum    float64
+	blackChroma float64
+	samples     int
 }
 
 // TestBallLiveOrbJarvisPureParticlesOverWhiteAndBlackFloors is the live
@@ -210,16 +256,21 @@ func TestBallLiveOrbJarvisPureParticlesOverWhiteAndBlackFloors(t *testing.T) {
 		b.Close()
 		orbTestReapLeakedWebView2(t)
 		if attempt < attempts {
-			t.Logf("attempt %d/%d did not clear all four teeth (ring lum %.1f ringOK=%v white cyan %.2f%% black cyan %.2f%%); rebuilding ball and WebView2 instance",
-				attempt, attempts, rep.ringLum, rep.ringOK, rep.whiteCyan*100, rep.blackCyan*100)
+			t.Logf("attempt %d/%d did not clear all teeth (ring lum %.1f ringOK=%v white cyan %.2f%% lum %.1f chroma %.1f black cyan %.2f%%); rebuilding ball and WebView2 instance",
+				attempt, attempts, rep.ringLum, rep.ringOK, rep.whiteCyan*100, rep.whiteLum, rep.whiteChroma, rep.blackCyan*100)
 		}
 	}
-	t.Fatalf("jarvis pure-particle regression after %d attempts: corners %v (want each channel within +/-%d of the floor: still transparent on BOTH floors); "+
+	t.Fatalf("jarvis pure-particle deep-color regression after %d attempts: corners %v (want each channel within +/-%d of the floor: still transparent on BOTH floors); "+
 		"white-floor ring non-particle average luminance %.1f (want > %d with >=%d/%d non-particle samples: NO dark backdrop may return); "+
-		"white-floor cyan-dominant ratio %.2f%% and black-floor cyan-dominant ratio %.2f%% (each want > %.2f%%: particles visible on any background)",
+		"white-floor cyan-dominant ratio %.2f%% (want > %.2f%% existence and > %.2f%% deep), particle mean luminance %.1f (want < %.0f: DEEPER than the pale 174.0 baseline) "+
+		"and mean chroma %.1f (want > %.1f: MORE saturated than the pale 44.2 baseline); "+
+		"black-floor cyan-dominant ratio %.2f%% (want > %.2f%% existence and > %.2f%% deep: particles visible on any background)",
 		attempts, last.corners, jarvisCornerTol,
 		last.ringLum, jarvisPureRingLumFloor, jarvisPureRingMinSamples, jarvisPureRingProbeCount,
-		last.whiteCyan*100, last.blackCyan*100, jarvisCyanFloor*100)
+		last.whiteCyan*100, jarvisCyanFloor*100, jarvisDeepWhiteRatioFloor*100,
+		last.whiteLum, jarvisDeepLumCeiling,
+		last.whiteChroma, jarvisDeepChromaFloor,
+		last.blackCyan*100, jarvisCyanFloor*100, jarvisDeepBlackRatioFloor*100)
 }
 
 // orbPurePixelAttempt runs one create-and-sample round of the four teeth: it
@@ -348,13 +399,20 @@ func orbPurePixelAttempt(t *testing.T, b *Ball, attempt int) (bool, pureReport) 
 		if rep.ringOK {
 			rep.ringLum = float64(lumSum) / float64(nonParticle)
 		}
-		// Tooth 3: cyan particles keep their hue over WHITE.
-		rep.whiteCyan, rep.samples = orbPureCyanRatio(hdc, wr)
+		// Tooth 3 + deep-color teeth: cyan particles keep their hue over
+		// WHITE, and the field is DEEP - large, dark, more chromatic than
+		// the pale pre-leg baseline.
+		rep.whiteCyan, rep.whiteLum, rep.whiteChroma, rep.samples = orbPureParticleStats(hdc, wr)
 		pReleaseDC.Call(0, hdc)
-		if cornersOK && rep.ringOK && rep.ringLum > float64(jarvisPureRingLumFloor) && rep.whiteCyan > jarvisCyanFloor {
-			t.Logf("attempt %d: white-floor phase: corners %v within +/-%d of WHITE; ring %d/%d non-particle samples averaging lum %.1f (> %d: no backdrop); cyan-dominant %.2f%% > %.2f%%",
+		if cornersOK && rep.ringOK && rep.ringLum > float64(jarvisPureRingLumFloor) &&
+			rep.whiteCyan > jarvisCyanFloor &&
+			rep.whiteCyan > jarvisDeepWhiteRatioFloor &&
+			rep.whiteLum < jarvisDeepLumCeiling &&
+			rep.whiteChroma > jarvisDeepChromaFloor {
+			t.Logf("attempt %d: white-floor phase: corners %v within +/-%d of WHITE; ring %d/%d non-particle samples averaging lum %.1f (> %d: no backdrop); cyan-dominant %.2f%% (existence > %.2f%%, deep > %.2f%%); particle lum %.1f (< %.0f) chroma %.1f (> %.1f)",
 				attempt, rep.corners, jarvisCornerTol, nonParticle, jarvisPureRingProbeCount,
-				rep.ringLum, jarvisPureRingLumFloor, rep.whiteCyan*100, jarvisCyanFloor*100)
+				rep.ringLum, jarvisPureRingLumFloor, rep.whiteCyan*100, jarvisCyanFloor*100, jarvisDeepWhiteRatioFloor*100,
+				rep.whiteLum, jarvisDeepLumCeiling, rep.whiteChroma, jarvisDeepChromaFloor)
 			break
 		}
 		if time.Now().After(deadline) {
@@ -397,12 +455,14 @@ func orbPurePixelAttempt(t *testing.T, b *Ball, attempt int) (bool, pureReport) 
 				cornersOK = false
 			}
 		}
-		// Tooth 4: the same cyan particles over BLACK.
-		rep.blackCyan, _ = orbPureCyanRatio(hdc, wr)
+		// Tooth 4 + deep-color: the same cyan particles over BLACK, now with
+		// the deep build's coverage floor.
+		rep.blackCyan, rep.blackLum, rep.blackChroma, _ = orbPureParticleStats(hdc, wr)
 		pReleaseDC.Call(0, hdc)
-		if cornersOK && rep.blackCyan > jarvisCyanFloor {
-			t.Logf("attempt %d: black-floor phase: corners within +/-%d of BLACK; cyan-dominant %.2f%% > %.2f%%",
-				attempt, jarvisCornerTol, rep.blackCyan*100, jarvisCyanFloor*100)
+		if cornersOK && rep.blackCyan > jarvisCyanFloor && rep.blackCyan > jarvisDeepBlackRatioFloor {
+			t.Logf("attempt %d: black-floor phase: corners within +/-%d of BLACK; cyan-dominant %.2f%% (existence > %.2f%%, deep > %.2f%%); particle lum %.1f chroma %.1f",
+				attempt, jarvisCornerTol, rep.blackCyan*100, jarvisCyanFloor*100, jarvisDeepBlackRatioFloor*100,
+				rep.blackLum, rep.blackChroma)
 			destroyFloor(fhBlack)
 			return true, rep
 		}
@@ -414,12 +474,15 @@ func orbPurePixelAttempt(t *testing.T, b *Ball, attempt int) (bool, pureReport) 
 	}
 }
 
-// orbPureCyanRatio samples the orb rect (4 px inset, 3 px stride - the file
-// family's established grid) and returns the cyan-dominant share
-// (g-r >= jarvisCyanGate AND b-r >= jarvisCyanGate AND b >= jarvisCyanBright)
-// and the total sampled pixel count.
-func orbPureCyanRatio(hdc uintptr, wr rect) (float64, int) {
-	cyan, total := 0, 0
+// orbPureParticleStats samples the orb rect (4 px inset, 3 px stride - the
+// file family's established grid) and returns the cyan-dominant share
+// (g-r >= jarvisCyanGate AND b-r >= jarvisCyanGate AND b >= jarvisCyanBright),
+// that population's mean luminance and mean min(g-r,b-r) chroma (the
+// deep-color teeth's dark-and-chromatic ruler), and the total sampled pixel
+// count.
+func orbPureParticleStats(hdc uintptr, wr rect) (ratio, lumMean, chromaMean float64, total int) {
+	cyan, lumSum, chromaSum := 0, 0, 0
+	total = 0
 	for y := wr.t + 4; y < wr.b-4; y += 3 {
 		for x := wr.l + 4; x < wr.r-4; x += 3 {
 			r, g, bl := orbTestPixelAt(hdc, x, y)
@@ -428,11 +491,20 @@ func orbPureCyanRatio(hdc uintptr, wr rect) (float64, int) {
 				int(bl)-int(r) >= jarvisCyanGate &&
 				bl >= jarvisCyanBright {
 				cyan++
+				lumSum += (int(r) + int(g) + int(bl))
+				cr, cb := int(g)-int(r), int(bl)-int(r)
+				if cb < cr {
+					cr = cb
+				}
+				chromaSum += cr
 			}
 		}
 	}
-	if total == 0 {
-		return 0, 0
+	if total == 0 || cyan == 0 {
+		return 0, 0, 0, total
 	}
-	return float64(cyan) / float64(total), total
+	return float64(cyan) / float64(total),
+		float64(lumSum) / float64(cyan) / 3.0,
+		float64(chromaSum) / float64(cyan),
+		total
 }
