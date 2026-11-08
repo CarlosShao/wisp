@@ -32339,3 +32339,45 @@ export WISP_LIVE_MIC=1
 ### 六、撤销口令
 - 230 收口＝`git revert d0b9b95d1`。
 - 291 只读程＝`git revert 1d0ab3494`（零产码，纯证据件）。
+## A1641（2026-11-08 18:5x，编排者）**★★★整包测试**第一次跑到终态**（931 秒 / RUN=708）——第二个根因找到并修掉｜wave95 三腿放出**
+
+### 一、★★里程碑：整包到终态了
+`eec09a028`（已推）后，`go test ./cmd/wisp -count=1 -timeout 40m` **第一次跑完**：
+**RUN=708 / PASS=497 / FAIL=54 / SKIP=2，931.4 秒。**
+
+### 二、★第二根因（大白话，腿给的）
+`ball.New` 里有一条**永不超时的等待**：球窗的 WebView2 附件启动失败时（WebView2 偶发「出生即死」——活体栈：`EnvironmentCompleted(S_OK, env=0x0)` 同步回调、空指针崩），**启动线程死掉但「我起来了」的信号永远不发**，等它的人就**永远等**。
+
+- **r1 的 UDF 修复只消掉了「跨进程抢同一个数据夹」这一种触发。**
+- **第二层**：同进程里顺序多枚 orb 共用一枚 per-pid 数据夹时，**WebView2 会让新实例 JOIN 还在拆的前一个浏览器进程**（实测：同进程第二枚球的启动 **1.3 秒 → 7.9 秒，6 倍慢**），负载一大就永不解析。
+
+### 三、★修了两层（`eec09a028`，我已现读核）
+1. **`internal/ball/orb_windows.go`**：per-process 夹降为 ROOT，每枚 orb 启动领**独立 `boot-<n>` 叶**——join 门物理消失。四枚牙零改动全绿，垃圾清扫逻辑不变。
+   - 我现读核：`:307 bootDir, bootDirErr := orbBootDataDir()`、`:315 browser.DataPath = bootDir`、`:373 siteDir := filepath.Join(bootDir, "site")` ✓
+2. **测试件**（新文件 `cmd/wisp/resident_ball_boot_bounded_windows_test.go` ＋ 8 处调用点）：`startResidentBallBounded` = **有上限的启动等待**（2 分钟 ≈ 最坏健康值 15 倍），到点**失败并打印全量 goroutine 栈**。**断言零改动、skip 口径零改动**——修的是「等不到要失败」，不是放宽断言。
+   - 我现读核：`:43` 定义、`:47` 签名、`resident_approval_246_windows_test.go:321`／`resident_hotkey_258_windows_test.go:278/:341` 三处调用 ✓
+- **两枚死点从「无限挂 10-17 分钟」变成「120 秒有界响红 + 全量栈诊断」。**
+
+### 四、★54 红分类（腿给的，如实）
+| 类 | 数 | 归因 |
+|---|---|---|
+| 存量 | 6 | 255Roster×2 等（历史在册） |
+| **语音族** | **30** | ★**本机 `C:\Windows\System32\onnxruntime.dll`（10,572,960 字节，1.17.1 旧版）遮挡 PATH 上的 1.28** ⇒ 环境遮蔽，非代码缺陷。我已现读核实两枚 DLL 都在 |
+| 他腿落树欠账 | 2 | 256Options 的 `"Answer"` 字段、247 的 `prototypeVisuals` |
+| 重执行族 | 6 | 负载语境类，单跑绿 |
+| 两枚死点 | 2 | 120.01s 有界红（按设计） |
+
+### 五、★腿报的两条残余（我裁）
+1. **fork 级 nil-env 守卫**（`forks/go-webview2`）：落了它，今天那两枚 120 秒红会按设计退化成「无 WebView2 就用 D2D 备胎」、直接变绿。⇒ **我裁：该做**（主流 harness 都做这个守卫；WebView2 起不来时降级到 D2D 是正确的产品行为，不是测试作弊）。**派下一波。**
+2. **`waitStarted` 有界化**：改产线语义。⇒ **我裁：该做，但按「主流做法」做**——生产代码等外部事件必须有上限＋到点**明确失败**（`select`+`time.After`），⛔ 无限等。**这属「改契约文字」那一类？不是**——它是**实现缺陷修复**（无限等本身就是 bug），⛔ 需要机主批。**派下一波。**
+
+### 六、wave95 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `dll-shadow` | ★治 System32 旧 `onnxruntime.dll` 遮挡——**主流做法＝依赖 DLL 与可执行文件同目录**（Windows 加载器先搜 exe 目录）或 `LoadLibraryEx` 绝对路径显式绑定。验收＝那 30 枚从红变绿 |
+| `fe-roster-pool` | 前端补 219 AC#6 两枚数据落点：**名册池号**（在跑 N / 上限 M）＋**流截断三数**；三牙（含无数据不显示假 0） |
+| `145-snapshot` | 票 145 AC#2/AC#6/AC#2b：把仍未进快照的有源字段加进去＋每枚配「值来自真来源」的用例；★先现读确认 313 是否已落了 AC#2b 第①维（⛔ 重复做） |
+
+### 七、撤销口令
+- 第二根因修复＝`git revert eec09a028`（会退回「整包跑不完」状态，⛔ 建议）。
+- 若只想退「有界等待」＝单独 revert 测试件那半（产码 `orbBootDataDir` 保留）。
