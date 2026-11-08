@@ -32253,3 +32253,33 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ### 四、撤销口令
 - 216 AC#5 归口＝「216 AC#5 回本票」。
 - 313 页面侧＝`git revert <313 commit>`。
+## A1639（2026-11-08 16:5x，编排者）**★313 页面侧落地（`34f325a9e` 已推）｜★腿更正了我的派单前提：页面主体早就在，真缺口只有 AC#1｜wave93 两腿放出**
+
+### 一、★腿更正我的派单前提（我认可，这是第 20+ 次「票面/派单过期」）
+- **我的派单说**：「313 页面侧半格未做」。
+- **腿现读 git 事实**：页面主体**早已落地**（我前腿 `9b820f8e8`/`f82b909e9`/`7c80ac032`：模型页 v2/v3、语音链编辑器、密钥门、删除能力）⇒ **AC#2、AC#3 零缺口**。
+- **真缺口只有 AC#1**：Go 侧早就在载荷里送 `configured/configuredKnown`（`panel_config_store.go:103-104`），但**全前端树零消费** ⇒ 「默认选中 stepfun」**没有任何承载物**。
+
+### 二、313 落地（`34f325a9e`，7 件）
+- **AC#1 补上**（`frontend/src/components/model-settings.tsx`）：`OWNER_DEFAULT_PROVIDER="stepfun"`（`:63`）＋**两道门预选**（`:233-234`）——用户没配过任何东西（`!configured`）**且**名字真在 Go 送来的预设清单里才预选；**只作 `useState` 初始值**，不点「添加」不写盘；用户改过后连预选都不出现（**⛔ 盲硬编码**）。
+- **新仪器** `render-model-settings.tsx`（`npm run render:model-settings`，`package.json:23`）四牙全绿：①预选落 picker 按钮文字、无隐藏 value 携带 ②已配置时无预选 ③**密码框无非空 value 属性＋canary 证**＋值只走 `performCredential` ④聊天对/ASR/TTS/实时 picker 挂载＋五个白名单字段名钉＋写后 `onReload()` 重读。
+- **门禁**：typecheck／新仪器／build／lint（0 errors，36 warnings 全既有类）／d22scan clean；全件 LF=0 CR。
+- **活体证据**（真 Chromium，同一 dist）：未配置态点「添加供应商」→ picker 现读 **`stepfun`**；录 canary 密钥→保存→**整棵 DOM grep 不到 canary**、`credentialValue` 有值且 **`configValue` 键不存在**（值没上共享封套）；语音页三卡全挂。`go build -o wisp.exe` rc0，**exe 内现读本腿 dist 入口 hash `index-Dk6PIr5X.js`** ⇒ 嵌入的是改后页面。
+- **★腿自报一次失误并当场复原**：往票 313 追加 log 时第一次 edit **误把 `313-r3` 那行替换掉**；当场逐字复原，`git diff` 核过＝**纯追加 +2/-0**。
+
+### 三、★我现跑复核（非只信腿）
+- `grep -n "OWNER_DEFAULT_PROVIDER" frontend/src/components/model-settings.tsx` ⇒ `:63` 定义、`:233-234` 使用 ✓
+- `grep -n "render:model-settings" frontend/package.json` ⇒ `:23` ✓
+- `grep -rn "configured" frontend/src/` ⇒ `model-settings.tsx:58/:60/:229` 真消费 ✓
+
+### 四、wave93 两腿（已放出）
+| 腿 | 票 | 任务 |
+|---|---|---|
+| `230-cells` | 230 AC#3/AC#4/AC#5 | AC#3 票 80 交接二选一（甲写进票 21／乙作废，腿自拍）；AC#4 `risk.blacklist_overrides` **只写归口⛔落地**（改契约需机主批）；AC#5 整包终态（**UDF 修复后第二份验收读数**） |
+| `291-level-dc` | 291 AC#2/#3/#4 | ★**只读程零产码**：AC#2 四形真麦读数（⛔ 合成包络冒充）／AC#3 落点表（票面明写「⛔ 本票不许落地」）／AC#4 零改动证明 |
+
+### 五、机主签收路径（腿给的，我认可）
+双击新版 `wisp.exe` → 托盘开面板 → 设置 → 模型：**全新机器会看到供应商已默认选好 `stepfun`**，粘 key、拉清单、保存即可。（本机 WebView2 白窗＝A1631 环境账。）
+
+### 六、撤销口令
+- 313 页面侧＝`git revert 34f325a9e`。
