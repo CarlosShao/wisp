@@ -32120,3 +32120,45 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 前端任务名册＝`git revert dbb9f1e70 e62877c60`。
 - 122 批2 删项若误删＝`git revert 1ebfec199`。
 - UDF 若改坏＝`git revert <wave88 commit>`。
+## A1635（2026-11-08 15:3x，编排者）**★wave88 两腿收官（UDF 唯一化 + risk SA1019 裁决，五笔已推）｜★机主对球给了硬判语「太糊+太粗」，两处全是我上轮改坏的｜★发现尺寸契约 44..72 是「像 demo」的物理天花板**
+
+### 一、五笔落地（已推 origin/dev，未推=0）
+| commit | 内容 |
+|---|---|
+| `e7f420a6c` | **UDF 按进程唯一化**：`<base>/wisp/orb/<pid>-<8hex>`，`sync.Once` 进程内稳定（选乙：甲纯 pid 会被 Windows pid 复用继承陈锁；丙 exe+pid 零唯一性增量且拉长路径） |
+| `c656c0ed8` | 编译修正（encoding/hex） |
+| `4afe456f7` | risk SA1019 裁决表 |
+| `5bbf23762` | **★我补的漏项**：408 票面腿写好但**没 git add**（`git ls-files` 计数 0）＋314 分界 log 留工作树 ⇒ 我补提交，`408tracked=1`、脏=0 |
+
+### 二、UDF 修法要点（腿自拍，我认可）
+- **垃圾界（⛔ 无限留垃圾）＝Chromium 式锁文件启动清扫**：锁**先**建、目录**后**建（清扫唯一活性信号＝被独占持有的锁文件）；扫 sibling 时锁能独占打开 ⇒ 拥有者已死 ⇒ 连夹带锁删；锁忙 ⇒ 活主 ⇒ 跳；无锁目录与外来形状**永不碰**。**不查 pid** ⇒ pid 复用不钉死垃圾。
+- 四牙全绿＋突变甲乙双红（摘 pid 段⇒牙②红；整叶去唯一⇒牙②红）。
+- **★残余共享态已具名**（写进 408 票面）：`cmd/wisp` 面板测试件的**固定名 profile 目录**（`wisp-33r1-panel-profile` 等被多文件共用）是同一碰撞类的**下一个嫌疑**；本腿写面禁碰 cmd/wisp，未修。
+
+### 三、★★机主对球的硬判语（逐字，2026-11-08 15:2x）
+> **「不行，太丑了这粒子，1. 太糊了，根本不像人家那个demo里那样高清 2. 粒子有点粗」**
+
+**两处全是我上轮改坏的**（`tools/jarvis-export/vite.config.mjs`）：
+| 现象 | 我改了什么 | 真值 |
+|---|---|---|
+| **太糊** | `dpr: 3.5 → 2.0`、`minDpr: 2.75 → 1.5`（`:179-184`） | 渲染分辨率**砍掉近一半** |
+| **太粗** | 点径 `(1.08 + twinkle*1.38) → (7.00 + twinkle*1.90)`（`:98-99`） | 放大 **6.5 倍** |
+
+⇒ **方向全错**。正确路＝**恢复 dpr 3.5 + 点径回 1.08 附近，靠浓色+高密度维持白底可见**（⛔ 靠大点）。已派 wave89 修。
+
+### 四、★★我发现「像 demo」的物理天花板（必须机主拍板）
+- **现读**：`WindowEdgePx(56,96) = 56 + 2*RingMarginPx(22) = 100` ⇒ **窗口 100px，实际绘制区仅 56px**。
+- **`-size=200` 实测被钳回 72**（`internal/ball/ball_windows.go:161-163` `opts.SizePx > BallSizeMaxPx(72)`）。
+- 契约冻结：`SPEC-03 §3` 44..72（`internal/config/validate.go:62`）。
+- ⇒ **在 56px 里画精细粒子，物理上就是糊的**；机主要的 demo 是几百像素/全屏渲染的。**唯一能真像 demo 的路＝放大球尺寸**，那要改契约文字（属摆机主的三类之一）⇒ **已摆，等拍板**。
+
+### 五、risk SA1019 裁决（腿拍，我认可）
+- `internal/risk/proccpu_windows_test.go:20` 用 `windows.GetCurrentProcess`（deprecated，error 恒 nil）；替代＝`windows.CurrentProcess`，**drop-in，行为逐位不变**（同一伪句柄传 `GetProcessTimes`）。
+- **是测试件**（票 86 的 C26 仪器，仅 `pathresolver_budget_norace_test.go` 5 处调用，零产码引用）。
+- **冻结出处如实**：PLAN.md/specs 里**查不到**「internal/risk 冻结」字面（grep 0）；具名依据＝台账 `A35`（`pending-and-issues.md:883`）＋SPEC-12 §4.1 契约冻结机制（risk 承载 C18/C19/C25/C26）＋各票禁改列。解冻先例＝票 130 一次、票 126 教训「解冻须编排者具名落 A##」。
+- **裁决＝甲：具名解冻这一枚文件这一条**，让下一批顺手修。**我采纳并落账**：撤销口令「撤 risk 测试件解冻，SA1019 留红」。
+
+### 六、撤销口令
+- UDF 唯一化＝`git revert c656c0ed8 e7f420a6c`。
+- 408 补登＝`git revert 5bbf23762`。
+- risk 解冻＝台账补一行撤销即可（未改码）。
