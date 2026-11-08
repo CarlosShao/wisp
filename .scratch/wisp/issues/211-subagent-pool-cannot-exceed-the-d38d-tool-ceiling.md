@@ -62,3 +62,5 @@
 - **不许**动 `frontend/**`、`design/**`；**不许**动 `internal/panel/tokens_fourway_test.go`。
 - 只 commit 不 push；commit 带显式 pathspec；禁 `git add -A` / `--amend` / `reset` / `rebase` / `stash` / `checkout .` / `clean`。
 — 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
+
+- [2026-11-08 21:1x +08] agent=211-r1（补读数腿：五格判据读数首次以 211 名义交付；零产码零框翻；写面＝docs/evidence/s1/211-pool-ceiling-readings-r1.md＋本条）did=AC#1 并排 grep 两常量 4=4（subagent_197.go:85 ⇄ bridge.go:24，budgets.go:47 同值拷贝）；AC#2 牙在树（Test197SubagentPoolNeverExceedsBridgeCeiling）且正控导出树现跑复现：池 4→8 ⇒ 该枚 FAIL 红句逐字（B_RC=1），cp 还原重跑 PASS（C_RC=0）；AC#3 Test197FullPoolRefusesNextSpawnWithReadableReason PASS（拒句带 RunningSubagentIDs 逐字在 subagent_197.go:288-291）；AC#4 Test197SubagentPoolCapsAtBridgeCeiling PASS＝真桥四枚同跑（spawnDirect 已删非文档化，用例头自陈）；AC#5 git diff bridge.go/budgets.go 空读数；汇总色＝导出树 ca790c46e 四发全 PASS A_RC=0。三核：五格原文在；甲支代码在树但 evidence 211 名义 0 枚（ls grep -c = 0）；色全取自 clone --shared 导出树。⛔ 翻框（五格归编排者凭证据件裁）⛔ push。next=编排者收件翻格；乙支（真 8 枚）仍卡 owner 契约一句话，本腿未碰。
