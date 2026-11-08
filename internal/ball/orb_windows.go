@@ -98,7 +98,6 @@ package ball
 
 import (
 	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"log/slog"
 	"os"
@@ -425,7 +424,7 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 // the site folder below), so the value is computed exactly once.
 func orbDataPath() string {
 	orbDataPathOnce.Do(func() {
-		orbDataDir, orbDataLock = acquireOrbDataDir()
+		orbDataDir = acquireOrbDataDir()
 	})
 	return orbDataDir
 }
@@ -469,11 +468,13 @@ func acquireOrbDataDir() string {
 	// handle stays open until process exit. A failure here logs and
 	// continues - uniqueness still holds; only this dir's own sweep
 	// protection is lost.
-	h, err := windows.CreateFile(dir+".lock", windows.GENERIC_READ|windows.GENERIC_WRITE,
-		0 /* no sharing: any second opener reads the owner as alive */, nil,
-		windows.OPEN_ALWAYS, windows.FILE_ATTRIBUTE_NORMAL, 0)
+	lockPath, err := windows.UTF16PtrFromString(dir + ".lock")
 	if err != nil {
-		slog.Warn("ball: orb user-data lock not held; this dir is invisible to the stale sweep", "err", err)
+		slog.Warn("ball: orb user-data lock path invalid", "err", err)
+	} else if h, lerr := windows.CreateFile(lockPath, windows.GENERIC_READ|windows.GENERIC_WRITE,
+		0 /* no sharing: any second opener reads the owner as alive */, nil,
+		windows.OPEN_ALWAYS, windows.FILE_ATTRIBUTE_NORMAL, 0); lerr != nil {
+		slog.Warn("ball: orb user-data lock not held; this dir is invisible to the stale sweep", "err", lerr)
 	} else {
 		orbDataLock = h
 	}
@@ -500,7 +501,11 @@ func orbSweepStaleDirs(root string) {
 		if !orbDataLeafRe.MatchString(name) {
 			continue
 		}
-		h, err := windows.CreateFile(filepath.Join(root, name+".lock"), windows.GENERIC_READ,
+		lockPath, err := windows.UTF16PtrFromString(filepath.Join(root, name+".lock"))
+		if err != nil {
+			continue
+		}
+		h, err := windows.CreateFile(lockPath, windows.GENERIC_READ,
 			0, nil, windows.OPEN_EXISTING, windows.FILE_ATTRIBUTE_NORMAL, 0)
 		if err != nil {
 			continue // alive owner or unreadable: conservative skip
@@ -525,7 +530,7 @@ func orbInstanceSuffix() string {
 		// still holds, and the lock-based sweep keeps pid reuse safe.
 		return "00000000"
 	}
-	return hex.EncodeToString(b[:])
+	return fmt.Sprintf("%x", b[:])
 }
 
 // pushState maps and pushes one ball state to the SERVED page (STA thread).

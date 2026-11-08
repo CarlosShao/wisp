@@ -44,7 +44,7 @@ func TestOrbDataPathIsStablePerProcessAndCarriesThePid(t *testing.T) {
 	}
 	wantLeaf := strconv.Itoa(os.Getpid()) + "-"
 	if !strings.Contains(filepath.Base(first), wantLeaf) {
-		t.Fatalf("orbDataPath leaf %q does not carry this process's pid (%s): pid-level uniqueness is gone", filepath.Base(first), os.Getpid())
+		t.Fatalf("orbDataPath leaf %q does not carry this process's pid (%d): pid-level uniqueness is gone", filepath.Base(first), os.Getpid())
 	}
 	if !orbDataLeafRe.MatchString(filepath.Base(first)) {
 		t.Fatalf("orbDataPath leaf %q does not match the per-process leaf shape <pid>-<8hex>", filepath.Base(first))
@@ -138,7 +138,11 @@ func TestOrbSweepRemovesDeadOwnerAndSparesLiveOwner(t *testing.T) {
 	if err := os.MkdirAll(liveDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	liveLock, err := windows.CreateFile(filepath.Join(root, "67890-cafef00d.lock"),
+	liveLockPath, err := windows.UTF16PtrFromString(filepath.Join(root, "67890-cafef00d.lock"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	liveLock, err := windows.CreateFile(liveLockPath,
 		windows.GENERIC_READ|windows.GENERIC_WRITE, 0, nil,
 		windows.OPEN_ALWAYS, windows.FILE_ATTRIBUTE_NORMAL, 0)
 	if err != nil {
