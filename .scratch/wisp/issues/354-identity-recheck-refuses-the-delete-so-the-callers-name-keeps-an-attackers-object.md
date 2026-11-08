@@ -17,10 +17,11 @@
 
 ## 结案判据（七格，判据原文在草案 SEC-C＝`.scratch/wisp/probes/353/v1/02-ticket-draft-secC.md`）
 
-- [ ] **AC#0 现读＋归因（读腿，⛔ 动产码字节）**：把"残余①留着攻击者对象"那一跳今天读成读数并归因。
+- [x] **AC#0 现读＋归因（读腿，⛔ 动产码字节）**：把"残余①留着攻击者对象"那一跳今天读成读数并归因。
       ★两族读数必须**现跑**、⛔ 抄任何腿的数（`353-v1` 量到的 `flipErrs` 基线 `9,130..31,366` ⇄ 落地 `6..16`；
       `provedReparse` 基线 `2..98` ⇄ 落地 `102..153` 只是"待复跑"的线索，⛔ 当凭据）。
       必须先跑**正控**证明尺能命中非零（本仓已有"钝尺读 0"的多次教训）。
+      - 〔354 收口腿 2026-11-08 21:3x +08〕翻勾（凭 `docs/evidence/s1/354-a1-residual-readings-r1.md`＋收口腿自己复跑，读腿与收口腿分属两枚 agent＝非实现者裁）：导出树 `git clone --shared`（HEAD `66a03a320`；`ca790c46e..HEAD` 于 `internal/winsec` 零字节）定向 `TestAC2Windows` 六发全 PASS，关键读数逐字同我手——`truncated=0 deleted=0`×2（symlink-dir／leaf-symlink 两形）、`refusals that left the caller's name standing=3`、DAMAGE 行 3 发逐字 `the caller's name=present (size 64 body [an object the caller never named, standing in the same directory])` 且 `the swapped-in object's own name=absent`×3（top-up 后调用者名字＝外来对象唯一名字）、负控 `RemovalStillRuns` `name=absent`（尺两向非钝）、`ancestorunlink_348_windows_test.go:169` 残留句运行期打出（bytes refused、NAME never removed）；`./internal/winsec` 整包 `ok 20.631s` rc0。归因对上＝复验拒的那支在 Remove 前返回（`unlinkPinnedLeaf` 对码 353-v1 第 1 件）⇒ 残留①是 owner 拍〔乙〕可观测方向的代价形、非回归；GREEN SCOPE（recheck 后 NtOpenFile 前 top-up）照抄不冒认。★unix 半边判＝**本格不要求**：AC#0 原文无「两平台」字样（同票 AC#4 才写「两平台成对」）；且残余①在 unix 机制上不存在——`pinnedleaf_342_unix.go:173-174` 的 `unlinkPinnedLeaf` 无同一性复验（直接 `Unlinkat`），「复验拒删留下名字」那一跳 unix 无从发生（`353-v1` 判语同口径：unix 行为照旧、unix 是否也该复验已上交未拍）。判语全文＝`docs/evidence/s1/211-354-closure.md`。
 - [x] **AC#1 拍形（编排者＋机主）**：三形各写代价＝〔甲〕复验拒删后**另走一条删除路径**（碰语义）；
       〔乙〕把"留着的那枚名字"**主动报出来**（只加读数、不删）；〔丙〕登记为已知残缺＋常驻仪器把 `leftStandingForeignName` 钉成可见红。
       ★本格**⛔ 由 agent 自决**：代价表出来后摆机主拍；`AC#2` 的形状以拍定那一形为准。
@@ -62,3 +63,4 @@
 
 - [2026-10-21 09:2x +08] agent=`编排者` did=立案（非实现者签名＝`353-v1` 第 5 件；草案 `02-ticket-draft-secC.md` 七格原文照搬＝本票判据）next=派 `354-a1` 只读腿出 `AC#0` 现读；`AC#1` 三形代价表回来后摆机主拍形。
 - [2026-11-08 21:1x +08] agent=354-a1（AC#0 只读腿＝现读＋归因；零产码零框翻；写面＝docs/evidence/s1/354-a1-residual-readings-r1.md＋.scratch/wisp/probes/354/a1/{readings.md,01-ac2windows-instruments.log,02-winsec-full-package.log}＋本条）did=两族仪器现跑全绿（导出树 ca790c46e，两棵 clone --shared 同锚）：ancestorunlink_348 Windows 两形 truncated=0/deleted=0（symlink-dir cycles=67/flipErrs=11；leaf-symlink cycles=81/provedReparse=83）且 :169 残留句逐字（bytes refused、NAME never removed）；nametopup_353 三发 refusals that left the caller name standing=3/3＋DAMAGE 行打出调用者名字下 64 字节攻击者对象本体（其自己名字=absent＝唯一名字）；负控 RemovalStillRuns name=absent（尺两向非钝）；正控先行＝shot 级 body 逐字非零，敏感度引 353-v1 去牙三发未重跑（归 354-r1 AC#3）。归因＝复验拒的那支在 Remove 前返回（unlinkPinnedLeaf 对码 353-v1 第 1 件）⇒ 残留①是 owner 拍〔乙〕可观测方向的代价形、非回归；GREEN SCOPE 那支（recheck 后 NtOpenFile 前 top-up）仍测不到照抄。unix 半边本机不可跑＝登记未跑。winsec 整包 ok 20.148s rc0（02 号日志）。⛔ 翻框（AC#0 归编排者）⛔ 动 internal/winsec 字节（单写腿留给 354-r1）⛔ push。next=编排者收件裁 AC#0；354-r1（AC#2 分子＋AC#3 去牙）待派，winsec 现量 0 在飞。
+- [2026-11-08 21:3x +08] agent=354-cls（AC#0 收口腿：凭 354-a1 证据件＋自己复跑翻 AC#0 一格；零产码；写面＝本票 AC#0 翻勾＋格下判语＋本条＋docs/evidence/s1/211-354-closure.md）did=三核全过（票面 AC 原文现读在；证据件＋readings.md＋01/02 原始日志现读；色取自 clone --shared 导出树 HEAD `66a03a320`，`ca790c46e..HEAD` 于 internal/winsec 零字节）。复跑：定向 `TestAC2Windows` 六发全 PASS（我手，非抄读数）＋关键读数逐字对上（truncated=0/deleted=0×2、standing=3、DAMAGE 64 字节攻击者对象×3、own name=absent×3、负控 name=absent、:169 残留句）＋winsec 整包 ok 20.631s rc0。unix 半边判＝AC#0 不要求（原文无两平台字样、AC#4 才有）且残余①unix 机制不存在（pinnedleaf_342_unix.go:173-174 无复验直接 Unlinkat，353-v1 同口径）。AC#0 翻勾；票⛔ `-done`（剩 AC#2/AC#3＝354-r1 写腿、AC#4 色与门禁、AC#5 接缝、AC#6 纪律格）。⛔ push。next=354-r1 待派（winsec 单写腿）。

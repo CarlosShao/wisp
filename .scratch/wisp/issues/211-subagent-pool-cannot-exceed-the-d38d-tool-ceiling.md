@@ -47,13 +47,18 @@
 
 ## 判据（落地腿必须逐条给读数；缺一条就具名报"没测"）
 
-- [ ] **AC#1**：`MaxConcurrentSubagents` **实测等于** `MaxToolConcurrency`（现跑 `grep -n` 两枚常量并排打印）。
-- [ ] **AC#2**：常驻判据一条——池常量**大于**桥天花板时**必须红**；正控＝人为把池写成 8 时那一枚判据确实红（不许只写"相等"这种恒真断言）。
-- [ ] **AC#3**：池满时第 5 枚**硬拒＋可读理由**（理由里带上"当前在跑的是哪几枚 `taskID`"），且**不占名册行、不占池位**（这条 `197-r1` 已有判据，改数之后要复跑）。
-- [ ] **AC#4**：AC#3 那枚"池=4"的测量**走真桥**（父任务真次派生），不再靠 `spawnDirect` 绕开桥；
+- [x] **AC#1**：`MaxConcurrentSubagents` **实测等于** `MaxToolConcurrency`（现跑 `grep -n` 两枚常量并排打印）。
+  - 〔211 收口腿 2026-11-08 21:3x +08〕翻勾：收口腿现跑 grep 同读数＝`subagent_197.go:85`＝4 ⇄ `bridge.go:24`＝4（`budgets.go:47` 同值拷贝＝4），行号与证据件 `docs/evidence/s1/211-pool-ceiling-readings-r1.md` 逐字同。
+- [x] **AC#2**：常驻判据一条——池常量**大于**桥天花板时**必须红**；正控＝人为把池写成 8 时那一枚判据确实红（不许只写"相等"这种恒真断言）。
+  - 〔211 收口腿 2026-11-08 21:3x +08〕翻勾：判据本体现读（`subagent_197_test.go:412-421`）＝比较两枚独立常量、非恒真（`MaxConcurrentSubagents > MaxToolConcurrency` 即报错，另钉池>0）；突变正控收口腿自跑复现——`git clone --shared` 导出树（HEAD `66a03a320`；`ca790c46e..HEAD` 于 `internal/tools` 零字节）里 sed 池 4→8 ⇒ `Test197SubagentPoolNeverExceedsBridgeCeiling` FAIL，红句逐字同证据件（"池 8 大于桥的 D38d 天花板 4…"）；`cp` 备份还原后同枚重跑 `ok`＝PASS。
+- [x] **AC#3**：池满时第 5 枚**硬拒＋可读理由**（理由里带上"当前在跑的是哪几枚 `taskID`"），且**不占名册行、不占池位**（这条 `197-r1` 已有判据，改数之后要复跑）。
+  - 〔211 收口腿 2026-11-08 21:3x +08〕翻勾：`Test197FullPoolRefusesNextSpawnWithReadableReason` 收口腿复跑 PASS（导出树四发之一）；拒句生产形状现读 `subagent_197.go:287-290`，`strings.Join(t.d.Roster.RunningSubagentIDs(), ", ")` 逐字在＝"当前在跑的是哪几枚 taskID"在理由里。
+- [x] **AC#4**：AC#3 那枚"池=4"的测量**走真桥**（父任务真次派生），不再靠 `spawnDirect` 绕开桥；
   如果绕行的那枚测试还留着，它必须**自己说清**它量的是"池语义"而不是"生产并发"。
-- [ ] **AC#5**：`internal/tools/bridge.go` 与 `internal/agent/budgets.go` 那两枚 **4 一字未动**（`git diff` 为空即证），
+  - 〔211 收口腿 2026-11-08 21:3x +08〕翻勾：`Test197SubagentPoolCapsAtBridgeCeiling` 收口腿复跑 PASS（真桥四发之一）；`grep -rn spawnDirect internal/tools/`＝2 处命中且全在测试头自陈散文里（逐字 "This replaces the pre-211 leg that drove the tool directly (spawnDirect), and spawnDirect is gone rather than documented"）＝绕行已删、非文档化保留。
+- [x] **AC#5**：`internal/tools/bridge.go` 与 `internal/agent/budgets.go` 那两枚 **4 一字未动**（`git diff` 为空即证），
   本票不借"改池"去碰契约——这是甲/乙的界线，谁越界要能在 diff 里看见。
+  - 〔211 收口腿 2026-11-08 21:3x +08〕翻勾：收口腿现跑 `git diff --stat -- internal/tools/bridge.go internal/agent/budgets.go`＝空输出，且该三文件 `git status --porcelain`＝空＝两枚 4 一字未动、本票未借改池碰契约。
 
 ## 禁区
 
@@ -64,3 +69,4 @@
 — 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
 
 - [2026-11-08 21:1x +08] agent=211-r1（补读数腿：五格判据读数首次以 211 名义交付；零产码零框翻；写面＝docs/evidence/s1/211-pool-ceiling-readings-r1.md＋本条）did=AC#1 并排 grep 两常量 4=4（subagent_197.go:85 ⇄ bridge.go:24，budgets.go:47 同值拷贝）；AC#2 牙在树（Test197SubagentPoolNeverExceedsBridgeCeiling）且正控导出树现跑复现：池 4→8 ⇒ 该枚 FAIL 红句逐字（B_RC=1），cp 还原重跑 PASS（C_RC=0）；AC#3 Test197FullPoolRefusesNextSpawnWithReadableReason PASS（拒句带 RunningSubagentIDs 逐字在 subagent_197.go:288-291）；AC#4 Test197SubagentPoolCapsAtBridgeCeiling PASS＝真桥四枚同跑（spawnDirect 已删非文档化，用例头自陈）；AC#5 git diff bridge.go/budgets.go 空读数；汇总色＝导出树 ca790c46e 四发全 PASS A_RC=0。三核：五格原文在；甲支代码在树但 evidence 211 名义 0 枚（ls grep -c = 0）；色全取自 clone --shared 导出树。⛔ 翻框（五格归编排者凭证据件裁）⛔ push。next=编排者收件翻格；乙支（真 8 枚）仍卡 owner 契约一句话，本腿未碰。
+- [2026-11-08 21:3x +08] agent=211-cls（收口腿：凭 211-r1 证据件＋自己复跑翻五格并 `-done`；零产码；写面＝本票 AC 框翻勾＋格下判语＋本条＋docs/evidence/s1/211-354-closure.md）did=起手三核全过（票面五格原文现读在；两份证据件全文现读；色全取自 `git clone --shared` 导出树 HEAD `66a03a320`，且 `ca790c46e..HEAD` 于 `internal/tools` 零字节）。五格逐格复跑全对上：AC#1 grep 两常量 4=4=4 行号同（:85/:24/:47）；AC#2 判据本体 `:412-421` 比较两常量非恒真＋突变正控 4→8 FAIL 红句逐字同＋cp 还原重跑 PASS；AC#3 `Test197FullPoolRefusesNextSpawnWithReadableReason` PASS＋拒句 `:287-290` 带 RunningSubagentIDs 逐字在；AC#4 `Test197SubagentPoolCapsAtBridgeCeiling` PASS＋spawnDirect 仅存 2 处头注释自陈；AC#5 `git diff --stat` bridge.go/budgets.go 空＋porcelain 空。五格全翻勾 ⇒ 票改名 `-done`（git mv 配方＋双名核）。⛔ push。next=无（票结；乙支真 8 枚仍卡 owner 契约一句话，不在本票）。
