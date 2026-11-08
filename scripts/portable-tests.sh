@@ -310,6 +310,38 @@ fi
 # above refused to buy. The census row moves from UNCLAIMED-HAS-TESTS to CLAIMED BY
 # speech in the same commit, because GUARD D compares this file's pins against the
 # packages it sees.
+#
+# UPDATE 2026-11-08 (census leg, the last four PACKAGE-level holes GUARD D had):
+# with speech closed the census still refused with unclaimed-with-tests=4 -
+# cmd/balldebug, internal/agent/scheduler, internal/command and
+# internal/plugin/manifestslot. All four are shape 甲 (has tests, never claimed):
+# each compiles a non-zero test count for GOOS=windows (1/0, 2/0, 1/0, 7/0) and
+# no named scope claimed it, so no CI step ran it and none could go red over it.
+# The per-package reading lives in docs/evidence/s1/census-guard-d.md; the claims
+# land here, split by the same bar this list already uses:
+#
+# - internal/agent/scheduler (ticket 47's acceptance legs) and internal/command
+#   (ticket 213's) join CORE on the measured present/watchdog bar: zero
+#   //go:build lines, zero t.Skip, zero os.Getenv, zero exec.Command
+#   (grep-measured over their _test.go files), both GOOS=linux test binaries
+#   compile and `go vet` clean, and both ran green on the windows host at the
+#   claim commit. scheduler re-enters a scope it was explicitly parked out of:
+#   ticket 111's Progress log registered it as a DEFERRED stub (zero tests, only
+#   doc.go) whose implementation ticket must put the package back in scope when
+#   its tests land - the tests landed, so this entry is that registered duty,
+#   not a new claim.
+# - cmd/balldebug (ticket 71's diff-gate tests, //go:build windows) and
+#   internal/plugin/manifestslot (tickets 50/51/52/138, seven test files) join
+#   the WINDOWS tier, and CORE is deliberately not their tier: balldebug's only
+#   test file is windows-tagged, so the ubuntu core job would refuse the entry
+#   through GUARD A the day it landed (zero compiled tests for GOOS=linux); and
+#   manifestslot's tests exec tasklist and probe SystemRoot/LOCALAPPDATA - the
+#   zero-exec.Command bar above is exactly what they fail, so their readings
+#   belong on the leg that can supply the subject. Both ran green on the windows
+#   host at the claim commit (manifestslot 17.7s, balldebug 0.4s, zero skips).
+# The scope entries and the pin lines move in the SAME commit because GUARD C
+# compares them. tiers=, the census arm and every guard's logic are untouched:
+# this commit only spends claims; it does not loosen the instrument.
 mode=core
 case "${1-}" in
     --scope=*) mode=${1#--scope=}; shift ;;
@@ -323,10 +355,12 @@ core_pin='
 github.com/CarlosShao/wisp/cmd/llmrecord
 github.com/CarlosShao/wisp/internal/agent
 github.com/CarlosShao/wisp/internal/agent/approval
+github.com/CarlosShao/wisp/internal/agent/scheduler
 github.com/CarlosShao/wisp/internal/audio
 github.com/CarlosShao/wisp/internal/audio/aecspike
 github.com/CarlosShao/wisp/internal/ball
 github.com/CarlosShao/wisp/internal/buildinfo
+github.com/CarlosShao/wisp/internal/command
 github.com/CarlosShao/wisp/internal/config
 github.com/CarlosShao/wisp/internal/llm
 github.com/CarlosShao/wisp/internal/llm/adaptertest
@@ -353,12 +387,14 @@ github.com/CarlosShao/wisp/internal/watchdog
 github.com/CarlosShao/wisp/internal/winsec
 '
 win_pin='
+github.com/CarlosShao/wisp/cmd/balldebug
 github.com/CarlosShao/wisp/cmd/llmrecord
 github.com/CarlosShao/wisp/internal/audio
 github.com/CarlosShao/wisp/internal/ball
 github.com/CarlosShao/wisp/internal/config
 github.com/CarlosShao/wisp/internal/perm
 github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/plugin/manifestslot
 github.com/CarlosShao/wisp/internal/proc
 github.com/CarlosShao/wisp/internal/projctx
 github.com/CarlosShao/wisp/internal/risk
@@ -399,12 +435,12 @@ pinned=''
 case $mode in
 core)
     scope=(
-        ./internal/agent/ ./internal/agent/approval/
+        ./internal/agent/ ./internal/agent/approval/ ./internal/agent/scheduler/
         ./internal/llm/... ./internal/config/...
         ./internal/memory/... ./internal/observe/... ./internal/secret/...
         ./internal/risk/... ./internal/statemachine/...
         ./internal/tools/... ./internal/models/...
-        ./internal/buildinfo/... ./internal/audio/ ./internal/audio/aecspike/
+        ./internal/buildinfo/... ./internal/command/ ./internal/audio/ ./internal/audio/aecspike/
         ./internal/proc/...
         ./internal/panel/... ./internal/ball/ ./internal/perm/
         ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
@@ -417,7 +453,7 @@ core)
 windows)
     scope=(
         ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
-        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+        ./internal/ball/ ./internal/perm/ ./internal/plugin/manifestslot/ ./cmd/balldebug/ ./cmd/llmrecord/
         ./internal/session/ ./internal/projctx/ ./internal/audio/
     )
     pinned=$win_pin
