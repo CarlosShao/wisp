@@ -520,12 +520,16 @@ const (
 // Geometry + motion tokens (CSS lengths/ms verbatim; px at 96 DPI, scaled by
 // the per-monitor DPI before use - never rescaled at call sites).
 const (
-	// --ball-size / --ball-sm / --ball-lg (config range 44-72, default 56).
+	// --ball-size / --ball-sm / --ball-lg (config range 44-160, default 56).
+	// Owner authorized widening size_max 72 -> 160 (ledger A1636, 2026-11-08):
+	// the config ceiling and the --ball-lg tier are different things, so
+	// BallSizeLargePx stays the 72px tier reference and only BallSizeMaxPx
+	// (the clamp the validators and window sizing read) follows the new range.
 	BallSizeDefaultPx = 56
 	BallSizeSmallPx   = 44
 	BallSizeLargePx   = 72
-	BallSizeMinPx     = 44 // [ball] size_min
-	BallSizeMaxPx     = 72 // [ball] size_max
+	BallSizeMinPx     = 44  // [ball] size_min
+	BallSizeMaxPx     = 160 // [ball] size_max
 
 	// Sleeping micro-dot: SPEC-08 §2 - "Sleeping 态直径缩到 12px 微点
 	// (opacity 0.35)"; ball.html pins it at 12px regardless of user size.

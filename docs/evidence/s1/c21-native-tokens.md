@@ -227,7 +227,7 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 
 | CSS 变量 / 规则 | 值 | Go 常量 | 用途 |
 |---|---|---|---|
-| `--ball-size` | 56px（可配 44–72） | `BallSizeDefaultPx` / `BallSizeMinPx` / `BallSizeMaxPx` | 球体直径 |
+| `--ball-size` | 56px（可配 44–160，上限 A1636 放宽） | `BallSizeDefaultPx` / `BallSizeMinPx` / `BallSizeMaxPx` | 球体直径 |
 | `--ball-sm` | 44px | `BallSizeSmallPx` | Armed 档参照 |
 | `--ball-lg` | 72px | `BallSizeLargePx` | 大尺寸档参照 |
 | SPEC-08 §2（Sleeping 微点，**原值，保留不删**） | 12px / opacity 0.35 | `SleepingDotPx` / `SleepOpacity` | 不随用户尺寸放大 —— **生产默认路径仍是此值**：`statevisual.go::stateSize` 在 `prototypeVisuals=false` 时返回 `SleepingDotPx`，`SleepOpacity` 另作 Settling 渐隐终点 |

@@ -102,7 +102,7 @@ func TestJarvisParticleCountBand(t *testing.T) {
 			BallSizeMaxPx, jarvisParticleCount(BallSizeMaxPx), BallSizeMinPx, n)
 	}
 	if jarvisParticleCount(BallSizeMaxPx) > 128 {
-		t.Fatalf("the 72px budget = %d, above the reference grid's 128 ceiling", jarvisParticleCount(BallSizeMaxPx))
+		t.Fatalf("the %vpx budget = %d, above the reference grid's 128 ceiling", BallSizeMaxPx, jarvisParticleCount(BallSizeMaxPx))
 	}
 }
 

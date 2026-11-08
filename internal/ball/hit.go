@@ -27,7 +27,10 @@ const (
 // R+21.75. The frozen ball.html inset (-5, Conversation -7) sized this for the
 // pre-ticket-62 ring, so the prototype's expanding waves were sliced by the
 // window rect and the ball read as a framed square (owner 09-30 sign-off).
-// 22 is the smallest value that fits the waves at every size in 44..72.
+// 22 is the smallest value that fits the waves at every size in 44..160: the
+// train tops out at R+21.75 where R is the orb radius, so the +22 margin
+// beyond R holds no matter how wide the config range goes (A1636 widened the
+// ceiling to 160; the margin math is radius-relative and unchanged).
 const RingMarginPx = 22.0
 
 // ClickTolerancePx extends the clickable circle slightly beyond the orb so

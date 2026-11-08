@@ -61,7 +61,7 @@ type Events struct {
 
 // Options configures New.
 type Options struct {
-	SizePx   int // configured orb size 44..72 (0 = default 56)
+	SizePx   int // configured orb size 44..160 (0 = default 56)
 	Theme    Theme
 	Initial  statemachine.State
 	Hotkeys  HotkeyConfig   // zero value = DefaultHotkeys()

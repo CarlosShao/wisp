@@ -481,3 +481,28 @@ func TestHitTestAndDPIInjection(t *testing.T) {
 		t.Error("Sleeping window must be smaller than the Armed orb window")
 	}
 }
+
+// TestBallSizeMaxWidenedTo160 pins the A1636 widening (owner authorization,
+// 2026-11-08): the config ceiling is 160 while the --ball-lg tier stays at 72 -
+// the tier and the ceiling are different things, and a future edit that moves
+// them together is wrong. The window edge follows the new ceiling exactly:
+// orb + 2*RingMarginPx = 160 + 44 = 204 physical px at 96 DPI.
+func TestBallSizeMaxWidenedTo160(t *testing.T) {
+	if BallSizeMaxPx != 160 {
+		t.Errorf("BallSizeMaxPx = %d, want the A1636 ceiling 160", BallSizeMaxPx)
+	}
+	if BallSizeLargePx != 72 {
+		t.Errorf("BallSizeLargePx = %d, want the --ball-lg tier 72 unchanged (the tier is not the ceiling)", BallSizeLargePx)
+	}
+	if BallSizeDefaultPx != 56 || BallSizeSmallPx != 44 || BallSizeMinPx != 44 {
+		t.Errorf("default/small/min drifted: %d/%d/%d, want 56/44/44", BallSizeDefaultPx, BallSizeSmallPx, BallSizeMinPx)
+	}
+	if got := WindowEdgePx(BallSizeMaxPx, 96); got != 204 {
+		t.Errorf("WindowEdgePx(160, 96) = %d, want 204 (160 + 2*22)", got)
+	}
+	// The clamp tracks the ceiling: a configured 160px orb must survive both
+	// clamp sites instead of being cut back to the old 72.
+	if got := stateSize(BallSizeMaxPx, statemachine.StateWarm); got != BallSizeMaxPx {
+		t.Errorf("stateSize(160, Warm) = %v, want the ceiling itself", got)
+	}
+}
