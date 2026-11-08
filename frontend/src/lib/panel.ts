@@ -438,6 +438,50 @@ interface WispHostBridge {
   postMessage(message: string): void;
 }
 
+/* --------------------------------------------------------------------------
+   The Go -> page snapshot push (ticket 329 AC#5, page half)
+   --------------------------------------------------------------------------
+   The host's half lives in cmd/wisp/panel_snapshot_deliver_329.go: on every
+   panel publish it runs one JS statement - window.wispOnPanelSnapshot(<the
+   snapshot JSON verbatim>) - with the argument evaluated in JS as an OBJECT
+   LITERAL, never a string. Each call is a WHOLE snapshot: the receiver
+   replaces, it never merges, and it must survive being called any number of
+   times, always ending up showing the latest package. While the page has not
+   defined the global, WebView2 drops the call silently - which is exactly why
+   the receiver has to be defined before the first push is useful, and why the
+   cold-start re-push question is tickets 33/35's, never invented here.
+   -------------------------------------------------------------------------- */
+
+/** The callback shape the host calls. It receives the pushed object as-is. */
+export type PanelSnapshotReceiver = (snapshot: PanelSnapshot) => void;
+
+/** The structural slice of Window the receiver is installed on. A plain
+    object satisfies it, which is what keeps the installer exercisable in the
+    Node render instruments without a DOM. */
+export interface PanelSnapshotPushTarget {
+  wispOnPanelSnapshot?: PanelSnapshotReceiver;
+}
+
+/**
+ * Define the named global and return the uninstaller. The door itself is
+ * dumb on purpose: it hands every pushed package to the callback verbatim -
+ * replacement semantics live in the caller's state update, and no merging
+ * happens anywhere on this path. The uninstaller removes the global only
+ * while it still holds THIS callback, so a stale cleanup can never clobber a
+ * reinstalled receiver (StrictMode mounts, cleans up, mounts again).
+ */
+export function installPanelSnapshotReceiver(
+  target: PanelSnapshotPushTarget,
+  onSnapshot: PanelSnapshotReceiver,
+): () => void {
+  target.wispOnPanelSnapshot = onSnapshot;
+  return () => {
+    if (target.wispOnPanelSnapshot === onSnapshot) {
+      delete target.wispOnPanelSnapshot;
+    }
+  };
+}
+
 declare global {
   interface Window {
     /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
@@ -450,6 +494,12 @@ declare global {
         the only caller that NEEDS the answer - everything else on this page
         is fire-and-forget onto the composer envelope above. */
     wispDispatch?: (raw: string) => string | Promise<string>;
+    /** The Go -> page snapshot push (ticket 329 AC#5). The host executes
+        window.wispOnPanelSnapshot(<snapshot object literal>) once per
+        publish; the panel root installs it on mount via
+        installPanelSnapshotReceiver. Outward push only - it never joins the
+        page-to-Go route roster above. */
+    wispOnPanelSnapshot?: PanelSnapshotReceiver;
   }
 }
 

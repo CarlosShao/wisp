@@ -1,6 +1,6 @@
 import { StrictMode, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "@/App";
+import { PanelRoot } from "@/panel-root";
 import { AppHarness } from "@/components/harness/app-harness";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Showcase } from "@/components/showcase";
@@ -10,8 +10,10 @@ import "./styles/theme.css";
 /**
  * The host page is loaded three ways and only one of them carries data:
  *   - inside Wisp, WebView2 serves the embedded dist and Go pushes snapshots
- *     through the C17 bridge - no query string, so this file renders <App />
- *     with its empty frame and every unfed screen says so out loud;
+ *     through the C17 bridge - no query string, so this file renders
+ *     <PanelRoot />, which defines window.wispOnPanelSnapshot (ticket 329
+ *     AC#5) and hands every pushed whole snapshot down to <App />; before the
+ *     first push lands every unfed screen says so out loud;
  *   - ?harness=1 renders the whole-application walkthrough (owner 2026-09-26:
  *     "用户刚进来的时候，不是都进入一个新任务的窗口吗" - sidebar, new-task
  *     entry, sessions, right rail, overlays), fed by fixtures;
@@ -94,7 +96,7 @@ if (harness === "1" || harness === "2") {
  * instead of all three saying "出错了".
  */
 const ROOTS = {
-  product: { area: "面板", node: <App /> },
+  product: { area: "面板", node: <PanelRoot /> },
   app: { area: "演示应用", node: <AppHarness /> },
   showcase: { area: "组件总览", node: <Showcase /> },
 } as const;

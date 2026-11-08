@@ -17,6 +17,7 @@
     "vendor:beautifului": "node scripts/vendor-beautifului.mjs",
     "vendor:shadcn": "node scripts/vendor-shadcn.mjs",
     "render:stream": "vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js",
+    "render:receiver": "vite build --ssr scripts/render-snapshot-receiver.tsx --outDir node_modules/.tmp/receiverrender --logLevel warn && node node_modules/.tmp/receiverrender/render-snapshot-receiver.js",
     "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js"
   },
   "dependencies": {
