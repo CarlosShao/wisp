@@ -32068,3 +32068,30 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 ### 撤销口令
 - 加深版＝`git revert 990b5313c`（退回 `c59316d9a` 纯粒子淡版）。
+## A1633（2026-11-08 14:4x，编排者）**★wave86 三腿收官（122/329/220，三笔已推）｜★两腿独立撞出「`go test ./cmd/wisp` 整包跑不完」的结构性缺陷｜220 点名「界面还差哪一跳＝tasks 零消费」**
+
+### 一、三笔落地（已推 origin/dev，未推=0）
+| commit | 票 | 内容 |
+|---|---|---|
+| `4df9964d1` | 122 | staticcheck 第一批：SA1019×3 修＋SA4006×3 修（**加强非写松**）＋SA4000 已被 `79041f071` 修掉；windows **115→109**；U1000 96 条出归属表（批2删22/留73/冻2） |
+| `c7a5101b2` | 329 | 收口：AC#0 三把尺（7 笔落地提交逐枚 `git show --name-only` 核）＋AC#7 整包读数 |
+| `df7489080` | 220 | 收口：`./internal/...` 两侧跑到终态、差集三段；★220 判据面两侧红名册**零枚** |
+
+### 二、★★两腿独立撞出同一结构性缺陷：`go test ./cmd/wisp` 整包**跑不完**
+- **329 现跑**：整包一发 `panic: test timed out after 30m0s`（1802s，RUN 6/PASS 3/FAIL 2/SKIP 0），死点＝`Test219AC2RevokeRoundTripByteForByte` 挂 26m55s（**测试件子进程驱动器饿死**，非产码 panic）。另路 13 枚具名 `-run` ＝ **13/13/0/0 ok 72.997s**。
+- **220 现跑**：`./cmd/wisp` **三发全被 timeout 掐死**（40m/60m/60m+全新 LOCALAPPDATA），死在三枚**不同**球窗用例上。**机理现取证**：球窗 WebView2 UDF 是**固定共享路径** `%LOCALAPPDATA%\wisp\orb`，整包连跑**自己 churn 自己**，fork 的 `EnvironmentCompleted` 拿回 `S_OK`+NULL env 空指针崩→recover→STA 线程死→`ball.New` 无限等。
+- **⇒ 新台面事实**：Q-85 的「无活实例」世界今天成立但**不够**——阻塞不在活实例，在**整包球窗自挤固定 UDF**。**这把 CI 全绿（票 70）与所有需整包终态的票都卡住。**
+- **★技术裁定（我拍，铁律 ⓪⓪⓪）**：**UDF 路径按进程唯一化**（`%LOCALAPPDATA%\wisp\orb\<pid>` 或每 test-binary 唯一子目录），这是主流做法（WebView2 多实例隔离 UDF 是官方推荐）；⛔ 靠串行 test 绕过（那是把复杂度藏起来、不买价值）。**待派腿**。
+
+### 三、★220 点名「界面还差哪一跳」（现读现树，非旧结论）
+- 传输/接收跳已通（`33b264d70`）；页面类型已声明、契约尺今日绿；**但 `snapshot.tasks` 在 `frontend/src` 零消费**（我现跑复核：`App.tsx:246` 写死 `agents={[]}`，`.tasks` 0 命中；`TaskRosterSection` 类型在 `panel.ts:224` 已声明）。
+- ⇒ **界面对「卡在等批准」可见 0 维**。拆「取数跳＋画格跳」两枚前端面小跳。**已派 wave87 前端腿**（归我，A1622 授权）。
+
+### 四、待机主/编排者裁的四处（见本轮汇报决策清单）
+1. 球的「深度 vs 细」取舍（上轮已摆，未答）。
+2. 122：`internal/risk` 冻结包剩 1 条 SA1019 换 API — 解冻让批2修 or 单开票？
+3. 329：AC#0 的 3 处 `待填`（:68/:69/:83）凭收口件盘上日志复量翻格？AC#7 采哪维（整包 FAIL vs 13 枚维 13/13）？
+4. cmd/wisp 整包 UDF 自挤 — 立票修（我倾向立票＋按 pid 唯一化 UDF）。
+
+### 撤销口令
+- 三笔＝`git revert df7489080 4df9964d1 c7a5101b2`（可单退）。122 删项若误删，`git revert 4df9964d1` 整体回滚。
