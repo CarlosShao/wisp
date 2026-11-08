@@ -31995,3 +31995,27 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 ### 撤销口令
 - 本条是记录；wave84 落地后若要退回＝`git revert <wave84 commit>`。
+## A1630（2026-11-08 10:2x，编排者）**★★wave80/81 收官｜219 AC#2 判据落（`78626eb85`）｜215 装配根落（`8d49dc562`）｜常驻泵落（`a5f84886f`）｜★真根因是三层，第三层＝前端缺接收器（我的活）｜推送仍被 TLS 卡**
+
+### 一、三笔落地（均只 commit，我待推）
+| commit | 内容 |
+|---|---|
+| `78626eb85` | 票 219 AC#2：WIDEN-APPLIED 审计行补 `when=<RFC3339>`（四字段齐：corr/when/dir+section/route）＋往返牙 4 枚（生产路径种「一直」→revoke→config.toml **逐字节**回到加之前；二次 revoke 必须拒且文件一字节不动）。腿还**抓到自己一枚 flaky 并修掉**（SecondRevoke 吊死 20min，根因 replyRoot 取消后丢行），9/9 绿。 |
+| `8d49dc562` | 票 215 装配根：`run.go:1104` PumpSources 加 `Plugins:` 读口（照 65/187/213 同款），三牙 PASS。 |
+| `a5f84886f` | 票 65 常驻泵：新件 `panel_resident_pump.go`＋四牙＋真机实弹（`-H=windowsgui` 实例启动→`Ctrl+Alt+P`→日志 `panel: SNAPSHOT mode=ask_every_step bytes=3656 sha256=1e4c49c7f08e4e0d`）。 |
+
+### 二、★★wave81 推翻我的根因诊断（我错，它对）
+我的结论（「常驻 leg 没接五枚 reader」）**方向对但机制错**。真根因**三层**：
+1. **出货 `wisp.exe`＝`-H=windowsgui` 无控制台** ⇒ `interactiveStdin()`=nil ⇒ 任务源装配前返回 nil ⇒ **出货形态根本没有 runtime、没有泵、零快照**。五枚 reader 在 `run.go:998` 共享字面量里**本来就全接了**——是「走不到」，不是「没接」。
+2. **★前端没有 `window.wispOnPanelSnapshot` 接收器**（我现跑复核：`grep -rn wispOnPanelSnapshot frontend/src/ | wc -l` ＝ **0**）⇒ 页面永远渲染 EMPTY。
+3. **`Show()` 从不推快照**（`PLAN.md:2982` 冻结契约 resync-on-show 无人兑现）⇒ 开机不跑任务也收不到包。——**wave81 已补**（show 一次推一包，冻结契约首次有机制）。
+
+### 三、⇒ 第三层是前端，**现在归我**（A1622 机主永久授权 frontend/UI）
+- **已派 `wave85`**：定义 `window.wispOnPanelSnapshot`（照 `.scratch/wisp/probes/329/r1/page-contract.md` 合同：整包替换、对象字面量参数、幂等）＋ App 变状态 ＋ TS 全局声明 ＋ 三牙 ＋ **端到端实机验收（`ball.style` 行必须显示 jarvis 而非「缺省」）**。
+- **合同已在盘**（65 行，出处 329 AC#5，Go 半边＝`panel_snapshot_deliver_329.go`）。
+
+### 四、推送
+- **GitHub TLS 故障持续**，重试 8×2 轮全红，**4 笔待推**。会继续重试；⛔ 不 force、⛔ 裸推。
+
+### 撤销口令
+- 三笔＝`git revert a5f84886f 8d49dc562 78626eb85`（可单退）。
