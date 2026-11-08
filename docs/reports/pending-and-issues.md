@@ -32582,3 +32582,47 @@ export WISP_LIVE_MIC=1
 ### 六、撤销口令
 - 301／329 结案＝`git revert ca790c46e 9f0e77014 0eb154ae9 21d5ac84a 64c553810 68de71743 66618887f`（⛔ 建议）。
 - 语音遮蔽治＝`git revert 656a2ea25`（退回 39 枚假红）。
+## A1646（2026-11-08 22:1x，编排者）**★★★语音族**全绿**（PASS=89/FAIL=0/SKIP=0）——我自己放标点模型补完最后 6 枚｜票 211 结案｜整包 runner 路由打通｜wave100 三腿放出**
+
+### 一、★★语音族三段治完，全绿
+| 阶段 | PASS | FAIL | SKIP | 谁做的 |
+|---|---|---|---|---|
+| 最初（System32 遮蔽） | 42 | 0 | 47 | — |
+| 治遮蔽后（staging carrier） | 83 | 0 | 6 | `656a2ea25` |
+| **★我放标点模型后** | **89** | **0** | **0** | **我（本账）** |
+
+- **★我做的事**：从 `third_party/model-fetch/punc-int8.tar.bz2`（64,717,756 B）解出 `model.int8.onnx`（75,519,198 B），**sha256 `65a3fb9f5ad7bfb96bf69e0dc4481df97f6ee60513c1d94ce981ba6effd524b1` 与测试期望值逐字一致**，放到 `third_party/spike-models/model.int8.onnx`。
+- **复跑**：`bash scripts/speech-tests.sh` ⇒ **PASS=89 FAIL=0 SKIP=0，RUN=106**（89 顶层通过＋17 非顶层）。
+- ⇒ **那 39 枚整包假红彻底消失的路径已通**（语音族从 51 红里清零）。
+
+### 二、★整包 runner 路由打通（`17fb41455`，票 409）
+- `scripts/portable-tests.sh`：`speech` tier 四件同笔（pin/tiers/分支/census 循环，GUARD C/A 照咬）；run 步 `mode=speech` **不走 strict runner**，路由过 `scripts/speech-tests.sh`；GUARD B 用 speech 形（`-v` 分母非零，残留 skip 不当 fatal——carrier 退出码已携带全部断言判决）。
+- `scripts/speech-tests.sh`：`-v` 流由 `>"log"` 改 `tee`＋`PIPESTATUS`——四数与全仓四数同源（真 `-v` 行，非摘要词）。
+- **★我自己复跑确认**：`bash scripts/portable-tests.sh --scope=speech` ⇒ 路由生效（日志明写 `mode=speech routes [./internal/speech/] through the staging carrier`），`onnxruntime base=0x7ffd13f30000 path=...\.scratch\wisp\stage-speech\onnxruntime.dll` ⇒ **载入来源确来自 stage 目录**。
+- **census**：`internal/speech` 行 **UNCLAIMED-HAS-TESTS → CLAIMED BY speech**，census 自检 rc0。
+- **★腿如实三笔**：① selftest 首跑 1 断言红（`unknown-scope-still-hard` 的 `known:` 钉过期，roster 合法加了 speech）⇒ 按钉面修正后重跑 **32 case／0 失败 GREEN** ② **census GUARD D 还剩 4 枚**（`cmd/balldebug`／`agent/scheduler`／`command`／`plugin/manifestslot`，与 speech 无关的存量洞，⛔ 越权代领，逐名记 §4）③ **CI 侧未接线**（`ci.yml` 不在写面）。
+
+### 三、★票 211 结案（`6f0fa0e08`＋`b4db9ea86`＋`1ed6b1a68`）
+- **五格逐格复跑全对上**：AC#1 `grep`＝4⇄4／AC#2 **突变 4→8 ⇒ FAIL 红句逐字同**，cp 还原重跑 ok／AC#3 `FullPoolRefuses` PASS＋拒句带 `RunningSubagentIDs`（`subagent_197.go:287-290`）／AC#4 `CapsAtBridgeCeiling` PASS（真桥）＋`spawnDirect` 全仓仅 2 处命中全在头注释自陈／AC#5 `git diff` bridge/budgets＝空＋porcelain 空。
+- **★rename 双名核抓到旧名删除留脏（计数 1）⇒ 单独补一笔只点名旧名（`1ed6b1a68`）⇒ 复核计数 0** ⇒ **我今天记的正确配方又验了一遍，腿照做成功。**
+- **★票 354 AC#0 翻勾但票 ⛔ `-done`**（剩 5 格）：AC#2 确定性仪器＋AC#3 去牙（归 `354-r1`）／AC#4 色与门禁／AC#5 接缝／AC#6 纪律格。
+- **★unix 半边裁定（腿现读票面判，我认可）＝本格不要求**：① AC#0 原文无「两平台」字样——**同票 AC#4 才写「两平台成对」，同票一有一无** ② 残余①在 unix **机制上不存在**——`pinnedleaf_342_unix.go:173-174` 直接 `Unlinkat`、无同一性复验，「复验拒删留下名字」那一跳 unix 无从发生（353-v1 判语同口径）。
+
+### 四、★cmd/wisp 两枚过期文案（`9aaf601c8`＋`eccae1fd7`）
+- **228 AC#8 真活**：`main.go:8` 逐字「`The floating ball GUI is ticket 07.`」⇒ 改成事实句「球由本文件所在常驻腿装配」。证据链四点现跑复认（`main.go:81→87 runResident()` → `resident_windows.go:419 startResidentBall` → `resident_ball_windows.go:382`）。
+- **★顺带揪出三句同族假话一并改真**（归属＝台账 A477 把 main.go 那族句子判归 228 文案面）：① 「runs an **empty** event loop」→ 假（环路今天泵激活＋等信号＋stop-request，`boot_windows.go:182-202`）② 「`wisp run` **still echoes its task text as a placeholder**」→ 假（agent loop 已落地）③ 「the tray's Exit item **still has no stop path**」→ 假（228 AC#11 执行者已挂，`resident_ball_windows.go:151-163` → `resident_windows.go:846 rt.RequestStop`）。
+- **245 AC#6① 已被别人做掉**（`9e84ae42e`，245-r3）：现文已是「**three** always-on global hot keys…the cancel slot is the fourth key」，与代码事实一致（`ball_windows.go:857` idle 名册不含 cancel／`:920` cancel 唯一注册路径）⇒ **零改动**，只记复认一行。
+- **★扫面剩 5 处未改**（列在证据件 §5）：最要紧＝`resident_sink_nail_127_windows_test.go:30` 注释还写「**Ticket 07 has not landed**」＝假话，但属**票 243 注释族**，⛔ 跨票改，列清待裁。
+
+### 五、wave100 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `354-r1` | 票 354 的 AC#2 **确定性仪器**（★⛔ 靠「跑三次都 3/3」当确定性；主流做法＝固定前置态＋逐字节可预期）＋AC#3 **去牙**（摘掉复验拒删 ⇒ 读数必须变）＋AC#4/5/6 |
+| `census-guardd` | ★治 census GUARD D 剩的 **4 枚洞**（`cmd/balldebug`／`agent/scheduler`／`command`／`plugin/manifestslot`），逐枚分三档（有测试没 claim／没测试／tag-gated）＋验收 census rc0＋selftest 32 case GREEN；**⛔ 改 GUARD D 逻辑本身让它变松** |
+| `next-batch` | ★做 **100 AC#0**（最便宜的一把判定格）＋**276 AC#0**（17 枚普查件归口，时间盒 10 枚）＋交本轮票池三档清单 |
+
+### 六、撤销口令
+- 语音全绿里的**我放模型**那步＝删 `third_party/spike-models/model.int8.onnx`（未入库，纯本地件）。
+- 整包路由＝`git revert 17fb41455`。
+- 211 结案＝`git revert 1ed6b1a68 b4db9ea86 6f0fa0e08`。
+- cmd/wisp 文案＝`git revert eccae1fd7 9aaf601c8`。
