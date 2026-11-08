@@ -14,6 +14,7 @@ func (i *ICoreWebView2AcceleratorKeyPressedEventHandler) AddRef() uintptr {
 	r, _, _ := i.vtbl.AddRef.Call()
 	return r
 }
+
 func _ICoreWebView2AcceleratorKeyPressedEventHandlerIUnknownQueryInterface(this *ICoreWebView2AcceleratorKeyPressedEventHandler, refiid, object uintptr) uintptr {
 	return this.impl.QueryInterface(refiid, object)
 }

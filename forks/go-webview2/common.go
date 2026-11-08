@@ -24,7 +24,6 @@ const (
 
 // WebView is the interface for the webview.
 type WebView interface {
-
 	// Run runs the main loop until it's terminated. After this function exits -
 	// you must destroy the webview.
 	Run()
