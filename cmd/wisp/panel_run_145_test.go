@@ -3,7 +3,8 @@ package main
 // Ticket 145's two-hop wiring, the teeth:
 //
 //   hop 1 - the console sink's event switch feeds rt.runFeed (Publish's
-//           EvToolEnd / EvReasoningDelta / EvError / EvStuck branches);
+//           EvToolStart / EvToolEnd / EvUsage / EvReasoningDelta / EvError /
+//           EvStuck / EvDone branches);
 //   hop 2 - the assembly root's PumpSources.Run reader hands the feed's
 //           Section to the pump.
 //
@@ -18,12 +19,15 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"strings"
 	"testing"
 
 	"github.com/CarlosShao/wisp/internal/agent"
+	"github.com/CarlosShao/wisp/internal/llm"
+	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 )
@@ -138,5 +142,161 @@ func Test145MutationReaderRemovedSendsNoRunKeyAtAll(t *testing.T) {
 	}
 	if bytes.Contains(data, []byte(`"run"`)) {
 		t.Errorf("a pump without the Run reader still sent the key:\n%s", data)
+	}
+}
+
+// Test145RunningUsageAndDoneTravelTheWire is AC#6's answer for the three
+// dimensions whose hop-1 lines this wave landed: the running chip exists
+// because the loop now forwards the adapters' tool_call_start (the kind's
+// first producer), the usage row exists because the accumulator's totals
+// now book an event, and the running chips retire with the task - the
+// wire carries what the events wrote and nothing else.
+func Test145RunningUsageAndDoneTravelTheWire(t *testing.T) {
+	feed := panel.NewRunFeed()
+	sink := consoleSink{out: io.Discard, runFeed: feed}
+
+	sink.Publish(agent.Event{Kind: agent.EvToolStart, CallID: "call-r", ToolName: "fs.read"})
+	sink.Publish(agent.Event{
+		Kind:       agent.EvUsage,
+		Usage:      llm.Usage{InputTokens: 120, OutputTokens: 24, CachedTokens: 96},
+		CostMicros: 3500, Currency: "CNY",
+	})
+
+	data, err := panel.NewSnapshotPump(panel.PumpSources{Run: feed.Section}).Marshal()
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	present, run := runSectionProbe145(t, data)
+	if !present || run == nil {
+		t.Fatalf("the fed sink's packet carries no run key at all:\n%s", data)
+	}
+	if len(run.Running) != 1 || run.Running[0].CallID != "call-r" || run.Running[0].Name != "fs.read" {
+		t.Errorf("running = %+v, want the start event's own call in flight", run.Running)
+	}
+	if run.Usage == nil || run.Usage.TokensIn != 120 || run.Usage.TokensOut != 24 ||
+		run.Usage.CachedTokens != 96 || run.Usage.Micros != 3500 || run.Usage.Currency != "CNY" {
+		t.Errorf("usage = %+v, want the accumulator's own totals verbatim", run.Usage)
+	}
+	for _, want := range []string{`"micros":3500`, `"currency":"CNY"`} {
+		if !strings.Contains(string(data), want) {
+			t.Errorf("the exit bytes lost the micros/currency pair member %s:\n%s", want, data)
+		}
+	}
+
+	// The end retires its chip into an ended row; the task's end retires any
+	// that never got one.
+	sink.Publish(agent.Event{Kind: agent.EvToolEnd, CallID: "call-r", ToolName: "fs.read", Outcome: "success", Text: "42 bytes"})
+	sink.Publish(agent.Event{Kind: agent.EvToolStart, CallID: "call-lost", ToolName: "net.fetch"})
+	sink.Publish(agent.Event{Kind: agent.EvDone, TaskID: "task-1", Text: "done"})
+
+	data, err = panel.NewSnapshotPump(panel.PumpSources{Run: feed.Section}).Marshal()
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	_, run = runSectionProbe145(t, data)
+	if len(run.Running) != 0 {
+		t.Errorf("running after done = %+v, want every chip retired with the task", run.Running)
+	}
+	if len(run.Tools) != 1 || run.Tools[0].CallID != "call-r" || run.Tools[0].Outcome != "success" {
+		t.Errorf("tools = %+v, want the ended call kept as the record", run.Tools)
+	}
+}
+
+// Test145ArgsJSONComesFromTheBookedForensicsRow is AC#6's answer for the
+// expanded-args dimension: the argsJson on the wire is the booked forensics
+// row's sanitized args, joined by the correlation id the event carries -
+// not a digest the sink invented. A call with no booked row (the mutation
+// arms below) travels with argsJson absent.
+func Test145ArgsJSONComesFromTheBookedForensicsRow(t *testing.T) {
+	dir := t.TempDir()
+	st, err := memory.Open(dir)
+	if err != nil {
+		t.Fatalf("memory.Open(%s): %v", dir, err)
+	}
+	t.Cleanup(func() { _ = st.Close() })
+	if _, err := st.InsertToolCall(context.Background(), memory.ToolCall{
+		TaskID: "task-145", Tool: "fs.write",
+		ArgsJSON:      `{"path":"a.txt","content":"x"}`,
+		RiskLevel:     "L1",
+		CorrelationID: "task-145#call-1",
+	}); err != nil {
+		t.Fatalf("InsertToolCall: %v", err)
+	}
+
+	feed := panel.NewRunFeed()
+	sink := consoleSink{out: io.Discard, runFeed: feed, store: st}
+	sink.Publish(agent.Event{
+		Kind: agent.EvToolEnd, TaskID: "task-145", CallID: "call-1",
+		ToolName: "fs.write", Outcome: "success", Text: "wrote",
+		CorrelationID: "task-145#call-1",
+	})
+
+	data, err := panel.NewSnapshotPump(panel.PumpSources{Run: feed.Section}).Marshal()
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if !strings.Contains(string(data), `"argsJson":"{\"path\":\"a.txt\",\"content\":\"x\"}"`) {
+		t.Errorf("the wire lost the booked row's sanitized args:\n%s", data)
+	}
+
+	// Mutation 1: no store (a sink built without the forensics face) - the
+	// args must be absent, never a digest invented from the event alone.
+	bare := panel.NewRunFeed()
+	consoleSink{out: io.Discard, runFeed: bare}.Publish(agent.Event{
+		Kind: agent.EvToolEnd, TaskID: "task-145", CallID: "call-1",
+		ToolName: "fs.write", Outcome: "success", Text: "wrote",
+		CorrelationID: "task-145#call-1",
+	})
+	bareData, err := panel.NewSnapshotPump(panel.PumpSources{Run: bare.Section}).Marshal()
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if strings.Contains(string(bareData), "argsJson") {
+		t.Errorf("a store-less sink invented args from the event alone:\n%s", bareData)
+	}
+
+	// Mutation 2: a correlation id no booked row answers (the loop-rejected
+	// and locally-answered calls) - absent is the truth here too.
+	noRow := panel.NewRunFeed()
+	sink.Publish(agent.Event{
+		Kind: agent.EvToolEnd, TaskID: "task-145", CallID: "call-9",
+		ToolName: "list_tools", Outcome: "success", Text: "answered in-loop",
+		CorrelationID: "task-145#call-9",
+	})
+	noRowData, err := panel.NewSnapshotPump(panel.PumpSources{Run: noRow.Section}).Marshal()
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if strings.Contains(string(noRowData), "argsJson") {
+		t.Errorf("an unbooked call grew args from some other row:\n%s", noRowData)
+	}
+}
+
+// Test145RetryableRidesTheClassPolicy is AC#6's answer for the retryable
+// half-key: the wire value is observe.Error.Retryable()'s own answer for the
+// class the event carried - provider retries, auth does not - and the last
+// classified error's row is the one on the wire.
+func Test145RetryableRidesTheClassPolicy(t *testing.T) {
+	feed := panel.NewRunFeed()
+	sink := consoleSink{out: io.Discard, runFeed: feed}
+	sink.Publish(agent.Event{Kind: agent.EvError, Text: "502", Err: &observe.Error{Class: observe.ClassProvider, Detail: "http 502"}})
+	sink.Publish(agent.Event{Kind: agent.EvError, Text: "key", Err: &observe.Error{Class: observe.ClassAuth, Detail: "http 401"}})
+
+	data, err := panel.NewSnapshotPump(panel.PumpSources{Run: feed.Section}).Marshal()
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	_, run := runSectionProbe145(t, data)
+	if run == nil || run.Error == nil {
+		t.Fatalf("the classified errors wrote no row:\n%s", data)
+	}
+	if run.Error.Class != string(observe.ClassAuth) {
+		t.Errorf("error class = %q, want the LAST classified error's own class", run.Error.Class)
+	}
+	if run.Error.Retryable {
+		t.Errorf("retryable = true for %s, want the class policy's own no - carrying the provider arm's answer would be a fabricated retry promise", run.Error.Class)
+	}
+	if !strings.Contains(string(data), `"retryable":false`) {
+		t.Errorf("the exit bytes lost the class policy's no:\n%s", data)
 	}
 }

@@ -1752,7 +1752,7 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// its Stream runs and the chain ADVANCES, with the skip and the step both
 	// announced on this run's own sink. The ledger lives on the runtime so the
 	// caps accumulate across this process's tasks.
-	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle, runFeed: rt.runFeed}
+	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle, runFeed: rt.runFeed, store: rt.store}
 	quotaKeys := append([]string{}, rt.names...)
 	if len(quotaKeys) > 0 {
 		quotaKeys[0] = ep.Provider + "/" + ep.Model
@@ -2335,12 +2335,47 @@ type consoleSink struct {
 	settle *settleTrace
 	// runFeed is ticket 145's hop-1 feed: the working-state holder the
 	// assembly root built (assembleRuntime) and the pump's PumpSources.Run
-	// reader reads. Publish's EvToolEnd / EvReasoningDelta / EvError / EvStuck
-	// branches each hand it one line, the values the event already carries.
-	// nil is safe by the feed's own nil-receiver guards - a sink built
-	// without the feed just drops the line - but the production sink below
-	// (execute) always carries the runtime's feed.
+	// reader reads. Publish's EvToolStart / EvToolEnd / EvUsage /
+	// EvReasoningDelta / EvError / EvStuck / EvDone branches each hand it one
+	// line, the values the event already carries. nil is safe by the feed's
+	// own nil-receiver guards - a sink built without the feed just drops the
+	// line - but the production sink below (execute) always carries the
+	// runtime's feed.
 	runFeed *panel.RunFeed
+	// store is the forensics face the EvToolEnd branch joins against: the
+	// event carries the call's C18 correlation id, the bridge's booked row
+	// carries the sanitized args, and the branch reads the row so the
+	// snapshot's tool row can show what actually ran. nil (a sink built
+	// without a store) leaves argsJson absent - the honest shape for a run
+	// whose forensics were never booked.
+	store *memory.Store
+}
+
+// bookedArgs looks up the sanitized args of the call the event closes: the
+// bridge booked one tool_call row per executed call under the correlation id
+// the dispatch minted, and that row's ArgsJSON is the census's named source
+// for the expanded-args dimension. A call the bridge never booked (rejected
+// in-loop, list_tools answered locally, a task with no store) has no row and
+// travels with argsJson absent - "never executed with args" is the truth,
+// not a gap to fill. The read is a plain store read on the publishing
+// goroutine, bounded by the rows one task booked; the last matching row wins
+// because an id-less call's minted key is positional and the freshest
+// booking is the one this end event closes.
+func (c consoleSink) bookedArgs(e agent.Event) string {
+	if c.store == nil || e.TaskID == "" || e.CorrelationID == "" {
+		return ""
+	}
+	rows, err := c.store.ListToolCallsByTask(context.Background(), e.TaskID)
+	if err != nil {
+		return ""
+	}
+	args := ""
+	for _, r := range rows {
+		if r.CorrelationID == e.CorrelationID && r.ArgsJSON != "" {
+			args = r.ArgsJSON
+		}
+	}
+	return args
 }
 
 func (c consoleSink) Publish(e agent.Event) {
@@ -2366,12 +2401,27 @@ func (c consoleSink) Publish(e agent.Event) {
 		c.runFeed.ReasoningDelta(e.Text)
 	case agent.EvToolStart:
 		fmt.Fprintf(c.out, "\n[工具 %s]\n", e.ToolName)
+		// Ticket 145's running chip, hop 1: the loop now forwards the
+		// adapters' own tool_call_start as this kind, so a row appears here
+		// the moment a call is in flight, and retires when its end (or the
+		// task's end) arrives.
+		c.runFeed.ToolStarted(e.CallID, e.ToolName)
 		changed = true
 	case agent.EvToolEnd:
 		fmt.Fprintf(c.out, "[工具 %s -> %s]\n", e.ToolName, e.Outcome)
 		// Ticket 145's tool row, hop 1: the event's own call id, tool name,
-		// outcome and result text, verbatim (run_feed_145.go's ToolRunRow).
-		c.runFeed.ToolEnded(e.CallID, e.ToolName, e.Outcome, e.Text)
+		// outcome and result text, verbatim (run_feed_145.go's ToolRunRow) -
+		// plus the booked forensics row's sanitized args, joined by the
+		// correlation id the event carries.
+		c.runFeed.ToolEnded(e.CallID, e.ToolName, e.Outcome, e.Text, c.bookedArgs(e))
+		changed = true
+	case agent.EvUsage:
+		// Ticket 145's rows 2 and 12, hop 1: the Cost accumulator's
+		// cumulative totals as the event carried them - in, out, cached and
+		// the micros/currency pair. Nothing here derives a display unit; the
+		// pair travels and the page decides how to render it.
+		c.runFeed.Usage(e.Usage.InputTokens, e.Usage.OutputTokens, e.Usage.CachedTokens,
+			e.CostMicros, e.Currency)
 		changed = true
 	case agent.EvStuck:
 		fmt.Fprintf(c.out, "\n[停滞] %s\n", e.Text)
@@ -2386,8 +2436,9 @@ func (c consoleSink) Publish(e agent.Event) {
 			// notice-shaped EvError (loop.go's budget notices publish Text
 			// with no Err) writes nothing - the carrier's RunErrorRow doc
 			// names that shape as the constant-as-data trap, and inventing
-			// a class for a notice would be exactly it.
-			c.runFeed.Errored(string(e.Err.Class), e.Err.Detail, e.Text)
+			// a class for a notice would be exactly it. Retryable is the
+			// class policy's own answer, carried verbatim.
+			c.runFeed.Errored(string(e.Err.Class), e.Err.Detail, e.Text, e.Err.Retryable())
 		}
 		changed = true
 	case agent.EvWarn:
@@ -2398,10 +2449,14 @@ func (c consoleSink) Publish(e agent.Event) {
 		changed = true
 	case agent.EvDone:
 		// The reply is over; the packet the panel renders has to carry that, or
-		// the result region would stream forever on a finished task.
+		// the result region would stream forever on a finished task. The run
+		// section's running chips retire with the task for the same reason: a
+		// task that died between a call's start and its end must not leave a
+		// chip running forever (the ended rows stay as the run's record).
 		if c.stream != nil {
 			c.stream.Close(e.TaskID)
 		}
+		c.runFeed.TaskEnded()
 		changed = true
 	}
 	if changed && c.publish != nil {

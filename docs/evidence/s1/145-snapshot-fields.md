@@ -141,3 +141,36 @@ run?: {
 **门禁读数**（导出树 HEAD `38628bee2`；环境卫生 unset GOTMPDIR/TMPDIR/TEMP/TMP＋PATH 加 build/sherpa-onnx，未设 CGO_ENABLED）：`/d/work/base/gopath/bin/gofumpt.exe -l internal/panel cmd/wisp` **空**；`go vet ./internal/panel ./cmd/wisp` **rc0**；build **rc0**；`go test ./internal/panel -count=1`＝===RUN **313**／---PASS **208**／---FAIL **2**，红册＝`TestC21DesignTokensFourWayAgree`（**在册**，球 token 文档族）＋`TestComposerRenderFixtureTellsTheTruth`（**环境性红**：生成件 `frontend/fixtures/composer-states.html` 不入 git、导出树缺席；自主树拷入克隆后单跑 **PASS**「verified across 3 painted states」）。★**145 在册三红现量只剩一枚**：两枚契约尺（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`）在 HEAD **已绿**＝TS 侧声明已入库（Q-51 那半张的解冻已有人落）。`sh scripts/d22scan.sh` **rc0 clean**（451 生产 Go 文件）。
 
 **Git**：零产码；只 commit、未 push；显式 pathspec 逐枚点名（本件＋票面 Progress log 一行）；禁面（frontend/**、internal/ball/**、internal/config/**、cmd/wisp 除装配点外、thresholds/golden、docs/PLAN.md、docs/specs/**、`tokens_fourway_test.go`）零字节；票面 AC 勾与 Status 零动。
+
+## 8. 11-08 20:0x　wave4 写腿：5 族逐族判定＋4 族落地（锚 `678a3b638`；写面＝internal/panel/**＋run.go 喂线行/装配点＋internal/agent 事件发布点，本波新开）
+
+**起手三核**：①证据件 §7 判定表现读（5 族具名锁逐条核对）；②现读 `internal/panel/composer.go:57-175`（Snapshot 顶层 11 枚）＋`PumpSources` 21 面（装配根 `cmd/wisp/run.go:998-1127` 全接线）＋`consoleSink.Publish` 喂线（`:2346-2404` 现量）＋`run_feed_145.go` 载体全文；③票 145 票面 AC#2/AC#6/AC#2b 原文现读（AC#2b＝187 已落、⛔ 重做，现读确认无缺半枚可动：`Display` 卡 internal/config 禁面、适配器档位词表卡 internal/llm 私有 var，维持 §7 判）。`git status --porcelain`：internal/agent、internal/panel 空；cmd/wisp 仅他人 323 两枚未跟踪测试件；internal/ball、forks 有他腿在飞 M 件（零触碰）。
+
+**5 族逐族判定**（判据＝AC#6「哪枚用例断言值来自真来源」＋有真发布点/读口在写面内）：
+
+| 族 | 判定 | 真源（现量 file:line） | 读者 |
+|---|---|---|---|
+| Retryable（行 10 尾） | **落** | `observe.Error.Retryable()`（`errors.go:220`）随 `EvError.Err` 到喂线行 `run.go:2441` | 新用例 `Test145RetryableRidesTheClassPolicy`：ClassProvider→true／ClassAuth→false，逐字来自类策略 |
+| 工具「运行中」态（行 4） | **落** | 三适配器全发的 `llm.EvToolCallStart`（census §2.5；anthropic `stream.go:262`、openaichat `toolasm.go:71`、openairesponses `stream.go:301,327`），`loop.stream` 的 switch（`loop.go:646`）**一行转发**为 `agent.EvToolStart`——kind 的**第一个生产者** | 新用例 `Test145RunningUsageAndDoneTravelTheWire`＋panel 侧 `TestRunFeedRunningRowsFollowTheEvents`：start 写行、end 退役、重复 start 不双画、任务终态清场 |
+| usage/cost 活值（行 2/12） | **落** | Cost 累加器（`loop.go:416` 起）每回合 `:522-541` 更新，`publishUsage`（现 `loop.go:1133`）就是"用量落账的时刻"——在它体内发新 kind `EvUsage`（`sink.go:49`），带累计 `llm.Usage` 三枚＋`Micros`＋`Currency`；**成对下发**（census §2.13 单位雷：`RunUsageRow` 两字段**无 omitempty**，要么都走要么不走）；llm.EvUsage 五处适配器发的形状不取（per-response 回声，非任务累计） | 同上用例＋panel 侧 `TestRunFeedUsageRowCarriesTheAccumulator`：五值逐字＋零值对仍在场 |
+| ArgsJSON（行 5） | **落**（带一座 CorrelationID 桥） | bridge 记账的 tool_call 行 `ArgsJSON＝sanitizeArgs(req.Args)`（`bridge.go:1307`，2048 字节截断 forensics 形）；join 键＝事件新带的 `CorrelationID`（`sink.go:86`；三枚 `EvToolEnd` 发布点 `loop.go:863/:1007/:1043` 用与派发同一把 `callCorr` 铸出）→ consoleSink 持 `rt.store`（构造点 `run.go:1755`）经 `ListToolCallsByTask` 按 correlation 取行（`run.go:2364 bookedArgs`）。⚠ store 的 `ToolCallByID` 按 int64 行号取、行无 call_id 列 ⇒ 直取不可达，这就是那座桥要存在的原因 | 新用例 `Test145ArgsJSONComesFromTheBookedForensicsRow`（真 `memory.Open` 行 → wire `argsJson` 逐字；两枚突变臂：无 store／无行 ⇒ 缺席不造假） |
+| 终结态（行 13） | **⛔ 归口未裁** | census §2.14「走 Event.Stop 还是 Result.Status」仍未裁；`EvDone` 不带 Stop、`EvDone.Text＝res.Text‖msg`（取消时＝部分回复文本） | 不落；按派单如实报 |
+
+**落不进的与不取的（宁缺毋造清单的现量版）**：① llm.EvUsage 直转不取——那是 per-response 值，面板要的是任务累计，`cost.Usage` 才是真账；② 事件面不携 args——`sink.go` 头注的"Text 永不带参数原文"密面设计不动，取的是 store 里**已脱敏截断**的 forensics 行；③ running 行在 `EvDone` 全 retire——流中断后 start 无 end 的调用不许把 chip 永远挂着；④ duration/started_at 仍无写者（census §2.6）、phase/humanText/remainingMs 仍纯无源、position/occupancy 归 167、composer.git 归 186、view 维持 AC#3。
+
+**顺带闭合的在册缺口（报备归口，未动台账）**：33-r14 **AC#8ⓑ** 的「EvToolStart 零发射者、删/留待 owner」——本程给了它真发射者，`case agent.EvToolStart`（`run.go:2402`）今天可达且诚实；35 的 **F-PUMP-6**「别为凑绿发假事件」未被触碰（转发的是适配器真事件，非造出来的）；票 16 的「Acting 驻留按真事实回放（EvToolStart 零生产者所致）」边界自此改形，归该票处置。
+
+**门禁读数**（主树现量；环境 unset GOTMPDIR/TMPDIR/TEMP/TMP＋PATH 加 build、third_party/sherpa-onnx，未设 CGO_ENABLED）：
+
+| 门 | 读数 |
+|---|---|
+| `/d/work/base/gopath/bin/gofumpt.exe -l internal/agent internal/panel cmd/wisp` | **空** |
+| `go vet`（三包） | **rc=0** |
+| `go build`（三包） | **rc=0** |
+| `go test ./internal/panel -count=1 -v` | **PASS 211／FAIL 1**＝`TestC21DesignTokensFourWayAgree`（**在册**：其读的 `internal/ball/tokens.go` 不在他腿在飞 M 名单里，红因同 §7 现量；`tokens_fourway_test.go` 冻结件零触碰） |
+| `go test ./cmd/wisp -count=1 -run TestPanel -timeout 20m` | **RUN 10／PASS 10／FAIL 0** rc=0 |
+| `go test ./internal/agent/... -count=1`（本程改了 loop/sink，尽职加跑） | **全绿 rc=0**（agent／approval／scheduler 三包 ok） |
+| `sh scripts/d22scan.sh` | **rc=0 clean**（bans #1-5 internal/=387、cmd/=64、ban #7 tools/=48、ban #8 internal/=965＋cmd/=244） |
+| LF | 七枚触碰件 `file` 无 CRLF |
+
+**Git**：只 commit、未 push；显式 pathspec 逐枚点名（7 枚产码/测试件＋本件＋票面 Progress log）；禁面（frontend/**、internal/ball/**、forks/**、internal/config/**、thresholds/golden、docs/PLAN.md、docs/specs/**、`tokens_fourway_test.go`）零字节；票面 AC 勾与 Status 零动。

@@ -41,6 +41,12 @@ const (
 	// through against a budget the user should know is close (票 40 renders the two
 	// apart).
 	EvWarn EventKind = "warn"
+	// EvUsage reports the task's cumulative spend at the moment one turn's usage
+	// landed in the accumulator (publishUsage). The values are the Cost
+	// accumulator's own totals - the same numbers Result books - not a
+	// per-response echo: llm.EvUsage is per-response, this is the task-so-far
+	// truth the panel's working-state rows render (ticket 145 rows 2 and 12).
+	EvUsage EventKind = "usage"
 	// EvDone closes the task.
 	EvDone EventKind = "done"
 )
@@ -63,6 +69,21 @@ type Event struct {
 	// input Facts.RepeatLevel).
 	RepeatLevel int
 	Err         *observe.Error
+	// Usage is the Cost accumulator's cumulative token counters (EvUsage):
+	// in, out and cached - llm.Usage's own three, verbatim. EvDone's
+	// TokensIn/TokensOut stay the terminal echo they always were; this field
+	// is the live one.
+	Usage llm.Usage
+	// CostMicros and Currency travel as a PAIR or not at all (census
+	// 145-snapshot-field-census-r1.md §2.13's unit rule: the money number is
+	// micro-denominated while Currency is the config's own label, so one
+	// without the other manufactures a fake unit). Carried on EvUsage.
+	CostMicros int64
+	Currency   string
+	// CorrelationID is the C18 routing key the call's forensics row is booked
+	// under, minted by the same callCorr the dispatch used (EvToolEnd). It is
+	// the join key between the event face (call id) and the store face (row).
+	CorrelationID string
 }
 
 // Sink receives loop events. Implementations must not block: the loop calls

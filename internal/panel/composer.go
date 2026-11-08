@@ -141,9 +141,11 @@ type Snapshot struct {
 	// with it - the write half rides config.set's ball_style field
 	// (config_write_65.go).
 	BallStyle *BallStyleSection `json:"ballStyle,omitempty"`
-	// Run is ticket 145's working-state carrier: the tool calls that ended,
-	// the reasoning streamed so far, the last classified error and the loop's
-	// stuck sentence - the working-state rows the fourteen-row table asks the
+	// Run is ticket 145's working-state carrier: the tool calls that ended
+	// (with their booked args), the calls in flight right now, the task's
+	// cumulative usage, the reasoning streamed so far, the last classified
+	// error (with its class-policy retryable answer) and the loop's stuck
+	// sentence - the working-state rows the fourteen-row table asks the
 	// panel to render while a task runs. The values are the loop's OWN event
 	// values (see run_feed_145.go for the per-field sources and for the
 	// dimensions deliberately absent because no event carries them); RunFeed

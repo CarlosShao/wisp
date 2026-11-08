@@ -643,6 +643,18 @@ func (l *Loop) stream(ctx context.Context, taskID string, req *llm.Request) (llm
 			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
 		case llm.EvReasoningDelta:
 			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+		case llm.EvToolCallStart:
+			// Ticket 145 row 4's "running" state. The adapters' tool_call_start
+			// is the wire fact that a call exists and is in flight; until this
+			// forwarding line the agent surface's own EvToolStart kind (sink.go)
+			// had a declared semantic and ZERO producers - the registered
+			// 33-r14 AC#8b zero-emitter. The event carries the adapter's own
+			// call id and tool name verbatim; the row it starts is retired by
+			// the matching EvToolEnd (or by EvDone's task end).
+			l.publish(Event{
+				Kind: EvToolStart, TaskID: taskID,
+				CallID: ev.ToolCallID, ToolName: ev.ToolName,
+			})
 		}
 		return nil
 	})
@@ -845,6 +857,10 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 		l.publish(Event{
 			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
 			ToolName: c.Name, Outcome: log.Outcome, Text: log.Text,
+			// The same C18 key the dispatch minted for this call
+			// (callCorr(taskID, c.ID, i) at the ToolRequest): the join key
+			// between this event and the forensics row the bridge booked.
+			CorrelationID: callCorr(taskID, c.ID, i),
 		})
 	}
 }
@@ -974,7 +990,7 @@ func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJou
 	// The assistant turn is recorded first so the failed results attach to the
 	// call ids they belong to (tool_call ids must stay in the chain).
 	l.append(assistantTurnMessage(turn))
-	for _, c := range turn.ToolCalls {
+	for i, c := range turn.ToolCalls {
 		row := j.startCall(ctx, c.ID, c.Name, c.Args, memoryRiskL0)
 		j.decide(ctx, row, DecisionReject)
 		j.finish(ctx, c.ID, row, OutcomeTruncated, string(observe.ClassLoop))
@@ -988,6 +1004,7 @@ func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJou
 		l.publish(Event{
 			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
 			Outcome: OutcomeTruncated, Text: text,
+			CorrelationID: callCorr(taskID, c.ID, i),
 		})
 	}
 	return len(turn.ToolCalls)
@@ -1003,7 +1020,7 @@ func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
 	// are written under a ctx detached from that cancellation.
 	wctx, cancelWrites := terminalWriteCtx(ctx)
 	defer cancelWrites()
-	for _, c := range turn.ToolCalls {
+	for i, c := range turn.ToolCalls {
 		if c.Complete {
 			continue
 		}
@@ -1023,6 +1040,7 @@ func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
 		l.publish(Event{
 			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
 			Outcome: outcome, Text: text,
+			CorrelationID: callCorr(taskID, c.ID, i),
 		})
 	}
 }
@@ -1116,6 +1134,16 @@ func (l *Loop) publishUsage(res *Result, cost Cost) {
 	res.Usage = cost.Usage
 	res.CostMicros = cost.Micros
 	res.Currency = cost.Currency
+	// Ticket 145 rows 2 and 12: the same accumulated truth books an event so
+	// the panel's run section can carry the live totals while the task runs,
+	// instead of only the EvDone terminal echo. The values are this
+	// accumulator's own - nothing re-derived - and Micros travels with
+	// Currency as the pair the census's unit rule (§2.13) demands: one
+	// without the other would manufacture a fake unit.
+	l.publish(Event{
+		Kind: EvUsage, TaskID: res.TaskID,
+		Usage: cost.Usage, CostMicros: cost.Micros, Currency: cost.Currency,
+	})
 }
 
 // TaskLogState maps a loop status onto memory's task_log.state vocabulary
