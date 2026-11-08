@@ -797,7 +797,10 @@ func (s *sloSubject) collectReportWithin(budget, poll time.Duration) (*sloRun, e
 		read = os.ReadFile
 	}
 	timeout := observe.NewTimeout(budget)
-	last := subjectReportRead{state: reportUnwritten, offset: -1, note: "nothing read yet"}
+	// The initial value is deliberately a bare zero value: every read of last
+	// in the loop body happens after last = obs in that same iteration, so
+	// any initializer here would be a value staticcheck rightly calls dead.
+	var last subjectReportRead
 	for {
 		data, err := read(s.outPath)
 		var obs subjectReportRead

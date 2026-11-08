@@ -100,6 +100,19 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
       登记一条形状：本格**第一版是用未加引号的 heredoc 贴进去的**，反引号里的字面量被 shell 逐条执行成空串（已按显式路径回滚重贴）。
       留着不是检讨，是因为它给出了 AC#7 自己的失效表现：**哪枚版本号或路径读起来"少了东西"，先怀疑仪器，别先怀疑树。**
 
+- [2026-11-08 12:3x +08] agent=122sa1 did=AC#1～#5 第一批落地（HEAD `6e2eb5845`，staticcheck 2026.2.2 (0.8.2)，
+  全部整包跑在 `--shared` 导出树，写只回主工作树）。
+  读数：今天 **linux 20 条 / windows 115 条**（票面 34/78 与 CI 42 都过期，差异归因见表：SA4000 已被
+  `79041f071` ci-r1 修掉、windows-only 面大增、检查器版本不同；linux 侧另有 internal/ball 编译噪音使分母偏低）。
+  第一批清了 **SA1019×3 修（risk 那 1 条包冻结不修、登记）＋SA4006×3 修**（改后 windows 115→109，diff 逐条＝目标六条）；
+  SA9009 假阳性格只登记（`:4` 散文、真指令 `:19`）；U1000 今天 96 条去重，逐条归属表交回（建议批 2 删 22、留 73、冻 2，本腿零删）。
+  门禁：gofumpt 0 行（v0.12.0）、go build rc0、go vet rc0、d22scan clean rc0。
+  测试：internal/speech `ok`（212 RUN=106×2，PASS 118/FAIL 0/SKIP 94）；
+  cmd/wisp FAIL 但红集全为预先存在的环境红（System32 onnxruntime 1.17.1 遮蔽，基线树同红）＋并发翻动，
+  本腿改到的面（Test384/TestSecret/TestSLO 全家）两遍全绿（1410 RUN=705×2）。
+  next=编排者推送后取 CI `lint` job staticcheck 步的 run/job/step 读数（期望 linux 20 / windows 109，须同报版本）关 AC#6；
+  risk 冻结那 1 条 SA1019 需编排者裁定归属。
+
 - [2026-09-23 22:2x +08] agent=orchestrator did=追加 AC#7（工具版本未钉＋跑门禁会升宿主工具链）；
   来源是批次 4 自己登记的那处"与前三批分歧"——它没拿新读数盖掉旧读数，而是把分歧摆出来，才让这件事现形。
   next=与 42 枚主账同批做（同一个人、同一次改 `ci.yml` 的 lint 步），别单开一票。

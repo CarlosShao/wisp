@@ -33,10 +33,10 @@ type loadedModule struct {
 // loadedModules enumerates the process's loaded images.
 func loadedModules(t *testing.T) []loadedModule {
 	t.Helper()
-	proc, err := windows.GetCurrentProcess()
-	if err != nil {
-		t.Fatalf("GetCurrentProcess: %v", err)
-	}
+	// windows.CurrentProcess is the non-deprecated pseudohandle accessor; it
+	// cannot fail, so there is no error to check (the old GetCurrentProcess
+	// API returned a redundant error).
+	proc := windows.CurrentProcess()
 	buf := make([]windows.Handle, 2048)
 	var needed uint32
 	cb := uint32(len(buf)) * uint32(unsafe.Sizeof(buf[0]))
@@ -92,10 +92,7 @@ func processThreads(t *testing.T) int {
 // processCPUTime is kernel+user CPU consumed by the whole process.
 func processCPUTime(t *testing.T) time.Duration {
 	t.Helper()
-	proc, err := windows.GetCurrentProcess()
-	if err != nil {
-		t.Fatalf("GetCurrentProcess: %v", err)
-	}
+	proc := windows.CurrentProcess()
 	var created, exited, kernel, user windows.Filetime
 	if err := windows.GetProcessTimes(proc, &created, &exited, &kernel, &user); err != nil {
 		t.Fatalf("GetProcessTimes: %v", err)

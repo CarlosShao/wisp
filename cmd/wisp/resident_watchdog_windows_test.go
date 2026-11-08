@@ -208,6 +208,10 @@ func Test384ResidentWatchdogEndToEnd(t *testing.T) {
 	// references die AND the instrumented release runs, and phase 2 needs the
 	// tree genuinely back under the Armed cap before its own breach starts.
 	hold64 := holdTouched384(64 << 20)
+	if len(hold64) != 64<<20 {
+		t.Fatalf("384: touched hold = %d bytes, want %d: the phase-1 breach is built on this hold",
+			len(hold64), 64<<20)
+	}
 	waitUntil384(t, 5*time.Second, "the real unload pass over the sustained Sleeping breach",
 		func() bool { return buf.count(`"msg":"watchdog: unload pass complete"`) >= 1 })
 	t.Logf("384-READ Sleeping unload passes=%d, unload-action lines=%d, no-row alert receipts=%d",
@@ -240,6 +244,10 @@ func Test384ResidentWatchdogEndToEnd(t *testing.T) {
 		t.Fatalf("384: machine state after #5 = %s, want Armed", rv.machine.State())
 	}
 	hold128 := holdTouched384(128 << 20)
+	if len(hold128) != 128<<20 {
+		t.Fatalf("384: touched hold = %d bytes, want %d: the Armed breach is built on this hold",
+			len(hold128), 128<<20)
+	}
 	waitUntil384(t, 5*time.Second, "D43 #9 kws.keep-alive-alert effect (Armed over-cap, mapped)",
 		func() bool { return sinkLog.has(9, "kws.keep-alive-alert") })
 	t.Logf("384-READ D43#9 effects(kws.keep-alive-alert)=%d, machine stays %s",

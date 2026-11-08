@@ -163,10 +163,15 @@ func buildWispForTest(t *testing.T) string {
 	if runtime.GOARCH != "amd64" {
 		t.Fatalf("GOARCH = %s, want amd64: the PEB offsets this test reads are 64-bit specific", runtime.GOARCH)
 	}
+	// runtime.GOROOT is deprecated (Go 1.24): the build-time root is not
+	// meaningful on a copied binary. The GOROOT environment variable is the
+	// part of the old behaviour that still describes this machine, so the
+	// fallback reads it directly; if neither PATH nor GOROOT can locate the
+	// toolchain the build below fails with its own explicit message.
 	goExe := "go"
 	if p, err := exec.LookPath("go"); err == nil {
 		goExe = p
-	} else if rooted := filepath.Join(runtime.GOROOT(), "bin", "go.exe"); fileExists(rooted) {
+	} else if rooted := filepath.Join(os.Getenv("GOROOT"), "bin", "go.exe"); fileExists(rooted) {
 		goExe = rooted
 	}
 	dir := t.TempDir()
