@@ -10,60 +10,29 @@
        follow-up, 2026-11-07): the Wisp host window is a transparent WebView2
        overlay (orb_windows.go DefaultBackgroundColor a=0), so the page's own
        CSS must not paint ANY backdrop - the pixels outside the orb are the
-       window's transparency, full stop. The earlier template shipped the
-       upstream demo's #050913 and relied on orbasset.go's injected
-       html,body{background:transparent !important} to win the cascade (it
-       does - !important beats a plain author rule - and the live corners
-       proof read the floor with zero deviation); shipping transparent here
-       removes the injection from the load-bearing path entirely, so the
-       product page is transparent even if a future serving seam ever dropped
-       the injected belt. Cost (accepted): opening the standalone artifact in
-       a browser tab shows the particles over the tab's own background
-       (AdditiveBlending cyan reads washed-out over white) - the dark demo
-       look stays available in jarvis-src/examples; the artifact's only
-       consumer is the embedded product asset. The injected belt in
-       orbasset.go STAYS: it is the siri page's transparency mechanism too
-       and costs nothing. */
+       window's transparency, full stop. The injected belt in orbasset.go
+       STAYS: it is the siri page's transparency mechanism too and costs
+       nothing. */
     body { overflow: hidden; background: transparent; }
-    /* The DARK DISC (ticket 65 jarvis dark-disc leg, 2026-11-07): a circular
-       backdrop UNDER the particle canvas, INSIDE the page - the mainstream
-       orb-UI shape (Jarvis/Siri/Cortana class: dark disc + bright particles).
-       Why a disc and not a body backdrop: the transparency architecture
-       (orb_windows.go) keeps the window's corners composited against the
-       desktop - the live corner teeth sample 3 px inside the rect and must
-       keep reading the floor color. The disc therefore lives in a CIRCLE
-       centered on the window: diameter 96% of the window edge, so the corner
-       probe (diagonal 66.5% of the half-edge at 3 px inset on the 100 px
-       window; 70.7% asymptotically) stays far outside the disc's 96%-radius
-       (48% of the edge) and the corners keep showing the desktop. Coverage
-       math from the upstream component (jarvis-ai-web-animation dist):
-       PerspectiveCamera(35deg) at z=4.1 with sceneScale 0.82 puts the widest
-       particle element (orbit radius 1.17 rings; particle shell radius 1.05
-       with its 0.88-1.14 jitter) at 76% of the canvas half-edge - the disc
-       radius (96% of the half-edge) covers it all, so AdditiveBlending
-       cyan never composites over the desktop again: over the owner's white
-       window surface it was washed to grey-white (JARVIS-PRODUCT-REAL.png);
-       over the dark disc the same particles keep the upstream demo contrast.
-       Colour: the demo's own dark-blue family (deep #050913 base, subtle
-       centre lift) - NOT pure black, which sits harshly on light desktops.
-       Stacking: #root must sit ABOVE the disc (position:relative;z-index:1)
-       because the React canvas renders the particles. */
-    #jarvis-disc {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      width: 96%;
-      height: 96%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 42%, #101a2e 0%, #0a1322 40%, #050913 100%);
-      z-index: 0;
-    }
+    /* PURE PARTICLES (ticket 65 pure-particle leg, 2026-11-08): the owner's
+       ruling verbatim - no sphere body, no visible frame, no backdrop; the
+       particles float by themselves, like Jarvis. The previous leg's dark
+       circular in-page backdrop div is GONE from this template (the owner
+       rejected the disc itself). The visibility fix lives in the
+       blending mode instead, applied at build time by the
+       wisp-jarvis-normal-blending plugin in vite.config.mjs: the upstream's
+       AdditiveBlending ADDS particle color onto the backdrop, so over white
+       surfaces the low-alpha particle edges clamp toward white (the owner's
+       JARVIS-PRODUCT-REAL.png wash-out); NormalBlending composites each
+       particle by its own alpha over whatever is behind it, so the same
+       saturated cyan palette reads cyan on white AND on dark - no disc, no
+       background, particles only. Nothing else changed: particle counts,
+       orbit geometry and the transparency architecture (corners keep showing
+       the desktop) are pinned by the existing teeth. */
     #root { position: relative; z-index: 1; }
   </style>
 </head>
 <body>
-  <div id="jarvis-disc" aria-hidden="true"></div>
   <div id="root"></div>
   <script type="module" src="/entry.tsx"></script>
 </body>

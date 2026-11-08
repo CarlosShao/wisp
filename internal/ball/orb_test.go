@@ -262,14 +262,19 @@ func TestOrbWriteSite(t *testing.T) {
 
 // jarvisUpstreamSHA256 pins the embedded jarvis build output
 // (assets/jarvis-orb.html). The asset is the tools/jarvis-export build of the
-// UNMODIFIED upstream component; a rebuild through the scaffold reproduces it
-// (update this pin in the same commit as the rebuilt asset). 2026-11-07
-// real-machine follow-up rebuilt the template with body background
-// TRANSPARENT by construction (the product page must not paint any backdrop;
-// evidence 65-jarvis-transparent-in-product.md §2) - same build, new bytes.
-// The dark-disc rework (same day, evidence 65-jarvis-dark-disc.md) added the
-// in-page circular backdrop (#jarvis-disc) the particles composite over.
-const jarvisUpstreamSHA256 = "2cb15fc2aaa2972181079a01ff889d832b52e8ab4daa288de1ede317bc0c72ff"
+// upstream component with the scaffold's ONE build-time override; a rebuild
+// through the scaffold reproduces it (update this pin in the same commit as
+// the rebuilt asset). History: 2026-11-07 real-machine follow-up rebuilt the
+// template with body background TRANSPARENT by construction (evidence
+// 65-jarvis-transparent-in-product.md §2); the same day's dark-disc rework
+// added an in-page circular backdrop - REVERSED by the pure-particle leg
+// (2026-11-08, owner's ruling verbatim: no sphere body, no backdrop,
+// particles only like Jarvis): the disc is gone and the scaffold's
+// wisp-jarvis-normal-blending vite plugin rewrites the upstream's ten
+// AdditiveBlending material sites to NormalBlending at build time, so the
+// particles composite by their own alpha on ANY background (evidence
+// 65-jarvis-pure-particles.md).
+const jarvisUpstreamSHA256 = "754037b9a4c393de03800483cba81d718b91dd6b5075ff89b1d421e6d07a5163"
 
 // TestJarvisAssetShippedAsBuilt pins the jarvis page's integration claim: the
 // embed is the scaffold's build of the upstream component with the entry's
