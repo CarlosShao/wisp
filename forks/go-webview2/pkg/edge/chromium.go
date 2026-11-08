@@ -15,11 +15,19 @@ import (
 )
 
 type Chromium struct {
-	hwnd                  uintptr
-	focusOnInit           bool
-	controller            *ICoreWebView2Controller
-	webview               *ICoreWebView2
-	inited                uintptr
+	hwnd        uintptr
+	focusOnInit bool
+	controller  *ICoreWebView2Controller
+	webview     *ICoreWebView2
+	inited      uintptr
+	// bootFailed is the ticket-408 nil-env guard: armed by
+	// EnvironmentCompleted / CreateCoreWebView2ControllerCompleted when a
+	// boot completes with a negative HRESULT or would hand back a nil
+	// interface pointer (measured live: res=S_OK with env=0x0 when the
+	// WebView2 browser process dies at birth). Embed's pump polls it and
+	// returns false instead of crashing the boot thread or waiting forever,
+	// which lets the host take its non-WebView2 fallback renderer.
+	bootFailed            uintptr
 	envCompleted          *iCoreWebView2CreateCoreWebView2EnvironmentCompletedHandler
 	controllerCompleted   *iCoreWebView2CreateCoreWebView2ControllerCompletedHandler
 	webMessageReceived    *iCoreWebView2WebMessageReceivedEventHandler
@@ -97,6 +105,9 @@ func (e *Chromium) Embed(hwnd uintptr) bool {
 		if atomic.LoadUintptr(&e.inited) != 0 {
 			break
 		}
+		if atomic.LoadUintptr(&e.bootFailed) != 0 {
+			return false
+		}
 		r, _, _ := w32.User32GetMessageW.Call(
 			uintptr(unsafe.Pointer(&msg)),
 			0,
@@ -108,6 +119,12 @@ func (e *Chromium) Embed(hwnd uintptr) bool {
 		}
 		_, _, _ = w32.User32TranslateMessage.Call(uintptr(unsafe.Pointer(&msg)))
 		_, _, _ = w32.User32DispatchMessageW.Call(uintptr(unsafe.Pointer(&msg)))
+	}
+	if atomic.LoadUintptr(&e.inited) == 0 {
+		// The pump drained (or the boot reported failure) without a
+		// completed controller: there is nothing to Init against - the old
+		// shape fell through to e.Init and dereferenced a nil webview.
+		return false
 	}
 	e.Init("window.external={invoke:s=>window.chrome.webview.postMessage(s)}")
 	return true
@@ -169,8 +186,14 @@ func (e *Chromium) Release() uintptr {
 }
 
 func (e *Chromium) EnvironmentCompleted(res uintptr, env *ICoreWebView2Environment) uintptr {
-	if int64(res) < 0 {
-		log.Fatalf("Creating environment failed with %08x", res)
+	if int64(res) < 0 || env == nil {
+		// Ticket-408 nil-env guard: a failed boot (negative HRESULT) or the
+		// measured birth-death shape (S_OK with env=0x0) must neither kill
+		// the process nor start the success chain. Arm bootFailed so Embed
+		// returns false and the host takes its fallback renderer.
+		log.Printf("webview2: environment boot failed (hr=%08x, env nil: %v)", res, env == nil)
+		atomic.StoreUintptr(&e.bootFailed, 1)
+		return 0
 	}
 	_, _, _ = env.vtbl.AddRef.Call(uintptr(unsafe.Pointer(env)))
 	e.environment = env
@@ -184,8 +207,13 @@ func (e *Chromium) EnvironmentCompleted(res uintptr, env *ICoreWebView2Environme
 }
 
 func (e *Chromium) CreateCoreWebView2ControllerCompleted(res uintptr, controller *ICoreWebView2Controller) uintptr {
-	if int64(res) < 0 {
-		log.Fatalf("Creating controller failed with %08x", res)
+	if int64(res) < 0 || controller == nil {
+		// Same boot-failure seam as EnvironmentCompleted's nil-env guard: a
+		// failed or nil controller must report to the Embed waiter instead
+		// of Fatalf-ing the process or dereferencing the nil pointer.
+		log.Printf("webview2: controller boot failed (hr=%08x, controller nil: %v)", res, controller == nil)
+		atomic.StoreUintptr(&e.bootFailed, 1)
+		return 0
 	}
 	_, _, _ = controller.vtbl.AddRef.Call(uintptr(unsafe.Pointer(controller)))
 	e.controller = controller
@@ -344,8 +372,8 @@ func (e *Chromium) NavigationCompleted(sender *ICoreWebView2, args *ICoreWebView
 }
 
 func (e *Chromium) NotifyParentWindowPositionChanged() error {
-	//It looks like the wndproc function is called before the controller initialization is complete.
-	//Because of this the controller is nil
+	// It looks like the wndproc function is called before the controller initialization is complete.
+	// Because of this the controller is nil
 	if e.controller == nil {
 		return nil
 	}

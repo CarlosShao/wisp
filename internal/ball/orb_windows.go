@@ -317,7 +317,11 @@ func newOrbWindow(s *staThread, sizePx int, dpi uint32, ballHWND windows.HWND) (
 
 	if !browser.Embed(uintptr(o.hwnd)) {
 		o.destroy()
-		return nil, fmt.Errorf("ball: orb WebView2 Embed failed (runtime missing or blocked)")
+		// Embed now returns false on the fork's boot-failure guard too
+		// (negative HRESULT or the measured S_OK+nil-environment shape),
+		// not only on a missing/blocked runtime - the D2D fallback below
+		// is the designed landing for all three.
+		return nil, fmt.Errorf("ball: orb WebView2 Embed failed (runtime missing, blocked, or boot guard: nil environment)")
 	}
 	browser.Resize()
 
@@ -839,4 +843,16 @@ func (b *Ball) DebugOrbHWND() windows.HWND {
 		return o.hwnd
 	}
 	return 0
+}
+
+// DebugOrbUserDataDir exposes the per-boot user-data leaf the ATTACHED orb's
+// WebView2 actually runs from (debug harness/evidence only; empty when the
+// D2D fallback is active). Since the r2 per-boot leaves (ticket 408) the
+// served site lives INSIDE this leaf, not under the per-process root - tests
+// and probes that want the served page must key on this, not orbDataPath().
+func (b *Ball) DebugOrbUserDataDir() string {
+	if o := b.orb.Load(); o != nil {
+		return o.browser.DataPath
+	}
+	return ""
 }

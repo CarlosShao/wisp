@@ -375,7 +375,9 @@ func TestBallLiveOrbJarvisServedPageAndOverlay(t *testing.T) {
 	}
 
 	// Tooth 1: the served jarvis.html the product WebView2 actually loads.
-	served, err := os.ReadFile(filepath.Join(orbDataPath(), "site", jarvisEntryName))
+	// Keyed on the orb's per-boot leaf (ticket 408 r2), not the per-process
+	// root: the site moved INSIDE the boot-<n> leaf when r2 landed.
+	served, err := os.ReadFile(filepath.Join(b.DebugOrbUserDataDir(), "site", jarvisEntryName))
 	if err != nil {
 		t.Fatalf("read served jarvis page: %v (orbWriteSite runs on every attach)", err)
 	}
