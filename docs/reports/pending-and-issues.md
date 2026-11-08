@@ -32474,3 +32474,61 @@ export WISP_LIVE_MIC=1
 - 有界等待＝`git revert 062e5fe70`（会退回「产码无限等」状态）。
 - 145 五族＝`git revert dd912e869`。
 - 越面一行＝把 `orb_jarvis_live_windows_test.go:380` 改回 `orbDataPath()`。
+## A1644（2026-11-08 20:5x，编排者）**★★票 408 结案（`-done`）——整包 579.5s 到终态、快 351.9 秒、两枚死点红→绿｜★我踩了 rename 老坑并记下正确配方｜wave98 三腿放出**
+
+### 一、★★票 408 结案（`7f5f8d7ba` ＋ `b90c0ff2c`）
+**四层根因全部修完并验收**：
+
+| 读数 | 基线 `eec09a028` | 终态 `b7a2b6721` | 差 |
+|---|---|---|---|
+| 整包耗时 | 931.402s | **579.515s** | **−351.9s** |
+| RUN | 708 | 707 | −1 |
+| PASS | 497 | 497 | 0 |
+| **FAIL** | **54** | **51** | **−3** |
+| SKIP | 2 | 4 | +2 |
+
+**两枚死点决定性红→绿**：
+- `Test258BridgeRebindsLiveKeysFromConfigEdit` **PASS 0.06s**（原挂 17m35s）
+- `TestAC294MuteHotkeyRegistersLiveOnARealBallWindow` **PASS 0.65s**（原挂 10m）
+
+**★nil-env 守卫在整包语境里真触发一次**（20:43:48）：`environment boot failed (hr=80010106, env nil: true)` → `D2D fallback stays active` ⇒ **守卫真的工作、按设计降级、零真 panic**。
+
+**winlive**：**10/10 全 PASS 244.689s**（三发读数：首发作废＝撞别腿在主树在飞的球窗 pid 4936；次发 53s 无声死亡＝已立档的环境 GPU 抖动族；三发终态）。
+
+**★有界等待的牙三发变异全按预期**（`2cc6b8e06`）：
+| 发 | 变异 | 实测 |
+|---|---|---|
+| A | 改回裸 `<-s.started` | **红 5.00s**：`the wait is unbounded again` |
+| B | budget→100ms | **PASS 0.20s**（牙自带楔值，不依赖真 30s） |
+| C | 超时改 `return nil` | **红 0.20s**：`the bounded wait is gone` |
+- **★我自己复跑**：`TestWaitStartedBoundedReturnsNamedError` PASS 0.20s、`TestWaitStartedStillPassesBootErrThrough` PASS 0.00s ✓
+- **预算裁定：维持 30s**（腿给的：最差健康 7.9s 的 4 倍；`waitStarted` 只罩最快的窗口腿；**代价不对称＝误杀活球比晚 30s 报死球更坏**，预算宁长勿短）。
+
+**★51 红全归因（逐名）**：存量 6（255Roster×2、198FirstRunCaller、313WritableUnion、AC4FocusReturn、LockedSuffix，与基线同名）／他腿落树欠账 2（256Options、AC247HandingTheLevel）／重执行族 **4（基线 6）**／**语音族 39（System32 旧 onnxruntime 遮蔽，治腿在飞）**。
+
+### 二、★★我踩了 rename 老坑（第 13 次），并记下**正确配方**
+**犯的错**：`git mv` 后我用「旧名＋新名」双 pathspec 去 `git add`，**旧名已不在磁盘 ⇒ `git add` 直接 fatal**，整个 commit 没发生（我误以为成功）；随后只点新名提交，**旧名删除留在脏面**。
+**正确配方（下次照做）**：
+1. `git mv old new` ⇒ git 自动暂存 **R100 旧→新**；
+2. **⛔ 不要再 `git add` 旧名**（文件已不在磁盘，会 fatal）；
+3. `git commit -F msg -- <新名>` 即可（R100 是**一对**，一个 pathspec 就够）；
+4. **落账后必跑双名核**：`git ls-tree HEAD --name-only <dir> | grep -c "<旧名>$"` **必须 0**、`grep -c "<新名>$"` **必须 1**、`git status --porcelain` **脏必须 0**；
+5. **若旧名删除仍留脏 ⇒ 单独补一笔**只点名旧名的 commit（我这次就是 `b90c0ff2c`）。
+⇒ **教训：`git add` 双名不是 rename 的配方；`git mv` 的 R100 才是。判据永远是 `git ls-tree HEAD` 的双名计数，⛔ 只看「commit rc=0」。**
+
+### 三、★票池三档清单（上一腿「≤2 格」层的结论，第一交付）
+- **档一（能做）＝ 0 枚**：≤2 格这一层今天**榨不出一枚可落地的**。
+- **档二（归口等票／等批准）＝10 张**：220（票 201 写面未空）／246（归 228）／247（归 297）／138（等 Q-55 机主批）／256（等 A## 批准）／174（等 owner 批准）／301（AC#4 永久留空＋AC#4b 待收）／329（待裁两维）／312（机主「后面再说」）／407（前端归外部 agent）。
+- **档三（不适用／要人／硬件／结构不可能）＝11 张**：216（已终裁不适用）／316（**withdrawn** ⛔ 碰）／290／293（⛔ 归机主在场）／64（缺第二屏）／68（需桌面）／70（要 Linux）／72（要真 CI run）／262（结构不可能）／239／311（等收件）。
+- ⇒ **下一波写腿别从 ≤2 格层挑**，真活在中段那 78 张里。
+
+### 四、wave98 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `dll-shadow-2` | ★治 **39 枚语音红**（System32 旧 `onnxruntime.dll` 1.17.1 遮蔽）——接手上一腿未交的活；**主流做法＝DLL 与 exe 同目录**（标准部署形状）或 `LoadLibraryEx` 绝对路径；★**⛔ 改 System32／⛔ 提交 10MB DLL／⛔ 靠 `os.Setenv(PATH)`**（已证明无效） |
+| `301-329-close` | ★收口两票（**我裁完了**）：301 AC#4＝**接受「永久留空」**（历史事实，⛔ 伪造读数去勾）／AC#4b＝**翻**（复跑名册对）／329 AC#7＝**采「另路 13 枚名册」维**（⛔ 采整包维——整包含 51 枚归因红，语音族 39 是**别人的环境问题**，算进本票就脏了）／AC#0＝**翻**（如实记缺陷） |
+| `deep-tickets` | ★从中段那 78 张里筛真能落地的，做掉至少 2 枚＋交「中段票三档清单」 |
+
+### 五、撤销口令
+- 408 结案＝`git revert b90c0ff2c 7f5f8d7ba`（会退回未结状态，⛔ 建议）。
+- 408 四层根因任一笔＝`git revert eec09a028 da5d559b7 062e5fe70 e7f420a6c`。
