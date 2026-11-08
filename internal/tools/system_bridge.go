@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"runtime"
 	"sync"
 )
 
@@ -257,12 +256,6 @@ func (o *systemOps) Lines() []string {
 // small helpers shared by the family
 // ---------------------------------------------------------------------------
 
-// isWindowsGate is the one place a non-test file asks "am I on Windows". It is
-// used only for prose (which limit applies), never for a security decision: a
-// security decision lives in a build-tagged backend, where the compiler is the
-// arbiter.
-func isWindowsGate() bool { return runtime.GOOS == "windows" }
-
 // argString reads one string argument.
 func argString(args map[string]any, key string) string {
 	v, ok := args[key]
@@ -308,18 +301,4 @@ func argBool(args map[string]any, key string) bool {
 	}
 	b, ok := v.(bool)
 	return ok && b
-}
-
-// systemErrText renders a backend refusal for the model. The distinction it
-// keeps is the one D37 draws: an unreachable platform is a tool-class failure
-// the model can act on, never a host fault.
-func systemErrText(what string, err error) string {
-	switch {
-	case errors.Is(err, ErrElevatedTarget):
-		return err.Error()
-	case errors.Is(err, ErrNoSystemBackend), errors.Is(err, ErrNotImplementedHere):
-		return what + "：" + err.Error()
-	default:
-		return what + "失败：" + err.Error()
-	}
 }

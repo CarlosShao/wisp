@@ -642,16 +642,6 @@ func (c *CloudTTSChain) indexOfName(name string) int {
 
 // -- shared helpers -----------------------------------------------------------
 
-// causeOrUnknown names the D37 class of the last failure for the terminal
-// hop's event; with no recorded failure the walk reached local because every
-// element was quota-skipped, and the cause field says exactly that.
-func causeOrUnknown(err *observe.Error) string {
-	if err == nil {
-		return quotaCauseSkip
-	}
-	return string(err.Class)
-}
-
 // classifySpeakError normalizes whatever a TTS engine returned into a
 // D37 *observe.Error (engines here already return classified errors; this
 // covers third-party TtsEngines that return plain errors -- the local

@@ -36,9 +36,7 @@ type mdParser struct {
 	b   bytes.Buffer
 	// block state
 	inPre   bool
-	preLang string
 	liDepth int
-	pendNL  int // pending blank-line count, flushed lazily so output stays tidy
 	links   []linkMark
 }
 
@@ -49,12 +47,6 @@ var voidBlockTags = map[string]bool{
 	"ul": true, "ol": true, "dl": true, "table": true, "tr": true, "br": true,
 	"hr": true, "figure": true, "figcaption": true, "form": true, "fieldset": true,
 	"address": true, "details": true, "summary": true,
-}
-
-var dropEntirely = map[string]bool{
-	"script": true, "style": true, "noscript": true, "template": true,
-	"iframe": true, "object": true, "embed": true, "svg": true, "math": true,
-	"head": true, "title": true,
 }
 
 // parse walks the byte stream. Any "<!" or "<?" run is skipped to ">", any

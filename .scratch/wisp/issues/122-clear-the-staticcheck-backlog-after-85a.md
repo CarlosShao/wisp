@@ -116,3 +116,17 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
 - [2026-09-23 22:2x +08] agent=orchestrator did=追加 AC#7（工具版本未钉＋跑门禁会升宿主工具链）；
   来源是批次 4 自己登记的那处"与前三批分歧"——它没拿新读数盖掉旧读数，而是把分歧摆出来，才让这件事现形。
   next=与 42 枚主账同批做（同一个人、同一次改 `ci.yml` 的 lint 步），别单开一票。
+
+- [2026-11-08 15:0x +08] agent=122sb2 did=第二批落地（HEAD `31482f271`，staticcheck 2026.2.2 (0.8.2)，整包跑
+  `--shared` 导出树 122sb1/122sb2，写只回主工作树；证据表 `docs/evidence/s1/122-staticcheck-batch2.md`）。
+  起手重测：windows 94×U1000 / linux 14×U1000，与批 1 表逐条对上（批 1 汇总"删 22"重数实为 21，按仪器为准）；
+  21 条候选逐条现核 grep ⇒ **删 11 条**（realPostMessage/fns/isWindowsGate/systemErrText/systemNowMu/colorGrey/
+  preLang/pendNL/dropEntirely/extractDeclJSON/causeOrUnknown），**留 10 条**，其中 3 枚现核推翻批 1"删-2"
+  （argInt/argBool windows 构建在用；orbHwndTopmost winlive 测试在引用）、2 枚 config 尺被同包测试真引用
+  （lockedSections/lockedKeyDisposition）、4 枚写面越界（ball×3＋cmd 侧 2 之 pGetModuleHandle/wroteIt——ball 派单禁碰、
+  cmd 不在本腿 internal/** 写面）。
+  读数：windows 109→98（U1000 94→83，diff −11＝全部目标）、linux 20→14（U1000 14→8）。
+  门禁：build rc0、gofumpt 0 行（7 枚改动件）、vet rc0、d22scan clean rc0；
+  测试 manifestslot/speech ok，tools 1 条环境红（TestTicket252R1 短名前置，基线树逐字同红，零新增红）。
+  **SA1019 剩 1 条（risk/proccpu_windows_test.go:20）：不修——`internal/risk/**` 冻结，本腿无写面，待编排者/机主裁是否解冻。**
+  next=编排者推送后取 CI `lint` job staticcheck 步读数（期望 linux 14 / windows 98，须同报版本）关 AC#6。

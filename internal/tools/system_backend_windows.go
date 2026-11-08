@@ -341,10 +341,6 @@ func realSetWindowPos(hwnd, insertAfter uintptr, x, y, cx, cy int32, flags uint3
 		uintptr(x), uintptr(y), uintptr(uint32(cx)), uintptr(uint32(cy)), uintptr(flags))
 }
 
-func realPostMessage(hwnd uintptr, msg uint32, wparam, lparam uintptr) bool {
-	return callBool(procPostMessageW, hwnd, uintptr(msg), wparam, lparam)
-}
-
 func realClipboardRead() (string, error) {
 	if !callBool(procOpenClipboard, 0) {
 		return "", fmt.Errorf("打开剪贴板失败（可能被其他程序占用）")
@@ -816,13 +812,6 @@ var (
 // ---------------------------------------------------------------------------
 // the verb implementations
 // ---------------------------------------------------------------------------
-
-func (b *systemBackend) fns() *systemBackend {
-	if b == nil {
-		return &systemBackend{}
-	}
-	return b
-}
 
 func realEnumWindowsFor(b *systemBackend) func(func(uintptr) bool) error {
 	if b != nil && b.enumWindows != nil {

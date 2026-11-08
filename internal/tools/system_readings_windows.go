@@ -14,7 +14,6 @@ import (
 // a test can pin the rendered text.
 
 var (
-	systemNowMu  sync.RWMutex
 	systemNowFn  = func() (string, error) { return time.Now().Format(time.RFC3339), nil }
 	platformRead = func() map[string]any {
 		return map[string]any{"battery": batteryState(), "volume": volumeReading()}

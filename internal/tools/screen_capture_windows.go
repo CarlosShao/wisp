@@ -5,7 +5,6 @@ package tools
 import (
 	"fmt"
 	"image"
-	"image/color"
 	"image/png"
 	"unsafe"
 
@@ -188,7 +187,3 @@ func (w *bytesBuffer) Write(p []byte) (int, error) {
 func callInt(proc *windows.LazyProc, args ...uintptr) int32 {
 	return int32(callUintptr(proc, args...))
 }
-
-// colorGrey is the placeholder the DRM notice renders around (kept so the
-// package's color import is not unused if the notice ever needs a swatch).
-var colorGrey = color.NRGBA{R: 0x20, G: 0x20, B: 0x20, A: 0xFF}
