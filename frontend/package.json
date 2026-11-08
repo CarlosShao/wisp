@@ -19,7 +19,8 @@
     "render:stream": "vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js",
     "render:receiver": "vite build --ssr scripts/render-snapshot-receiver.tsx --outDir node_modules/.tmp/receiverrender --logLevel warn && node node_modules/.tmp/receiverrender/render-snapshot-receiver.js",
     "render:roster": "vite build --ssr scripts/render-task-roster.tsx --outDir node_modules/.tmp/rosterrender --logLevel warn && node node_modules/.tmp/rosterrender/render-task-roster.js",
-    "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js"
+    "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js",
+    "render:model-settings": "vite build --ssr scripts/render-model-settings.tsx --outDir node_modules/.tmp/modelrender --logLevel warn && node node_modules/.tmp/modelrender/render-model-settings.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

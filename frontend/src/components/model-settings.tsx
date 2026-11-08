@@ -54,6 +54,14 @@ import {
    itself lives in lib/config-actions.ts with the performers that take it. */
 export type { ConfigWireWrite, ModelsFetchResult } from "@/lib/config-actions";
 
+/** 票 313 AC#1（机主原话「可以把 stepfun 作为我们默认的模型来使用」；A877
+    裁定③＝`configuredKnown && !configured` 时默认高亮）：机主点名的默认
+    供应商。它只在两道门都过时才生效——用户还没配过任何东西
+    （`!view.configured`），且这个名字真的出现在 Go 侧送来的预设清单里
+    （`view.presets`）。它只是添加表单的初始预选：不点「添加」不写任何
+    东西，用户一旦有配置就永远以用户的为准，这里连预选都不再给。 */
+export const OWNER_DEFAULT_PROVIDER = "stepfun";
+
 export interface ModelSettingsViewProps {
   view: ConfigView;
   /** One whitelisted write, answered as the sentence to show. */
@@ -216,6 +224,16 @@ function ProvidersCard({
       ? view.presets.filter((name) => !rows.some((p) => p.name === name))
       : null;
 
+  // 票 313 AC#1：预选只在「用户还没配过任何东西」时给，而且必须真的在 Go
+  // 侧的预设清单里——预选是初始高亮，不是一次隐藏的写入；用户改过以后
+  // （configured=true）永远走用户自己的值，这里连预选都不出现。
+  const defaultProvider =
+    view.configuredKnown &&
+    !view.configured &&
+    (availablePresets ?? []).includes(OWNER_DEFAULT_PROVIDER)
+      ? OWNER_DEFAULT_PROVIDER
+      : "";
+
   return (
     <SettingsCard title="供应商" description="密钥只保存在本机；界面上不会再显示密钥内容。">
       {rows.length === 0 && !addOpen ? (
@@ -243,6 +261,7 @@ function ProvidersCard({
             <AddProviderForm
               available={availablePresets}
               busy={busy}
+              defaultProvider={defaultProvider}
               onCancel={() => setAddOpen(false)}
               onFeedback={onFeedback}
               performCredential={performCredential}
@@ -285,7 +304,10 @@ type FetchState =
   | { phase: "error"; feedback: Feedback }
   | { phase: "ready"; models: string[] };
 
-function ProviderRow({
+/** Exported for the render instrument (scripts/render-model-settings.tsx):
+    the key row's markup (type="password", value never in state) is asserted
+    on this piece directly. */
+export function ProviderRow({
   row,
   busy,
   editing,
@@ -770,10 +792,14 @@ function ProviderEdit({
   );
 }
 
-function AddProviderForm({
+/** Exported for the render instrument (scripts/render-model-settings.tsx):
+    static markup cannot click the 添加供应商 button, so the instrument mounts
+    the pure form directly. */
+export function AddProviderForm({
   available,
   presets,
   busy,
+  defaultProvider,
   onCancel,
   onDone,
   onFeedback,
@@ -784,6 +810,10 @@ function AddProviderForm({
   available: string[] | null;
   presets: string[] | null;
   busy: string | null;
+  /** 票 313 AC#1's initial pre-selection. It is read exactly once, as the
+      initial state below - it never re-imposes itself over the user's pick,
+      and it never sends anything on its own. */
+  defaultProvider: string;
   onCancel: () => void;
   onDone: (name: string) => void;
   onFeedback: (next: Feedback | null) => void;
@@ -794,7 +824,9 @@ function AddProviderForm({
   const MODES = ["内置供应商", "自定义接入"] as const;
   const BILLING = ["套餐（plan）", "按量（pay-per-token）"] as const;
   const [selectedMode, setSelectedMode] = useState<(typeof MODES)[number]>("内置供应商");
-  const [provider, setProvider] = useState("");
+  // 票 313 AC#1: the pre-selection lands here, once, as the initial value.
+  // The picker above it stays fully in the user's hands from the first click.
+  const [provider, setProvider] = useState(defaultProvider);
   const [customName, setCustomName] = useState("");
   const [protocol, setProtocol] = useState("");
   const [customBase, setCustomBase] = useState("");
