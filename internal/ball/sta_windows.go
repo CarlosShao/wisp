@@ -13,6 +13,7 @@ import (
 	"log/slog"
 	"runtime"
 	"sync"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -213,9 +214,37 @@ func (s *staThread) releaseCOM() {
 
 var pCoUninitialize = modOle32.NewProc("CoUninitialize")
 
-// waitStarted blocks until the window is up (or boot failed).
+// bootWaitBudget bounds waitStarted (ticket 408, the production half of the
+// bounded-boot work; the test-layer half is startResidentBallBounded in
+// cmd/wisp). 30s is ~4x the worst healthy boot measured on this tree (7.9s for
+// a FULL boot - WebView2 environment plus controller - of which waitStarted
+// only covers the window-creation leg, the fast part) and matches the
+// user-facing judgement that a ball which has not appeared within 30s is
+// broken: New returns a named error instead of hanging forever, so the
+// resident layer can report the dead boot and degrade. It is a var, not a
+// const, solely so the bounded-wait test can shorten it; production never
+// writes it.
+var bootWaitBudget = 30 * time.Second
+
+// waitStarted blocks until the window is up (or boot failed), bounded by
+// bootWaitBudget. Before ticket 408 this was a bare <-s.started: when the
+// ui-sta thread died before signalling - the WebView2 born-dead shape, where
+// EnvironmentCompleted(S_OK, env=0x0) panics the start goroutine and close
+// never runs - ball.New hung forever while the user watched no ball appear
+// and no process exit. Expiry does NOT unwind the wedged thread: the STA
+// thread, its window and its hotkeys stay wedged exactly as the test-layer
+// helper documents - what expiry buys is that the WAITER gets a named error
+// and the caller a decision point, instead of a silent permanent hang. The
+// timer is a monotonic timer, not a wall-clock delta (D22's banned shape).
 func (s *staThread) waitStarted() error {
-	<-s.started
+	timer := time.NewTimer(bootWaitBudget)
+	defer timer.Stop()
+	select {
+	case <-s.started:
+	case <-timer.C:
+		return fmt.Errorf("ball: the ui-sta thread did not report window creation within %s; the ball boot is wedged (healthy boots measure 1.3-7.9s on this tree)",
+			bootWaitBudget)
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.err
