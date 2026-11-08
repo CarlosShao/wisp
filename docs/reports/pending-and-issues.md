@@ -32162,3 +32162,40 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - UDF 唯一化＝`git revert c656c0ed8 e7f420a6c`。
 - 408 补登＝`git revert 5bbf23762`。
 - risk 解冻＝台账补一行撤销即可（未改码）。
+## A1636（2026-11-08 15:4x，编排者）**★★★机主批准改契约：球的尺寸范围可放大（逐字「可放大，按你推荐的试试」）｜授权落账｜执行分两批（避开在飞写面）**
+
+### 一、机主授权（逐字，2026-11-08 15:4x）
+> 问：「① 球要不要放大？（推荐：放大到 120~160）」
+> **机主答：「可放大，按你推荐的试试」**
+
+⇒ **授权成立**：`SPEC-03 §3` 的 `[ball] size(int)=56（44–72）` 这行契约文字**可以改**；`PLAN.md:3557` 的「配置范围 44–72px」同改。
+
+### 二、★现状（我现读，改前基线）
+| 位置 | 现值 |
+|---|---|
+| `docs/specs/SPEC-03*.md:27` | `[ball] \| size(int)=56（44–72）…` |
+| `docs/PLAN.md:3557` | 「格子内球体 **56px**（配置范围 **44–72px**…）」 |
+| `internal/ball/tokens.go:522-528` | `BallSizeDefaultPx=56`／`SmallPx=44`／`LargePx=72`／`MinPx=44`／`MaxPx=72` |
+| `internal/config/validate.go:62` | `if c.Ball.Size < 44 \|\| c.Ball.Size > 72` |
+| `internal/ball/ball_windows.go:158-163` | clamp 到 Min/Max |
+| `internal/ball/statevisual.go:130-134` | clamp 到 Min/Max |
+| `internal/ball/renderer_windows.go:939` | `WindowEdgePx(BallSizeMaxPx, dpi)` |
+| 实测 | `WindowEdgePx(56,96)=56+2*22=100` ⇒ 窗口 100px，**绘制区仅 56px**；`-size=200` 被钳回 72 |
+
+### 三、★为什么要放大（物理依据）
+在 **56px 绘制区**里画精细粒子**物理上就是糊的**。机主对比的 Jarvis demo 是几百像素/全屏渲染。⇒ 唯一能真像 demo 的路＝**放大绘制区**。
+
+### 四、★我的技术裁定（铁律 ⓪⓪⓪，⛔ 丢回机主）
+- **新范围 = 44..160，默认 56 不变**（保守起点，机主说「按你推荐的试试」＝先试，不是定死）。
+  - **⛔ 不把默认改成 160**：默认变大是**行为变更**，会影响所有既有用户与所有尺寸断言；先让**能力**可用（用户/配置可调大到 160），默认仍 56，机主试完满意再决定默认值。
+  - **上限 160**：`WindowEdgePx(160,96)=160+44=204` ⇒ 窗口 204px，绘制区 160px，够画精细粒子；再大则球在 1080p 屏上占 1/5 宽，过度。
+- **RingMarginPx=22 保持不变**（渲染留白是几何契约，⛔ 动）。
+- **`BallSizeLargePx` 语义**：现 72＝"large 档"；改为 160 会破坏 `--ball-lg` 的档位语义 ⇒ **新增 `BallSizeMaxPx=160` 但保留 `BallSizeLargePx=72`**（large 档仍是 72，只是允许用户手配到 160）。★这是关键区分，⛔ 混。
+
+### 五、执行分两批（避开 wave89 在飞写面）
+- **批 A（现在派）**：`internal/config/**`（validate 44→160）＋`docs/specs/SPEC-03*.md`＋`docs/PLAN.md:3557`＋`internal/config/validate_test.go`。**⛔ 碰 `internal/ball/**`**（wave89 在写）。
+- **批 B（wave89 落账后派）**：`internal/ball/tokens.go`（`BallSizeMaxPx=160`，`LargePx` 留 72）＋`ball_windows.go`/`statevisual.go` clamp 跟随＋`renderer_windows.go:939`＋相关测试。
+
+### 六、撤销口令
+- 契约放大整体＝「球尺寸回退」⇒ 还原 `SPEC-03`/`PLAN.md`/`validate.go`/`tokens.go` 四处（分两笔 revert）。
+- 只回退默认值＝默认本来就没改（仍 56），无需动作。
