@@ -79,6 +79,9 @@
 #   bash scripts/portable-tests.sh --scope=windows    # the test-windows scope
 #   bash scripts/portable-tests.sh --scope=cli        # cmd/wisp, after third_party
 #   bash scripts/portable-tests.sh --scope=winsec     # the internal/winsec tier (ticket 251)
+#   bash scripts/portable-tests.sh --scope=speech     # internal/speech via the staging
+#                                                     # carrier scripts/speech-tests.sh
+#                                                     # (ticket 409, wave99)
 #   bash scripts/portable-tests.sh ./internal/proc/   # explicit scope (A and B still
 #                                                     # apply; C has nothing to pin -
 #                                                     # UNLESS the list IS one tier's own
@@ -221,6 +224,19 @@ fi
 #           census is not a scope - it is the audit of the four above, and it is in
 #           the tiers= roster below because AC#4 (ticket 251) requires the tier names
 #           census reads and the branches that give a tier its scope to be ONE list.
+#   speech  the internal/speech tier (ticket 409, wave99). This tier exists because
+#           the package cannot be judged by a bare `go test` invocation on Windows:
+#           its cgo test binary links the sherpa-onnx import library and the loader
+#           resolves the whole DLL tree at process LOAD time, before any Go code, so
+#           the directory of the executable is the only search slot a runner can
+#           still influence. The tier's run step therefore never reaches the strict
+#           runner; it hands the package to scripts/speech-tests.sh (the staging
+#           carrier: `go test -c`, stage the three pinned DLLs next to the binary,
+#           run it from the package directory) and reads the verdict off the same
+#           -v stream. The four numbers, the ledger staleness check and the guards
+#           above the run step all still apply; only the per-package `ok <path>`
+#           result-line table (GUARD B) is replaced by its speech-shaped
+#           equivalent, because a raw binary run prints no such line.
 #
 # ./internal/winsec/ joined the core list for ticket 111 AC#9: the ubuntu leg ran
 # 16 globs that never named it, so the whole `!windows` half of the package that
@@ -279,6 +295,21 @@ fi
 # exactly what that runner exists to refuse. It stays on the census as
 # UNCLAIMED-HAS-TESTS until such a carrier claims it; nothing is hidden by leaving it
 # off this list.
+#
+# UPDATE 2026-11-08 (ticket 409, wave99): that reading is now superseded by a carrier
+# that removes its premise. scripts/speech-tests.sh builds the test binary with
+# `go test -c`, stages the three pinned DLLs NEXT TO IT and runs the binary from the
+# package directory - the loader's FIRST search slot, ahead of System32 - so the
+# shadowed OS-provided onnxruntime 1.17.1 can no longer win: the 41 shadow skips
+# turned into real passes (measured 2026-11-08: PASS=83 FAIL=0 SKIP=6 rc=0, the 6
+# residual skips naming a missing punctuation model, not the shadow). The speech tier
+# below therefore claims github.com/CarlosShao/wisp/internal/speech and routes it
+# through that carrier instead of the strict runner - a bare `go test` in a named
+# scope would still die at LOAD time or book the model-missing skips against a runner
+# that treats every skip as fatal, which is the exact permanent red the paragraph
+# above refused to buy. The census row moves from UNCLAIMED-HAS-TESTS to CLAIMED BY
+# speech in the same commit, because GUARD D compares this file's pins against the
+# packages it sees.
 mode=core
 case "${1-}" in
     --scope=*) mode=${1#--scope=}; shift ;;
@@ -340,6 +371,9 @@ github.com/CarlosShao/wisp/cmd/wisp
 winsec_pin='
 github.com/CarlosShao/wisp/internal/winsec
 '
+speech_pin='
+github.com/CarlosShao/wisp/internal/speech
+'
 
 # TICKET 251 AC#4 - ONE ROSTER, READ BY EVERYONE. The tier names used to be written
 # TWICE in this file: as the `case $mode in` branches, and again as
@@ -349,7 +383,7 @@ github.com/CarlosShao/wisp/internal/winsec
 # only place the names are written; the census step re-reads THIS FILE's own
 # `case $mode in` block and refuses to report anything unless the two sets are equal
 # in both directions, so the roster cannot be maintained apart from the branches.
-tiers='core windows cli winsec census'
+tiers='core windows cli winsec speech census'
 # The winsec tier's scope, named once: the tier branch below, the explicit-path audit
 # further down and the core tier's winsec row ALL read it, so "what the tier covers"
 # cannot drift from "what the tier's pin claims" the way the tier NAME used to, and
@@ -402,6 +436,15 @@ winsec)
     # a rename or a package that stopped resolving, in BOTH directions.
     scope=("$winsec_scope")
     pinned=$winsec_pin
+    ;;
+speech)
+    # Ticket 409 / wave99: the tier claims the package the census used to report as
+    # UNCLAIMED-HAS-TESTS, and the run step routes it through the staging carrier
+    # (see the mode=speech branch below the guards). Scope and pin follow the same
+    # one-list rule as every other tier: GUARD C bites when the package is split,
+    # renamed or stops resolving, in both directions.
+    scope=(./internal/speech/)
+    pinned=$speech_pin
     ;;
 census)
     scope=()
@@ -502,7 +545,7 @@ if [ "$mode" = census ]; then
             if [ "$m" = census ]; then continue; fi # the auditor owns no pin (ticket 251 AC#4)
             case $m in
             core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
-            winsec) pin=$winsec_pin ;;
+            winsec) pin=$winsec_pin ;; speech) pin=$speech_pin ;;
             *)
                 {
                     echo "portable-tests.sh: census - tier '$m' is in tiers= but this loop has no pin for"
@@ -898,7 +941,34 @@ capture=$(mktemp 2>/dev/null || echo "$root/.portable-tests.$$.log")
 rc=0
 # tee costs nothing and keeps the strict runner's verdict intact while giving
 # this script the bytes for the four numbers and for naming an offender.
-sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?
+#
+# TICKET 409 / wave99: the speech tier never reaches the strict runner. A bare
+# `go test ./internal/speech/` cannot be judged here - the cgo test binary's DLL
+# tree is resolved by the Windows loader at process load time, before any Go code,
+# so on a host whose System32 carries an older onnxruntime the run is 47 skips
+# (which the strict runner books as fatal), and without the DLLs on the first
+# search slot it dies with 0xc0000135 before a single test runs. The tier's scope
+# is still resolved, pinned (GUARD C) and audited (GUARD A) above; only the run
+# step is delegated, to the carrier that stages the pinned DLLs next to the test
+# binary and runs it from the package directory. Its stdout is the same -v stream
+# the strict runner would have produced, so the four numbers below are read off
+# it unchanged.
+if [ "$mode" = speech ]; then
+    carrier="$here/speech-tests.sh"
+    if [ ! -f "$carrier" ]; then
+        echo "portable-tests.sh: $carrier is missing - the speech tier routes through it and" \
+            "refuses to invent a weaker run in its place." >&2
+        rm -f "$capture"
+        exit 2
+    fi
+    echo "portable-tests.sh: mode=speech routes [${scope[*]}] through the staging carrier" \
+        "scripts/speech-tests.sh (ticket 409) - the strict runner cannot judge this package:"
+    echo "portable-tests.sh: the loader resolves the sherpa DLL tree at process load time," \
+        "so the carrier stages the pinned DLLs next to the test binary first."
+    bash "$carrier" 2>&1 | tee "$capture" || rc=$?
+else
+    sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?
+fi
 
 count() { grep -c "$1" "$capture" || true; }
 ran=$(count '^=== RUN')
@@ -936,6 +1006,30 @@ escape_re() { printf '%s' "$1" | sed 's/[][\\^$.*+?(){}|]/\\&/g'; }
 # to confuse with a real run here.
 result_tail='[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$'
 
+if [ "$mode" = speech ]; then
+    # GUARD B (speech shape, ticket 409 / wave99): the carrier runs the raw test
+    # binary, so Go's per-package `ok <import path> <duration>` result line does
+    # not exist in the output and the anchored per-package table below cannot
+    # apply. The speech-shaped equivalent of "the package was tested" is the -v
+    # denominator itself: a capture with zero top-level PASS and zero top-level
+    # FAIL lines ran nothing at all - the green no-op the strict runner refuses
+    # as its third check - so it is refused here with the same voice. The
+    # remaining skips are NOT made fatal here, deliberately and on the record:
+    # the carrier's own exit code already carries every assertion verdict, and
+    # the 6 residual skips name a missing punctuation model (a fixture-class
+    # environment gap, printed with their reasons above), not a softened
+    # assertion - the strict runner's skip rule stays untouched for every other
+    # tier.
+    if [ "$passed" -eq 0 ] && [ "$failed" -eq 0 ]; then
+        {
+            echo "portable-tests.sh: GUARD B (speech) - the carrier's -v output carries NO top-level"
+            echo "portable-tests.sh:   result line, so this step tested [${scope[*]}] ZERO times:"
+            echo "portable-tests.sh:   === RUN=$ran  --- PASS=$passed  --- FAIL=$failed  --- SKIP=$skipped"
+            echo "portable-tests.sh: that is the green no-op shape ticket 71 AC#3 was written against."
+        } >&2
+        if [ "$rc" -eq 0 ]; then rc=1; fi
+    fi
+else
 missing=0
 declare -A per_pkg=()
 while IFS= read -r pkg; do
@@ -967,6 +1061,7 @@ if [ "$missing" -ne 0 ]; then
         echo "portable-tests.sh: that got shorter (ticket 111 AC#2/AC#8)."
     } >&2
     if [ "$rc" -eq 0 ]; then rc=1; fi
+fi
 fi
 
 rm -f "$capture" "$resolved"

@@ -568,7 +568,7 @@ fi
 if selected unknown-scope-still-hard; then
     run_with unknown-scope-still-hard "$pin" -- --scope=winsecfoo
     want_rc 2
-    has 'unknown --scope=winsecfoo \(known: core, windows, cli, winsec, census\)'
+    has 'unknown --scope=winsecfoo \(known: core, windows, cli, winsec, speech, census\)'
     hasnt 'refusing to be a green no-op'
     hasnt '^runtests\.sh: OK'
 fi

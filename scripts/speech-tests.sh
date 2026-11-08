@@ -28,8 +28,13 @@
 # Usage: scripts/speech-tests.sh [extra -test.* flags...]
 #   e.g. scripts/speech-tests.sh -test.run 'TestVAD'
 # Exit codes: the test binary's exit code, or 1/2 on a named setup failure.
-# Output: the test log is kept at $WISP_SPEECH_STAGE_DIR/speech-tests.log and
-# a runtests.sh-shaped summary is printed here.
+# Output: the test log is kept at $WISP_SPEECH_STAGE_DIR/speech-tests.log, and
+# the same -v stream is ALSO printed on stdout (teed, not swallowed): the
+# full-package runner (scripts/portable-tests.sh --scope=speech, ticket 409
+# wave99) counts the four numbers by scanning `=== RUN` / `--- PASS` /
+# `--- FAIL` / `--- SKIP` lines in what this step prints - a summary line alone
+# would be "the word appeared in the log" wearing four numbers, the exact shape
+# that runner exists to refuse.
 
 set -u
 
@@ -64,11 +69,14 @@ bash "$root/scripts/stage-sherpa-dlls.sh" "$stage" || exit 1
 
 # Run from the package directory, the cwd "go test" uses, so package-relative
 # fixtures resolve the same way. The binary is invoked by its absolute path.
+# The -v stream is teed to stdout (see the Output note in the header): the
+# full-package runner counts the four numbers off this stream, and the log
+# file keeps the same bytes for the skip-reason reading below.
 log="$stage/speech-tests.log"
 abs_stage=$(cd "$stage" && pwd)
 echo "speech-tests.sh: running speech.test.exe (cwd = internal/speech)"
-(cd internal/speech && "$abs_stage/speech.test.exe" -test.count=1 -test.timeout=20m -test.v "$@") >"$log" 2>&1
-rc=$?
+(cd internal/speech && "$abs_stage/speech.test.exe" -test.count=1 -test.timeout=20m -test.v "$@") 2>&1 | tee "$log"
+rc=${PIPESTATUS[0]}
 
 passed=$(grep -c '^--- PASS' "$log" || true)
 failed=$(grep -c '^--- FAIL' "$log" || true)
