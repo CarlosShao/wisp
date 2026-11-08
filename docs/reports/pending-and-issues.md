@@ -32426,3 +32426,51 @@ export WISP_LIVE_MIC=1
 ### 五、撤销口令
 - 219 追补＝`git revert 678a3b638 37df1ec64`。
 - 145 判定程＝`git revert 6cda28b72`（零产码，纯证据件）。
+## A1643（2026-11-08 20:2x，编排者）**★wave96 三腿收件（nil-env 守卫 + 有界等待产码 + 145 五族四落）｜★我代提交 `062e5fe70`（防丢）｜wave97 三腿放出**
+
+### 一、★fork 级 nil-env 守卫落地（`da5d559b7`）
+**WebView2「出生即死」时（`EnvironmentCompleted` 拿 `S_OK` 但 `env` 空），原码空指针崩掉启动线程。现在：**
+- fork 回调里判到该形状 ⇒ **不崩、不装成功**，记具名日志 `webview2: environment boot failed (hr=..., env nil: true)` ＋置内部标志；
+- `Embed` 等待方看到标志就**返回失败** ⇒ **失败自动流进现成的 D2D 备胎路**（`attachOrb` 那条**本来就存在**的降级，**一行降级码都没新造**）；
+- **公开 API 签名零变化**。
+- **牙 5/5 PASS**（直接调 `EnvironmentCompleted(0, nil)` 四种形状＋标志复位，**不靠真 WebView2 偶发**）＋**winlive 10/10 PASS 267.260s**。
+- **★腿如实报两件**：① **r2 欠账一枚红**——`TestBallLiveOrbJarvisServedPageAndOverlay` 读的还是 r1 老路径，而 `eec09a028` 已把 site 挪进 `boot-<n>` 叶（r2 只跑 default-tag 没暴露）；**基线导出树同尺同红实锤** ⇒ 腿补了一枚取值器＋测试一行改用，该牙转绿。**⚠ 这一行越出写面**（`orb_jarvis_live_windows_test.go:380`），已具名。② **暗页抖动族**：glass 面两枚像素牙同代码先红后绿（19:51 红→20:02 绿），基线也绿 ⇒ **纯环境 GPU 抖**，守卫零触发。
+- **★我的裁定**：①**越面一行＝留**（不修则 winlive 永远一红；撤销口令＝把该行改回 `orbDataPath()`）。②**暗页抖动族＝开票**（`orb 暗页环境抖动`），代价＝不修则 winlive 门禁随机红、浪费每条腿复跑。
+
+### 二、★产码有界等待（`062e5fe70`，**我代提交，防丢**）
+- `internal/ball/sta_windows.go`：`waitStarted` 从**裸 `<-s.started`** 改成 `select` + `time.NewTimer(bootWaitBudget=30s)`，到点返回**具名错误**。
+- **30s 依据**（腿写的）：≈**最坏健康值 7.9s 的 4 倍**（7.9s 是**完整启动**——WebView2 环境＋控制器，而 `waitStarted` 只覆盖窗口创建那段、是快的那段）；且符合**用户视角**「球 30 秒不出来＝坏了」。
+- **★D22 禁令实证不撞**：腿现读 `tools/d22scan` 射程，**禁令只扫 `.Sub(time.Now())`** ⇒ `time.NewTimer`（单调定时器）不在射程。
+- **★到期不拆死线程**：STA 线程、窗口、热键**仍楔死**（与测试件口径一致）——到期买的是**等待方拿到具名错误＋调用方有决策点**，不是静默永久挂住。
+- **牙**＝`internal/ball/sta_wait_started_bounded_windows_test.go`（已存在）。
+- **★我为什么代提交**：那条腿还在等 winlive 重跑（它首跑红＝**另一腿在飞件桌面碰撞伪红**，pid 53900/父 11480 实证存活），产码留在工作树有**丢失风险** ⇒ 我先提交保命，牙的变异验证派下一腿补。
+
+### 三、★票 145 五族四落（`dd912e869`，+584/−61，9 件）
+| 族 | 判定 | 真源（现量） |
+|---|---|---|
+| **Retryable** | ✅ 落 | `observe.Error.Retryable()`（`errors.go:220`）随 `EvError.Err` 上喂线 `run.go:2441` |
+| **工具「运行中」态** | ✅ 落 | ★**不是无源，是接缝有转发无**——三适配器全发 `llm.EvToolCallStart`，`loop.stream:646` 一行转发成 `agent.EvToolStart` ＝**该 kind 第一个生产者** |
+| **usage/cost 活值** | ✅ 落 | 新 kind `EvUsage` 发在 `publishUsage` 体内（`loop.go:1133`），带**任务累计** `llm.Usage`＋Micros＋Currency；**成对无 omitempty**（census §2.13 单位雷） |
+| **ArgsJSON** | ✅ 落（架桥） | bridge 记账的 forensics 行 `sanitizeArgs` 后真值（`bridge.go:1307`）。★**拦路石**：store 的 `ToolCallByID` 按 int64 行号取、行无 call_id 列 ⇒ 事件面与 store 面**没有 join 键**；解法＝事件新带 `CorrelationID`（三枚 `EvToolEnd` 发布点用与派发同一把 `callCorr` 铸出）＋consoleSink 持 `rt.store` 经 `ListToolCallsByTask` 按 correlation 取行 |
+| **终结态** | ⛔ **归口未裁** | census §2.14「走 `Event.Stop` 还是 `Result.Status`」仍未裁 ⇒ 如实不落 |
+- **★宁缺毋造三处**：①事件面**不携 args 原文**（sink.go 头注密面设计不动）②**running 行在 `EvDone` 全退役**（流中断后 start 无 end 的调用不许把 chip 永远挂着）③AC#6 每枚有具名用例（含两枚突变臂）。
+- **门禁**：`internal/panel` **PASS 211／FAIL 1**（唯一红＝`TestC21DesignTokensFourWayAgree` **在册**）；`cmd/wisp -run TestPanel` **RUN 10／PASS 10／FAIL 0**；`internal/agent/...` **三包全绿**；d22scan clean。
+- **★顺带闭合三笔归口**：①**33-r14 AC#8ⓑ**「`EvToolStart` 零发射者」——真发射者今天存在 ⇒ 该 case 可达且诚实 ②**35 的 F-PUMP-6**「别为凑绿发假事件」未违 ③票 16「Acting 驻留按真事实回放」的边界自此改形，归该票处置。
+
+### 四、★§2.14 终结态取向＝**唯一没裁的那族**（需我裁）
+- 候选：**甲＝`Event.Stop`**（走事件面）／**乙＝`Result.Status`**（走结果面）。
+- **★我的裁定：甲（`Event.Stop`）**。理由：①**事件面是本仓的既有形状**——145 刚落的四族（Retryable/工具态/usage/ArgsJSON）**全部走事件面**，混入一个结果面会分裂 ②`Event.Stop` 带**时序**（什么时候停的），`Result.Status` 只是终值，面板要「流到哪了」需要时序 ③主流 harness 的流式管线一律事件驱动，结果对象是**快照**不是**真源**。
+- **撤销口令**：「终结态走乙」⇒ 改 `EvDone`/`EvStop` 那条落点。
+
+### 五、wave97 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `408-closure` | ★**票 408 收口**：三笔合起来的**终态验收**（winlive 全 PASS ＋ 整包四数与 `eec09a028` 基线作差）＋逐格判「408 能不能结」＋新建 `docs/evidence/s1/408-closure.md` |
+| `wait-teeth` | ★**变异验证有界等待的牙**：A＝删 select 回裸 `<-` 必须超时红／B＝budget 改 100ms 必须仍 PASS（防慢牙）／C＝到点改 `return nil` 必须红；＋winlive 正控＋判 30s 预算合不合适 |
+| `next-tickets` | ★**扫票池填坑**：逐票读那格正文分三档（能做／归口等票／不适用要人）＋**做掉至少两枚真能落地的**＋★**交「票池三档分类清单」**（本腿第一交付） |
+
+### 六、撤销口令
+- nil-env 守卫＝`git revert da5d559b7`。
+- 有界等待＝`git revert 062e5fe70`（会退回「产码无限等」状态）。
+- 145 五族＝`git revert dd912e869`。
+- 越面一行＝把 `orb_jarvis_live_windows_test.go:380` 改回 `orbDataPath()`。
