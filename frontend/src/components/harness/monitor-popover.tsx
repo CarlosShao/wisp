@@ -17,16 +17,92 @@ export interface MonitorEnvRow {
   value: string;
 }
 
+/** One row of the task monitor as the WIRE carries it (App derives these from
+    lib/panel.ts TaskRowView, ticket 197). Two rules ride over from the wire:
+    blockedOnApproval is the host's own join - a card for this very task is on
+    the queue right now (tickets 197/220) - and status is a D43 name that is
+    empty exactly when statusKnown is false. This layer displays those words;
+    it never re-judges a status and never invents one. */
 export interface MonitorAgentRow {
   id: string;
   name: string;
-  state: "running" | "done" | "failed";
+  blockedOnApproval: boolean;
+  status: string;
+  statusKnown: boolean;
+  /** The host's own sentence for a status it did not file (wire statusReason). */
+  statusReason?: string;
 }
+
+/** The dot's vocabulary - a DISPLAY tier, not a status judgement. blocked is
+    the 等批准 tier: the row's task has its own card waiting. idle is "the host
+    filed no status word", a different fact from any of the others. */
+type AgentDot = "running" | "done" | "failed" | "blocked" | "idle";
+
+/** D43 状态名 -> the Chinese the row shows (internal/statemachine/states.go is
+    the source of the names; App's TIER_NAMES is the precedent for spelling the
+    display map in the component that draws it). A name missing here falls to
+    the honest line below, never to a guessed word. */
+const D43_LABELS: Record<string, string> = {
+  FirstRun: "首次运行",
+  Sleeping: "休眠",
+  Armed: "已就绪",
+  Muted: "已静音",
+  Listening: "在听",
+  Thinking: "思考中",
+  Acting: "执行中",
+  Speaking: "回话中",
+  Warm: "预热",
+  Conversation: "对话中",
+  Confirming: "待确认（L1）",
+  AwaitingApproval: "待审批（L2）",
+  Settling: "收尾中",
+  Downloading: "下载中",
+  Unconfigured: "未配置",
+  NoNetwork: "无网络",
+  Error: "出错",
+  Queued: "排队中",
+  Stuck: "卡住",
+  WatchdogAlert: "看门狗告警",
+};
+
+/** Only the failure family goes red; Settling is the one name that reads as
+    wrapping up. Every other known status is live work (accent); a status the
+    host never filed is idle grey. */
+const D43_DOT: Record<string, AgentDot> = {
+  Error: "failed",
+  Stuck: "failed",
+  WatchdogAlert: "failed",
+  Settling: "done",
+};
+
+/** One row's displayed word and dot, derived from the wire fields and nothing
+    else. 等批准 outranks the status word: a task whose own card is on the
+    queue is waiting on the user, whatever its D43 name currently says. */
+function agentDisplay(row: MonitorAgentRow): { label: string; dot: AgentDot } {
+  if (row.blockedOnApproval) return { label: "等批准", dot: "blocked" };
+  if (row.statusKnown && D43_LABELS[row.status] !== undefined) {
+    return { label: D43_LABELS[row.status]!, dot: D43_DOT[row.status] ?? "running" };
+  }
+  return { label: row.statusReason?.trim() || "宿主没有给出状态", dot: "idle" };
+}
+
+const DOT_CLASS: Record<AgentDot, string> = {
+  running: "bg-accent",
+  done: "bg-green",
+  failed: "bg-red",
+  blocked: "bg-warn",
+  idle: "bg-ink-3",
+};
 
 export interface MonitorPopoverProps {
   open: boolean;
   env: readonly MonitorEnvRow[];
   agents: readonly MonitorAgentRow[];
+  /** Whether the snapshot carried a tasks section AT ALL. Absent = the pump
+      was assembled without a roster reader, which lib/panel.ts's own rule says
+      is a different fact from an empty roster - the empty line says which one
+      it is instead of leaving both looking the same. */
+  rosterPresent?: boolean;
   onPin?: () => void;
 }
 
@@ -44,19 +120,11 @@ function AgentAvatar() {
   );
 }
 
-function StateDot({ state }: { state: MonitorAgentRow["state"] }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        "size-1.5 shrink-0 rounded-full",
-        state === "running" ? "bg-accent" : state === "done" ? "bg-green" : "bg-red",
-      )}
-    />
-  );
+function StateDot({ state }: { state: AgentDot }) {
+  return <span aria-hidden="true" className={cn("size-1.5 shrink-0 rounded-full", DOT_CLASS[state])} />;
 }
 
-export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps) {
+export function MonitorPopover({ open, env, agents, rosterPresent, onPin }: MonitorPopoverProps) {
   if (!open) return null;
   return (
     <div
@@ -94,27 +162,46 @@ export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps
         ))}
       </div>
 
-      {/* 子智能体：渐变圆点头像 + 名 + 状态点 */}
+      {/* 子智能体：渐变圆点头像 + 名 + 状态字 + 状态点。零行时把「没有带名册」
+          和「名册在、还没有子任务」分开说，绝不共用一句含糊话。 */}
       <p className="px-1 pb-1 pt-2.5 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
         子智能体
       </p>
       <div className="flex flex-col gap-0.5">
-        {agents.map((agent) => (
-          <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row key={agent.id}>
-            <AgentAvatar />
-            <span className="min-w-0 flex-1 truncate text-ink-2" title={agent.name}>
-              {agent.name}
-            </span>
-            <StateDot state={agent.state} />
-          </div>
-        ))}
+        {agents.length === 0 ? (
+          <p className="px-1.5 py-1.5 text-[11.5px] leading-relaxed text-ink-3">
+            {rosterPresent ? "还没有子任务在跑" : "还没收到名册（宿主没带任务这一节）"}
+          </p>
+        ) : (
+          agents.map((agent) => {
+            const display = agentDisplay(agent);
+            return (
+              <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row key={agent.id}>
+                <AgentAvatar />
+                <span className="min-w-0 flex-1 truncate text-ink-2" title={agent.name}>
+                  {agent.name}
+                </span>
+                <span
+                  className={cn(
+                    "shrink-0 text-[11px] tabular-nums",
+                    display.dot === "blocked" ? "text-warn" : "text-ink-3",
+                  )}
+                >
+                  {display.label}
+                </span>
+                <StateDot state={display.dot} />
+              </div>
+            );
+          })
+        )}
       </div>
     </GlideMenu>
     </div>
   );
 }
 
-/* 演示数据：环境信息取 Wisp 仓现状口径（demo 假数据）。 */
+/* 演示数据：环境信息取 Wisp 仓现状口径（demo 假数据）；行形状＝wire 的
+   TaskRowView 派生形（等批准、D43 名、宿主的未知状态句各占一枚）。 */
 export const RB_MONITOR: Pick<MonitorPopoverProps, "env" | "agents"> = {
   env: [
     { label: "工作区", value: "D:\work\workspace\projects plans\Wisp" },
@@ -122,9 +209,16 @@ export const RB_MONITOR: Pick<MonitorPopoverProps, "env" | "agents"> = {
     { label: "未提交", value: "+2,244 -1,233" },
   ],
   agents: [
-    { id: "a1", name: "前端会话看门狗", state: "running" },
-    { id: "a2", name: "票 145 快照字段", state: "running" },
-    { id: "a3", name: "票 153 门禁修复", state: "done" },
-    { id: "a4", name: "票 146 LiveApprovals", state: "done" },
+    { id: "a1", name: "前端会话看门狗", blockedOnApproval: false, status: "Acting", statusKnown: true },
+    { id: "a2", name: "票 145 快照字段", blockedOnApproval: true, status: "Acting", statusKnown: true },
+    { id: "a3", name: "票 153 门禁修复", blockedOnApproval: false, status: "Settling", statusKnown: true },
+    {
+      id: "a4",
+      name: "票 146 LiveApprovals",
+      blockedOnApproval: false,
+      status: "",
+      statusKnown: false,
+      statusReason: "宿主没有给出这一维的读数（fail-closed：不替任务编一个状态）",
+    },
   ],
 };

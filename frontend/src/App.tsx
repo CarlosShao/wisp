@@ -40,7 +40,7 @@ import { Activity, Command, Moon, PanelLeft, PanelRight, PanelRightClose, Sun } 
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { ContextMeter } from "@/components/context-meter";
 import { GitBranchChip } from "@/components/git-branch";
-import { MonitorPopover } from "@/components/harness/monitor-popover";
+import { MonitorPopover, type MonitorAgentRow } from "@/components/harness/monitor-popover";
 import { PaletteScreen } from "@/components/palette-screen";
 import { PromptBar } from "@/components/ai-native/prompt-bar";
 import { LineSidebar } from "@/components/react-bits/line-sidebar";
@@ -49,7 +49,7 @@ import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
-import type { ComposerState, PanelSnapshot } from "@/lib/panel";
+import type { ComposerState, PanelSnapshot, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
   mode: { current: "unknown", names: [], l2ConfirmNames: [] },
@@ -82,6 +82,24 @@ const TIER_NAMES: Record<string, string> = {
   auto_approve: "全自动",
   unknown: "档位未知",
 };
+
+/** The task monitor's roster rows, straight off the wire (ticket 197/220: the
+    fields are copied verbatim - blockedOnApproval is the host's own join, and
+    status is a D43 name this file neither judges nor fills in; the display
+    words live in the popover that draws them). Until this derivation existed
+    the monitor was fed a bare empty array and every pushed row died unseen. An
+    absent tasks key stays distinguishable from an empty roster: the popover is
+    told which one it got (lib/panel.ts's optionality rule). */
+export function monitorAgents(tasks: TaskRosterSection | undefined): MonitorAgentRow[] {
+  return (tasks?.rows ?? []).map((row) => ({
+    id: row.taskId,
+    name: row.label || row.taskId,
+    blockedOnApproval: row.blockedOnApproval,
+    status: row.status,
+    statusKnown: row.statusKnown,
+    statusReason: row.statusReason,
+  }));
+}
 
 /** Narrower than this and the sidebar stops fitting a session title, so it
     collapses to its icon rail. 640px is the DEFAULT panel width, not an edge
@@ -243,7 +261,8 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                     { label: "工作区", value: composer.workspace.set ? composer.workspace.canonical : "尚未收到" },
                     { label: "分支", value: "尚未读到" },
                   ]}
-                  agents={[]}
+                  agents={monitorAgents(snapshot.tasks)}
+                  rosterPresent={snapshot.tasks !== undefined}
                   onPin={() => undefined}
                 />
               </div>
