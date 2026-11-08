@@ -32019,3 +32019,32 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 ### 撤销口令
 - 三笔＝`git revert a5f84886f 8d49dc562 78626eb85`（可单退）。
+## A1631（2026-11-08 11:2x，编排者）**★★★设置页「球风格」真正能用了（`33b264d70` 已推）｜三层根因全部补齐｜我亲眼见 `ball.style` 行显示 `jarvis`＋「能改」**
+
+### 一、三层根因全部落地（这是「屏幕会动」的完整拼图）
+| 层 | 内容 | commit |
+|---|---|---|
+| ① 常驻泵 | 无控制台形态自建泵＋show 推包 | `a5f84886f` |
+| ② **前端接收器** | `window.wispOnPanelSnapshot`（整包替换、对象字面量参数、幂等、StrictMode 安全卸载） | **`33b264d70`** |
+| ③ show 推包 | `PLAN.md:2982` resync-on-show 首次有实现 | 含在 `a5f84886f` |
+
+### 二、★我亲眼验收（截图 `D:\tmp\wisp\20261108\orblab\PANEL-BALLSTYLE-WIRED.png`）
+- **`ball.style` 行现在显示：`悬浮球外观风格（玻璃 / Jarvis 粒子）` + 下拉框当前值 `jarvis` + 右侧徽章「能改」**。
+- ⇒ **不再是「缺省 / 无读口」**。设置页真的可读了。
+
+### 三、★我亲跑读数
+| 判据 | 读数 |
+|---|---|
+| `grep -rn wispOnPanelSnapshot frontend/src/` | 原 0 ⇒ 现 **11 处命中**（panel.ts 声明+安装门、panel-root.tsx 挂载、main.tsx） |
+| `npm run render:receiver`（15 牙新仪器） | **rc=0 全绿**：`window.wispOnPanelSnapshot defined via the shared door (whole-object pushes, latest wins, no merge, strict-safe uninstall), EMPTY honest without a push, pushed package reaches chat + ball.style row` |
+| `npm run typecheck` / `build` / `lint` / `d22scan` | 腿报全 rc0/clean |
+
+### 四、腿如实报的两条（我认可）
+1. **本机 `wisp.exe` 自己的 WebView2 面板窗画不出（纯白），且进程数十秒后无日志消失**。**A/B 证明这是本机环境/面板宿主侧，非接收器**（2026-11-06 旧二进制同机同样白窗同法死亡；页面 JS 杀不死 Go 进程）。线索：**NBA2K 反作弊在跑**，与 UIA 查询强相关。⇒ **归 cmd/wisp 宿主腿另查**，⛔ 赖到接收器。
+2. 所以接收器的「活体已证」是用**同一 bundle 供真 Chromium** 推一枚 `ballStyle=jarvis` 整包 ⇒ 行显示 `jarvis`、console 0 error。**这是页面半边的真凭据**（不是假装）。
+
+### 五、推送
+- **网络恢复，6 笔全部推上 origin/dev，未推=0** ✓
+
+### 撤销口令
+- 接收器＝`git revert 33b264d70`（退回页面永远 EMPTY 的旧状）。
