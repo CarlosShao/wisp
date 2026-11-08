@@ -24,7 +24,7 @@
 | section | 键（类型 = 默认） | 生效级别 |
 |---|---|---|
 | `[app]` | `language(string)="zh-CN"` `theme("dark"\|"light"\|"auto")="dark"`（hot）`autostart(bool)=false` `single_instance(bool)=true` `portable(bool)`（只读，由 portable.txt 决定） | restart（theme 除外） |
-| `[ball]` | `size(int)=56`（44–72）`position{x,y,monitor}` `opacity_idle(float)=0.35` `click_through(bool)=true` `hide_on_fullscreen(bool)=true` | hot |
+| `[ball]` | `size(int)=56`（44–160）`position{x,y,monitor}` `opacity_idle(float)=0.35` `click_through(bool)=true` `hide_on_fullscreen(bool)=true` | hot |
 | `[hotkey]` | `summon(string)` `mute(string)` `cancel(string)="Esc"`（Confirming 期间临时接管，会话结束归还）`panel(string)` | hot（须重注册） |
 | `[session]` | `warm_timeout_sec(int)=90` `settling_sec(int)=3` `conversation_idle_sec(int)=30` | hot |
 | `[voice]` | `enabled(bool)=true` `wake_word{enabled=false, keywords[]=[], thresholds[]=[], veto_words[]=["取消","停下","别"]}` `asr{provider="local-sherpa", model=<id>}` `tts{provider="local-sherpa", voice, speed(float)=1.0}` `punctuation(bool)=true` `conversation_mode(bool)=false` `aec{enabled(bool)=true, echo_ref="self-render"}` `realtime{enabled(bool)=false, provider, model, api_key_ref, base_url}`（C32，票60）`cloud_asr_chain[]=[]` `cloud_tts_chain[]=[]`（C9 云级联，票61；**本地 sherpa 级联是语音的终极兜底，不入链、永远最后**） | reload（换模型）/ hot（阈值、否决词） |

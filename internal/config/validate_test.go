@@ -153,19 +153,38 @@ func TestValidateHardcodedReadOnly(t *testing.T) {
 	}
 }
 
+// TestValidateBallSizeRange pins the [ball].size band. The ceiling moved
+// 72 -> 160 with owner approval (A1636, 2026-11-08 "可放大，按你推荐的试试");
+// the default stays 56 - only the configurable range widened. The band text
+// is a LITERAL on purpose (the same rule TestValidateRiskConfirmTimeoutRange
+// pins): a mutation that moves the ceiling back must turn the size=160 case
+// red, and an error that stops naming the band must fail this test too.
 func TestValidateBallSizeRange(t *testing.T) {
-	c := validConfig(t)
-	for _, bad := range []int{43, 73, 0, -1} {
-		c.Ball.Size = bad
-		if err := validate(c); err == nil {
-			t.Fatalf("ball.size=%d must be rejected (allowed 44-72)", bad)
-		}
+	const band = "out of range [44, 160]"
+	for _, bad := range []int{43, 161, 200, 0, -1} {
+		t.Run(fmt.Sprintf("reject_%d", bad), func(t *testing.T) {
+			c := validConfig(t)
+			c.Ball.Size = bad
+			err := validate(c)
+			if err == nil {
+				t.Fatalf("ball.size=%d must be rejected (allowed 44-160)", bad)
+			}
+			if !strings.Contains(err.Error(), "ball.size") {
+				t.Fatalf("error %q must name the key ball.size", err)
+			}
+			if !strings.Contains(err.Error(), band) {
+				t.Fatalf("error %q must state the band %q", err, band)
+			}
+		})
 	}
-	for _, good := range []int{44, 56, 72} {
-		c.Ball.Size = good
-		if err := validate(c); err != nil {
-			t.Fatalf("ball.size=%d must validate: %v", good, err)
-		}
+	for _, good := range []int{44, 56, 72, 73, 160} {
+		t.Run(fmt.Sprintf("accept_%d", good), func(t *testing.T) {
+			c := validConfig(t)
+			c.Ball.Size = good
+			if err := validate(c); err != nil {
+				t.Fatalf("ball.size=%d must validate: %v", good, err)
+			}
+		})
 	}
 }
 

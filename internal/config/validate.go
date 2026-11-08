@@ -54,14 +54,16 @@ func validateApp(c *Config) error {
 	return nil
 }
 
-// validateBall checks the [ball] ranges (SPEC-03 sec 3: size 44-72) and the
+// validateBall checks the [ball] ranges (SPEC-03 sec 3: size 44-160; the
+// ceiling moved 72 -> 160 with owner approval A1636, 2026-11-08 "可放大，按
+// 你推荐的试试" - the default stays 56, only the configurable range widened) and the
 // ball.style enum (ticket 65: glass|jarvis - an unknown style is an error
 // naming the vocabulary, never a silent fall back to glass, same rule as
 // every other enum in this layer).
 func validateBall(c *Config) error {
-	if c.Ball.Size < 44 || c.Ball.Size > 72 {
+	if c.Ball.Size < 44 || c.Ball.Size > 160 {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(
-			"config.toml: ball.size %d out of range [44, 72]", c.Ball.Size))
+			"config.toml: ball.size %d out of range [44, 160]", c.Ball.Size))
 	}
 	if c.Ball.OpacityIdle < 0 || c.Ball.OpacityIdle > 1 {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(

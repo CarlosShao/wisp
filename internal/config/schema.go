@@ -176,7 +176,8 @@ type BallPos struct {
 
 // BallSection is [ball]; entirely hot-tier.
 type BallSection struct {
-	// Size is the floating ball diameter in px, range 44-72 (SPEC-03 sec 3).
+	// Size is the floating ball diameter in px, range 44-160 (SPEC-03 sec 3;
+	// ceiling widened 72 -> 160 with owner approval A1636, default stays 56).
 	Size int `toml:"size" default:"56"`
 	// Style selects the ball's visual style family (ticket 65; D36 [ball]
 	// hot key, owner-approved direction A1581). Vocabulary: glass (the
