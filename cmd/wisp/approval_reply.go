@@ -70,6 +70,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/CarlosShao/wisp/internal/agent/approval"
@@ -413,11 +414,18 @@ func panelItemLine(item approval.PanelItem) string {
 // readings instead of one inference. Reason text travels verbatim (observe's
 // handler bounds it), because 「谁以什么理由答的」 is the sentence the ledger owes
 // an auditor and 票 219's reason box is built on top of it.
+//
+// when=<RFC3339> is ticket 219 AC#2's 什么时候: the widening's WIDEN-APPLIED line
+// must let an auditor read WHO (corr=), WHEN (when=), WHICH LINE (dir= inside
+// detail=) and WHICH SOURCE (route=) off one line. The durable JSONL copy was
+// already stamped by the slog handler; the console copy carries its own stamp
+// now, so both copies answer the same four questions.
 func (s *replySurface) record(kind, corr, tool, route, detail string) {
 	if s == nil || s.audit == nil {
 		return
 	}
-	s.audit("approval: REPLY %s corr=%q tool=%s route=%q detail=%q", kind, corr, tool, route, detail)
+	s.audit("approval: REPLY %s corr=%q tool=%s route=%q detail=%q when=%s",
+		kind, corr, tool, route, detail, time.Now().Format(time.RFC3339))
 }
 
 // attachReplyListener puts the answer side on this run. Called from
