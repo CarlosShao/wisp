@@ -106,3 +106,38 @@ run?: {
 2. **出向最后一跳**（Go→页推＋页面接收器）＝票 35，`A657` 判语维持。
 3. **页面声明**＝Q-51（两枚双向尺的解冻钥匙）。
 4. usage/cost/终结态/计时类见 §1b——缺的是**源**（loop 局部 holder／事件字段），不是字段；先解源再谈。
+
+## 7. 11-08 19:1x　只读判定程 wave3（零产码；起手三核＋「还剩什么」终局判定；锚 `38628bee2`）
+
+**起手三核**：①派单前提「Snapshot 恰四字段」**过期**——现量顶层 **11 枚直接字段**（`internal/panel/composer.go:57-174`：pending/results/composer/generatedAt/instructions/tasks/commands/modelSwitch/ballStyle/run/plugins），`PumpSources` **21 面**（`pump.go:146-299`）且**全部在装配根接线**（`cmd/wisp/run.go:998-1127`，含 `Run: rt.runFeed.Section` `:1059`）；②引文＝census r1 §4.2 甲组 12 行现读真字段；③门禁在 `git clone -c core.longpaths=true --shared` 导出树跑（主树 `frontend/**` 三枚 M＝前端腿在飞）。克隆一次撞 Windows MAX_PATH（一枚长文件名 tracked 件 checkout 失败），失败件留 `.scratch/wisp/probes/145/wave3-clone/` 不删，重克隆 `wave3-clone-lp` 成功（HEAD 同锚、树净）。
+
+**AC#1 甲组 12 行逐行现量判定**（权威名册＝`145-snapshot-field-census-r1.md` §4.2）：
+
+| 行 | 字段 | 现量判定 |
+|---|---|---|
+| 3 | reasoning 文本 | **已落**＝`run` 段（`run_feed_145.go`），装配根 `:1059`＋sink `:2366` 已接（wave-leg2 闭账） |
+| 11 | stuck | **已落**（`stuck` 键，sink `:2380`） |
+| 4 | 工具调用 | **部分落**（callId/name/outcome，sink `:2374`）；「运行中」态未落（见下 5 族之 3） |
+| 5 | 展开半 | **部分落**（callId/resultText）；ArgsJSON 未落（5 族之 4） |
+| 10 | 失败 | **部分落**（class/detail/text，sink `:2390`）；Retryable 未落（5 族之 5） |
+| 7 | pending 十字段 | **早已通**（零 Go 改动行） |
+| 14 | 注入来源 | **早已通**（reason 链） |
+| 8 | L1 窗口 | **按裁定形状落**＝220 的 `L1Windows` id-join（`run.go:1036`）；remainingMs 在 `run_feed_145.go` 头注释具名不落 |
+| 6 | Depth | **裁走**＝167 射程（position/occupancy）＋前端可算（r3 拒收维持） |
+| 1/9 | 无源／原生侧 | 不在本组（census 原判维持） |
+
+**AC#2b 两维＝票 187 已落，⛔ 不重复做**：①模型清单＝`ModelSwitch.Models`（**enabled-only**：`internal/config/settings_187.go:202-205` ∩ 装配根 `run.go:1071-1084`）；②档位集＝`ThinkingLevels`＝当前模型自己声明的表（`settings_187.go:200`）。**两枚半枚未落且都卡禁面**：`Display`（源在 `schema.go:372`，`ChatSwitchOptions` 不导出，加＝动 internal/config）；「各家适配器实际接受的词表」（三张包内私有 `var` 无导出面，r2 R-3② 维持）。派单点名的 313 腿 `SettingsView.Presets/configured` 现读在 `config_handlers.go:151-185`——那是**入向读答路**（页面问、Go 答），不是快照推送，与 AC#2b① 不同通路、不构成部分落地。
+
+**剩余未落的有源字段＝5 族，逐族具名锁，全部卡在本波写面（internal/panel/**＋run.go PumpSources 字面量一处）之外 ⇒ 落地集＝空、零产码＝宁缺毋造**：
+
+1. **usage/cost 活值**（行 2/12）：`publishUsage` 只写 `Result`（`loop.go:1115-1119`）；`agent.Event` 无 Usage/CostMicros 字段（`sink.go:51-66`），`EvDone` 只带 TokensIn/TokensOut 半回声（`:1093-1096`）；`Guard` 每任务局部（`loop.go:415`），cmd/wisp 不持有 ⇒ 装配根无活读口可接。锁＝internal/agent 事件面＋`consoleSink.Publish` 喂线（`run.go:2346-2404`，字面量之外）；§2.13 Micros/Currency 成对裁定仍未解。
+2. **终结态**（行 13）：`Event.Stop` 存在（`sink.go:59`）但唯一填点＝EvError（`loop.go:553`），`EvDone` 不带 Stop；census §2.14「走 Event.Stop 还是 Result.Status」**未裁**。锁＝internal/agent＋裁定＋喂线。
+3. **工具「运行中」态**（行 4）：`EvToolStart` kind＋console handler 在（`sink.go:25`、`run.go:2367`）但**生产码发布点仍 0**（本程 grep 复核）。锁＝`loop.stream` 发布点（internal/agent）。
+4. **ArgsJSON/Level**（行 4/5 尾）：事件不带；store 读面在（`ToolCallByID`/`ListToolCallsByTask`）但接线点＝sink `ToolEnded` 行（`run.go:2374`）。锁＝喂线。
+5. **Retryable**（行 10 尾）：`observe.Error.Retryable()` 在，喂线＝`run.go:2390`。锁＝喂线。
+
+⇒ **给下一程派单的一句**：每族的落地点都在 `cmd/wisp/run.go` 的 **consoleSink.Publish 喂线行**（或 internal/agent 发布点／internal/config 导出面）——派单必须把这些行开进写面，否则加了就是 AC#6 答不出的装饰品。
+
+**门禁读数**（导出树 HEAD `38628bee2`；环境卫生 unset GOTMPDIR/TMPDIR/TEMP/TMP＋PATH 加 build/sherpa-onnx，未设 CGO_ENABLED）：`/d/work/base/gopath/bin/gofumpt.exe -l internal/panel cmd/wisp` **空**；`go vet ./internal/panel ./cmd/wisp` **rc0**；build **rc0**；`go test ./internal/panel -count=1`＝===RUN **313**／---PASS **208**／---FAIL **2**，红册＝`TestC21DesignTokensFourWayAgree`（**在册**，球 token 文档族）＋`TestComposerRenderFixtureTellsTheTruth`（**环境性红**：生成件 `frontend/fixtures/composer-states.html` 不入 git、导出树缺席；自主树拷入克隆后单跑 **PASS**「verified across 3 painted states」）。★**145 在册三红现量只剩一枚**：两枚契约尺（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`）在 HEAD **已绿**＝TS 侧声明已入库（Q-51 那半张的解冻已有人落）。`sh scripts/d22scan.sh` **rc0 clean**（451 生产 Go 文件）。
+
+**Git**：零产码；只 commit、未 push；显式 pathspec 逐枚点名（本件＋票面 Progress log 一行）；禁面（frontend/**、internal/ball/**、internal/config/**、cmd/wisp 除装配点外、thresholds/golden、docs/PLAN.md、docs/specs/**、`tokens_fourway_test.go`）零字节；票面 AC 勾与 Status 零动。

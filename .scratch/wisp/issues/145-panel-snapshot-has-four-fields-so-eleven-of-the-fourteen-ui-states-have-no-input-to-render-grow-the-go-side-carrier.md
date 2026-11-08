@@ -245,3 +245,7 @@
 - **留给 cmd/wisp 的两跳**（本程零触碰）：console sink 既有四 case 各喂一行＋装配根 `PumpSources` 加 `Run:` 一根——落地前生产包不带 `run` 键（四键字节钉保持绿的形状）。
 - **门禁**：gofumpt（四枚点名件＋全 panel）空、vet rc0、build rc0；全量 panel 改后 RUN 310/PASS 204/FAIL 3，**改前基线用 `-overlay`（HEAD 版两文件、仓外副本 `probes/145/wave-leg/`）复跑红逐名同册**（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestC21DesignTokensFourWayAgree`＝在册，非本程引入；本程差量＝两枚已红尺点名列表多 `run` 一词，零新红）；`d22scan.sh` **rc=0 clean**（bans #1-5 internal/=386＋cmd/=63、ban #6 frontend/=116、ban #7 tools/=48、ban #10 risk/=21、ban #8 design/=39＋frontend/=116＋internal/=958＋cmd/=236）；四枚件 LF 核过。
 - **Git**：只 commit、未 push；显式 pathspec 逐枚点名；禁面（frontend/**、design/**、cmd/wisp/**、internal/ball/**、internal/config/**、thresholds/golden、docs/PLAN.md、docs/specs/**）零字节；仓内零删除。
+
+### 11-08 19:2x　只读判定程 wave3（零产码；证据件 `docs/evidence/s1/145-snapshot-fields.md` §7；锚 `38628bee2`）
+
+- 派单前提「Snapshot 四字段」**过期**：现量顶层 11 枚字段、PumpSources 21 面**全接线**（`run.go:998-1127` 含 Run:/ModelSwitch:/Plugins:；wave-leg2 已闭 sink 喂线＋装配根两跳）；AC#1 甲组 12 行现量判：**9 行已落／裁走**，AC#2b 两维＝**187 已落**（`Display` 与「适配器词表」两半枚卡 internal/config／internal/llm 禁面；313 的 `SettingsView` 是入向读答路非快照通路）；剩余 **5 族**（usage/cost 活值、终结态、运行中态、ArgsJSON/Level、Retryable）源真但落点全在本波写面外（consoleSink.Publish 喂线／internal/agent 发布点／§2.14 未裁）⇒ **落地集＝空、零产码＝宁缺毋造**，AC 勾零动；门禁（`git clone --shared` 导出树）：gofumpt 空／vet rc0／build rc0／panel RUN313 PASS208 FAIL2（C21 在册＋render-fixture 环境红，拷件复绿「3 painted states」）/d22scan clean rc0；★在册三红现量只剩一枚——两枚契约尺在 HEAD **已绿**（TS 声明已入库）。只 commit 未 push，pathspec 两枚。
