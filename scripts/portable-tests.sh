@@ -453,7 +453,7 @@ core)
 windows)
     scope=(
         ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
-        ./internal/ball/ ./internal/perm/ ./internal/plugin/manifestslot/ ./cmd/balldebug/ ./cmd/llmrecord/
+        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./internal/plugin/manifestslot/ ./cmd/balldebug/ ./cmd/llmrecord/
         ./internal/session/ ./internal/projctx/ ./internal/audio/
     )
     pinned=$win_pin
