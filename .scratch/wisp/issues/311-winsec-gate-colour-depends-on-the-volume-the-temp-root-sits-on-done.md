@@ -78,3 +78,11 @@
 - [2026-10-13 17:22:56 +08] agent=编排者 did=亲跑 `Q-311-r1b-1` **三发闭档**（判据＝守卫一声不响＋四数行在场）：形①×2＝`bash scripts/wisp-cli-tests.sh` 默认形（件 `orch311-q/logs/qshot-default.txt`／`…-default-2.txt`）⇒ 两发守卫全静（GUARD=0／INCONCLUSIVE=0）＋四数行全在（q1 `RUN=176 PASS=126 FAIL=0 SKIP=0`；q2 `RUN=172 PASS=120 FAIL=2 SKIP=0`）；形②×1＝`WISP_TEST_GOTMP_ROOT` 指同卷换目录（件 `…-shape2.txt`）⇒ 守卫静＋**换目录被认领**（逐字 `GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/orch311-q-20261013/root2/cli-20261013-171826-1438`）＋四数行在（`RUN=172 PASS=121 FAIL=1`）⇒ **该笔销**（摘除侧仍按 10-12 判"仓内形状做不了"具名，⛔ 复活）。⚠ 三发 `rc=1` 的成因**出本票射程**＝cmd/wisp 测试二进制整进程死亡（5/5 连发再现、同形 4/4 全活对照）⇒ 已**另立票 314**；本票另两笔残余（`Q-311-r1-1`／票 310 盖章）⛔ 动
 
 - [2026-10-19 22:5x +08] 编排者补一条（★只具名、⛔ 动任何格／`Status:`／原句；来路＝`227-v2` 的Ⓒ 段＋`346-a1` 的 (iv) ①，两条独立坐实）：**本票射程内那族"真 NTFS junction 前置造不出"的红，根因⛔ 是"临时根太长／落在 D 卷"、是 `GOTMPDIR`⇄`TMPDIR` 的拼法方向**。凭据＝★编排者自己搭配对台（同一棵 `git archive` 导出树、同一枚 `-run`，只差分隔符方向）：`C:\Users\…\wisp-pf-bs`（反斜杠）⇒ 两枚目标用例 `2/2/0/0 rc=0` **全绿**；`C:/Users/…/wisp-pf-sl`（正斜杠）⇒ 同一两枚 `2/0/2/0 rc=1` **全红**、红句逐字 `Invalid switch - "Users"`；机制＝`os.MkdirTemp` 把前缀**原样**带进 `t.TempDir()`，其后 `cmd /c mklink /J <link> <target>` 的 target 一旦是 `X:/…` 形就被 cmd 当开关吃掉。★`346-a1` 独立复尺＝那 9 枚红句里的 target 全是 `D:/tmp/…` 正斜杠形；`342-v1`／`342-v2` 早前也各自量到过同一味（⛔ 归因到"长"）。⇒ 本票既⛔ 新立⛔ 重开（判据层已 6 勾），只把这一味**钉进派单公共块**（块 k 起＝"临时根一律 `cygpath -w` 反斜杠形"＋"整条 `PATH` 一次 `cygpath -wp`"＋"判据只认到达数"）；★本票 AC 判据格里⛔ 覆盖拼法这一维（尺＝`grep -cE '^- \[[ x]\].*(cygpath|正斜杠|反斜杠|拼法)'`＝**0**；全文命中的 3 处都在 `Status:` 与 Progress log 散文里）＝若日后要为"拼法"补一枚常驻仪器，另立具名、⛔ 塞进本票。⛔ push。
+
+## 结案（2026-11-09 22:5x，编排者；现跑复算）
+
+**六格全勾 ⇒ `-done`。** 依据＝票面 AC 清单逐格已勾：AC#0 归因到差在哪一枚 SID（只读两枚根对跑）／AC#1 三形择一处置（由 AC#0 读数裁）／AC#2 牙（成对两发，⛔ 只判"换卷也绿"）／AC#3 第三种死法具名归口（`TempDir RemoveAll cleanup: … Access is denied`＝正常收尾）／AC#4 门禁（build／d22scan／路径长度）／AC#5 存量与归口（编排者侧 `Q-304-a1-H` 逐枚归属）。
+
+**★本次只做改名，未动任何 AC 原文**：原名 77 字符，缩短为 `311-winsec-gate-colour-depends-on-the-volume-the-temp-root-sits-on-done.md`（75 字符）以留 `-done` 余量。
+
+**撤销口令**：`git revert <本次 commit>`（改名可逆，内容零改动）。
