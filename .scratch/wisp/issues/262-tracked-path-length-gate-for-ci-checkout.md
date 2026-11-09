@@ -136,3 +136,47 @@
   **判语＝不可收口**：(a) 未勾两格与"尺存在"无关；(b) ⓑ 原文自带禁勾，AC#5 父格被 ⓑ 卡死，谁勾谁违 AC 原文；(c) 2026-10-07 编排者终态裁定"⑥ 状态尺（终态，⛔ 不加 `-done`）"未被废止，仍是现行裁定；(d) 门在 HEAD 此刻是 RED，在门红时刻宣告"收口"更不成立。⇒ **两枚 AC 框一枚未翻、票名未加 `-done`**。
   **★上报编排者（新账，⛔ 本腿不修——不在本腿写面）**：HEAD 门红是**本轮的真发现**：四枚 `-done` 名越帽。先例＝`f67af953` 把 273/274/275 改短后门回绿（名册 57＝树 57）；处置二选一：**循先例改短四枚 `-done` 名**（正控，不动名册）或对名册/帽出新裁定。**修好前，每条跑这把尺的腿都会读到 RED（rc=1）**——包括 AC#6 那种"读数不扩大"的门禁引用。
   门禁：零产码 ⇒ `gofumpt`/`go vet`/`go build` 无对象；`sh scripts/d22scan.sh`＝**rc=0 clean**（/tmp/w262-d22.log）。本轮只 commit、⛔ 零 push；`frontend/**`·`design/**`·`cmd/wisp`·`internal/**` 零写入。
+
+## AC#5ⓐ 落地凭据（2026-11-09 23:5x，编排者现跑 `gh api` 拉托管侧日志）
+
+**run**＝`42643523161`（headSha `d797a855`），**job**＝`lint`（`129250565029`，`ubuntu-latest` 托管侧），**第 7 步** `Tracked path-length budget (ticket 262)` ＝ **success**。
+
+**逐字日志行（`gh api repos/CarlosShao/wisp/actions/jobs/129250565029/logs`，落档 `/d/tmp/wisp/20261109/ci-lint-262-full.log` 156,708 字节）**：
+```
+2026-11-09T15:20:23.6060318Z check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+2026-11-09T15:20:23.6272305Z check-path-length-budget.sh: denominator read: 19255 tracked paths
+2026-11-09T15:20:23.6569704Z check-path-length-budget.sh: denominator: tracked paths=19255  over-budget=62  covered by roster=62  not in roster=0
+2026-11-09T15:20:23.6575332Z check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+```
+
+**⇒ AC#5ⓐ「该步在 CI 侧真出颜色、有日志行可指」＝已满足**：
+- ✅ **真跑了**（第 7 步，非跳过）
+- ✅ **真出颜色**（VERDICT GREEN）
+- ✅ **日志行可指**（四行逐字在上，`gh api` 可重跑复现）
+- ✅ **正控也在**（`control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim`）⇒ 不是"空仪器"
+
+**★读数与本地一致**：`over-budget=62 / covered=62 / not in roster=0` —— 与我在本机 `bash scripts/check-path-length-budget.sh` 读到的 **62/62/0 完全相同** ⇒ **CI 侧与本地同形，无环境差异**。
+## 11. ★AC#5 母格的"ⓐ 那半"补上更强凭据（2026-11-09 23:5x，编排者现跑 `gh api`）
+
+**1. 票面 `:130` 的终态裁定（⛔ 我照办，不结票）**：
+> **⑥ 状态尺（终态，⛔ 不加 `-done`）**：本票面 `- [ ]`＝**2**（AC#5 父格＋AC#5ⓑ）／`- [x]`＝**8**
+
+⇒ **本票终态＝2 未勾 + 8 已勾 + ⛔ 不加 `-done`。** 本轮**不改这个终态**。
+
+**2. 但 ⓐ 那半今天拿到了比 10-06 那次更近的凭据**（`gh api` 可重跑）：
+- **run** `42643523161`（headSha `d797a855`）／**job** `lint`（`129250565029`，**`ubuntu-latest` 托管**）／**第 7 步** `Tracked path-length budget (ticket 262)` ＝ **success**。
+- 逐字四行：
+  ```
+  15:20:23.6060318Z check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+  15:20:23.6272305Z check-path-length-budget.sh: denominator read: 19255 tracked paths
+  15:20:23.6569704Z check-path-length-budget.sh: denominator: tracked paths=19255  over-budget=62  covered by roster=62  not in roster=0
+  15:20:23.6575332Z check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+  ```
+- **落档**：`/d/tmp/wisp/20261109/ci-lint-262-full.log`（156,708 字节）。
+- **★与本地一致**：`over-budget=62 / covered=62 / not in roster=0`，我在本机跑的读数**完全相同** ⇒ CI 与本地同形，无环境差异。
+
+**3. ★AC#5ⓑ 结构不可能 —— 本轮用 CI 日志实证（此前是读 ci.yml 注释推断）**：
+- **本机 runner 今天接的 38 个 job 全部是 `"jobDisplayName": "slo-full"`**（`/e/work/base/actions-runner/_diag/Worker_20261109*.log` 逐个 grep）。
+- 路径长度那步在 `lint` job（`ci.yml:176`），`lint` 跑 `ubuntu-latest`（`ci.yml:96`）；唯一 self-hosted 的 job 是 `slo-full`（`ci.yml:1193`）。
+- ⇒ **本机 self-hosted runner 结构上永远接不到那一步。** 票面判断**正确**，本轮由"推断"升级为"实证"。
+- ⛔ 本格**仍不勾**（票面 `:73` 原文"⛔ 本格不勾、也不许拿 ⓐ 的读数替它填"）。

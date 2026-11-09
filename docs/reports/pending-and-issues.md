@@ -33422,3 +33422,37 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 
 ### 五、撤销口令
 - **「416 AC#1 判断撤回」** ⇒ 本裁定作废，票面那段标注为待议，落地腿重新自判。
+## A1670（2026-11-09 23:5x，编排者）**★★票 262 AC#5ⓑ 用 CI 日志实证"结构上不可能"｜★发现本机 self-hosted runner 今天跑了 38 个 job、全是 `slo-full`，从不接 `lint`**
+
+### 一、怎么发现的（现跑）
+- 降载巡检时 `Get-Process go` 数到 **1 枚**（降载令下本该 0）⇒ 查命令行，**不是我派的腿**：
+  ```
+  "E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64\bin\go.exe" build ... -o ...\build\wisp.exe ./cmd/wisp
+  ```
+  ⇒ **是 GitHub Actions self-hosted runner 在跑 CI 构建**。
+
+### 二、★★决定性证据（现跑，可逐条重跑）
+| 读数 | 值 | 出处 |
+|---|---|---|
+| 本机 runner 今天接的 job | **38 个，全部 `"jobDisplayName": "slo-full"`** | `ls /e/work/base/actions-runner/_diag/Worker_20261109*.log` 逐个 `grep jobDisplayName` |
+| 路径长度那步在哪个 job | **`lint` job（`ci.yml:176`）** | `grep -n -B30 "Tracked path-length budget" .github/workflows/ci.yml` |
+| `lint` job 跑在哪 | **`ubuntu-latest`（托管，`ci.yml:96`）** | `grep -nE "runs-on:" .github/workflows/ci.yml` |
+| 唯一 self-hosted 的 job | **`slo-full`（`ci.yml:1193`，`[self-hosted, wisp-slo]`）** | 同上 |
+
+- ⇒ **★路径长度那步跑在托管 ubuntu 上，本机 self-hosted runner 结构上永远接不到它。** 票 262 AC#5ⓑ 说「现形下结构上不可能满足」—— **票面判断正确，本轮用 CI 日志实证**（此前只是读 `.github/workflows/ci.yml` 注释推断）。
+
+### 三、AC#5ⓐ 现状（"该步在 CI 真出颜色、有日志行可指"）
+- **ⓐ 的前提已成立**：CI 今天真在跑（38 发），`lint` job 在托管侧跑，其日志在 GitHub Actions 页面**可指**。
+- ⚠ **但本机读不到托管侧的日志**（那是 GitHub 侧，不是本机 `_diag`）。⇒ **ⓐ 的"日志行可指"要么机主在浏览器打开 Actions 页面看，要么我用 `gh` 拉。**
+- **★下一步（恢复跑腿后）**：`gh run list --workflow=ci.yml --limit 5` → 找到对应 run → `gh run view <id> --log` 抓 `Tracked path-length budget` 那几行。
+
+### 四、★顺带核实的两个数字（给下一个接手）
+- **`slo-full` 今天跑了 38 发**（01:07 到 15:43 UTC，约 14.5 小时）⇒ **CI 频次很高**，但**全是同一个 job**。
+- 三个含 "path-length" 字样的日志（`061743`／`063803`／`071730`）**只是提交正文里提到**，**不是那步真跑了** —— ⛔ 误当证据。
+
+### 五、降载状态
+- 那 1 枚 `go` 是 **runner 的 CI 构建**，不是我派的腿 ⇒ **不违反降载令**（我没派任何腿）。
+- `go`/`compile`/`link` 里**我的腿＝0 枚**。
+
+### 六、撤销口令
+- 无产码改动，无撤销对象。
