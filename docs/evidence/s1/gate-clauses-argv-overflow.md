@@ -72,16 +72,18 @@
    会把近空 index 提成新根树（首版克隆 ls-tree=1 事故，废弃；重克隆用
    `git -c core.longpaths=true clone --shared`）。
 
-## 6. 回归件（probes/161/r6/flip-declaration.sh）
+## 6. 回归件（probes/161/r6/flip-declaration.sh）——终局
 
-- 电池 09:33 起跑，**宽射程下单发门 ≈6.5 分钟 ⇒ 全程 40+ 分钟**（运行时事实，本程不动）。
-- 中期读数（前 6 发：基线＋flip1-5，存档 `.scratch/wisp/probes/154/r20261108/30-flip-interim.txt`）：
-  ① 基线发按设计转为 finding——其恢复基线断言（rc=0）在 9 腿声明与实测不符下不再成立，
-  而那正是它要报的事（其文件头「a finding, NOT a knob」），不是仪器坏；
-  ② 每一发翻转都真实移动聚合：G5neg ring→quiet 后由「枚数漂移 BAD」变「空/非空 BAD」；
-  G7 ring→quiet 后仍 BAD（枚数味 6>基线1 顶住）——翻声明退码跟着变、且枚数味独立在线，
-  机制完好；方向与预期一致。
-- 终局还原发跑毕后由下一程在票 411 AC#5 补一行终读（本腿不干等，不占共享树）。
+- 全电池跑毕（锚 cb2287a5，09:33→10:5x 约 75 分钟 8 发；**宽射程下单发门 ≈9 分钟**，
+  运行时事实，本程不动）。终局 **RED rc=1＝finding 路径**，工具判语逐字：
+  「flip-declaration.sh: RED - at least one assertion above failed. A declaration that
+  stopped matching today is a finding for the next slice, not a knob to turn.」
+- 逐发：基线发 rc=9（9 腿声明与实测不符＝它要报的事）；flip1-6 每发都真实移动聚合
+  （G5neg ring→quiet 后改判「空/非空 BAD」；G7 ring→quiet 后仍 BAD＝枚数味 6>基线1 顶住；
+  flip6 双翻期待 rc 差值方向正确）；还原发与基发两读一致（rc=9）＝机制自洽完好。
+- stale 发 3 FAIL：G5neg 基线 8→9 期望「实测<基线走 SHR」，实测 14 ＞ 9 ⇒ 走 BAD——
+  与本件 §4 的 9 腿基线过期是**同一件事**，正是交裁决的 finding 本体，不是仪器坏。
+- 完整日志：`probes/154/r20261108/30-flip-final.txt`（中期件 30-flip-interim.txt 保留）。
 
 ## 7. 追记（2026-11-09 10:1x）
 
