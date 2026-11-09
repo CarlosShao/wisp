@@ -32,7 +32,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 )
 
@@ -102,6 +104,47 @@ func TestAC5FreshManagerFlagStartsOff33ac5(t *testing.T) {
 	if on, reason := mgr.Unavailable(); on || reason != "" {
 		t.Fatalf("a fresh manager must read (false, \"\"), got (%t, %q)", on, reason)
 	}
+}
+
+// TestAC5NonRetiringRefusalIsObservableOnTheResidentThread33ac5 is AC#5's
+// end-to-end half on the production panel thread: mask the runtime, press the
+// hotkey (RequestShow), and demand that the refusal becomes readable in
+// bounded time (lastShowErr carries the named reason) while the thread STAYS
+// ALIVE and takes requests - the "app alive" reading, plus the standing
+// 10-01 16:42 debt's tooth: before lastShowErr existed, this shape was
+// readable only as a 15-second silent timeout. The window is never created
+// (the probe refuses before the create), so this stays in the headless tier;
+// the same mask that drives the direct fixture above drives the real
+// showOnThread path here.
+func TestAC5NonRetiringRefusalIsObservableOnTheResidentThread33ac5(t *testing.T) {
+	withMaskedRuntime(t)
+	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
+	mgr := NewPanelManager(disp, nil, filepath.Join(t.TempDir(), "panel-webview2"))
+	rp := startResidentPanel(observe.NewRegistry(), mgr)
+	t.Cleanup(rp.stop)
+
+	started := time.Now()
+	if !rp.RequestShow("33ac5-masked-runtime") {
+		t.Fatalf("RequestShow was refused by a live thread (startUp error: %v) - the runtime refusal must not retire the thread", rp.startUpErr())
+	}
+	waitPanelTrue(t, "the masked-runtime refusal to land in lastShowErr", func() bool {
+		return rp.lastShowErr() != nil
+	})
+	elapsed := time.Since(started)
+	err := rp.lastShowErr()
+	if !errors.Is(err, errPanelRuntimeMissing) {
+		t.Fatalf("the recorded refusal is not the runtime-missing class: %v", err)
+	}
+	if rp.startUpErr() != nil {
+		t.Errorf("the runtime refusal retired the thread (startUp = %v); it must stay retryable", rp.startUpErr())
+	}
+	if rp.isFinished() {
+		t.Errorf("the panel thread is gone after a runtime refusal - app-alive means the thread survives it")
+	}
+	if elapsed > 5*time.Second {
+		t.Errorf("the refusal took %v to become readable - that is the 15-second-silence shape the lastShowErr debt exists to kill", elapsed)
+	}
+	t.Logf("33ac5 resident reading: refusal readable in %v, thread alive, startUp nil", elapsed)
 }
 
 // TestAC5ProbeMapsEveryMissingAnswerToTheNamedRefusal33ac5 pins the probe's
