@@ -30,10 +30,10 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
    覆盖面仍无人看；一个恒为 0 的作用域就是"看着在扫、其实没扫"。
 
 ## Acceptance criteria
-- [ ] **AC#1**：`cmd/balldebug -diff` 有一个**阈值门**模式——当任一行 `px_delta_ge8` 低于给定的
+- [x] **AC#1**：`cmd/balldebug -diff` 有一个**阈值门**模式——当任一行 `px_delta_ge8` 低于给定的
       最小可见性阈值、或缺行、或 `timers` 非 `no`（在要求零定时器的态上）时**非零退出**；
       阈值**写死在票面/配置里**并带来源（D43/SPEC-08），**不许为了让某次跑变绿而现场调低**（D22 精神）。
-- [ ] **AC#2**：阳性对照（**这条不做本票不算完**）：构造一次**故意不成像**的跑（把球隐藏或把阈值调到
+- [x] **AC#2**：阳性对照（**这条不做本票不算完**）：构造一次**故意不成像**的跑（把球隐藏或把阈值调到
       不可能达到），证明 AC#1 的门**会红**。今天的教训正是"没红"被当成"过"。
 - [x] **AC#3**：一个可复用的测试运行器（脚本或 `cmd/` 下的小工具），跑 `go test -tags <X> -v <pkg>`
       后**断言 `--- PASS/FAIL/SKIP` 行数 > 0 且 `-run` 模式实际匹配到测试**；
@@ -142,3 +142,5 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   `gofumpt -l .` 在整棵 HEAD 上**只剩 1 个文件**：`internal/memory/artifacts_path_invariant_test.go`
   （`d9224af`，票 76，不属我）⇒ 我自己的路径 gofumpt 为空，但 **lint 第一步在 HEAD 上仍会因这一条红**，
   这是该转给票 76 的一句话，不是我该顺手改的文件（同文件并发 = 假并行）。本代理停在这里。
+
+- [2026-11-09 09:5x +08] agent=收件r1（编排者派·非实现者）did=复跑读数 verdict=**AC#1/AC#2 翻〔成立〕**（balldebug 半张票；交件 `08c4c51e2`＝11-05 09:46，5 枚文件 +715，三把尺真在）：导出树（`cda38fd52`，DLL 手补 build/third_party）复跑——`go test -count=1 ./cmd/balldebug/` **8/8 PASS**（含 `TestDiffGateRedOnANonImagingRun` 单元缝阳性对照、`TestDiffGateGreenOnRecordedGoodRuns` 五行带内阴性、`TestGateFloorCannotBeLowered`）；**进程级四发真退出码我自跑**（`go build` 真二进制，仓外 /tmp）：①票 62 不成像真表（`62-diff-baseline/diff-table.txt`）⇒ **rc=1**（`1 violation(s) at min px_delta_ge8=800`）；②阈值调到 100000 ⇒ **rc=1**（6 行逐行 FAIL＝AC#2 明列的第二种构造）；③`-diff-gate-min-px8 10` ⇒ **rc=2**（打印 floor 来源整句＝SPEC-08 §2 记录 2098/2103/2120 → 预测 2130 → floor 800，**拒现场调低**＝AC#1"带来源＋不许现场调低"由机械强制兑现）；④阴性对照（被接受的 `62-diff-signoff` 表）⇒ **rc=0 PASS**。门自报 examined 行数在场 ⇒「没报问题」与「没看」可区分。⚠ AC#5 的"CI 真红"仍因禁 push 物理不可证，维持不勾；AC#4 的 ban #6 处置裁决仍留给编排者。
