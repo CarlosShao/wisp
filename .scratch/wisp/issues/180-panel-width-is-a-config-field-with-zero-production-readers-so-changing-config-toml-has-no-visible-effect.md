@@ -236,3 +236,25 @@
 **4. 本票还欠什么**：`AC#5`（契约轴：`schema.go` 默认数值一字未动——现量 `:542` 仍 `default:"640"`）与 `AC#6`（门禁）由落地腿自己交；`AC#4` 那张 69 枚名册的**处置**（哪几枚该报错、哪几枚属"规格真空"）是一枚**待我裁**的事，排在票 255 的宽度落地之后——那时有 255 的先例可参照，现在裁等于凭空定档。
 
 - [2026-11-04 20:3x 编排者 163轮] **判定=blocked-by 票 33/35，⛔ 派单**（读正文避坑）：AC#1 已判"规格要求生效"（PLAN:2726/2743 hot），但本树**无面板窗口**（internal/panel/doc.go:16／pump.go:15-17／run.go:438 三处同指票 33/35 未落）⇒ AC#2 正向落地**无对象**；AC#3 的"登记 RESERVED"分支只在 AC#1 判"不要求生效"时适用，此处不适用。AC#4 同族 18 枚普查已交（census §3，且已在票 83 AC#1 归口）。⇒ 待票 33/35 落地方可续；Status 名义 ready 实为 gated。
+## ★★前提复验（2026-11-09 23:3x，编排者现跑）＝**本票标题那句"生产码零读者"已不成立**
+
+**1. 现量（⛔ 引用前先重跑）**：
+```
+cmd/wisp/panel_resident_windows.go:231   return cfg.Panel.Width, cfg.Panel.Height
+```
+在 `panelGeometrySource` 闭包里，注释逐字「closure from the assembly root, no panel->config edge, no host disk read」。
+
+**2. 登记在册**：`cmd/wisp/config_readers_255.go:245` 逐字 `"panel": … "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation…"`。
+
+**3. 落地来源**：票 **33-r3** 提交 **`908c6652c`**（`AC#10 落地 enabled/keep_alive 两枚真生产者`）。
+
+**4. ★对本票各格的影响**：
+| AC | 原状 | 现状 |
+|---|---|---|
+| **AC#2 正向落地** | 要"把那一跳接上" | ⚠ **已在盘**（`908c6652c`）⇒ **该由非实现者复判后翻勾，⛔ 再派腿重做** |
+| **AC#3 反向判据** | 改 `default:"640"` 不接读者＝装饰 | ⚠ **判据前提变了**（读者在）⇒ 该重写成「**删掉 `:231` 那行喂线必须变红**」 |
+| **AC#4 顺带查同族** | `schema.go` 里还有几枚"有 `default` 但零读者" | ❌ **真剩余**（尺：逐字段 `grep -rn "\.<字段名>" --include=*.go`） |
+| AC#5 契约轴 | 零改动自证 | ✅ 可跑 |
+| AC#6 门禁 | 逐包 `go test` | ⚠ 需跑测试 ⇒ **降载令下不派** |
+
+**5. ★给下一个接手的警告**：本票标题是**立票时刻（09-27 前后）**的事实，**不是今天的**。派腿前必须重跑上面第 1 条那条 grep。**这是"票面断言零读者"这类票的通用陷阱** —— 台账 `A1667` 记了。

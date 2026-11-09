@@ -33322,3 +33322,38 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 ### 七、★给机主的一句话
 - 我 `A1665` 那枚批准**批的是早就做完的事** —— 这条我认。**但我没造成任何损害**：批准是"许可"，不是"动工"，我没改一个字节产码。
 - **★真正值钱的教训**：`A1665` 我该先跑的那条命令是 `grep -A14 "approval.New(approval.Options{" cmd/wisp/resident_approval_windows.go`。**10 秒的事，我省了，代价是一整轮判断作废。**
+## A1667（2026-11-09 23:3x，编排者）**★票 180 前提腐烂（现跑核）：`[panel] width` 已有生产读者｜★"零读者"这类票面断言必须现跑复验，否则会派腿去接一条已经接上的线**
+
+### 一、现跑读数（⛔ 引用前先重跑）
+- 票 180 标题逐字：「`[panel] width` 是一枚**生产码零读者**的配置项」。
+- **现量**：`cmd/wisp/panel_resident_windows.go:231` 逐字 `return cfg.Panel.Width, cfg.Panel.Height`，**在 `panelGeometrySource` 闭包里**，注释说明「closure from the assembly root, no panel->config edge, no host disk read」。
+- **登记在册**：`cmd/wisp/config_readers_255.go:245` 逐字 `"panel": … "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation…"`。
+- **落地来源**：票 **33-r3** 的提交 **`908c6652c`**（`AC#10 落地 enabled/keep_alive 两枚真生产者`）。
+
+### 二、★后果（这条比票本身值钱）
+- 票 180 的 **AC#2「正向落地：把那一跳接上」＝已经做完**；**AC#3 反向判据**（改默认值而不接读者＝装饰）也**已不成立**（读者在）。
+- ⇒ **若我按票面派腿，腿会去"接一条已经接上的线"**，最坏结果是它把已有接线改坏或加一层重复闭包。
+- ⇒ **★这类票（标题断言"零读者/零实现/没人做"）必须先跑 `git grep` 复验再派**。这是「落地腿起手三核」的第 19 处（票面点名的串/行还在不在）**在编排者侧的镜像**。
+
+### 三、票 180 真实剩余（逐格读后）
+| AC | 状态 |
+|---|---|
+| AC#2 正向落地 | ⚠ **实现已在盘**（`908c6652c`）⇒ 该由非实现者复判后翻勾，⛔ 再派腿重做 |
+| AC#3 反向判据 | ⚠ **判据前提已变**（读者在）⇒ 该重写成"删掉 `:231` 那行喂线必须变红" |
+| **AC#4 顺带查同族** | ❌ **真剩余** —— `schema.go` 里还有几枚"有 `default` 但生产零读者"的字段（尺：逐字段 `grep -rn "\.<字段名>" --include=*.go`） |
+| AC#5 契约轴 | ✅ 可跑（零改动自证） |
+| AC#6 门禁 | ⚠ 需跑 `go test ./internal/config/ ./internal/panel/` ⇒ **降载令下不派** |
+
+- ⇒ **票 180 从 5 格降到"1 格真剩余（AC#4）＋2 格待复判＋1 格待跑门禁"**。
+
+### 四、降载状态
+- `go`/`compile`/`link` 进程 **0 枚**；本轮纯读 grep ＋ 写台账。
+
+### 五、撤销口令
+- 无产码改动，无撤销对象。
+### 六、★同轮我犯的第三个错（必须记）：**我误建了一个垃圾票文件**
+- **怎么错的**：我想给票 180 追加前提复验段，`ReadAllText` 用了一个**猜的文件名**（真名有 `-so-changing-config-toml-has-no-visible-effect` 后缀，我没先 `ls` 核）。`ReadAllText` 抛异常 ⇒ `$c` 空 ⇒ 随后的 `WriteAllText` **新建了一个只有我那段追加的垃圾文件**（1,712 字节，不在 git 里）。
+- **怎么发现的**：核票号重复时看到 `180-*` 有两个文件。
+- **怎么修的**：①核 `git ls-files` 确认空壳**未跟踪**（0）、真票**已跟踪**（1）②把空壳里我那段 `tail -n +2` 追加到真票末尾（32,477→34,188 字节，未勾仍 5）③`rm` 掉空壳。
+- **★教训**：**`ReadAllText` 失败后用 `WriteAllText` 会静默创建新文件**。以后写任何既有文件，**先 `ls` 核真名**（或用 glob 拿路径），⛔ 凭记忆拼文件名。
+- **★这是本轮第三个自造错误**（前两个：`A1665` 过期前提批准、HANDOVER 节号撞车）。三个都是**同一根**：**没先核盘就动手**。
