@@ -32883,3 +32883,41 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 ### 七、撤销口令
 - 98 结案＝`git revert d8c78bf75 39ad45224`。
 - 基线重登＝`git revert 3bf4a4e60`（退回 9 腿 rc=9 真读数态）。
+## A1653（2026-11-09 13:1x，编排者）**★★门禁 rc=0 真绿＋防作弊正控 rc=3（新违规照样抓）｜票 412 结案｜票 148 AC#2 裁定翻｜145/148 派单前提过期（诚实报）｜pool-audit 腿失败重试｜wave106 三腿**
+
+### 一、★★门禁 rc=0 真绿 ＋ 防作弊正控 rc=3（我亲跑）
+- **重登后**：`bash .scratch/wisp/probes/154/gate-clauses.sh` ⇒ **rc=0**，基线过期 **0 枚**（8m32s）。
+- **★防作弊正控**（导出合成树注入只开不关新形状 `internal/tools/mutation_412_openonly.go`）⇒ **rc=3**，逐腿 BAD：
+  - `G2 ring 基线2 实测5`（新增命中）／`G6 quiet 基线0 实测1`（空/非空不符）／`G6neg ring 基线1 实测2`（**新增未成对＝正是注入形状**）
+- ⇒ **干净树 rc=0 ⇄ 注入树 rc=3：门没放松，新违规照样被抓。** 这是这把尺**史上第一次真正绿**。
+
+### 二、★票 412 结案（`3bf4a4e60` 改动 ＋ `7d9d32658` 立案）
+- 5 AC 全勾（重登 rc=0／判据语义不变／正控 rc=3／裁决者≠实现者／每枚新基线＝实测真读数）。
+- 撤销口令：`git revert 3bf4a4e60`。
+
+### 三、★票 148 AC#2 裁定翻（`c8a7beb49`）
+- **148-ac2-r1 腿独立复跑**：subject PASS 5.01s，5 秒窗口**工具调用=2166 次、LiveApprovals=2166 次**；三臂 bench A1 4096B/1alloc／A2 8064B/73allocs／A3 4736B/17allocs ⇒ 满深度多 **3968B/72allocs**。
+- **★裁定＝甲（实质凭据结格）**：机制账已独立复跑成立；生产档缺口**结构上不可达**（三条结构凭据：subject sit-still `slo_windows.go:345/:414`；`internal/proc` 全目录零 approval/Gate/Queue 引用；唯一生产读者 `panel_pump.go:82`）⇒ 维持票 146 §4.3 永久登记。**选甲不选乙**：⛔ 为勾一格在 cmd/wisp 造 fixture＝复杂买不到真价值。
+- 剩 AC#1/#3/#4/#5（148-verify 腿复核）。
+
+### 四、★wave105 诚实报：145/148 派单前提都过期
+- **145**：「Snapshot 只有四字段」**过期**——现量顶层 **11 枚**、`ComposerState` **13 枚**。在独占写面 `internal/panel/**` 内 AC#2 剩余可落地集＝**空**（零产码＝宁缺毋造，AC#6 一枚装饰品没造）。**离十四态可画最少还需 1 轮**（三面同开：§2.14 先裁→agent 发布点＋cmd/wisp 喂线→config/llm 导出面）。
+- **148**：已被 148-r3（`024681b8c`，wave48）落了大半——台账 **A1591** 机主 2026-11-07「**148选B**」＝Ⓐ/Ⓑ 批准已落，票面 `Status: blocked` 过期。
+- ★**教训**：派单简报可能落后盘面——腿起手三核抓出来是对的；**「票面现状」必须起手现读，⛔ 信转述**。
+
+### 五、★pool-audit 腿失败（返回 null，没落件）
+- wave105 的 `pool-audit` 腿**失败返回 null**，`docs/evidence/s1/pool-audit-r6.md` **不存在**。⇒ wave106 重试（C 腿）。
+
+### 六、★票 145 §2.14 终态词裁定＝OPTION A（`Event.Stop`）
+- 上一腿按规矩没擅自选（这是裁定项）。**我裁定 OPTION A＝`Event.Stop`**（与既往前任裁定一致），wave106-A 照此落地。
+
+### 七、wave106 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `145-impl` | ★本波唯一 cmd/wisp 写腿：§2.14 终态族（**OPTION A＝Event.Stop**）＋`ToolRunRow.Level`（真源 memory.ToolCall.RiskLevel，cmd/wisp 喂线 join 填真值）＋AC#2b 两半枚；每字段必须有构造点＋消费者（AC#6） |
+| `148-verify` | 票 148 收口复核：AC#1/#3/#5 复核翻框＋AC#4 契约轴核；全翻 ⇒ 改名 `-done`（正确 rename 配方） |
+| `pool-retry` | 池子定档重试（90 张分三档，带 blocker 逐字）＋顺手落一票 |
+
+### 八、撤销口令
+- 门禁重登＝`git revert 3bf4a4e60`。
+- 148 AC#2＝`git revert c8a7beb49`。
