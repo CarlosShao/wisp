@@ -125,11 +125,17 @@ func slicesContains(haystack []string, needle string) bool {
 }
 
 // ChatModelOption is one catalog entry a picker may offer: the pair a
-// role/pair write addresses (FieldRoleChatPair's two selectors), nothing
-// more. No credential-shaped string can appear here by construction.
+// role/pair write addresses, plus the entry's own human-facing Display name
+// (ticket 145 AC#2b①: ModelSpec.Display verbatim - the source the census
+// named; empty stays empty, the page falls back to the model id and this
+// reader invents no name). No credential-shaped string can appear here by
+// construction.
 type ChatModelOption struct {
 	Provider string
 	Model    string
+	// Display is the catalog entry's display name, verbatim from
+	// ModelSpec.Display; "" means the entry declares none.
+	Display string
 }
 
 // ChatSwitchOptions is ticket 187's read face over the chat role: what the
@@ -153,6 +159,11 @@ type ChatSwitchOptions struct {
 	// which the schema's default spells "off" on disk but which this reader
 	// does not invent - the wire carries what the file holds.
 	CurrentThinking string
+	// CurrentDisplay is the CURRENT model's own Display name as the catalog
+	// entry declares it (ticket 145 AC#2b①), found on the same walk that
+	// fills Models; "" when the pair names no catalog entry - the reader
+	// invents no name for a pair the catalog does not hold.
+	CurrentDisplay string
 	// Models is the offerable list, sorted by provider then model so a page
 	// cannot read order as preference.
 	Models []ChatModelOption
@@ -198,11 +209,15 @@ func (m *Manager) ChatSwitchOptions() ChatSwitchOptions {
 			spec := p.Models[id]
 			if pname == out.CurrentProvider && id == out.CurrentModel {
 				out.ThinkingLevels = append([]string(nil), spec.ThinkingLevels...)
+				// Ticket 145 AC#2b①: the current model's display name rides
+				// the same walk - one pass, so the name and the pair cannot
+				// be read from different moments.
+				out.CurrentDisplay = spec.Display
 			}
 			if !spec.Enabled {
 				continue
 			}
-			out.Models = append(out.Models, ChatModelOption{Provider: pname, Model: id})
+			out.Models = append(out.Models, ChatModelOption{Provider: pname, Model: id, Display: spec.Display})
 		}
 	}
 	if len(out.Models) == 0 {

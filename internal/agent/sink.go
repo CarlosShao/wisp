@@ -55,13 +55,19 @@ const (
 // always safe to show to a user (it never carries tool args beyond a
 // truncated preview, and never carries secrets - observe.Error is log-safe).
 type Event struct {
-	Kind      EventKind
-	TaskID    string
-	Text      string
-	ToolName  string
-	CallID    string
-	Outcome   string
-	Verb      ControlVerb
+	Kind     EventKind
+	TaskID   string
+	Text     string
+	ToolName string
+	CallID   string
+	Outcome  string
+	Verb     ControlVerb
+	// Stop is the terminal word the loop publishes on its terminal events:
+	// EvDone carries it on every ending (ticket 145 row 13, census §2.14's
+	// OPTION A ruling), and the terminal EvError publications carry it where
+	// the provider's own stop reason exists. Empty means the ending was the
+	// loop's own (a C22 brake, a refusal) with no provider word - absent is
+	// the truth, never filled from Status.
 	Stop      llm.StopReason
 	TokensIn  int
 	TokensOut int

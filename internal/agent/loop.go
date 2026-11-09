@@ -443,12 +443,15 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		res.Message = v.Notice
 		res.Err = observe.New(observe.ClassBudget, "agent: 新任务被费用预算拒绝")
 		l.publish(Event{Kind: EvError, TaskID: taskID, Text: v.Notice})
-		return l.finish(ctx, root, j, guard, cost, &res, StatusFailed, v.Notice)
+		// No llm stop reason exists here: the refusal is the loop's own gate,
+		// no provider stream ever ran, and the event face's error row already
+		// carries the class - an empty stop is the honest shape, not a gap.
+		return l.finish(ctx, root, j, guard, cost, &res, StatusFailed, v.Notice, "")
 	}
 
 	for {
 		if ctx.Err() != nil {
-			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消", llm.StopCancelled)
 		}
 		// Token brake first: an exhausted budget must not start another call.
 		if guard.TokenBudget() > 0 && guard.TokensUsed() >= guard.TokenBudget() {
@@ -495,8 +498,10 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 
 		req, err := l.buildRequest(ctx)
 		if err != nil {
+			// The context assembly failed before any provider round trip: no
+			// provider stop reason exists, so the empty stop is the honest one.
 			return l.failWith(ctx, root, j, guard, cost, &res,
-				observe.Wrap(observe.ClassInternal, err, "agent: assemble context"))
+				observe.Wrap(observe.ClassInternal, err, "agent: assemble context"), "")
 		}
 
 		turn, streamErr := l.stream(ctx, taskID, req)
@@ -510,14 +515,14 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 			if turn.Text != "" {
 				l.append(assistantMessage(turn.Text))
 			}
-			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消", llm.StopCancelled)
 		}
 		if turn.Err != nil {
 			l.failOpenCalls(ctx, j, taskID, turn, OutcomeError, string(turn.Err.Class), &res)
 			if turn.Text != "" {
 				l.append(assistantMessage(turn.Text)) // partial kept, marked (SPEC-05 §3.4)
 			}
-			return l.failWith(ctx, root, j, guard, cost, &res, turn.Err)
+			return l.failWith(ctx, root, j, guard, cost, &res, turn.Err, turn.Stop)
 		}
 		if !turn.Usage.IsZero() {
 			delta := cost.AddUsage(l.opt.Config.Price, turn.Usage)
@@ -551,7 +556,7 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 			}
 			res.Text = turn.Text
 			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
-			return l.finish(ctx, root, j, guard, cost, &res, StatusTruncated, msg)
+			return l.finish(ctx, root, j, guard, cost, &res, StatusTruncated, msg, turn.Stop)
 		}
 
 		if len(turn.ToolCalls) == 0 {
@@ -561,7 +566,7 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 			}
 			res.Text = turn.Text
 			guard.ResetRepeats()
-			return l.finish(ctx, root, j, guard, cost, &res, StatusCompleted, "")
+			return l.finish(ctx, root, j, guard, cost, &res, StatusCompleted, "", turn.Stop)
 		}
 
 		// C22 gradient brake ladder on duplicate calls.
@@ -592,7 +597,7 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		}
 		res.Text = turn.Text
 		if ctx.Err() != nil {
-			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消", llm.StopCancelled)
 		}
 	}
 }
@@ -1046,6 +1051,10 @@ func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
 }
 
 // brakeStuck ends the task in Stuck with the visible message C22 demands.
+//
+// The C22 brake is the loop's own decision - no provider stream ended here,
+// so no llm stop reason exists and the terminal event carries none (the
+// EvStuck publication below plus the Stuck row carry the why).
 func (l *Loop) brakeStuck(ctx context.Context, root *observe.Root, j *taskJournal,
 	guard *Guard, cost Cost, res *Result, brake Brake, msg string,
 ) Result {
@@ -1054,22 +1063,33 @@ func (l *Loop) brakeStuck(ctx context.Context, root *observe.Root, j *taskJourna
 		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
 		TokensIn: guard.tokensIn, TokensOut: guard.tokensOut,
 	})
-	return l.finish(ctx, root, j, guard, cost, res, StatusStuck, msg)
+	return l.finish(ctx, root, j, guard, cost, res, StatusStuck, msg, "")
 }
 
 func (l *Loop) failWith(ctx context.Context, root *observe.Root, j *taskJournal,
-	guard *Guard, cost Cost, res *Result, err *observe.Error,
+	guard *Guard, cost Cost, res *Result, err *observe.Error, stop llm.StopReason,
 ) Result {
 	res.Err = err
 	res.Message = err.Error()
-	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
-	return l.finish(ctx, root, j, guard, cost, res, StatusFailed, res.Message)
+	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err, Stop: stop})
+	return l.finish(ctx, root, j, guard, cost, res, StatusFailed, res.Message, stop)
 }
 
 // finish writes the task_log row, drains the task root (D38e: completion means
 // every spawned goroutine joined) and returns the result.
+//
+// stop is the terminal word the event face publishes on EvDone (ticket 145
+// row 13, census §2.14's OPTION A ruling: Event.Stop, not a Result.Status
+// copy). It is the provider's own stop reason when one exists - a completed
+// turn's end_turn family, a truncation's max_tokens, a cancellation's
+// StopCancelled, a stream failure's StopError - and empty when the ending is
+// the loop's own (a C22 brake, a budget refusal, a context-assembly failure)
+// with no provider word to carry. It travels verbatim, never derived from
+// status: EvDone.Text is res.Text || msg, which on a cancelled task is the
+// partial REPLY, so without this word the event face cannot say how the task
+// ended.
 func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
-	guard *Guard, cost Cost, res *Result, status Status, msg string,
+	guard *Guard, cost Cost, res *Result, status Status, msg string, stop llm.StopReason,
 ) Result {
 	res.Status = status
 	if msg != "" && res.Message == "" {
@@ -1111,6 +1131,7 @@ func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
 	l.publish(Event{
 		Kind: EvDone, TaskID: res.TaskID, Text: summary,
 		TokensIn: cost.Usage.InputTokens, TokensOut: cost.Usage.OutputTokens,
+		Stop: stop,
 	})
 	return *res
 }

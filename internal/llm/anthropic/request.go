@@ -91,6 +91,18 @@ type wireRequest struct {
 // numbers; see the package doc).
 var thinkingBudgets = map[string]int{"low": 1024, "medium": 4096, "high": 8192}
 
+// thinkingVocabulary derives the accepted tier words from thinkingBudgets
+// itself, so the vocabulary registered for ticket 145 AC#2b② cannot drift
+// from the table buildWire consults at request time. "off" is not a member:
+// the off request disables thinking outside this table.
+func thinkingVocabulary() []string {
+	out := make([]string, 0, len(thinkingBudgets))
+	for k := range thinkingBudgets {
+		out = append(out, k)
+	}
+	return out
+}
+
 // buildWire encodes the normalized request.
 func (a *Adapter) buildWire(req *llm.Request) ([]byte, error) {
 	breaks, err := a.planBreakpoints(req)

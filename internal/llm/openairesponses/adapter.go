@@ -75,6 +75,10 @@ func init() {
 	llm.RegisterProtocol(Protocol, func(ep llm.EndpointOptions) (llm.LlmProvider, error) {
 		return New(ep), nil
 	})
+	// Ticket 145 AC#2b②: the tier words this adapter maps, derived from
+	// effortLevels itself so the exported vocabulary cannot drift from what
+	// buildWire consults at request time.
+	llm.RegisterThinkingLevels(Protocol, effortVocabulary())
 }
 
 // Adapter implements llm.LlmProvider for the OpenAI Responses API.

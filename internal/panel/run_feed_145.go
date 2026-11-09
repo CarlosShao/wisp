@@ -62,13 +62,17 @@ import (
 //
 // Registered as NOT landable today (no event source, so landing any of them
 // would be a constant dressed as data - the exact shape ticket 145's AC#1
-// forbids): the terminal status word and cancel reason (census §2.14's
-// orientation - Event.Stop vs Result.Status - is still unruded, and
-// EvDone.Text is res.Text || the terminal sentence, so a cancelled run's
-// event text is its partial REPLY, not a reason), tool duration (the
-// forensics row's started_at has no production writer, so ended-start is
-// not computable - census §2.6), phase / elapsed timers, the human error
-// sentence, and the L2 window's remainingMs.
+// forbids): tool duration (the forensics row's started_at has no production
+// writer, so ended-start is not computable - census §2.6), phase / elapsed
+// timers, the human error sentence, and the L2 window's remainingMs. The
+// terminal status word LANDED on 2026-11-09 (census §2.14's OPTION A ruling,
+// Event.Stop): loop.go's finish() now carries the provider's own llm.StopReason
+// on every terminal EvDone, the Done row below is that word verbatim, and the
+// census's cancel-reason need is answered by it - "cancelled" on the wire is
+// the ended-as-cancelled fact EvDone.Text (the partial reply) could never
+// state. Empty stop on a Done row means the ending was the loop's own (a C22
+// brake, a refusal) with no provider word - absent is the truth, never a
+// status word copied over.
 // pending[].position and context.occupancy are ticket 167's territory (the
 // two legs must not each add their own pending[] keys); composer.git's
 // branches half is ticket 186's; the "which screen" view dimension is held
@@ -81,12 +85,18 @@ import (
 // sanitized args (memory.ToolCall.ArgsJSON), joined by the event's C18
 // correlation id at the feed line - a call with no booked row travels with
 // it absent (omitempty), which is the truth "nothing executed these args".
+// Level is the SAME booked row's RiskLevel (the gate's L0/L1/L2 decision the
+// row was booked under, ticket 145 row 4's risk dimension): it joins at the
+// same feed line from the same row, so a call with no booked row travels
+// with it absent too - the event face alone does not know the risk tier and
+// this carrier invents none.
 type ToolRunRow struct {
 	CallID     string `json:"callId"`
 	Name       string `json:"name"`
 	Outcome    string `json:"outcome"`
 	ResultText string `json:"resultText,omitempty"`
 	ArgsJSON   string `json:"argsJson,omitempty"`
+	Level      string `json:"level,omitempty"`
 }
 
 // ToolRunningRow is one call IN FLIGHT: the adapters' tool_call_start as the
@@ -131,6 +141,17 @@ type RunStuckRow struct {
 	RepeatLevel int    `json:"repeatLevel"`
 }
 
+// RunDoneRow is HOW the task ended: llm.StopReason verbatim as the terminal
+// EvDone event carried it (ticket 145 row 13, census §2.14's OPTION A ruling).
+// The word is the loop's own publish value - a completed turn's end_turn
+// family, a truncation's max_tokens, a cancellation's StopCancelled, a stream
+// failure's StopError - and empty when the ending was the loop's own (a C22
+// brake, a refusal) with no provider word to carry. The row's presence marks
+// the task as ended; its absence means no EvDone arrived yet.
+type RunDoneRow struct {
+	Stop string `json:"stop,omitempty"`
+}
+
 // RunSection is the snapshot's top-level "run" key.
 type RunSection struct {
 	// Tools lists the tool calls that have ENDED in feed order, oldest kept
@@ -157,6 +178,10 @@ type RunSection struct {
 	// Stuck is the loop's last stuck sentence, or nil while the task is not
 	// stuck.
 	Stuck *RunStuckRow `json:"stuck,omitempty"`
+	// Done is how the task ended - the terminal EvDone's own llm.StopReason
+	// (ticket 145 row 13) - or nil until an EvDone arrived. It stays as the
+	// run's record, the same rule the ended tool rows follow.
+	Done *RunDoneRow `json:"done,omitempty"`
 }
 
 const (
@@ -194,6 +219,7 @@ type RunFeed struct {
 	reasoningSeen int
 	lastError     *RunErrorRow
 	stuck         *RunStuckRow
+	done          *RunDoneRow
 }
 
 // NewRunFeed builds an empty feed.
@@ -219,8 +245,10 @@ func (f *RunFeed) ToolStarted(callID, name string) {
 // ToolEnded records one ended tool call and retires its running row - the
 // same call cannot be both. Oldest rows past the cap are evicted and
 // counted, never folded into a neighbour. argsJSON is the booked forensics
-// row's sanitized args as the feed line looked it up; empty stays absent.
-func (f *RunFeed) ToolEnded(callID, name, outcome, resultText, argsJSON string) {
+// row's sanitized args and riskLevel the same row's RiskLevel, as the feed
+// line looked them up; empty stays absent for both - a call with no booked
+// row executed nothing and had no gate decision to show.
+func (f *RunFeed) ToolEnded(callID, name, outcome, resultText, argsJSON, riskLevel string) {
 	if f == nil {
 		return
 	}
@@ -235,7 +263,7 @@ func (f *RunFeed) ToolEnded(callID, name, outcome, resultText, argsJSON string) 
 	f.running = kept
 	f.tools = append(f.tools, ToolRunRow{
 		CallID: callID, Name: name, Outcome: outcome, ResultText: resultText,
-		ArgsJSON: argsJSON,
+		ArgsJSON: argsJSON, Level: riskLevel,
 	})
 	if len(f.tools) > runToolRowsKept {
 		f.tools = f.tools[len(f.tools)-runToolRowsKept:]
@@ -258,16 +286,20 @@ func (f *RunFeed) Usage(in, out, cached int, micros int64, currency string) {
 	}
 }
 
-// TaskEnded retires every running row: a task that died between a call's
-// start and its end must not leave a chip running forever. The ended rows
-// and every other dimension stay - they are the run's record.
-func (f *RunFeed) TaskEnded() {
+// TaskEnded records how the task ended - the terminal EvDone's own
+// llm.StopReason, verbatim (ticket 145 row 13) - and retires every running
+// row: a task that died between a call's start and its end must not leave a
+// chip running forever. The ended rows and every other dimension stay - they
+// are the run's record. An empty stop word is a true shape (the loop's own
+// endings - brake, refusal - have no provider word) and is recorded as such.
+func (f *RunFeed) TaskEnded(stop string) {
 	if f == nil {
 		return
 	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.running = nil
+	f.done = &RunDoneRow{Stop: stop}
 }
 
 // ReasoningDelta accumulates one reasoning text delta under the tail window.
@@ -325,6 +357,7 @@ func (f *RunFeed) Section() *RunSection {
 		Error:        f.lastError,
 		Stuck:        f.stuck,
 		Usage:        f.usage,
+		Done:         f.done,
 	}
 	if len(f.running) > 0 {
 		running := make([]ToolRunningRow, len(f.running))

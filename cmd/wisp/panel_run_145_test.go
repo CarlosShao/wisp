@@ -184,10 +184,11 @@ func Test145RunningUsageAndDoneTravelTheWire(t *testing.T) {
 	}
 
 	// The end retires its chip into an ended row; the task's end retires any
-	// that never got one.
+	// that never got one. The terminal event now carries the loop's own stop
+	// word (ticket 145 row 13): a cancelled ending's cancelled, verbatim.
 	sink.Publish(agent.Event{Kind: agent.EvToolEnd, CallID: "call-r", ToolName: "fs.read", Outcome: "success", Text: "42 bytes"})
 	sink.Publish(agent.Event{Kind: agent.EvToolStart, CallID: "call-lost", ToolName: "net.fetch"})
-	sink.Publish(agent.Event{Kind: agent.EvDone, TaskID: "task-1", Text: "done"})
+	sink.Publish(agent.Event{Kind: agent.EvDone, TaskID: "task-1", Text: "done", Stop: llm.StopCancelled})
 
 	data, err = panel.NewSnapshotPump(panel.PumpSources{Run: feed.Section}).Marshal()
 	if err != nil {
@@ -199,6 +200,12 @@ func Test145RunningUsageAndDoneTravelTheWire(t *testing.T) {
 	}
 	if len(run.Tools) != 1 || run.Tools[0].CallID != "call-r" || run.Tools[0].Outcome != "success" {
 		t.Errorf("tools = %+v, want the ended call kept as the record", run.Tools)
+	}
+	if run.Done == nil || run.Done.Stop != string(llm.StopCancelled) {
+		t.Errorf("done row = %+v, want the terminal event's own stop word verbatim", run.Done)
+	}
+	if !strings.Contains(string(data), `"stop":"cancelled"`) {
+		t.Errorf("the exit bytes lost the stop word:\n%s", data)
 	}
 }
 
@@ -238,6 +245,11 @@ func Test145ArgsJSONComesFromTheBookedForensicsRow(t *testing.T) {
 	if !strings.Contains(string(data), `"argsJson":"{\"path\":\"a.txt\",\"content\":\"x\"}"`) {
 		t.Errorf("the wire lost the booked row's sanitized args:\n%s", data)
 	}
+	// Ticket 145 row 4's risk dimension rides the SAME booked row: the gate's
+	// L1 decision travels verbatim as the row's level.
+	if !strings.Contains(string(data), `"level":"L1"`) {
+		t.Errorf("the wire lost the booked row's RiskLevel:\n%s", data)
+	}
 
 	// Mutation 1: no store (a sink built without the forensics face) - the
 	// args must be absent, never a digest invented from the event alone.
@@ -254,6 +266,9 @@ func Test145ArgsJSONComesFromTheBookedForensicsRow(t *testing.T) {
 	if strings.Contains(string(bareData), "argsJson") {
 		t.Errorf("a store-less sink invented args from the event alone:\n%s", bareData)
 	}
+	if strings.Contains(string(bareData), `"level"`) {
+		t.Errorf("a store-less sink invented a risk level from the event alone:\n%s", bareData)
+	}
 
 	// Mutation 2: a correlation id no booked row answers (the loop-rejected
 	// and locally-answered calls) - absent is the truth here too.
@@ -269,6 +284,9 @@ func Test145ArgsJSONComesFromTheBookedForensicsRow(t *testing.T) {
 	}
 	if strings.Contains(string(noRowData), "argsJson") {
 		t.Errorf("an unbooked call grew args from some other row:\n%s", noRowData)
+	}
+	if strings.Contains(string(noRowData), `"level"`) {
+		t.Errorf("an unbooked call grew a risk level from some other row:\n%s", noRowData)
 	}
 }
 

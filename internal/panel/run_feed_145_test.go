@@ -56,11 +56,12 @@ func TestRunFeedCarriesOnlyWhatEventsWrote(t *testing.T) {
 	feed := NewRunFeed()
 	// The values are what loop.go's EvToolEnd publish sites carry: the
 	// journal's own outcome vocabulary, the call id, the name, the result
-	// text - and the booked forensics row's sanitized args the feed line
-	// joined by the event's correlation id (call-2's bridge row is absent:
-	// a call the bridge never booked travels with argsJson absent).
-	feed.ToolEnded("call-1", "fs.write", "success", "wrote 3 files", `{"path":"a.txt","content":"x"}`)
-	feed.ToolEnded("call-2", "net.fetch", "error", "boom", "")
+	// text - and the booked forensics row's sanitized args and RiskLevel the
+	// feed line joined by the event's correlation id (call-2's bridge row is
+	// absent: a call the bridge never booked travels with argsJson and level
+	// absent).
+	feed.ToolEnded("call-1", "fs.write", "success", "wrote 3 files", `{"path":"a.txt","content":"x"}`, "L1")
+	feed.ToolEnded("call-2", "net.fetch", "error", "boom", "", "")
 	// A classified error event: class and detail are observe.Error's own
 	// fields as the event carried them, text is the event's message, and
 	// retryable is the class policy's own answer (provider retries, auth
@@ -86,8 +87,11 @@ func TestRunFeedCarriesOnlyWhatEventsWrote(t *testing.T) {
 	if sec.Tools[0].ArgsJSON != `{"path":"a.txt","content":"x"}` {
 		t.Errorf("row 0 args = %q, want the booked row's sanitized args verbatim", sec.Tools[0].ArgsJSON)
 	}
-	if sec.Tools[1].Outcome != "error" || sec.Tools[1].ResultText != "boom" || sec.Tools[1].ArgsJSON != "" {
-		t.Errorf("row 1 = %#v, want the event's own outcome and text with no invented args", sec.Tools[1])
+	if sec.Tools[0].Level != "L1" {
+		t.Errorf("row 0 level = %q, want the booked row's RiskLevel verbatim", sec.Tools[0].Level)
+	}
+	if sec.Tools[1].Outcome != "error" || sec.Tools[1].ResultText != "boom" || sec.Tools[1].ArgsJSON != "" || sec.Tools[1].Level != "" {
+		t.Errorf("row 1 = %#v, want the event's own outcome and text with no invented args or level", sec.Tools[1])
 	}
 	if sec.Error == nil || sec.Error.Class != "provider" ||
 		sec.Error.Detail != "http 502 from upstream" || sec.Error.Text != "调用失败" || !sec.Error.Retryable {
@@ -111,11 +115,17 @@ func TestRunFeedCarriesOnlyWhatEventsWrote(t *testing.T) {
 	}
 	for _, want := range []string{
 		`"outcome":"success"`, `"outcome":"error"`, `"class":"provider"`, `"repeatLevel":2`,
-		`"argsJson":"{\"path\":\"a.txt\",\"content\":\"x\"}"`, `"retryable":true`,
+		`"argsJson":"{\"path\":\"a.txt\",\"content\":\"x\"}"`, `"retryable":true`, `"level":"L1"`,
 	} {
 		if !strings.Contains(string(data), want) {
 			t.Errorf("the exit bytes lost %s:\n%s", want, data)
 		}
+	}
+	// A call with no booked row travels with level absent too - the event
+	// face alone does not know the risk tier and inventing one here would be
+	// the constant-as-data shape.
+	if strings.Contains(string(data), `"level":""`) || len(strings.Split(string(data), `"level"`)) != 2 {
+		t.Errorf("the exit bytes must carry exactly one (booked) level, never an invented one:\n%s", data)
 	}
 
 	// A notice-shaped error (no class, no detail, no text) writes nothing -
@@ -148,7 +158,7 @@ func TestRunFeedRunningRowsFollowTheEvents(t *testing.T) {
 	}
 
 	// The end retires its own call and only its own call.
-	feed.ToolEnded("call-a", "fs.read", "success", "42 bytes", "")
+	feed.ToolEnded("call-a", "fs.read", "success", "42 bytes", "", "")
 	sec = feed.Section()
 	if len(sec.Running) != 1 || sec.Running[0].CallID != "call-b" {
 		t.Fatalf("running = %#v, want only call-b left", sec.Running)
@@ -158,8 +168,10 @@ func TestRunFeedRunningRowsFollowTheEvents(t *testing.T) {
 	}
 
 	// The task's end retires the rest - a dead task's chip must not run
-	// forever - while the ended rows stay as the run's record.
-	feed.TaskEnded()
+	// forever - while the ended rows stay as the run's record. The stop word
+	// is the terminal EvDone's own (ticket 145 row 13): here the cancelled
+	// ending's own word, carried verbatim.
+	feed.TaskEnded(string(llmStopCancelled))
 	sec = feed.Section()
 	if len(sec.Running) != 0 {
 		t.Errorf("running after task end = %#v, want none", sec.Running)
@@ -167,12 +179,59 @@ func TestRunFeedRunningRowsFollowTheEvents(t *testing.T) {
 	if len(sec.Tools) != 1 {
 		t.Errorf("ended rows = %#v, want the record kept", sec.Tools)
 	}
+	if sec.Done == nil || sec.Done.Stop != "cancelled" {
+		t.Errorf("done row = %#v, want the terminal event's own stop word", sec.Done)
+	}
 
 	// An id-less start never happened on this wire: no call id, no row.
 	idless := NewRunFeed()
 	idless.ToolStarted("", "mystery")
 	if s := idless.Section(); len(s.Running) != 0 {
 		t.Errorf("an id-less start wrote %#v - there is nothing true to key a row on", s.Running)
+	}
+}
+
+// llmStopCancelled is llm.StopCancelled spelled locally: this package does
+// not import internal/agent or internal/llm (the narrow-seam rule the feed
+// states), and the word is asserted as the loop's own vocabulary spells it.
+const llmStopCancelled = "cancelled"
+
+// TestRunFeedDoneRowFollowsTheEvent is AC#6's answer for the terminal word:
+// the done row exists only because a terminal EvDone wrote it, its Stop is
+// the event's own llm.StopReason verbatim, and an empty stop (the loop's own
+// endings - brake, refusal - have no provider word) travels as a present row
+// with the word absent, never as an invented status name.
+func TestRunFeedDoneRowFollowsTheEvent(t *testing.T) {
+	before := NewRunFeed().Section()
+	if before.Done != nil {
+		t.Fatalf("done before any terminal event = %#v, want absent until EvDone arrives", before.Done)
+	}
+
+	feed := NewRunFeed()
+	feed.TaskEnded("max_tokens")
+	sec := feed.Section()
+	if sec.Done == nil || sec.Done.Stop != "max_tokens" {
+		t.Fatalf("done row = %#v, want the terminal event's own stop word", sec.Done)
+	}
+	data, err := json.Marshal(sec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `"done":{"stop":"max_tokens"}`) {
+		t.Errorf("the exit bytes lost the stop word:\n%s", data)
+	}
+
+	// The loop's own endings carry no provider word: present row, absent
+	// word - copying a status name in here would be a constant dressed as
+	// the provider's word.
+	own := NewRunFeed()
+	own.TaskEnded("")
+	ownData, err := json.Marshal(own.Section())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(ownData), `"done":{}`) {
+		t.Errorf("an own-ending task must ship the done row with the word absent:\n%s", ownData)
 	}
 }
 
@@ -228,7 +287,7 @@ func TestRunFeedBoundsAreHonest(t *testing.T) {
 	feed := NewRunFeed()
 	total := runToolRowsKept + 5
 	for i := 0; i < total; i++ {
-		feed.ToolEnded(fmt.Sprintf("call-%03d", i), "tool", "success", "", "")
+		feed.ToolEnded(fmt.Sprintf("call-%03d", i), "tool", "success", "", "", "")
 	}
 	sec := feed.Section()
 	if len(sec.Tools) != runToolRowsKept {

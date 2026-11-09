@@ -44,26 +44,14 @@ func Test187AssemblyRootCarriesTheModelSwitchReader(t *testing.T) {
 	}
 }
 
-// modelSwitchSection187 mirrors run.go's PumpSources literal mapping verbatim
-// (ChatSwitchOptions into panel.ModelSwitchSection, per-row ModelOption
-// conversion). The byte-nail above pins the literal's presence; this helper
-// lets tooth 2 exercise the same read chain against a real Manager. If the
-// literal's mapping ever diverges from this helper, tooth 2's hardcoded
-// content still holds for the helper - the divergence itself is what the
-// evidence doc asks a reviewer to diff by eye, one five-field mapping.
+// modelSwitchSection187 exercises the SAME mapping function run.go's
+// PumpSources literal calls (modelSwitchSection, ticket 145's refactor of
+// the five-field literal) - production and test share one body, so the
+// mirror cannot drift. The byte-nail above still pins the literal's
+// presence; this helper hands it a nil provider, the shape the helper's
+// original five-field assertions were built on.
 func modelSwitchSection187(m *config.Manager) panel.ModelSwitchSection {
-	v := m.ChatSwitchOptions()
-	models := make([]panel.ModelOption, 0, len(v.Models))
-	for _, opt := range v.Models {
-		models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model})
-	}
-	return panel.ModelSwitchSection{
-		Current:         panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel},
-		CurrentThinking: v.CurrentThinking,
-		Models:          models,
-		ThinkingLevels:  v.ThinkingLevels,
-		Reason:          v.Reason,
-	}
+	return modelSwitchSection(m, nil)
 }
 
 // Test187WiredModelSwitchReaderSendsTheLiveValues: the reader chain the

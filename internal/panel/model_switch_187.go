@@ -40,11 +40,15 @@ package panel
 // as "nothing to choose".
 
 // ModelOption is one offerable catalog row: the pair a role_chat_pair write
-// addresses. Provider plus model id, nothing else - no price card, no
-// capability bits, and by construction no credential-shaped string.
+// addresses, plus the entry's own human-facing Display name (ticket 145
+// AC#2b①: ModelSpec.Display verbatim as internal/config's ChatSwitchOptions
+// carried it off the catalog; empty means the entry declares none and the
+// page falls back to the model id - this carrier invents no name). No price
+// card, no capability bits, and by construction no credential-shaped string.
 type ModelOption struct {
 	Provider string `json:"provider"`
 	Model    string `json:"model"`
+	Display  string `json:"display,omitempty"`
 }
 
 // ModelSwitchSection is the snapshot's modelSwitch key.
@@ -72,4 +76,20 @@ type ModelSwitchSection struct {
 	// (no [llm.providers] section / every row disabled / config unreadable).
 	// Empty = the catalog was read and holds offerable rows.
 	Reason string `json:"reason,omitempty"`
+	// Adapter is the live chat provider's own protocol word
+	// (llm.ProviderInfo.Protocol, read off the built provider chain) - the
+	// answer to WHICH adapter's vocabulary AdapterThinkingLevels below is
+	// (ticket 145 AC#2b②). Empty = no provider was built (the role is
+	// unset or the chain failed); the section then offers no tiers.
+	Adapter string `json:"adapter,omitempty"`
+	// AdapterThinkingLevels is the tier vocabulary the adapter named above
+	// ACTUALLY accepts in Request.ThinkingIntensity - llm.ThinkingLevels of
+	// that protocol's own registration, derived from the adapter's own
+	// mapping table. This is the census's second question ("which tiers does
+	// this adapter map") answered separately from ThinkingLevels above
+	// ("which tiers does the MODEL declare"): a model declaring four values
+	// behind an adapter that maps none must offer none, and handing the
+	// config enum out verbatim as "what everyone supports" is exactly the
+	// shape AC#2b forbids. Empty/absent = offer no tier choices.
+	AdapterThinkingLevels []string `json:"adapterThinkingLevels,omitempty"`
 }

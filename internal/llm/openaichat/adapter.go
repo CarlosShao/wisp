@@ -38,6 +38,13 @@ func init() {
 	llm.RegisterProtocol("openai-chat", func(ep llm.EndpointOptions) (llm.LlmProvider, error) {
 		return New(ep), nil
 	})
+	// Ticket 145 AC#2b②: this protocol is KNOWN and maps no tier - the
+	// adapter doc above says the intensity is intentionally not sent, because
+	// strict chat-completions endpoints 400 on the thinking params. An empty
+	// registration makes that measured fact explicit (a picker reading the
+	// exported vocabulary must offer no tier choices here), rather than
+	// leaving openai-chat indistinguishable from an unregistered protocol.
+	llm.RegisterThinkingLevels("openai-chat", nil)
 }
 
 // Adapter implements llm.LlmProvider for OpenAI Chat Completions.

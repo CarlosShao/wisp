@@ -165,14 +165,21 @@ func ballStyleSectionFromConfig(m *config.Manager) panel.BallStyleSection {
 
 // modelSwitchSectionFromConfig is the config->panel mapping for ticket 187's
 // picker row, over the same Manager. Same convergence note as above.
+//
+// Ticket 145 AC#2b: the catalog rows' Display names ride here too
+// (ChatSwitchOptions carries them off the same walk). The adapter vocabulary
+// does NOT: this is the no-pipeline shape, no provider chain was ever built
+// in this process, and llm.ThinkingLevels needs a protocol word off a built
+// provider - so Adapter stays empty, which is the same honest no-source
+// posture this file's log line states (无源不冒充), never a guessed protocol.
 func modelSwitchSectionFromConfig(m *config.Manager) panel.ModelSwitchSection {
 	v := m.ChatSwitchOptions()
 	models := make([]panel.ModelOption, 0, len(v.Models))
 	for _, opt := range v.Models {
-		models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model})
+		models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model, Display: opt.Display})
 	}
 	return panel.ModelSwitchSection{
-		Current:         panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel},
+		Current:         panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel, Display: v.CurrentDisplay},
 		CurrentThinking: v.CurrentThinking,
 		Models:          models,
 		ThinkingLevels:  v.ThinkingLevels,

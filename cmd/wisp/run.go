@@ -506,6 +506,51 @@ type agentRuntime struct {
 	stderr     io.Writer
 }
 
+// chatChainProvider is the live chat provider chain's first provider - the
+// one whose protocol word names which adapter's tier vocabulary the picker
+// must respect (ticket 145 AC#2b②). Nil when the chain was never built (the
+// role is unset or assembly failed); the caller then offers no adapter
+// vocabulary, which is the honest shape, not a default.
+func chatChainProvider(rt *agentRuntime) llm.LlmProvider {
+	if rt == nil || len(rt.provs) == 0 {
+		return nil
+	}
+	return rt.provs[0]
+}
+
+// modelSwitchSection maps internal/config's ChatSwitchOptions and the live
+// provider chain's own protocol word into the snapshot's modelSwitch section.
+// The values travel verbatim; this function spells neither a provider, nor a
+// display name, nor a tier. Display rides ChatSwitchOptions' own walk over
+// the catalog (ticket 145 AC#2b①), and the adapter vocabulary is
+// llm.ThinkingLevels of the built provider's own protocol - the words that
+// adapter's mapping table accepts, never the config's four-value enum handed
+// out as "what everyone supports" (ticket 145 AC#2b②). Without the reader
+// line in the PumpSources literal the snapshot carries no "modelSwitch" key
+// at all (the reader-gated 213 shape).
+func modelSwitchSection(mgr *config.Manager, prov llm.LlmProvider) panel.ModelSwitchSection {
+	v := mgr.ChatSwitchOptions()
+	models := make([]panel.ModelOption, 0, len(v.Models))
+	for _, opt := range v.Models {
+		models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model, Display: opt.Display})
+	}
+	var adapter string
+	var adapterLevels []string
+	if prov != nil {
+		adapter = prov.Info().Protocol
+		adapterLevels = llm.ThinkingLevels(adapter)
+	}
+	return panel.ModelSwitchSection{
+		Current:               panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel, Display: v.CurrentDisplay},
+		CurrentThinking:       v.CurrentThinking,
+		Models:                models,
+		ThinkingLevels:        v.ThinkingLevels,
+		Adapter:               adapter,
+		AdapterThinkingLevels: adapterLevels,
+		Reason:                v.Reason,
+	}
+}
+
 // assembleRuntime builds the whole stack from the data dir. A failure here is
 // the Unconfigured state (SPEC-03 §4.1: never fall back to a half-configured
 // runtime silently), which exits 2 with a named reason.
@@ -1069,18 +1114,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// "modelSwitch" key at all (the reader-gated 213 shape), which is
 		// the exact assembly gap the 187 carrier and write leg left owed.
 		ModelSwitch: func() panel.ModelSwitchSection {
-			v := mgr.ChatSwitchOptions()
-			models := make([]panel.ModelOption, 0, len(v.Models))
-			for _, opt := range v.Models {
-				models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model})
-			}
-			return panel.ModelSwitchSection{
-				Current:         panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel},
-				CurrentThinking: v.CurrentThinking,
-				Models:          models,
-				ThinkingLevels:  v.ThinkingLevels,
-				Reason:          v.Reason,
-			}
+			return modelSwitchSection(mgr, chatChainProvider(rt))
 		},
 		// Ticket 215a's assembly-root line - the hop the panel leg's evidence
 		// (docs/evidence/s1/215-skills-plugins-inventory.md) records as owed:
@@ -2351,31 +2385,38 @@ type consoleSink struct {
 	store *memory.Store
 }
 
-// bookedArgs looks up the sanitized args of the call the event closes: the
-// bridge booked one tool_call row per executed call under the correlation id
-// the dispatch minted, and that row's ArgsJSON is the census's named source
-// for the expanded-args dimension. A call the bridge never booked (rejected
-// in-loop, list_tools answered locally, a task with no store) has no row and
-// travels with argsJson absent - "never executed with args" is the truth,
-// not a gap to fill. The read is a plain store read on the publishing
+// bookedForensics looks up the booked forensics row of the call the event
+// closes: the bridge booked one tool_call row per executed call under the
+// correlation id the dispatch minted, and that row's ArgsJSON and RiskLevel
+// are the census's named sources for the expanded-args dimension and the
+// tool row's risk dimension (ticket 145 row 4, AC#2b's sibling ruling: the
+// event face alone does not know either, so both join from the same row).
+// A call the bridge never booked (rejected in-loop, list_tools answered
+// locally, a task with no store) has no row and travels with both absent -
+// "never executed with args" and "no gate decision booked" are the truths,
+// not gaps to fill. The read is a plain store read on the publishing
 // goroutine, bounded by the rows one task booked; the last matching row wins
 // because an id-less call's minted key is positional and the freshest
 // booking is the one this end event closes.
-func (c consoleSink) bookedArgs(e agent.Event) string {
+func (c consoleSink) bookedForensics(e agent.Event) (argsJSON, riskLevel string) {
 	if c.store == nil || e.TaskID == "" || e.CorrelationID == "" {
-		return ""
+		return "", ""
 	}
 	rows, err := c.store.ListToolCallsByTask(context.Background(), e.TaskID)
 	if err != nil {
-		return ""
+		return "", ""
 	}
-	args := ""
 	for _, r := range rows {
-		if r.CorrelationID == e.CorrelationID && r.ArgsJSON != "" {
-			args = r.ArgsJSON
+		if r.CorrelationID == e.CorrelationID {
+			if r.ArgsJSON != "" {
+				argsJSON = r.ArgsJSON
+			}
+			if r.RiskLevel != "" {
+				riskLevel = r.RiskLevel
+			}
 		}
 	}
-	return args
+	return argsJSON, riskLevel
 }
 
 func (c consoleSink) Publish(e agent.Event) {
@@ -2411,9 +2452,10 @@ func (c consoleSink) Publish(e agent.Event) {
 		fmt.Fprintf(c.out, "[工具 %s -> %s]\n", e.ToolName, e.Outcome)
 		// Ticket 145's tool row, hop 1: the event's own call id, tool name,
 		// outcome and result text, verbatim (run_feed_145.go's ToolRunRow) -
-		// plus the booked forensics row's sanitized args, joined by the
-		// correlation id the event carries.
-		c.runFeed.ToolEnded(e.CallID, e.ToolName, e.Outcome, e.Text, c.bookedArgs(e))
+		// plus the booked forensics row's sanitized args and its RiskLevel,
+		// both joined by the correlation id the event carries.
+		args, level := c.bookedForensics(e)
+		c.runFeed.ToolEnded(e.CallID, e.ToolName, e.Outcome, e.Text, args, level)
 		changed = true
 	case agent.EvUsage:
 		// Ticket 145's rows 2 and 12, hop 1: the Cost accumulator's
@@ -2453,10 +2495,14 @@ func (c consoleSink) Publish(e agent.Event) {
 		// section's running chips retire with the task for the same reason: a
 		// task that died between a call's start and its end must not leave a
 		// chip running forever (the ended rows stay as the run's record).
+		// Ticket 145's row 13, hop 1: the event's own llm.StopReason - now
+		// published by loop.go's finish() on every terminal path (census
+		// §2.14's OPTION A ruling) - travels verbatim into the done row, so
+		// the page can say how the task ended without parsing the reply text.
 		if c.stream != nil {
 			c.stream.Close(e.TaskID)
 		}
-		c.runFeed.TaskEnded()
+		c.runFeed.TaskEnded(string(e.Stop))
 		changed = true
 	}
 	if changed && c.publish != nil {

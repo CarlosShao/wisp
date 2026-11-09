@@ -62,6 +62,18 @@ type wireRequest struct {
 // effortLevels maps the config thinking enum onto reasoning.effort.
 var effortLevels = map[string]string{"low": "low", "medium": "medium", "high": "high"}
 
+// effortVocabulary derives the accepted tier words from effortLevels itself,
+// so the vocabulary registered for ticket 145 AC#2b② cannot drift from the
+// table buildWire actually consults at request time. "off" is not a member:
+// it is the no-thinking request, handled outside this table.
+func effortVocabulary() []string {
+	out := make([]string, 0, len(effortLevels))
+	for k := range effortLevels {
+		out = append(out, k)
+	}
+	return out
+}
+
 // buildWire encodes the normalized request.
 func (a *Adapter) buildWire(req *llm.Request) ([]byte, error) {
 	if len(req.StopSequences) > 0 {
