@@ -33108,3 +33108,27 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 ### 五、撤销口令
 - 145 结案＝`git revert 50d038437 ff6b8a2c5`。
 - 112 结案＝`git revert fb6f29c00`。
+## A1660（2026-11-09 22:5x，编排者）**★降载轮 2：纯读扫票池｜核票 64「无第二屏」判据（我先错后对，诚实记）｜核票 262 AC#5ⓑ「结构上不可能」仍成立｜票 316 已撤票（第 22 处陷阱再现）**
+
+### 一、★★票 64「本机无第二屏」判据复核 —— 我先判错，再自证判对
+- **起因**：降载期想找纯读能结的票，票 64 唯一未勾是「多显示器：真拖到第二屏验证并留证；本机无第二屏则保持未勾并写明所需硬件」。
+- **我第一次量（错）**：`Get-CimInstance Win32_DesktopMonitor` ⇒ **3 枚**（DesktopMonitor1 3440×1440／2 离线 Availability=8／3 1920×1080），`Win32_VideoController` 也 3 条（含 GameViewer Virtual Display Adapter）⇒ 我一度判「本机真有第二屏，票面那句是错的」。
+- **我第二次量（对，且是仓里同一把尺）**：用**仓内 `internal/ball/monitors_windows.go:55` 同一个 API** `EnumDisplayMonitors`（PowerShell P/Invoke 等价重放）⇒ **`count=1`，只有 `\\.\DISPLAY4` 3440×1440 primary=True**。
+- **结论**：**票面判据成立**——`Win32_DesktopMonitor` 把虚拟/离线适配器也列出来（Availability=8＝离线，GameViewer 是虚拟显示适配器），**真实活动屏只有 1 块**。票 64 那句「本机无第二屏」**正确，保持未勾**。
+- ★**教训**：WMI `Win32_DesktopMonitor` ⛔ 当"屏数"尺——它含虚拟/离线项；**屏数尺＝`EnumDisplayMonitors`**（仓里 `enumMonitors()` 就是它）。我第一反应错了一次，靠"用仓里同一 API 复量"纠正。
+
+### 二、★票 262 AC#5ⓑ「结构上不可能」复核 —— 仍成立，且理由比我记的更硬
+- 现读 `.github/workflows/ci.yml:176` 那个 step 的注释原文：该步**故意**放在 lint job（托管 `ubuntu-latest`），**不**放 self-hosted `slo-full`，理由逐字＝「A step placed after `actions/checkout` in that job is a **dead gate**: it runs only if checkout ran, and the path shape this gate exists to catch is **precisely the one that makes checkout fail**」。
+- ⇒ 票面「AC#5ⓑ 现形下结构上不可能满足，⛔ 本格不勾」**完全正确**，不是偷懒。该步用 `WORST_PREFIX=44` 具名常量把最坏宽度**复现**成纸面预算，注释明写「what this step cannot see … the real filesystem behaviour of the self-hosted runner」。
+- ⇒ **票 262 只剩 AC#5ⓐ**（CI 侧真出颜色＝需一次推送后看 self-hosted 日志），属**等 CI 跑**，降载期不催。
+
+### 三、★票 316 已撤票（第 22 处「排除 withdrawn」陷阱再现，但这次我起手就查了）
+- 扫描「只差 1 格」的票时，316 的未勾是「AC#1 收口（三选一）」，看着像能裁。**起手读票头** ⇒ `Status: withdrawn（撤票；口令「316 撤」已用）`，撤因＝**与票 272 重复**（272 已落 arm1+arm2 把 M 形打红）。
+- ⇒ **跳过，未派未动**。★这次陷阱没咬到我（起手三核里"读票头 Status"救了一次）。
+
+### 四、降载状态
+- `go`/`compile`/`link` 进程 **0 枚**；本轮全程只读（grep/sed/WMI/P/Invoke）＋写台账，**零编译零测试**。
+- 未结票池现跑见盘（本轮未变）。
+
+### 五、撤销口令
+- 本轮零产码零提交产码，无撤销对象。
