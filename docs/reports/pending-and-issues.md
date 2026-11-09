@@ -32990,3 +32990,47 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 - 路径门禁修复＝`git revert a0b1ea40d`（会退回 RED，不建议）。
 - 23 翻格＝`git revert 9537d46b6`。
 - 262 判定＝`git revert 9b0eccb5b`。
+## A1656（2026-11-09 19:0x，编排者）**★★我派错票 238（owner 早已否决 A476）｜★路由变了：glm-5.3-flash 不可用，全编队改 deepseek-v4.1-flash｜票 145＝5/6（只剩 AC#2b）｜★裁定 AC#2b＝方案 B｜票 33 AC#10 落 2 格、AC#7 判据实测不成立｜wave109 三腿**
+
+### 一、★★我派错了：票 238 是 owner-vetoed 票（我的派单过期）
+- **A476（09-30 16:5x）owner 原话**：「锁个屁，人家都能登录我电脑了，还锁个蛋啊，怎么想的你」⇒ **首启封根两支都不落地**，AC#1..AC#4 四框全保持未勾，「不再排落地腿」，重开只认 owner 说「**Q-72 重开**」。
+- **A1558（2026-11-05）**明确记「**238 STOP（owner-vetoed）……勿再派**」。
+- **我 A1655 把 `238-proc` 放回 wave108，没引「Q-72 重开」** ⇒ **过期派单，我的错**。腿按纪律停手零产码（`31668c2d7` 只追加 STOP 记录＋证据件）。
+- **★前提复量也证明原缺陷已被票 132 收口**：`internal/observe/logging.go:99 winsec.PrivateDirAll(cfg.Dir, 0o700)`（**创建即封**）；`internal/proc` 对 `internal/winsec` 实际导入 **0 条**；票面所称「logging.go:72 旧行」已不存在。
+- ⇒ **238 永不派**，除非 owner 亲口「Q-72 重开」。
+
+### 二、★★路由变更（必须记）：`auto/glm-5.3-flash` 本会话**已不允许**
+- `list_subagent_models(magpie)` 现只返回 **`magpie/auto/deepseek-v4.1-flash`**；`auto/glm-5.3-flash` 报 **`child LLM route "magpie/auto/glm-5.3-flash" is not allowed for this Session`**。
+- **这就是 wave108 三腿全返 null、零提交的原因**（不是腿的问题）。⇒ 全编队改 `provider:"magpie", model:"auto/deepseek-v4.1-flash"`（与主会话同款）。
+- ★**已按「⛔ 静默降级」上报机主**（本轮总结具名摆出）。
+
+### 三、★票 145＝**5/6 勾，只剩 AC#2b**（`c6afcd752`＋`656df9b6e`＋`e1bbb17e1`）
+- **AC#2 翻**：构造点逐枚具名——3 个生产站点（`pump.go:409` 唯一真装配／`:479` Run 读者门／`:460` ModelSwitch 读者门）、2 个装配根（`run.go:1104`／`:1116`）、2 条喂线（`run.go:2505`／`:2458`）。
+- **AC#6 翻**：对象集 6 枚新键**用反射探针从生产结构现量**（不抄实现者文件）：`run.done.stop`／`tools[].level`／`modelSwitch.models[].display`／`modelSwitch.current.display`／`modelSwitch.adapter`／`modelSwitch.adapterThinkingLevels`。每枚有具名用例，每枚有只碰该字段的突变反钉（每枚突变都红对应用例）⇒ **装饰品判据从未触发**。
+- **AC#2b ⛔ 翻，两条实测缺陷**：①AC 自己的判据（两模型假树逐字读回）**全仓无用例**（现有两模型树都让第二枚 `enabled=false` 只断 `len==1`＝只断过滤方向，只 offer 第一行的突变全仓绿＝真洞）②`Capabilities.Thinking` **零读者**（该维跟随声明档词表，thinking=false＋两档声明仍送两档，适配器词表也不交集）。
+- ★**验收腿自我更正一次（诚实）**：首版证据称「基线同族失败」是错的——`go test ./cmd/wisp` 600-720s，Go 默认 10 分钟超时把基线**在 600.189s 杀掉**，读数 60 而非 64 ⇒ 幻影「三枚新失败」。**加 `-timeout 30m` 重跑**：基线 64／HEAD 63，`comm -13` 空 ⇒ **HEAD 是严格子集**；多出那枚 3/3 重试绿＝真窗 flake。同尺重跑差距主张两侧（671.871s/63 vs 595.853s/63，diff 空），结论成立。
+
+### 四、★★裁定：票 145 AC#2b ＝ **方案 B（改代码取交集）**
+- **A（改契约文字）被否**；**B＝`Capabilities.Thinking=false` 就不送该维 ＋ `thinkingLevels` 与 `adapterThinkingLevels` 取交集后送**。
+- **理由（主流 harness）**：两个清单并列、让每个页面自己算交集＝**把同一个判断散到每个读方**；Go 侧算完再送，读方拿到就是能发出去的档。
+- 撤销口令：`git revert e1bbb17e1 656df9b6e c6afcd752`。
+
+### 五、★票 33：AC#10 落 2 格（`908c6652c`），AC#7 判据实测**不成立**
+- **AC#10**：`enabled`（`bringUp` 最顶部就检查，**在 `probePanelRuntime()` 之前**——策略拒绝≠机器拒绝，票 37 的降级卡不该跳出来说「这台机器没有 WebView2」）＋`keep_alive_in_session=false`（`Hide()` 走 `Destroy()` 真拆窗）。**突变实测**：删检查 ⇒ `FAIL TestAC10DisabledPanelRefusesBeforeTheRuntimeProbe (5.20s)`，还原 ⇒ `ok`。
+- **`scale` 未落地**：`PutZoomFactor` 在 fork 里只有裸 vtbl 槽、无 Go 包装、`controller` 未导出 ⇒ **需改 `forks/**`**（腿禁写面）。
+- **★AC#7 判据实测不成立（重要发现）**：票面说「把 `Snapshot()` 改成持锁一次性快照」就红转绿——**实测票面解药无效**：把泵锁**全程持住**（最强形式），包**依然撕裂**。原因：`SnapshotPump.mu` 全部调用点只有 `pump.go:553-561` 两处（护 `Publishes()`/`count()`），而四个数据源各持自己的锁（`Gate.mu` 20 处、`StreamLog.mu` 18 处）。⇒ **任何按票面写出来的「红转绿」用例只能靠测别的东西变绿＝票面自己禁止的恒真判据升一层**。
+- **真正的解（腿只命名不假装做）**：跨源一致性需**共享纪元**（单一写入者为每源打戳，或包上带序号让读方丢弃不自洽的一对）——后者是主流做法，**归票 35 的 D38d 传输线**。
+- ★腿**没有为了让格子好看去接装饰性 `Marshal()` 调用方**（造绿比不交更坏）——正确。
+- **★新平台陷阱**：Windows 出口树克隆**必须 `-c core.autocrlf=false -c core.eol=lf`**，否则 `internal/ball` 假红（blob CR=0、sha 等于钉值，红在检出物）。
+
+### 六、wave109 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `145-ac2b` | ★按**方案 B** 闭 AC#2b 两缺陷＋补「两模型假树逐字读回」用例（须让「只 offer 第一行」突变变红）；本波独占 cmd/wisp+panel+config+llm+agent |
+| `112-verify` | 票 112 winsec CI 首跑红：非实现者复判五格（AC#1 失败断言须**从 CI 日志逐字引**）；全翻则 `-done`；写面 `scripts/**` |
+| `323-census` | 票 323 只读普查五格台件方案（**零产码**） |
+
+### 七、撤销口令
+- 238 STOP 记录＝`git revert 31668c2d7`。
+- 145 三笔验收＝`git revert e1bbb17e1 656df9b6e c6afcd752`。
+- 33 AC#10＝`git revert 908c6652c`。
