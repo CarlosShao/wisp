@@ -58,6 +58,22 @@
 #      先被 bash 在**工作树**上做路径名展开（现量 496 枚路径）再喂 git grep ⇒ 射程的**文件清单**
 #      来自工作树、只有内容来自 $A 那棵树（合成树里「新加一枚文件」因此对这把尺不可见，本程
 #      AC#2 的变异因此改成改既有件的内容）。改它＝改所有腿在所有锚点的射程，须单独立票。
+# 票 411 追加（2026-11-08，**只改喂参数的方式；一枚腿没删、一条判据没动、名册/want_n 逐枚原样**）：
+#   ① 病（编队级活缺陷，读数件 .scratch/wisp/probes/154/r20261108/00-argv-overflow.md）：
+#      run()/pair() 的 `-- $@` 未加引号 ⇒ bash 在工作树上把 'internal/**/*.go'／'cmd/**/*.go'
+#      摊成逐枚文件字面 pathspec（现量 1084 词／39,836 字符＞Windows 32767 命令行上限）⇒
+#      git grep exec 失败 rc=126 ⇒ 14 腿里 10 腿假 BAD（git-grep-rc-126）；10-14 票 178 收口时
+#      同展开 496 枚还能跑（rc=2），其后树长肥过限，仪器从「能跑」变「全红」。
+#   ② 修法＝`-- "$@"`（引号保 pattern 本体、git 在 $A 那棵树上自己展开）。选型理由：git grep
+#      原生吃 glob pathspec（正控 rc=0 有命中，探针件读数 4）；xargs 分批要多进程拼名册、
+#      --pathspec-from-file 要临时件，两形都不如引号一刀（且都还留着「清单来自工作树」那半条病）。
+#   ③ 顺带收掉票 178 随单发现⑤的前半条：名册的**文件清单**从此与内容同源（都来自 $A），
+#      合成树里 commit 过的新文件这把尺看得见了。⚠ 射程因此变宽：旧展开（bash 无 globstar）
+#      只吃两层深，第 3 层及以下的文件它结构性看不见（锚 cb2287a5 现量 9 枚带词表命中的
+#      盲区文件，对照件 r20261108/15-glob-equivalence.sh）⇒ 修后读数与 09-27/10-14 在盲区
+#      射程下登记的 want/want_n **不可直接比**，重登基线归裁决方（171 r3 规矩），本程一字不动。
+#   ④ 顺带把 587/590 两行 echo 里未转义的反引号转义（`ring 1`／`改完之后…`曾被 bash 当命令
+#      替换执行，stderr 噪音两行）＝转义保输出字节不变，不是改读数。
 # 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
 # 规矩：只做 grep／不写仓里任何东西；名册变了即门响。
 #   （G5 的 pair() 为求差集用了一次 bash herestring，临时件走 $TMPDIR、不落仓；
@@ -299,7 +315,15 @@ run() { # $1 标题 $2 pattern $3 额外 git-grep 旗标 $4.. pathspecs
 	echo
 	echo "## $title"
 	echo "\$ git grep -nE $flags '$pat' $A -- $*"
-	# shellcheck disable=SC2068
+	# 票 411（2026-11-08）：`-- $@` 改 `-- "$@"`。改前未引号 ⇒ bash 在工作树上把
+	#   'internal/**/*.go'／'cmd/**/*.go' 摊成逐枚文件字面 pathspec（现量 1084 词／39,836 字符
+	#   ＞ Windows 32767 命令行上限）⇒ git grep exec 失败 rc=126 ⇒ 14 腿里 10 腿假 BAD
+	#   （git-grep-rc-126）。读数件＝.scratch/wisp/probes/154/r20261108/00-argv-overflow.md。
+	#   引号之后喂给 git 的是 glob pattern 本体（两枚短参数），由 git 在 $A 那棵树上自己展开
+	#   ——顺带把票 178 随单发现⑤（射程文件清单来自工作树、合成树新加文件不可见）也一并收掉：
+	#   名册的文件清单从此与内容同源（都来自 $A）。⚠ 射程变宽：旧展开只吃两层深，第 3 层及
+	#   以下盲区文件（锚 cb2287a5 现量 9 枚带命中，件 r20261108/15-glob-equivalence.sh）从此
+	#   进射程 ⇒ 读数与旧基线不可直接比，重登基线归裁决方。只改喂参数的方式，判据一字未动。
 	# 票 171 AC#7：名册先收进变量再原样打出来（行内容一字不差，只是多次数一遍行），
 	# 因为这一族腿的响从此看枚数：命中行数 vs want_n 登记的基线。
 	# 票 171 AC#1（本程）：分子从此只数"代码里真有那一味"的行——
@@ -308,7 +332,7 @@ run() { # $1 标题 $2 pattern $3 额外 git-grep 旗标 $4.. pathspecs
 	#   名册本体照旧逐行原样打印（下一程仍按行 diff），只是"行数"这一格换成了剔注释之后的数，
 	#   并附一张被剔掉的行——两族腿同一处实现（call_lines），不写第二份。
 	local roster rc hits raw_hits dropped
-	roster="$(git grep -nE $flags "$pat" "$A" -- $@ 2>/dev/null)"; rc=$?
+	roster="$(git grep -nE $flags "$pat" "$A" -- "$@" 2>/dev/null)"; rc=$?
 	if [ -n "$roster" ]; then printf '%s\n' "$roster"; fi
 	raw_hits="$(printf '%s' "$roster" | grep -c . || true)"
 	hits="$(call_lines "$roster" "$pat" -E | grep -c . || true)"
@@ -339,9 +363,10 @@ pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handl
 	echo
 	echo "## $title"
 	echo "\$ git grep -nEw '$open|$close' $A -- $*"
-	# shellcheck disable=SC2068
+	# 票 411（2026-11-08）：`-- $@` 改 `-- "$@"`，机理同 run() 那一格（argv 溢出 rc=126 ⇒ 10 腿假 BAD；
+	#   名册文件清单从此与内容同源、都来自 $A 那棵树）。只改喂参数的方式，判据一字未动。
 	local roster rrc calls dropped='' unpaired="" runpaired="" n rn f oc deleg rncalls meas disc='' generic='' gk
-	roster="$(git grep -nEw "$open|$close" "$A" -- $@ 2>/dev/null)"; rrc=$?
+	roster="$(git grep -nEw "$open|$close" "$A" -- "$@" 2>/dev/null)"; rrc=$?
 	echo "# 逐行读数（名册本体，供下一程 diff；这一份含注释行）："
 	if [ -n "$roster" ]; then printf '%s\n' "$roster"; else echo "#   （空）"; fi
 	# 成对判据只吃调用点：纯注释行剔掉。
@@ -584,10 +609,10 @@ echo "## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了
 echo "# 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。"
 echo "# 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体"
 echo "#   在那儿（:855 与 :923；09-27 登记时是 :633／:684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。"
-echo "# 票 178 四堆口径（piles 味）：判据只吃【只开】那一堆。09-27 登记的那 `ring 1` 是一发【只关】"
+echo "# 票 178 四堆口径（piles 味）：判据只吃【只开】那一堆。09-27 登记的那 \`ring 1\` 是一发【只关】"
 echo "#   （run.go 关 bridge.mark／组合根开的那一枚——票 178 判语：关的是别处开的不算缺陷）；票 315"
 echo "#   （bfc74ae9）把 admitTask 补成开合成对之后，这条射程两堆都空，诚实登记是 quiet＋0。"
-echo "#   `改完之后 AC#2 那一发仍会红`：在生产码里真造一枚【只开】（合成树 8ca0a52e＝锚树 1675e844"
+echo "#   \`改完之后 AC#2 那一发仍会红\`：在生产码里真造一枚【只开】（合成树 8ca0a52e＝锚树 1675e844"
 echo "#   ＋internal/tools/subagent_197.go 的变异 blob f534915a）⇒ ② 堆 1 枚 > 基线 0 ⇒ BAD。"
 echo "#   读数＝.scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt——同一发在改前尺上实测 1 枚"
 echo "#   恰好等于那时登记的基线 1 ⇒ 沉默；改完才点得出来（票 178 AC#2 那句「未修上响不出来」的正文）。"

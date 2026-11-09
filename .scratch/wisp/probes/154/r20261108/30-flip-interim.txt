@@ -1,0 +1,68 @@
+flip-declaration.sh: anchor cb2287a58b56efd3a8bfa61cf80e1a3ec3235b42 (the gate reads the COMMITTED tree at this anchor, never the working tree)
+== (0) baseline: committed declarations, untouched
+  FAIL  14 legs each say what it does -> rc=9 (want zero)
+   legs booked: 腿数＝14   mismatched: 声明与实测不符＝9
+== flip 1: G2 ring->quiet (run-shaped; its roster is non-empty today)
+   the declaration lines this run differs by:
+   < want G2 ring
+   > want G2 quiet
+  ok    G2 ring->quiet (run-shaped; its roster is non-empty today) -> rc=9 (want nonzero)
+   which legs the aggregate called out (rc=9):
+   # BAD  腿=G1 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G1b 声明=quiet 基线=0枚 实测=4枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G2 声明=quiet 基线=1枚 实测=2枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G5 声明=ring 基线=1枚 实测=2枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G5pos 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G5neg 声明=ring 基线=8枚 实测=14枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G6neg 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G7 声明=ring 基线=1枚 实测=6枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G7neg 声明=ring 基线=2枚 实测=7枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+== flip 2: G5neg ring->quiet (pair-shaped; 5 unpaired by design today)
+   the declaration lines this run differs by:
+   < want G5neg ring
+   > want G5neg quiet
+  ok    G5neg ring->quiet (pair-shaped; 5 unpaired by design today) -> rc=9 (want nonzero)
+   which legs the aggregate called out (rc=9):
+   # BAD  腿=G1 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G1b 声明=quiet 基线=0枚 实测=4枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G2 声明=ring 基线=1枚 实测=2枚 因=新增命中（票 171 AC#7：实测 > 基线）
+   # BAD  腿=G5 声明=ring 基线=1枚 实测=2枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G5pos 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G5neg 声明=quiet 基线=8枚 实测=14枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G6neg 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G7 声明=ring 基线=1枚 实测=6枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G7neg 声明=ring 基线=2枚 实测=7枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+== flip 3: G7 ring->quiet (new AC#6 leg; 3 unpaired today, reverse direction only)
+   the declaration lines this run differs by:
+   < want G7 ring rev
+   > want G7 quiet rev
+  ok    G7 ring->quiet (new AC#6 leg; 3 unpaired today, reverse direction only) -> rc=9 (want nonzero)
+   which legs the aggregate called out (rc=9):
+   # BAD  腿=G1 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G1b 声明=quiet 基线=0枚 实测=4枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G2 声明=ring 基线=1枚 实测=2枚 因=新增命中（票 171 AC#7：实测 > 基线）
+   # BAD  腿=G5 声明=ring 基线=1枚 实测=2枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G5pos 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G5neg 声明=ring 基线=8枚 实测=14枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G6neg 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G7 声明=quiet 基线=1枚 实测=6枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G7neg 声明=ring 基线=2枚 实测=7枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+== flip 4: G1 quiet->ring (run-shaped; zero hits today)
+   the declaration lines this run differs by:
+   < want G1 quiet
+   > want G1 ring
+  ok    G1 quiet->ring (run-shaped; zero hits today) -> rc=9 (want nonzero)
+   which legs the aggregate called out (rc=9):
+   # BAD  腿=G1 声明=ring 基线=0枚 实测=1枚 因=新增命中（票 171 AC#7：实测 > 基线）
+   # BAD  腿=G1b 声明=quiet 基线=0枚 实测=4枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G2 声明=ring 基线=1枚 实测=2枚 因=新增命中（票 171 AC#7：实测 > 基线）
+   # BAD  腿=G5 声明=ring 基线=1枚 实测=2枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G5pos 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G5neg 声明=ring 基线=8枚 实测=14枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G6neg 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G7 声明=ring 基线=1枚 实测=6枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+   # BAD  腿=G7neg 声明=ring 基线=2枚 实测=7枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+== flip 5: G7pos quiet->ring (new AC#6 positive control; 0 unpaired today)
+   the declaration lines this run differs by:
+   < want G7pos quiet rev
+   > want G7pos ring rev
