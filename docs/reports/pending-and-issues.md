@@ -33456,3 +33456,42 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 
 ### 六、撤销口令
 - 无产码改动，无撤销对象。
+## A1671（2026-11-09 23:5x，编排者）**★★从 CI 真红反推出一条新缺陷 ⇒ 立票 417：`d22scan` 的 blob 正控在 CI 上永远红（浅克隆）**
+
+### 一、怎么挖到的（纯读 `gh api`，零 CPU）
+- 顺着 `A1670` 那条线继续拉 CI 日志，`lint` job 里除路径长度外**还有真红**：
+  ```
+  2026-11-09T15:20:14.4992476Z ##[error]    riskwordlist_test.go:118: git show 29d258f9:internal/risk/blacklist.go: exit status 128
+  2026-11-09T15:20:14.5001117Z --- FAIL: TestRiskWordlistStartAnchorControlIsExactlyAEquiv (0.00s)
+  ```
+
+### 二、根因链（三发现跑，逐条可重跑）
+| 问题 | 读数 |
+|---|---|
+| `29d258f9` 是本仓祖先吗 | **YES**（`git merge-base --is-ancestor 29d258f9 origin/dev`） |
+| 本机能 `git show` 吗 | **能**（`package risk` 出来了） |
+| CI 为什么拿不到 | `grep -c "fetch-depth" .github/workflows/ci.yml` ＝ **0**；`grep -c "actions/checkout"` ＝ **7** ⇒ **7 处全用默认 `fetch-depth: 1`（浅克隆）** |
+| 肇事代码 | `tools/d22scan/riskwordlist_test.go:52-57` `writeBlobAt` 里 `exec.Command("git","show",rev+":"+rel)`；调用点 `:118` 传 `"29d258f9"` |
+
+⇒ **本机全克隆 ⇒ 绿；CI 浅克隆 ⇒ 128 ⇒ 必红。** 不是 flake，是**结构性**的。
+
+### 三、★为什么这条最有价值（铁律 ⓪⓪⓪）
+- `TestRiskWordlistStartAnchorControlIsExactlyAEquiv` 是**票 350 的正控**（证明 phantom-symbol 扫描器精确命中唯一一枚 `aEquiv`）。
+- 它红了 ⇒ **票 350 那道闸在 CI 上等于不存在**。
+- ⇒ 这比"修个 flake"价值高一档：**修的是"一条尺在 CI 上量不到东西"**。
+
+### 四、我倾向的解法（写进票面，但⛔ 强制腿照抄）
+**ⓒ 测试自足**：`writeBlobAt` 不再依赖 git 历史，把那个 blob 内嵌成 fixture 常量。理由：①CI 与本地同形 ②不受 checkout 深度影响 ③省 CI 时间 ④**主流 harness 的做法＝测试不依赖版本库历史的可得性**。
+- ⓐ `fetch-depth: 0`（拉全历史，7 处 checkout × 全历史 ⇒ CI 变慢）
+- ⓑ `fetch-depth: N`（**下次引更老 commit 又红**＝把定时炸弹往后挪）
+- **腿自己判并写明理由**，⛔ 照抄我。
+
+### 五、票 417 已建
+- 文件名 52 字符（**远低于 100 上限**），5 格 AC，含 AC#5「推一发后 `gh api` 拉日志核 PASS」。
+- **票池无任何票管过这个**（`grep -rln "fetch-depth\|writeBlobAt\|浅克隆\|shallow" .scratch/wisp/issues/*.md` ＝ 空）⇒ **真新缺陷**。
+
+### 六、降载状态
+- 本轮**零腿**、`go`/`compile`/`link` 我的进程 **0 枚**；全部工作＝`gh api` 读日志 ＋ grep ＋ 写票 ＋ 写台账。
+
+### 七、撤销口令
+- **「417 撤回」** ⇒ 票 417 作废（无产码改动）。
