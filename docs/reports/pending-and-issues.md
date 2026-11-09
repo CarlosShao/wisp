@@ -32955,3 +32955,38 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 - 148 结案＝`git revert 8f76d044d 526796deb`。
 - 145 实现＝`git revert c88bfa3b1 4111ada61`。
 - 239 残余①＝`git revert b3aefc34b`。
+## A1655（2026-11-09 15:2x，编排者）**★★我自己改名造成路径长度门禁 HEAD 真红，已修回绿（改短 4 名＋删 2 旧 roster）｜票 23 AC#1/2/4/5 翻｜票 262 不可收口（前提过期）｜wave108 三腿（33 续＋145 验收＋238）**
+
+### 一、★★路径长度门禁 HEAD 真红＋已修回绿（`a0b1ea40d`）
+- **是我造成的**：我给票 138/140/148/301 加 `-done` 后缀，把名字推过 README 规则 9 的 100 帽 ⇒ `check-path-length-budget.sh` **VERDICT RED**（not in roster 4＋roster 漂移 2＋count 65≠67）⇒ **每条跑这把尺的腿都读 rc=1**。
+- **修法（循先例 `f67af953`：改短名，⛔ 抬帽）**：4 名改短到 81/73/80/75 字符（保 `NN-` 前缀＋`-done` 后缀）＋**删掉 140/148 旧名两条 roster 行**（改名后不再超预算，不需豁免）。
+- **结果**：`VERDICT GREEN`，over-budget 63＝roster 63，not in roster 0，rc=0。
+- 双名核：138/140/148/301 旧=0／新=1，工作树 4 文件在。
+- ★**教训**：`-done` 改名会拉长名字——**改名后必须现跑路径长度门禁**，⛔ 只看「提交 rc=0」。
+
+### 二、★票 23 AC#1/2/4/5 翻（`9537d46b6`）
+- **依据 `docs/evidence/s1/23-verdict.md` §7 非实现者终裁**＋fresh `go test ./internal/tools -count=2` ok 64.2s：
+  - AC#1 风险矩阵 PASS／AC#2 C7 ImagePart PASS（bytes_ref 内存 only 由类型形状＋DB/日志腿＋`assertNoPNGOnDisk23` 钉住）／AC#4 剪贴板 PASS／AC#5 关机确认词 PASS。
+- **AC#3 input.type＝PARTIAL，⛔ 翻**：三枚残余 R1（真 fixture app 注入）/R2（真提权窗实机）/R3（确认卡三选项 UI 在 `frontend/`）全在真机/前端写面。
+- ⇒ **票 23 保持 open 不 `-done`**；残余归 frontend/owner-open-window。
+
+### 三、★票 262 不可收口（`9b0eccb5b`，pool-audit 前提过期）
+- pool-audit 说「262 要补的尺已存在 ⇒ 可收口」**两头都不成立**：
+  1. **指认错格**：尺存在/被调用/绿是 AC#1/#2，**2026-10-07 就已勾**；今天未勾的是 AC#5（CI 侧 self-hosted 真跑＋日志）＋AC#5ⓑ（原文自带「⛔ 本格不勾」）。
+  2. **尺今天不绿**：红因＝138/140/148/301 四枚 `-done` 改名超 100 帽（现已由我改短修绿）。
+- ⇒ 262 维持 2 未勾（设计内长期提醒格）；别的腿⛔ 再按 audit 第 6 条去收。
+
+### 四、★票 33 部分落地（wave107 超时返 null 但落 2 笔）
+- `96fa94876`（AC#5 运行时缺失 fixture 切片）＋`f22397dbc`（端到端牙：RequestShow 活线程落 lastShowErr ~10ms、线程存活、窗未建）。**未复核**——由 wave108 33-continue 腿先复核三把尺再续做。
+
+### 五、wave108 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `33-continue` | ★最大杠杆续做（13 未勾）：先复核前进 2 笔，再逐片接未落；**本波独占 cmd/wisp+panel+ball+config** |
+| `145-accept` | 非实现者验收 145（**导出树锚 4111ada61，绝不碰活树**）：核 AC#6 逐枚消费者，翻 AC#2/#2b/#6，全勾则 `-done` |
+| `238-proc` | 票 238 首跑造数据根（**只做 internal/proc/observe/secret/models，⛔ 碰 cmd/wisp**）；AC#1 谁封根若在 cmd/wisp 则具名报 seam |
+
+### 六、撤销口令
+- 路径门禁修复＝`git revert a0b1ea40d`（会退回 RED，不建议）。
+- 23 翻格＝`git revert 9537d46b6`。
+- 262 判定＝`git revert 9b0eccb5b`。
