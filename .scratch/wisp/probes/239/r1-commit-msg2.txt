@@ -1,0 +1,20 @@
+pool-audit-r6: the retried pool triage lands, plus ticket 239 residual 1.
+
+Deliverable docs/evidence/s1/pool-audit-r6.md: all 90 open tickets sorted
+into three tiers (24 immediately dispatchable / 30 waiting on a named ticket /
+36 owner-, desktop- or environment-bound), every blocker re-verified live
+against the -done suffix, and a value-ordered dispatch list. Eight stale
+dispatch premises are recorded with live readings: 46's blockers 41-45 are
+all done (it is desktop-bound, not ticket-bound), 53 is blocked only by 48
+(51/52 done), 168's 50/51 prerequisites are done, 256's re-judge gate 265 is
+done, 262's ruler already exists as scripts/check-path-length-budget.sh,
+245's AC#1/2/3/5 already landed, 148's blocked status is superseded by A1591,
+and 23/33's paper blockers are done.
+
+Bonus ticket 239 residual 1 (b3aefc34b, previous commit): the wave travel
+distance now named and rostered; this commit adds the ticket progress
+bullet, the export-tree gate readings (shared clone: new ruler and C21 lock
+PASS, d22scan clean, de-tooth mutation walk 16->17 turns the ruler red, the
+three embedded-asset CRLF reds proven to be autocrlf checkout artifacts by
+blob CR=0 vs worktree CR>0), the CRLF control script, and the audit report
+itself.
