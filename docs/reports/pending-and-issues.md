@@ -32724,3 +32724,72 @@ export WISP_LIVE_MIC=1
 - 354 翻勾＝`git revert 9dbd468e3`。
 - forks 格式化＝`git revert 504858fd1`（一枚复原 8 枚）。
 - 410 立案＝删 `.scratch/wisp/issues/410-forks-gofumpt-scope.md`。
+## A1649（2026-11-09 11:0x，编排者）**★★票 354 结案（七格全绿）｜★票 411 命令行溢出修好（假 rc=10 → 真 rc=9，史上第一次全树真读数）｜4 票收框｜wave103 三腿放出**
+
+### 一、★★票 354 结案（`85800170a`＋`ee44c6432`＋`ebd2c8198`）
+**七格全勾，判语出自收口腿自己在导出树 `cda38fd52` 的复跑（零抄前腿读数）**：
+- **AC#4 颜色与门禁成立**：windows 半边 `go test ./internal/winsec -count=1 -v` ⇒ **rc=0、ok 27.637s、RUN=129/PASS=129/FAIL=0/SKIP=0**，**逐名红册＝0 红**；今天**四发独立绿**（20.148s/37.254s/35.199s/27.637s）。★**unix 半边如实报本机跑不了 linux 测试二进制**，给两把编译期尺 `GOOS=linux go vet` rc=0／`GOOS=darwin` rc=0，运行时色归 CI。
+- **AC#5 接缝成立**：四族（342/348/353/354）**12 枚顶层名今天全 PASS**；`…NeverTruncatesA…` 族专项 `-count=3` 三发全绿 truncated=0×6 ⇒ **零摆动**；342 时代那枚既有红今天 0/3 取不到。
+- **AC#6 纪律成立**（逐条读数）：框尺起手⇄交件同为未勾3／已勾4（**0 勺**）；Status/票名/`-done` 未碰；**0 push**；改动件 CR=0；**.go=0 枚**。
+- **★双名核**：旧名=0、新名=1、脏=0 ✓（★**又踩一次「只点新名 ⇒ 旧名删除留脏」**，补 `ebd2c8198` 才干净——**这是第 4 次，配方已写死在台账**）。
+
+### 二、★★票 411 命令行溢出修好（`358e2da8c`＋`e022182df`）
+**从假 rc=10（10/14 腿 `git-grep-rc-126` 溢出）变真 rc=9。**
+
+**★修法＝甲（`-- \"$@\"` 加引号）——派单我原倾向丙，腿现跑否决了**：
+- **丙 `--pathspec-from-file` 判据不成立**：现跑 `git grep --pathspec-from-file` ⇒ **`error: unknown option`**，那选项属 **add/commit/restore 家族**，`git grep` 没有。
+- **乙 xargs 实测有分批静默失败**：批间 `2>/dev/null` 吞错导致读数偏小（G7 29 vs 真值 57）⇒ 否。
+- **甲**：`-- \"$@\"` 两处，argv 从此固定两枚短 pattern，**树再长肥永不复溢**。**判据一字未动**（diff **+31/−6**：引号＋注释＋两处反引号转义）。
+- **现量证据**：bash 未引号展开 **1084 词／39,836 字符** ＞ 32767 上限；git 递归 glob 同射程 **1209 枚**。
+
+**★★含义（这是本票最大价值）**：**这把尺史上第一次全树真读数**。旧射程只吃两层深（bash 无 globstar），⇒ **9 枚盲区文件**（`internal/agent/approval/{batch,cardrender,gate,ui}.go`＋`internal/plugin/manifestslot/{command,install,lifecycle,tier2}.go`）第一次被看见。
+
+**★防作弊正控（导出合成树）**：注入只开形状 ⇒ G6 ok→BAD、rc 9→**10**；还原 ⇒ rc=**9** 回真基线。**门没松。**
+
+**★运行时事实（写进票面）**：宽射程下**门单跑 6m17s**、**flip 电池全程 75 分钟**——后续腿拿它当门禁要有心理预期。
+
+### 三、★9 腿真红（票 411 AC#4 待我这个裁决者拍）
+| 腿 | 基线 | 实测 | 具名 |
+|---|---|---|---|
+| G1 | 0 | 1 | `manifestslot/tier2.go:46` `Tier2ToolRequest{`——词表是 `ToolRequest\\{`，**子串误命中** |
+| G1b | 0 | 4 | `tier2.go:46`／`tier2_gate.go:210`／`tier2_loader.go:195`／`tools/subagent_197.go:616`（10-14 后新落执行面） |
+| G2 | 1 | 2 | `cmd/wisp/run.go:1514`（OpenTask）＋`:1520`（CloseTask）＝**resident 钩子新落的一对** |
+| G5 | 1 | 2 | 在册 `panel_assets.go` ＋**新** `resident_present_windows.go`（开方=1，同文件无 Close——**真红候选**） |
+| G5pos | 0 | 1 | 同上文件污染正控 |
+| G5neg | 8 | 14 | +6＝resident_present＋394/382/403 家族测试＋provenance_syncdirs_other_test |
+| G6neg | 0 | 1 | `internal/tools/web_bridge_test.go`（**测试文件**只开） |
+| G7 | 1 | 6 | 反向 +5＝`resident_voice_bargein_windows.go`／`resident_voice_windows.go`／`plugin/goja_runtime.go`／`manifestslot/command.go`／`manifestslot/lifecycle.go` |
+| G7neg | 2 | 7 | 同 G7 家族 |
+
+- **★腿不改任何 want/基线**（重登基线＝改判据周边的**裁决动作**，非实现者裁，178-v1 判语先例）⇒ **归我裁**。
+- **★我的裁定框架**：逐腿分三档——**甲＝真缺陷（新立案）／乙＝合法新码待重登基线／丙＝pattern 不精确（改词表）**。⇒ **派 `411-triage` 事实腿逐枚现读产码给足证据**，我再拍。
+- **★重点**：G5／G7 是「真漏还是委托」——**开在 A 函数、关在 B 函数（同包/上层 defer/显式 Close）都算有收尾**；只有真的没任何关才是真漏。
+
+### 四、★4 票收框（`cb2287a58`，collect-r1）
+| 票 | 我的复跑读数 | 判 |
+|---|---|---|
+| **163 AC#1b** | 台件真注册表复跑：`Lookup("shell.exec")=false`／`shell.session=false`、对照 `task.output=true`；四行在册（`PLAN:2574/2575`＋`SPEC-07:74/75`） | **翻** |
+| **177 AC#0** | 四形状逐发自跑 PASS：A 0.21s／B 0.00s／C **34.78s**（挂起到 C18 截止再拒）／D 2.34s | **翻** |
+| **195** | config 包整包 **ok 2.419s**，十枚 AC 命名用例逐名 PASS；调用链 7 处在；**AC#4 名册 8→9 仅 +1 纯注释**；`bridge.go:42-45` 零触碰 | **AC#1/2/3/4/6 翻；AC#5 具名不翻**（gate 溢出缺陷仍在飞时那一条谁都取不到真值）；AC#0 照 10-02 裁定永缺 |
+| **71 AC#1/AC#2** | balldebug 8/8 PASS；进程级真退出码四发：不成像真表 **rc=1**、阈值 100000 **rc=1**、调低到 10 **rc=2**、阴性对照 **rc=0** | **双翻** |
+
+### 五、★票池账假的教训（A1648 记过，这里再确认）
+上一腿抓到：**177 AC#0（`aee58549c`）／163 AC#1b（`8ae13b4a0`）交件后都没在票面留 Progress log 行** ⇒ 按票面 log 审池会得出「这两格还开着」的假象。**本波收件腿已补翻框。** ⇒ **审池必须 `git log --grep` 交叉核。**
+
+### 六、★处理了 8 枚 `.scratch` 脏件（`706fec5b4`）
+- 这 8 枚是 **`probes/161/r6/logs/flip-*.txt`**，被 ticket 411 的 flip 电池**重新生成**（文件头写明「票 154 AC#1 触发门」，锚 `cb2287a5`，生成时刻 **今天 09:46–10:01**）；**旧内容 9-27 是修复前仪器的读数**。
+- **★我核了成因才提交**：`git log -- 该目录` 最近真提交是 9-27（`9f530571e`），而 Nov 9 时间戳＋「票 154」文件头证明是今天的电池跑出来的。⇒ **提交＝让证据与修好的仪器同步**，⛔ 让 tracked 历史留着坏仪器的读数。**内容零手改**。
+- **★踩坑记**：这 8 枚是**别的腿留下的未提交件**——本应由那条腿自己提交。以后派「跑 flip 电池」的腿，**派单要明确点名「电池日志的落点与提交」**。
+
+### 七、wave103 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `411-triage` | ★**事实腿**：9 腿真红逐枚现读产码，分三档（真缺陷／合法新码待重登基线／pattern 不精确），★**重点是 G5/G7 找 Close 真实落点**；出 `411-adjudication-facts.md` 供我裁定 |
+| `195-ac5` | ★票 411 AC#6：刷新票 195 AC#5 过期句（「BAD 名册只 G6neg」⇒ 真读数 9 腿）——★**只追加不改 AC 原文**；判票 195 AC#5 能不能翻（★9 腿有没有一条是 195 自己的） |
+| `collect-r2` | ★继续收件：**138／140／230／346** 四票逐格复跑（★138 先核 Status: blocked 等 Q-55）；★**本波唯一被授权翻框的腿**；全翻完的改名 `-done`（正确配方） |
+
+### 八、撤销口令
+- 354 结案＝`git revert ebd2c8198 ee44c6432 85800170a`。
+- 411 修法＝`git revert e022182df 358e2da8c`（退回假 rc=10 的溢出态）。
+- flip 日志重生成＝`git revert 706fec5b4`。
+- 4 票收框＝`git revert cb2287a58`。
