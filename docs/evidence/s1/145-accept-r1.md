@@ -82,7 +82,7 @@
 1. **全量名册相等**〔独立复现〕：`acc-r1-mut`（把 `loop.go:1134` 的 `Stop: stop` 改成 `Stop: ""`，即只掐起源跳）下跑**整个** `./cmd/wisp`（`-count=1 -timeout 30m`），与干净树跑同一命令的 `--- FAIL` 名册逐名 `diff` ⇒
    `clean=63 mut=63`、**`diff` 空 ⇒ `IDENTICAL: mutating the loop->Event.Stop hop changes ZERO cmd/wisp test outcomes`**。
    两次全跑时长 671.871s／595.853s，**均未触 30 分钟上限**（见 §7 的仪器坑：这一条必须先排除"被掐死"才能成立，本程第一版就差点读成假回归）。
-   （日志：`probes/145/acc-r1-clean-full2.txt`、`probes/145/acc-r1-mut-full.txt`、名册 `probes/145/acc-r1-clean-cmdwisp-fails.txt`。）
+   （日志：`probes/145/acc-r1-clean-30m.txt`、`probes/145/acc-r1-mut-30m.txt`；早先未给 `-timeout` 的两发 `acc-r1-clean-full2.txt`／`acc-r1-mut-full.txt` 仍留档，但**不作本条的判据**——它们贴着默认上限，见 §7。）
 2. **同轮阳性对照**〔独立复现〕：同一棵被验树上别的变异都真红——`acc-r1-ctl`（改 `res.Status`）⇒ **15 FAIL**；`acc-r1-mut4`（`Kind: EvDone`→`EvWarn`）⇒ **5 FAIL**；`acc-r1-mut3`（填 `"BOGUS_XYZ"`）⇒ 机制活。⇒ **"零差集"不是 overlay 没生效**。
 3. **可断言性证明**〔独立复现〕：本程在导出树写了一枚 6 行的临时探针 `TestAccR1TerminalEvDoneCarriesTheProvidersOwnStopWord`（复用仓里既有的 golden harness：`newHarness(t,"text-reply")` ＋ `h.run(...)`，断言 `h.sink.LastOf(EvDone).Stop == llm.StopEndTurn`）：
    - 干净树 ⇒ **PASS**（载体诚实）；
