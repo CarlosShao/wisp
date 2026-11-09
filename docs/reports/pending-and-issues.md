@@ -33034,3 +33034,52 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 - 238 STOP 记录＝`git revert 31668c2d7`。
 - 145 三笔验收＝`git revert e1bbb17e1 656df9b6e c6afcd752`。
 - 33 AC#10＝`git revert 908c6652c`。
+## A1657（2026-11-09 22:0x，编排者）**★★机主两条裁定：①环核都保留（我的「去环留核」方案被否）②尺寸做成滑块（设置项自调）｜★查明：`[ball] size` 配置/校验早就有，缺的是生产读者**
+
+### 一、★★机主裁定（2026-11-09 21:5x，逐字）
+- **①「我看了你的那个示意图，不行，环核都要，不能去掉，去掉就完全太丑了」** ⇒ **环 + 核都保留**，我提的「去环留核」/「只留核」两案**作废**。球外观维持现状（三条轨道环 + 散场 + 核）。
+- **②「给滑块这个好，可以，可以搞个滑块，然后设置项自己调整，这个设计好」** ⇒ **`[ball] size` 做成设置项滑块**（44–160），不做固定值。
+- ★**教训**：球外观这种审美题我该**先问再动手**——我做了三案预览（真实渲染公式算的，`preview2.png`），机主一看就否了。预览方法本身对（省了实现返工），但**不该把「去环」当默认推荐**。
+
+### 二、★查明：滑块缺的是「生产读者」，不是配置
+| 层 | 现状 | 读数 |
+|---|---|---|
+| **配置 schema** | ✅ **早有** | `internal/config/schema.go:178` `BallSection.Size int \`toml:"size" default:"56"\``，注释写明「range 44-160 (SPEC-03 §3; ceiling widened 72→160 with owner approval A1636)」 |
+| **校验** | ✅ **早有** | `internal/config/validate.go:64` `if c.Ball.Size < 44 \|\| c.Ball.Size > 160` |
+| **Ball 内部 option** | ✅ **早有** | `internal/ball/ball_windows.go:64` `SizePx int // configured orb size 44..160 (0 = default 56)`，夹取逻辑 `:155-163` |
+| **★生产读者** | ❌ **缺** | `cmd/wisp/resident_ball_windows.go:396` `ball.New(ball.Options{...})` **⛔ 不传 SizePx** ⇒ 永远走默认 56 |
+| **前端配置页** | ⚠ **画了但标 blocked** | `frontend/src/components/config-screen.tsx:105` `{ group: "ball", name: "size", desc: "悬浮球直径（44-72）", blocked: "那颗球是原生绘制的（D29），页面改不到" }` —— ★**两处过期**：范围写旧 `44-72`（现 44-160）；`blocked` 那句**是假前提**（页面改不到 ≠ 不能做，只缺一条 C17 读+写回路由） |
+
+- ⇒ **真活＝补整条通路**：①`cmd/wisp` 装配根把 `cfg.Ball.Size` 喂进 `ball.Options.SizePx` ②`internal/config` 出 `BallSizeView`（照 `settings_65.go` 的 `BallStyleView` 同形）③前端滑块（**归外部 agent**，我们只出 Go 侧 + 契约）。★写面含 `cmd/wisp` ⇒ 本波独占。
+
+### 三、★票 291 探针已改（`25s` → `8s` ＋ 双提示音）
+- 机主反馈「听到嘟的一声了，但是我发出了一些声音，远没有 25s」⇒ **我的说明有问题**（25 秒是录音窗口不是要连续说 25 秒，且只有开头一个提示音、结尾无提示）。
+- **已改**：说话窗 `25s → 8s`；**加 `beepAsync(880)` 开始提示 + `beepAsync(440)` 结束提示**；exe 已编好 `/d/tmp/wisp/20261109/291probe.test`（60,917,355 字节）。
+- gofumpt 空；竞争进程核 `wisp.exe`/`balldebug.exe` 均 absent。
+
+### 四、撤销口令
+- 探针改动＝`git checkout .scratch/wisp/probes/291/mic/`（未提交，随时可退）。
+## A1658（2026-11-09 22:2x，编排者）**★★机主令「暂时不要搞太费 CPU 的活儿，有点卡，影响我玩游戏了」⇒ 立刻降载：杀掉 wave110 全波、Go 编译进程清零**
+
+### 一、机主令（逐字）
+> **「暂时不要搞太费cpu的活儿，有点卡，影响我玩游戏了」**
+
+### 二、我做了什么（立刻执行，⛔ 等）
+1. **杀掉 `wave110` 全波**（3 腿：413 滑块腿／33-r4 腿／302 普查腿）——它是本波唯一在跑**全包 Go 编译 + 完整测试套件**的活。
+2. **Go 编译进程清零**：现跑 `Get-Process go,compile,link` ⇒ **0 枚**。
+3. **保留不费 CPU 的活**：wave109 已自然跑完（145-ac2b 落地 `dade544a9`）；只做 commit／git 类轻动作。
+
+### 三、★降载期间的工作纪律（本轮起生效，直到机主说恢复）
+- **⛔ 不派任何跑 `go build`／`go test`／`go vet`／整包门禁／flip 电池的腿**（这些是 CPU 大头：单遍门禁 8m32s、整包测试 600-720s）。
+- **✅ 可以做**：只读普查（grep/sed 读码）、写文档/证据件、git commit/push、写票面、预览图（headless 截图很轻）。
+- **★若有机主在场才能做的活（麦克风／桌面），照常可提**，但不催。
+- **恢复条件**：机主说「可以了」/「继续」。
+
+### 四、本轮已落地的（降载前完成，全部已推或待推）
+- **`dade544a9` 145-ac2b-r1 方案 B 落地**：档位维由能力位决定（`Capabilities.Thinking=false` 不送该维）＋两词表取交集。
+- `b4d14312f` 323-a1 五格台件普查；`0de58e178` 112 verify。
+- 票 291 探针改动（8s＋双提示音）**未提交**，留工作树（临时件只建不删）。
+
+### 五、撤销口令
+- 杀 wave110＝无副作用（那些腿零提交）。
+- 恢复跑腿＝机主一句话，我下轮重派 413／33-r4／302。
