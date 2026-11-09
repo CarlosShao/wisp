@@ -36,17 +36,27 @@ per-target-process session-binding groundwork.
 - Grant persistence/lifecycle (49); voice dictation flow (32); panel screens (37/40).
 
 ## Acceptance criteria
-- [ ] RiskLevel matrix test: every action above asserted (esp. window.close=L2, power=L2,
+- [x] RiskLevel matrix test: every action above asserted (esp. window.close=L2, power=L2,
       set=L1, get=L0+window-title taint).
-- [ ] screen.capture: screenshot reaches mock LLM as ImagePart (C7 wire format asserted);
+- [x] screen.capture: screenshot reaches mock LLM as ImagePart (C7 wire format asserted);
       bytes_ref absent from disk/db/logs; DRM window → black frame + doc note.
 - [ ] input.type: types 300-char text into fixture app focused window; elevated-process
       injection → explicit UIPI error; confirm-card three options render with danger styling
       on "all apps".
-- [ ] clipboard round-trip + taint propagation into R4 (write of tainted content → L2).
-- [ ] system.power shutdown path requires typed confirmation word (unit test with fake executor).
+- [x] clipboard round-trip + taint propagation into R4 (write of tainted content → L2).
+- [x] system.power shutdown path requires typed confirmation word (unit test with fake executor).
 
 ## Progress log (append-only, newest last)
 
 - 2026-11-03 21:4x 编排者：后端+工具接线层落地（119c3fa91 后端6文件；a2f6f4a95 system.go BuiltinSystemEntries 11工具+run.go注册+system_23测试 1450行；df67e002e 修229普查登记52的OS进程spawn站点）。internal/tools 整包 ok、d22 clean。**已满足**: AC1 风险矩阵、AC5 关机确认词、AC4 taint→R4。**残余**: AC2 C7 ImagePart→LLM 接缝(需 internal/agent loop+llm.ImagePart 集成)+bytes_ref内存only/DRM黑帧；AC3 input.type 真fixture app+UIPI 真机+确认卡三选项UI(前端)；AC4 真剪贴板round-trip。**卡点**: AC3 确认卡UI=frontend(机主外部agent)+真机集成，非纯后端可闭合。票仍 open。
 - 2026-11-09 14:3x 写腿（票23复核腿）：**上格进度已过期，实况如下（本腿零写面，只追加）**。AC2 的 C7 ImagePart→LLM 接缝**已闭合**：a67e1d335（loop+llm 半）+ 111bfdb04（tools 半：`Result.Images`+`bridgeImages`+system.go 文案改写）+ e3abe0ebb（遗产腿代提 5 测试腿+AC4 真剪贴板往返门闩+SrcClipboardRead→R4+AC3 UIPI 谓词/D45 绑定键）。**非实现者裁决表 `docs/evidence/s1/23-verdict.md` 终裁：AC#1/#2/#4/#5 PASS、AC#3 PARTIAL**——残余 R1 真fixture app 300字符注入／R2 真提权窗口 UIPI 实机／R3 确认卡三选项 UI（`frontend/**`，机主外部 agent 写面）／R4 真屏截图→真 LLM 演示（owner 真机签收类）。**名册差集（D34 PLAN.md:2560-2567 ＋ SPEC-07 §3:56-67 ↔ `BuiltinSystemEntries` 11 枚，run.go:773 注册）＝空集**（多 0 缺 0），且 `Test23RosterCoversElevenD34Rows`＋`Test23RosterDeclarationsMatchTheFrozenTable` 双钉。**门禁在共享克隆（`git clone --shared`，锚 cc5b297e2）fresh**：gofumpt 空 rc0 / vet rc0 / `go test ./internal/tools -count=2` ok 64.2s / d22scan clean；点名 `Test23` 族 10 枚 = 9 PASS + 1 SKIP（`Test23LiveClipboardRoundTripThroughRealOS` 门闩默认不碰操作者剪贴板，形状正确）。勾不翻（裁决表 §8 明文把翻勾留给编排者/票面流程）；票保持 open，残余归属见裁决表 §8。
+
+## 编排者翻框（2026-11-09 15:1x，非实现者判语）
+
+依据 `docs/evidence/s1/23-verdict.md` §7 逐 AC 终裁表（非实现者裁决）＋该腿 fresh `go test ./internal/tools -count=2` ok 64.2s：
+- **AC#1 风险矩阵＝PASS** ⇒ 翻（count=2 绿，无残余）
+- **AC#2 C7 ImagePart＝PASS** ⇒ 翻（bytes_ref 内存 only 由类型形状＋两枚 DB/日志腿＋`assertNoPNGOnDisk23` 钉住；无本域残余）
+- **AC#4 剪贴板＝PASS** ⇒ 翻（taint→R4 fresh 绿，live 腿门闩正确）
+- **AC#5 关机确认词＝PASS** ⇒ 翻（fresh 绿）
+- **AC#3 input.type＝PARTIAL，⛔ 不翻**：后端余量已闭（L2 声明/UIPI 拒绝序/绑定键），三枚残余 R1（真 fixture app 注入）/R2（真提权窗实机）/R3（确认卡三选项 UI 在 `frontend/`）全在真机/前端写面。
+- ⇒ **票 23 保持 open 不 `-done`**；残余 R1–R3 归属 frontend/owner-open-window，等真机窗口期一次收口。
