@@ -106,9 +106,16 @@ func showAndWait(t *testing.T, rp *residentPanel) {
 	if !rp.RequestShow("test-harness") {
 		t.Fatalf("RequestShow was refused by the panel thread (startUp error: %v)", rp.startUpErr())
 	}
+	// The lastShowErr term is the standing debt the 10-01 16:42 ruling filed:
+	// a refusal that does not retire the thread (the runtime probe among them)
+	// used to be readable only as this wait's 15-second timeout. Now the wait
+	// ends on the refusal and the reason is named below.
 	waitPanelTrue(t, "the panel thread to finish Show", func() bool {
-		return rp.mgr.IsShown() || rp.startUpErr() != nil
+		return rp.mgr.IsShown() || rp.startUpErr() != nil || rp.lastShowErr() != nil
 	})
+	if err := rp.lastShowErr(); err != nil {
+		t.Fatalf("the show request was refused without retiring the thread: %v", err)
+	}
 	if err := rp.startUpErr(); err != nil {
 		t.Fatalf("the panel thread refused to bring up the window: %v", err)
 	}

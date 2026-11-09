@@ -56,12 +56,14 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"sync"
 	"time"
 	"unsafe"
 
 	"github.com/CarlosShao/wisp/internal/panel"
 	webview2 "github.com/jchv/go-webview2"
+	webviewloader "github.com/jchv/go-webview2/webviewloader"
 	"golang.org/x/sys/windows"
 )
 
@@ -75,6 +77,51 @@ import (
 // refusal; the nil-control error further down (runtime missing) deliberately does
 // NOT carry it, because that one is retryable and belongs to AC#5.
 var errPanelRefusedThread = errors.New("panel host: refusing to create the panel window")
+
+// errPanelRuntimeMissing names AC#5's world: the WebView2 Runtime is not
+// installed on this machine. It deliberately does NOT carry
+// errPanelRefusedThread: a thread refusal retires the panel thread for good
+// (33-r9), while a missing runtime is retryable - the user installs the
+// Evergreen Runtime and the NEXT show probes again, so the thread stays alive
+// and keeps taking requests. The probe runs BEFORE newPanelControl on purpose:
+// the library's create path has log.Fatal call sites a missing runtime can
+// reach (fork webview.go:115/120/125, pkg/edge/chromium.go), and A500's
+// correction of this ticket's J2 answer is "真探测再创建" - the process must
+// never find out by dying.
+var errPanelRuntimeMissing = errors.New("panel host: WebView2 runtime not installed")
+
+// panelRuntimeGuide is the sentence AC#5 pairs with every refusal of this
+// class: guide the user to the Evergreen install, never auto-download.
+const panelRuntimeGuide = "install the Microsoft Edge WebView2 Evergreen Runtime (https://developer.microsoft.com/microsoft-edge/webview2/); wisp never downloads anything by itself"
+
+// panelRuntimeVersion is the probe seam. In production it IS the loader's own
+// documented version query, which answers ("", nil) - no error, no install -
+// on a machine without the Runtime; the create path it guards has log.Fatal
+// call sites, so this query is the only safe way to ask. It is a package
+// variable and not a hard call for ONE reason: the runtime-missing fixture
+// (ticket 33 AC#5, which ticket 37's masked-runtime fallback test consumes)
+// has to make THIS machine - which has the Runtime installed - answer the
+// missing world without uninstalling anything. The fork embeds
+// WebView2Loader.dll in memory (webviewloader/module_amd64.go), so the
+// ticket's "rename/mask loader" cannot land on the DLL file itself; the mask
+// lands HERE, on the probe's answer, while the production wiring stays the
+// real query (the fixture's seam nail reds if that default is dropped).
+var panelRuntimeVersion = webviewloader.GetInstalledVersion
+
+// probePanelRuntime asks the one AC#5 question: is the WebView2 Runtime
+// installed? A loader error and an empty answer both mean "no" - fail-closed,
+// because the alternative is walking into a create path with log.Fatal call
+// sites in it.
+func probePanelRuntime() error {
+	ver, err := panelRuntimeVersion()
+	if err != nil {
+		return fmt.Errorf("%w: the loader's version query failed: %v (%s)", errPanelRuntimeMissing, err, panelRuntimeGuide)
+	}
+	if strings.TrimSpace(ver) == "" {
+		return fmt.Errorf("%w (%s)", errPanelRuntimeMissing, panelRuntimeGuide)
+	}
+	return nil
+}
 
 const (
 	panelDispatchBinding = "wispDispatch"
@@ -181,6 +228,18 @@ type PanelManager struct {
 	lastColdMs float64
 	lastHotMs  float64
 
+	// runtimeMissing / unavailableReason are ticket 33 AC#5's L2 native
+	// fallback flag: set the moment a bring-up refuses on the runtime probe,
+	// read through Unavailable(). Ticket 37's native fallback card is the
+	// named consumer ("with panel runtime masked, L2 still approvable via
+	// native card (33 fixture)"); until that card lands the flag's readers
+	// are the fixture test and the show refusal's own report. The flag is
+	// set, never cleared: a Runtime does not uninstall itself mid-session,
+	// and clearing it would let a later card claim a surface the first probe
+	// already refused.
+	runtimeMissing    bool
+	unavailableReason string
+
 	// geometry answers "how big is the NEXT window", called once per create by
 	// windowOptions. nil means nobody handed this host a source, and the host then
 	// sizes itself at panelWidthPx x panelHeightPx. It is a function value and not
@@ -286,6 +345,16 @@ func (m *PanelManager) IsShown() bool {
 	return m.created && m.shown
 }
 
+// Unavailable is ticket 33 AC#5's native L2 fallback flag: (true, reason) once
+// a bring-up refused on the runtime probe. It is a state read, not a promise -
+// (false, "") only means "no refusal has happened yet", never "the runtime is
+// guaranteed present", because the probe runs at bring-up time and not here.
+func (m *PanelManager) Unavailable() (bool, string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.runtimeMissing, m.unavailableReason
+}
+
 // LastColdMs / LastHotMs expose the two latencies the last bring-up measured on
 // this instance, so a caller (the diagnostic command, a test) can print or assert
 // against a real reading instead of a promise.
@@ -354,6 +423,22 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 		return nil
 	}
 	m.mu.Unlock()
+
+	// AC#5 (ticket 33): probe the Runtime BEFORE anything can touch the create
+	// path. The library's create reaches log.Fatal call sites when the Runtime
+	// is missing (A500's correction of this ticket's J2 answer), so the
+	// detection is a real version query and never a creation we hope fails
+	// gracefully. The flag and the named event are this refusal's two products;
+	// the error travels to Show's caller with the guide sentence inside it, and
+	// it does NOT retire the resident thread - the next show probes again.
+	if perr := probePanelRuntime(); perr != nil {
+		m.mu.Lock()
+		m.runtimeMissing = true
+		m.unavailableReason = perr.Error()
+		m.mu.Unlock()
+		slog.Error("panel.unavailable", "reason", "the WebView2 runtime probe refused the create", "err", perr.Error())
+		return perr
+	}
 
 	// PRECONDITION (33-r7): the thread that creates the panel window must have
 	// nothing left to dispatch. This is not belt-and-braces wording - it is the one

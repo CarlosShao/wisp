@@ -117,6 +117,18 @@ type residentPanel struct {
 	tasks   chan func()
 	startUp error
 
+	// lastShow is the most recent per-request show verdict - the refusal the
+	// 10-01 16:42 ruling filed as the standing debt: "被具名拒绝" used to be
+	// readable only as 15 seconds of silence, because startUp retires the thread
+	// only on the errPanelRefusedThread class while every OTHER refusal (the
+	// runtime probe among them, ticket 33 AC#5) left no state at all. Unlike
+	// startUp it does NOT retire anything: it records that ONE show was refused
+	// and why, so a bounded waiter (showAndWait) can end on the refusal with the
+	// reason instead of timing out, and the next request can still try. A
+	// successful show clears it, so it always answers for the LAST request only.
+	// Read it through lastShowErr(), the same field/method split startUp uses.
+	lastShow error
+
 	entered  chan struct{} // closed just before the library pump takes over
 	finished chan struct{} // closed when the thread's goroutine returns
 	stopNow  chan struct{} // closed by stop() while the pump is not live yet
@@ -465,11 +477,13 @@ func (rp *residentPanel) RequestShow(via string) bool {
 func (rp *residentPanel) showOnThread(via string) {
 	err := rp.mgr.Show(context.Background())
 	if err == nil {
+		rp.setLastShowErr(nil)
 		fmt.Printf("wisp: panel window is up (%s, cold %.1f ms, hot path %.1f ms)\n",
 			via, rp.mgr.LastColdMs(), rp.mgr.LastHotMs())
 		rp.publishOnShow()
 		return
 	}
+	rp.setLastShowErr(err)
 	slog.Error("panel host: show failed on the panel thread", "via", via, "err", err)
 	fmt.Printf("wisp: panel could not open (%v): %s\n", err, via)
 	if errors.Is(err, errPanelRefusedThread) {
@@ -651,6 +665,20 @@ func (rp *residentPanel) startUpErr() error {
 	rp.mu.Lock()
 	defer rp.mu.Unlock()
 	return rp.startUp
+}
+
+// setLastShowErr / lastShowErr carry the most recent per-request show verdict.
+// See the field's own comment for why this is not a second startUp.
+func (rp *residentPanel) setLastShowErr(err error) {
+	rp.mu.Lock()
+	rp.lastShow = err
+	rp.mu.Unlock()
+}
+
+func (rp *residentPanel) lastShowErr() error {
+	rp.mu.Lock()
+	defer rp.mu.Unlock()
+	return rp.lastShow
 }
 
 // isFinished reports the thread's own handle being done, i.e. its goroutine has
