@@ -74,6 +74,19 @@
 #      射程下登记的 want/want_n **不可直接比**，重登基线归裁决方（171 r3 规矩），本程一字不动。
 #   ④ 顺带把 587/590 两行 echo 里未转义的反引号转义（`ring 1`／`改完之后…`曾被 bash 当命令
 #      替换执行，stderr 噪音两行）＝转义保输出字节不变，不是改读数。
+# 票 411 裁定落地（2026-11-09，执行腿照裁决者裁定＋docs/evidence/s1/411-adjudication-facts.md，
+#   **只重登 want/want_n＋G1 一味 -w＋G5pos 正控排除名单同格补；一枚腿没删、一条射程没减、名册本体逐行原样**）：
+#   ① G1＝丙：pattern 加 -w（旧味 -E 子串误命中 plugin 层另一类型 Tier2ToolRequest{，
+#     tier2.go:46，类型定义 tier2_loader.go:80；-Ew 实测正反两向都对）⇒ 回 quiet/0。
+#   ② 乙重登（实测＝411 修后第一次全树真读数，与事实件 9/9 对平，见 facts §0/§9）：
+#     G1b quiet→ring 0→4；G2 1→2；G5 1→2；G5neg 8→14；G6neg quiet→ring(piles) 0→1；G7 1→6；G7neg 2→7。
+#     ⚠ 凡实测枚数>0 的腿，want 的 ring/quiet 味必须随基线同格翻（book_count 第①味先于枚数味：
+#     quiet 声明＋非空实测＝BAD），这不是放宽——每一枚新基线都严格等于真读数。
+#   ③ G5pos＝正控（裁定表括号条件成立：按其声明语义登记）：quiet/0 不变，正控排除名单同格补
+#     cmd/wisp/resident_present_windows.go（facts §4 具名的重登同格动作）。裁定表主值「0→2」与
+#     facts §4/§9 现量实测 1 相抵，按其括号条件执行并在此具名留痕。
+#   ④ 从此「按设计就该响」的腿集＝G1b/G2/G5/G5neg/G6neg/G7/G7neg（G6 自 178 起退场；历史叙述段
+#     逐字保留不改，以本段与各腿现场登记为准）。
 # 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
 # 规矩：只做 grep／不写仓里任何东西；名册变了即门响。
 #   （G5 的 pair() 为求差集用了一次 bash herestring，临时件走 $TMPDIR、不落仓；
@@ -507,11 +520,18 @@ fi
 # run 腿的枚数吃整张名册，注释行也算——这与 pair 腿"只吃调用点"是两回事，票面 AC#1 那枚尺洞不归本程）。
 want G1 quiet
 want_n 0
+# 票 411 裁定＝丙：加 -w。旧味 -E 的子串 'ToolRequest\{' 误命中 plugin 层另一类型
+#   Tier2ToolRequest{（tier2.go:46；定义 tier2_loader.go:80，非 agent.ToolRequest 的别名/嵌入）。
+#   现跑验（2026-11-09，锚 5071d88255）：-w 后 G1 射程只剩 bridge.go:984 一行整行注释（分子剔成 0），
+#   真 agent.ToolRequest{ 形状 rc=0 仍命中。重登基线只会把误命中固化进判据，故走丙不走乙。
 run "G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）" \
-	'ToolRequest\{' '' "$GO" "$GO2" ':!*_test.go' ':!internal/agent/*'
+	'ToolRequest\{' '-w' "$GO" "$GO2" ':!*_test.go' ':!internal/agent/*'
 
-want G1b quiet
-want_n 0
+# 票 411 裁定＝乙重登 0→4（quiet→ring 同格翻）：4 枚＝装饰器委托 1（subagent_197.go:616）
+#   ＋Tier-2 自有门控链 3（tier2.go:46／tier2_loader.go:195／tier2_gate.go:210），无裸执行（facts §2）。
+#   实测>0 ⇒ want 必须翻 ring（book_count 第①味：quiet 声明＋非空实测＝BAD）。
+want G1b ring
+want_n 4
 run "G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）" \
 	'\.Execute\(' '' "$GO" "$GO2" ':!*_test.go' ':!internal/agent/loop.go' ':!internal/tools/bridge.go'
 
@@ -522,7 +542,9 @@ want G2 ring
 #   现量现口径：名册行数＝3、命中行数＝1（锚 4f2a777b，命令＝
 #   sh .scratch/wisp/probes/154/gate-clauses.sh 4f2a777b | 取 G2 那一格的「# 命中行数＝」）。
 #   那 3 行名册逐行原样照打，被剔掉的 2 行逐枚打在 COMMENT-ONLY 格里（读数不藏在算式里）。
-want_n 1
+# 票 411 裁定＝乙重登 1→2：admitTask（run.go:1508）内 OpenTask:1514/CloseTask:1520 配对完整、
+#   loop 端 defer 收口；10-14 锚存档里 G2 已实测 2（基线过期早于 411 修，facts §3）。
+want_n 2
 run "G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）" \
 	'OpenTask|CloseTask' '-w' "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
 
@@ -548,8 +570,10 @@ run "G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面�
 #   因为票 160 之后 CloseScope 这个词根在生产码里【已经一枚都不剩】（现量：git grep -n CloseScope <锚>
 #   -- internal cmd 排测试 ⇒ rc=1 零命中；唯一的收尾是 internal/tools/bridge.go:706 的 scope.Close()），
 #   只写 CloseScope 的尺于是把「用句柄正常关掉」的文件一律读成漏；另一味＝handle（丢句柄强制点名）。
+# 票 411 裁定＝乙重登 1→2：panel_assets.go（在册活形状）＋resident_present_windows.go
+#   （10-31 落，与在册活形状逐位同形、注释具名「进程生命周期 scope」，facts §4）。
 want G5 ring
-want_n 1
+want_n 2
 pair "G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）" \
 	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*'
 
@@ -567,10 +591,14 @@ echo "#       本机现量：git grep -lEw OpenScope <锚> -- internal/tools/**/
 echo "#                          同尺 -- internal/tools/*.go  => rc=0 命中 bridge.go。"
 echo "#   (2) 必须排 *_test.go。第一版没排，正控自己被本程新测试里那句解释 Mark 机理的**注释**"
 echo "#       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。"
+# 票 411 裁定（括号条件成立：G5pos 是正控 ⇒ 按其声明语义登记）：quiet/0 不变；
+#   正控排除名单同格补 cmd/wisp/resident_present_windows.go（facts §4 具名的重登同格动作：
+#   该文件进程生命周期 scope 与在册活形状同形，正控不能因它响）。
+#   ⚠ 裁定表主值「0→2」与 facts §4/§9 现量实测 1 相抵，按括号条件执行、此处具名留痕。
 want G5pos quiet
 want_n 0
 pair "G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本" \
-	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*' ':!cmd/wisp/panel_assets.go'
+	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*' ':!cmd/wisp/panel_assets.go' ':!cmd/wisp/resident_present_windows.go'
 
 echo
 echo "## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）"
@@ -578,8 +606,10 @@ echo "## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今
 # 枚数＝本程现量：改前 9 枚 → 改后 8 枚，退场的只有 internal/tools/bridge.go 那一枚
 #   （它在 :648 接住句柄、在 :706 用句柄关掉——认得句柄那一形之后这一枚按设计该退场）；
 #   其余 8 枚逐枚还在被点名，命令与两读见 docs/evidence/s1/171-pair-legs-r1.md §4。
+# 票 411 裁定＝乙重登 8→14：老 8 枚全在＋新 6 枚（含勘误后的 provenance_160_boundary_test.go；
+#   盲区零贡献，facts §5）。
 want G5neg ring
-want_n 8
+want_n 14
 pair "G5-负一负 同尺不过滤任何文件" \
 	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2"
 
@@ -638,8 +668,11 @@ echo "#   5 处 CloseTask）与 pointer_183 的接缝件（2 处）只调合方�
 echo "#   scope，合法。四堆口径下这两枚落【③ 只关】堆、逐枚点名但不顶红（改前它们把基线 1 顶到 2）。"
 echo "#   今天【② 只开】全树 0 枚 ⇒ 诚实登记是 quiet＋0；「真造一枚只开仍会红」那一发＝"
 echo "#   .scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt（合成树 8ca0a52e 上 ② 堆 1 枚 ⇒ BAD）。"
-want G6neg quiet piles
-want_n 0
+# 票 411 裁定＝乙重登 0→1（quiet→ring 同格翻；二案中取乙，「测试卫生补关归 0」不采——facts §6）：
+#   ② 只开堆＝web_bridge_test.go:186（票 22 测试故意只开＋每测新桥、无跨测泄漏）。
+#   实测>0 ⇒ ring/quiet 味随基线同格翻（book_count 第①味先于枚数味）。
+want G6neg ring piles
+want_n 1
 pair "G6-负一负 同尺不过滤任何文件（四堆只吃『只开』；『只关』逐枚点名不顶红）" \
 	'OpenTask' 'CloseTask' - "$GO" "$GO2"
 
@@ -665,7 +698,9 @@ want G7 ring rev
 #   留下的那一枚＝internal/memory/retention.go（合方调用点=2：:98 的签名＋:100 的字符串字面量），
 #   161-v2 判它"形状使然，且是判据词表缺一味（Go 不并成方）"——本程一字节未动它，它是正控：
 #   AC#1 修的是"注释算不算调用点"，不是"谁该被点名"。名册本体 19 行逐行原样照打（r3-roster-diff check 1）。
-want_n 1
+# 票 411 裁定＝乙重登 1→6：反向 6 枚＝retention.go（正控地位）＋新 5 枚全找到 Dispose 落点
+#   （同函数 defer×1／同函数顺位×1／owner 生命周期×1／构造注入委托×1／Manager 生命周期事件×1，facts §7）。
+want_n 6
 pair "G7 主尺 Defer↔DisposalScope 成对普查（排 *_test.go、排定义本体 internal/plugin/disposal.go；两向都算）" \
 	'Defer(Named)?' '(New)?DisposalScope' - "$GO" "$GO2" ':!*_test.go' ':!internal/plugin/disposal.go'
 
@@ -687,7 +722,9 @@ want G7neg ring rev
 #   （goroutine.go、shutdown.go），留下的两枚是真代码（retention.go 的签名＋字符串、retention_test.go 的
 #   测试本体）。现量命令与逐枚位移＝sh .scratch/wisp/probes/171/r3/r3-roster-diff.sh（两把尺打同一枚锚
 #   4f2a777b，名册 71 行逐字节相同＝射程未动，位移两枚都有 COMMENT-ONLY 的解释）。
-want_n 2
+# 票 411 裁定＝乙重登 2→7：G7 同批 5 枚新枚＋retention.go／retention_test.go 两枚老名册
+#   （disposal 定义族 balanced，对平在案，facts §7）。
+want_n 7
 pair "G7-负一负 同尺不过滤任何文件" \
 	'Defer(Named)?' '(New)?DisposalScope' - "$GO" "$GO2"
 
