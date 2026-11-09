@@ -32844,3 +32844,42 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 - 410 结案＝`git revert 975e925d4 cb4a7ace3`。
 - 195 AC#5＝`git revert ad4574584`。
 - 138/140 结案＝`git revert d6a7c8c49 a88de340d 90734326a`。
+## A1652（2026-11-09 12:5x，编排者）**★票 98 结案（staging 车收口 0xc0000135）｜票 346＝5翻/2需Linux｜★基线重登已提交（我接管超时腿的活）｜wave105 三腿放出**
+
+### 一、★票 98 结案（`39ad45224`＋`d8c78bf75`）
+**五格全翻、`-done`**：票 98 根因＝`go test ./cmd/wisp/` **进程起不来 `0xc0000135`**（缺 sherpa DLL），**语音 staging 车已收口**。★**关键区分（证据件 §8 具名）**：`cmd/wisp` 整包 rc=1 是**真红/真窗族＋语音族二级 shadow**（staging 形下后者已消），⛔ 混为票 98 缺陷，逐枚名单归各用例所在票。
+
+### 二、★票 346＝5 翻／2 需 Linux（`3c717220f`）
+| 格 | 判 |
+|---|---|
+| AC#0／AC#1／AC#3／AC#5／AC#6 | ✅ 翻（blob 三点同串 `dfaddac8`/`0b0e5173`；同族尺现量 31 行/12 文件＝比 c1 又长，名册腐烂坐实；归因工具导出树亲跑 RED 8/16 FAIL rc=1 ⇄ GREEN 34/34 rc=0） |
+| AC#2 去牙反形／AC#4 双平台成对 | ⛔ 需 Linux（两枚仪器 `//go:build !windows`，本机结构性不编译；台账 `A1407` 在案） |
+- **⇒ 票 346 不 `-done`**；AC#1 的选形裁定（甲/乙/丙）**仍悬在我手里**（表和抽点都在盘上）。
+
+### 三、★★基线重登已提交（`3bf4a4e60`）——我接管超时腿的活
+- `411-baseline-rereg` 腿跑到 G5neg 段**超时未提交**（门禁单遍 6m17s＋flip 电池 75 分钟，超出单腿轮次）。**我核了它的 diff**：
+  - **完整且忠实于裁定**：G1 加 `-w`／G1b quiet→ring 0→4／G2 1→2／G5 1→2／G5pos 保 quiet/0 并补排除 `resident_present_windows.go`／G5neg 8→14／G6neg quiet→ring piles 0→1／G7 1→6／G7neg 2→7。
+  - **每枚新基线严格＝实测真读数**，⛔ 删腿、⛔ 减射程、名册本体逐行原样。
+  - ★**腿自己具名一处相抵**：我裁定表 G5pos 主值「0→2」与 facts §4/§9 现量实测 1 相抵，腿按我括号条件（G5pos 是正控）执行＝保 quiet/0＋补排除 ⇒ **正确**。
+- **★我先 commit 保护成果**（学 161/r6 日志教训：别让超时腿的活烂在共享树），**再自己后台复跑门禁核 rc=0（在跑）**。
+- ★**教训**：派「跑 6-11 分钟门禁／75 分钟 flip 电池」的腿，**必须给它足够轮次**或**拆成「改＋提交」与「长跑验收」两条腿**。
+
+### 四、★S3-S8「ready-for-agent」票抽查＝**真的卡别票**（第 22 处陷阱再确认）
+- **46**：`Blocked by: 41-kws-wake-word, 42-watchdog, 43-power-lifecycle-events, 44-costmeter…`（全未 done）
+- **53**：`Blocked by: 48-approval-queue-full, 51-tier2-goja, 52-d46-command-plugins`（全未 done）
+- ⇒ **⛔ 派「ready-for-agent」这个 Status，必须读 `Blocked by:` 再核 blocker 真 done 没**。
+
+### 五、★311／312 不能结（又躲一次）
+- **311**：框 6 勾/0 未勾，**但 Status 有残余（`Q-311-r1b-1` 等 295-v1 交 cmd/wisp 色）** ⇒ ⛔ `-done`。
+- **312**：**零 AC 格**（parked nice-to-have）⇒ ⛔ 碰。
+
+### 六、wave105 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `145-ac2` | 面板快照加字段（`internal/panel/**` 独占）：AC#2＋AC#6 反向判据；每个新字段必须有构造点＋消费者（⛔ 加没人读的字段） |
+| `148-ac2` | 票 148 AC#2（**票面明写「不依赖任何批准，今天就能做」**）：先证明 LiveApprovals 5 秒被调 ≥1 次再取「多拷 8 枚槽位」前后读数；阈值/golden 硬禁动 |
+| `pool-audit` | ★池子定档：90 张未结票分三档（可做/归口等票/要人），每张带 blocker 逐字；出「立即可派」清单；顺手落一票 |
+
+### 七、撤销口令
+- 98 结案＝`git revert d8c78bf75 39ad45224`。
+- 基线重登＝`git revert 3bf4a4e60`（退回 9 腿 rc=9 真读数态）。
