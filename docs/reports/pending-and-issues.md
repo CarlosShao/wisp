@@ -32921,3 +32921,37 @@ forks 8 枚 gofumpt 格式化、`attrib.sh --tracked-only` GREEN rc=0（我亲�
 ### 八、撤销口令
 - 门禁重登＝`git revert 3bf4a4e60`。
 - 148 AC#2＝`git revert c8a7beb49`。
+## A1654（2026-11-09 14:2x，编排者）**★票 148 结案｜票 145 实现完待验收｜pool-audit 定性表（甲24/乙30/丙36）｜顺手落票 239 残余①｜wave107 三腿（33 大杠杆）**
+
+### 一、★票 148 结案（`526796deb`＋`8f76d044d`）
+- **复核腿逐格现量复跑**：AC#1（`queue.go:624` `d := cloneDecision(it.Dec)`，全仓非测试 `:= it.Dec` 仅剩 2 处标量 `.Tool` 读）／AC#3（`panelVerdict` 白名单 6 字段，与生产读者 `panel_pump.go:87-92` 逐字对上，零 `Params` 读）／AC#4（`024681b8c` 及后两笔零点名契约轴，`approval.go` 零字节）／AC#5（导出树 gofumpt 空／vet rc0／build rc0／approval 包 `ok 5.673s`／d22scan clean；名册差集 100→105 全具名）。
+- **双名核**：旧=0／新=1。
+
+### 二、★票 145 实现完（`4111ada61` 码＋牙＋`c88bfa3b1` 证据），**待非实现者验收**
+- **①§2.14 终态族（OPTION A＝Event.Stop）**：`loop.go` `finish`/`failWith` 增 stop 参；`EvDone` **全终态带 `Stop`**（完成/截断/取消/流失败逐字 provider 词）；loop 自有终态（C22 刹车/预算拒/buildRequest 失败）**传空＝诚实**（没有 provider 词就不借词）。panel `RunSection.Done` 行＋cmd/wisp 喂线同步。
+- **②`ToolRunRow.Level`**：`bookedArgs`→`bookedForensics`，**同一枚 booked forensics 行一次 join 出 ArgsJSON＋RiskLevel**（同源同行，⛔ 第二次查表）。
+- **③AC#2b 两半枚**：config `ChatModelOption.Display`＋`CurrentDisplay`→panel `ModelOption.Display`→装配根；llm 新导出面 `ThinkingLevels(protocol)`，三家适配器 init 从自家映射表派生注册（openai-chat 注册零档＝已知协议无档）。
+- **门禁**：gofumpt 空／vet rc0／build rc0／panel PASS 212/FAIL 2（C21 在册＋render-fixture 环境性，212＝上轮 210＋新牙 2）／agent/config/llm ok／cmd/wisp 64 红 vs 基线 63 红，唯一差＝活窗时序那枚 **-count=3 3/3 绿＝flake 非回归**，本腿 12 枚新牙 **0 红**。
+- **★剩**：十四态可画缺的只剩乙组纯无源各枚（须另开票/人工批准）＋票 167 position/occupancy——**不在本票射程**。
+- ⇒ **验收腿待 33 落定后派**（panel 是本波 33 的独占写面，现在跑 panel 测试＝测移动树）。
+
+### 三、★pool-audit-r6 定性表（`e9f2040da`）＝**甲 24／乙 30／丙 36**
+- **甲前四名（最大杠杆）**：**33**（网关，解锁 35→36/37/38/39/40→195/180 七张）→ **228**（宿主，解锁 201/219/246/123/245-AC#4）→ **23**（解锁 25 S3 验收）→ **145**（先解⑥）。
+- **★8 处派单/票面前提过期**（现跑核出）：46 的 41-45 **全 done**（实为真机桌面票）、53 只剩 48 一个 blocker、168 的 50/51 已 done、**256 的复判门 265 已 done**（⇒升甲）、**262 要补的尺已存在**（`scripts/check-path-length-budget.sh` 多票引用 GREEN）⇒建议收口、245 的 AC#1/2/3/5 已在码里、148 的 blocked 已被 A1591 取代、23/33 纸面 blocker 全 done（09-19 旧票面）。
+- **★教训再确认**：票面 `Status: ready-for-agent` ＋ `Blocked by` 都可能过期，**必须逐票现跑核 blocker 真 done 没**。
+
+### 四、★顺手落票 239 残余①（`b3aefc34b`）
+- 走距 16 收进 C21 名册（新常量＋表行＋golden pin）＋**常驻静态尺** `Test239WaveTrainStaysInsideTheWindowWithAMarginFloor`（余量下限 0.25px＋44..160 全档 box 严格小于窗半）。**去牙突变**走距 16→17 ⇒ 尺红（"leaves only -0.750px"），还原复绿。
+- 具名没做：残余 a（真窗像素差分常驻化——要独占桌面，未定义即停）、残余 b（cmd/wisp 整包复跑——归编排者整包门禁）。
+
+### 五、wave107 三腿（已放出）
+| 腿 | 任务 |
+|---|---|
+| `33-gateway` | ★**最大杠杆**：panel-host-c27 网关，解锁 7 张；**本波独占 cmd/wisp+panel+ball+config**；先只读复量片结构再接「已确认未落」那片 |
+| `23-tools` | 票 23 system/window 工具族：先出 D34↔生产注册表**差集裁定表**再实现；RiskLevel matrix＋screen.capture ImagePart（C7 wire）；写面 `internal/tools/**` |
+| `262-verify` | 核票 262 能否收口（其要补的 `check-path-length-budget.sh` 已存在）；能收则翻勾＋改名 `-done` |
+
+### 六、撤销口令
+- 148 结案＝`git revert 8f76d044d 526796deb`。
+- 145 实现＝`git revert c88bfa3b1 4111ada61`。
+- 239 残余①＝`git revert b3aefc34b`。
