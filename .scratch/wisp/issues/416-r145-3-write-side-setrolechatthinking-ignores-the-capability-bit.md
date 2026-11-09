@@ -28,3 +28,31 @@
 ## Progress log (append-only, newest last)
 
 - [2026-11-09 22:5x +08] 编排者立票（来路 `R-145-3`；读面已修/写面未跟逐条引；★写明"读面问能发什么、写面问能存什么，两问不同源"是落地腿当时不修的正当理由，本票单独结清）。
+## AC#1 判断层已落（2026-11-09 23:4x，编排者现跑读码；⛔ 未改一字节产码）
+
+**票面 AC#1 逐字要求**：「落地腿必须**先给判断＋理由**，再动手」。
+
+**★现量：这个判断已经写在产码注释里了** —— `internal/config/settings_187.go:66-79` 逐字：
+
+> **THIS SETTER DOES NOT CONSULT `Capabilities.Thinking`, and that is a measured decision, not an oversight.**
+> Ticket 145 AC#2b made the **READ** face's question "does this dimension exist for this model" (`thinkingDimensionDeclared` below); the **WRITE** face's question is "is this value legal". The two were already different before this ticket: a model declaring no levels accepts any enum tier while offering none. So the third divergence case - a model whose entry never declared the bit still takes a tier write - is the same asymmetry, not a new one. **Closing it belongs to the write leg's own ticket; the read face cannot be made to depend on a rule the write face does not carry, or the two would answer the same question differently** (the defect ticket 145 AC#2b exists to remove). Registered as **R-145-3** in `docs/evidence/s1/145-ac2b-r1.md`.
+
+**⇒ 判断已给出，理由已写清，且已具名登记 `R-145-3`。** 这正是本票存在的理由（本票就是那张"write leg's own ticket"）。
+
+### ★我的裁定（按铁律 ⓪⓪⓪「主流 harness 怎么做」，agent 自己拍）
+
+**问题**：用户能不能给"不支持 thinking 的模型"存一个档位？
+
+**答案：能存，但页面不该让他存。** 理由三条：
+
+1. **主流 harness 的做法**：档位（reasoning effort）是**请求参数**，不是**模型属性**。OpenAI/Anthropic/Google 的 API 都允许请求里带 reasoning 参数，由服务端决定是否忽略。**配置文件存的是"用户意图"，不是"模型能力"。**
+2. **写面否决会丢信息**：若写面拒绝，用户换模型后**原来的档位偏好就丢了**。而"存着、切回支持的模型时生效"才是用户想要的。
+3. **读面已经负责"不显示"**：`dade544a9` 的读面用 `Capabilities.Thinking` 否决维度、取交集 ⇒ **页面上根本不会出现那个档位选项** ⇒ **写面永远收不到"不支持的模型的档位"**（除非手改 `config.toml`）。
+
+⇒ **★落地形状：保持现状（写面不查能力位），但补一条测试钉住"为什么"**，即：
+- `TestWriteSideAcceptsTierForModelWithoutCapabilityBit416`：断言写面**接受**一个能力位为 false 的模型的合法枚举档位（**钉住这是刻意行为，不是疏漏**）。
+- 反向判据：把写面的枚举校验删掉 ⇒ 该测试**仍绿**（证明它钉的是"接受"而非"校验"）；把 `requireDeclaredThinkingLevel` 删掉 ⇒ 该测试**变红**（证明它钉的是第二道闸）。
+- ⚠ **若落地腿按主流 harness 重新判断后认为写面该否决**，则**必须先推翻上面三条**并写明理由，⛔ 直接照抄读面解法。
+
+### ★AC#4「与读面不打架」的现成证据
+读面（`dade544a9`）与写面的分工已在上面注释里逐条对齐：读面问"存不存在"、写面问"合不合法"。**两面不打架的前提是它们回答不同问题**，而不是回答同一问题给不同答案。
