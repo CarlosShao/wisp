@@ -33,6 +33,16 @@ const (
 // ceiling to 160; the margin math is radius-relative and unchanged).
 const RingMarginPx = 22.0
 
+// WaveTravelPx is how far a Listening wave ring travels beyond its spawn
+// ring (R+5px) over one animation cycle. The train's outer edge therefore
+// tops out at R+5+16+RingStrokePx/2 = R+21.75, which is why RingMarginPx
+// needs 22: anything smaller re-slices the waves with the window rect and
+// the ball reads as a framed square again (ticket 239 sign-off). The floor
+// this leaves is 0.25px at 96 DPI (radius-relative, so it scales with the
+// configured size). It was a bare literal at the renderer's wave draw site
+// until ticket 239's residual folded it into the C21 geometry roster.
+const WaveTravelPx = 16.0
+
 // ClickTolerancePx extends the clickable circle slightly beyond the orb so
 // the drawn ring belongs to the hit region (DPI-scaled at call sites). It is
 // the FLOOR of the clickable circle, not its whole story: since R15#5 (owner,

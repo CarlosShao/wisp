@@ -238,6 +238,7 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | Warm 呼吸周期 | 2.4s（opacity 0.55↔0.7） | `WarmBreathPeriodMs` / `WarmOpacityLow` / `WarmOpacityHigh` | 合成器友好：仅改整窗常量 alpha，10fps |
 | Speaking 呼吸 | 1.6s | `SpeakingBreathMs` | success 光晕呼吸 |
 | Listening 波环 | 2.4s（3 层 0.8s 错峰） | `ListeningWaveMs` | accent 外环 |
+| Listening 波纹走距（票 239 残余①收册） | 16px（外沿 R+5+16+RingStrokePx/2 = R+21.75，窗半 R+22 ⇒ 96 DPI 下余量 0.25px，半径相对量随配置尺寸同缩放） | `WaveTravelPx` | 波纹一周期走过的距离；此前是渲染器波纹绘制点的裸字面量，全仓无一枚测试能拦住"走距上调/边距下调 ⇒ 波纹重新被窗口切边"。由 `Test239WaveTrainStaysInsideTheWindowWithAMarginFloor` 常驻钉住 |
 | Thinking 光带 | 1.2s | `ThinkingSweepMs` | 底部 2px accent 光带 |
 | Confirming 脉冲 | 2s | `ConfirmingPulseMs` | danger 脉冲环 |
 | FirstRun 引导脉冲 | 2.6s | `FirstRunGuidePulseMs` | 引导脉冲周期（S1 静态，接线票启用） |

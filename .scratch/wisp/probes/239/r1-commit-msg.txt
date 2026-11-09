@@ -1,0 +1,28 @@
+ticket 239 residual 1: fold the Listening wave travel distance into the C21
+geometry roster and pin it with a standing static ruler.
+
+The walk distance (16px) lived as a bare literal at the renderer's wave draw
+site, so nothing in the repo could catch "raise the walk distance or lower
+RingMarginPx and the window rect starts slicing the waves again" - the exact
+defect the owner signed off on 09-30. Changes:
+
+- internal/ball/hit.go: new exported const WaveTravelPx = 16.0 (comment
+  carries the R+21.75 outer-edge derivation and the 0.25px floor it leaves).
+- internal/ball/renderer_windows.go: wave draw site now uses WaveTravelPx
+  (value unchanged, behavior unchanged).
+- docs/evidence/s1/c21-native-tokens.md: one new geometry row; the Go
+  constant column names WaveTravelPx only (keeps the test's one-row-per-name
+  injection).
+- internal/ball/tokens_table_test.go: c21MotionGolden pins WaveTravelPx per
+  the lock's own rule for rows naming constants outside tokens.go.
+- internal/ball/wave_margin_239_test.go: new standing ruler
+  Test239WaveTrainStaysInsideTheWindowWithAMarginFloor - margin floor 0.25px
+  at 96 DPI (radius-relative, DPI-independent ratio) and train outer edge
+  strictly inside the window half for every configured size 44..160.
+- ticket 239 progress bullet + probe artifact appended; the live pixel-diff
+  half of the residual needs an exclusive-desktop window harness and is
+  deliberately not fabricated (undefined-stop), named in the bullet.
+
+Gates: gofumpt -l empty on all four Go files, go vet ./internal/ball/ rc=0,
+go build ./internal/ball/ ./cmd/balldebug/ rc=0 in the shared tree; test
+color and d22scan re-run on a shared-clone export tree after this commit.

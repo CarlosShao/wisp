@@ -563,6 +563,7 @@ var c21MotionGolden = map[string]float64{
 	// hit.go: window sizing + the clickable circle.
 	"RingMarginPx":     RingMarginPx,
 	"ClickTolerancePx": ClickTolerancePx,
+	"WaveTravelPx":     WaveTravelPx,
 
 	// liquid.go: what the audio envelope does to the liquid.
 	"SpinBaseRadPerS":   SpinBaseRadPerS,

@@ -536,7 +536,7 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 			alpha := v.Opacity * float32(1-t) * 0.8
 			if alpha > 0 {
 				r.setSolid(mulA(pal.AccentLine, alpha))
-				r.circle(c, R+5*s+float32(t)*16*s, RingStrokePx*s)
+				r.circle(c, R+5*s+float32(t)*WaveTravelPx*s, RingStrokePx*s)
 			}
 		}
 	}
