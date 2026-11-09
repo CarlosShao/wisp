@@ -120,8 +120,12 @@ func fullConfig(t *testing.T) *Config {
 			TPM:                  100000,
 			Models: map[string]ModelSpec{
 				"m1": {
-					Display:         "Acme One",
-					Capabilities:    Capabilities{Text: true, Vision: true, FC: true, Stream: true},
+					Display: "Acme One",
+					// Thinking: true rides with the declared levels - ticket
+					// 145 AC#2b makes the bit the authority on the
+					// dimension's existence, and a spec declaring tiers
+					// without the bit is the contradiction the gate vetoes.
+					Capabilities:    Capabilities{Text: true, Vision: true, FC: true, Stream: true, Thinking: true},
 					ContextWindow:   128000,
 					MaxOutputTokens: 4096,
 					ThinkingLevels:  []string{ThinkingOff, ThinkingLow},

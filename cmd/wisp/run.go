@@ -518,16 +518,69 @@ func chatChainProvider(rt *agentRuntime) llm.LlmProvider {
 	return rt.provs[0]
 }
 
+// intersectThinkingLevels is ticket 145 AC#2b's second half, done ONCE here
+// instead of once per reader. It keeps the tiers the model declares that the
+// adapter named above actually maps, in the order the model declares them,
+// and drops everything else.
+//
+// WHY THE INTERSECTION AND NOT TWO LISTS SIDE BY SIDE. The two censuses answer
+// different questions - "which tiers does this model declare" (the catalog
+// entry) and "which tiers does this adapter map" (the adapter's own table) -
+// and shipping both to the page leaves the page to compute the only list it
+// can actually use. That scatters one judgement across every reader: the next
+// consumer (a CLI, a second window, a test) would have to re-derive it, and
+// the two would drift. The orchestrator's ruling on ticket 145 (ledger
+// docs/reports/pending-and-issues.md:33013-33016) chose the other way: Go
+// computes it, and the reader receives a set it can send as-is.
+//
+// "off" DROPS OUT BY CONSTRUCTION, and that is the measured fact, not an
+// accident: the config-side enum has four values including "off", while every
+// adapter's mapping table tests `intensity != "" && intensity != "off"`
+// (openairesponses/request.go:139-143, anthropic/request.go:124-129), so "off"
+// is never a registered tier word (llm.RegisterThinkingLevels is fed from
+// effortLevels / thinkingBudgets). "off" still means something - it is the
+// request for NO thinking - and it travels as CurrentThinking, not as a tier.
+//
+// An empty result is a real answer: the model declares no tier, or the adapter
+// maps none of the ones it declares (openai-chat registers nil). Either way the
+// page offers no tier choices rather than inventing the four-value enum.
+func intersectThinkingLevels(declared, accepted []string) []string {
+	if len(declared) == 0 || len(accepted) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(declared))
+	for _, want := range declared {
+		for _, have := range accepted {
+			if want == have {
+				out = append(out, want)
+				break
+			}
+		}
+	}
+	return out
+}
+
 // modelSwitchSection maps internal/config's ChatSwitchOptions and the live
 // provider chain's own protocol word into the snapshot's modelSwitch section.
-// The values travel verbatim; this function spells neither a provider, nor a
-// display name, nor a tier. Display rides ChatSwitchOptions' own walk over
-// the catalog (ticket 145 AC#2b①), and the adapter vocabulary is
-// llm.ThinkingLevels of the built provider's own protocol - the words that
-// adapter's mapping table accepts, never the config's four-value enum handed
-// out as "what everyone supports" (ticket 145 AC#2b②). Without the reader
-// line in the PumpSources literal the snapshot carries no "modelSwitch" key
-// at all (the reader-gated 213 shape).
+// No value is spelled here: not a provider, not a display name, not a tier.
+// Display rides ChatSwitchOptions' own walk over the catalog (ticket 145
+// AC#2b①). The adapter census is llm.ThinkingLevels of the built provider's
+// own protocol - the words that adapter's mapping table accepts, never the
+// config's four-value enum handed out as "what everyone supports".
+//
+// ThinkingLevels on the wire is the SENDABLE set: the model's declared tiers
+// (already gated on Capabilities.Thinking by the config side, AC#2b's
+// existence question) intersected with the adapter's census (AC#2b's "which
+// tiers" question) by intersectThinkingLevels above. AdapterThinkingLevels
+// still travels as the census the intersection was taken against, so a page
+// showing an empty offer can say WHICH half emptied it. With no provider
+// built there is no census and therefore no intersection: the section then
+// carries the declaration alone and Adapter stays empty, which is how a
+// reader tells "proven sendable" from "declared only" (see
+// modelSwitchSectionFromConfig for the resident leg, which never has one).
+//
+// Without the reader line in the PumpSources literal the snapshot carries no
+// "modelSwitch" key at all (the reader-gated 213 shape).
 func modelSwitchSection(mgr *config.Manager, prov llm.LlmProvider) panel.ModelSwitchSection {
 	v := mgr.ChatSwitchOptions()
 	models := make([]panel.ModelOption, 0, len(v.Models))
@@ -536,15 +589,17 @@ func modelSwitchSection(mgr *config.Manager, prov llm.LlmProvider) panel.ModelSw
 	}
 	var adapter string
 	var adapterLevels []string
+	offered := v.ThinkingLevels
 	if prov != nil {
 		adapter = prov.Info().Protocol
 		adapterLevels = llm.ThinkingLevels(adapter)
+		offered = intersectThinkingLevels(v.ThinkingLevels, adapterLevels)
 	}
 	return panel.ModelSwitchSection{
 		Current:               panel.ModelOption{Provider: v.CurrentProvider, Model: v.CurrentModel, Display: v.CurrentDisplay},
 		CurrentThinking:       v.CurrentThinking,
 		Models:                models,
-		ThinkingLevels:        v.ThinkingLevels,
+		ThinkingLevels:        offered,
 		Adapter:               adapter,
 		AdapterThinkingLevels: adapterLevels,
 		Reason:                v.Reason,

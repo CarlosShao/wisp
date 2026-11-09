@@ -61,6 +61,19 @@ const keyPathChatThinking = "llm.roles.chat.thinking_intensity"
 // defaults the key empty), so the four-value enum alone decides in that shape;
 // the picker on the page lists nothing for such a model, which is the same
 // measured asymmetry stated on the read half.
+//
+// THIS SETTER DOES NOT CONSULT Capabilities.Thinking, and that is a measured
+// decision, not an oversight. Ticket 145 AC#2b made the READ face's question
+// "does this dimension exist for this model" (thinkingDimensionDeclared
+// below); the WRITE face's question is "is this value legal". The two were
+// already different before this ticket: a model declaring no levels accepts
+// any enum tier while offering none. So the third divergence case - a model
+// whose entry never declared the bit still takes a tier write - is the same
+// asymmetry, not a new one. Closing it belongs to the write leg's own ticket;
+// the read face cannot be made to depend on a rule the write face does not
+// carry, or the two would answer the same question differently (the defect
+// ticket 145 AC#2b exists to remove). Registered as R-145-3 in
+// docs/evidence/s1/145-ac2b-r1.md.
 func (m *Manager) SetRoleChatThinking(level string) ([]string, error) {
 	v := strings.TrimSpace(level)
 	if v == "" {
@@ -138,6 +151,39 @@ type ChatModelOption struct {
 	Display string
 }
 
+// thinkingDimensionDeclared answers ticket 145 AC#2b's FIRST question for one
+// catalog entry: does this model have a thinking dimension at all?
+//
+// The ticket splits the tier question in two and forbids answering them with
+// one judgement: Capabilities.Thinking decides WHETHER the dimension exists,
+// the adapter's vocabulary decides WHICH tiers it holds. This function is the
+// first half, and it is a conjunction of two declarations the entry itself
+// makes:
+//
+//   - Capabilities.Thinking is the authority on existence. SPEC-03 section 3.1
+//     makes every capability bit default to false and probe-first ("新增模型
+//     默认 capabilities 全 false + 引导探测"), so an entry that never declared
+//     the bit is not "probably able to think" - it is UNKNOWN, and unknown
+//     offers nothing (宁缺毋造). The same shape already governs the speech
+//     chain, where a missing AudioIn/AudioOut bit removes the chain element
+//     outright (internal/speech/cloudcatalog.go:95,99).
+//   - A non-empty ThinkingLevels is the entry's own list of tiers. A model
+//     that declares the bit but no tiers says "thinking exists, and I name no
+//     tier for it" - the adapter then maps nothing, and an empty offer is the
+//     truthful answer rather than a guess at four enum values.
+//
+// The bit VETOES: levels declared under a false bit are dropped, not trusted.
+// That is deliberate - it is the only order in which a contradiction inside
+// one catalog entry (levels declared, capability never declared) resolves
+// toward "do not offer a request we cannot justify", and it is what makes the
+// all-false default safe rather than accidentally permissive.
+func thinkingDimensionDeclared(spec ModelSpec) bool {
+	if !spec.Capabilities.Thinking {
+		return false
+	}
+	return len(spec.ThinkingLevels) > 0
+}
+
 // ChatSwitchOptions is ticket 187's read face over the chat role: what the
 // composer row's model and tier pickers need, read off the in-memory config.
 //
@@ -145,10 +191,11 @@ type ChatModelOption struct {
 // enforced at resolve time in internal/llm; the read face applies it here so
 // the picker cannot offer a row the resolver would refuse). ThinkingLevels
 // lists what the CURRENT model declares, verbatim and possibly empty - an
-// empty list is "this model declares no tiers", never "the reader failed".
-// Reason is the one sentence the empty-catalog shapes carry instead of rows
-// (AC#4's explicit "没有可用模型", 宁缺毋造): empty Reason means the catalog
-// was read and holds offerable rows.
+// empty list is "this model has no thinking dimension" (thinkingDimensionDeclared
+// above: the capability bit or the declared tiers said no), never "the reader
+// failed". Reason is the one sentence the empty-catalog shapes carry instead of
+// rows (AC#4's explicit "没有可用模型", 宁缺毋造): empty Reason means the
+// catalog was read and holds offerable rows.
 type ChatSwitchOptions struct {
 	// CurrentProvider / CurrentModel are llm.roles.chat as this process holds
 	// it right now. Empty both = the role is unset (text_chain would carry the
@@ -167,7 +214,10 @@ type ChatSwitchOptions struct {
 	// Models is the offerable list, sorted by provider then model so a page
 	// cannot read order as preference.
 	Models []ChatModelOption
-	// ThinkingLevels is the current model's own declared list.
+	// ThinkingLevels is the current model's own declared list, and it is
+	// EMPTY unless thinkingDimensionDeclared says the model has the dimension
+	// at all (ticket 145 AC#2b: the bit decides existence, the vocabulary
+	// decides which tiers). An empty list is an answer, not a failure.
 	ThinkingLevels []string
 	// Reason explains the no-offerable-rows shapes; empty otherwise.
 	Reason string
@@ -208,7 +258,12 @@ func (m *Manager) ChatSwitchOptions() ChatSwitchOptions {
 		for _, id := range ids {
 			spec := p.Models[id]
 			if pname == out.CurrentProvider && id == out.CurrentModel {
-				out.ThinkingLevels = append([]string(nil), spec.ThinkingLevels...)
+				// Ticket 145 AC#2b defect (1): the dimension EXISTS only
+				// when the entry declares the bit AND names a tier. Both
+				// halves are the entry's own words; neither is inferred.
+				if thinkingDimensionDeclared(spec) {
+					out.ThinkingLevels = append([]string(nil), spec.ThinkingLevels...)
+				}
 				// Ticket 145 AC#2b①: the current model's display name rides
 				// the same walk - one pass, so the name and the pair cannot
 				// be read from different moments.

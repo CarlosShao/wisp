@@ -32,6 +32,12 @@ import (
 // thinking187Base is the same minimal valid config the config side's own 187
 // tests load: one provider, one enabled model declaring off|low, the chat
 // role pinned to it with thinking_intensity = "off".
+//
+// capabilities.thinking = true is declared on purpose - ticket 145 AC#2b makes
+// that bit the authority on whether the thinking dimension exists, and
+// SPEC-03 §3.1 defaults it false. Declaring the levels without the bit would be
+// the contradiction the gate resolves by veto, and this fixture is the one the
+// picker's happy path reads.
 const thinking187Base = `schema_version = 2
 
 [llm]
@@ -49,6 +55,9 @@ api_key_ref = "env:DEEPSEEK_KEY"
 enabled = true
 context_window = 64000
 thinking_levels = ["off", "low"]
+
+[llm.providers.deepseek.models.deepseek-chat.capabilities]
+thinking = true
 
 [llm.providers.deepseek.models.deepseek-chat.price]
 in = 2500000

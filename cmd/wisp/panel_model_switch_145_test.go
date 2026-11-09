@@ -1,12 +1,15 @@
 package main
 
-// Ticket 145 AC#2b's assembly-root teeth: the modelSwitchSection mapping now
+// Ticket 145 AC#2b's assembly-root teeth: the modelSwitchSection mapping
 // carries each catalog row's own Display name (AC#2b①, read off
-// ChatSwitchOptions' walk) and the live provider chain's adapter vocabulary
-// (AC#2b②, llm.ThinkingLevels of the built provider's OWN protocol word).
+// ChatSwitchOptions' walk) and the SENDABLE tier set - the model's declared
+// tiers intersected with the live adapter's own census (AC#2b②, the
+// orchestrator's 方案 B: Go computes the intersection once, so every reader
+// receives a list it can send as-is instead of two lists to combine itself).
 // The values are hardcoded from the adapters' own tables and the config text
-// below, so a mapping that invents a name, drops a real one, or hands the
-// config's four-value enum out as "what every adapter supports" reds here.
+// below, so a mapping that invents a name, drops a real one, hands the
+// config's four-value enum out as "what every adapter supports", or ships the
+// declaration un-intersected reds here.
 
 import (
 	"os"
@@ -91,9 +94,19 @@ func Test145ModelSwitchMappingCarriesTheAdapterVocabulary(t *testing.T) {
 	if want := []string{"high", "low", "medium"}; !reflect.DeepEqual(sec.AdapterThinkingLevels, want) {
 		t.Errorf("adapterThinkingLevels = %v, want %v (the responses adapter's own tier words)", sec.AdapterThinkingLevels, want)
 	}
+	// The SENDABLE set: thinking187Base declares off|low, the responses
+	// adapter maps high|low|medium, so exactly "low" survives. "off" drops out
+	// because no adapter registers it - it is the request for NO thinking, not
+	// a tier. A mapping that shipped the declaration verbatim would offer
+	// "off" to an adapter that cannot map it; one that shipped the census
+	// verbatim would offer "high"/"medium" to a model that never declared them.
+	if want := []string{"low"}; !reflect.DeepEqual(sec.ThinkingLevels, want) {
+		t.Errorf("thinkingLevels = %v, want %v (declared off|low intersected with the adapter's high|low|medium)", sec.ThinkingLevels, want)
+	}
 
-	// The chat-completions adapter maps NO tier: the wire must offer none -
-	// the adapter's own doc, not a guessed default.
+	// The chat-completions adapter maps NO tier: the intersection is empty
+	// even though the model declares two - the adapter's own doc, not a
+	// guessed default.
 	chatProv, err := llm.NewProvider(llm.EndpointOptions{Protocol: "openai-chat", Provider: "deepseek", Model: "deepseek-chat"})
 	if err != nil {
 		t.Fatalf("chat provider: %v", err)
@@ -103,9 +116,13 @@ func Test145ModelSwitchMappingCarriesTheAdapterVocabulary(t *testing.T) {
 		t.Errorf("openai-chat mapping = %q/%v, want the protocol word with no invented tiers",
 			chatSec.Adapter, chatSec.AdapterThinkingLevels)
 	}
+	if len(chatSec.ThinkingLevels) != 0 {
+		t.Errorf("thinkingLevels = %v, want empty: the model declares off|low but this adapter maps no tier at all", chatSec.ThinkingLevels)
+	}
 
-	// Byte-level: the vocab travels under its wire name for the tiered
-	// adapter and stays absent for the zero-tier one.
+	// Byte-level: the census travels under its wire name for the tiered
+	// adapter and stays absent for the zero-tier one; the offerable set is
+	// the intersection, never the declaration.
 	data, err := panel.NewSnapshotPump(panel.PumpSources{
 		ModelSwitch: func() panel.ModelSwitchSection { return sec },
 	}).Marshal()
@@ -114,7 +131,10 @@ func Test145ModelSwitchMappingCarriesTheAdapterVocabulary(t *testing.T) {
 	}
 	if !strings.Contains(string(data), `"adapter":"openai-responses"`) ||
 		!strings.Contains(string(data), `"adapterThinkingLevels":["high","low","medium"]`) {
-		t.Errorf("the wire lost the adapter vocabulary:\n%s", data)
+		t.Errorf("the wire lost the adapter census:\n%s", data)
+	}
+	if !strings.Contains(string(data), `"thinkingLevels":["low"]`) {
+		t.Errorf("the wire does not carry the intersected offer:\n%s", data)
 	}
 	chatData, err := panel.NewSnapshotPump(panel.PumpSources{
 		ModelSwitch: func() panel.ModelSwitchSection { return chatSec },
@@ -123,6 +143,9 @@ func Test145ModelSwitchMappingCarriesTheAdapterVocabulary(t *testing.T) {
 		t.Fatalf("marshal: %v", err)
 	}
 	if strings.Contains(string(chatData), "adapterThinkingLevels") {
-		t.Errorf("a zero-tier adapter must not ship a vocabulary key:\n%s", chatData)
+		t.Errorf("a zero-tier adapter must not ship a census key:\n%s", chatData)
+	}
+	if !strings.Contains(string(chatData), `"thinkingLevels":[]`) {
+		t.Errorf("a zero-tier adapter must ship an empty offer, not the declaration:\n%s", chatData)
 	}
 }

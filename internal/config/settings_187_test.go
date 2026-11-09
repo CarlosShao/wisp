@@ -23,6 +23,13 @@ import (
 // settings187Base is a config with one provider, one enabled model that
 // declares off|low, and one DISABLED model, so the picker's filter and the
 // declared-levels check both have something real to bite.
+//
+// capabilities.thinking = true is DECLARED on both entries, deliberately:
+// ticket 145 AC#2b makes the bit the authority on whether the thinking
+// dimension exists, and SPEC-03 §3.1 defaults every bit to false (probe-first).
+// A fixture that declared levels but not the bit would be the contradiction
+// the gate resolves by veto - so these fixtures declare both, and the
+// no-bit case gets its own test instead of hiding inside the happy path.
 const settings187Base = `schema_version = 2
 
 [llm]
@@ -41,6 +48,9 @@ enabled = true
 context_window = 64000
 thinking_levels = ["off", "low"]
 
+[llm.providers.deepseek.models.deepseek-chat.capabilities]
+thinking = true
+
 [llm.providers.deepseek.models.deepseek-chat.price]
 in = 2500000
 out = 10000000
@@ -49,6 +59,9 @@ out = 10000000
 enabled = false
 context_window = 128000
 thinking_levels = ["off", "low", "medium", "high"]
+
+[llm.providers.deepseek.models.deepseek-reasoner.capabilities]
+thinking = true
 `
 
 // AC#1's write half: the tier write lands on the file, the receipt names the
@@ -107,14 +120,16 @@ func Test187ThinkingWriteRefusesALevelTheModelDoesNotDeclare(t *testing.T) {
 
 // A model that declares NO thinking_levels constrains nothing: the four-value
 // enum alone decides. The write must not invent a stricter rule than the
-// schema carries (and the picker side lists nothing for such a model - the
-// asymmetry is measured, stated in the evidence doc, and pinned here).
+// schema carries. The READ side lists nothing for such a model - not because
+// the write leg said so, but because AC#2b's existence question needs a named
+// tier as well as the bit (see Test145ChatSwitchOptionsThinkingBitDecidesTheDimension
+// for the read-side control on this same shape).
 func Test187ThinkingWriteOnAModelThatDeclaresNoLevelsIsEnumOnly(t *testing.T) {
 	base := strings.Replace(settings187Base,
 		`thinking_levels = ["off", "low"]
 
-[llm.providers.deepseek.models.deepseek-chat.price]`,
-		`[llm.providers.deepseek.models.deepseek-chat.price]`, 1)
+[llm.providers.deepseek.models.deepseek-chat.capabilities]`,
+		`[llm.providers.deepseek.models.deepseek-chat.capabilities]`, 1)
 	m, _, _ := newTestManager(t, base)
 
 	if _, err := m.SetRoleChatThinking("medium"); err != nil {

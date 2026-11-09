@@ -87,9 +87,17 @@ func Test187WiredModelSwitchReaderSendsTheLiveValues(t *testing.T) {
 	got := *envelope.ModelSwitch
 
 	// Hardcoded from thinking187Base: one provider, one enabled model
-	// declaring off|low, the chat role pinned to it with "off". Keeping the
-	// expectations literal makes this nail independent of ChatSwitchOptions'
-	// own code - a config-side regression reds here too.
+	// declaring off|low (with capabilities.thinking = true), the chat role
+	// pinned to it with "off". Keeping the expectations literal makes this
+	// nail independent of ChatSwitchOptions' own code - a config-side
+	// regression reds here too.
+	//
+	// No provider is built in this test (modelSwitchSection187 passes nil), so
+	// the section carries the model's DECLARATION without an intersection:
+	// ticket 145 AC#2b's sendable set needs an adapter census to intersect
+	// against, and with none the honest answer is the declaration alone with
+	// Adapter empty. Test145ModelSwitchMappingCarriesTheAdapterVocabulary
+	// covers the intersected shape.
 	want := panel.ModelSwitchSection{
 		Current:         panel.ModelOption{Provider: "deepseek", Model: "deepseek-chat"},
 		CurrentThinking: "off",

@@ -172,6 +172,16 @@ func ballStyleSectionFromConfig(m *config.Manager) panel.BallStyleSection {
 // in this process, and llm.ThinkingLevels needs a protocol word off a built
 // provider - so Adapter stays empty, which is the same honest no-source
 // posture this file's log line states (无源不冒充), never a guessed protocol.
+//
+// CONSEQUENCE FOR ThinkingLevels, stated because it differs from the pipeline
+// leg and the difference is load-bearing: with no adapter census there is
+// nothing to intersect, so this section carries the model's DECLARATION -
+// already gated on capabilities.thinking by the config side (AC#2b's existence
+// question) but not yet proven against an adapter's mapping table. That is the
+// most this process can know, and Adapter=="" is exactly how a reader tells it
+// apart from the pipeline leg's sendable set (see modelSwitchSection in
+// run.go). Inventing a protocol word here to fake the intersection would be
+// the one thing this posture forbids.
 func modelSwitchSectionFromConfig(m *config.Manager) panel.ModelSwitchSection {
 	v := m.ChatSwitchOptions()
 	models := make([]panel.ModelOption, 0, len(v.Models))
