@@ -305,3 +305,18 @@
 - **新登记 `R-145-3`**：写面 `SetRoleChatThinking`（`internal/config/settings_187.go:77`）**不查** `Capabilities.Thinking`——模型从未声明该位仍照收档位写入。**本波不修**：读面问"这一维在不在"、写面问"这个值合不合法"，两问在本票之前就已不同；让读面依赖写面尚未承载的规则会让两问对同一件事给出不同答案，那正是 AC#2b 要消灭的缺陷。关它属写面自己的票。该分歧**已被记录**：`Test187ThinkingWriteOnAModelThatDeclaresNoLevelsIsEnumOnly` 现在就钉着它。
 - **边界**：活树改动＝**10 枚 Go 文件 ＋ 本证据件 ＋ 票面一个方括号 ＋ 本节**，其余零字节；`frontend/**`／`design/**`／`forks/**`／`internal/winsec/**`／`internal/tools/**`／`internal/proc/**`／`internal/observe/**`／`internal/secret/**`／`scripts/**`／`docs/PLAN.md`／`docs/specs/**`／thresholds／golden **全部未动**；十枚改动文件逐枚 `tr -cd "\r" | wc -c` ⇒ **全部 0（全 LF）**；零 emoji；临时件只建不删；`git add`／`commit` 显式 pathspec、只 commit 不 push。
 - **没做的**：①`R-145-2`（嵌套 section 的合同尺）未修；②`R-145-3`（写面问位）未修；③未跑 `-race`；④未跑 `scripts/wisp-cli-tests.sh` 全量；⑤**`-done` 未加**——AC#2b 本格已关，但票 145 其余各格的归宿仍归编排者，加 `-done` 须先确认全票收口。
+
+## 结案（2026-11-09 22:3x，编排者；非实现者判语＋现跑复算）
+
+**七格全勾 ⇒ `-done`。** 依据：
+- **AC#1/AC#3/AC#4/AC#5**：09-26 非实现者验收表已勾（见上 Status 追加）。
+- **AC#2 翻**（`c6afcd752`）：验收腿现量具名构造点——3 个生产站点（`pump.go:409` 唯一真装配／`:479` Run 读者门／`:460` ModelSwitch 读者门）、2 个装配根（`run.go:1104`／`:1116`）、2 条喂线（`run.go:2505`／`:2458`）。
+- **AC#6 翻**（同上）：6 枚新键**用反射探针从生产结构现量**（不抄实现者文件）——`run.done.stop`／`tools[].level`／`modelSwitch.models[].display`／`modelSwitch.current.display`／`modelSwitch.adapter`／`modelSwitch.adapterThinkingLevels`；每枚有具名用例＋只碰该字段的突变反钉 ⇒ **装饰品判据从未触发**。
+- **AC#2b 翻**（`dade544a9`，★我裁定方案 B）：档位维由能力位否决（`Capabilities.Thinking=false` 不送该维）＋档位表与适配器词表**取交集后送**。★裁定理由（主流 harness）：两个清单并列、让每个页面自己算交集＝把同一个判断散到每个读方；Go 侧算完再送，读方拿到就是能发出去的档。
+- ★**验收腿自我更正一次（诚实）**：首版证据称「基线同族失败」是错的——`go test ./cmd/wisp` 600-720s，Go 默认 10 分钟超时把基线**在 600.189s 杀掉**（读数 60 而非 64）⇒ 幻影「三枚新失败」。**加 `-timeout 30m` 重跑**：基线 64／HEAD 63，`comm -13` 空 ⇒ HEAD 是严格子集；多出那枚 3/3 重试绿＝真窗 flake。
+
+**遗留登记（不欠本票，另立小票）**：
+- `R-145-1`：事件的值来自 provider 这一跳全仓无用例（6 行就能补，已证明可断言）。
+- `R-145-2`：合同尺只配顶层类型，嵌套 section 无尺（Go 加了 6 键、`panel.ts` 一枚没跟上却零红）。
+
+**撤销口令**：`git revert dade544a9 e1bbb17e1 656df9b6e c6afcd752`。
