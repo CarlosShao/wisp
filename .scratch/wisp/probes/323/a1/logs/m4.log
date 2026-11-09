@@ -1,0 +1,11 @@
+time=2026-11-09T19:08:07.716+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-09T19:08:07.754+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-11-09T19:08:07.885+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+--- FAIL: Test320FetchLegClassifiesNon200WithoutRelayingTheBody (0.18s)
+    --- FAIL: Test320FetchLegClassifiesNon200WithoutRelayingTheBody/401 (0.13s)
+        panel_models_320_test.go:599: the page-visible refusal relays the upstream body's own words: "面板请求被拒绝 [config.models.list r-320-401]：拉取失败（供应商 deepseek；D37 分类 auth）：auth (<nil>): HTTP 401 code=<nil>: {\"error\":{\"message\":\"UPSTREAM_LEAK_320XYZ: the provider's own words\"}}"
+    --- FAIL: Test320FetchLegClassifiesNon200WithoutRelayingTheBody/500 (0.04s)
+        panel_models_320_test.go:599: the page-visible refusal relays the upstream body's own words: "面板请求被拒绝 [config.models.list r-320-500]：拉取失败（供应商 deepseek；D37 分类 provider）：provider (<nil>): HTTP 500 code=<nil>: {\"error\":{\"message\":\"UPSTREAM_LEAK_320XYZ: the provider's own words\"}}"
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.307s
+FAIL

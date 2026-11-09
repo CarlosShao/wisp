@@ -1,0 +1,8 @@
+time=2026-11-09T19:06:57.653+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test320FetchLegWritesTheKeyNowhereOnDisk
+time=2026-11-09T19:06:57.694+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+    panel_models_320_test.go:424: the fetch leg left the resolved credential in 1 file(s) under D:\work\tmp\wisp323a1\clean\cmd\wisp: [D:\work\tmp\wisp323a1\clean\cmd\wisp\wisp323a1-keyleak.txt]
+--- FAIL: Test320FetchLegWritesTheKeyNowhereOnDisk (0.10s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.215s
+FAIL

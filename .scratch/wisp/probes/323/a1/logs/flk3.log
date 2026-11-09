@@ -1,0 +1,7 @@
+time=2026-11-09T19:10:02.012+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-09T19:10:02.060+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+--- FAIL: Test320FetchLegTimesOutWithinItsBudget (0.18s)
+    panel_models_320_test.go:521: the slow endpoint was called 0 time(s), want exactly 1 (no retry storm behind one fetch)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.388s
+FAIL

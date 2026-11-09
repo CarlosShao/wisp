@@ -1,0 +1,10 @@
+time=2026-11-09T19:02:49.739+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-09T19:02:49.774+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw wrote=[llm.providers.local-gw]
+time=2026-11-09T19:02:49.798+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw-bare wrote=[llm.providers.local-gw-bare]
+time=2026-11-09T19:02:49.825+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw-four wrote=[llm.providers.local-gw-four]
+--- FAIL: Test320CreateCustomProviderRowLandsAndRefusesByName (0.08s)
+    --- FAIL: Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum (0.00s)
+        settings_320_test.go:178: the refusal came from the whole-file gate instead of the field's own pre-check: config: config: refused to write llm.providers.local-gw-three; the value would not survive validation, so config.toml is unchanged。第 3 种拒因：校验不过：值本身过不了这份 schema 的校验，这一行要改的是值；文件一个字节都没动。: config: config.toml: llm.providers.local-gw-three.protocol "grpc" must be one of openai-chat|openai-responses|anthropic
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.193s
+FAIL
