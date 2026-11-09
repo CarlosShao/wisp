@@ -79,8 +79,9 @@
 
 本程做了三件互相独立的事来把这件事从"推断"变成"读数"：
 
-1. **全量名册相等**〔独立复现〕：`acc-r1-mut`（把 `loop.go:1134` 的 `Stop: stop` 改成 `Stop: ""`，即只掐起源跳）下跑**整个** `./cmd/wisp`，与干净树跑同一命令的 `--- FAIL` 名册逐名 `diff` ⇒
-   `clean=63 mut=63`、**`IDENTICAL: mutating the loop->Event.Stop hop changes ZERO cmd/wisp test outcomes`**。
+1. **全量名册相等**〔独立复现〕：`acc-r1-mut`（把 `loop.go:1134` 的 `Stop: stop` 改成 `Stop: ""`，即只掐起源跳）下跑**整个** `./cmd/wisp`（`-count=1 -timeout 30m`），与干净树跑同一命令的 `--- FAIL` 名册逐名 `diff` ⇒
+   `clean=63 mut=63`、**`diff` 空 ⇒ `IDENTICAL: mutating the loop->Event.Stop hop changes ZERO cmd/wisp test outcomes`**。
+   两次全跑时长 671.871s／595.853s，**均未触 30 分钟上限**（见 §7 的仪器坑：这一条必须先排除"被掐死"才能成立，本程第一版就差点读成假回归）。
    （日志：`probes/145/acc-r1-clean-full2.txt`、`probes/145/acc-r1-mut-full.txt`、名册 `probes/145/acc-r1-clean-cmdwisp-fails.txt`。）
 2. **同轮阳性对照**〔独立复现〕：同一棵被验树上别的变异都真红——`acc-r1-ctl`（改 `res.Status`）⇒ **15 FAIL**；`acc-r1-mut4`（`Kind: EvDone`→`EvWarn`）⇒ **5 FAIL**；`acc-r1-mut3`（填 `"BOGUS_XYZ"`）⇒ 机制活。⇒ **"零差集"不是 overlay 没生效**。
 3. **可断言性证明**〔独立复现〕：本程在导出树写了一枚 6 行的临时探针 `TestAccR1TerminalEvDoneCarriesTheProvidersOwnStopWord`（复用仓里既有的 golden harness：`newHarness(t,"text-reply")` ＋ `h.run(...)`，断言 `h.sink.LastOf(EvDone).Stop == llm.StopEndTurn`）：
@@ -263,7 +264,9 @@ AC#2b② 逐字：**"`Capabilities.Thinking` 决定'有没有这一维' ＋ 该�
 | `go vet`（同五包） | **rc=0** |
 | `go build`（同五包） | **rc=0** |
 | `go test ./internal/panel` | **PASS 212 / FAIL 2** —— `TestComposerRenderFixtureTellsTheTruth`（克隆树缺 fixture，环境性，wave3/ac2r1 同读数）、`TestC21DesignTokensFourWayAgree`（在册）。基线树 `acc-r1-base` 同尺：**PASS 210 / FAIL 2**，**逐名同两枚** ⇒ **零新红** |
-| `go test ./cmd/wisp`（干净树全量，`-count=1`） | **63 枚具名 FAIL**，全部落在既有真窗／语音／名册族（`Test12r2…`／`Test15e…`／`Test16r1…`／`Test26P/R3…`／`Test313…`／`Test381r2…`／`Test382WR2…`／`Test390r1…`／`Test392…`／`Test394R1…`／`Test395r1…`／`Test41a2r1…`／`TestAC1…`／`TestAC228…`／`TestAC246…`／`TestAC247…`／`TestAC2RealProcess…`／`TestAC3Early…`／`TestAC4Focus…`／`TestLockedSuffix…`／`TestSecret…`／`TestTicket198/224/255×2/256…`／`TestWireR1…`×6）。**`Test145*`／`Test187*` 零 FAIL**；基线树 `71ff0fc87` 同族名册 ⇒ **本票 commit 未新增 cmd/wisp 红** |
+| `go test ./cmd/wisp`（被验树全量，`-count=1 -timeout 30m`） | **63 枚具名 FAIL**，全部落在既有真窗／语音／名册族（`Test12r2…`／`Test15e…`／`Test16r1…`／`Test26P/R3…`／`Test313…`／`Test381r2…`／`Test382WR2…`／`Test390r1…`／`Test392…`／`Test394R1…`／`Test395r1…`／`Test41a2r1…`／`TestAC1…`／`TestAC228…`／`TestAC246…`／`TestAC247…`／`TestAC2RealProcess…`／`TestAC3Early…`／`TestAC4Focus…`／`TestLockedSuffix…`／`TestSecret…`／`TestTicket198/224/255×2/256…`／`TestWireR1…`×6）。**`Test145*`／`Test187*` 零 FAIL**。两次独立全跑（588s 与 672s）**名册逐名相同**（`diff` 空）⇒ 该名册稳定可复现 |
+| `go test ./cmd/wisp`（基线树 `71ff0fc87`，同尺） | **64 枚具名 FAIL**；`comm -13 基线 HEAD` ⇒ **0 枚**，即 **HEAD 的 63 枚是基线 64 枚的子集**，本票 commit **未新增任何 cmd/wisp 红**。唯一多出的一枚 `TestPanelHostRealWindowHopAndLifecycle` 在基线树 `-count=3` **3/3 全绿**（1.45s／1.78s／1.71s）⇒ 真窗时序 flake，非回归 |
+| ⚠ 本程踩到的仪器坑（登记，下一位别再踩） | `go test ./cmd/wisp` **不加 `-timeout` 会撞 Go 默认 10 分钟**：本程首跑基线树 600.189s 被掐，**三枚用例（`Test16r1…`×2、`TestTicket224…`）还没来得及打印 `--- FAIL`**，于是名册读成 60 而非 64 ⇒ 会得出"HEAD 新增 3 红"的**假回归**。加 `-timeout 30m` 复跑后三枚照常红、名册变 64。**判 cmd/wisp 名册差集必须显式给 `-timeout`，且先确认进程不是被掐死的（看末尾秒数是否≈600s）。** |
 | 定向复跑（被验的 6 枚新键相关用例） | `Test145*`（8 枚）＋`Test187*`（5 枚）**全 PASS** |
 | `sh scripts/d22scan.sh` | **rc=0 clean** |
 | `sh scripts/check-path-length-budget.sh` | **GREEN**，rc=0（63 条超预算路径在册） |
@@ -275,7 +278,8 @@ AC#2b② 逐字：**"`Capabilities.Thinking` 决定'有没有这一维' ＋ 该�
 - **活树零写入**：本程所有跑动、变异、探针都在 `.scratch/wisp/probes/145/` 的两棵克隆树与仓外 overlay 副本里。本程只改两处：本证据件 ＋ 票 145 的三枚 AC 框（翻两枚）＋ 票面 Progress log 一行。
 - **禁面零字节**〔独立复现〕：`git show --name-status 4111ada61` 共 **20 文件**；`grep -cE "^(frontend/|forks/|internal/winsec/|docs/PLAN.md|docs/specs/|thresholds|.*golden)"` ⇒ **0**。
 - **被验树＝活树（对全部被验路径）**〔独立复现〕：`4111ada61..908c6652c` 共 **12** 枚 commit，其中触及 `internal/panel` 的只有 `908c6652c`（33-r3，两枚**测试件**＋`panel_host/resident_windows`）；对 6 枚新键的定义行与读者行逐枚 `git diff` ⇒ **空**（`run_feed_145.go`／`model_switch_187.go`／`composer.go`／`pump.go`／`loop.go`／`settings_187.go`／`schema.go`／`validate.go`／`thinking_levels.go`／`run.go`／`panel_pump.go`／`panel.ts` 全部无 diff）。
-- **临时件只建不删**：`probes/145/` 下新增 5 枚探针件（`acc_r1_keys_probe_test.go`／`acc_r1_plural_probe_test.go`／`acc_r1_stop_probe_test.go`／`acc_r1_capability_probe_test.go`／`acc_r1_tier_probe_test.go`，**全部只在克隆树、未跟踪、永不入仓**）＋ 4 枚日志（`acc-r1-clean-cmdwisp-fails.txt`／`acc-r1-clean-full2.txt`／`acc-r1-mut-full.txt`／`acc-r1-probes-final.txt`／`acc-r1-probes-mutated-final.txt`）。零删除。
+- **临时件只建不删**：`probes/145/` 下新增 5 枚探针件（`acc_r1_keys_probe_test.go`／`acc_r1_plural_probe_test.go`／`acc_r1_stop_probe_test.go`／`acc_r1_capability_probe_test.go`／`acc_r1_tier_probe_test.go`，**全部只在克隆树、未跟踪、永不入仓**）＋ 日志 8 枚（`acc-r1-clean-cmdwisp-fails.txt`／`acc-r1-clean-full2.txt`／`acc-r1-mut-full.txt`／`acc-r1-probes-final.txt`／`acc-r1-probes-mutated-final.txt`／`acc-r1-base-cmdwisp.txt`／`acc-r1-base-cmdwisp-30m.txt`／`acc-r1-clean-30m.txt`／`acc-r1-mut-30m.txt`）＋ 提交信息稿 1 枚。零删除。
+- **⚠ 一次自纠（写下来给下一位）**：本程第一版证据件写着"基线同族名册 ⇒ 零新红"，那是**读了被掐死的日志**得出的；随后自己复跑发现基线实为 **64**（不是 60/62），且 HEAD 的 63 是它的**真子集**。同一条仪器坑也差点污染 R-145-1（变异全跑 680.866s 也接近上限）——已用 `-timeout 30m` 把**干净树与变异树两发都重跑**（671.871s／595.853s），名册仍逐名相等。**结论未变，但支撑它的两次跑动换了更硬的读数。**
 - **本程没做的**：①没有选形——§5.2 的"改 AC 文字 vs 改代码"、§2.1 的"补起源跳用例"、§4.1 的"给嵌套 section 造尺"三项**一律交编排者**；②没有动 `frontend/**`、`design/**`、thresholds/golden、`docs/PLAN.md`、`docs/specs/**`；③没有重跑票 145 之外的门（如 `-race`、`scripts/wisp-cli-tests.sh` 全跑）。
 - **两条登记（不阻断翻勾，建议另立）**：
   - **`R-145-1`**：agent 侧"事件的值来自 provider"这一跳全仓无用例（`cal-text`／`cal-usage` 两发标定同色）；`run.done.stop` 的起源跳是它的一个实例。**可断言、已证明**（本程探针 6 行即红），建议单独开一枚"给 golden harness 加终态词断言"的小票，别挂在 145 上。
