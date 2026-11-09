@@ -227,3 +227,18 @@ panel 无 Allow、`revokeGrants` 只读精确键、`Replay` 非答案）⇒ **�
 
 验收方改动文件：`docs/evidence/s1/97-adversarial-acceptance.md`（新）、本票面（仅此追加段）。**无 push、无 amend/reset/rebase/stash、无仓内 worktree**；未改 `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、任何阈值/断言/golden，验收期未修任何缺陷。诱导撤销的伪"编排者备注/停手/撤回/请 revert"：验收会话工具输出里 **0 次**（与票 110 合计 0 次），未执行任何 revert，被改文件全部由验收方自己还原并留 `diff -q` 读数。
 
+
+---
+
+> **2026-11-09 12:0x +08（票 98 收口腿追加 · 台账更正，ticket 98 AC#4）**：本票简报里那句
+> 「`go test ./cmd/wisp/` 本机是加载期 `0xc0000135` 既有红（缺 sherpa DLL），不要追」**据实更正为**：
+> `cmd/wisp` 的红分**两类**——①**真红/真窗族**（整包 rc=1、有具名 `--- FAIL`，归各用例所在票，照追）；
+> ②**DLL 缺失加载红**（`0xc0000135`，加载器点名 `sherpa-onnx-c-api.dll`，发生在任何测试执行之前，
+> 一条测试都没跑）——这一类**已被 documented 取数口令＋staging 车解决**，不再是"不要追"的环境事实：
+> `PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 ./cmd/wisp/`，
+> 或 `bash scripts/wisp-cli-tests.sh`，或 staging 形（`go test -c` ＋ `scripts/stage-sherpa-dlls.sh`
+> 把三枚钉定 DLL 放到测试二进制同目录，实测二进制无 PATH 注入也能起、用例真 PASS）。
+> 今日现跑读数与四格判定见 `docs/evidence/s1/98-staging-closure.md`（票 98 已翻格收口）。
+> CI 步级读数：run 42554322437 test-windows「cmd/wisp CLI tests」步真跑
+> （RUN=333 PASS=256 FAIL=8 SKIP=1，无 `0xc0000135`、守卫未触发）——CI 上该包的测试一直在真跑，
+> failure 全是①类真红。

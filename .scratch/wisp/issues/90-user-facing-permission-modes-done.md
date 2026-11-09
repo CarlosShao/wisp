@@ -191,3 +191,18 @@
     `risk.DefaultMode()`＝最严档（`TestTicket90UnwiredModeSourceIsTheStrictestMode` 盯），所以今天的行为是"三档全问"，
     **不会**因为没接线而变松。**交接给票 92/77**：`cmd/wisp/run.go` 里把 `perm.Store` 注进 `tools.Options.Modes`
     （以及面板只读显示 `Mode()`/`LastSwitch()`），`run.go` 是票 77 地界，本票**不代写**。
+
+---
+
+> **2026-11-09 12:0x +08（票 98 收口腿追加 · 台账更正，ticket 98 AC#4）**：本票简报里那句
+> 「`go test ./cmd/wisp/` 本机是加载期 `0xc0000135` 既有红（缺 sherpa DLL），不要追」**据实更正为**：
+> `cmd/wisp` 的红分**两类**——①**真红/真窗族**（整包 rc=1、有具名 `--- FAIL`，归各用例所在票，照追）；
+> ②**DLL 缺失加载红**（`0xc0000135`，加载器点名 `sherpa-onnx-c-api.dll`，发生在任何测试执行之前，
+> 一条测试都没跑）——这一类**已被 documented 取数口令＋staging 车解决**，不再是"不要追"的环境事实：
+> `PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 ./cmd/wisp/`，
+> 或 `bash scripts/wisp-cli-tests.sh`，或 staging 形（`go test -c` ＋ `scripts/stage-sherpa-dlls.sh`
+> 把三枚钉定 DLL 放到测试二进制同目录，实测二进制无 PATH 注入也能起、用例真 PASS）。
+> 今日现跑读数与四格判定见 `docs/evidence/s1/98-staging-closure.md`（票 98 已翻格收口）。
+> CI 步级读数：run 42554322437 test-windows「cmd/wisp CLI tests」步真跑
+> （RUN=333 PASS=256 FAIL=8 SKIP=1，无 `0xc0000135`、守卫未触发）——CI 上该包的测试一直在真跑，
+> failure 全是①类真红。
