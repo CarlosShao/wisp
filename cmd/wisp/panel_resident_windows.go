@@ -232,6 +232,51 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 	}
 }
 
+// panelEnabledSource is [panel] enabled, re-read from disk every time the host is
+// about to bring a window up. Same shape and same reasons as panelGeometrySource
+// above (closure from the assembly root, no panel->config edge, no host disk
+// read), and the same failure direction: an unreadable config.toml answers TRUE,
+// because "the file could not be parsed" must not silently disable a feature the
+// schema defaults to on - the geometry source's own note states the rule this
+// mirrors, "a host whose config could not be parsed says so rather than silently
+// answering someone else's number".
+//
+// WHY PER-CALL AND NOT ONCE. [panel] is registered hot (internal/config/tiers.go),
+// so the value a user saves must be able to take effect without a restart. The
+// panel host asks on every bring-up, which makes "switch the panel off, close it,
+// and the next gesture refuses by name" true without this leg polling config.toml
+// (it does not - see residentPanelHotReloadNote).
+func panelEnabledSource(dataDir string) func() bool {
+	cfgPath := filepath.Join(dataDir, configFileName)
+	return func() bool {
+		cfg, _, err := config.LoadFile(cfgPath, nil)
+		if err != nil {
+			slog.Warn("panel host: [panel] enabled source unreadable, treating the panel as enabled",
+				"path", cfgPath, "err", err, "default", true)
+			return true
+		}
+		return cfg.Panel.Enabled
+	}
+}
+
+// panelKeepAliveSource is [panel] keep_alive_in_session (SPEC-05 sec 5's "面板可
+// 隐藏保活"), re-read per hide. Same closure shape, same no-disk-in-host rule,
+// and the same failure direction as panelEnabledSource: an unreadable file
+// answers true, which keeps C27's hide-don't-destroy posture rather than
+// destroying a window on the strength of a parse error.
+func panelKeepAliveSource(dataDir string) func() bool {
+	cfgPath := filepath.Join(dataDir, configFileName)
+	return func() bool {
+		cfg, _, err := config.LoadFile(cfgPath, nil)
+		if err != nil {
+			slog.Warn("panel host: [panel] keep_alive_in_session source unreadable, keeping the window warm",
+				"path", cfgPath, "err", err, "default", true)
+			return true
+		}
+		return cfg.Panel.KeepAliveInSession
+	}
+}
+
 // newResidentComposerDispatch builds the resident panel's chain and attaches
 // ticket 186's workspace socket to a holder this function also returns.
 //
@@ -319,7 +364,15 @@ func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelM
 	// it per window creation rather than holding it. Said once per start, in the
 	// same posture as the hot-reload note above.
 	auditf("%s", residentPanelGeometryNote)
-	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), cfgMgr, workspaceScope, drafts, nil
+	return NewPanelManager(disp, assets, dataPath,
+		withGeometrySource(panelGeometrySource(dataDir)),
+		// AC#10: the other two [panel] fields that decide whether a window may
+		// exist at all and how long it survives a hide. Both are read per
+		// event, both default to the schema's true, and both are closures for
+		// the same reason the geometry source is one.
+		withPanelEnabled(panelEnabledSource(dataDir)),
+		withPanelKeepAlive(panelKeepAliveSource(dataDir)),
+	), cfgMgr, workspaceScope, drafts, nil
 }
 
 // loop is the panel thread. Registry.Spawn owns the recover and the panic sink,

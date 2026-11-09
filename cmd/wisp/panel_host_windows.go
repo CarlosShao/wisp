@@ -248,6 +248,29 @@ type PanelManager struct {
 	// root keeps the parsing and this file keeps only the asking. Set by
 	// withGeometrySource; never mutated after construction, so it needs no lock.
 	geometry func() (width, height int)
+
+	// enabled answers "may this host open a window at all", read from
+	// [panel] enabled on every bring-up. nil means nobody handed this host a
+	// policy and the host is enabled - the same "a missing option is a
+	// default, not a compile error" rule withGeometrySource states, which is
+	// what keeps the pre-ticket NewPanelManager call sites behaving exactly as
+	// they did. See panelEnabledSource for why the read is a closure.
+	enabled func() bool
+
+	// disabledByConfig / disabledReason are the [panel] enabled=false
+	// refusal's two products, the same pair runtimeMissing/unavailableReason
+	// are for the runtime probe and kept SEPARATE from them on purpose: a
+	// disabled panel is a policy answer, a missing Runtime is a machine
+	// answer, and ticket 37's fallback card must not read one as the other.
+	disabledByConfig bool
+	disabledReason   string
+
+	// keepAlive answers SPEC-05 sec 5's "面板可隐藏保活" ([panel]
+	// keep_alive_in_session): whether a hide may leave the WebView2 warm or
+	// must tear it down. nil means nobody handed a source, and the host then
+	// keeps the pre-ticket posture - hide, never destroy (C27). Read through
+	// KeepAliveOnHide by the one production hide path.
+	keepAlive func() bool
 }
 
 // panelHostOption is one thing the assembly root may hand the panel host at
@@ -264,6 +287,35 @@ type panelHostOption func(*PanelManager)
 // A nil src, or one answering <=0, falls back to the constants in this file.
 func withGeometrySource(src func() (width, height int)) panelHostOption {
 	return func(m *PanelManager) { m.geometry = src }
+}
+
+// withPanelEnabled hands the host [panel] enabled - "may a window be opened at
+// all". A nil src, or one answering true, leaves the host enabled, which is the
+// schema default (`default:"true"`) and therefore the behaviour every pre-ticket
+// construction site already had.
+//
+// The gate sits at the TOP of bringUp, before the runtime probe, and that order
+// is the claim a test can redden: a disabled panel must refuse on POLICY without
+// ever asking the machine a question, because the two refusals are different
+// facts (a policy answer versus a missing Runtime) and ticket 37's native
+// fallback card is entitled to tell them apart.
+func withPanelEnabled(src func() bool) panelHostOption {
+	return func(m *PanelManager) { m.enabled = src }
+}
+
+// withPanelKeepAlive hands the host [panel] keep_alive_in_session - SPEC-05 sec
+// 5's "面板可隐藏保活". A nil src, or one answering true, keeps C27's
+// hide-don't-destroy posture, which is again the schema default
+// (`default:"true"`).
+//
+// The false branch is the field's only observable meaning: a hide must NOT leave
+// a warm WebView2 behind, so Hide tears the window down instead of parking it.
+// That is a real teardown, not a flag: the panel thread then retires through the
+// library's own WM_CLOSE chain (the one panel_resident_windows.go's
+// RequestDispose documents at length) and the next gesture gets a fresh thread
+// from panelHolder. Nothing here invents a second teardown path.
+func withPanelKeepAlive(src func() bool) panelHostOption {
+	return func(m *PanelManager) { m.keepAlive = src }
 }
 
 // NewPanelManager wires one host to the inbound router and the embedded asset
@@ -355,6 +407,63 @@ func (m *PanelManager) Unavailable() (bool, string) {
 	return m.runtimeMissing, m.unavailableReason
 }
 
+// errPanelDisabledByConfig is [panel] enabled=false's refusal. It is a separate
+// error value from errPanelRuntimeMissing because they are separate facts and
+// the caller (ticket 37's fallback card) is entitled to tell "the user switched
+// the panel off" from "this machine has no WebView2".
+//
+// The sentence names the config ROW and not the file on purpose: ticket 255's
+// ruler (TestTicket255HostStillDoesNotParseConfigItself) forbids this file from
+// spelling the config file's name outside a comment, because the host must never
+// look one up - the assembly root hands it the value. An operator reading the
+// refusal has the file open already, so the row is the actionable half.
+var errPanelDisabledByConfig = errors.New("panel host: the panel is disabled by its configuration")
+
+// panelDisabled is the [panel] enabled gate. A host with no source is enabled
+// (the schema default), so this answers nil for every pre-ticket construction
+// site. On refusal it records the same two products the runtime probe records,
+// in the fields Unavailable does NOT read - see the struct comment for why.
+func (m *PanelManager) panelDisabled() error {
+	m.mu.Lock()
+	src := m.enabled
+	m.mu.Unlock()
+	if src == nil || src() {
+		return nil
+	}
+	const fix = "set [panel] enabled = true in your config and reopen the panel"
+	reason := fmt.Sprintf("%v: %s", errPanelDisabledByConfig, fix)
+	m.mu.Lock()
+	m.disabledByConfig = true
+	m.disabledReason = reason
+	m.mu.Unlock()
+	slog.Info("panel.disabled", "reason", "[panel] enabled is false", "detail", reason)
+	return fmt.Errorf("%w: %s", errPanelDisabledByConfig, fix)
+}
+
+// Disabled is [panel] enabled=false's state read, the policy twin of
+// Unavailable. (true, reason) means a bring-up was refused by configuration, and
+// the panel thread keeps taking requests: like the runtime refusal and unlike
+// errPanelRefusedThread, flipping the config back and asking again is a real
+// recovery, so this does not retire the thread.
+func (m *PanelManager) Disabled() (bool, string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.disabledByConfig, m.disabledReason
+}
+
+// KeepAliveOnHide answers whether a hide may leave the WebView2 warm (SPEC-05
+// sec 5, [panel] keep_alive_in_session). A host with no source keeps C27's
+// hide-don't-destroy posture, which is the schema default.
+func (m *PanelManager) KeepAliveOnHide() bool {
+	m.mu.Lock()
+	src := m.keepAlive
+	m.mu.Unlock()
+	if src == nil {
+		return true
+	}
+	return src()
+}
+
 // LastColdMs / LastHotMs expose the two latencies the last bring-up measured on
 // this instance, so a caller (the diagnostic command, a test) can print or assert
 // against a real reading instead of a promise.
@@ -423,6 +532,15 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 		return nil
 	}
 	m.mu.Unlock()
+
+	// AC#10 (ticket 33): [panel] enabled is a POLICY answer and is asked BEFORE
+	// the runtime probe, so a panel switched off in config.toml refuses by name
+	// without ever touching the machine question. The two refusals stay
+	// distinguishable - this one does not set runtimeMissing, and a later show
+	// after the config is flipped back re-reads the source and proceeds.
+	if err := m.panelDisabled(); err != nil {
+		return err
+	}
 
 	// AC#5 (ticket 33): probe the Runtime BEFORE anything can touch the create
 	// path. The library's create reaches log.Fatal call sites when the Runtime
@@ -864,6 +982,15 @@ func (m *PanelManager) HotShow(ctx context.Context) error {
 // lastRestoreTo / lastRestoreSetForeground / lastRestoreSetFocus carry the per-run
 // handles instead.
 func (m *PanelManager) Hide() {
+	// AC#10: [panel] keep_alive_in_session=false means a hide may NOT leave the
+	// WebView2 warm, so the window is torn down instead of parked. The default
+	// (source absent, or answering true) keeps C27's hide-don't-destroy posture
+	// byte for byte, which is why every pre-ticket caller of Hide is unaffected.
+	// The teardown is Destroy's - the same WM_CLOSE chain the library owns - and
+	// the focus hand-back below still runs, because a torn-down panel must not
+	// swallow the user's foreground.
+	keepAlive := m.KeepAliveOnHide()
+
 	m.mu.Lock()
 	hwnd := m.hwnd
 	prev := m.prevFocus
@@ -884,6 +1011,7 @@ func (m *PanelManager) Hide() {
 	// named when there is one to hand back to.
 	if prev == 0 {
 		fmt.Printf("wisp: panel window hidden (no prior window to return focus to)\n")
+		m.teardownAfterHideUnlessKept(keepAlive)
 		return
 	}
 	rf, _, _ := pnlSetForeground.Call(uintptr(prev))
@@ -894,6 +1022,29 @@ func (m *PanelManager) Hide() {
 	m.lastRestoreSetFocus = rc
 	m.mu.Unlock()
 	fmt.Printf("wisp: panel window hidden (focus returned to hwnd 0x%x)\n", prev)
+	m.teardownAfterHideUnlessKept(keepAlive)
+}
+
+// teardownAfterHideUnlessKept is [panel] keep_alive_in_session=false's one
+// effect. It runs at the END of Hide, after the window is off screen and the
+// foreground has been handed back, so a panel that is not kept warm still gives
+// the user their focus before it goes.
+//
+// It calls Destroy and nothing else: Destroy is already this file's "tear the
+// window down for good" (it posts the library's WM_CLOSE, the owning thread
+// dispatches it, WM_QUIT follows and the panel thread retires), so the false
+// branch reuses that path instead of inventing a second teardown. The cost is
+// named where it is paid: the next gesture needs a FRESH thread from
+// panelHolder (resident_windows.go's toggle already spawns one when the previous
+// thread finished), so keep_alive_in_session=false buys a smaller resident
+// footprint at the price of a cold start per open - which is exactly the trade
+// SPEC-05 sec 5 describes and not a defect.
+func (m *PanelManager) teardownAfterHideUnlessKept(keepAlive bool) {
+	if keepAlive {
+		return
+	}
+	m.Destroy()
+	fmt.Printf("wisp: panel window torn down after hide ([panel] keep_alive_in_session = false)\n")
 }
 
 // terminateOnThisThread asks the window's message loop to end. It must be called
