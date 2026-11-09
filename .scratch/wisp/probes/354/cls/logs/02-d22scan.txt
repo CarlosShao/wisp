@@ -1,0 +1,11 @@
+d22scan: examined 451 production Go files under internal/ and cmd/ of D:/tmp/wisp/20261108/354cls/tree-cls
+d22scan: scope bans #1-5 internal/      examined 387 production Go files
+d22scan: scope bans #1-5 cmd/           examined  64 production Go files
+d22scan: scope ban #6 frontend/         examined 121 text files
+d22scan: scope ban #7 internal/tools/   examined  48 production Go files
+d22scan: scope ban #10 internal/risk/   examined  21 production Go files, comment symbol citations
+d22scan: scope ban #8 design/           examined  14 text files
+d22scan: scope ban #8 frontend/         examined 121 text files
+d22scan: scope ban #8 internal/         examined 966 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 242 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=387, bans #1-5 cmd/=64, ban #6 frontend/=121, ban #7 internal/tools/=48, ban #10 internal/risk/=21, ban #8 design/=14, ban #8 frontend/=121, ban #8 internal/=966, ban #8 cmd/=242; ban #8 emoji coverage: design/ 14 text files; frontend/ 121 text files; internal/ 966 Go files, comments and _test.go included; cmd/ 242 Go files, comments and _test.go included
