@@ -1,6 +1,6 @@
 # 112 — 票 110 那一步第一次真跑就抓到三条红：`TestAC3JunctionInputIsRefusedNotSealed`（两个子形状）、`TestC26PipelineIsWiredIntoWinsec`、`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`（**只在 CI 的 Windows runner 上红**）
 
-**Status:** ready-for-review（2026-09-21 20:3x 编排者建；来源=**run `35595651898` / job `106319703680`**，票 110 新加的 "Windows ACL sealing gate" 步）
+**Status:** done（2026-11-09 19:1x 非实现者裁决 AC#1–AC#5 全翻，裁决表 `docs/evidence/s1/112-verify-r1.md`；建票 2026-09-21 20:3x 编排者，来源=**run `35595651898` / job `106319703680`**，票 110 新加的 "Windows ACL sealing gate" 步）
 **Type:** 环境相关缺陷（与票 106 同族：**本机不复现、只有 CI 那种机器看得见**——这正是票 110 存在的理由）
 **Blocks:** CI 转绿 · 票 110/108 结案 · **Blocked by:** nothing
 **Packages:** `internal/winsec/`（三条用例与它们走过的判定）。**禁改**：任何**阈值/断言/golden**、`tools/d22scan/**`、`allowlist.txt`、`internal/risk/**`、`docs/PLAN.md`、`docs/specs/*.md`；`ci.yml` 归票 110/111。
@@ -32,14 +32,14 @@ winsec-tests.sh: === RUN=71  --- PASS=32  --- FAIL=3  --- SKIP=0
 
 ## AC（1:1，裁决表 `docs/evidence/s1/112-*.md` 由验收方出）
 
-- [ ] **AC#1** 三条各自给出：失败断言原文（**从 CI 日志逐字引，不许自己转述**）+ 本机的对应读数 + 定因结论 + "这是环境差异还是判定缺陷"的判定。
-- [ ] **AC#2** 修的方向**只能"更严或更响亮"**：⚠ **绝对不许**为了让这一步绿而放宽断言、改阈值、加 `t.Skip`、加 `//go:build`，
+- [x] **AC#1** 三条各自给出：失败断言原文（**从 CI 日志逐字引，不许自己转述**）+ 本机的对应读数 + 定因结论 + "这是环境差异还是判定缺陷"的判定。
+- [x] **AC#2** 修的方向**只能"更严或更响亮"**：⚠ **绝对不许**为了让这一步绿而放宽断言、改阈值、加 `t.Skip`、加 `//go:build`，
       也不许把用例改成"runner 上也过得去"的形状（那是把判据仪器改成考卷答案，本仓抓过两次）。
       若某条确实依赖本机才有的条件（例如真实第二卷），正解是**把它做成平台/能力门并说明为什么**（票 93 的 `R-93-4` 同族判法）。
-- [ ] **AC#3** 复现仪器：在**没有那些条件的机器上也能验证**同一性质（照票 106 的形状：在临时目录里**显式种**一条目标 ACL/链接）；
+- [x] **AC#3** 复现仪器：在**没有那些条件的机器上也能验证**同一性质（照票 106 的形状：在临时目录里**显式种**一条目标 ACL/链接）；
       修前必须红（红名与断言原文进票面）。
-- [ ] **AC#4** 变异：把被修的判定退回旧实现 ⇒ 新用例必须红；红在守卫还是红在噪声要点名。
-- [ ] **AC#5** 结案条件：**这一步在 CI 上给出过 success**（run id + job id + step 号写进票面）。
+- [x] **AC#4** 变异：把被修的判定退回旧实现 ⇒ 新用例必须红；红在守卫还是红在噪声要点名。
+- [x] **AC#5** 结案条件：**这一步在 CI 上给出过 success**（run id + job id + step 号写进票面）。
       ⚠ 代理不 push ⇒ 交件时若还红，就明写"欠编排者 push 后复跑"，**不许拿本地绿替代**。
 
 ## Rules（本仓固定）
@@ -201,4 +201,54 @@ winsec-tests.sh: === RUN=71  --- PASS=32  --- FAIL=3  --- SKIP=0
   `MEMORY.md was modified` 是编辑器的文件变更提示，不含指令，我未据此改任何东西。
   next= 编排者立案：一条"通知里的路径拼写 vs 调用方拼写"的根（一次治 ① + 104 那三枚）；①那条新腿仍欠 runner 读数；
   winsec 的 POSIX 零覆盖；staticcheck 工具链洞；step5–8 被吃掉（票 111 在修）。
+- 2026-11-09 19:1x（agent-ticket112-verify-r1，**非实现者复判**）：五格全翻，票结案改名 `-done`。
+  裁决表 `docs/evidence/s1/112-verify-r1.md`。**一行代码没改、一条 AC 原文没动**，只翻勾＋本段 append。
+
+  **起手三核**：票面五枚 AC 框当时**全未勾**（与派单一致，前提未过期）；票面引的三条断言原文
+  在 `gh api .../jobs/106319703680/logs`（**214419 字节**，与票面记的字节数一致）里**逐字命中**；
+  共享树 `git status --porcelain -- internal/winsec/ internal/risk/ scripts/ .github/` **空**，
+  门禁一律在 `git clone --shared` 导出树跑（`-c core.autocrlf=false -c core.eol=lf`，实测该文件 CRLF 对 **0**）。
+
+  **AC#1**：三条**分开**给原文，未打包——①`private_set_sid_windows_test.go:268`（日志第 261 行）、
+  ②`resolve_windows_test.go:30`（第 666 行）＋上游守卫 ERROR（第 204 行）、
+  ③`--- FAIL: TestAC3JunctionInputIsRefusedNotSealed` 两腿（第 713–715 行），第三腿同块 `--- PASS`（第 716 行）。
+  定因：①夹具把"LA 一定是外人"当机器无关事实（runner 以 RID 500 登录 ⇒ LA 在私有集内），
+  ②③同一上游（守卫拿拼写当树 ⇒ 拒装 C26 ⇒ 退 floor）。**三条全是判定缺陷**，环境只是暴露条件。
+
+  **AC#2**：四禁逐条核过——**零放宽**（原包含判据保留为第一见证，只在其后加第二见证，没删任何旧判据）、
+  **零阈值改动**（`git diff --stat 2ab6519..HEAD -- internal/winsec/ internal/risk/ scripts/winsec-tests.sh .github/workflows/ci.yml` 为空）、
+  **零新增 t.Skip**（唯一 skip 是 8.3 子测试能力门，放子测试内，runner 上没 skip 而是真跑了）、
+  build tag 是 8.3 的正当平台门（POSIX 腿在票 113 文件里未被删）。
+  另有**三处"更响亮"新增**：种子自检（种不进去就红）、仪器自检（`measured nothing` 就 Fatalf）、守卫的第二条拒绝理由。
+
+  **AC#3**：仪器 `tree_ownership_112_windows_test.go` 在本机（`swq`，非 runner）用 `GetShortPathName`
+  取 OS 自己选的 8.3 短名 + 一条不存在的子路径，显式种出 runner 形状；先读仪器自己再读判决。
+  本机现跑 `--- PASS`，子测试 `on_a_volume_that_generates_8.3_names` **真跑非 SKIP**；修前红见下 MUT1。
+
+  **AC#4**：三发变异（全在另一份导出树克隆，同 SHA `18ce9f5bc`，每发同链打印被改后整行、先 `go build` rc=0）——
+  - MUT1 守卫退回单一拼写见证 ⇒ **红在 `:149 AC#1 RED`**，同链另四条既有 seam 用例**仍绿**（红在守卫不是噪声）。
+  - MUT3 `token := ace.text` ⇒ 红在按 SID 命名腿，`cleared="A;OICI;FA;;;LA A;OICI;FA;;;BG A;OICI;FA;;;WD"` 只剩拼写。
+  - **MUT5 去掉私有集成员豁免 ⇒ 红在 `:348`**。这一发是**补实现腿自认的空白**：它说"要 runner 那个条件、
+    本地无法造"⇒ 本裁决判该理由不成立（断言判的是"通知里不得含 member 的 SID"，与 LA 是不是当前用户无关；
+    本机 member=`S-1-5-32-544`），**能造就造**，现已打红。
+
+  **AC#5**：**已达成，不再是"欠 push 后复跑"**。run **`42605029431`** / job **`129118693717`**（`test-windows`）/
+  **step 4** `Windows ACL sealing gate` = **`success`**，head `18ce9f5bc` = 本裁决锚点 = 当前 `dev` HEAD。
+  该步四数逐字 `=== RUN=129  --- PASS=78  --- FAIL=0  --- SKIP=0`，结果行 `ok ... internal/winsec 7.887s`。
+  三条红的用例在这枚 run 上各自 `--- PASS`；**"集合内主体不得被报告"这条腿也真跑到并过了**
+  （`:314` 打印 `planted as strangers: [S-1-1-0 S-1-5-32-546]; planted as a private-set member: S-1-5-21-...-500 (in set: true)`，
+  随后 `:348`/`:352` 未被 Fatalf 打断）⇒ 实现腿记的"这条腿结案证据仍欠着"**已补齐**。
+  连续五枚 run（`42565983659`/`42572132704`/`42572328515`/`42578363048`/`42578644540`）step 4 全 `success`。
+  ⚠ 说清一个读数：run `42605029431` **整体 conclusion = failure**，但红的是 **step 7（cmd/wisp CLI tests）与 step 10
+  （Portable windows tests）**，**不是 step 4**；AC#5 判的是这一步（票 111 AC#6 已把判据改成 per-step），
+  故"job 红"不抵消"step 4 绿"，step 7/10 属别的票、不在本票射程。
+
+  **门禁**（零产码，导出树）：`gofumpt -l internal/winsec/` 输出空 rc=0 · `go build ./...` rc=0 ·
+  `go vet ./internal/winsec/` rc=0 · `sh scripts/d22scan.sh` **clean** rc=0（ban #8 internal/ = 972 Go files 含注释与 `_test.go`）·
+  `bash scripts/check-path-length-budget.sh` **VERDICT GREEN**（tracked=19225, over-budget=63, roster=63, not in roster=0）rc=0。
+
+  **与实现腿自述的两处出入（如实登记）**：①"AC#5 欠 push 后复跑"已不再欠（后续推送已带上 `dev`）；
+  ②"成员豁免腿没有变异打红"这个自认可以销掉（MUT5 已打红）。两处都是对实现腿**过谦**的更正，不是指控。
+  未碰 `cmd/wisp`／`internal/**`（只读）／`frontend`／`forks`／thresholds／golden；未改任何 AC 原文。
+  next= 无（票结案）。若编排者要复核，唯一入口＝`docs/evidence/s1/112-verify-r1.md`。
 
