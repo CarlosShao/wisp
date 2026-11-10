@@ -1,0 +1,6 @@
+# The start-anchor blob (ticket 417) is a byte-exact frozen copy of
+# internal/risk/blacklist.go AS COMMITTED at 29d258f9; its sha256 is stated in
+# riskwordlist_test.go. text=auto alone lets a Windows re-checkout (core.autocrlf
+# =true) rewrite it to CRLF, which would break that byte-exactness claim. Same
+# pin shape the repo already uses for its .sse goldens.
+*.go.txt text eol=lf
