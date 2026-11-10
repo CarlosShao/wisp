@@ -2,10 +2,11 @@ package main
 
 // Ticket 350's own tests: the bounded wordlist gate (ban #10), AC#1③.
 //
-// Everything here runs on THROWAWAY fixtures (t.TempDir()) or on blobs read
-// out of this repository's git objects - never by editing the shared tree: the
+// Everything here runs on THROWAWAY fixtures (t.TempDir()) or on the byte-
+// exact embedded start-anchor blob - never by editing the shared tree: the
 // start-anchor control (AC#1①) materialises the committed bytes of
-// internal/risk/blacklist.go at the START anchor 29d258f9 into a fixture,
+// internal/risk/blacklist.go at the START anchor 29d258f9 (frozen into
+// testdata/blacklist_29d258f9.go.txt, ticket 417) into a fixture,
 // re-scans, and requires the red to be EXACTLY aEquiv; the delivery-side
 // control (AC#1②) is the real tree's own scan, which must examine >0 risk
 // files and stay green.
@@ -13,18 +14,18 @@ package main
 // THE CONTROL TREE, stated plainly (measured, not assumed): these tests were
 // written and run inside a `git clone --shared` of the main worktree at HEAD
 // d0a230547 (rule-21 isolation; the main tree carried no in-flight file under
-// tools/d22scan or docs/evidence/s1/350-* at leg start). The git-object
-// controls therefore read internal/risk/blacklist.go AS COMMITTED at HEAD and
-// at 29d258f9 - which is exactly what AC#1① wants judged (the committed
-// tree's own state) - and they stay stable no matter what other legs hold
-// uncommitted in the shared tree.
+// tools/d22scan or docs/evidence/s1/350-* at leg start). Since ticket 417 the
+// start-anchor bytes are frozen into testdata (go:embed) instead of read out
+// of git objects, so the control judges exactly what AC#1① wants judged (the
+// committed tree's own state at 29d258f9) and stays stable no matter what
+// other legs hold uncommitted in the shared tree - or how shallow the clone.
 
 import (
+	_ "embed"
 	"fmt"
 	"go/parser"
 	"go/token"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -45,21 +46,38 @@ func repoRoot(t *testing.T) string {
 	return root
 }
 
-// writeBlobAt materialises <base>/<rel> with the EXACT bytes of <rev>:<rel>
-// from the repository at repoRoot (git show), creating parent dirs. The base
+// startAnchorBlacklistBlob is the byte-exact content of
+// internal/risk/blacklist.go AS COMMITTED at the START anchor 29d258f9
+// (git show 29d258f9:internal/risk/blacklist.go, 16819 bytes,
+// sha256 bc00f4eab8617b96b1bfb83ada903d6df16058de3f010f19d7c10f843314aad1).
+//
+// It is embedded via go:embed instead of read out of the repository's git
+// objects at test time, because a test that depends on git-history
+// availability is not hermetic: CI checks the repo out with the default
+// fetch-depth=1 (a shallow clone), the anchor commit is not present there,
+// and `git show 29d258f9:...` would fail with exit 128 - the control would
+// read as a broken instrument instead of a verdict. Freezing the blob into
+// the package's testdata (ticket 417) keeps the control self-contained: the
+// committed bytes it judges are committed next to the test, and the control
+// no longer moves when clone depth does. Embedding the same bytes as a raw
+// string literal was rejected on shape: the blob contains 52 backticks, so a
+// raw literal would have to be split into 53 concatenated segments - noise
+// with no added fidelity over go:embed, which carries the exact bytes too.
+
+//go:embed testdata/blacklist_29d258f9.go.txt
+var startAnchorBlacklistBlob []byte
+
+// plantStartAnchorBlacklist materialises <base>/internal/risk/blacklist.go
+// with the EXACT embedded start-anchor bytes, creating parent dirs. The base
 // is a t.TempDir() fixture, never the repository: the blob is planted in a
 // throwaway tree and the shared tree is never edited for a control.
-func writeBlobAt(t *testing.T, repoRoot, rev, rel, base string) {
+func plantStartAnchorBlacklist(t *testing.T, base string) {
 	t.Helper()
-	out, err := exec.Command("git", "-C", repoRoot, "show", rev+":"+rel).Output()
-	if err != nil {
-		t.Fatalf("git show %s:%s: %v", rev, rel, err)
-	}
-	dst := filepath.Join(base, filepath.FromSlash(rel))
+	dst := filepath.Join(base, "internal", "risk", "blacklist.go")
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(dst, out, 0o644); err != nil {
+	if err := os.WriteFile(dst, startAnchorBlacklistBlob, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -109,13 +127,13 @@ func phantomFindings(s *scanner) []string {
 // - the comment-cited symbol that no declaration in the package defines - and
 // on nothing else under this tag.
 func TestRiskWordlistStartAnchorControlIsExactlyAEquiv(t *testing.T) {
-	root := repoRoot(t)
 	fixture := gateFixture(t)
-	// blacklist.go at 29d258f9: its comments cite aEquiv (the ticket's real
-	// positive) plus the package-declared aAnyForm/aEq/aRelates/aRuleReason/
-	// aUnder. Its package is `risk`. The census behind "exactly one phantom
-	// citation in this blob" is docs/evidence/s1/350-bounded-wordlist-gate.md.
-	writeBlobAt(t, root, "29d258f9", "internal/risk/blacklist.go", fixture)
+	// blacklist.go at 29d258f9 (the byte-exact embedded copy): its comments
+	// cite aEquiv (the ticket's real positive) plus the package-declared
+	// aAnyForm/aEq/aRelates/aRuleReason/aUnder. Its package is `risk`. The
+	// census behind "exactly one phantom citation in this blob" is
+	// docs/evidence/s1/350-bounded-wordlist-gate.md.
+	plantStartAnchorBlacklist(t, fixture)
 
 	s := scanFixture(t, fixture)
 	checkWalkRan(t, s)
