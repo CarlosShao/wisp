@@ -41,13 +41,25 @@ import "sort"
 // anything is written, the same way provider_billing's enum is.
 const FieldBallStyle = "ball_style"
 
+// FieldBallSize is ball.size, the orb's diameter in px. Value = the integer
+// px as its string ("90"); the 44..160 band is enforced in internal/config
+// before anything is written - SetBallSize refuses with validate.go's own
+// ballSizeRangeError, the single-sourced sentence the load gate uses, so the
+// write refusal and the load failure can never diverge. Ticket 422 grew this
+// roster from one field to two (the 413 contract named the landing here, not
+// in a fifth roster, and the disjointness pins stay untouched by the same
+// argument the file comment above makes).
+const FieldBallSize = "ball_size"
+
 // fields65 is the roster this file owns, sorted at the accessor.
 var fields65 = []string{
+	FieldBallSize,
 	FieldBallStyle,
 }
 
-// fields65TakesValue: the one field needs the envelope's plain value half.
+// fields65TakesValue: both fields need the envelope's plain value half.
 var fields65TakesValue = map[string]bool{
+	FieldBallSize:  true,
 	FieldBallStyle: true,
 }
 

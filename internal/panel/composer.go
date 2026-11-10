@@ -141,6 +141,23 @@ type Snapshot struct {
 	// with it - the write half rides config.set's ball_style field
 	// (config_write_65.go).
 	BallStyle *BallStyleSection `json:"ballStyle,omitempty"`
+	// BallSize is ticket 413's carrier, landed by 422: the orb diameter the
+	// live config holds and the band the size slider may offer. See
+	// ball_size_413.go for the shape.
+	//
+	// It is a pointer with omitempty for the same reason the fields above
+	// are: a pump assembled WITHOUT the reader sends no key, which is the
+	// exact shape the four-key byte nails pin, and a pump that has one
+	// always sends the key. The page-side declaration for this key is not
+	// written yet (frontend/** is the external UI agent's write face, Q-51),
+	// so the two-way reconciliations against frontend/src/lib/panel.ts judge
+	// it through the gap ledger (composerTSGapLedger's PanelSnapshot entry)
+	// until the UI leg moves panel.ts: when that declaration lands the ledger
+	// entry goes stale-red by its own both-ways rule, forcing the ordinary
+	// comparison to take over in the same move. No C17 method arrives with
+	// it - the write half rides config.set's ball_size field
+	// (config_write_65.go).
+	BallSize *BallSizeSection `json:"ballSize,omitempty"`
 	// Run is ticket 145's working-state carrier: the tool calls that ended
 	// (with their booked args), the calls in flight right now, the task's
 	// cumulative usage, the reasoning streamed so far, the last classified

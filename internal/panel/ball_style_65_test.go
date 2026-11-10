@@ -31,8 +31,10 @@ import (
 // admitted by the union and by both helper unions (the refusal text and the
 // empty-value check), and none of the three older rosters grew to carry it.
 func Test65RosterJoinsTheUnionWithoutMovingOlderPins(t *testing.T) {
-	if got := WritableFields65(); !reflect.DeepEqual(got, []string{FieldBallStyle}) {
-		t.Fatalf("WritableFields65() = %v, want exactly [ball_style]", got)
+	// Ticket 422 grew this roster to two fields (ball_size joined ball_style
+	// here, per the 413 contract's landing note); the pin stays exact-set.
+	if got := WritableFields65(); !reflect.DeepEqual(got, []string{FieldBallSize, FieldBallStyle}) {
+		t.Fatalf("WritableFields65() = %v, want exactly [ball_size ball_style]", got)
 	}
 	if !knownWritableField(FieldBallStyle) {
 		t.Fatalf("knownWritableField refuses %q - the union admission is gone and the settings door would refuse the appearance switch on a live machine", FieldBallStyle)

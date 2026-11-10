@@ -125,8 +125,12 @@ func TestApprovalCardViewJSONKeysMatchFrontendTypes(t *testing.T) {
 		if !ok {
 			t.Fatalf("frontend/src/lib/panel.ts declares no interface %s - the contract was renamed on one side only", p.tsIface)
 		}
-		if missing := subtract(goKeys, tsKeys); len(missing) > 0 {
-			t.Errorf("Go %s emits %v that interface %s does not declare", p.name, missing, p.tsIface)
+		// Same judged-gap engine the composer ruler uses (ticket 422): an
+		// unregistered Go-only key is red, a ledger entry is the 415
+		// registration procedure judged both ways. The TS-only check below
+		// stays unconditional.
+		for _, v := range topLevelGapViolations(goKeys, tsKeys, p.tsIface, composerTSGapLedger()) {
+			t.Errorf("%s <-> %s: %s", p.name, p.tsIface, v)
 		}
 		if extra := subtract(tsKeys, goKeys); len(extra) > 0 {
 			t.Errorf("interface %s reads %v that Go %s never sends - those fields render as undefined", p.tsIface, extra, p.name)

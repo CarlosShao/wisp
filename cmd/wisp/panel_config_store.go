@@ -286,6 +286,20 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		// setter 在落盘前把关（320 裁定的同一条形状）；盘上的 [ball].style 键、
 		// 校验与 glass 默认是票 65 实现腿（30d8f2e38）早已落的，这里只接写入腿。
 		written, err = s.mgr.SetBallStyle(w.Value)
+	case panel.FieldBallSize:
+		// 票 413 契约 §2.2、由 422 接线：值＝整数 px 的字符串（"90"）。44..160
+		// 的带由 config 侧 SetBallSize 先拒后写，拒绝句＝validate.go 的
+		// ballSizeRangeError 单源句，与加载闸逐字同一串，永不分叉；这里只在值
+		// 根本不是整数时替它答一句形状话（上面 222 行 [llm] 数值字段的同款）。
+		// 档位静态答 restart（下面盖的默认档，无需改判）：size 没有 65 那种进程
+		// 内 applier，球窗几何在建窗时从开机种子读定，写完内存热生效但可见直径
+		// 要等下次建窗——像 187 的静态标法，不像 ball_style 要实测。
+		v, perr := strconv.Atoi(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 44..160 的整数（px），收到的值解析不了", w.Field)
+		}
+		written, err = s.mgr.SetBallSize(v)
 	case panel.FieldProviderCredential:
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
 			fmt.Errorf("凭据值不走这条写入路径（它只写不回显，必须走 StoreCredential），字段 %q 未落盘", w.Field)

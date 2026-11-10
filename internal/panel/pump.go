@@ -239,6 +239,15 @@ type PumpSources struct {
 	// a reader that exists always sends the key, with the schema's vocabulary
 	// rendered as [] if it ever came back nil.
 	BallStyle func() BallStyleSection
+	// BallSize reads the snapshot's size dimension (ticket 413, wired by
+	// 422): the orb diameter the live config holds and the schema's own band,
+	// read off the live config by the assembly root (internal/config's
+	// BallSizeOptions is the production reader). It is a reader like every
+	// field above; a nil reader is the ONLY way the packet carries no
+	// "ballSize" key at all - the shape the four-key byte nails pin - and a
+	// reader that exists always sends the key, a not-yet-configured diameter
+	// traveling as the section's Size 0 rather than as a vanished key.
+	BallSize func() BallSizeSection
 	// Run reads the working-state section (ticket 145): the ended tool rows,
 	// accumulated reasoning, last classified error and stuck sentence the
 	// assembly root's RunFeed holds. The console sink's event switch already
@@ -469,6 +478,15 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			sec.Vocabulary = []string{}
 		}
 		snap.BallStyle = &sec
+	}
+	if p.src.BallSize != nil {
+		// Ticket 413/422: same reader-gated rule one block up - a reader that
+		// exists always sends the key. The diameter and the band travel
+		// verbatim from the config side; the pump invents nothing and
+		// normalizes nothing (the fields are ints - there is no nil slice
+		// here to render as []).
+		sec := p.src.BallSize()
+		snap.BallSize = &sec
 	}
 	if p.src.Run != nil {
 		// Ticket 145: same reader-gated rule one block up - a reader that

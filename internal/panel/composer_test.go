@@ -77,14 +77,20 @@ func TestComposerContractTypesMatchFrontend(t *testing.T) {
 		{"AttachmentRef", AttachmentRef{}, "ComposerAttachment"},
 		{"ResultChunk", ResultChunk{}, "ResultChunkView"},
 	}
+	ledger := composerTSGapLedger()
 	for _, p := range pairs {
 		goKeys := jsonKeysOf(p.goType)
 		tsKeys, ok := tsInterfaceKeys(text, p.tsIface)
 		if !ok {
 			t.Fatalf("frontend/src/lib/panel.ts declares no interface %s - the composer contract was renamed on one side only", p.tsIface)
 		}
-		if missing := subtract(goKeys, tsKeys); len(missing) > 0 {
-			t.Errorf("Go %s emits %v that interface %s does not declare", p.name, missing, p.tsIface)
+		// Go-only keys go through the same judged-gap engine the nested walk
+		// uses (topLevelGapViolations): unregistered drift is red, a ledger
+		// entry is the 415 registration procedure, and the ledger is judged
+		// both ways so it cannot rot. The TS-only check below stays
+		// unconditional - a registered gap never softens it.
+		for _, v := range topLevelGapViolations(goKeys, tsKeys, p.tsIface, ledger) {
+			t.Errorf("%s <-> %s: %s", p.name, p.tsIface, v)
 		}
 		if extra := subtract(tsKeys, goKeys); len(extra) > 0 {
 			t.Errorf("interface %s reads %v that Go %s never sends - those fields render as undefined", p.tsIface, extra, p.name)
@@ -194,6 +200,17 @@ func composerTSNameMap() map[string]string {
 // eleven times and any movement on either side flips the ruler red.
 func composerTSGapLedger() map[string][]string {
 	return map[string][]string{
+		// Ticket 422's TOP-LEVEL entry: the snapshot's ballSize key is live on
+		// the Go wire (ticket 413's carrier, wired by 422) and
+		// PanelSnapshot does not declare it yet - the page half belongs to
+		// the external UI agent (frontend/** is outside every Go leg's write
+		// face, Q-51; the 413 contract §2.1 names the declaration as its
+		// deliverable). Registered, never silenced: the pairs-table
+		// reconciliation below judges this entry both ways like the nested
+		// walk does, so the moment panel.ts declares ballSize the stale-red
+		// fires and the ordinary two-way comparison takes over - the ledger
+		// may never stand between the two sides once the gap is gone.
+		"PanelSnapshot":      {"ballSize"},
 		"ModelOptionView":    {"display"},
 		"ModelSwitchSection": {"adapter", "adapterThinkingLevels"},
 		"ToolRunRowView":     {"argsJson", "level"},
@@ -201,6 +218,51 @@ func composerTSGapLedger() map[string][]string {
 		"RunSection":         {"running", "usage", "done"},
 		"GitView":            {"uncommitted", "diff"},
 	}
+}
+
+// topLevelGapViolations judges the pairs-table half against the same gap
+// ledger the nested walk uses (ticket 415's engine, now reaching the six
+// top-level pairs too - ticket 422's ballSize landing needed the same
+// registered-gap procedure at the top level, and a ruler that treated the
+// same fact red at one depth and judged at the other would be two rulers).
+// Same contract as nestedContractViolations, scoped to one pair:
+//
+//   - a Go-only key is either a ledger entry (judged gap) or fresh drift
+//     (red, naming the key);
+//   - a ledger entry whose gap closed (panel.ts declares it now) is red -
+//     stale registration, delete the entry;
+//   - a ledger entry Go stopped emitting is red - dead registration.
+//
+// TS-only keys are NOT judged here; every pairs site keeps its own
+// unconditional extra-keys check, which this helper never softens.
+func topLevelGapViolations(goKeys, tsKeys []string, tsIface string, ledger map[string][]string) []string {
+	registered := map[string]bool{}
+	for _, k := range ledger[tsIface] {
+		registered[k] = true
+	}
+	tsHas := map[string]bool{}
+	for _, k := range tsKeys {
+		tsHas[k] = true
+	}
+	goHas := map[string]bool{}
+	for _, k := range goKeys {
+		goHas[k] = true
+	}
+	var out []string
+	for _, k := range goKeys {
+		if !tsHas[k] && !registered[k] {
+			out = append(out, "Go emits "+k+" and interface "+tsIface+" does not declare it - register it in composerTSGapLedger ONLY with a judgement, never to silence it")
+		}
+	}
+	for _, k := range ledger[tsIface] {
+		if tsHas[k] {
+			out = append(out, "stale gap registration: interface "+tsIface+" declares "+k+" now - delete the ledger entry so the ordinary two-way comparison judges it")
+		} else if !goHas[k] {
+			out = append(out, "dead gap registration: Go no longer emits "+k+" - delete the ledger entry")
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 // nestedContractViolations walks goRoot's json shape against tsText and

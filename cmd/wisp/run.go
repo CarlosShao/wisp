@@ -1150,6 +1150,19 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 			v := mgr.BallStyleOptions()
 			return panel.BallStyleSection{Style: v.Style, Vocabulary: v.Vocabulary}
 		},
+		// Ticket 413's size dimension, wired by 422: the orb diameter the
+		// live config holds and the schema's own 44..160 band, read off this
+		// run's own Manager by internal/config's BallSizeOptions (the
+		// production reader) - the same Manager the settings leg above
+		// (rt.settings) writes through, so the slider shows what the next
+		// ApplySetting would act on. The values travel verbatim; this literal
+		// spells neither 44 nor 160. Without this line the snapshot carries
+		// no "ballSize" key at all (the reader-gated 213/187/65 shape), which
+		// is the exact assembly gap the 413 contract named for the panel leg.
+		BallSize: func() panel.BallSizeSection {
+			v := mgr.BallSizeOptions()
+			return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
+		},
 		// Ticket 145's hop 2, the working-state reader: the feed the sink
 		// fills (Publish's EvToolEnd / EvReasoningDelta / EvError / EvStuck
 		// branches) hands its Section here, so the packet's top-level "run"
