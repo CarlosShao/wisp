@@ -33649,3 +33649,41 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 ### 六、下一手
 - 收 wave111 任一枚 ⇒ **同轮派 wave112**（418 / 413 / 415 / 416 按写面互斥配平）。
 - 推送只由编排者做、只推 origin/dev。
+## A1676（2026-11-10 16:4x，编排者）**wave111 收件：417＋419 两腿落地上账（自己复跑绿）｜420 空返回失败｜wave112 已派**
+
+### 一、wave111 三腿收件（`workflow-0c6ccf82fdf84230`，三把尺逐腿核）
+| 腿 | 结果 | 盘上证据（现跑） | 自己复跑 | 提交 |
+|---|---|---|---|---|
+| **417** | ✅ 落地 | `writeBlobAt` 已删、`//go:embed testdata/blacklist_29d258f9.go.txt` 在 | `go test .` in `tools/d22scan` ⇒ **PASS 0.07s／全包 ok 50.891s** | `def465091`＋`9bb75d8d2` |
+| **419** | ✅ 落地 | `config_readers_255.go:177` 名册 token 已 `44..160`；`sectionReadSites["Ball"]` 填两读者 | `go test ./cmd/wisp -run TestTicket255Roster*` ⇒ **ok 1.430s** | `dd2974e73` |
+| **420** | ❌ **空返回** | `.gitattributes` 无 html/assets 规则；两资产仍 **341／4346 行 CRLF** | — | **无提交** |
+
+**⇒ 已推 origin/dev（`def465091`/`9bb75d8d2`/`dd2974e73`），未推=0。**
+
+### 二、417 的关键裁定（腿自判，记下来）
+- 选 **ⓒ 测试自足**，但形状＝**`go:embed` + `testdata/` 文件**（非字符串常量）——理由：blob 16,819 字节含 **52 个反引号**，raw string 常量须切 53 段纯噪音；Go 主流对 >16KB fixture 就是 `testdata/`+embed，编译期内嵌、字节精确、浅克隆自足。
+- 附带：`tools/d22scan/testdata/.gitattributes` 追加 `*.go.txt text eol=lf`（仿 `*.sse` golden 先例，防 Windows 重检出破 sha256）。
+- 同族 `exec.Command("git"` 全仓逐枚判：只 `riskwordlist_test.go:54` 同病（已除），其余（`scan_test.go:1399/2164`、`internal/panel` 两枚、`cmd/wisp` 5 处）均非同病（临时仓/`rev-parse`/浅克隆有 HEAD）——有逐条理由。
+
+### 三、419 的关键裁定（腿自判）
+- 判**保持 `no-reader`**（不升 `other-process`）：`.Style` 两读点各是一次新鲜 `config.LoadFile`（不重读活 Manager），`wisp run` 两处都不建 ⇒ 热改到不了运行中进程；且活体对照测试 `TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere`（:777）逐字钉住 [ball] ledger 行须含 `no-reader`。**诚实与既有钉子同向。**
+- 名册行 :167→:177（写面注释加高所致），token 唯一命中判据不受影响。
+- ⚠ 第一跑误抬 `CGO_ENABLED=0` 撞 sherpa build-constraint（票面预告过的），去掉即正常。
+
+### 四、420 为什么失败
+- 空返回、零改动。**未查明具体原因**（工作流只回空串，无 stderr）。⇒ 重派（见五），并在重派 prompt 里显式提示"上一腿空返回"。
+
+### 五、wave112 已派（`workflow-07a12bd526b14107`，三腿同波）
+| 腿 | 票 | 写面 |
+|---|---|---|
+| **420-crlf-retry** | 420 | `.gitattributes`＋`internal/ball/assets/**` |
+| **415-ruler** | 415（R-145-2） | `internal/panel/**`（尺伸嵌套 section） |
+| **416-writeside** | 416（R-145-3） | `internal/config/**`（写面档位判定） |
+**互斥核**：三包两两不同、均**非 cmd/wisp** ⇒ 可并行。**413（cmd/wisp）留 wave113 独占。**
+派单存档：`420-crlf-retry-dispatch.txt`／`415-contract-ruler-dispatch.txt`／`416-writeside-thinking-dispatch.txt`。
+
+### 六、球尺寸
+- 机主未答 90 ⇒ 按之前告知的 **56–90** 实施（可撤）。413 派下时生效。
+
+### 七、撤销口令
+- 「**420 撤回**」「**415 撤回**」「**416 撤回**」各自作废对应票。
