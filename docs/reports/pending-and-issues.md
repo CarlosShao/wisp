@@ -33784,4 +33784,17 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 待关余量（现量）
 - 已落地未关：**413／414／417／418／419／420**（6 张）。
-- 其中 417 AC#5／418 AC#6／419 AC#7／420 AC#7 有 CI 侧验证；413 AC#2 已按 A1678 裁定重述。
+- 其中 417 AC#5／418 AC#6／419 AC#7／420 AC#7 有 CI 侧验证；413 AC#2 已按 A1678 裁定重述。## A1681（2026-11-10 18:5x，腿 194-wisp）**票 194 分批落地第一枚：cost.summary 入向名册＋路由＋处理器＋页面镜像缺口台账；三枚受阻拼写具名停报**
+
+- **owner 裁定溯源**：A381「按当前规格补一下，别搞债务了」＋A384 裁定①③＋票面 Progress log `194-cost-table`（11-07）裁定「乙堆先行、四枚最低价可同批」。本腿起手锚 `e90ea3cf`（现跑 HEAD，较 11-07 表 `a1c3f245b` 已推进 14 枚 commit，全部读数现跑不抄票面）。
+- **落地（写面＝internal/panel/**，只 commit 不 push）**：
+  - `cost.summary`（SPEC-08:166 逐字）全链落地：`bridge.go` 常量 `MethodCostSummary`（追加式，四枚 `panel.*` 旧常量顺序命名未动，`git_test.go` 抽取器读数保持 4）＋守卫 case 单行延伸（l2/253 两仪器的锚形状，带回行注释钉住）＋`composer_dispatch.go` 接口 `CostSummaryHandler`／插座 `Costs`／case＋`cost_handlers.go` 处理器（`CostReader` 接口＝只读面声明、整数微单位、`wisp-cost-summary:` payload 行、选择子全拒）。
+  - 尺的登记摩擦照程序走：`inbound_roster_253_test.go` 名册 7→8、非前缀 3→4（两计数＋plant 串同 commit 移动）；`bridge_test.go` 新增 `rosterPageGapLedger194` 页面镜像缺口台账（**加牙不弱化**：未登记未镜像仍红＝plant 正控保留；台账双向审计＝守卫不答＝幻影登记红、页面开始携带＝过期登记红）。理由：`frontend/src/lib/panel.ts` 归外部 agent（Q-51），票 114 AC#8 门的两句处置里没有本腿可走的第三句，按仓内既有 `composerTSGapLedger` 先例登记而非绕过。
+  - 测试：`cost_roster_194_test.go`（AC#4① 名册外拒＋审计、② 只读无裁决通路、③ RequestID/Source 逐字透传；nil 插座按名拒绝；payload 空渲染 [] 不 null；四枚受阻拼写拒绝常驻）。
+- **三枚受阻拼写（AC#1 四问现跑，均未落地、未起别名、未改仪器）**：
+  1. `approval.current`/`approval.queue`（SPEC-08:166）：**撞死冻结仪器** `l2_grant_boundary_test.go` 的 `grantRouteWords`（:184/:192-195 含 "approval"）＋`TestAnsweredPanelRoutesCarryNoApprovalDecision`（:1222-1239）。AC#6 明列该文件不动 ⇒ **规格表与 ban#6 仪器正面冲突，须机主拍**（改仪器＝改判据、改规格＝改契约文字，两条都不归腿）。
+  2. `tasks.list`/`task.detail`（SPEC-08:164）：**撞 `internal/tools` 票 188 仪器** `task_state_188_test.go:323-339`（任何值含 "task"/"state" 的 Method* 常量＝面板写腿，正控含 `MethodTaskStateWrite`）。该包在本腿写面外 ⇒ 停手。腿侧已验证：task 门只落 internal/panel 半边时 `internal/tools` 红 2 枚；整体退回后绿。**建议**（归编排者）：188 仪器按读写分形收窄（读门豁免＋正控保留），或机主另批。
+- **诚实边界（AC#5）**：`cost.summary` 今天**无真听众**——装配 `newComposerDispatchChain` 在 `cmd/wisp/panel_inbound.go:281-359`（生产码），本腿派单禁改 ⇒ nil 插座按名拒绝（`ErrNoHandlerAttached`＋审计）。下一波 cmd/wisp 写腿接 `memory.Store.ListCostDaily`（`dao_misc.go:169`）适配器即通。
+- **门禁读数（全绿）**：gofumpt（绝对路径）`internal/panel/` 空；`go vet ./internal/panel` rc0；`go build ./cmd/... ./internal/... ./tools/...` rc0（⚠ `go build ./...` 红于未跟踪在飞件 `build/mut_rvw.go`（别人的变异模板，登记未动）；`go test -count=1`：panel **ok 21.4s**／tools **ok 36.2s**／config **ok 4.0s**；risk 单包 **ok 13.6s**；d22scan **clean**（bans #1-5 internal/=390、cmd/=65、ban#8 internal/=976 全扫 0 违规）；path-length **VERDICT GREEN**（62/62 roster）；gate-clauses **14/14 相符、聚合退码 0**。
+- **反向判据（成对在跑）**：plant 正控 4 发（188 仪器）＋`config.unmirrored114` plant（镜像门）＋253 三 plant（未登记名）全部保持红能力＝套件绿中含正控；ledger 双向审计红路径由 plant 形状证明。
+- **撤销口令**：「194 第一枚撤回」（revert 本 commit 即恢复 7 枚名册原状；台账三条只追加不删）。

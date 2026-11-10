@@ -73,6 +73,38 @@ const (
 	// local signed model repository (SPEC-08 sec 5.2, ticket 29/D26), so the
 	// settings namespace is where this route belongs.
 	MethodModelsList = "config.models.list"
+	// MethodCostSummary is ticket 194's one landed roster name (batch 1): the
+	// read-only cost door from docs/specs/SPEC-08-ui-ball-panel.md:166, the spec
+	// table this ticket was filed to align the code with (owner ruling A381).
+	// The same three naming facts the settings pair above records hold here too,
+	// so they are stated once more and then relied on:
+	//
+	//   - The spelling is the spec's, not a fourth vocabulary minted here.
+	//   - No `panel.` prefix (ticket 181's extractor counts those literals, and
+	//     git_test.go's whitelistMethodsFromSource wants exactly the four it
+	//     already finds), and no word of the grant-boundary instrument's verdict
+	//     vocabulary.
+	//   - The door answers with a receipt sentence plus one payload line, the
+	//     settings-route shape: there is no second voice to defer to for a
+	//     summary.
+	//
+	// Why ONE name and not the ticket's full batch: the two sibling spellings
+	// this batch measured are blocked by two frozen instruments, not by choice -
+	// approval.current / approval.queue by l2_grant_boundary_test.go's
+	// grantRouteWords (any answered route carrying an approval word is red), and
+	// tasks.list / task.detail by internal/tools' ticket-188 task-axis scan
+	// (task_state_188_test.go flags every Method* constant whose value contains
+	// "task"/"state" as a panel-side write leg, and that package is outside this
+	// ticket's write surface). Both blockers are named with their rulers in the
+	// ticket evidence; neither door is landed under an alias, and neither
+	// instrument is edited here.
+	//
+	// The page literal half of ticket 114 AC#8's mirror gate is registered, not
+	// dodged: this name sits in bridge_test.go's roster page-gap ledger
+	// (frontend/src/lib/panel.ts is an external agent's write surface, Q-51) with
+	// teeth - an entry the page starts carrying goes red, and an unregistered
+	// unmirrored name still goes red exactly as before.
+	MethodCostSummary = "cost.summary"
 )
 
 // ErrComposerRequest is every way a composer request can fail to be usable.
@@ -153,7 +185,12 @@ func ParseComposerRequest(raw string) (ComposerRequest, error) {
 
 func knownComposerMethod(m string) bool {
 	switch m {
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList:
+	// One comma-separated line, and that is load-bearing: the frozen
+	// grant-boundary instrument (l2_grant_boundary_test.go) and the closed-roster
+	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
+	// exact one-line form, so wrapping it would leave real plants replacing
+	// nothing. Appending a constant means extending this line, deliberately.
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary:
 		return true
 	}
 	return false

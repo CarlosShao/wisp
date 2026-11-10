@@ -105,3 +105,12 @@ git --no-pager grep -n 'disp\.Handle(' HEAD -- cmd internal | grep -v '_test.go'
 - **分堆（18 invoke）**：甲已落地 **4**（`config.get`/`config.set`/`models.list`(拼写待裁)/`panel.resync`(仅出向半边)）｜乙地基已在 **9**（`tasks.list`/`task.detail`/`history.query`/`approval.current`/`approval.queue`/`grants.list`/`privacy.purge`/`privacy.export`/`cost.summary`/`diagnostics.export`）｜丙没货 **5**（`transcript.get`/`models.delete`/`approval.decide` reject 支/`grants.revoke`/`config.set` 安全节分支(195 已内建)）——乙丙枚数含跨界件，逐枚归属见表。**具名用例**：已落地 3 枚有用例（248/313/320 件），未落地 16 枚**产码＋测试双侧字面量全零**（本轮现跑）。
 - **裁定（写进表 §2）**：落地顺序＝乙堆先行（`tasks.list`/`task.detail`/`approval.current`/`cost.summary` 四枚最低价可同批）→丙堆**逐枚 A## 批准**后落→丁堆 5 枚事件**单独立出向名册**（⛔ 混进 `bridge.go` 入向常量，c1 §10#8 建议今天维持）；**集线器**＝`bridge.go`（23 枚入向名全过 `knownComposerMethod` `:154-159`）＋次级集线器 `composer_dispatch.go` 的 `dispatch` switch（`:199-237`）与装配 `newComposerDispatchChain`（`panel_inbound.go:264-347`）——动一枚过「常量→case→interface/handler→装配」四件套，但 248/320 先例证明**追加式改动不撞** `composer_test.go:502` 那枚钉。**A384 裁定③「先片 B 后名册」被盘上事实追平**：真实听众已在（`Handle` 调用者 2 枚），本票从收件类回到可派写腿，不再等票 33。
 - **纪律自证**：零产码（`internal/**`/`cmd/**`/`go.mod`/`docs/PLAN.md`/`docs/specs/**` 零字节）；在飞件具名登记未动（wave62＝`internal/ball` 四枚 M；323＝`cmd/wisp` 两枚未跟踪）；零 Go 改动 ⇒ gofumpt/vet **无对象可扫**；写面仅两处＝代价表＋本节追加；只 commit 不 push。
+
+## 2026-11-10 落地腿（`194-wisp`，锚 `e90ea3cf`）：代价表四枚批次现量后只落成 1 枚——两把冻结仪器把另外三枚拦死，具名停报
+
+- **读数全部现跑**（锚已自 `a1c3f245b` 推进 14 枚 commit）：`Handle` 生产调用者 2 枚、前端 `panel.ts` 不携带乙堆任何名字、起手 panel 包已绿（3 枚在册红已被 415/421 关闭）。表＝`docs/evidence/s1/194-batch1-cost-door-r1.md`；台账＝**A1681**。
+- **落地（写面 internal/panel/**）**：`cost.summary` 全链（常量→守卫→路由→处理器→测试）＋253 尺登记摩擦（7→8／3→4）＋`bridge_test.go` 新增 `rosterPageGapLedger194` 页面镜像缺口台账（加牙不弱化：plant 正控保留、幻影/过期登记双向红）。四枚 `panel.*` 旧常量顺序命名未动。
+- **受阻三枚（未落地、未起别名、未改仪器）**：① `approval.current`/`approval.queue` 撞死冻结 l2 仪器词表（`grantRouteWords` 含 "approval"）⇒ **规格表 vs ban#6 仪器冲突＝机主拍**；② `tasks.list`/`task.detail` 撞 `internal/tools` 票 188 仪器（值含 task/state 的 Method* 常量＝写腿，正控可证）⇒ 包在本腿写面外，停手；腿侧实测退回后 tools 包绿。③ 代价表「approval.current 改动面=1 低」与「四枚可同批」在今日树上**不成立**，据此修正。
+- **AC#5 诚实边界**：`cost.summary` 今天无真听众（装配在 cmd/wisp 生产码，禁改）——nil 插座按名拒绝＋审计；下一波 cmd/wisp 写腿接 `ListCostDaily` 适配器即通。
+- **门禁全绿**：gofumpt 空／vet rc0／build 目标面 rc0（`./...` 红于未跟踪在飞件 `build/mut_rvw.go`，登记未动）／panel 21.4s＋tools 36.2s＋config 4.0s＋risk 13.6s 全 ok／d22scan clean（ban#8 internal/=976 零违规）／path-length GREEN（62/62）／gate-clauses 14/14 聚合退码 0。
+- AC 七格一格未勾（勾归非实现者）；只 commit 不 push。

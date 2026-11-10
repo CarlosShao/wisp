@@ -10,8 +10,9 @@ package panel
 // §4), and it is the reason the mode write leg at composer_handlers.go:141 has
 // been written and assembled with nobody able to ring it. This file is that one
 // hop: raw in, method + args out, one door per whitelisted method. Four when
-// slice A shipped; the two settings doors ticket 248 added make six, and the
-// roster they are read from is bridge.go's, never a copy written here.
+// slice A shipped; the two settings doors ticket 248 added make six, ticket
+// 320's fetch route seven, and ticket 194's cost door eight - and the roster
+// they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
 // The whitelist decision is made exactly once, inside ParseComposerRequest, and
@@ -130,6 +131,23 @@ type ModelsListRequestHandler interface {
 	HandleModelsListRequest(ctx context.Context, req ComposerRequest) (string, error)
 }
 
+// CostSummaryHandler answers ticket 194's read-only cost door (cost.summary). It
+// returns the receipt the page renders, settings-route shape: one prose sentence
+// plus one payload line the page finds by the marker and parses, because a
+// summary door has no second voice to defer to either.
+//
+// It is a separate interface, not a fourth method on ConfigRequestHandler, for
+// the reason the models interface above records: the settings legs' spies
+// implement the interface they were built against, and adding a method there
+// would break those tests for a reason unrelated to this route. nil means the
+// same named refusal every unattached door gives. The interface declares one
+// read method and nothing else - read-only is the security statement, and it is
+// why this name could join the roster without touching the frozen
+// grant-boundary instrument.
+type CostSummaryHandler interface {
+	HandleCostSummary(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -155,6 +173,9 @@ type ComposerDispatch struct {
 	// Models answers ticket 320 AC#4's fetch route. Optional in the same way:
 	// nil is a refusal that names the door, not a silence.
 	Models ModelsListRequestHandler
+	// Costs answers ticket 194's read-only cost door. Optional like every socket
+	// above: nil is the named refusal, never a silence.
+	Costs CostSummaryHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -232,6 +253,11 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.Models.HandleModelsListRequest(ctx, req)
+	case MethodCostSummary:
+		if d == nil || d.Costs == nil {
+			return "", d.unattached(req)
+		}
+		return d.Costs.HandleCostSummary(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

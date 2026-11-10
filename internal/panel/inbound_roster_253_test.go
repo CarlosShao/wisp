@@ -60,11 +60,17 @@ const (
 	// size went 6 -> 7 and the non-prefixed count went 2 -> 3. That is exactly the
 	// friction this file was built to produce, done on purpose in the same commit
 	// that added the route (see bridge.go's MethodModelsList).
-	wantFullInboundRosterSize253 = 7
+	// Ticket 194 moved both again: the read-only cost door ("cost.summary")
+	// joined, size 7 -> 8 and non-prefixed 3 -> 4, in the same commit that added
+	// the route (bridge.go's MethodCostSummary; the ticket's other three
+	// spellings are blocked by two frozen instruments and are NOT landed - see
+	// the roster note in bridge.go).
+	wantFullInboundRosterSize253 = 8
 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
-	// "panel." prefix, invisible to both old rulers. It was 2 ("config.get",
-	// "config.set") until ticket 320 AC#4 added the third: "config.models.list".
-	wantNonPanelPrefixedInbound253 = 3
+	// "panel." prefix, invisible to both old rulers. It was 3 ("config.get",
+	// "config.set", "config.models.list") until ticket 194 added the fourth:
+	// "cost.summary".
+	wantNonPanelPrefixedInbound253 = 4
 )
 
 // wantFullInboundRoster253 is the closed roster: every name a page can put in the
@@ -73,6 +79,7 @@ var wantFullInboundRoster253 = []string{
 	"config.get",
 	"config.models.list",
 	"config.set",
+	"cost.summary",
 	"panel.attachment.add",
 	"panel.message.send",
 	"panel.mode.request",
@@ -660,7 +667,7 @@ func TestPlantedUnregisteredInboundMethodNameGoesRed(t *testing.T) {
 	// into a copy by replacing that copy's single case line.
 	dir := t.TempDir()
 	path := filepath.Join(dir, "bridge.go")
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is no longer written as one comma-separated clause - re-read knownComposerMethod and rebuild this plant from what is on disk rather than replacing nothing")
 	}
@@ -704,7 +711,7 @@ func TestRegistrationSilencesTheRosterRuler(t *testing.T) {
 		t.Fatalf("read bridge.go: %v", err)
 	}
 	constLine := "\nconst ConfigRegistered253Test = \"config.registered253\"\n"
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is not the one comma-separated clause this plant was written against - re-read knownComposerMethod rather than trusting this line")
 	}
