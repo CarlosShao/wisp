@@ -158,13 +158,23 @@ var hotRowClaims = map[string]string{
 	// that residual stays ticket 245's, named rather than hidden.
 	"hotkey": hotClaimOtherProcess + "cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] - the resident ball host binds from [hotkey] and its reloader bridge rebinds on change (cmd/wisp/resident_windows.go), but the ball lives in the resident process, not in this `wisp run` host",
 
-	// Zero production readers (票 180's census classes these keys "D"). Two shapes
-	// of evidence, and the roster test demands one of them per row: a cite naming
-	// the code that decides the value instead of reading it, or the marker
-	// "扫描零命中", which is the reader scan's own result for that field
-	// (TestTicket255RosterStillMatchesTheActualReadSites in
-	// config_receipt_255_test.go re-measures it on every run).
-	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..72] - the ball's own option carries the size, and nothing outside internal/config reads cfg.Ball",
+	// Ticket 419 re-adjudicated this row, and it stays no-reader while the two
+	// fields behind the section carry different facts, so the verdict text says
+	// each field separately instead of one sentence covering both. The SIZE
+	// half is still what this row has always described: ball_windows.go:64's
+	// SizePx is the option the configured size would ride, and no code feeds it
+	// (ticket 413 is the leg about to feed it), so the hot-applied size still
+	// reads from nowhere. The STYLE half is the change that reddened the scan:
+	// ticket 65's leg gave cfg.Ball.Style two production read sites outside
+	// internal/config, so the old "nothing outside internal/config reads
+	// cfg.Ball" is no longer sayable. Neither site is a live reader - each is
+	// one fresh config.LoadFile (the resident ball host's boot seed, and
+	// `wisp config get` in its own process), neither re-reads the live Manager,
+	// and this `wisp run` host builds neither - so a hot-applied [ball] edit
+	// reaches the next boot or the next CLI invocation, never a running
+	// process, which is why the verdict does not move to other-process the way
+	// [audio]'s did when its resident reader landed.
+	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..160 (0 = default 56)] - SizePx is the option the configured size would ride and no code feeds it yet (ticket 413 is the leg about to feed it), so the size still reads from nowhere; the style field carries a different fact and gets its own sentence: two files outside internal/config read cfg.Ball.Style, cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the resident ball host's boot seed, one fresh config.LoadFile called from resident_windows.go's assembly) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) - both reads are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither, so no running process acts on a hot-applied [ball] value and the verdict stays no-reader",
 	// Ticket 233 re-adjudicated this row: since ticket wire-r1 the resident
 	// voice leg reads one [session] key at boot (cmd/wisp/resident_voice_windows.go:1329
 	// [c.Session.WarmTimeoutSec], handed to the voice plan's warm timeout), so
@@ -278,7 +288,13 @@ var hotRowClaims = map[string]string{
 // making the receipt untrue. The values are file paths, not line numbers, so an
 // unrelated edit above a reader does not churn the pin.
 var sectionReadSites = map[string][]string{
-	"Ball": nil,
+	// Ticket 419: ticket 65's leg gave cfg.Ball.Style two production read
+	// sites, so nil is no longer the honest answer for [ball] - the scan finds
+	// both files and this list must name exactly them. The verdict itself
+	// stays no-reader (see the [ball] roster row above): both reads are boot /
+	// invocation-time config.LoadFile passes, not live re-readers, and this
+	// `wisp run` host builds neither.
+	"Ball": {"cmd/wisp/ball_style_65_windows.go", "cmd/wisp/config_cmd_65.go"},
 	// Ticket 233: the resident voice leg's boot LoadFile reads WarmTimeoutSec
 	// (see the roster row above), so [session] left the reader-less class.
 	"Session": {"cmd/wisp/resident_voice_windows.go"},
