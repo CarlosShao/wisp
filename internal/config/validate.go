@@ -54,6 +54,24 @@ func validateApp(c *Config) error {
 	return nil
 }
 
+// The [ball].size band, single-sourced for both gates that judge it: the load
+// gate below (a hand-edited file) and the write gate (settings_413.go's
+// SetBallSize, a slider value). Ceiling widened 72 -> 160 with owner approval
+// A1636, default stays 56 (SPEC-03 sec 3).
+const (
+	ballSizeMinPx = 44
+	ballSizeMaxPx = 160
+)
+
+// ballSizeRangeError is the ONE out-of-range refusal for ball.size: both gates
+// hand out this same sentence, so the message a bad file fails at boot and the
+// message a refused slider write answers with are the same string by
+// construction, never two copies that can drift.
+func ballSizeRangeError(v int) error {
+	return observe.New(observe.ClassConfig, fmt.Sprintf(
+		"config.toml: ball.size %d out of range [%d, %d]", v, ballSizeMinPx, ballSizeMaxPx))
+}
+
 // validateBall checks the [ball] ranges (SPEC-03 sec 3: size 44-160; the
 // ceiling moved 72 -> 160 with owner approval A1636, 2026-11-08 "可放大，按
 // 你推荐的试试" - the default stays 56, only the configurable range widened) and the
@@ -61,9 +79,8 @@ func validateApp(c *Config) error {
 // naming the vocabulary, never a silent fall back to glass, same rule as
 // every other enum in this layer).
 func validateBall(c *Config) error {
-	if c.Ball.Size < 44 || c.Ball.Size > 160 {
-		return observe.New(observe.ClassConfig, fmt.Sprintf(
-			"config.toml: ball.size %d out of range [44, 160]", c.Ball.Size))
+	if c.Ball.Size < ballSizeMinPx || c.Ball.Size > ballSizeMaxPx {
+		return ballSizeRangeError(c.Ball.Size)
 	}
 	if c.Ball.OpacityIdle < 0 || c.Ball.OpacityIdle > 1 {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(
