@@ -6,7 +6,10 @@ package aecspike
 // of it) compiles, and every DMO reading reports itself as unavailable
 // instead of silently vanishing.
 
-import "fmt"
+import (
+	"fmt"
+	"unsafe"
+)
 
 // DmoInfo is the presence reading for the OS voice-AEC DMO.
 type DmoInfo struct {
@@ -39,5 +42,10 @@ func (s *DmoSession) Close() {}
 
 // SetSessionVolume without cgo refuses with the reason named.
 func SetSessionVolume(client unsafe.Pointer, v float64) (float64, error) {
+	return 0, fmt.Errorf("aecspike: session volume requires cgo")
+}
+
+// GetSessionVolume without cgo refuses with the reason named.
+func GetSessionVolume(client unsafe.Pointer) (float64, error) {
 	return 0, fmt.Errorf("aecspike: session volume requires cgo")
 }

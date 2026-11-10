@@ -44,6 +44,10 @@ int64_t aecsmoke_set_client_volume(void *client, float v);
 /* The session volume read back by the last set_client_volume call. */
 float aecsmoke_last_volume(void);
 
+/* Read the given stream client's session master volume WITHOUT writing it
+ * (the ticket-388 attenuation guard's save/restore axis). 0 on success. */
+int64_t aecsmoke_get_client_volume(void *client, float *out);
+
 #ifdef __cplusplus
 }
 #endif

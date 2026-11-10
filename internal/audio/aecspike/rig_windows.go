@@ -292,9 +292,27 @@ type RigReading struct {
 func RunLoopback(reg *observe.Registry, ctx context.Context, endpointID string, volume float64,
 	far []float32, farRate int,
 ) (*RigReading, []int16, error) {
+	return runLoopbackBundle(reg, ctx, endpointID, volume, far, farRate, true)
+}
+
+// RunLoopbackQuiet is RunLoopback WITHOUT the session-volume pin: it renders
+// the fixture at whatever the process session volume currently is, so an
+// attenuation already applied by the ticket-388 guard
+// (ApplyAnnounceAttenuation) governs the captured reading. Volume here stays
+// the sample-scaling gain, exactly as in RunLoopback.
+func RunLoopbackQuiet(reg *observe.Registry, ctx context.Context, endpointID string, volume float64,
+	far []float32, farRate int,
+) (*RigReading, []int16, error) {
+	return runLoopbackBundle(reg, ctx, endpointID, volume, far, farRate, false)
+}
+
+func runLoopbackBundle(reg *observe.Registry, ctx context.Context, endpointID string, volume float64,
+	far []float32, farRate int, pinSession bool,
+) (*RigReading, []int16, error) {
 	rb := &rigBundle{
 		endpointID: endpointID, volume: volume, far: far, farRate: farRate,
-		ready: make(chan error, 1),
+		pinSession: pinSession,
+		ready:      make(chan error, 1),
 	}
 	done := make(chan struct{})
 	_ = audio.SpawnCapture(reg, func(cctx context.Context) {
@@ -322,6 +340,7 @@ type rigBundle struct {
 	volume     float64
 	far        []float32
 	farRate    int
+	pinSession bool // true: reset the session volume to 1.0 before rendering
 
 	ready    chan error
 	mu       sync.Mutex
@@ -412,11 +431,14 @@ func (rb *rigBundle) run(ctx context.Context) error {
 	// the volume axis is applied by scaling the samples, and the explicit
 	// reset undoes the integer-path ISimpleAudioVolume damage recorded in
 	// the evidence file (a garbage float once persisted a near-zero session
-	// volume here, silencing every render run).
-	if vol, err := SetSessionVolume(render.client, 1.0); err != nil {
-		slog.Warn("aecspike rig could not reset session volume", "error", err.Error())
-	} else {
-		slog.Info("aecspike rig session volume reset", "readback", vol)
+	// volume here, silencing every render run). RunLoopbackQuiet skips this
+	// so an externally applied attenuation (ticket 388) governs the run.
+	if rb.pinSession {
+		if vol, err := SetSessionVolume(render.client, 1.0); err != nil {
+			slog.Warn("aecspike rig could not reset session volume", "error", err.Error())
+		} else {
+			slog.Info("aecspike rig session volume reset", "readback", vol)
+		}
 	}
 	slog.Debug("aecspike rig loopback format", "tag", loop.fmt.tag, "rate", loop.fmt.rate,
 		"channels", loop.fmt.channels, "bits", loop.fmt.bits)

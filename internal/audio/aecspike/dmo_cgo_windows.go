@@ -96,6 +96,17 @@ func SetSessionVolume(client unsafe.Pointer, v float64) (float64, error) {
 	return float64(C.aecsmoke_last_volume()), nil
 }
 
+// GetSessionVolume reads a stream client's session master volume WITHOUT
+// writing it (the ticket-388 attenuation guard's save/restore axis).
+func GetSessionVolume(client unsafe.Pointer) (float64, error) {
+	var out C.float
+	hr := C.aecsmoke_get_client_volume(client, &out)
+	if hr != 0 {
+		return 0, fmt.Errorf("aecspike: aecsmoke_get_client_volume hr=0x%08X", uint32(hr))
+	}
+	return float64(out), nil
+}
+
 // Close ends the session (balances COM init). Idempotent.
 func (s *DmoSession) Close() {
 	if s.active {

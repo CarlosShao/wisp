@@ -387,3 +387,26 @@ int64_t aecsmoke_set_client_volume(void *client, float v) {
 float aecsmoke_last_volume(void) {
     return g_lastVolume;
 }
+
+/* Ticket-388: read a stream client's session master volume without writing
+ * it. GetMasterVolume takes an OUT float pointer - no XMM-argument problem
+ * here, but the call still goes through the same C shim so the guard's
+ * save/restore axis rides the one proven COM path. */
+int64_t aecsmoke_get_client_volume(void *client, float *out) {
+    if (!client || !out) {
+        return (int64_t)E_POINTER;
+    }
+    HRESULT hrInit = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (FAILED(hrInit)) {
+        return (int64_t)hrInit;
+    }
+    IAudioClient *ac = (IAudioClient *)client;
+    ISimpleAudioVolume *sv = NULL;
+    HRESULT hr = IAudioClient_GetService(ac, &wisp_IID_ISimpleAudioVolume, (void **)&sv);
+    if (SUCCEEDED(hr)) {
+        hr = ISimpleAudioVolume_GetMasterVolume(sv, out);
+        ISimpleAudioVolume_Release(sv);
+    }
+    CoUninitialize();
+    return (int64_t)hr;
+}
