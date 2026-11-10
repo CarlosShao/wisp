@@ -62,6 +62,13 @@ var spawn229ReviewedSites = map[string]string{
 	`cmd/wisp/resident_task_source_windows.go|taskSourceConsoleGoroutine`:                "approval-waiter：per_task",
 	`cmd/wisp/resident_task_source_windows.go|taskSourceGoroutinePrefix+fmt.Sprint(seq)`: "agent-task-resident-<n>：per_task 前缀族",
 	`internal/tools/subagent_197.go|"agent-task-"+bg.ID`:                                 "per_task：票 229 修法后的子代理收尾协程（bg.ID 是孩子任务 id）",
+	// ticket 163: the shell family's goroutines. shellExecGoroutine(taskID)
+	// renders "tool-exec-shell-<task id>" (plain "tool-exec-shell-exec" when
+	// no task id is on the call), which lands in the frozen per_task prefix
+	// family (tool-exec-, D38b): the one-shot Wait watcher and the session's
+	// one output reader share the same name space, one per task.
+	`internal/tools/shell_session.go|shellExecGoroutine(s.taskID)`: "per_task：票 163 shell 家族的收尾/读流协程（tool-exec-shell-<task id>，落 tool-exec- 前缀族）",
+	`internal/tools/shell_exec.go|shellExecGoroutine(TaskID(ctx))`: "per_task：票 163 shell.exec 的 Wait 收尾协程（tool-exec-shell-<task id>，落 tool-exec- 前缀族；同 shell_session.go 那条）",
 	// ticket 47 AC#1: the TaskScheduler's task root goroutine. t.id is the
 	// scheduler-minted task id, so the runtime name lands in the frozen
 	// per_task prefix family (agent-task-<id>, D38b), same shape as the

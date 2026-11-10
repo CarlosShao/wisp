@@ -120,6 +120,20 @@ type Options struct {
 	// re-read per call, so a reload that re-arms the list takes effect without
 	// a restart; nothing in this package can add to it.
 	PersistedExemptions func() map[string]bool
+
+	// TaskCleanup is the task-end janitor seam (ticket 163 AC#3): CloseTask
+	// calls it with the task id BEFORE the C25 close, so whatever a task
+	// accumulated that has a process or a handle attached - the shell.session
+	// roster is today's only tenant - dies at the SAME boundary the taint
+	// scope dies at. The composition root wires the session roster's
+	// collector here; nil means no janitor is wired, which leaves the C25
+	// behavior byte-identical to before this field existed. It is a callback
+	// and not a second close verb on purpose: the task-end boundary is
+	// CloseTask, and anything a task owns must be collected through it, not
+	// through a parallel path that a host can forget to call. The int is how
+	// many units the janitor collected, and it lands on the audit line so
+	// "did this task leave anything running" is answerable from the log.
+	TaskCleanup func(taskID string) int
 }
 
 // Bridge is the host bridge: the single choke point every capability flows
@@ -166,6 +180,9 @@ type Bridge struct {
 	modes               ModeSource
 	confirmations       func() map[string]bool
 	persistedExemptions func() map[string]bool
+	// taskCleanup is ticket 163 AC#3's janitor, invoked from CloseTask (the
+	// ONE task-end boundary this bridge owns) before the C25 close.
+	taskCleanup func(taskID string) int
 	// grants is ticket 224's third read-only injection, same shape and the same
 	// rule: read per call, no setter, and nil means no session has ever
 	// answered anything.
@@ -198,20 +215,21 @@ func New(o Options) *Bridge {
 		gate = NoGate{}
 	}
 	b := &Bridge{
-		reg:      o.Registry,
-		paths:    o.Paths,
-		prov:     o.Provenance,
-		j:        o.Journal,
-		gate:     gate,
-		declared: o.DeclaredCaps,
-		sem:      make(chan struct{}, ceiling),
-		defTm:    defTm,
-		onUpdate: o.OnUpdate,
-		logf:     o.Logf,
-		onDec:    o.OnDecision,
-		cancel:   o.Cancel,
-		modes:    o.Modes,
-		grants:   o.Grants,
+		reg:         o.Registry,
+		paths:       o.Paths,
+		prov:        o.Provenance,
+		j:           o.Journal,
+		gate:        gate,
+		declared:    o.DeclaredCaps,
+		sem:         make(chan struct{}, ceiling),
+		defTm:       defTm,
+		onUpdate:    o.OnUpdate,
+		logf:        o.Logf,
+		onDec:       o.OnDecision,
+		cancel:      o.Cancel,
+		modes:       o.Modes,
+		grants:      o.Grants,
+		taskCleanup: o.TaskCleanup,
 		confirmations: func() map[string]bool {
 			if o.Confirmations == nil {
 				return nil // no file was ever confirmed: B tier stays "ask first"
@@ -1015,7 +1033,19 @@ func (b *Bridge) OpenTask(taskID string) {
 // question the C25 ledger owes a long-running host. A scope that was never
 // opened (a task that read no sensitive source) closes as dropped=0.
 func (b *Bridge) CloseTask(taskID string) {
-	if b.prov == nil || taskID == "" {
+	if taskID == "" {
+		return
+	}
+	// Ticket 163 AC#3: the janitor runs FIRST, on the same boundary, so a
+	// session the task opened dies together with the taint scope. nil janitor
+	// (every pre-163 composition) keeps the old behavior byte-identical.
+	if b.taskCleanup != nil {
+		if collected := b.taskCleanup(taskID); collected > 0 {
+			b.log("tools: TASK-JANITOR task=%s collected=%d (session/child processes released)",
+				taskID, collected)
+		}
+	}
+	if b.prov == nil {
 		return
 	}
 	dropped := len(b.prov.ScopeTaints(taskID))
