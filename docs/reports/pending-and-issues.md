@@ -33617,3 +33617,35 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 四、撤销口令
 - 无产码改动；票 418/420 的"补充同源测试名"段可单独删（不影响票的主 AC）。
+## A1675（2026-11-10 16:2x，编排者）**机主「可以了，开始」解降载令 ⇒ 目标 resume（上限 256→400）⇒ wave111 三腿在飞**
+
+### 一、机主令
+- 逐字：**「可以了，开始」**（2026-11-10 16:17 +08）⇒ 降载令**解除**，可跑 go build/go test/go vet/整包门禁。
+
+### 二、目标操作
+- `update_goal edit maxGoalRounds 256→400`（revision 53→54）⇒ `resume`（→55，phase=active，activation=armed）。
+- ⚠ 记一笔：goal 达 256 上限后 `resume` 直接报"exhausted 256 goal rounds"，必须先 `edit` 抬上限再 resume。
+
+### 三、wave111 三腿（`run_in_background: true`，job `workflow-0c6ccf82fdf84230`）
+**模型**：`provider:"magpie", model:"auto/glm-5.3-flash"`（机主 2026-11-06 令）。
+
+| 腿 | 票 | 写面（互斥校验） |
+|---|---|---|
+| **420-crlf** | 420 | `.gitattributes` + `internal/ball/assets/**` |
+| **417-shallow** | 417 | `tools/d22scan/**`（独立 module） |
+| **419-roster** | 419 | `cmd/wisp/config_readers_255.go` |
+
+**写面互斥核**：三者写面**两两不相交**（资产非 Go / d22scan 独立 module / cmd/wisp 单文件）⇒ 同波可并行。
+**★为什么 418/413 不进本波**：418 写 `internal/ball/*.go`（与 420 同包）、413 写 `cmd/wisp/resident_ball_windows.go`（与 419 同 cmd/wisp 编译面）⇒ 按"同包只一枚写腿"推入 wave112。
+
+### 四、派单存档（先存档再发）
+- `.scratch/wisp/probes/orch/20261110/txt/420-crlf-dispatch.txt`（1,676 字节）
+- `.scratch/wisp/probes/orch/20261110/txt/417-shallow-dispatch.txt`（1,543 字节）
+- `.scratch/wisp/probes/orch/20261110/txt/419-roster-dispatch.txt`（1,746 字节）
+
+### 五、波前地面真相（现跑）
+- HEAD `e77576543`；未推 **0**；tracked 脏只有 `291` 探针（他人历史脏，⛔ 碰）；票池 总 406／已结 316／未结 **90**。
+
+### 六、下一手
+- 收 wave111 任一枚 ⇒ **同轮派 wave112**（418 / 413 / 415 / 416 按写面互斥配平）。
+- 推送只由编排者做、只推 origin/dev。
