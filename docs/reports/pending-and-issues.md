@@ -33850,3 +33850,14 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 待关余量（现量）
 - 已落地未关：**417／419／420**（3 张，各 1 条 CI 侧验证 AC；核心测试本地绿）。
+## A1685（2026-11-10 19:5x，编排者）**本轮关 4 张：422/418/419/420（done=324）｜★首获真 CI 日志当 AC 证据（job 129790147091）**
+
+- **本轮关闭（各带独立复跑/CI 证据）**：
+  - **422** `90a7616d9`（5/5 AC）：面板接线快照键 ballSize + config.set ball_size。
+  - **418** `b935161f7`（6/6 AC）：orbdebug 拆 Linux；AC#6 以 AC#4 逐包扫更强证据替代。
+  - **419** `a04572f7f`（7/7 AC）：票 255 名册两行腐烂；**CI job `129790147091` 里 `TestTicket255Roster*` 三条全 PASS**＝AC#7 真凭据。
+  - **420** `d45c49b8c`（7/7 AC）：orb 资产 CRLF；选 ⓑ 目录级 `.gitattributes:13 internal/ball/assets/** text eol=lf`；`od` 数两文件 CR=0；**CI job `129790147091` 里 `TestOrbAssetShippedUnmodified`/`TestJarvisAsset*`/`TestOrbServingConstants` 四条全 PASS**（sha256 亦恢复）＝AC#7 真凭据。
+- **★方法学**：首次从**实 CI 日志**（`gh api .../jobs/129790147091/logs`，test-windows）取 PASS 行当 AC#7 证据，而非本地替代——CI 整体红因 A1674 预存在批，但票内测试实 PASS。
+- **票池：done 322→324，未结 86→84。**
+- **余量**：**417**（d22scan blob 抗浅 clone）已落地，剩 AC#5「lint job CI 验证」——待下轮拉 lint job 日志核 `TestRiskWordlist*` 后关。
+- 撤销口令：422/418/419/420 各自「XXN 撤回」。
