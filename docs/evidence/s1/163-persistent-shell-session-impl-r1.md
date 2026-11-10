@@ -94,3 +94,8 @@
 ## 7. 撤销口令
 
 **「撤 163-impl-r1」**＝revert 本提交即可：产码 5 枚（shell.go/shell_exec.go/shell_session.go/bridge.go 小改/spawn_census 2 行登记）＋判据 3 枚＋文书 2 枚，全部随这一笔；`internal/proc/**` 与全部禁区零字节，无第二笔要追。
+
+## 8. 自纠（提交后追加，不改上文）
+
+- **CGO_ENABLED 自纠**：提交前的一轮测试在未显式 export CGO_ENABLED 的 shell 里跑（默认 1）；提交后复跑（显式 `export CGO_ENABLED=0`）：build rc0／vet rc0／`go test -count=1 ./internal/tools/` ok 33.0s／`./internal/proc/` ok 1.4s——**CGO=0 下全绿，结论不变**（本腿零 cgo 依赖，两环境读数一致）。读数时刻 2026-11-10 22:3x，HEAD＝提交 `75f9479fa`。
+- 提交式自查：`git show --stat 75f9479fa -- <禁区 pathspec>` ⇒ 0 行（§5 读数①已在提交后现跑）；本腿两处 pathspec（add/commit）逐字同一组 10 枚路径；`git status --porcelain -- internal/tools/ internal/proc/` ⇒ 0 行。
