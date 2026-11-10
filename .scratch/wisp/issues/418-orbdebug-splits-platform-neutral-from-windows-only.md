@@ -71,3 +71,7 @@ func (b *Ball) DebugOrbState() statemachine.State      // :43  ★ 要 Ball
     vet.exe: internal\ball\orbdebug.go:39:10: undefined: Ball
 ```
 ⇒ **修 418 后 `TestCrossVetForLinux` 应同时转绿**。AC#2 正向判据请把这条也纳入。
+
+## Progress log
+
+- [2026-11-10 19:3x +08] agent=`418-ac4`（AC#4 补腿·写面＝本票尾本条＋票 230 尾一条＋`docs/evidence/s1/418-ac4-linux-build-scan.md`；**零产码**）did=AC#4 逐包扫（锚 HEAD `477a2ed00`、418 笔 `f54c972c2` 已核在祖先）：①整仓 `GOOS=linux GOARCH=amd64 go build ./...` rc=1、唯一失败链＝`cmd/wisp → sherpa_onnx → sherpa-onnx-go-linux@v1.13.8: build constraints exclude all Go files`（⛔ 未设 CGO_ENABLED=0，交叉档 Go 自动关 cgo＝`A1032` 第③节定式）；②整仓发只停一条链 ⇒ 另起逐包单扫，分母 `go list ./...`＝**40 枚包**、每枚单独 build ⇒ **TOTAL=40 FAIL=2**：`cmd/wisp`、`internal/speech`，两枚输出逐字同上、**零行指向本仓源码**＝外部 cgo 模块交叉档排除；③逐枚归属＝两枚全归**存量交叉档口径**（前科在册：`102:147`/`105:166`/`121:276`/`127:162`/`128-ac4-gates:235` 修前锚同红句/`131-followup-1:280`/`135:100`/`136-ac8-ac9-impl:322`/`137:259`/`138:805`/`342-ac4-readings:64`＋台账 `A1032` 原裁"不立票"），**无任何一枚新主**；④本票自己那枚已消失＝`internal/ball` 不在失败名单，佐证 `GOOS=linux go vet ./internal/ball/` rc=0、`./internal/proc/ ./internal/ball/`（TestCrossVetForLinux 同射程）rc=0；⑤对照说明＝票 230 AC#5 在册的 panel 4 枚是 **Windows 测试面红**（`internal/panel` 本程 Linux build rc=0），ball 1 枚即本票根因、修后应随转绿（`go test` 面绿归 AC#5 复量）。⚠ 本腿零 `.go` ⇒ gofumpt 射程空集；⛔ 翻框（AC 勾归编排者收件）⛔ push。完整读数＝证据件 §1–§5。
