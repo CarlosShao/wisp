@@ -612,6 +612,20 @@ func themeFunc(theme string) string {
 	return "DarkPalette()"
 }
 
+// c21V2RetiredGlass mirrors internal/ball/tokens_table_test.go:678-682 (the
+// authoritative copy, ticket 344 shape A, owner ruling 2026-11-02, ledger
+// A1395): the three first-generation frosted-glass edge colours the owner
+// retired. The table KEEPS their 6 rows - deleting a row would launder the
+// record into nonexistence - so the P2 -> P3 pass below flips exactly these
+// fields from "the table's literal must match tokens.go" to "tokens.go must
+// NOT hold the field at all". Re-adding a retired colour is the owner's call,
+// not a test edit, so it fails here rather than passing silently.
+var c21V2RetiredGlass = map[string]string{
+	"GlassRing":   "ticket 344 shape A (ledger A1395): v2 glass family retired, zero readers before deletion",
+	"GlassHi":     "ticket 344 shape A (ledger A1395): v2 glass family retired, zero readers before deletion",
+	"GlassHiSoft": "ticket 344 shape A (ledger A1395): v2 glass family retired, zero readers before deletion",
+}
+
 // ---------------------------------------------------------------- the one test
 
 func TestC21DesignTokensFourWayAgree(t *testing.T) {
@@ -700,8 +714,12 @@ func TestC21DesignTokensFourWayAgree(t *testing.T) {
 
 	// ------------------------------------------- P2 -> P3 (all 78 colour rows)
 	// Every colour row of the native-generation table still states the literal
-	// tokens.go holds, in the palette constructor that matches its theme. The
-	// table's CSS column is no longer compared anywhere in this package: it
+	// tokens.go holds, in the palette constructor that matches its theme - with
+	// one deliberate exception: the six rows named in c21V2RetiredGlass (ticket
+	// 344 shape A, ledger A1395) assert the OPPOSITE, that the field is gone.
+	// The row is still checked; only the checked proposition flipped from
+	// equality to absence.
+	// The table's CSS column is no longer compared anywhere in this package: it
 	// documents the retired first-generation file, and the ball package owns
 	// that edge against its own fixture.
 	type rowKey struct{ where, theme string }
@@ -720,6 +738,16 @@ func TestC21DesignTokensFourWayAgree(t *testing.T) {
 		field := r.goRef
 		if i := strings.LastIndex(field, "."); i >= 0 {
 			field = field[i+1:]
+		}
+		// Retired rows (ticket 344 shape A, ledger A1395) flip the proposition:
+		// the field must NOT be held any more, mirroring the ball-side check in
+		// internal/ball/tokens_table_test.go. The `continue` costs nothing in
+		// checks 1/3/4 - none of the three retired names is a mapped slot.
+		if _, retired := c21V2RetiredGlass[field]; retired {
+			if _, ok := native[r.theme][field]; ok {
+				t.Errorf("%s: Palette.%s was retired by owner ruling (ticket 344 shape A, ledger A1395) but tokens.go holds it again - re-adding a retired colour is the owner's call, not a test edit", r.where, field)
+			}
+			continue
 		}
 		held, ok := native[r.theme][field]
 		if !ok {
