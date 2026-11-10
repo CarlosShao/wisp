@@ -33828,3 +33828,12 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **wave117 = 413-followup（cmd/wisp＋config＋ball 单腿）** 补 AC#2 写接口/AC#4 往返/AC#6 证据件。
 - 188 待机主裁第 1 项后派 tools 写腿；194 待第 2/3 项后派 cmd/wisp 腿。
 - 417/419/420 待按 CI 日志单测名核 → 可关。
+## A1683（2026-11-10 19:2x，编排者）**413-followup 补齐 AC#2/4/6 ⇒ 413 关闭（第5张 done）｜另立 422 面板接线｜★网络断，未推=2**
+
+- **413-followup** `baefa152b`：`internal/config/settings_413.go`（`SetBallSize` 守卫写＋`BallSizeOptions`/`BallSizeView`）＋`validate.go` band 单源＋config 三测＋`cmd/wisp/ball_size_413_roundtrip_windows_test.go` 全程往返＋证据件 `docs/evidence/s1/413-ball-size-slider-contract.md`。
+- **编排者独立复跑**：`go test ./cmd/wisp -run Test413` **ok 4.283s**（写90→读回90→种子90→live boot 球持90，球窗真起非skip）；`go test ./internal/config -run 'Test413|TestSetBallSize'` **ok 0.144s**；vet 三包 rc0；gofumpt 空；`d22scan` **clean exit0**；path-length GREEN。
+- **413 关闭**（commit 见下；双名 old=0/new=1 核过；6/6 AC PASS，裁决表进票面）。⚠ 诚实边界：面板两条路由+前端未接 ⇒ 用户可见滑块还需 422+外部 agent。
+- **另立 422**（.scratch/wisp/issues/422-ball-size-slider-panel-wiring-snapshot-key-and-config-set-route.md）：internal/panel 接快照键 `ballSize` + `config.set ball_size` 路由，照票 65 链。
+- **票池：done 319→320，未结 88（总 407→408 含 422）。**
+- **★网络断**：`git push` 报 `TLS connect error: unexpected eof while reading`，12+6 次全失败 ⇒ 按铁律停推，本地照常 commit。**未推=2**（`baefa152b` 413-followup ＋ 本轮 413 close/422）。恢复后统一推。
+- 撤销口令：「413 重开」／「422 撤回」。
