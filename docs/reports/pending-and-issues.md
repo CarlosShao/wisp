@@ -33774,3 +33774,14 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 六、撤销口令
 - 「416 重开」／「421 撤回」。
+## A1680（2026-11-10 17:5x，编排者）**421-panel 落地（C21 8 天红修好，加牙）｜415＋421 双双关闭（已结 319）**
+
+- **421-panel** `a89101612`：只改 `internal/panel/tokens_fourway_test.go`（+30/−2），镜像球侧 `c21V2RetiredGlass` 退役翻转。**加牙不是减牙**：命题从"必须有字面量"翻成"必须没有"，78 行证据表一字节未动、waived 仍 23。
+- **编排者独立复跑**：`TestC21DesignTokensFourWayAgree` **ok 0.064s**；全 `./internal/panel` **ok 17.134s**；`./internal/ball` **ok 1.058s**；`go vet ./internal/panel ./internal/ball` rc0；`go build` 同两包 rc0；gofumpt 空；d22scan clean。
+- **415 关闭** `18504f0b3`（AC#4「`go test ./internal/panel` 绿」在 421 修好 C21 后解除）；**421 关闭** `d91a86f29`。两票各 5/6 AC 全 PASS，1:1 裁决表写进票面。**双名核对各 1/1（old 消失、done 在）**；改名后 path-length **VERDICT GREEN**。
+- **票池：已结 317→319，未结 90→88。**
+- 撤销口令：「415 重开」／「421 撤回」。
+
+### 待关余量（现量）
+- 已落地未关：**413／414／417／418／419／420**（6 张）。
+- 其中 417 AC#5／418 AC#6／419 AC#7／420 AC#7 有 CI 侧验证；413 AC#2 已按 A1678 裁定重述。
