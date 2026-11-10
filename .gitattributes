@@ -6,6 +6,11 @@
 # Shell entry points (scripts/d22scan.sh) run under sh on both the ubuntu CI
 # runner and local Git Bash; CRLF would break the shebang and `set -eu`.
 *.sh text eol=lf
+# The orb pages under internal/ball/assets are go:embed'd byte assets: the
+# contract tests (internal/ball/orb_test.go) forbid CRLF and pin sha256 of
+# the exact shipped bytes. Pin the whole asset dir so any future asset
+# (.css/.js) added there inherits LF without a per-extension rule.
+internal/ball/assets/** text eol=lf
 *.png binary
 *.jpg binary
 *.ico binary
