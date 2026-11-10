@@ -33886,3 +33886,16 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 三、待编排者判语
 - **297 AC#2 三形裁定**：读数已指向形①（声音没到麦＝非码缺陷，需机主真麦冒烟）；下轮我给判语并决定 297 能否关。
+## A1688（2026-11-10 22:3x，编排者）**wave121：388/163 落地｜★423 腿断线留真活在盘上未提交→派 423-followup 收口｜派 wave122**
+
+### 一、wave121 三腿
+- **388** `28763663e`（7 件，全 `internal/audio/aecspike`）：cgo 浮点会话音量衰减守卫 `ApplyAnnounceAttenuation`＋`Restore`＋三读数；**真机读数 original=1.000000→attenuated=0.150000（回读一致）**；loopback 对照 session 0.6→peakrms 750.3 vs 0.15→46.5（ratio 0.0619＝tap 平方律，衰减确达真端点）。**编排者复跑** `go test ./internal/audio/...` **ok 18.354s**（aecspike 0.186s）。⚠ 未做：cmd/wisp 接线（当波 423 占槽）＋AC#2 听感对照（需机主在场）。
+- **163** `75f9479fa`+`7ec0bcadc`（10+1 件）：`shell.exec`＋`shell.session`（常驻会话、标记协议、零墙钟差、CloseTask 唯一收口）；17 枚测试含变异负控。**编排者复跑** `go test ./internal/tools ./internal/proc` **ok 27.521s/1.493s**、vet rc0。⚠ 未做：`cmd/wisp/run.go` 组合根接线（两行，该文件被在飞腿占用）＋AC#5 unwired 三行文案待 owner。
+- **423**：★**腿断线**——真活写在盘上但**未 commit、未写测试**。盘上 6 件脏（+83/−15）：`run.go` 喂 `MaxRounds/TokenBudget/RepeatThresholds`（票 10 尾巴）、`resident_voice_windows.go` 喂 `ConversationIdle/SettleStatic/PunctEnabled` 三孤儿、`config_readers_255.go` 名册更新。**编排者验**：`go build ./cmd/wisp` rc0、vet rc0、`TestTicket255Roster` **ok 1.365s**；但 423 定向**无测试**（腿没写）。⇒ **派 423-followup 收口**（补测试＋提交＋票面 log）。
+
+### 二、动作
+- 388/163 已推（未推 0）。**派 wave122**：423-followup（cmd/wisp 独占槽）＋297 剩余格（internal/audio only）。
+- done 326，未结 83。
+
+### 三、★教训（新）
+- **子代理可能"写完码没 commit 就断线"**——收件三把尺里"提交真在"这条会挡住它，但**脏件留在共享树里**会阻塞后续同包腿。⇒ 收件时必须现跑 `git status --porcelain` 查有无该腿遗留脏件，有则当轮派收口腿，⛔ 留着不管。
