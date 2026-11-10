@@ -33539,3 +33539,47 @@ section "ball" field=Ball roster=[] scan=[ball_style_65_windows.go config_cmd_65
 
 ### 五、撤销口令
 - **「418 撤回」**／**「419 撤回」** ⇒ 对应票作废。
+## A1673（2026-11-10 09:3x，编排者）**★★第三张票 420：内嵌 orb 页面被 checkout 成 CRLF ⇒ 机主那条"⛔ 手写复刻"的守护尺在 CI 与本机都红**
+
+### 一、真红（`test-windows`）
+```
+--- FAIL: TestOrbAssetShippedUnmodified (0.00s)
+orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
+```
+
+### 二、★根因链（五步，逐条现跑核过）
+| 步 | 读数 |
+|---|---|
+| 1 | `.gitattributes:1` ＝ `* text=auto` ⇒ `.html` 落自动转换类 |
+| 2 | `git config --get core.autocrlf` ＝ **`true`** ⇒ checkout 时 LF→CRLF |
+| 3 | `.gitattributes` 有 `*.go/*.md/*.sh text eol=lf`、`*.ps1/*.bat eol=crlf`，**唯独没有 `*.html`** |
+| 4 | `internal/ball/orbasset.go:34` `//go:embed assets/orb-siri.html`（`:56` jarvis 同理）⇒ **`go:embed` 吃的是工作树** |
+| 5 | `orb_test.go:38-40` 断言 `!bytes.Contains(orbPageHTML, []byte("\r\n"))` ⇒ 必红 |
+
+**决定性对比**：
+| 位置 | CRLF 行数 |
+|---|---|
+| 工作树 `orb-siri.html`（89,660 字节） | **341** |
+| 工作树 `jarvis-orb.html`（760,132 字节） | **4,346** |
+| `git show HEAD:internal/ball/assets/orb-siri.html` | **0（纯 LF）** |
+
+⇒ **git 里是干净的，红的是"checkout 之后"的工作树。** 这也解释了为什么 `git show` 读到 0 而测试红。
+
+### 三、★为什么这条价值高
+- 该测试的注释逐字写着它防什么：「**keeps a later leg from quietly swapping the asset for a local imitation**」—— 是机主否掉手写 D2D 球（原话「拉裤兜子的复刻」）之后立的**守护尺**。
+- 它红了 ⇒ **机主那条裁定在 CI 上无人守**。
+- **本机也红** ⇒ 任何人 clone 下来跑都红 ⇒ **不是 CI 环境问题，是仓库配置缺陷**。
+
+### 四、我倾向的解法（写进票面，⛔ 强制腿照抄）
+- ⓐ `.gitattributes` 加 `*.html text eol=lf`（最小，但只覆盖 html）
+- **ⓑ `internal/ball/assets/** text eol=lf`（我倾向）**：这些文件的本质是"被 `go:embed` 吃掉的字节资产"，目录级规则比逐扩展名准；将来加 `.css`/`.js` 自动覆盖；仍保留 diff
+- ⓒ 标 `-text`（binary）：彻底不转，但**review 看不到 diff** ⇒ 代价大
+
+### 五、★AC#2 埋了个坑我提前写进票面了
+`.gitattributes` 改完，**工作树里已有的 CRLF 不会自动变 LF**，必须重新 checkout。而**本仓禁 `reset --hard`/`checkout .`/`clean`** ⇒ 票面要求腿用**安全形**（逐个 `git checkout -- <path>`）并写明用了哪条。
+
+### 六、降载状态
+- 本轮**零腿**、我的 `go` 进程 **0 枚**；全部工作＝读 CI 日志 ＋ 盘上 `grep -c $'\r'` ＋ 写票 ＋ 写台账。
+
+### 七、撤销口令
+- **「420 撤回」** ⇒ 票作废。
