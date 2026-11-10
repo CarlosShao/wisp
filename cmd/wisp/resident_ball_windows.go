@@ -136,9 +136,25 @@ type ballHostHook func(*panelHostHooks)
 // A nil showPanel is the pre-ticket-33 shape: the gesture is recorded and said
 // out loud as unhosted. A nil requestStop is the pre-AC#11 shape, and
 // recordTrayExit says that instead of pretending it stopped something.
+//
+// sizePx (ticket 413) is the one value in the bag that is not an executor: the
+// configured [ball] diameter the assembly root read at boot (ballSizeSeed413),
+// handed over pre-New because ball.New is the ONLY place the size can enter -
+// the window edge, the hit test and every state visual derive from the option
+// (internal/ball's WindowEdgePx / VisualFor), and no re-size path exists after
+// construction. Zero is legal and means "the seed read nothing" (the seed's
+// own Warn already said so); ball.New answers it with the package default 56.
 type panelHostHooks struct {
 	showPanel   func(via string) bool
 	requestStop stopRequestFunc
+	sizePx      int
+}
+
+// withBallSizePx hands the ball host the configured [ball] size (ticket 413).
+// It is a hook and not a parameter for the same reason withPanelHost is one:
+// the existing call sites of startResidentBall keep compiling untouched.
+func withBallSizePx(px int) ballHostHook {
+	return func(h *panelHostHooks) { h.sizePx = px }
 }
 
 // withPanelHost hands the ball host the thing that opens the panel window
@@ -394,10 +410,17 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 	rb.hotkeyProvenance = provenance
 
 	b, err := ball.New(ball.Options{
+		// Ticket 413: the configured [ball] size reaches the option it always
+		// named (internal/ball/ball_windows.go:64's SizePx) instead of the
+		// package default. The assembly root sourced the number from
+		// config.toml (ballSizeSeed413) and handed it over with withBallSizePx;
+		// zero means the seed read nothing, and ball.New's own default (56)
+		// and 44..160 clamp stand - no second copy of either lives here.
 		// Sleeping is the only state this leg may claim on its own: nothing here
 		// is listening, thinking, acting or waiting on anyone. A card that IS
 		// waiting moves the orb through the injected gate's UI, which returns it
 		// here the moment nobody is being waited on.
+		SizePx:   hs.sizePx,
 		Initial:  statemachine.StateSleeping,
 		Hotkeys:  cfg,
 		Registry: reg,

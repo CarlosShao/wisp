@@ -174,7 +174,23 @@ var hotRowClaims = map[string]string{
 	// reaches the next boot or the next CLI invocation, never a running
 	// process, which is why the verdict does not move to other-process the way
 	// [audio]'s did when its resident reader landed.
-	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..160 (0 = default 56)] - SizePx is the option the configured size would ride and no code feeds it yet (ticket 413 is the leg about to feed it), so the size still reads from nowhere; the style field carries a different fact and gets its own sentence: two files outside internal/config read cfg.Ball.Style, cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the resident ball host's boot seed, one fresh config.LoadFile called from resident_windows.go's assembly) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) - both reads are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither, so no running process acts on a hot-applied [ball] value and the verdict stays no-reader",
+	// Ticket 413 re-adjudicated the SIZE half of this row, and the verdict
+	// stays no-reader. The gap this row described is closed at the feed side:
+	// cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] is a production read
+	// site now - the resident ball host's boot seed, one fresh config.LoadFile
+	// whose answer the assembly root hands to ball.New's SizePx
+	// (cmd/wisp/resident_ball_windows.go [SizePx:   hs.sizePx,]) - so the
+	// slider's 44-160 reaches the window at construction instead of every boot
+	// building at the package default. What keeps the verdict where 419 put it:
+	// the read is one construction-time LoadFile, nothing re-reads the live
+	// Manager (the ball carries no live re-size, so a hot-applied [ball] size
+	// waits for the next boot), and the reader lives in the resident `wisp`
+	// process while this receipt prints in `wisp run`, which builds no ball.
+	// The STYLE half keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50
+	// [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235
+	// [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are
+	// boot/invocation-time LoadFile passes too.
+	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..160 (0 = default 56)] - the option the configured size rides; ticket 413 landed the feed: cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] (the resident ball host's boot seed) hands the file's number to ball.New through cmd/wisp/resident_ball_windows.go, so the size reaches the window at construction; the verdict stays no-reader because the read is one boot-time LoadFile that never re-reads the live Manager and the ball has no live re-size, and the style field keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither",
 	// Ticket 233 re-adjudicated this row: since ticket wire-r1 the resident
 	// voice leg reads one [session] key at boot (cmd/wisp/resident_voice_windows.go:1329
 	// [c.Session.WarmTimeoutSec], handed to the voice plan's warm timeout), so
@@ -288,13 +304,12 @@ var hotRowClaims = map[string]string{
 // making the receipt untrue. The values are file paths, not line numbers, so an
 // unrelated edit above a reader does not churn the pin.
 var sectionReadSites = map[string][]string{
-	// Ticket 419: ticket 65's leg gave cfg.Ball.Style two production read
-	// sites, so nil is no longer the honest answer for [ball] - the scan finds
-	// both files and this list must name exactly them. The verdict itself
-	// stays no-reader (see the [ball] roster row above): both reads are boot /
-	// invocation-time config.LoadFile passes, not live re-readers, and this
-	// `wisp run` host builds neither.
-	"Ball": {"cmd/wisp/ball_style_65_windows.go", "cmd/wisp/config_cmd_65.go"},
+	// Ticket 419 gave this list its first two entries (the style half); ticket
+	// 413 added the third: the [ball].size boot seed is a production read site
+	// now (see the [ball] roster row above). The verdict itself stays
+	// no-reader: all three reads are boot / invocation-time config.LoadFile
+	// passes, not live re-readers, and this `wisp run` host builds neither.
+	"Ball": {"cmd/wisp/ball_size_413_windows.go", "cmd/wisp/ball_style_65_windows.go", "cmd/wisp/config_cmd_65.go"},
 	// Ticket 233: the resident voice leg's boot LoadFile reads WarmTimeoutSec
 	// (see the roster row above), so [session] left the reader-less class.
 	"Session": {"cmd/wisp/resident_voice_windows.go"},

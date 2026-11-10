@@ -416,7 +416,15 @@ func runResident() {
 	if ballStyleOK65 {
 		ball.SetStyle(ballStyleName65)
 	}
-	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
+	// Ticket 413: the [ball].size seed reads the same per-use shape the style
+	// seed above and hotCfg258 read with - the Manager does not exist yet at
+	// this point of the boot (the 258-a1 census order). Zero means the file was
+	// unreadable and the ball package's own default (56) stands, with the
+	// seed's Warn naming the fallback (ball_size_413_windows.go); the value is
+	// handed to startResidentBall with withBallSizePx because ball.New is the
+	// only place the size can enter the window.
+	ballSizePx413, _ := ballSizeSeed413(rt.Layout.DataDir)
+	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withBallSizePx(ballSizePx413), withPanelHost(func(via string) bool {
 		return holder.toggle(via)
 	}), withStopRequest(residentTrayStop228(rt)))
 	defer rb.stop()
