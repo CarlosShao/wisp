@@ -33861,3 +33861,12 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **票池：done 322→324，未结 86→84。**
 - **余量**：**417**（d22scan blob 抗浅 clone）已落地，剩 AC#5「lint job CI 验证」——待下轮拉 lint job 日志核 `TestRiskWordlist*` 后关。
 - 撤销口令：422/418/419/420 各自「XXN 撤回」。
+## A1686（2026-11-10 20:2x，编排者）**wave119：194 cost.summary 接真听众｜分诊 84 未结=①10/②27/③47｜★更正 417 未落地｜派 wave120**
+
+- **194 cost.summary 接线** `fbd677803`+`cf54ed50e`（写面仅 cmd/wisp）：新件 `cmd/wisp/panel_cost_194.go`（costReader194 适配 memory.Store.ListCostDaily dao_misc.go:169）+`panel_inbound.go` 给 Costs 插座接 CostReadHandler+三测。**编排者复跑** `go test ./cmd/wisp -run Cost` **ok 3.462s**。⛔ 194 整体仍未关（approval.* 撞冻结仪器词表待机主、tasks.* 撞 188 仪器待裁）。
+- **★194 腿报的 3 枚整包红（198/313/33r11）非本腿写面**：编排者单跑 `Test33*` **ok 1.950s**（非 422 回归），198/313 属 A1674 既有批。
+- **分诊腿 round264**：84 未结＝**①能做 10｜②归口等票 27｜③不适用/要人 47**（报告 `.scratch/wisp/probes/orch/20261110/triage-round264.md`）。①档：123/163/174/180/230/256/297/314/388/417。
+- **★★更正**：票 **417 未落地**（Status open、AC 全空；先前"417 已落地"是编排者记错）。它是①能做，需 ⓒ 内嵌 fixture 修 d22scan 浅克隆正控——已派 wave120。
+- **派 wave120**（4 腿；写面互斥）：**417**(tools/d22scan)/**297**(internal/audio 仅测试+probes)/**123**(cmd/wisp 测试)/**180**(只读普查零产码)。⚠ 388 会撞 297 的 internal/audio 故押后；163 立而不派（D34/D46 需人工批）；174 写面实为 internal/tools 非 cmd/wisp 且 AC#2 等 Q-60，押后。
+- 未推 0（全推）。done=324，未结 84。
+- **★机主集中决策清单见本轮汇报**（分诊§5：264三形/170甲乙丙/194词表/188 D43/193 Q-70/215 D36/274 SPEC-11/56花钱/55-57-58 go-ahead）。
