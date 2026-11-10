@@ -33718,3 +33718,33 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 ### 五、下一步
 - 收 wave113；随后**关闭**已落地 5 票（417/419/415/416/420）：逐票核 AC、勾格、补落地读数、`git mv` 加 `-done`（⛔ 改名后必跑 `scripts/check-path-length-budget.sh`）、推 CI 后验。
 - 撤销口令：各票「NNN 撤回」。
+## A1678（2026-11-10 17:2x，编排者）**wave113 两腿落地（413/418，自己复跑绿）｜建 421（C21 token 真红）｜wave114 派（414＋421）｜★413 AC#2 偏离待我裁**
+
+### 一、wave113 收件（`workflow-61d04519fb0d4362`）
+| 腿 | 提交 | 我独立复跑读数 | 结论 |
+|---|---|---|---|
+| **413** | `c8dbd2288` | `go test ./cmd/wisp -run 'Test413|TestTicket255Roster'` ⇒ **ok 2.759s**；喂线在盘 `resident_ball_windows.go:423 SizePx: hs.sizePx,` | ✅ |
+| **418** | `f54c972c2` | `GOOS=linux GOARCH=amd64 go vet ./internal/ball/` ⇒ **rc=0 无输出**；`go test ./internal/ball -run TestOrb` ⇒ **ok 0.179s** | ✅ |
+- 全推 origin/dev（未推=0）。**共 7 票落地**：417/419/415/416/420/413/418。
+
+### 二、★413 的 AC#2 偏离（要我这个裁决者拍，⛔ 腿自己糊过去）
+- 我写票时 AC#2 = 「`internal/config` 出 `BallSizeView`，照 `settings_65.go` 的 `BallStyleView`」。
+- **腿没建 BallSizeView**：改用 boot 种子 `ballSizeSeed413`（fresh `config.LoadFile` 读 `c.Ball.Size`）＋ `withBallSizePx` hook，落点 `SizePx: hs.sizePx`。
+- 腿给的理由（合理）：`startResidentBall` 手里的 cfg 是 `ball.HotkeyConfig` 没有 `.Ball`；按票面"若需 view 模仿 BallStyleView"走了种子＋hook，读点仍是一次 LoadFile 的 `c.Ball.Size`，语义一致。
+- **我的裁决（铁律⓪⓪⓪：最有价值/主流）**：**接受种子＋hook，AC#2 的"BallSizeView"是我过度指定的手段**——一个没有消费者的 view 类型是纯仪式；直读 `c.Ball.Size` 喂 `SizePx` 是更直接的主流形。**关闭 413 时 AC#2 按此重述（意图＝Go 侧有读路径喂 SizePx，已满足），⛔ 不算腿欠交付。**
+- 撤销口令：若机主/我不认此裁 ⇒ 「413 AC#2 要 BallSizeView」重开该格。
+
+### 三、建 421（C21 token 四方一致真红）
+- `TestC21DesignTokensFourWayAgree` 真红：证据表点名 `Palette.GlassRing/GlassHi`，`internal/ball/tokens.go` `DarkPalette()` 无此字面量。**非 415 造成**（415 只改 composer_test.go）。建票 `.scratch/wisp/issues/421-c21-token-fourway-names-glassring-glasshi-absent-from-darkpalette.md`（72 字符名，6 AC）。
+
+### 四、wave114 已派（`workflow-00ec2027e1d8488e`）
+| 腿 | 票 | 写面 |
+|---|---|---|
+| **414-rundone** | 414（R-145-1） | `cmd/wisp/`（run.done.stop 起源跳断言，6 行） |
+| **421-c21token** | 421（新） | `internal/ball/tokens.go` 和/或 `docs/evidence/s1/c21-native-tokens.md` |
+- 派单存档：`414-rundone-dispatch.txt`。**★注意**：421 与 414 的 cmd/wisp 有弱耦合（cmd/wisp import internal/ball）——已让 421 只跑 `./internal/ball ./internal/panel` 测试，风险窗口小。
+
+### 五、下一步（关键）：7 票待关
+- 417/419/415/416/420/413/418 **AC 全未勾**（腿只写 Progress log，勾格留非实现者＝我）。关闭需逐票：①核 AC 逐格②勾格③Progress log 有落地读数④`git mv` 加 `-done`⑤改名后**必跑** `scripts/check-path-length-budget.sh`（若某名掉出 over-budget，删其名册行）。
+- 其中 **417 AC#5／420 AC#7／418 AC#6／419 AC#7 有 CI 侧验证** ⇒ 推后等 CI 绿才能勾。
+- **下轮逐票关闭**（先关全本地的 415/416，再按 CI 回来的关其余）。
