@@ -73,3 +73,42 @@
   ⚠ 我特意把"**超时值不是旋钮**"写在 AC#2 之前：这一族最省事的"修法"就是调阈值，而那个 300 秒是 C18 的契约。
   取证代理还留了一条它没动的观察：**票 85a 里那条 R-4（`mockllm module vet` 被 staticcheck 连带 skip）
   其实已经在 `d3cc9ed` 上死了**（第 10 步 success）⇒ 85a 的那一半属**多余但无害**，已另行更正，不在本票。
+
+- 2026-11-10 20:5x +08（wave120 落地腿 W123v2，查重复核＋补 AC#4/AC#5 runner 真读数；零新测试改动）：
+  - 查重先核：W123 腿遗留已 swept（`abf2a35a6`）、三枚 replyleg helper 已补落（`446831ea9`，纯 HEAD 导出树 vet rc0 已核）、
+    非实现者裁决表 `docs/evidence/s1/123-verdict.md` 已交（AC#1/2/3/5/6 PASS、AC#4 未取、closeable=no）。
+    本腿 `git status --porcelain cmd/wisp/` 现量 tracked 零改动 ⇒ **写面早已落库，本腿只补读数**，不重做。
+  - **AC#4 runner 真读数（run id＋job id＋step 号具名）**：run **`42336011115`**（head `532f936d6`，
+    2026-11-07T03:53Z，`git merge-base --is-ancestor 446831ea9 532f936d6` rc0 ＝ 修复在其祖先）→
+    job **`128292985864`**（test-windows）→ step **7** `cmd/wisp CLI tests (needs the sherpa DLLs staged above,
+    ticket 111 AC#4)`（ci.yml:886，按步名取）。四枚逐名 `--- PASS`：
+    `TestTicket101ManualSwitchSurvivesRestart 1.21s`／`TestTicket101UntouchedConfigRestartsAtDefault 7.39s`／
+    `TestTicket101SessionGrantDoesNotCrossRestart 1.71s`／`TestComposedGateBlocksAWriteForTwoSeconds 2.93s`
+    （同场 `TestTicket101ModeSwitchUsesTheRealL2Gate 1.19s`、`TestTicket101UnreadableModeFailsLoudlyAndStrict 0.91s`
+    ＋3 子测也在）。全步 `审批超时` **0 命中**、无 300.0x/40.0x 等满形状 ⇒ **hosted runner 上没有人在场，
+    四枚不再等审批超时——脚本应答腿在 runner 上真的被生产 runReplyLoop 消费**。
+  - **反向两读数（同一步骤、同一批名、方向翻转）**：pre-fix＝run **`35606321404`** 第 7 步（票面 :15 的现场）：
+    四枚全红、句名"审批超时"、ComposedGate **301.06s**；post-fix＝run `42336011115`（上条）：四枚全 PASS、
+    全部秒级。两读数之间隔的正是 `abf2a35a6`+`446831ea9` 那条程序化应答腿，无任何阈值/断言改动。
+  - **AC#5 替身支 CI 首读**：同 job **step 10**（Portable windows tests）`TestSyncRedTeamRealOneDrive --- PASS (0.01s)`，
+    替身声明行在案 `syncdirs_redteam_windows_test.go:248` 逐字 `ticket 123 AC#5 stand-in: no live sync root on this
+    machine (detected roots: [...])` ＋ R4 命中三发 ⇒ **runner（无活体根）上替身支点亮、SKIP=0**，
+    与裁决表 §2-AC#5 的本地活体支读数互补成两支全读。
+  - **诚实边界（步 rc≠0 的红不在本票，本腿不翻格的原因）**：42336011115 那发 cmd/wisp 四数
+    `RUN=662 PASS=460 FAIL=34 SKIP=13`，红全是别票家族；HEAD 现量（run `42811365957`，`cc283dd83`，2026-11-10，
+    job `129813332334`）已缩到 **4 枚红**＝`TestTicket223PermissionDeniedSitsInItsOwnSentence`／
+    `TestTicket198FirstRunCallerIsTheRunEntryOnly`／`Test313WritableUnionEqualsTheTwoRosters`／
+    `TestLockedSuffixNeverTakesTheLockItself33r11`；且该发二进制**中途无痕硬死**提前到 panel_* 族
+    （`TestAC14AwaitedBindingReplyReachesThePage` PASS 之后／`TestPanelThreadIsSTAAndExitsCleanly` 起跑后
+    `CreateWindowExW` 消息若干即终局，无 panic 无后续 `=== RUN`；2026-11-06 与 11-10 两发同形状、死点不同）⇒
+    按文件字母序 `run_mode101_test.go`/`run_test.go` 排在 panel_* 之后，**HEAD 那发四枚票 123 用例根本没被执行到**
+    （`Ticket101` 全 job 日志 0 命中）。硬死形状与台账 A957 记的"票 314 整包死亡区"同族，**归口别票**；
+    裁决表 §2-AC#4 的翻格前提"步 FAIL=0"被这些别票红＋硬死占着 ⇒ 本腿按"未定义即停"**一格未翻**，
+    读数交验收方裁翻格与结案。
+  - **本机门禁现量（HEAD `a2495ae15`，tracked 工作树干净；LC_ALL=C、GOTMPDIR/TMPDIR/TEMP/TMP unset、
+    PATH 带 build+sherpa、CGO 未置 0）**：`gofmt -l ./cmd/wisp` 空；`/d/work/base/gopath/bin/gofumpt.exe -l ./cmd/wisp` 空；
+    `go vet ./cmd/wisp` rc0；`go test ./cmd/wisp -run "TestTicket101|TestComposedGateBlocksAWriteForTwoSeconds"
+    -count=2 -v -timeout 30m` **rc0，12/12 PASS，ok 43.844s**（四枚两回路 2.22/8.04/3.58 与 2.06/8.42/2.39、
+    ComposedGate 3.86/4.59s，与裁决表 count=2 读数同形）；`sh scripts/d22scan.sh` **rc0 clean**
+    （bans#1-5 internal/=392、cmd/=66、ban#7 internal/tools/=48、ban#8 internal/=983、cmd/=255、frontend/=121、
+    design/=39，逐枚 ≥ 裁决表末记 ⇒ 台账各 scope 不降）；`sh scripts/check-path-length-budget.sh` **GREEN**。
