@@ -33799,3 +33799,32 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **门禁读数（全绿）**：gofumpt（绝对路径）`internal/panel/` 空；`go vet ./internal/panel` rc0；`go build ./cmd/... ./internal/... ./tools/...` rc0（⚠ `go build ./...` 红于未跟踪在飞件 `build/mut_rvw.go`（别人的变异模板，登记未动）；`go test -count=1`：panel **ok 21.4s**／tools **ok 36.2s**／config **ok 4.0s**；risk 单包 **ok 13.6s**；d22scan **clean**（bans #1-5 internal/=390、cmd/=65、ban#8 internal/=976 全扫 0 违规）；path-length **VERDICT GREEN**（62/62 roster）；gate-clauses **14/14 相符、聚合退码 0**。
 - **反向判据（成对在跑）**：plant 正控 4 发（188 仪器）＋`config.unmirrored114` plant（镜像门）＋253 三 plant（未登记名）全部保持红能力＝套件绿中含正控；ledger 双向审计红路径由 plant 形状证明。
 - **撤销口令**：「194 第一枚撤回」（revert 本 commit 即恢复 7 枚名册原状；台账三条只追加不删）。
+
+## A1682（2026-11-10 19:0x，编排者）**wave116：188 停手(D43借名+写面在tools)｜194 部分落地(cost.summary进名册)｜414 关闭｜★CI 全红＝A1674 预存在批｜★已落地票多"部分"，诚实重核**
+
+### 一、wave116 收件（`workflow-b13b80625a304b2e`）
+- **188-s1** `7873e962b`：**零产码停手上报**（正确）。卡两处——① **D43「已拒绝」借名规格真空未裁**（20 枚 state 名无「已拒绝」；spawn 拒绝点 `internal/tools/subagent_197.go` 八处早退零名册行）⇒ 要编排者/机主裁；② 写面在 `internal/tools/**`（本腿写面＝internal/agent），须另派 tools 写腿。AC 框未勾。**188 未落地。**
+- **194** `1ce422261`+`95bcb9538`：**部分落地**——cost.summary 进 inbound 名册（`bridge.go` 常量＋`composer_dispatch.go` case＋`cost_handlers.go`＋`cost_roster_194_test.go`＋名册 7→8），台账 A1681。但 3 处拼写受阻：approval.current/queue 撞冻结 l2 仪器词表（规格 vs ban#6 仪器冲突＝机主拍）、tasks.list/task.detail 撞 188 tools 仪器、cost.summary 无真听众（装配在 `cmd/wisp/panel_inbound.go` 生产码，本腿禁改，需 cmd/wisp 写腿接 `memory.Store.ListCostDaily`）。**194 未完整，不关。**
+
+### 二、414 已关闭 `7ac3d8aed`（本会话第 4 张 done：416/415/421/414）
+- 落地 `45a70705a`（`run_done_stop_origin_414_test.go` 139 行）。**编排者现跑**：`go test ./cmd/wisp -run 'Test413|TestRunDoneStop...'` **ok 5.486s**／vet rc0／gofumpt 空／d22scan **clean exit0**／path GREEN。4/4 AC PASS，双名 0/1，改名后 path GREEN。
+
+### 三、★★诚实重核：已落地"6 票"里多数是"部分"，先前口径过乐观
+- **413**：腿只做喂线（读侧种子 `SizePx: hs.sizePx`）＋反射正/反测试；**AC#2 写接口 `BallSizeView`（读+写+越界）未建、AC#4 43/161 越界往返未做、AC#6 前端契约未写证据件** ⇒ **未完整，不关**。→ 派 413-followup。
+- **418**：AC#1-3、AC#5 达；**AC#4（`GOOS=linux go build ./...` 逐包扫+追加票 230 账）与 AC#6（CI 验 `undefined: Ball` 消失）未覆盖**（我派单漏这两格）⇒ 未完整。
+- **417/419/420**：核心测试本地绿，但**各有一条 CI 侧验证 AC**，需 CI 绿或按日志单测名核。
+- ⇒ **教训**：派单必须把票面**每条 AC 逐格**映射进派单步骤；本轮 418 漏 AC#4/6、413 漏 AC#2/4/6 即此。
+
+### 四、★CI 现状：dev 全红＝A1674 预存在批，非本会话票造成
+- 现跑 `gh api actions/runs?branch=dev`：`42794331087`(e90ea3cf0)/`42793989596`(a89101612)/`42793097949`(c723a1f5b) 均 **failure**；`42803948906`(95bcb9538) in_progress。
+- 红因＝A1674 登记的 19 枚预存在 FAIL（198/223/313/Test52*/readfail_42r1…）＋历史 418 Linux。**这些不是 413/414/415/416/417/419/420 的票内测试造成**。⇒ CI 侧 AC 需"整体绿"或"按 job 日志里该票测试名逐个核 PASS"，后者下一轮做。
+
+### 五、★摆机主（编号决策，各含撤销口令；属"改契约文字/改冻结仪器"）
+1. **188「已拒绝」状态借 D43 哪枚名？**（D43 状态机转移表＝冻结契约 C12，加名＝改契约文字）现 20 枚名无「已拒绝」，spawn 拒绝点八处零名册行。**不裁的代价**：188 拒绝行永悬、subagent 拒绝态无源。**撤销口令**：「188 按 A434 先例取 `StateMuted`」或你给名。
+2. **194 `approval.current/queue` 撞冻结 l2 仪器词表（`grantRouteWords` 含 "approval"）**：规格表要它 vs ban#6 仪器守卫它 ⇒ **二选一：改仪器 / 改规格表**。**不裁的代价**：审批队列两方法永进不了名册。**撤销口令**：「194 跳过 approval 两方法」。
+3. （告知式，我按主流已排）**194 cost.summary 无真听众** ⇒ 下一波派 cmd/wisp 写腿接 `ListCostDaily` 适配器。撤销口令：「194 不接 cost.summary 听众」。
+
+### 六、下一步
+- **wave117 = 413-followup（cmd/wisp＋config＋ball 单腿）** 补 AC#2 写接口/AC#4 往返/AC#6 证据件。
+- 188 待机主裁第 1 项后派 tools 写腿；194 待第 2/3 项后派 cmd/wisp 腿。
+- 417/419/420 待按 CI 日志单测名核 → 可关。
