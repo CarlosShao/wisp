@@ -345,6 +345,17 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// same secret store as the settings leg above, so "拉取模型列表" and the
 	// writes it feeds cannot disagree about which row or which key they mean.
 	modelsList := &modelsListHandler320{mgr: mgr, secrets: secrets}
+	// Ticket 194 (ledger A1681): the read-only cost door is answered by the real
+	// leg - panel_cost_194.go's adapter over memory.Store.ListCostDaily on THIS
+	// data root, opened per read (sessions.go's outlet shape) so a chain that
+	// never sees a cost request opens no database. Before this wiring the door
+	// was landed with a nil socket and refused by name (ErrNoCostReader); the
+	// wiring nail in panel_cost_194_test.go reddens if this field is unplugged.
+	costs := &panel.CostReadHandler{
+		Reader: newCostReader194(dir),
+		Audit:  auditf,
+		Actor:  actor,
+	}
 	// Ticket 186's leg, attached only where a runtime scope was handed over (see
 	// the signature note). The interface is left nil rather than holding a typed
 	// nil pointer, because the router's refusal is decided by a nil interface
@@ -366,7 +377,9 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Config: configWrites,
 		// Ticket 320 AC#4's read-only door is answered by the fetch leg above.
 		Models: modelsList,
-		Audit:  auditf,
+		// Ticket 194 (A1681): the cost door's real reader, wired above.
+		Costs: costs,
+		Audit: auditf,
 	}, mgr, nil
 }
 
