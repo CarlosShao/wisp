@@ -62,3 +62,12 @@ func (b *Ball) DebugOrbState() statemachine.State      // :43  ★ 要 Ball
 
 ## 撤销口令
 - 「**418 撤回**」⇒ 本票作废。
+## 补充：同源测试名（2026-11-10 09:5x，编排者现跑核）
+
+同一根因（`undefined: Ball`）在 CI 还表现为：
+```
+--- FAIL: TestCrossVetForLinux (24.89s)
+    crossvet_test.go:71: go.exe vet ./internal/proc/ ./internal/ball/ for GOOS=linux failed (exit status 1):
+    vet.exe: internal\ball\orbdebug.go:39:10: undefined: Ball
+```
+⇒ **修 418 后 `TestCrossVetForLinux` 应同时转绿**。AC#2 正向判据请把这条也纳入。

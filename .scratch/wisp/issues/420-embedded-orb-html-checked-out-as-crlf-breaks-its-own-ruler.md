@@ -78,3 +78,17 @@ $ cat .gitattributes               →  * text=auto
 
 ## 撤销口令
 - 「**420 撤回**」⇒ 本票作废。
+## 补充：同源测试名（2026-11-10 09:5x，编排者现跑核）
+
+同一根因（CRLF）在 CI 还表现为**两条**：
+```
+--- FAIL: TestJarvisAssetShippedAsBuilt (0.00s)
+    orb_test.go:306: embedded jarvis page still contains CRLF; the asset must be LF
+--- FAIL: TestOrbServingConstants (0.00s)
+    orb_test.go:225: embedded orb page sha256 = 4d9e291b..., want the pinned upstream d93da649...
+    orb_test.go:306: embedded jarvis page still contains CRLF; the asset must be LF
+```
+⇒ **★`TestOrbServingConstants` 的 sha256 不符很可能也是 CRLF 造成的**（CRLF 改变字节 ⇒ 改变哈希）。修 420 后必须**核 sha256 是否也恢复**：
+- 若恢复 ⇒ 同源，420 一并解决；
+- 若仍不符 ⇒ **另有内容漂移**，需单独立项（⛔ 但先别急着立，先看修完 CRLF 后的读数）。
+- AC#3 正向判据请把这两条纳入。

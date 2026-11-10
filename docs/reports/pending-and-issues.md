@@ -33583,3 +33583,37 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 七、撤销口令
 - **「420 撤回」** ⇒ 票作废。
+## A1674（2026-11-10 09:5x，编排者）**★CI `test-windows` 全 FAIL 三角定位表（19 条 FAIL 逐条归队）｜★4 条已立票，7 条独立待查，1 条已知在册**
+
+### 一、全清单（`gh api` 拉 `test-windows` job `129250564875` 日志，落 `/d/tmp/wisp/20261109/ci-test-windows.log`）
+`--- FAIL:` 去重后 **19 条**。逐条归队如下：
+
+| FAIL 测试 | 归队 | 依据 |
+|---|---|---|
+| `TestOrbAssetShippedUnmodified` | **票 420** | `orb_test.go:39 embedded orb page still contains CRLF` |
+| `TestJarvisAssetShippedAsBuilt` | **票 420**（同源，已补进票面） | `orb_test.go:306 embedded jarvis page still contains CRLF` |
+| `TestOrbServingConstants` | **票 420**（疑同源，已补） | 同一行 `:306` CRLF ＋ sha256 不符（CRLF 会改哈希 ⇒ 疑同源，修后须复核） |
+| `TestCrossVetForLinux` | **票 418**（同源，已补进票面） | `crossvet_test.go:71 ... vet ./internal/ball/ for GOOS=linux ... orbdebug.go:39:10: undefined: Ball` |
+| `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` | **票 419** | `row "ball" ... 44..72 ... token nowhere` |
+| `TestTicket255RosterStillMatchesTheActualReadSites` | **票 419** | `section "ball" roster=[] scan=[...] match=false` |
+| `TestTicket198FirstRunCallerIsTheRunEntryOnly` | **独立待查** | `firstrun_198_test.go:281: AC J1 RED: ensureFirstRunConfig is called by [runTextTask runConfigSet65], want exactly [runTextTask]` |
+| `TestTicket223PermissionDeniedSitsInItsOwnSentence` | **独立待查** | 日志未抓到 `:行号` 错行（需再拉更细上下文） |
+| `Test313WritableUnionEqualsTheTwoRosters` | **独立待查** | `panel_config_313_test.go:252: the door reports the union [...]`（门报的 union 与两枚名册不等） |
+| `TestLockedSuffixNeverTakesTheLockItself33r11` | **独立待查** | `panel_locked_naming_33r11_windows_test.go:243-245`（4 枚 Locked 函数逐个 body 检查） |
+| `TestReadFailureDoesNotAdoptStatTheNextTickSeesTheWrite` | **独立待查** | `manager_readfail_42r1_windows_test.go:100: ... got report &{Hot:[ball] ...}` |
+| `Test52AbsoluteTempPathIsRefusedForTheTempReason` | **独立待查** | `command_52_test.go:288: first exe refusal = "...RUNNER~1... contains ~..."`（**疑 runner 短路径环境差异**） |
+| `Test52CommandKindValidates`（＋子例 unknown_kind） | **独立待查** | `command_52_test.go:1002: plugin: manifest failed C14 validation` |
+| `Test52SchemaViolationsAreRejected`（＋3 子例 above/below/not_int） | **独立待查** | 同 52 族，疑同一根因 |
+| `Test52TimeoutKillsTheProcessTree` | **独立待查** | 同 52 族 |
+
+### 二、★结论
+- **4 条已有票（420 三条／418 一条、419 两条，实际覆盖 6 个 FAIL 名）**。
+- **独立待查 `Test52*` 一族（5 个 FAIL 名）**：**高度疑似同一根因且与 runner 环境有关**（`RUNNER~1` 短路径、manifest C14 校验），⛔ 但**未经核证不许断言**。**下一手先核 `Test52*` 一族是不是一个根**（最省时间）。
+- **独立待查 3 条**（198／223／313／33r11／readfail_42r1 五枚）：各是不同面，需逐枚读测试与产码。
+- ⚠ **本机没跑整包**，以上全是**读 CI 日志**得来 ⇒ 属"别人的红"，按纪律**不能当本机判据**，派腿前必须 `git clone --shared` 导出树复跑。
+
+### 三、降载状态
+- 本轮零腿、`go` 进程 0 枚；全部＝读日志 ＋ 写票面补充 ＋ 写台账。
+
+### 四、撤销口令
+- 无产码改动；票 418/420 的"补充同源测试名"段可单独删（不影响票的主 AC）。
