@@ -33748,3 +33748,29 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - 417/419/415/416/420/413/418 **AC 全未勾**（腿只写 Progress log，勾格留非实现者＝我）。关闭需逐票：①核 AC 逐格②勾格③Progress log 有落地读数④`git mv` 加 `-done`⑤改名后**必跑** `scripts/check-path-length-budget.sh`（若某名掉出 over-budget，删其名册行）。
 - 其中 **417 AC#5／420 AC#7／418 AC#6／419 AC#7 有 CI 侧验证** ⇒ 推后等 CI 绿才能勾。
 - **下轮逐票关闭**（先关全本地的 415/416，再按 CI 回来的关其余）。
+## A1679（2026-11-10 17:4x，编排者）**414 落地｜421 腿判定完成停手上报（真根因＝344 漏改 panel 四方尺）｜★416 已关（首张本会话闭环）｜wave115 派 421-panel**
+
+### 一、wave114 收件（`workflow-00ec2027e1d8488e`）
+- **414** ✅ `45a70705a`：run.done.stop 起源跳断言（`run_done_stop_origin_414_test.go` 139 行）。自证反向：掐 `loop.go:1134 Stop: stop`⇒新用例必红（`run.done.stop="" want "end_turn"`），还原绿。**我未独立复跑**（诚实：只读腿报告＋4 条提交在盘）。
+- **421**：腿**未写入、零改动**，按「未定义即停」停手上报——诊断极好：①AC#1 判定＝**废弃**（GlassRing/GlassHi/GlassHiSoft 是机主 344 票 A1395/`ebf33fd77` 已裁死色，球侧 `c21V2RetiredGlass` 已反向钉死）；②真根因＝**344 漏改 `internal/panel/tokens_fourway_test.go` 的 P2→P3 遍历**，仍要求 78 行都有活字面量 ⇒ 红 8 天；③两条 AC#2 路（删表行/补字段）均被机主批过的机器钉死（78 行不删／球侧测试）；④诚实修法＝panel 四方尺镜像 344 翻转（~15 行，加牙不弱化），但落在 421 写面外 ⇒ 停手。
+- **我的裁定**：接受腿的停手，**扩 421 写面到 `internal/panel/tokens_fourway_test.go`** 另派 421-panel。
+
+### 二、★416 已闭环关闭（本会话首张 done，已结 316→317）
+- 落地 `c13909229`（`settings_187.go` 注释定案＋`settings_187_r1453_test.go` 3 测试）。
+- **编排者独立跑门禁**：gofumpt 两文件空／`go vet ./internal/config` rc0／`go test ./internal/config` **ok 3.349s**／`d22scan` **clean（exit 0）**／path-length **over-budget=62 covered=62 not in roster=0**。
+- 5/5 AC PASS（1:1 裁决表写进票面）⇒ `git mv ...-done.md`（commit `6946ff1d9`）；**双名核对 old=0 new=1**；改名后 path-length **VERDICT GREEN**。
+
+### 三、wave115 已派（`workflow-33262e22fc68486a`，1 腿）
+- **421-panel**：只改 `internal/panel/tokens_fourway_test.go`（_test 文件，不被 cmd/wisp 依赖编译 ⇒ 与 cmd/wisp 腿可安全并行），镜像球侧 `c21V2RetiredGlass` 翻转。派单 `421-panel-dispatch.txt`。
+- **★为何 1 腿**：本轮把精力放在**关闭 416**（真正推进"所有票完成"）；cmd/wisp 面 414 刚落地、下一张需筛；421-panel 是唯一在飞的 CI-red 修复。下一张 cmd/wisp 腿待 421-panel 落地即派。
+
+### 四、★415 为何暂不关
+- 415 AC#4 要「`go test ./internal/panel` 绿」，但 **C21 红**（421 正修）⇒ **415 等 421-panel 落地后才能关**（AC#4 才能诚实勾）。
+
+### 五、待关清单（现量）
+- 已落地未关：**417／419／415／413／418／420／414**（416 已关）。
+- 417 AC#5／420 AC#7／418 AC#6／419 AC#7 有 CI 侧验证，需推后等 CI。
+- 415 等 421；413 AC#2 已按 A1678 裁定重述（喂线意图满足）。
+
+### 六、撤销口令
+- 「416 重开」／「421 撤回」。
