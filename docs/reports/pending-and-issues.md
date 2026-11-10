@@ -33687,3 +33687,34 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 七、撤销口令
 - 「**420 撤回**」「**415 撤回**」「**416 撤回**」各自作废对应票。
+## A1677（2026-11-10 17:1x，编排者）**wave112 三腿全落地（415/416/420，自己复跑绿）｜★我量 CRLF 的尺子是错的｜wave113 已派（413＋418）**
+
+### 一、wave112 三腿收件（`workflow-07a12bd526b14107`，三把尺逐腿核）
+| 腿 | 提交 | 自己复跑读数 | 结论 |
+|---|---|---|---|
+| **420** | `0f94d82fc` | `go test ./internal/ball -run 'TestOrbAsset*|TestJarvisAsset*|TestOrbServingConstants'` ⇒ **3 条全 PASS, ok 0.062s**；`git ls-files --eol` ⇒ 两文件 `w/lf`；`od` 真 CR 字节 **0** | ✅ |
+| **415** | `551d2a16d` | `go test ./internal/panel -run 'TestComposerContractTypesMatchFrontend|TestPlantedNestedContractDriftGoesRed'` ⇒ **ok 0.216s** | ✅ |
+| **416** | `c13909229` | `go test ./internal/config -run 'Test187R1453|Test187Thinking'` ⇒ **ok 0.147s** | ✅ |
+- 415 遗留的证据件＋票面 log 已由我收（commit `7912d0912`）。**四条提交全推 origin/dev，未推=0。**
+
+### 二、★★我犯的错：CRLF 量尺是错的（必须记，防重犯）
+- 我进场用 `grep -c $'\r'` 量资产，读到 **341／4346**，据此判"420 没改、规则加了文件没重 checkout"。
+- **420 腿当场指出**：本机 pwsh→Git Bash 链上 `$'\r'` 在 grep 里读数**不可信**（真 CR 文件报 0、LF 文件全行假报，两种失真都实测到）。
+- **我用可靠尺复核**：`od -An -tu1 | tr -s ' ' '\n' | grep -c '^13$'` ⇒ 真 CR 字节 **0**；`git ls-files --eol` ⇒ `w/lf`；真跑测试 ⇒ **3 条全 PASS**。**腿是对的，我错了。**
+- **★新纪律**：量行尾**禁用 `grep $'\r'`**（在此链上不可信）；用 `od` 字节尺 或 `git ls-files --eol` 或 PowerShell `ReadAllBytes`。
+- **★附带更正 A1676**：A1676 里我写"420 空返回失败"是对第一腿的；A1676 里"420 仍 341/4346 CRLF"那句是**假读数**，以本条为准。
+
+### 三、415 报的一个预存在红（不是它造成的）
+- `TestC21DesignTokensFourWayAgree` 红（`docs/evidence/s1/c21-native-tokens.md:58/59` 点名 `Palette.GlassRing/GlassHi`，但 `internal/ball/tokens.go` DarkPalette 无此字面量）。**415 只改 composer_test.go，未碰 tokens/css ⇒ 无关，预存在。** 需单独立项（归 65/239 族），下一轮建票。
+
+### 四、wave113 已派（`workflow-61d04519fb0d4362`）
+| 腿 | 票 | 包 |
+|---|---|---|
+| **413-slider** | 413 | `cmd/wisp/`（喂 SizePx: cfg.Ball.Size） |
+| **418-orbdebug** | 418 | `internal/ball/`（拆 orbdebug.go） |
+- **★为什么只有 2 腿（诚实，非怠工）**：扫了全部 `ready-for-agent` 未结票，**其余大功能票（174/187/188/191/194…）写面全落 `internal/agent`/`internal/panel`，而 cmd/wisp 都 import 它们** ⇒ 与 413 的 `go test ./cmd/wisp` 同编译面 ⇒ 同波会互相造**假红**。已排除：316=`withdrawn`撤票；167=票面写"立而不派"；174 只剩 AC#4 契约轴（要机主批改契约文字）。
+- **下一腿何时派**：413/418 任一落地，同轮即派 414（cmd/wisp，R-145-1 run.done.stop 断言）＋ 其它非耦合腿。
+
+### 五、下一步
+- 收 wave113；随后**关闭**已落地 5 票（417/419/415/416/420）：逐票核 AC、勾格、补落地读数、`git mv` 加 `-done`（⛔ 改名后必跑 `scripts/check-path-length-budget.sh`）、推 CI 后验。
+- 撤销口令：各票「NNN 撤回」。
