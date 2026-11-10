@@ -33837,3 +33837,16 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **票池：done 319→320，未结 88（总 407→408 含 422）。**
 - **★网络断**：`git push` 报 `TLS connect error: unexpected eof while reading`，12+6 次全失败 ⇒ 按铁律停推，本地照常 commit。**未推=2**（`baefa152b` 413-followup ＋ 本轮 413 close/422）。恢复后统一推。
 - 撤销口令：「413 重开」／「422 撤回」。
+## A1684（2026-11-10 19:4x，编排者）**wave118：422 面板接线落地｜418-AC#4 全Linux扫落地｜422+418 双双关闭（done=322）｜网络恢复全推**
+
+- **网络恢复**：push 成功，`baefa152b`+413 close+A1683+422+418ac4 **全推 origin/dev，未推=0**（随后 422/418 close 两笔再推）。
+- **422** `587e0e22e`（12 件 +483/−7）：快照键 `ballSize`＋`config.set ball_size` 路由接通。**两处自判**：①动 cmd/wisp 生产码（ApplySetting case，**AC#2 明令要求**，非越界）②把 415 缺口台账延伸到顶层对账登记 `PanelSnapshot:{ballSize}`（带双向腐烂判定，加牙非静音）。两处均接受。
+- **418-AC#4** `47044c7b7`：`GOOS=linux go list ./...`=40 枚逐包单 build ⇒ **FAIL=2**（`cmd/wisp`/`internal/speech`，均 sherpa cgo 交叉档存量口径 A1032，零行指向本仓源码）；**`internal/ball` 不在失败名单**（418 根因已清）；追加票 230＋证据件。
+- **编排者独立复跑**：`go test ./internal/panel` **ok 18.978s**／`go test ./cmd/wisp -run 'Test422|Test413|Test65'` **ok 4.397s**／`./internal/ball` **ok 0.961s**／vet rc0／gofumpt 空／d22scan clean／path GREEN／`GOOS=linux go vet ./internal/ball/` rc0。
+- **422 关闭** `90a7616d9`（5/5 AC）＋**418 关闭** `b935161f7`（6/6 AC，AC#6 以 AC#4 更强本地证据替代 CI job 日志，因 CI 整体红＝A1674 预存在批）。双名各 0/1；改名后 path VERDICT GREEN。
+- **票池：done 320→322，未结 88→86。**
+- **诚实边界**：滑块页面仍半接线——`frontend/src/lib/panel.ts` 未声明 `ballSize`、`config-screen.tsx:105` 范围旧 44-72，归外部 UI agent（Q-51）；CLI `ball.size` 键未扩（可选件）。
+- 撤销口令：「422 撤回」／「418 撤回」。
+
+### 待关余量（现量）
+- 已落地未关：**417／419／420**（3 张，各 1 条 CI 侧验证 AC；核心测试本地绿）。
