@@ -1,0 +1,13 @@
+=== RUN   TestAC297LivePacketByteFace
+    livepacket_297_windows_test.go:51: [A0] capture endpoint id="{0.0.1.00000000}.{1115a660-460f-4ff0-9e2f-bdf480451e19}" name="麦克风 (Realtek(R) Audio)" | render endpoint name="扬声器 (Realtek(R) Audio)"
+    livepacket_297_windows_test.go:68: [A] mix format quad: tag=3 channels=2 rate=48000 bits=32
+    livepacket_297_windows_test.go:70: [A2] convertPacket path: floating=true (tag==waveFormatFloat)
+    livepacket_297_windows_test.go:134: [B/C] first packet: frames=480 flags=0x1 bytes=3840 (bits=32 ch=2)
+    livepacket_297_windows_test.go:152: [D] window 1 FrameLevel = 0.000000
+    livepacket_297_windows_test.go:175: [B] first packet, int16 view, first 16: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+    livepacket_297_windows_test.go:178: [C] same bytes, float32 view, first 8: [0 0 0 0 0 0 0 0]
+    livepacket_297_windows_test.go:195: [D] 64 windows x 512 samples (rate 48000): mean=0.002175 max=0.030298 min=0.000000 silentPackets=0 firstFlags=0x1 -- ticket 247 floor was mean=0.367691 max=0.409285
+    livepacket_297_windows_test.go:247: [verdict] no signature matched; the printed faces above are the evidence for AC#2
+--- PASS: TestAC297LivePacketByteFace (0.93s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.996s
