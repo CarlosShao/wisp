@@ -62,18 +62,45 @@ const keyPathChatThinking = "llm.roles.chat.thinking_intensity"
 // the picker on the page lists nothing for such a model, which is the same
 // measured asymmetry stated on the read half.
 //
-// THIS SETTER DOES NOT CONSULT Capabilities.Thinking, and that is a measured
-// decision, not an oversight. Ticket 145 AC#2b made the READ face's question
-// "does this dimension exist for this model" (thinkingDimensionDeclared
-// below); the WRITE face's question is "is this value legal". The two were
-// already different before this ticket: a model declaring no levels accepts
-// any enum tier while offering none. So the third divergence case - a model
-// whose entry never declared the bit still takes a tier write - is the same
-// asymmetry, not a new one. Closing it belongs to the write leg's own ticket;
-// the read face cannot be made to depend on a rule the write face does not
-// carry, or the two would answer the same question differently (the defect
-// ticket 145 AC#2b exists to remove). Registered as R-145-3 in
-// docs/evidence/s1/145-ac2b-r1.md.
+// THE CAPABILITY BIT DOES NOT VETO HERE - ticket 416's ruling on R-145-3,
+// decided on this leg, not inherited. The two faces answer different questions
+// and ticket 145 AC#2b already split them: the READ face's question is "does
+// this dimension exist for this model, so the page may offer it"
+// (thinkingDimensionDeclared answers it with the bit AND the declared list,
+// because SPEC-03 section 3.1's probe-first all-false default makes an
+// undeclared bit UNKNOWN, and unknown offers nothing - 宁缺毋造); the WRITE
+// face's question is "is this stored value legal", and the vocabulary alone
+// decides that. Three measured facts close it this way:
+//
+//   - thinking_intensity is a REQUEST parameter the role carries, not a
+//     property the model owns, and the rest of the chain never lets the bit
+//     near the value: the resolver carries it verbatim
+//     (internal/llm/resolver.go:204) and each adapter validates it against
+//     its own vocabulary at request time
+//     (internal/llm/openairesponses/request.go:139,
+//     internal/llm/anthropic/request.go:124). A setter veto would be the
+//     chain's only bit gate on a VALUE, and it would gate nothing:
+//     config.toml is hand-editable, so the file door accepts what the setter
+//     door refuses - the gate would only divide the two doors.
+//   - What a veto would cost buys nothing: the model switcher never touches
+//     this key, so a tier rides across models; on a no-bit model every
+//     re-assert (even writing "off" back) would be refused while the stored
+//     value sat in the file regardless. Storage is where the user's explicit
+//     choice lives; the page simply does not offer the option again
+//     (MAY-store, never-offer - the same split every mainstream harness
+//     draws between a persisted preference and a filtered picker).
+//   - So the shape already here IS the mainstream shape: capability gates
+//     the OFFER (read face), the vocabulary gates the VALUE (this setter),
+//     the adapter gates the REQUEST. Each face answers one question, and the
+//     bit decides only the first.
+//
+// The declared-list check above stays, for a VALUE reason not a bit reason: a
+// non-empty ThinkingLevels is the entry's own named vocabulary, and a value
+// its own words contradict is refused wherever the write came from - the
+// refusal tracks the entry's vocabulary, never its capability bits.
+// Round-trip teeth for this whole ruling:
+// internal/config/settings_187_r1453_test.go. Registered as R-145-3 in
+// docs/evidence/s1/145-ac2b-r1.md; closed by this file, not by a doc.
 func (m *Manager) SetRoleChatThinking(level string) ([]string, error) {
 	v := strings.TrimSpace(level)
 	if v == "" {
