@@ -5,6 +5,10 @@ package ball
 // owner can see WHICH surface is rendering the ball and WHICH upstream orb
 // state the page was pushed to, without opening a debugger. No Win32, no
 // WebGPU, no locks - everything here reads values the caller already holds.
+//
+// The two *Ball debug methods (DebugOrbAttached/DebugOrbState) live in
+// orbdebug_windows.go: they read fields defined only in ball_windows.go, so
+// they must not compile into non-Windows builds (ticket 418).
 
 import (
 	"fmt"
@@ -31,17 +35,4 @@ func OrbMappedState(s statemachine.State) string { return orbStateFor(s) }
 // state. Pure so every claim in the evidence doc is re-derivable anywhere.
 func OrbDebugLine(attached bool, s statemachine.State) string {
 	return fmt.Sprintf("orb-surface=%s orb-state=%s", OrbSurfaceName(attached), orbStateFor(s))
-}
-
-// DebugOrbAttached reports whether the WebView2 orb owns the pixels (debug
-// harness/evidence only; false = the D2D fallback is what is on screen).
-// Same shape as DebugHWND's debug-only contract.
-func (b *Ball) DebugOrbAttached() bool { return b.orb.Load() != nil }
-
-// DebugOrbState returns the ball's current state under its own lock (the
-// read side of SetState for the debug face).
-func (b *Ball) DebugOrbState() statemachine.State {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.curState
 }
