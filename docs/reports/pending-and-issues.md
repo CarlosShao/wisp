@@ -33870,3 +33870,19 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **派 wave120**（4 腿；写面互斥）：**417**(tools/d22scan)/**297**(internal/audio 仅测试+probes)/**123**(cmd/wisp 测试)/**180**(只读普查零产码)。⚠ 388 会撞 297 的 internal/audio 故押后；163 立而不派（D34/D46 需人工批）；174 写面实为 internal/tools 非 cmd/wisp 且 AC#2 等 Q-60，押后。
 - 未推 0（全推）。done=324，未结 84。
 - **★机主集中决策清单见本轮汇报**（分诊§5：264三形/170甲乙丙/194词表/188 D43/193 Q-70/215 D36/274 SPEC-11/56花钱/55-57-58 go-ahead）。
+## A1687（2026-11-10 21:1x，编排者）**wave120 收件：417 关闭（done=326）｜297/123/180 落地｜★180 发现 25 枚孤儿 config 字段→立 423｜派 wave121**
+
+### 一、wave120 四腿
+- **417**：★**二次更正**——A1686 说"417 未落地"是错的；实际代码今日 16:27/16:29 由 `def465091`（go:embed testdata/blacklist_29d258f9.go.txt 16819B）＋`9bb75d8d2`（钉 LF）落地且已推，票面只是没更新。**编排者现跑（独立模块内）** `go test . -run TestRiskWordlistStartAnchorControlIsExactlyAEquiv` **PASS 0.06s**、`go test .` **ok 47.269s**；CI 修复后 run **`42815234142`** PASS×2、`runtests OK PASS=45 FAIL=0`。**417 关闭** `51b2ec7ff`（5/5 AC）。
+- **297** `0b5a19f34`（20 件全 windows-tagged 测试仪器，零产码）：三形读数——**形②（切错字节）＝旧 0.37 底成因、票 300 @24 修复已治**；形③（设备本底）两发真机排除；**形①（声音没到麦）＝红句现存唯一成因**。AC#2 裁形归编排者（下轮我给判语）。
+- **123** `b177f1b4d`（票面 append）：AC#1/2/3/5/6 维持裁决表 PASS；AC#4 runner 真读数＝run `42336011115` step7 四枚 PASS（秒级）。**closeable 仍否**：该步 FAIL=0 前提被别票 4 红（223/198/313/33）占着，归那些票＋314 硬死。
+- **180** `6eda2be3b`（普查 102 行）：母体 70 字段＝33 有读者/7 守卫/30 零读者（5 挂未结票，**25 悬空**）。**★25 枚孤儿**：归属票全 done 但字段仍零生产读者，改 config 白改——**已立 423 承接**。
+
+### 二、动作
+- **417 关闭** `51b2ec7ff`（双名 0/1、path GREEN）。
+- **立 423**（25 孤儿字段，internal/config+cmd/wisp 读者侧）。
+- **派 wave121**（3 写腿，写面互斥）：**423**(config/cmd-wisp 读者)/**388**(internal/audio only)/**163**(internal/tools+proc)。⚠ 388 限 internal/audio 因 423 占 cmd/wisp 槽。
+- done 324→**326**，未结 84→**83**（含 423 新增）。未推 0。
+
+### 三、待编排者判语
+- **297 AC#2 三形裁定**：读数已指向形①（声音没到麦＝非码缺陷，需机主真麦冒烟）；下轮我给判语并决定 297 能否关。
