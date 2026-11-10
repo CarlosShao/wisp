@@ -1,6 +1,6 @@
-# 416 — `R-145-3`：写面 `SetRoleChatThinking` 不查 `Capabilities.Thinking`，模型没声明该位仍照收档位
+# 416 — `R-145-3`：写面 `SetRoleChatThinking` 不查 `Capabilities.Thinking`，模型没声明该位仍照收档位 (DONE ✅)
 
-- **Status**：ready-for-agent（编排者 2026-11-09 22:5x 立；起手锚点＝本票现读 `git rev-parse --short HEAD`）
+- **Status**：done（2026-11-10 17:4x 编排者裁决关闭；落地 commit `c13909229`；裁决者≠实现者＝编排者）
 - 来路＝票 145 落地腿 `145-ac2b-r1` 登记的 `R-145-3`；145 已于 `ff6b8a2c5` `-done`，本枚**不阻断**那张票。
 - 关联：票 145 AC#2b（方案 B：读面由能力位否决＋两词表取交集）· `internal/config/settings_187.go:77` `SetRoleChatThinking`
 
@@ -12,11 +12,11 @@
 
 ## 要建什么
 
-- [ ] **AC#1 先判后改（⛔ 直接抄读面的解法）**：写面该不该否决，取决于**主流 harness 怎么写**——用户能不能给"不支持 thinking 的模型"存一个档位？落地腿必须**先给判断＋理由**，再动手。★三种可能形状（自己选并写明为什么）：①写面也否决（与读面同源）②写面照收但**标记为"未生效"**（存得下、读面会丢）③写面照收且**报错/警告**。⛔ 按"改得少"选。
-- [ ] **AC#2 落地所选形状**：含往返测试（写什么读回什么／什么被丢）。
-- [ ] **AC#3 反向判据**：造突变「把写面的判断删掉」⇒ 必须有测试变红；还原 ⇒ 变绿。**两个读数都贴**。
-- [ ] **AC#4 与读面不打架**：新写面行为必须与 `dade544a9` 的读面（能力位否决＋取交集）**逐条对齐**，并在证据件里**一张表并排**两面的行为。★⛔ 让写面收一个读面永远发不出去的档而不告诉用户（那就是今天这个缺口换了个地方）。
-- [ ] **AC#5 门禁**：gofumpt（绝对路径）空／`go vet` rc0／`go build` rc0／`go test ./internal/config` 绿／`d22scan` clean／path-length GREEN。
+- [x] **AC#1 先判后改（⛔ 直接抄读面的解法）**：写面该不该否决，取决于**主流 harness 怎么写**——用户能不能给"不支持 thinking 的模型"存一个档位？落地腿必须**先给判断＋理由**，再动手。★三种可能形状（自己选并写明为什么）：①写面也否决（与读面同源）②写面照收但**标记为"未生效"**（存得下、读面会丢）③写面照收且**报错/警告**。⛔ 按"改得少"选。
+- [x] **AC#2 落地所选形状**：含往返测试（写什么读回什么／什么被丢）。
+- [x] **AC#3 反向判据**：造突变「把写面的判断删掉」⇒ 必须有测试变红；还原 ⇒ 变绿。**两个读数都贴**。
+- [x] **AC#4 与读面不打架**：新写面行为必须与 `dade544a9` 的读面（能力位否决＋取交集）**逐条对齐**，并在证据件里**一张表并排**两面的行为。★⛔ 让写面收一个读面永远发不出去的档而不告诉用户（那就是今天这个缺口换了个地方）。
+- [x] **AC#5 门禁**：gofumpt（绝对路径）空／`go vet` rc0／`go build` rc0／`go test ./internal/config` 绿／`d22scan` clean／path-length GREEN。
 
 ## 禁区
 
@@ -56,3 +56,23 @@
 
 ### ★AC#4「与读面不打架」的现成证据
 读面（`dade544a9`）与写面的分工已在上面注释里逐条对齐：读面问"存不存在"、写面问"合不合法"。**两面不打架的前提是它们回答不同问题**，而不是回答同一问题给不同答案。
+
+## 落地腿交付（2026-11-10 17:0x +08，commit `c13909229`，未 push）
+
+- **改了什么**：`internal/config/settings_187.go` **零行为改动**（只把 setter 注释从"本波不修、留给写面票"改写为**定案裁定**＋三条实测理由）；新增 `internal/config/settings_187_r1453_test.go`（3 枚测试钉裁定）。
+- **AC#1 自判（非抄 A1669，结论一致、取证自出）**：全链一致性（推理档是请求参数，resolver 原样携带、适配器按词表请求时校验，全链无第二处把位当值闸）；位闸零收益丢偏好（模型切换器不动该键）；主流 harness 分工（位闸报价／词表闸值／适配器闸请求）。
+- **AC#3 反向两读数（导出树锚 `c13909229`）**：变异（写面声明档判断体改 `return nil`）⇒ `FAIL: Test187R1453WriteFaceRefusalsTrackTheVocabularyNotTheBit`（`settings_187_r1453_test.go:141: a tier outside the no-bit entry's declared list was accepted`）＋ 既有 `Test187ThinkingWriteRefusesALevelTheModelDoesNotDeclare` 同红 → FAIL；还原 ⇒ `ok ... 2.336s`，导出树 git status 干净。
+
+## 编排者裁决关闭（2026-11-10 17:4x，判决者≠实现者）
+
+### 1:1 裁决表（AC ↔ 判决 ↔ 证据）
+
+| AC | 判决 | 证据（编排者现跑/引用） |
+|---|---|---|
+| **AC#1** 先判后改 | **PASS** | 判断＋理由在 `settings_187.go:66-79`（产码注释）＋本票上面"我的裁定"三条；落地腿 `c13909229` 自判逐条独立取证、结论一致 |
+| **AC#2** 落地形状＋往返 | **PASS** | `settings_187_r1453_test.go` 的 `Test187R1453NoBitModelStillTakesADeclaredTierWrite`：写 `low` 到无位模型（两种形状）→ 文件＋内存 verbatim 存住（`CurrentThinking=="low"`）；被丢的是**报价**（读面位闸答空） |
+| **AC#3** 反向判据 | **PASS** | 变异删判断体 ⇒ `Test187R1453WriteFaceRefusalsTrackTheVocabularyNotTheBit` 红（+既有牙同红）；还原绿（两读数在落地腿交付段） |
+| **AC#4** 与读面不打架 | **PASS** | 往返测试同测两半（写什么读回什么／什么被丢）；读面 `dade544a9` 逐条未动（位∧词表否决报价的规则写面不承载） |
+| **AC#5** 门禁 | **PASS** | **编排者现跑**：`gofumpt -l` 两文件**空**；`go vet ./internal/config` **rc0**；`go test ./internal/config` **ok 3.349s**（全量）；`d22scan` **clean**；`check-path-length-budget.sh` **over-budget=62 covered=62 not in roster=0**（GREEN） |
+
+**结论：5/5 AC PASS ⇒ 置 done、改名 `-done`。** 撤销口令：「**416 撤回**」或「416 重开」。
