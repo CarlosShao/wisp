@@ -49,6 +49,15 @@ import (
 // promise ticket 77 made for the approval card, extended to what this ticket
 // adds. A renamed field on one side must go red here, not render "undefined"
 // inside a permission indicator.
+//
+// Ticket 415 (R-145-2) is about this ruler's REACH. The pairs table below
+// enumerates six TOP-LEVEL types; ticket 145's acceptance leg measured what
+// that reach misses: every nested section the wire grew after ticket 92
+// (instructions, tasks, commands, modelSwitch, ballStyle, run, plugins, git,
+// files) had no ruler at all, so Go emitted eleven keys panel.ts never
+// declared and not one instrument noticed. The nested half is the recursive
+// walk in the subtest below; TestPlantedNestedContractDriftGoesRed is its
+// reverse criterion.
 func TestComposerContractTypesMatchFrontend(t *testing.T) {
 	root := panelRepoRoot(t)
 	data, err := os.ReadFile(filepath.Join(root, "frontend", "src", "lib", "panel.ts"))
@@ -82,6 +91,387 @@ func TestComposerContractTypesMatchFrontend(t *testing.T) {
 		}
 		t.Logf("%s <-> %s: %d JSON keys reconciled", p.name, p.tsIface, len(goKeys))
 	}
+
+	// The nested half (ticket 415 AC#1): the pairs table above stops at the
+	// six top-level view models, so the same two-way reconciliation now walks
+	// everything Snapshot's json shape can reach. The shape is recursive
+	// type-derivation on BOTH sides - the same shape the mainstream
+	// type-contract tooling family (quicktype, ts-rs, OpenAPI-driven contract
+	// tests) uses - because a hand-copied enumeration of today's sections is
+	// exactly the design that went blind once already (see
+	// composerTSNameMap's comment for why, and
+	// TestPlantedNestedContractDriftGoesRed for the proof it has teeth).
+	t.Run("the ruler reaches the nested sections (ticket 415, R-145-2)", func(t *testing.T) {
+		nameMap := composerTSNameMap()
+		ledger := composerTSGapLedger()
+		violations := nestedContractViolations(reflect.TypeOf(Snapshot{}), text, nameMap, ledger)
+		if len(violations) > 0 {
+			t.Errorf("the nested half of the composer contract drifted; the ruler names:%s",
+				"\n  "+strings.Join(violations, "\n  "))
+		}
+		pinned := 0
+		for _, keys := range ledger {
+			pinned += len(keys)
+		}
+		t.Logf("nested contract held: %d Go view-model types translated and walked against panel.ts, %d judged page-side gap(s) pinned by exact set",
+			len(nameMap), pinned)
+	})
+}
+
+// ------------------------------------------------- contract, nested sections
+
+// composerTSNameMap translates every Go view-model type the recursive walk can
+// reach from Snapshot into the frontend/src/lib/panel.ts interface that
+// declares the same key set.
+//
+// WHY THIS SHAPE (ticket 415 AC#1 asked for the choice, judged by "what does
+// mainstream harness tooling do", not by "what edits least"). The failed
+// predecessor was the hand-copied pairs table: it enumerated the six types of
+// ticket 92's day, so the nine nested sections the wire grew afterwards were
+// outside every instrument's reach and ticket 145's acceptance leg measured
+// the consequence - eleven Go-only keys, zero red. The replacement is
+// type-derivation, the same principle quicktype / ts-rs / OpenAPI contract
+// tooling is built on: the walk starts at Snapshot, follows json tags through
+// pointers, slices and arrays, and every struct it reaches needs BOTH a
+// translation here and a matching interface on the page, whose own field
+// types are followed the same way. A section added tomorrow is therefore
+// covered by construction: what fires is not a blind spot but the ruler
+// naming the reachable Go type that has no page half. The map is exact-set
+// like the walk it serves - a translation whose type left the wire is red
+// (stale), so the table cannot rot into either direction of drift.
+func composerTSNameMap() map[string]string {
+	return map[string]string{
+		"Snapshot":               "PanelSnapshot",
+		"ComposerState":          "ComposerState",
+		"ModeView":               "ComposerMode",
+		"WorkspaceView":          "ComposerWorkspace",
+		"AttachmentRef":          "ComposerAttachment",
+		"ResultChunk":            "ResultChunkView",
+		"ApprovalCardView":       "ApprovalCardView",
+		"InstructionsSection":    "InstructionsSection",
+		"ProjectInstructionFile": "ProjectInstructionFile",
+		"TaskRosterSection":      "TaskRosterSection",
+		"TaskRowView":            "TaskRowView",
+		"CommandRosterSection":   "CommandsSection",
+		"CommandRow":             "CommandRowView",
+		"ModelSwitchSection":     "ModelSwitchSection",
+		"ModelOption":            "ModelOptionView",
+		"BallStyleSection":       "BallStyleSection",
+		"TreeView":               "FilesSection",
+		"TreeEntry":              "TreeEntryView",
+		"RunSection":             "RunSection",
+		"ToolRunRow":             "ToolRunRowView",
+		"RunErrorRow":            "RunErrorRowView",
+		"RunStuckRow":            "RunStuckRowView",
+		"PluginInventorySection": "PluginsSection",
+		"PluginRow":              "PluginRowView",
+		"GitView":                "GitView",
+		"GitWorktree":            "GitWorktree",
+	}
+}
+
+// composerTSGapLedger is ticket 415 AC#3's judgement, in instrument form.
+//
+// Each entry is a key the Go wire emits inside a nested section that
+// frontend/src/lib/panel.ts does not declare - the ticket 145 acceptance
+// leg's finding, measured key by key by the recursive walk on its first run.
+// AC#3 asked the landing leg to judge each one rather than skip it: every key
+// here SHOULD have a page-side declaration (they are real wire facts a
+// renderer needs - the per-key judgement and the named deliverable list for
+// the external UI agent are in docs/evidence/s1/415-r145-2-*.md), but the
+// page half belongs to that agent (frontend/** is outside this ticket's
+// write face, Q-51). So the gap is REGISTERED, never silenced:
+//
+//   - panel.ts declaring one of these keys is RED (stale registration: the
+//     gap closed, delete the entry and the ordinary two-way comparison
+//     judges the key from then on - and the walk starts demanding the child
+//     type's translation the same turn);
+//   - Go emitting any OTHER undeclared key is RED (unregistered gap);
+//   - Go dropping a registered key is RED (dead registration).
+//
+// That is the difference from the "跳过这 6 键" the ticket forbids: before
+// this ledger the gap was invisible to every instrument; now it is named
+// eleven times and any movement on either side flips the ruler red.
+func composerTSGapLedger() map[string][]string {
+	return map[string][]string{
+		"ModelOptionView":    {"display"},
+		"ModelSwitchSection": {"adapter", "adapterThinkingLevels"},
+		"ToolRunRowView":     {"argsJson", "level"},
+		"RunErrorRowView":    {"retryable"},
+		"RunSection":         {"running", "usage", "done"},
+		"GitView":            {"uncommitted", "diff"},
+	}
+}
+
+// nestedContractViolations walks goRoot's json shape against tsText and
+// returns one human-readable line per violation, sorted. Both the real-tree
+// subtest above and ticket 415 AC#2's planted-mutation subtests drive this
+// one engine, in this file's standing tradition: a gate that has never been
+// seen red is a decoration, so the gate's teeth are proven against planted
+// drift, not asserted.
+//
+// Judged here, per reached interface:
+//
+//   - a Go-only key is either a ledger entry (judged gap, see
+//     composerTSGapLedger) or a fresh drift (red, and the message names the
+//     key and refuses to be silenced);
+//   - a ledger entry whose gap closed or whose key Go stopped emitting is
+//     red - the ledger is exact-set, never an absorb-everything bin;
+//   - a TS-only key is red (fields the page reads that Go never sends render
+//     as undefined);
+//   - every struct-typed key both sides declare must name the translated
+//     interface on the TS side, and the walk descends through it;
+//   - a reachable Go struct with no translation is red - that is the ruler
+//     catching a NEW nested section, the shape the old pairs table was blind
+//     to; and a translation the walk never reaches is red (stale).
+func nestedContractViolations(goRoot reflect.Type, tsText string,
+	nameMap map[string]string, ledger map[string][]string,
+) []string {
+	var out []string
+	want, mapped := nameMap[goRoot.Name()]
+	if !mapped {
+		return []string{"the walk's root " + goRoot.Name() + " has no page-side translation in composerTSNameMap - the ruler cannot start"}
+	}
+	ifaces := tsInterfaces(tsText)
+	fieldTypes := tsInterfaceFieldTypes(tsText)
+	visited := map[string]bool{}
+
+	var walk func(gt reflect.Type, tsName, path string)
+	walk = func(gt reflect.Type, tsName, path string) {
+		visited[gt.Name()] = true
+		goKeys := jsonKeysOf(reflect.New(gt).Elem().Interface())
+		tsKeys, ok := tsInterfaceKeys(tsText, tsName)
+		if !ok {
+			out = append(out, path+" needs interface "+tsName+" and panel.ts declares none - the page half is missing entirely")
+			return
+		}
+		tsHas := map[string]bool{}
+		for _, k := range tsKeys {
+			tsHas[k] = true
+		}
+		goHas := map[string]bool{}
+		for _, k := range goKeys {
+			goHas[k] = true
+		}
+		registered := map[string]bool{}
+		for _, k := range ledger[tsName] {
+			registered[k] = true
+		}
+
+		// Go-only keys: each is a judged gap (ledger) or fresh drift (red).
+		var observedGaps []string
+		for _, k := range goKeys {
+			if !tsHas[k] {
+				observedGaps = append(observedGaps, k)
+			}
+		}
+		sort.Strings(observedGaps)
+		for _, k := range observedGaps {
+			if registered[k] {
+				continue
+			}
+			out = append(out, path+" emits "+k+" and interface "+tsName+" does not declare it - a nested key one side grew and the other never saw; register it in composerTSGapLedger ONLY with a judgement, never to silence it")
+		}
+		// The ledger itself is judged both ways, so it cannot rot.
+		for _, k := range ledger[tsName] {
+			if tsHas[k] {
+				out = append(out, "stale gap registration: interface "+tsName+" declares "+k+" now - delete the ledger entry so the ordinary two-way comparison judges it")
+			} else if !goHas[k] {
+				out = append(out, "dead gap registration: Go "+path+" no longer emits "+k+" - delete the ledger entry")
+			}
+		}
+		// TS-only keys: the page reads what Go never sends.
+		for _, k := range tsKeys {
+			if !goHas[k] {
+				out = append(out, "interface "+tsName+" reads "+k+" that Go "+path+" never sends - those fields render as undefined")
+			}
+		}
+		// Descend through struct children both sides declare.
+		for i := 0; i < gt.NumField(); i++ {
+			f := gt.Field(i)
+			key, ok := contractJSONKey(f)
+			if !ok {
+				continue
+			}
+			et := contractElemType(f.Type)
+			if et.Kind() != reflect.Struct || et.Name() == "" || et.Name() == "Time" {
+				continue
+			}
+			if !tsHas[key] {
+				continue // judged above as a gap; nothing to reconcile on a side that declares nothing
+			}
+			childWant, childMapped := nameMap[et.Name()]
+			if !childMapped {
+				out = append(out, path+"."+key+" nests Go struct "+et.Name()+" and composerTSNameMap has no page-side interface for it - add the translation and the panel.ts interface in the same move; this red is the ruler catching a new section, not a defect")
+				continue
+			}
+			refs := tsFieldTypeInterfaceNames(fieldTypes[tsName][key], ifaces)
+			if !containsString(refs, childWant) {
+				out = append(out, path+"."+key+" nests Go "+et.Name()+" (page shape "+childWant+"), but the TS field type is {"+
+					fieldTypes[tsName][key]+"} - the page half must name "+childWant)
+				continue
+			}
+			if !visited[et.Name()] {
+				walk(et, childWant, path+"."+key)
+			}
+		}
+	}
+	walk(goRoot, want, goRoot.Name())
+
+	for g, page := range nameMap {
+		if !visited[g] {
+			out = append(out, "composerTSNameMap translates "+g+" -> "+page+" but the walk never reached it - the type left the wire or the mapping is stale; fix the map, never widen the walk to keep it busy")
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// contractJSONKey returns a field's wire key under the same rule jsonKeysOf
+// applies: unexported fields and json:"-" carry no key.
+func contractJSONKey(f reflect.StructField) (string, bool) {
+	if f.PkgPath != "" {
+		return "", false
+	}
+	tag := f.Tag.Get("json")
+	if tag == "" || tag == "-" {
+		return "", false
+	}
+	return strings.Split(tag, ",")[0], true
+}
+
+// contractElemType unwraps the pointer/slice/array layers between a field and
+// the struct it carries (nil maps and time.Time stay leaves; no view model
+// nests either).
+func contractElemType(t reflect.Type) reflect.Type {
+	for {
+		switch t.Kind() {
+		case reflect.Ptr, reflect.Slice, reflect.Array:
+			t = t.Elem()
+		default:
+			return t
+		}
+	}
+}
+
+// tsInterfaceFieldTypes parses each interface's field lines into key -> raw
+// type text, the half tsInterfaces' key-only parse does not keep.
+func tsInterfaceFieldTypes(text string) map[string]map[string]string {
+	fieldRe := regexp.MustCompile(`^\s*(\w+)(\?)?:\s*([^;]+);`)
+	out := map[string]map[string]string{}
+	for _, m := range tsBlockRe.FindAllStringSubmatch(text, -1) {
+		fields := map[string]string{}
+		for _, line := range strings.Split(m[2], "\n") {
+			if fm := fieldRe.FindStringSubmatch(line); fm != nil {
+				fields[fm[1]] = fm[3]
+			}
+		}
+		out[m[1]] = fields
+	}
+	return out
+}
+
+// tsFieldTypeInterfaceNames returns the interfaces a TS field type references
+// (union and array wrappers stripped by intersection with the declared
+// interface set: "RunErrorRowView | null" and "ComposerAttachment[]" both
+// resolve; a literal-union alias such as CredentialState is a leaf).
+func tsFieldTypeInterfaceNames(typeText string, ifaces map[string][]string) []string {
+	var out []string
+	for _, id := range regexp.MustCompile(`[A-Za-z_]\w*`).FindAllString(typeText, -1) {
+		if _, ok := ifaces[id]; ok && !containsString(out, id) {
+			out = append(out, id)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// TestPlantedNestedContractDriftGoesRed is ticket 415 AC#2's reverse
+// criterion, the planted-shape nail this file's gates are all held to: a
+// ruler that has never been seen red is a decoration. The drift is planted by
+// TEXT surgery on the real panel.ts against the real compiled Go types -
+// deleting a nested key from an interface is exactly the "Go emits a nested
+// key the page never declared" drift ticket 145's acceptance leg measured,
+// with the Go half already carrying the key - and the ruler must NAME the
+// drifted key, not merely frown. The unmutated real-tree reading (zero
+// violations) is the subtest inside TestComposerContractTypesMatchFrontend.
+func TestPlantedNestedContractDriftGoesRed(t *testing.T) {
+	root := panelRepoRoot(t)
+	data, err := os.ReadFile(filepath.Join(root, "frontend", "src", "lib", "panel.ts"))
+	if err != nil {
+		t.Fatalf("read frontend/src/lib/panel.ts: %v", err)
+	}
+	text := string(data)
+
+	t.Run("a nested key Go emits and panel.ts does not declare is red, naming the key", func(t *testing.T) {
+		// PanelSnapshot.run.toolsDropped is a real nested key today (Go
+		// RunSection.ToolsDropped, a leaf the walk judges directly); deleting
+		// its declaration is the exact drift shape R-145-2 filed.
+		drifted := strings.Replace(text, "toolsDropped?: number;", "", 1)
+		if drifted == text {
+			t.Fatal("plant premise broken: panel.ts no longer declares toolsDropped - re-point this plant at a live nested key, never at a synthetic one")
+		}
+		violations := nestedContractViolations(reflect.TypeOf(Snapshot{}), drifted, composerTSNameMap(), composerTSGapLedger())
+		joined := strings.Join(violations, "\n")
+		if !strings.Contains(joined, "toolsDropped") || !strings.Contains(joined, "does not declare") {
+			t.Fatalf("planted a nested key Go emits and panel.ts does not declare, and the ruler did not name it: %v", violations)
+		}
+		t.Logf("red as required: %d violation(s), named: %s", len(violations), joined)
+	})
+
+	t.Run("a nested key panel.ts reads and Go never sends is red, naming the key", func(t *testing.T) {
+		ghosted := strings.Replace(text, "attachmentError: string;",
+			"attachmentError: string;\n  ghostRenderKey: string;", 1)
+		if ghosted == text {
+			t.Fatal("plant premise broken: the attachmentError anchor is gone from panel.ts")
+		}
+		violations := nestedContractViolations(reflect.TypeOf(Snapshot{}), ghosted, composerTSNameMap(), composerTSGapLedger())
+		joined := strings.Join(violations, "\n")
+		if !strings.Contains(joined, "ghostRenderKey") || !strings.Contains(joined, "never sends") {
+			t.Fatalf("planted a key the page reads and Go never sends, and the ruler did not name it: %v", violations)
+		}
+		t.Logf("red as required: %d violation(s), named: %s", len(violations), joined)
+	})
+
+	t.Run("the gap ledger cannot absorb a fresh gap or hide a closed one", func(t *testing.T) {
+		// (a) a fresh Go-only key with a non-empty ledger present must still
+		// be red: the ledger judges ITS entries and nothing else.
+		drifted := strings.Replace(text, "deduplicated: boolean;", "", 1)
+		if drifted == text {
+			t.Fatal("plant premise broken: panel.ts no longer declares deduplicated")
+		}
+		violations := nestedContractViolations(reflect.TypeOf(Snapshot{}), drifted, composerTSNameMap(), composerTSGapLedger())
+		if joined := strings.Join(violations, "\n"); !strings.Contains(joined, "deduplicated") || !strings.Contains(joined, "does not declare") {
+			t.Fatalf("the ledger did not stop at its own entries: %v", violations)
+		}
+		// (b) registering a key the page ALREADY declares must be red: the
+		// ledger may not stand between the two sides once the gap is gone.
+		stale := composerTSGapLedger()
+		stale["ComposerState"] = []string{"mode"}
+		violations = nestedContractViolations(reflect.TypeOf(Snapshot{}), text, composerTSNameMap(), stale)
+		if joined := strings.Join(violations, "\n"); !strings.Contains(joined, "stale gap registration") || !strings.Contains(joined, "declares mode") {
+			t.Fatalf("a closed gap registered in the ledger did not go red: %v", violations)
+		}
+		t.Logf("ledger held: fresh unregistered gap red, stale registration red")
+	})
+
+	t.Run("a reachable nested Go type with no page-half translation is red", func(t *testing.T) {
+		// The guard that makes tomorrow's section covered by construction:
+		// drop GitWorktree's translation and the walk must name the type it
+		// can no longer reach the page half for.
+		blinded := map[string]string{}
+		for k, v := range composerTSNameMap() {
+			if k != "GitWorktree" {
+				blinded[k] = v
+			}
+		}
+		violations := nestedContractViolations(reflect.TypeOf(Snapshot{}), text, blinded, composerTSGapLedger())
+		joined := strings.Join(violations, "\n")
+		if !strings.Contains(joined, "GitWorktree") || !strings.Contains(joined, "no page-side interface") {
+			t.Fatalf("a reachable Go struct with no translation did not go red: %v", violations)
+		}
+		t.Logf("red as required: %d violation(s), named: %s", len(violations), joined)
+	})
 }
 
 // ------------------------------------------------- AC#1: mode is display-only
