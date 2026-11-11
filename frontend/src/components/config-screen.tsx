@@ -20,6 +20,16 @@
                        page's own document; this one leaves the WebView as a
                        real config write.
 
+      ball.size        WORKS as a config write (tickets 413/422, 2026-11-11).
+                        Same shape as ball.style: the write rides config.set's
+                        ball_size field through the settings door (Go's write
+                        route is already live), and the snapshot's ballSize
+                        section is its read half - the slider's band is the
+                        section's own min/max, never a number typed here. Its
+                        effect tier is restart: the orb window geometry is
+                        built once at boot, so the receipt says so rather
+                        than calling it instant.
+
      the opacity row  WORKS. The frost is a CSS custom property in this
                       document (the generated table's alpha knob), and moving
                       it is a style write on this page. It is not a config
@@ -31,14 +41,15 @@
 
      everything else  DORMANT, and says so instead of showing a number.
                       Theme / font size / panel width belong to Go's config
-                      and need a C17 read plus a route back; the ball size, opacity and click-through keys
+                      and need a C17 read plus a route back; the ball opacity and click-through keys
                       belong to the native ball, which is Direct2D and cannot
                       be reached from a page at all (D29). Rendering an
                       editable box with a made-up value in it would be owner's
                       P9 red line, so those rows carry no value.
 
    The dormant rows still wait on their own feed; ball.style left that queue
-   today (ticket 65 closed it 2026-11-07).
+   today (ticket 65 closed it 2026-11-07) and ball.size joined it today
+   (tickets 413/422, 2026-11-11).
 
    Spelling note that is load-bearing: the dotted key labels are stored in two
    halves (group / name) and joined only at render time, because
@@ -62,7 +73,7 @@ import {
 } from "@/lib/motion";
 import { performConfigWrite } from "@/lib/config-actions";
 import { BallStylePicker, FeedbackLine } from "@/components/settings-controls";
-import type { BallStyleSection } from "@/lib/panel";
+import type { BallSizeSection, BallStyleSection } from "@/lib/panel";
 import type { Feedback } from "@/lib/config-feedback";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
@@ -93,7 +104,7 @@ interface Row {
   /** Why this row is not editable yet. Empty string = the panel owns it. */
   blocked: string;
   /** Which live control this row draws when `blocked` is empty. */
-  control?: "alpha" | "motion" | "ballStyle";
+  control?: "alpha" | "motion" | "ballStyle" | "ballSize";
 }
 
 /** The appearance rows, in the demo owner's original order. */
@@ -102,8 +113,8 @@ const APPEARANCE_ROWS: readonly Row[] = [
   { group: "panel", name: "opacity", desc: "面板背景不透明度", blocked: "", control: "alpha" },
   { group: "panel", name: "animations", desc: "界面动画（关掉后全部静帧，性能最省）", blocked: "", control: "motion" },
   { group: "panel", name: "font_size", desc: "面板正文字号（px）", blocked: "快照里没有这个字段" },
-  { group: "ball", name: "size", desc: "悬浮球直径（44-72）", blocked: "那颗球是原生绘制的（D29），页面改不到" },
-  { group: "ball", name: "opacity_idle", desc: "空闲时悬浮球不透明度", blocked: "同上" },
+  { group: "ball", name: "size", desc: "悬浮球直径（44-160）", blocked: "", control: "ballSize" },
+  { group: "ball", name: "opacity_idle", desc: "空闲时悬浮球不透明度", blocked: "那颗球是原生绘制的（D29），页面改不到" },
   { group: "ball", name: "click_through", desc: "空闲时鼠标穿透悬浮球", blocked: "同上" },
   { group: "ball", name: "style", desc: "悬浮球外观风格（玻璃 / Jarvis 粒子）", blocked: "", control: "ballStyle" },
   { group: "panel", name: "width", desc: "面板宽度（px）", blocked: "窗口尺寸在宿主手里" },
@@ -130,8 +141,9 @@ function EffectBadge({ live, word }: { live: boolean; word?: string }) {
 
 export function ConfigScreen({
   heading = "设置",
-  lede = "外观一节九行键。悬浮球风格、面板不透明度和界面动画三行能动，其余各行今天没有数据源，所以它们不显示数字。",
+  lede = "外观一节九行键。悬浮球风格、悬浮球大小、面板不透明度和界面动画四行能动，其余各行今天没有数据源，所以它们不显示数字。",
   ballStyle = null,
+  ballSize = null,
 }: {
   /** The heading this screen prints for itself. Defaults to 设置 because that
       is what it says standalone (?harness=2 and the render harnesses). The
@@ -145,6 +157,11 @@ export function ConfigScreen({
       ball.style row. Null means this pump has no ballStyle reader - a
       different fact from an empty style, and the picker says which one. */
   ballStyle?: BallStyleSection | null;
+  /** The snapshot's ballSize section (tickets 413/422): the read half of the
+      ball.size row. Null means this pump has no ballSize reader - a
+      different fact from a zero size, and the row says which one. The
+      slider's band is the section's own min/max, the schema's own range. */
+  ballSize?: BallSizeSection | null;
 }) {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
   // Read the tier back off the document rather than mirroring it: a tier set
@@ -178,6 +195,22 @@ export function ConfigScreen({
       setBallFeedback(fb);
       setBallBusy(false);
     });
+  }
+
+  /** The ball.size write (tickets 413/422): same shape as moveBallStyle - one
+      config.set with the field's value, answered as the receipt sentence.
+      The size leaves as its decimal string; the 44..160 band is Go's own
+      (the slider offers only the snapshot's min/max), so the page sends and
+      lets the write route be the judge. */
+  function moveBallSize(next: number) {
+    if (ballBusy) return;
+    setBallBusy(true);
+    void performConfigWrite({ field: "ball_size", value: String(next) }).then(
+      (fb) => {
+        setBallFeedback(fb);
+        setBallBusy(false);
+      },
+    );
   }
 
   return (
@@ -236,6 +269,36 @@ export function ConfigScreen({
                       <span className="text-[11px] text-ink-3">%</span>
                     </>
                   )
+                ) : live && row.control === "ballSize" ? (
+                  ballSize === null || ballSize === undefined ? (
+                    /* No reader on this pump: say so instead of mounting a
+                        slider with an invented diameter (P9). The real page
+                        hands the section down once its settings-page leg is
+                        wired; the render harnesses pass it explicitly. */
+                    <span className="text-xs text-ink-3">等快照</span>
+                  ) : (
+                    <>
+                      {/* Same accent slider as the alpha row, but the band
+                          is the snapshot's own min/max - the schema's range,
+                          never a copy typed here. The number beside it is
+                          the current diameter as the host read it. */}
+                      <input
+                        aria-label="悬浮球大小"
+                        className="w-28 accent-primary"
+                        max={ballSize.max}
+                        min={ballSize.min}
+                        onChange={(e) =>
+                          moveBallSize(Number(e.currentTarget.value))
+                        }
+                        step={1}
+                        type="range"
+                        value={ballSize.size}
+                      />
+                      <span className="text-[11px] text-ink-3">
+                        {ballSize.size}px
+                      </span>
+                    </>
+                  )
                 ) : live && row.control === "ballStyle" ? (
                   <BallStylePicker
                     section={ballStyle}
@@ -247,16 +310,24 @@ export function ConfigScreen({
                 ) : (
                   <span className="text-xs text-ink-3">{row.blocked}</span>
                 )}
-                <EffectBadge live={live} word={row.control === "ballStyle" ? "能改" : undefined} />
+                <EffectBadge
+                  live={live}
+                  word={
+                    row.control === "ballStyle" || row.control === "ballSize"
+                      ? "能改"
+                      : undefined
+                  }
+                />
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* The ball.style receipt line: the write's own answer, never a local
-          echo of the family word. It lives under the whole row block so a
-          refusal lands where the eye already is. */}
+      {/* The ball.style / ball.size receipt line: the write's own answer,
+          never a local echo of what was sent. It lives under the whole row
+          block so a refusal lands where the eye already is; the two config
+          rows share one line because they never write at the same time. */}
       {ballFeedback ? (
         <div className="mt-1 flex flex-col gap-1">
           <FeedbackLine feedback={ballFeedback} />
@@ -265,7 +336,8 @@ export function ConfigScreen({
 
       <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
         「即时」那两行改的是这个页面自己的一层样式：关掉面板就回到 token 表里的默认值。
-        悬浮球风格那一行不同：它走设置写入通路真正落盘，收据句会写明是立即生效还是重启后生效。
+        悬浮球风格和大小那两行不同：它们走设置写入通路真正落盘，收据句会写明是立即生效还是重启后生效
+        （大小那行的球窗几何是启动时一次建好的，收据会照实说重启后生效）。
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">

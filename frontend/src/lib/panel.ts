@@ -310,6 +310,20 @@ export interface BallStyleSection {
   vocabulary: string[];
 }
 
+/** The ballSize section (internal/panel/ball_size_413.go BallSizeSection,
+    landed by ticket 422): the orb diameter the live config holds RIGHT NOW
+    and the band a size slider may offer - min/max are the schema's own band
+    (internal/config's BallSizeOptions), so a slider offers exactly what the
+    load gate accepts, never a copy of the numbers typed here. size 0 means
+    no Manager backed the read; the page then says so rather than being
+    handed an invented diameter. The write half rides config.set's ball_size
+    field (no C17 method arrives with this key). */
+export interface BallSizeSection {
+  size: number;
+  min: number;
+  max: number;
+}
+
 
 /** One working-tree file entry (internal/panel TreeEntry). */
 export interface TreeEntryView {
@@ -423,6 +437,11 @@ export interface PanelSnapshot {
       appearance picker may offer (ticket 65). The settings page's ball.style
       row reads this; its write rides config.set's ball_style field. */
   ballStyle?: BallStyleSection;
+  /** The orb diameter the live config holds and the band a size slider may
+      offer (tickets 413/422). The settings page's ball.size row reads this;
+      its write rides config.set's ball_size field. Same optionality rule as
+      ballStyle: a pump without the reader sends no key at all. */
+  ballSize?: BallSizeSection;
   /** The working-state rows rendered while a task runs (ticket 145): ended
       tool calls, the reasoning streamed so far, the last classified error
       and the loop's stuck sentence. */
