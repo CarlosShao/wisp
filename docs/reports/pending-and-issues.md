@@ -34107,3 +34107,10 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 交付：163-v1、388-v1 非实现者裁决证据落盘并提交 `d0140b21d`（docs/evidence/s1/163-persistent-shell-session-v1.md、388-announce-attenuation-v1.md）；163 AC#2/#3/#4/#5 翻勾、388 AC#1–#5 翻勾；两票改 `-done`。163 残留 `unwired.go:75 risk.allow_shell_string`＝待机主定"字符串模式"，非欠账；388 AC#2 走 loopback 录回读数支（择一）PASS，机主亲耳可选补。
 - 在飞：297-v1 验收腿（workflow-2b0be23f208c4aa4，glm，后台）。
 - 撤销口令：删本 A1705 条并 `git mv` 两票回原名、撤回本节收口提交即可复原。
+
+## A1707（2026-11-11 18:4x，编排者）**297 收口：非实现者裁决 297-v1（AC#0-3 PASS / AC#2 形① SUPPORTED / AC#4 PARTIAL＝gitignored build/mut_rvw.go 致整树 build rc=1，非本票码）→ 翻 5 框、票 -done；顺带查明"整树 build 长期 rc=1"的公共根因之一＝build/mut_rvw.go 遗留件**
+
+- 297 三把尺核过：四枚仪器件全 tracked/已提交（`0b5a19f34` 297-l1／`f12029b7c` 297-l2／`47d7f9bcd` roster）；`probes/297` a1×5 / l1×16 / l2×20 / l3×4 读数件在盘；证据 `docs/evidence/s1/297-quiet-level-v1.md`。
+- AC#4 唯一缺口＝整树 `go build ./...` rc=1，我现跑坐实＝gitignored `build/mut_rvw.go`（91,003B，引 voiceTtsFiles/residentBall 等未定义符号＝预存变异副本）；scoped build `./cmd/... ./internal/... ./tools/...` rc=0。**这是全仓"整树 build 红"的公共根因之一**，待机主一句话决定是否把它移出仓（不删、移 D:\tmp）以恢复整树 build 绿。
+- 编号备忘：A1705＝本会话起点（commit `38257bb35`）；A1706 是 handover 刷新提交标题（`bd1315fad`，无 ledger 节）；本会话续用 A1707。
+- 撤销口令：删本 A1707 条并把 297 票 `git mv` 回原名、撤回本节提交即复原。
