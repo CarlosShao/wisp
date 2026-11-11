@@ -34437,3 +34437,24 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - ③ 删 `panel_unbound_253r6` 与 `panel_assets_299` 的 `"os"`/`"path/filepath"` import（改后未使用，见上一轮）；
   - ④ 验证：`go vet` rc=0；整包**终点锚 3/3**（不是 ≥1——已知应有 3 枚）；定点两发 rc=0。
 - 撤销口令：删本 A1727 条。**本条推翻 `A1722` 里"可加 RemoveAll"那句。**
+
+## A1728 — ★★自我纠正：`A1727` 的"`RemoveAll` 抢锁杀死进程"**证据不支持，撤回**
+
+- 停车令下零派腿、零 go test。本轮去**检验** `A1727` 的结论（而非复述它），**结论不成立**，如实撤回。
+- **三条反证（全部现跑）**：
+  1. **`RemoveAll` 的错误被 `_ =` 丢弃**：`cmd/wisp/panel_resident_windows_test.go:72` 是 `t.Cleanup(func() { _ = os.RemoveAll(dataPath) })`。**锁住的文件只会返回 err 并被丢掉，`os.RemoveAll` 不会杀进程、不会 panic**。⇒ 机制上它**做不到**"静默带走进程"。
+  2. **两发 stderr 都无崩溃痕迹**：`full.err.log`（4077 行）与 `full2.err.log`（2163 行）里 `panic`/`fatal error`/`unexpected fault`/`stack exceeds`/`out of memory`/`ACCESS_VIOLATION` **各 0 命中**（唯一的 2 条 ERROR 是 `33r9-nail` 那枚**预期内的具名拒绝**，两发都有）。
+  3. **`full2.err.log` 最后两行是正常收尾**：`22:03:08.078 panel thread exited cleanly` ＋ `22:03:08.115 panel thread exited cleanly`（**打了两次**）。⇒ 死前面板线程是**干净退出**的，不是被抢锁拖死的。
+  4. **Windows 事件日志 22:02–22:06 窗口内 0 条记录**（`Get-WinEvent Application` 现查）⇒ **没有崩溃事件**。
+- **★还有一条更要紧的发现，它同时否掉了"A1727 死因"与"死点是 TestPanelThreadIsSTA"**：
+  - `full.log`（跑完那发）里 `TestPanelThreadIsSTAAndExitsCleanly` 是**第 #399 条 RUN**；
+  - `full2.log` 停在**第 #409 条 RUN**。
+  - ⇒ **full2 比它多跑了 10 条**。所以 **`full2` 的最后一条 `=== RUN` 是 `TestPanelThreadIsSTA` 这件事，并不代表它死在那枚**——两发**测试顺序不同**（并发/并行测试导致 `=== RUN` 顺序可变）。⇒ **我此前"A1719 把死点精确定位到 TestPanelThreadIsSTA"是过度解读。**
+- **★时间线还有一个我此前忽略的混淆项**：`full2` 两份日志 mtime 均为 **22:03:08**，而我 `job_kill` 是 **约 22:04**。二者相差约 52 秒。⇒ **无法排除"full2 当时仍在跑、被我杀掉、缓冲输出未刷完"**。`go test` 的 `-v` 输出经管道时是有缓冲的，**被杀会丢尾部**。⇒ **这两份日志都不能当作"早停死点"的干净证据。**
+- **诚实结论**：`314` 的整包早停**仍然存在**（`314-ac3` 那发 CLI 形态的证据链是独立的、未受影响），但**死因与死点，我目前没有可信证据**。`A1727` 的因果链（RemoveAll→抢锁→进程死）**撤回**；`A1719` 的"死点=TestPanelThreadIsSTA"**降级为不可靠**。
+- **要拿到可信结论，下一步必须做的事（不是推断，是测量）**：
+  1. **直跑编译好的测试二进制**（`cmd/wisp/wisp.test.exe` 已在 `D:\tmp\wisp\20261111\314early\`，62MB），**直接抓 `$LASTEXITCODE`**——退出码是唯一不会骗人的信号（`0xC0000005`＝访问违例、`0xC0000409`＝stack buffer overrun、`1`＝测试失败、`0`＝跑完）；
+  2. **输出重定向到文件而非管道**（避免缓冲丢尾）；
+  3. 跑前 `Set-Location` 到仓库根、DLL 入 PATH；
+  4. 若退出码非 0 且非 1 ⇒ 是**原生崩溃**，用 `WER` 或 `procdump` 抓 dump 定死因；若退出码 0/1 ⇒ **没早停**，此前"早停"结论需重审。
+- 撤销口令：删本 A1728 条。**本条撤回 `A1727` 的因果结论，并降级 `A1719` 的死点定位。**
