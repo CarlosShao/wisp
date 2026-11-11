@@ -34570,3 +34570,18 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **给 `314-rep` 派单的补充（已可写死）**：跑 5 次时**额外抓两样**：① 每次 `FAIL <pkg> <elapsed>` 行的 elapsed（看 392s 是否稳定）；② 每次顶层 RUN 数（330 是否稳定复现）。若 330 稳定 ⇒ **确定性提前返回**，可二分定位；若散布 ⇒ 时序型。
 - **诚实登记**：我 `A1719`/`A1729` 两次"找到死点"、`A1727` 一次"RemoveAll 抢锁"，**全错**。本轮这条**不是猜测**：它是 `go test` 自己的摘要行说的，且 `exit status` 零命中、`[no tests to run]`=0 三条互证。
 - 撤销口令：删本 A1733 条。
+
+## A1734 — 零 CPU 排除法：`TestMain`／`flag.Parse`／进程内 `os.Exit` **三条都不是**（剩两种可能）
+
+- 接 `A1733`（`go test` 自己打印了包级 `FAIL` ⇒ 正常提前返回，非崩溃）。本轮把最可能的三条机制逐条排掉。
+- **排除 ①：没有 `TestMain`**。`Select-String -Path 'cmd/wisp/*_test.go' -Pattern '^func TestMain'` → **0 命中**。⇒ 不是 `TestMain` 里 `m.Run()` 提前返回。
+- **排除 ②：没有 `flag.Parse`**。`flag.Parse|flag.CommandLine` → **0 命中**（唯一 `runtime.Goexit` 命中在 `dataroot_128_test.go:487` 是**注释**）。⇒ 不是二次 Parse 导致 `os.Exit(2)`（且那会是码 2，不是 1）。
+- **排除 ③：测试不进程内调 `os.Exit`**。测试确实直接调产品函数（`cmdConfig`/`cmdModels`/`cmdSessions`/`cmdSecret`，见 `config_cmd_65_test.go:45`、`dataroot_128_test.go:123/137`、`leg_sink_nail_131_windows_test.go:352/425/457`、`sessions_test.go:75`），**但这些都是 `func(...) int` 形状、返回码，`os.Exit` 只出现在 `main.go`**（`main.go:125-200`）⇒ 测试里调用它们**不会退出进程**。`dispatch_hop_selfproof_133_test.go` 里的 `runResident()` 是**测试文件内定义的 `func runResident() {}` 空桩**（`:209`/`:279`/`:314`），不是产品函数。
+- **剩下的两种可能（下一步实测要分的）**：
+  1. **`t.Parallel()` + 父测试提前返回**：日志里 `=== PAUSE`/`=== CONT` **均为 0** ⇒ 该发**没有并行测试**，这条**基本可排除**（但 `full.log` 也未查，若它也 0 则彻底排除）；
+  2. **★最可能：某测试启动的 goroutine 里调了 `os.Exit`**，或**产品代码在测试路径上走到 `os.Exit`**（`main.go` 的 `os.Exit(1)` 在 `resident_windows.go:160` 也有对应）。**`resident_windows.go:131`/`:160` 的 `os.Exit(2)`/`os.Exit(1)`** 在 `runResident` 路径上——若有测试**在进程内**走到那条 boot 失败分支，就会**直接杀掉整个测试二进制**，且 `go test` 会把它当"正常退出 + 有红"打印 `FAIL`。**这条与所有观察吻合**（无 panic、无 exit status、码 1、静默少跑一半）。
+- **★由此给出 `314-rep` 的最终补充（写死，别再改）**：
+  - 5 次直跑时，**额外**在每次前后各记一次 `Get-Date`，并抓 `FAIL <pkg> <elapsed>` 行的 elapsed；
+  - **判据**：若 **5 次 RUN 数都停在 330** ⇒ **确定性**，直接二分（`-test.run` 按文件前缀切两半，看哪半触发）；若**散布** ⇒ 时序型，查 goroutine；
+  - **二分时的关键**：**必须用 `-test.run '^(A|B|...)$'` 显式列举**，而不是靠 `-test.skip`——因为死法是"提前返回"，`-skip` 不会帮你定位到触发者。
+- 撤销口令：删本 A1734 条。
