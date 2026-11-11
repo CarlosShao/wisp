@@ -58,23 +58,23 @@ type unwiredKey struct {
 // capability it names: a load-time error must not outlive the consumer that
 // justifies it.
 var unwiredKeys = []unwiredKey{
-	{
-		path:    "risk.shell_enabled",
-		missing: "no shell.exec tool is registered in internal/tools, so nothing reads this flag",
-		lands:   "it lands with the shell.exec tool itself (SPEC-07 sec 3, S3, default-disabled per D14)",
-		fires:   func(c *Config) bool { return c.Risk.ShellEnabled },
-	},
+	// risk.shell_enabled and risk.shell_allowlist used to sit here. Ticket 163
+	// AC#5 (leg N wired the family at the composition root): cmd/wisp/run.go
+	// now reads both keys - ShellDeps.Enabled gates whether
+	// tools.BuiltinShellEntries registers the shell family at all, and
+	// ShellDeps.Allowlist is the production writer behind
+	// risk.Facts.ShellAllowlist (internal/tools/shell.go) that feeds R6 - so
+	// the rows are gone: a load-time error must not outlive the consumer that
+	// justifies it. shell_allowlist takes effect only once shell_enabled turns
+	// the family on; while the family is off the value is inert, and the
+	// direction auditor in manager.go still classifies a change to either key
+	// as a security change needing L2 reconfirm. The one shell key that stays
+	// guarded is allow_shell_string: string mode is not implemented anywhere.
 	{
 		path:    "risk.allow_shell_string",
-		missing: "risk.Facts.ShellString has no production writer, so R6's string-mode verdict never runs",
-		lands:   "it lands with the shell.exec tool (SPEC-06 sec 10 forced-argv rule)",
+		missing: "string mode is not implemented anywhere: the shell family landed argv-only (ticket 163), risk.Facts.ShellString has no production writer and stays false by construction, so R6's string-mode verdict never runs",
+		lands:   "it lands with a string-mode shell consumer; the landed shell.exec keeps the SPEC-06 sec 10 forced-argv rule",
 		fires:   func(c *Config) bool { return c.Risk.AllowShellString },
-	},
-	{
-		path:    "risk.shell_allowlist",
-		missing: "risk.Facts.ShellAllowlist has no production writer, so R6's allowlist verdict never runs",
-		lands:   "it lands with the shell.exec tool (SPEC-06 sec 10)",
-		fires:   func(c *Config) bool { return len(c.Risk.ShellAllowlist) > 0 },
 	},
 	// risk.blacklist_overrides used to sit here. Ticket 230 AC#4 (owner ruling
 	// 2026-11-05, ledger A1549) opened the B-tier exemption as a user-persisted
@@ -119,9 +119,9 @@ var lockedKeyDisposition = map[string]string{
 	// [risk]
 	"risk.confirm_timeout_sec": "consumed: cmd/wisp/run.go and cmd/wisp/resident_approval_windows.go both build the approval timeout from it (the resident leg since ticket 256); ticket 267 bands it [31, 3600] at load",
 	"risk.l1_window_sec":       "consumed: cmd/wisp/run.go builds the L1 auto-approve window from it",
-	"risk.shell_enabled":       "unwired:risk.shell_enabled",
+	"risk.shell_enabled":       "consumed: cmd/wisp/run.go feeds it to ShellDeps.Enabled (ticket 163): tools.BuiltinShellEntries registers the shell family only while it is true and registers NOTHING while it is false (D14 默认禁用, the FSDeps.DeleteEnabled shape)",
 	"risk.allow_shell_string":  "unwired:risk.allow_shell_string",
-	"risk.shell_allowlist":     "unwired:risk.shell_allowlist",
+	"risk.shell_allowlist":     "consumed: cmd/wisp/run.go feeds it to ShellDeps.Allowlist, the production writer behind risk.Facts.ShellAllowlist (internal/tools/shell.go) that R6 judges; empty = every call judges L2 (fail-closed); it takes effect once shell_enabled turns the family on",
 	"risk.blacklist_overrides": "consumed: validated and canonicalized at load (overrides.go, ticket 230 AC#4: B tier only, A tier refused, a spelling C26 has to expand is refused); the list is the persisted exemption set tools.Options.PersistedExemptions returns to risk.GateStanding as its third argument (the second is the runtime L2 confirmations), armed by cmd/wisp (armPersistedExemptions, keyed with risk.OverrideKey) and re-armed after every reload",
 	"risk.permission_mode":     "consumed: Config.PermissionMode is read per tool call by the bridge (internal/tools), persisted by Manager.SetPermissionMode; ticket 90",
 	// [fs]

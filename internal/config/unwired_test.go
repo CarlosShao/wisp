@@ -19,9 +19,7 @@ var unwiredCases = []struct {
 	fragment string
 	wantTalk string // plan/owner sentence marker
 }{
-	{"risk.shell_enabled", "[risk]\nshell_enabled = true\n", "shell.exec"},
 	{"risk.allow_shell_string", "[risk]\nallow_shell_string = true\n", "shell.exec"},
-	{"risk.shell_allowlist", "[risk]\nshell_allowlist = [\"git\"]\n", "shell.exec"},
 	{"net.allowlist", "[net]\nallowlist = [\"api.example.com\"]\n", "ticket 22"},
 	{"net.block_private_ranges", "[net]\nblock_private_ranges = false\n", "D22"},
 }
@@ -92,13 +90,18 @@ block_private_ranges = true
 			t.Fatalf("a config the app itself wrote must load: %v", err)
 		}
 	})
-	t.Run("tightening a guarded key past its default is still rejected", func(t *testing.T) {
-		// shell_enabled=false is the default; the guard is about the value
-		// nothing consumes, so the false case must stay loadable (checked by
-		// the subtest above) while true fails.
+	t.Run("a landed key loads while a still-unwired one is rejected", func(t *testing.T) {
+		// risk.shell_enabled left the guard table with ticket 163 AC#5: the
+		// composition root now reads it (ShellDeps.Enabled), so the flag is
+		// real and must load. allow_shell_string still has no consumer, so
+		// its non-default value still fails the load.
 		path := writeConfigFile(t, "schema_version = 2\n\n[risk]\nshell_enabled = true\n")
-		if _, _, err := LoadFile(path, nil); err == nil {
-			t.Fatal("shell_enabled = true must fail")
+		if _, _, err := LoadFile(path, nil); err != nil {
+			t.Fatalf("shell_enabled = true is wired since ticket 163 and must load: %v", err)
+		}
+		unwired := writeConfigFile(t, "schema_version = 2\n\n[risk]\nallow_shell_string = true\n")
+		if _, _, err := LoadFile(unwired, nil); err == nil {
+			t.Fatal("allow_shell_string = true is still unwired and must fail")
 		}
 	})
 }
@@ -118,7 +121,7 @@ func TestUnwiredGuardFiresBeforeAnyFileWrite(t *testing.T) {
 theme = "dark"
 
 [risk]
-shell_allowlist = ["git"]
+allow_shell_string = true
 
 [llm]
 default_provider = "openai"
@@ -134,8 +137,8 @@ model = "gpt-4o-mini"
 		t.Fatal(err)
 	}
 	if _, _, err := LoadFile(path, nil); err == nil {
-		t.Fatal("a v1 file carrying risk.shell_allowlist must not load")
-	} else if !strings.Contains(err.Error(), "risk.shell_allowlist") {
+		t.Fatal("a v1 file carrying risk.allow_shell_string must not load")
+	} else if !strings.Contains(err.Error(), "risk.allow_shell_string") {
 		t.Fatalf("error must name the key, got %q", err)
 	}
 	after, err := os.ReadFile(path)
@@ -261,18 +264,23 @@ host_api = ["fs"]
 	}
 }
 
-// TestUnwiredKeysStillRoundTripAtTheByteLevel keeps the schema honest: these
-// keys are rejected at load, they are not deleted from the schema. Their
-// marshal/decode symmetry still has to hold, because the day ticket 21/22 lands
-// the consumer the row disappears and the GUI double-source guard (D36 rule 4)
-// must already cover them. validate() is deliberately bypassed here.
+// TestUnwiredKeysStillRoundTripAtTheByteLevel keeps the schema honest: the
+// keys still guarded at load are rejected, they are not deleted from the
+// schema. Their marshal/decode symmetry still has to hold, because the day a
+// row disappears - as risk.shell_enabled and risk.shell_allowlist did when
+// ticket 163 wired the shell family - the GUI double-source guard (D36 rule 4)
+// must already cover them. The round trip itself bypasses validate(); the
+// validate() call below is a sanity pin that the still-guarded values are the
+// ones validate refuses.
 //
 // risk.blacklist_overrides is no longer one of the guarded keys (ticket 230
-// AC#4 made it a real setting), but it stays in this fixture: its byte-level
-// symmetry is still a schema property, and since the ticket it ALSO has to
-// survive the load validator, which canonicalizes it. The fixture entry is
-// therefore a B-tier shape (a ".env" leaf under a temp root) rather than the
-// old placeholder, which validateBlacklistOverrides would now refuse.
+// AC#4 made it a real setting), and neither are risk.shell_enabled /
+// risk.shell_allowlist (ticket 163 AC#5: the composition root reads both),
+// but they stay in this fixture: byte-level symmetry is a schema property,
+// and blacklist_overrides since the ticket ALSO has to survive the load
+// validator, which canonicalizes it. Its fixture entry is therefore a B-tier
+// shape (a ".env" leaf under a temp root) rather than the old placeholder,
+// which validateBlacklistOverrides would now refuse.
 func TestUnwiredKeysStillRoundTripAtTheByteLevel(t *testing.T) {
 	override := filepath.Join(sealableTempDir124(t), ".env")
 	c := NewDefaults()
@@ -286,7 +294,7 @@ func TestUnwiredKeysStillRoundTripAtTheByteLevel(t *testing.T) {
 
 	if err := validate(c); err == nil {
 		t.Fatal("sanity: the guarded values must be the ones validate rejects")
-	} else if !strings.Contains(err.Error(), "risk.shell_enabled") {
+	} else if !strings.Contains(err.Error(), "risk.allow_shell_string") {
 		t.Fatalf("unexpected first rejection: %v", err)
 	}
 
