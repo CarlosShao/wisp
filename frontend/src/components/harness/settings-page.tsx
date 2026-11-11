@@ -50,7 +50,11 @@ const CATEGORIES: readonly Category[] = [
   {
     name: "通用",
     purpose: "启动行为、默认工作区、面板与球的分工。",
-    waiting: "还没收到配置读口。config.toml 的全量 section 树在 D36 里定，但 C17 还没有把任何一节推给面板。",
+    // Ticket 313's read door and the appearance wave made the old "C17 has
+    // not pushed any section" sentence false: config.get answers the model
+    // and voice halves, and the ball/panel sections ride the snapshot push.
+    // What this category still lacks is its OWN keys, so the line says that.
+    waiting: "配置读口（config.get）已经落地：模型、语音两节走读口回执，悬浮球与面板各节随快照推送。这一类自己的键（启动行为、默认工作区）还没有节推上来，等它们上读口再画。",
   },
   {
     name: "外观",
