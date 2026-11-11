@@ -34045,3 +34045,9 @@ ball.opacity_idle 百分比滑杆（页 0–100%、线上 0..1）／ball.click_t
 
 ### 四、wave133 现状
 V 已提交 `b59575fba`（frontend 设置页"通用"过期文案刷新）；R（cmd/wisp 语音快照键）／W（只读裁决 163/388/423）仍跑。
+## A1701（2026-11-11 17:2x，编排者）**wave133 收件+推送：R d64d48e03（语音快照三键 reader-gated＋voice_aec_enabled/audio_input_device 写字段＋run.go 注释改真）；V b59575fba 随 A1700 已推；W closeout-163-388-423.md 落盘**
+- R 交件 9 文件 +442/−27：internal/panel/config_handlers.go+config_write_313.go（aecEnabled/inputDevice/sampleRate 三键，reader 指针门）；cmd/wisp/panel_config_store.go（voice_aec_enabled/audio_input_device 写腿，走 internal/config/settings_local_audio.go setter→writeOneKey）；audio.sample_rate 作守卫键不進写面；cmd/wisp/run.go:837-844 过期注释改真（shell_enabled 守卫行已由 Q 7bcc2ae08 释放，票163 AC#5）。突变反向两发全红后还原绿。
+- 自复跑（编排者）：go build ./cmd/... ./internal/... rc=0；settings_local_audio.go 确在提交内；tracked 脏仅剩他腿 .scratch/wisp/probes/291/mic/*_test.go ＋ frontend/fixtures/composer-states.html（渲染churn，均未碰）。
+- W 裁决：163＝待 R 已落，走验收裁决关＋追认 N/Q 写面＋补 Q 收件行；388＝可关（AC#2 录回已在盘 A1688 750.3→46.5 平方律，机主亲耳亦已确认）；423＝需 2 件（SPEC-12 §5 补四残键五字段＋开票 61 收尾票）。
+- 已推：d64d48e03 → origin/dev，未推 0。
+- ★路由封锁（待机主）：审计/测试/审查子代理（group-review-and-audit）与 glm auto/glm-5.3-flash 均 not allowed for this Session，本会话仅放行 magpie/auto/deepseek-v4.1-flash；新腿派不出，编队补位暂停，等机主在会话白名单放行。
