@@ -52,13 +52,24 @@ import (
 // wall-clock difference - ban #4.
 const panelThreadWait = 15 * time.Second
 
+// uniqueProfileLeaf returns a per-run unique user-data leaf under the system
+// temp dir. The root stays os.TempDir() on purpose (t.TempDir() would shift the
+// root to GOTMPDIR and move other instruments' readings - ticket 314 audit);
+// only the leaf is made unique with pid + nanotime so runs and processes stop
+// sharing one fixed-name WebView2 user-data folder. Callers register
+// t.Cleanup(os.RemoveAll) on the leaf they hand out.
+func uniqueProfileLeaf(prefix string) string {
+	return filepath.Join(os.TempDir(), fmt.Sprintf("%s-%d-%d", prefix, os.Getpid(), time.Now().UnixNano()))
+}
+
 // startPanelForTest brings up the production thread with a production-shaped
 // manager (real embedded assets, a real user-data folder under the system temp
 // dir, the real fail-closed dispatch chain) and returns it with the cleanups
 // already registered.
 func startPanelForTest(t *testing.T) (*residentPanel, *PanelManager) {
 	t.Helper()
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r5-panel-profile")
+	dataPath := uniqueProfileLeaf("wisp-33r5-panel-profile")
+	t.Cleanup(func() { _ = os.RemoveAll(dataPath) })
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 	rp := startResidentPanel(observe.NewRegistry(), mgr)
@@ -578,7 +589,8 @@ func releaseThreadClean() (int, int, string) {
 // releaseThreadClean call and the two checks below go red on this thread, here, now -
 // not in whichever later test the scheduler happens to poison.
 func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r6-reused-thread-quit")
+	dataPath := uniqueProfileLeaf("wisp-33r6-reused-thread-quit")
+	t.Cleanup(func() { _ = os.RemoveAll(dataPath) })
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 
@@ -655,7 +667,8 @@ func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 // red on the spot with the recovered nil-pointer panic (created=false, panicked!=nil),
 // not with a timeout.
 func TestAC13BringUpRefusesAThreadWithAQueuedClose(t *testing.T) {
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r7-queued-close")
+	dataPath := uniqueProfileLeaf("wisp-33r7-queued-close")
+	t.Cleanup(func() { _ = os.RemoveAll(dataPath); _ = os.RemoveAll(dataPath + "-second") })
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 	mgr2 := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath+"-second")
