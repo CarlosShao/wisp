@@ -34362,3 +34362,19 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   4. **必须先 `Set-Location` 到仓库根再跑**（否则重演 `A1719` 那 104 个假红）。
 - **恢复口令**：机主说「继续」⇒ 我直接把该存档内容作为 prompt 发 `workflow`（`provider:"magpie", model:"auto/glm-5.3-flash"`，`run_in_background:true`），⛔ 再改动。
 - 撤销口令：删本 A1723 条与那份存档文件。
+
+## A1724 — 停车期预写 `346-a2` 派单存档（恢复即发，⛔ 现跑）
+
+- 机主停车令仍生效，本轮**零派腿、零 go test**。继续零 CPU 的准备工作：把第二份欠账（`346-a2`）的派单也预写并核对。
+- 存档：**`.scratch/wisp/probes/orch/20261111/txt/346-a2-dispatch.txt`**。
+- **核对结果（现跑，全部为真）**：
+  - 引用的 `docs/evidence/s1/346-a1-census.md` **存在**（13,664B，2026-10-19 22:19）。
+  - `internal/winsec/*_test.go` 里 **`t.Skip` 共 31 处** —— 正是 AC#2 要逐条查"有没有具名登记面"的对象（裸 Skip＝本仓禁手）。
+  - 弃权红句命中：`ancestoropen_342_windows_test.go:11`、`ancestorwindow_342r2_windows_test.go:630`（票面说"三句"，a1 普查件里有完整出处，派单里让腿先读 a1 件）。
+- 存档写死的边界（防腿越界）：
+  - ⛔ 动 `internal/winsec/winsec.go`/`winsec_other.go`/`winsec_windows.go` 任何字节（票面 AC#5 明令）；
+  - ⛔ 动 `scripts/**`、⛔ 动 `ci.yml`；
+  - **⛔ 跑 `go test ./internal/winsec/`**（本腿是只读现量；若腿判断"不跑判不了 AC#4"，**如实写"需另派复跑腿"**，⛔ 自己跑）；
+  - ⛔ 翻框（票面 AC#6：七格由非实现者裁）。
+- **恢复口令**：机主说「继续」⇒ 我把 `314-profile`（写腿，优先级最高）与 `346-a2`（只读）两份存档同时发出去，`run_in_background:true`。
+- 撤销口令：删本 A1724 条与那份存档文件。

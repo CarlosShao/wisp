@@ -1,0 +1,62 @@
+# 346-a2 只读现量派单（停车期预写，恢复即发）
+
+- 腿码：**346-a2**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`（high 档）
+- 写面：**只写 1 枚 md**（`docs/evidence/s1/346-a2-census.md`）
+- 状态：**已写好，等机主说「继续」即发**
+
+---
+
+## 一句话任务
+
+票 346 七格里还剩 **AC#2** 与 **AC#4** 未勾。你要**只读现量**这两格今天的状态，给逐格判定。
+
+## 票面
+
+`.scratch/wisp/issues/346-two-race-window-instruments-red-on-abstention-under-ci-contention-blob-identical-flip.md`（54 行，**全文读**）
+
+## AC#2 原文（逐字，⛔ 改写）
+
+> **AC#2 ★⛔ 用"变绿"换"看不见"**：⛔ 放宽或删掉那三句弃权红句、⛔ `t.Skip`（无具名登记面的裸 Skip＝本仓禁手）、⛔ 把重试拉到"总能过"、⛔ 给 CI 加 `continue-on-error`／撤步骤。⇒ 判据＝**交件侧那三句红句逐字仍在**（只在"真到不了窗口"时响）。
+
+**你要查的**：
+1. 那"三句弃权红句"今天在哪几个文件、逐字是什么（grep `internal/winsec/` 找，票面 a1 普查件 `docs/evidence/s1/346-a1-census.md` 里应有出处，先读它）
+2. 它们**是否逐字仍在**（有没有被放宽/删掉/改成 Skip）
+3. `internal/winsec/` 里所有 `t.Skip` 调用：逐条列出**有没有具名登记面**（裸 Skip 是本仓禁手）
+4. CI 有没有 `continue-on-error` 或撤步骤的痕迹（grep `.github/workflows/ci.yml`）
+
+## AC#4 原文（逐字，⛔ 改写）
+
+> **AC#4 颜色与门禁**：`./internal/winsec/` 两平台成对（Linux 容器 ⇄ 本机 Windows 档；同一 `-run` 名册、`-count=1 -timeout 30m`、四数逐枚点名⛔ 混用⛔ 相减）＋★**两枚弃权仪器各自至少 3 发独立复跑**（同一台面、逐名点名红⇄绿⇄弃权，散布如实报）；红名册作差逐名归位。门禁四数只在共享工作树、★跑前 `u…`（后续文字以票面为准）
+
+**你要查的**：
+1. "两平台成对"这道门禁**今天落在哪**（grep `scripts/**` 与 `.github/workflows/ci.yml` 里 winsec 相关步骤）
+2. 它的**今天的形状**：是否满足"同一 `-run` 名册、`-count=1 -timeout 30m`"
+3. "两枚弃权仪器各自至少 3 发独立复跑"这件事**今天有没有台件/记录在守**
+
+## ⛔ 绝对不做（票面 AC#5 明令 + 本仓铁律）
+
+- ⛔ 动 `internal/winsec/winsec.go` / `winsec_other.go` / `winsec_windows.go` **任何字节**
+- ⛔ 动 `scripts/**`、⛔ 动 `.github/workflows/ci.yml`
+- ⛔ 跑 `go test ./internal/winsec/`（本腿是**只读现量**，不是复跑腿；复跑属 AC#4 的独立复跑任务，另批）
+  - ⚠ 若你判断"不跑就判不了 AC#4"，**如实写"需要另派复跑腿"**，⛔ 自己跑
+- ⛔ 翻任何框（票面 AC#6 逐字：七格由非实现者裁）
+- ⛔ 改票名 / `Status:` / 加 `-done`
+
+## 交付
+
+`docs/evidence/s1/346-a2-census.md`，含四节：
+1. **AC#2 现量**：三句红句逐字 + 位置 + 是否仍在；`t.Skip` 逐条 + 有无登记面；CI 有无 `continue-on-error`
+2. **AC#4 现量**：两平台成对门禁的位置与形状；"3 发独立复跑"有无台件
+3. **逐格判定**：AC#2 = PASS/PARTIAL/FAIL；AC#4 = PASS/PARTIAL/FAIL，各附一句理由
+4. **缺什么才能勾**（具体到"要谁做什么"）
+
+只 commit 这一个 md（**显式 pathspec**），⛔ push。
+
+## 铁律
+- ⛔ `git add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`
+- ⛔ 删文件；⛔ 改 `thresholds.go`/`golden`/`PLAN.md`/`docs/specs/**`/`frontend/**`/`design/**`
+- 写面只有那 1 枚 md
+
+## 回一行
+`DONE: 346-a2 <AC#2 判定> <AC#4 判定> <件路径>`
