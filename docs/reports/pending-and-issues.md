@@ -33931,3 +33931,9 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 ### 三、★压推策略（防 CI 红窗）
 - **wave123 暂不推**（未推=1）：单独推 panel.ts 会让 `internal/panel` 先红。等 wave124-A 释放 internal/panel → 派 Go 腿补台账两行并验 `go test ./internal/panel` 绿 → **wave123＋台账修复＋其余一并推**，CI 一次见全绿。
 - 在飞：wave124（A 面板后端四字段／B 297 CI 名册）＋ wave125（前端 settings-page）。
+## A1692（2026-11-11 11:0x，编排者）**wave125 落地：球径前端链全通（`7942125eb`）｜派 wave126 修 render-config-screen 仪器｜三条写腿在飞**
+
+- **wave125** `7942125eb`（`settings-page.tsx`+`App.tsx`，+8/−1）：`App.tsx:345 <SettingsPage ballSize={snapshot.ballSize ?? null}>` → settings-page 新 prop → ConfigScreen。**球径端到端前端链全通**（panel.ts→App→settings-page→config-screen 滑块）。门禁：typecheck/lint/build/render:composer/render:nav 全绿（render-nav 9 屏/70 冻结名全对）。
+- **ball.size 现状**：前端 100% 通；**只差 Go 台账两行**（`composer_test.go`：删 `PanelSnapshot:{"ballSize"}` ＋ 加 `BallSizeSection→BallSizeSection`）才能 `go test ./internal/panel` 绿并推。internal/panel 仍被 wave124-A 占用 ⇒ 待其完成派 Go 腿补并推。
+- **派 wave126**（第三条写腿，前端）：修 `render-config-screen.tsx:66` 的过期切片（`live.indexOf("能改")` 全局首个被球径行抢，改锚定 style 行自身），并认到球径行也活了；D29 钉子保留。
+- 在飞：wave124-A（面板后端 ball 透明度/穿透/panel 宽/字号）＋ wave124-B（297 CI 名册）＋ wave126（仪器）。未推 3（压着，等台账修复一并推）。
