@@ -1,0 +1,46 @@
+portable-tests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-20261111-204831-1737 - this run's t.TempDir() family lands here. Nothing deletes it: ticket 310 requires a per-directory roster plus a non-implementer review before any removal.
+portable-tests.sh: census GOOS=windows - go list ./... = 42 packages (one row each)
+portable-tests.sh: PACKAGE                                        TESTS(t/x)  CLAIMED BY
+portable-tests.sh: github.com/CarlosShao/wisp/build               0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/cmd/balldebug       1/0         windows
+portable-tests.sh: github.com/CarlosShao/wisp/cmd/llmrecord       1/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/cmd/wisp            182/0       cli
+portable-tests.sh: github.com/CarlosShao/wisp/frontend            0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/agent      39/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/agent/approval 14/17       core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/agent/scheduler 2/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/audio      16/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/audio/aec  0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/audio/aecspike 9/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/ball       21/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/buildinfo  1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/command    1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/config     35/1        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm        2/9         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/adaptertest 1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/anthropic 4/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/golden 1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/openaichat 5/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/openairesponses 3/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/memory     28/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/models     20/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/observe    25/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/panel      49/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/perm       10/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/plugin     12/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/plugin/manifestslot 7/0         windows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/present    4/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/proc       13/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/projctx    0/1         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/risk       35/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/secret     5/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/session    8/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/speech     16/0        speech
+portable-tests.sh: github.com/CarlosShao/wisp/internal/speech/cer 4/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/statemachine 2/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/streamkey  0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/tools      97/5        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/watchdog   3/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/winsec     23/8        corewinsec
+portable-tests.sh: github.com/CarlosShao/wisp/tools/signmodels    0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: census totals: packages=42 with-zero-compiled-tests=5 claimed-by-no-scope=5 unclaimed-with-tests=0

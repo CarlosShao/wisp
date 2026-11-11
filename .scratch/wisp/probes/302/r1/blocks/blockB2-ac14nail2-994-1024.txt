@@ -1,0 +1,31 @@
+// ---------------------------------------------------------------------------
+// AC#14, nail 2: the Go -> page Eval push (a DIFFERENT dimension, its own nail)
+// ---------------------------------------------------------------------------
+
+// TestAC14GoSideEvalPushReachesThePage is the second nail and stays a separate test:
+// 33-p1 §A measured the push dimension arriving (R27, 907ms) while the reply dimension
+// did not (R25) in the same process, and ticket 33's own wording forbids blending the
+// two into one sentence.
+func TestAC14GoSideEvalPushReachesThePage(t *testing.T) {
+	rp, mgr := startPanelForTest(t)
+	showAndWait(t, rp)
+	h := mgr.disp.Mode.(*recordingModeHandler)
+
+	// The handover's last document must be live before anything is pushed into it:
+	// the push and its report envelope would otherwise straddle the asynchronous
+	// document replacement and measure the transit instead of the push (the helper
+	// names the measurement and the runs that showed it).
+	awaitSettledHandoverDocument(t, rp, h)
+
+	// A value the page can only know if Go's push landed. This nail never awaits a
+	// binding, so nothing here can be satisfied by the reply hop, and vice versa.
+	const pushed = "PUSHED-33R5-OK"
+	evalOnPanelThread(t, rp, fmt.Sprintf("document.title = %q;", pushed))
+	evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv("ac14-push", "document.title")+");")
+
+	answer := awaitReport(t, h, "ac14-push", "AC#14's push hop")
+	t.Logf("AC#14 nail 2 (Eval push hop), page's own words: title=%q", answer)
+	if answer != pushed {
+		t.Errorf("Go's Eval push did not reach the document: the page reports its title as %q, want %q. This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other", answer, pushed)
+	}
+}

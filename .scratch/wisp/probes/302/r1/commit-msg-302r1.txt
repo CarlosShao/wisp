@@ -1,0 +1,20 @@
+302: move the three page-reply rulers (AC#13 cold start, AC#14 reply+push) from the cli tier to the winlive tier - dispatch 302-r1, form 甲, verdict code untouched byte-for-byte
+
+- cmd/wisp/panel_page_reply_302_winlive_test.go (new, //go:build windows && winlive):
+  TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe,
+  TestAC14AwaitedBindingReplyReachesThePage,
+  TestAC14GoSideEvalPushReachesThePage + their private harness, moved verbatim
+  out of panel_resident_windows_test.go (blocks cmp-verified byte-identical).
+  The criteria keep judging a missing page receipt a red; only the tier changed -
+  a hosted runner never supplies that receipt (ticket 302).
+- cmd/wisp/panel_resident_windows_test.go: those blocks and the now-orphaned
+  "regexp" import removed; countRequests deliberately stayed (shared with
+  panel_unbound_253r6_windows_test.go on the default tier).
+- scripts/portable-tests.sh: the cli tier comment now names the placement rule
+  (the three page-reply rulers are winlive-tier by build tag, still compiled by
+  the ci.yml winlive vet gate). No executable line, pin or ledger row touched.
+- evidence: docs/evidence/s1/302-r1-instrument-placement.md (red/green pair,
+  census totals before/after, boundary roster); probes under
+  .scratch/wisp/probes/302/r1/.
+
+commit only, no push. explicit pathspecs on add and commit.

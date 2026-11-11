@@ -462,6 +462,15 @@ cli)
     # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
     # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
     # 98), and that script stages them and refuses to run if they are not there.
+    #
+    # TICKET 302 (302-r1, form 甲): the three page-reply rulers - AC#13's
+    # cold-start reading and both AC#14 nails - are winlive-tier now
+    # (panel_page_reply_302_winlive_test.go, //go:build windows && winlive).
+    # Their verdict needs a page that answers back, and this tier's world is a
+    # hosted runner where that receipt never arrives; judging them here red every
+    # run was instrument placement, not an assertion. They stay compiled: the
+    # ci.yml winlive vet gate covers them (ticket 111 AC#11). Criteria text
+    # byte-unchanged; the -skip ledger above is NOT the mechanism used here.
     scope=(./cmd/wisp/)
     pinned=$cli_pin
     ;;

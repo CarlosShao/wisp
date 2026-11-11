@@ -1,0 +1,4 @@
+=== default-tags go vet ./cmd/wisp/ ===
+VET_DEFAULT_rc=0
+=== go vet -tags winlive ./cmd/wisp/ (AC#2 receipt) ===
+VET_WINLIVE_rc=0

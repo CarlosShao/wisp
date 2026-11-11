@@ -1,0 +1,7 @@
+VET_DEFAULT_rc=0
+VET_WINLIVE_rc=0
+LIST_WINLIVE_rc=0 roster_count=638
+LIST_CONTAINS TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe : YES
+LIST_CONTAINS TestAC14AwaitedBindingReplyReachesThePage : YES
+LIST_CONTAINS TestAC14GoSideEvalPushReachesThePage : YES
+GREP_TAGGED_TESTFUNCS in panel_page_reply_302_winlive_test.go (anchored ^func Test): 3

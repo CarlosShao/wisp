@@ -1,0 +1,6 @@
+=== FINAL TREE: go test -tags winlive -list '.*' ./cmd/wisp/ ===
+rc=0 roster_count=638
+contains TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe : YES
+contains TestAC14AwaitedBindingReplyReachesThePage : YES
+contains TestAC14GoSideEvalPushReachesThePage : YES
+VET receipts this session: default=0 winlive=0
