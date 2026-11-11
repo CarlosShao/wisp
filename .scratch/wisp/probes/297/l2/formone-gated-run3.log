@@ -1,0 +1,20 @@
+time=2026-11-11T10:08:20.092+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC297FormOneRenderReachProbe
+    formone_297_windows_test.go:304: [volume] render session ISimpleAudioVolume: volume=1.000 muted=false
+    formone_297_windows_test.go:305: [volume] render endpoint IAudioEndpointVolume: volume=0.200 muted=false
+    formone_297_windows_test.go:326: [mic A] quiet 6s: n=188 mean=0.002108 max=0.121012 min=0.000000 (~31 levels/s)
+time=2026-11-11T10:08:27.391+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+    formone_297_windows_test.go:357: [render 1] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 0): n=31 mean=0.001866 max=0.004488
+time=2026-11-11T10:08:29.468+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+    formone_297_windows_test.go:357: [render 2] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 1): n=31 mean=0.001735 max=0.004353
+time=2026-11-11T10:08:31.547+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+    formone_297_windows_test.go:357: [render 3] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 2): n=31 mean=0.001959 max=0.005050
+time=2026-11-11T10:08:33.628+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+    formone_297_windows_test.go:357: [render 4] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 3): n=31 mean=0.001288 max=0.001843
+time=2026-11-11T10:08:35.713+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+    formone_297_windows_test.go:357: [render 5] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 4): n=31 mean=0.001596 max=0.003542
+    formone_297_windows_test.go:391: [verdict] the microphone did NOT hear the render (best 0.001959 = 0.93x quiet 0.002108, after-face mean 0.001467): form ① SUPPORTED this run -- the sound did not reach the capture device while the endpoint feed carried it (taps above); the fact question is WHY: session volume=1.000 muted=false, endpoint volume=0.200 muted=false, or physical speakers/headphones off -- the owner's ears settle it
+    formone_297_windows_test.go:394: [summary] quiet mean=0.002108 | best render-covering mean=0.001959 (ratio 0.93) | after mean=0.001467 | endpoint taps carried 5/5 at fixture gain=0.35
+--- PASS: TestAC297FormOneRenderReachProbe (18.67s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio/aecspike	18.813s

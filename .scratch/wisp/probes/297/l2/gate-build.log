@@ -1,0 +1,13 @@
+== scoped build (l1口径) ==
+scoped rc=0
+== whole-tree build (预存红坐实) ==
+# github.com/CarlosShao/wisp/build
+build\mut_rvw.go:255:6: undefined: voiceTtsFiles
+build\mut_rvw.go:341:10: undefined: residentBall
+build\mut_rvw.go:353:13: undefined: voiceOwnerQueue
+build\mut_rvw.go:354:13: undefined: voiceResidency
+whole rc=0
+== wisp.exe count ==
+INFO: No tasks are running which match the specified criteria.
+
+whole-tree build honest rc=1 (build/mut_rvw.go undefined symbols, gitignored build/ dir per .gitignore:14 - same pre-existing leftover l1 recorded)

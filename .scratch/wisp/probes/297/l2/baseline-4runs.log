@@ -1,0 +1,45 @@
+Tue Nov 10 23:00:39 CST 2026
+windows
+amd64
+0
+== baseline audio run1 ==
+# github.com/CarlosShao/wisp/internal/audio/aecspike
+package github.com/CarlosShao/wisp/internal/audio/aecspike (test)
+	imports github.com/CarlosShao/wisp/internal/speech
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-windows: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-windows@v1.13.8
+FAIL	github.com/CarlosShao/wisp/internal/audio/aecspike [setup failed]
+ok  	github.com/CarlosShao/wisp/internal/audio	17.932s
+?   	github.com/CarlosShao/wisp/internal/audio/aec	[no test files]
+FAIL
+RC=1
+== baseline audio run2 ==
+# github.com/CarlosShao/wisp/internal/audio/aecspike
+package github.com/CarlosShao/wisp/internal/audio/aecspike (test)
+	imports github.com/CarlosShao/wisp/internal/speech
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-windows: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-windows@v1.13.8
+FAIL	github.com/CarlosShao/wisp/internal/audio/aecspike [setup failed]
+ok  	github.com/CarlosShao/wisp/internal/audio	18.191s
+?   	github.com/CarlosShao/wisp/internal/audio/aec	[no test files]
+FAIL
+RC=1
+== baseline cmdwisp run1 ==
+# github.com/CarlosShao/wisp/cmd/wisp
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/CarlosShao/wisp/internal/speech
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-windows: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-windows@v1.13.8
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]
+FAIL
+RC=1
+== baseline cmdwisp run2 ==
+# github.com/CarlosShao/wisp/cmd/wisp
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/CarlosShao/wisp/internal/speech
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-windows: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-windows@v1.13.8
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]
+FAIL
+RC=1
+Tue Nov 10 23:01:18 CST 2026

@@ -1,0 +1,3 @@
+fork/exec C:\Users\swq\go-build2826680074\b001\aecspike.test: %1 is not a valid Win32 application.
+FAIL	github.com/CarlosShao/wisp/internal/audio/aecspike	0.002s
+FAIL

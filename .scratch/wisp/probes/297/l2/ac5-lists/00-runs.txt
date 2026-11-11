@@ -1,0 +1,9 @@
+date: 2026-11-11T10:09:55.4299168+08:00
+== [1] GOOS=linux CGO_ENABLED=0 list ./internal/audio/ ==
+rc=1 lines=3
+== [2] GOOS=linux CGO_ENABLED=0 list ./internal/audio/aecspike/ ==
+rc=1 lines=3
+== [3] native windows list ./internal/audio/ ==
+rc=0 lines=62
+== [4] native windows list ./internal/audio/aecspike/ ==
+rc=0 lines=34

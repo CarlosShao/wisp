@@ -1,0 +1,33 @@
+Tue Nov 10 23:07:42 CST 2026
+go env CGO_ENABLED=1 GO=go version go1.27.1 windows/amd64
+== baseline audio ./internal/audio/ run1 ==
+ok  	github.com/CarlosShao/wisp/internal/audio	18.080s
+RC=0
+== baseline audio run2 ==
+ok  	github.com/CarlosShao/wisp/internal/audio	18.140s
+RC=0
+== baseline aecspike run1 ==
+ok  	github.com/CarlosShao/wisp/internal/audio/aecspike	0.188s
+RC=0
+== baseline aecspike run2 ==
+ok  	github.com/CarlosShao/wisp/internal/audio/aecspike	0.187s
+RC=0
+== baseline cmdwisp run1 ==
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+cmd\wisp\config_wire_423_windows_test.go:54:7: h.rt undefined (type *replyHost has no field or method rt)
+cmd\wisp\config_wire_423_windows_test.go:57:8: h.rt undefined (type *replyHost has no field or method rt)
+cmd\wisp\config_wire_423_windows_test.go:60:11: h.rt undefined (type *replyHost has no field or method rt)
+cmd\wisp\config_wire_423_windows_test.go:156:12: assignment mismatch: 1 variable but sc.EnableConversation returns 2 values
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+RC=1
+== baseline cmdwisp run2 ==
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+cmd\wisp\config_wire_423_windows_test.go:54:7: h.rt undefined (type *replyHost has no field or method rt)
+cmd\wisp\config_wire_423_windows_test.go:57:8: h.rt undefined (type *replyHost has no field or method rt)
+cmd\wisp\config_wire_423_windows_test.go:60:11: h.rt undefined (type *replyHost has no field or method rt)
+cmd\wisp\config_wire_423_windows_test.go:156:12: assignment mismatch: 1 variable but sc.EnableConversation returns 2 values
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+RC=1
+Tue Nov 10 23:08:30 CST 2026

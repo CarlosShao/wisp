@@ -1,0 +1,29 @@
+time=2026-11-11T10:03:17.601+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC297FormOneRenderReachProbe
+    formone_297_windows_test.go:291: [volume] render session ISimpleAudioVolume: volume=1.000 muted=false
+    formone_297_windows_test.go:292: [volume] render endpoint IAudioEndpointVolume: volume=0.200 muted=false
+time=2026-11-11T10:03:19.937+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:20.967+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=33 dropped_bytes_total=33792 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:21.987+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=65 dropped_bytes_total=66560 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:23.017+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=97 dropped_bytes_total=99328 bounded_window=192ms frame_ms=32
+    formone_297_windows_test.go:313: [mic A] quiet 6s: n=188 mean=0.001088 max=0.033606 min=0.000000 (~31 levels/s)
+time=2026-11-11T10:03:24.037+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=129 dropped_bytes_total=132096 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:24.968+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+time=2026-11-11T10:03:25.057+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=161 dropped_bytes_total=164864 bounded_window=192ms frame_ms=32
+    formone_297_windows_test.go:351: [render 1] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 0): n=31 mean=0.000759 max=0.000922
+time=2026-11-11T10:03:26.087+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=193 dropped_bytes_total=197632 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:27.051+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+time=2026-11-11T10:03:27.106+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=225 dropped_bytes_total=230400 bounded_window=192ms frame_ms=32
+    formone_297_windows_test.go:351: [render 2] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 1): n=32 mean=0.000856 max=0.001581
+time=2026-11-11T10:03:28.137+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=257 dropped_bytes_total=263168 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:29.130+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+time=2026-11-11T10:03:29.157+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=289 dropped_bytes_total=295936 bounded_window=192ms frame_ms=32
+    formone_297_windows_test.go:351: [render 3] endpoint tap: rms=640.055832 peakrms=1459.285234 pushed=48000 captured=48000 | mic window (covers render 2): n=32 mean=0.001046 max=0.002834
+time=2026-11-11T10:03:30.177+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=321 dropped_bytes_total=328704 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:31.177+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=352 dropped_bytes_total=360448 bounded_window=192ms frame_ms=32
+time=2026-11-11T10:03:31.216+08:00 level=INFO msg="aecspike rig session volume reset" readback=1
+time=2026-11-11T10:03:31.261+08:00 level=ERROR msg="goroutine panic recovered" goroutine=audio-capture owner=audio root="" error_class=internal recovered="runtime error: unsafe.Slice: ptr is nil and len is not zero" stack="goroutine 39 [running]:\nruntime/debug.Stack()\n\tD:/work/base/go/src/runtime/debug/stack.go:26 +0x5e\ngithub.com/CarlosShao/wisp/internal/observe.(*Registry).run.func1()\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:302 +0xbe\npanic({0x7ff61fa4ca18?, 0x7ff61f7a6b90?})\n\tD:/work/base/go/src/runtime/panic.go:859 +0x125\ngithub.com/CarlosShao/wisp/internal/audio/aecspike.(*stream).fill(0x2f0ca6de3e30, {0x2f0ca6e9e000, 0x17700, 0x17700}, 0x2f0ca6de38b0, 0x2580, {0x3, 0x2, 0xbb80, 0x20})\n\tD:/work/workspace/projects plans/Wisp/internal/audio/aecspike/rig_windows.go:707 +0x87f\ngithub.com/CarlosShao/wisp/internal/audio/aecspike.(*rigBundle).run(0x2f0ca6d80000, {0x7ff61fa8acd8, 0x7ff61faea660})\n\tD:/work/workspace/projects plans/Wisp/internal/audio/aecspike/rig_windows.go:499 +0x12ec\ngithub.com/CarlosShao/wisp/internal/audio/aecspike.runLoopbackBundle.func1({0x7ff61fa8acd8?, 0x7ff61faea660?})\n\tD:/work/workspace/projects plans/Wisp/internal/audio/aecspike/rig_windows.go:320 +0x5a\ngithub.com/CarlosShao/wisp/internal/observe.(*Registry).run(0x0?, 0x0?, {0x7ff61f7857e1?, 0x0?}, {0x7ff61f7826ad?, 0x0?}, 0x0?, 0x0?)\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x97\ncreated by github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn in goroutine 8\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x387\n" at=2026-11-11T02:03:31Z
+    formone_297_windows_test.go:343: loopback rig unavailable on this host (run 4): aecspike: rig thread exited without an answer
+--- SKIP: TestAC297FormOneRenderReachProbe (13.69s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio/aecspike	13.755s

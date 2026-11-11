@@ -1,0 +1,14 @@
+== gofumpt ==
+gofumpt rc=0
+== gofmt ==
+gofmt out=[] rc=0
+== vet ==
+vet rc=0
+== cispike run (no gate) ==
+time=2026-11-11T10:02:02.077+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC297FormOneRenderReachProbe
+    formone_297_windows_test.go:258: hardware rig: set WISP_AEC_SPIKE=1 (renders synthetic audio on the default endpoint)
+--- SKIP: TestAC297FormOneRenderReachProbe (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio/aecspike	0.119s
+run rc=0

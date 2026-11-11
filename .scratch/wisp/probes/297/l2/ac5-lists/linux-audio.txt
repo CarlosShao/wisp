@@ -1,0 +1,3 @@
+fork/exec C:\Users\swq\go-build1446126042\b001\audio.test: %1 is not a valid Win32 application.
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.001s
+FAIL
