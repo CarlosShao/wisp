@@ -1,0 +1,124 @@
+# 314-rep 重复实测派单（停车期预写，恢复即发）
+
+- 腿码：**314-rep**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`（high 档）
+- 写面：**只写 1 枚 md**（`docs/evidence/s1/314-repetition-measurement.md`）＋ `D:\tmp\wisp\<YYYYMMDD>\314rep\`
+- ⚠ **本腿不产码、不改任何 `.go`**——纯测量
+- 状态：**已写好，等机主说「继续」即发**
+
+---
+
+## 背景（必读，这是本腿存在的理由）
+
+票 314 的整包早停是**间歇性**的，已由两份日志对撞证明：
+
+| 日志 | 顶层 `=== RUN` | 终点锚 `TestZZ315A1` | `Test145ArgsJSON` | 终止行 |
+|---|---|---|---|---|
+| `D:\tmp\wisp\20261111\314early\full.log` | **616 / 616 可运行** | **3/3 到达** | **PASS (0.20s)** | 无（直跑二进制） |
+| `D:\tmp\wisp\20261111\314ac3\rerun1-cli-form.txt` | **330 / 616 ≈53%** | **0/3** | **无判定行** | 有（`strict runner exited 1`） |
+
+⇒ **同一棵树、同一个二进制，一发跑完、一发停在一半。**
+⇒ **因此"找出那一枚会死的测试"是错误方向**（已被排除两次：`TestPanelThreadIsSTA` 与 `Test145` 都不是稳定死点）。
+⇒ **本腿的唯一目的：拿到退出码与 RUN 数的分布，判定"原生崩溃"还是"逻辑提前返回"。**
+
+## 必须做的事（逐条照做，⛔ 自创方法）
+
+### 第 0 步：环境（缺一读数全废）
+
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\build;D:\work\workspace\projects plans\Wisp;' + $env:PATH
+```
+⚠ DLL 不入 PATH ⇒ rc=`0xC0000135`（DLL_NOT_FOUND），那是**环境问题不是死法**，遇到必须报告而不是当成发现。
+
+### 第 1 步：编译测试二进制（一次）
+
+```powershell
+New-Item -ItemType Directory -Force -Path 'D:\tmp\wisp\20261111\314rep' | Out-Null
+go test -c -o 'D:\tmp\wisp\20261111\314rep\wisp.test.exe' ./cmd/wisp 2>&1 | Tee-Object 'D:\tmp\wisp\20261111\314rep\build.log'
+Write-Output "build rc=$LASTEXITCODE"
+```
+
+### 第 2 步：★重复直跑 **5 次**（本腿的核心）
+
+对 `$i in 1..5` 各跑一次，**每次都必须**：
+- 用 `Start-Process -Wait -PassThru` 或 `& $exe *> file` 拿 **`$LASTEXITCODE`**
+- **⛔ 不要用管道**（`| Out-File` 会缓冲丢尾，这正是 `full2.log` 不可信的原因）
+- 每次独立日志文件：`run$i.log` / `run$i.err.log` / `run$i.rc.txt`
+
+参考形状（照此写，勿改语义）：
+```powershell
+$exe = 'D:\tmp\wisp\20261111\314rep\wisp.test.exe'
+for($i=1; $i -le 5; $i++){
+  $out = "D:\tmp\wisp\20261111\314rep\run$i.log"
+  $err = "D:\tmp\wisp\20261111\314rep\run$i.err.log"
+  $p = Start-Process -FilePath $exe -ArgumentList '-test.v','-test.timeout=1800s' `
+        -NoNewWindow -Wait -PassThru `
+        -RedirectStandardOutput $out -RedirectStandardError $err
+  $rc = $p.ExitCode
+  # 转成十六进制便于认原生码
+  $hex = '0x{0:X8}' -f $rc
+  Set-Content "D:\tmp\wisp\20261111\314rep\run$i.rc.txt" "decimal=$rc hex=$hex"
+  Write-Output "run$i rc=$rc ($hex)"
+}
+```
+
+### 第 3 步：每次跑完立刻统计（**逐次都要算，不许只算最后一次**）
+
+对每次 `run$i.log` 算这四项，**记进表格**：
+1. 顶层 `=== RUN` 数（**剥掉含 `/` 的子测试**——不剥会得出 89 条这种假数，我踩过）
+2. 顶层无判定行数（`=== RUN` 有、`--- PASS/FAIL/SKIP` 无）
+3. 终点锚 `^=== RUN   TestZZ315A1` 命中数（满分 3）
+4. `panic` / `fatal error` / `unexpected fault` / `ACCESS_VIOLATION` / `out of memory` 命中数
+
+参考统计（照此写）：
+```powershell
+$c = @(Get-Content $out)
+$runs = @($c | Select-String '^=== RUN   (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
+$verd = @($c | Select-String '^--- (PASS|FAIL|SKIP): (\S+)' | ForEach-Object { $_.Matches[0].Groups[2].Value } | Where-Object { $_ -notmatch '/' })
+$noV  = @($runs | Where-Object { $verd -notcontains $_ })
+$anchor = @($c | Select-String '^=== RUN   TestZZ315A1').Count
+$crash  = @($c | Select-String 'panic|fatal error|unexpected fault|ACCESS_VIOLATION|out of memory').Count
+Write-Output "topRun=$($runs.Count) noVerdict=$($noV.Count) anchor=$anchor crashHits=$crash"
+```
+
+### 第 4 步：判读（**这是本腿的结论，必须明确写**）
+
+| 退出码 | 含义 | 结论 |
+|---|---|---|
+| `0` | 全部跑完 | 该发正常 |
+| `1` | 有测试红（**不是早停**） | 看 FAIL 名单 |
+| `0xC0000005` | **访问违例**（原生崩溃） | ★真崩溃，需 dump |
+| `0xC0000409` | **栈缓冲溢出** | ★真崩溃 |
+| `0xC00000FD` | **栈溢出** | ★真崩溃 |
+| `0xC0000135` | DLL 未找到 | ⚠ **环境问题，作废该次**，修 PATH 重跑 |
+| 其他 | 记原值 | 不得归类为"崩溃"或"正常" |
+
+**结论必须回答这三问**：
+1. 5 次里几次 `0`、几次非 0？非 0 的原值各是什么？
+2. 每次顶层 RUN 数是**固定同一数字**（确定性）还是**散布**（真间歇）？
+3. 非 0 的几次里，`crashHits` 是否 >0？（>0 ⇒ 原生崩溃；=0 且 RUN 数少 ⇒ **逻辑提前返回**）
+
+## 交付
+
+1. `docs/evidence/s1/314-repetition-measurement.md`，含：
+   - 环境读数（PATH 是否含 build、go 版本、二进制大小）
+   - **5 次逐次表格**：rc(decimal/hex) / topRun / noVerdict / anchor / crashHits
+   - **第 4 步三问的明确回答**
+   - 一句总判：**「间歇性早停已复现 N/5 次；死因为〈原生崩溃 X 型〉或〈逻辑提前返回〉」**
+2. 全部原始日志落 `D:\tmp\wisp\20261111\314rep\`（**只建不删**）
+3. 只 commit 那 1 枚 md（**显式 pathspec**），⛔ push
+
+## 铁律（违反即作废）
+
+- ⛔ 改任何 `.go` 文件（本腿纯测量）
+- ⛔ 改 `scripts/portable-tests.sh`、⛔ 改 `.github/workflows/ci.yml`
+- ⛔ 改任何测试断言/判据；⛔ 动 `thresholds.go`/`golden`/`PLAN.md`/`docs/specs/**`/`frontend/**`/`design/**`
+- ⛔ `git add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；add/commit 两处**显式 pathspec**
+- ⛔ 删文件（含临时件）；⛔ 用管道接测试输出
+- ⛔ 因为"跑一次没复现"就收工——**必须跑满 5 次**
+- `cmd/wisp` 重包同一时刻只跑一个（本波只有你一条腿）
+
+## 回一行
+
+`DONE: 314-rep <N/5 复现早停> <退出码原值清单> <RUN数 固定/散布> <原生崩溃 或 逻辑提前返回>`
