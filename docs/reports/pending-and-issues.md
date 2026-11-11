@@ -34265,3 +34265,18 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   3. **346-a2**（glm high，只读）：票 346 AC#2（⛔ 用"变绿"换"看不见"——查三句弃权红句与裸 `t.Skip` 今天在不在）＋ AC#4（winsec 两平台成对门禁今天什么形状）。⛔ 动 `internal/winsec/**` 任何字节（票面 AC#5 明令）。
 - 写面互斥：314-early＝`cmd/wisp/**`；122-ac6＝1 枚 md＋`D:\tmp`；346-a2＝1 枚 md ⇒ **零重叠**。
 - 撤销口令：删本 A1718 条。
+
+## A1719 — 停车期间零 CPU 读盘：`314-early` 那两发日志的实际读数（其中一发是废发）
+
+- 机主令停车等发话（HANDOVER `4.0gb`）。本轮**不派腿、不跑测试**，只读盘上已有日志。
+- **`D:\tmp\wisp\20261111\314early\full.log`（271,375B／2,273 行）＝★废发，⛔ 当读数用**：
+  - 表面读数 RUN=783 / PASS=508 / **FAIL=104** / SKIP=4，终点锚 `TestZZ315A1` **20 命中**（看似"跑完了"）。
+  - 但 FAIL 原因是 **工作目录不对**：逐字 `approval_badge_21s2_windows_test.go:93: parse resident_approval_windows.go: open resident_approval_windows.go: The system cannot find the file specified.` ⇒ 该腿在**非仓库根目录**（或没 `cd` 到 `cmd/wisp`）直跑了二进制，凡靠相对路径读源文件的测试全假红。
+  - 另有 50 处 `onnxruntime` 相关降级（`onnxruntime 1.17.1 is older than the 1.28 … a second onnxruntime.dll is shadowing the one on PATH`）⇒ 语音链族 FAIL 也是环境假红。
+  - ⇒ **783 枚这个分母不作数**，我上一轮说"分母 618"也是转述未核，一并作废。
+- **`D:\tmp\wisp\20261111\314early\full2.log`（129,059B／1,109 行）＝有效读数**：
+  - RUN=409 / PASS=316 / FAIL=3 / SKIP=1，**终点锚 `TestZZ315A1` 0 命中**。
+  - 最后 3 条 `=== RUN` ＝ `TestAC14AwaitedBindingReplyReachesThePage`（PASS 1.73s，逐字 `title="PUSHED-33R5-OK"`）→ `TestAC14GoSideEvalPushReachesThePage`（PASS 1.73s）→ `TestPanelThreadIsSTAAndExitsCleanly`（**无 verdict**，逐字最后一行 `panel thread up and down: hwnd 0x4ea1590, exits observed, shows=1`）。
+  - ⇒ **新死点精确到 `TestPanelThreadIsSTAAndExitsCleanly`**（不是 `Test145…`——那是 `314-ac3` 在 cli 档形态下抓到的另一处早停）。⚠ **两发死在不同地方** ⇒ 早停位置**不稳定/竞态**，不是固定一枚。
+- **给下次重派的直接指令**：`314-early` 续跑时 **①必须先 `Set-Location` 到仓库根再直跑**（否则重演 `full.log` 那类假红）；**②死点候选两枚**＝`TestPanelThreadIsSTAAndExitsCleanly`（本发）与 `Test145ArgsJSONComesFromTheBookedForensicsRow`（`314-ac3` 发）⇒ 先查这两枚的共同点（是否都碰窗口/WebView2 生命周期），而不是只盯一枚。
+- 撤销口令：删本 A1719 条。
