@@ -34323,3 +34323,22 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - ⚠ **`panel_host_windows_test.go` 两处在同一文件**：改它时注意 `:620` 与 `:919` 是**两枚不同测试**，各自独立 leaf；⛔ 让它们共用同一个 leaf（那就等于没改）。
 - **给 `314-early` 续跑的最终指令（覆盖 `A1720` 那句"9 处"）**：只改这 **4 处**；改完 `go vet ./cmd/wisp` 必须 rc=0；跑整包**必须验终点锚** `^=== RUN TestZZ315A1` ≥1 行才算跑完（四数不作数，`A1717`）；若仍早停，再查 `Test145` 那条 `panel` 包路径（不碰窗口，属另一类根因）。
 - 撤销口令：删本 A1721 条（`A1720` 的"9 处"表述由本条收窄为"4 处"，两条并存，以本条为准）。
+
+## A1722 — ★★零 CPU 逐处读码：4 处里**只有 3 处真该改**，且找到**真正的撞车点**（`A1721` 再收窄）
+
+- 接 `A1720`/`A1721`。本轮逐处读完整上下文，**再纠正自己一次**：
+- **★真正的撞车点（本会话最硬的一条线索）**：`panel_host_windows_test.go:620`（`TestPanelHostRealWindowHopAndLifecycle`）与 `:919`（`TestAC4FocusReturnToPriorWindowGap33r5`）**用的是同一个固定名** `wisp-33r1-panel-profile`，而**两枚都会创建真窗口**（`:170` 形状的 `hh.bringUp` / `CreateWindowExW`）。⇒ **这是同一文件内两枚窗口用例共用一个 WebView2 user-data-folder**，正是"谁先谁后决定谁死"的机制。**优先修这一对。**
+- **⚠ 纠正 `A1721` 的一处错误指令**：我在 `A1721` 写"4 处全部改成 `uniqueProfileLeaf` + 加 `t.Cleanup` 清理"——**`panel_host_windows_test.go:615-619` 的注释逐字否掉了后半句**：
+  > `The WebView2 user-data folder is created here and deliberately NOT deleted (repo rule: throwaways are only ever created). t.TempDir's auto-RemoveAll races the browser's own profile-DB teardown and fails on a locked file - that is the teardown, not a product assertion.`
+  ⇒ **⛔ 给这两处加 `os.RemoveAll` 清理**（会与浏览器 profile-DB 收尾抢锁、造出假红）。**只改 leaf 唯一化，⛔ 加删除。**（`68275983e` 那 3 处加了 RemoveAll，属另一批、口径不同，⛔ 照搬。）
+- **逐处最终判定（以本条为准）**：
+  | 位置 | 归属 | 会建窗 | 判定 | 备注 |
+  |---|---|---|---|---|
+  | `panel_host_windows_test.go:620` | `TestPanelHostRealWindowHopAndLifecycle` | 是 | **必改 leaf** | 与 `:919` 撞同一名字；**⛔ 加 RemoveAll**（`:615-619` 明令） |
+  | `panel_host_windows_test.go:919` | `TestAC4FocusReturnToPriorWindowGap33r5` | 是 | **必改 leaf** | 同上；**⛔ 加 RemoveAll** |
+  | `panel_unbound_253r6_windows_test.go:73` | `startPanelFor253r6` | 是（`:205 showAndWait`） | **必改 leaf** | 无 RemoveAll 的既有先例，可按 `68275983e` 形状加 cleanup（该文件无"故意不删"注释） |
+  | `panel_assets_299_windows_test.go:161` | `TestPanelPageFetchesItsOwnAssets299` | 是（`:170 bringUp`） | **必改 leaf** | 同上 |
+  | `panel_holder_319_windows_test.go:53` | `panel319DataPath` | **否** | **⛔ 不改** | `:46-50` 逐字 `Nothing here creates a window` ＋ `shared here on purpose` |
+- **修法定式（给续跑腿）**：把这 4 处（实际是 3 个独立 leaf：`33r1-panel-profile` 那对**各改各的**、`253r6`、`299r1`）换成 `uniqueProfileLeaf("<原前缀>")`；`panel_host_windows_test.go` 那两处**必须分别调用**（⛔ 两处共用一个变量/一个名字，否则等于没改）。`uniqueProfileLeaf` 定义在 `cmd/wisp/panel_resident_windows_test.go`（`fmt.Sprintf("%s-%d-%d", prefix, os.Getpid(), time.Now().UnixNano())`）。
+- **验证判据（三条，缺一不算）**：① `go vet ./cmd/wisp` rc=0；② 跑整包**必须验终点锚** `^=== RUN TestZZ315A1` ≥1 行（四数不作数，`A1717`）；③ 定点跑 `-run 'TestPanelHostRealWindowHopAndLifecycle|TestAC4FocusReturnToPriorWindowGap33r5' -count=1` 与 `-count=2` 都 rc=0。
+- 撤销口令：删本 A1722 条（`A1720`→`A1721`→本条逐次收窄，**以本条为准**）。
