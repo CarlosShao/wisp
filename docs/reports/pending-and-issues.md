@@ -34884,3 +34884,36 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   2. 若 **fresh 全绿 / 旧的全早停** ⇒ **归因成立，AC#1 结案**，直接进修法；
   3. ⚠ 挪夹子是**移动不是删除**（`Move-Item` 到 `D:\tmp\wisp\<date>\314rep\parked-profiles\`），**只建不删**。
 - 撤销口令：删本 A1744 条。
+
+## A1745 — ★★纠正 `A1744` 的归因错误 ＋ 找到**铁证**：pid 54788 的 6 个 profile 夹在 **21:29:54–21:30:02** 逐枚创建、**全部非空删不掉**，而进程 **21:30:05** 死
+
+- 停车令下零派腿、零 go test。本轮先自查 `A1744`，**发现自己上一轮的归因是错的**，然后挖到了比它更硬的证据。
+- **★必须纠正 `A1744` 的错误**：我说"死点前 11 枚建窗测试共用固定名 profile" —— **错**。
+  - 那 11 枚（ac3 index 314–324）全在 **`panel_resident_windows_test.go`**，该文件的夹具是 **`uniqueProfileLeaf("wisp-33r5-panel-profile")`**（`:71`），**每发独立名**（`:62` 逐字 `fmt.Sprintf("%s-%d-%d", prefix, os.Getpid(), time.Now().UnixNano())`）；
+  - 该文件 `:55-60` 的注释还**逐字点名了本票**：`only the leaf is made unique with pid + nanotime so runs and processes stop sharing one fixed-name WebView2 user-data folder` + `(ticket 314 audit)` ⇒ **这一处早就按 314 修过了**；
+  - 而真正用**固定名**的 `TestPanelHostRealWindowHopAndLifecycle`（`panel_host_windows_test.go:620`）在 **index 255**，`TestPanelPageFetchesItsOwnAssets299`（`panel_assets_299:161`）在 **index 190** —— **都不在死点前 11 枚里**。
+  - ⇒ **"固定名 profile 导致 314"这个假设被推翻**（至少不是那 11 枚的直接机制）。
+- **★但同一批现跑数据给出了更硬的铁证：`uniqueProfileLeaf` 造的夹 `t.Cleanup(os.RemoveAll)` 全部失败**：
+  ```
+  wisp-33r5-* 目录 = 39 个
+  非空（RemoveAll 失败） = 39 / 39  ← 全部
+  按 pid 分组：54788→6, 65264→6, 38744→6, 21796→6, 57936→4, 27160→3, 58012→3, 63064→3, 48564→1
+  ```
+  ⇒ **`t.Cleanup(func(){ _ = os.RemoveAll(dataPath) })`（`:72`）每次都失败**（`_ =` 把错误吞了，所以**日志里一声不响**）。这正是 `panel_host_windows_test.go:615-619` 那条注释说的现象：**`RemoveAll` 与浏览器自己的 profile-DB teardown 抢锁**。
+- **★铁证时间线（决定性）**：ac3 那发的测试进程 **pid = 54788**（6 个夹的 pid 段一致），其 6 个 profile 夹的时间戳：
+  ```
+  21:29:54  21:29:57  21:29:58  21:30:00  21:30:01  21:30:02
+  ```
+  而 **ac3 日志最后一行 = 21:30:03**（`panel thread exited cleanly`）、**进程结束 = 21:30:05**。
+  ⇒ **6 个建窗测试在死前 11 秒内逐枚创建 profile 夹、逐枚删不掉**，**第 7 枚（`TestAC4PriorFocusSurvivesARefusedPanelSample`, index 324）之后就死了**。
+  ⇒ 与 `A1744` 的"连续 11 枚建窗"观察吻合，但**机制不是"共用固定名"，而是"每枚都留下删不掉的夹 + 浏览器子进程"**——**同一现象，不同机制**，必须按本条更正。
+- **★这对 314 的意义**：
+  1. **AC#1 的修法候选仍然成立**（每发独立 profile **已经做了**，但**收不干净**）⇒ **真正缺的是"收尾"**，不是"隔离"；
+  2. ⇒ **修法方向变了**：不是"改成 unique"，而是**"unique 了但删不掉 ⇒ 要么放弃删除（承认残留）、要么等浏览器退干净再删、要么把 profile 根移到每次运行独占的 GOTMPDIR 下"**；
+  3. ⚠ 第 3 条**正是 `uniqueProfileLeaf:56-57` 注释明确拒绝的**（`t.TempDir() would shift the root to GOTMPDIR and move other instruments' readings`）⇒ **这条要作为契约级选择摆机主或按铁律⓪⓪⓪自己拍**。
+- **⇒ `314-rep` 派单再改（覆盖 `A1744` 的 A/B 方案）**：
+  - A/B **不再是"fresh vs 旧固定名"**，而是 **"profile 根在 %TEMP%（现状）vs 在每次运行独占的 GOTMPDIR"**——因为**固定名已不是变量**；
+  - **同时必须测**：跑完 `wisp-33r5-*` 目录**增量**（每枚窗口测试应 +1，**若增量 = 建窗测试数 ⇒ 一个都没删掉**）；
+  - **判据**：若 GOTMPDIR 版 **不早停** 且 **残留被整根回收** ⇒ 这就是修法。
+- 诚实登记：这是 `A1744` 之后**同一轮话题内的第 2 次自我更正**。`A1744` 的"固定名"归因是我从"7 处固定名"这个真读数**推过头**了——**真读数不等于真机制**。
+- 撤销口令：删本 A1745 条（并据此撤回 `A1744` 的"固定名导致 314"归因）。
