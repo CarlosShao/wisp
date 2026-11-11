@@ -34166,3 +34166,12 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 备份：`D:\tmp\wisp\20261111\cordis.patch.yml.20261111-preMagpieMax`。**撤销口令**：用该备份覆盖 `C:\Users\swq\.dsh\profiles\desktop\cordis.patch.yml` 即复原（`magpie-max` 消失）。
 - ⚠ 副作用登记：`settings.yaml` 里我也加过一个同名 `magpie-max`（无效、需重启才注册 adapter）——**它不影响运行**（cordis 层优先/同名合并），保留作为重启后的冗余；若要清干净，用 `D:\tmp\wisp\20261111\settings.yaml.20261111-preProviderMax` 覆盖。
 - 结论：**此后所有审计/测试/审查腿一律走 `provider:"magpie-max", model:"group/group-review-and-audit"`（max 档，请求头实证）**；写腿继续 `provider:"magpie", model:"auto/glm-5.3-flash"`（high）。
+
+## A1712 — 编排者自纠：238-a1 派单前没读 Progress（违反"筛票派单前逐格读正文"）
+
+- 事实：我派 238-a1 时只读了票面 `## 现量`/`## 判据`，**没读 Progress log**。票 238 Progress 里躺着两笔 owner 裁定：**A476（09-30，逐字「锁个屁，人家都能登录我电脑了，还锁个蛋啊」＝本条不做）**、**A1558（11-05）＝owner-vetoed、勿再派**，还有 **wave108 `238-proc`（11-09）STOP 零实现**。⇒ 我按铁律本该在派单前排除此票。
+- 后果评估：**无害**。238-a1 是只读腿、零产码、零 `go test`，唯一写点 `probes/238/a1/census.md`（23,343B／171 行，commit `e436b3a37`，已推）。它交的件本身**与 A476/A1558 同向**：逐条现跑证明 132-r1（`b22225513`）已在 `internal/observe/logging.go:99` 把"创建即封"落地，票 238 标题所述缺陷**主体已被收口**，AC#1..3 的消费者今天不存在；`238-proc` 的 STOP 读数被独立复现。
+- 净收益（不是零）：该件给出了**若「Q-72 重开」时的一次取用材料**——乙形（装配根先封）3 枚文件、判定理由（低层包不反向依赖上层＋装配根是 composition root，与台账 `:8788–8791` 在册裁定同形）、AC#2 尺的注入缝形状与**正控诚实边界**（narrowing gauge ≠ provenance gauge）、AC#3 POSIX 已无事可做（`logging.go:297` 已是 0o600）。
+- 处置：**票 238 仍按 A476/A1558 保持不做、不翻框、不再派落地腿**；census 件按 `238-c1`/`238-proc` 同等地位**保留当账、不当待办**。
+- 我的改正：此后派任何票前，**必须读票面 Progress log 全文**，把 owner 裁定/veto/STOP 逐笔抄进派单存档再决定派不派；这条写进下一份交接。
+- 撤销口令：删本 A1712 条。
