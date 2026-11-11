@@ -33969,3 +33969,23 @@ wave124-A 占 `cmd/wisp`（每波一枚写腿铁律），19 孤儿字段批、�
 - **★新发现（wave128 上报）**：PromptBar 的权限档位/工作区/附件/发送 4 个回调是 `() => undefined` 空桩（普查矩阵从退役 composer.tsx 误判为 A，实为静默假）⇒ **派 wave129-I**：接既有 `requestModeSwitch`/`sendMessage`/attachment 路由，缺路由则改诚实禁用态。
 - **wave124-A 进行中**：go/link 进程在跑，新建 `internal/ball/idle_appearance`／`internal/panel/ball_idle_appearance`／`cmd/wisp/appearance_wave` 一批件＋十余件改，未 commit（大任务，非卡死）。
 - 在飞：124-A（Go）＋129-I（前端）＝2 写腿。未推 10（继续压，等 124-A 落账补 Go 台账一并推）。
+## A1696（2026-11-11 12:0x，编排者）**wave124-A 四字段后端全通（`7f3177f93`）｜wave129-I PromptBar 4 回调全接（`6c0cbd244`）｜13 笔已推（未推 0）｜★契约缺口上报：panel.font_size**
+
+### 一、wave124-A `7f3177f93`（26 文件 +1720/−51）四字段 Go 后端全通
+- **ball.opacity_idle** ✅ 全链：schema 键→boot 种子 `ball_idle_appearance_windows.go`→`ball.Options.OpacityIdle *float64`（nil=读不到/0=真值不吞）→Sleeping 视觉 Opacity；写 `SetBallOpacityIdle`。
+- **ball.click_through** ✅ **live**：同种子→`ball.Options.ClickThrough`→Sleeping 态挂 `WS_EX_TRANSPARENT`；写实测 now/restart。
+- **panel.width** ✅ 写路由 `SetPanelWidth`＋快照 `panelWidth`（两处泵都接）；restart 档诚实答"关窗再开即可"。
+- **panel.font_size** ✅ **新 schema 键**（默认 12）＋`SetPanelFontSize`＋快照 `panelFontSize`。
+- 测试：4 写路由全绿＋喂线正控＋**反向两读数实红**（摘种子/摘喂线各红）；gofumpt空/vet/build/全包 ok/d22scan clean/LF 26 文件 0 CR。
+- **顺手清 422 前端腿 stale-red**：台账把 `ballSize` 条目摘除＋翻译补上 ⇒ `go test ./internal/panel` 现 **ok 0.096s**（编排者复跑核实）。
+- 3 发既有 cmd/wisp 红与本腿无关（198 的 `runConfigSet65` 第二调用者／33r11 stampPublishLocked 未入名册／313 union 钉未随 187/65 更新），归 A1674 批。
+
+### 二、wave129-I `6c0cbd244` PromptBar 4 回调全接（零缺路由）
+权限档位 `requestModeSwitch`(panel.mode.request)／工作区 `requestWorkspaceChange`(panel.workspace.request)＋新画工作区行／附件 `submitAttachment`(panel.attachment.add，按字节一文件一请求，被拒原话红字)／发送 `sendMessage`(panel.message.send)。档位"需强确认"标记改从 `l2ConfirmNames` 取。门禁 typecheck/lint/build/render:composer(7态)/render:nav 全绿，产物 bundle 四条路由字面量在盘。
+
+### 三、★契约缺口（需机主批：改契约文字）
+`panel.font_size` 是 124-A 新增的 schema 键（默认 12），但 `PLAN.md:2753` 的 `[panel]` 行还没它。schema 注释已留 CONTRACT NOTE。**改 PLAN 契约文字属三类上报之一 ⇒ 请机主一句「font_size 入契约」**（或我起一张契约变更单走 SPEC-12 §4.1 批准）。不批则该键先悬着（功能已实现，只是契约表未登记）。
+
+### 四、推送与在飞
+- **13 笔已推** `073276055..6c0cbd244`，未推 **0**。
+- 派 **wave130**：J（前端接 4 控件，会触发 gap ledger 4 条需后续 Go 腿清）＋ K（Go 批接 19 孤儿 config 字段读者）。
