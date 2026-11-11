@@ -16,6 +16,7 @@
 
 import {
   translateFetchReply,
+  translateTieredWriteReply,
   translateWriteReply,
   type Feedback,
 } from "@/lib/config-feedback";
@@ -43,6 +44,26 @@ export type ModelsFetchResult =
 /** One whitelisted write (config.set), answered as the sentence to show. */
 export async function performConfigWrite(write: ConfigWireWrite): Promise<Feedback> {
   return translateWriteReply(await requestConfigWrite(write));
+}
+
+/** The composer row's model switch (ticket 187): one offerable catalog row,
+    written as the role_chat_pair field the model page already uses, with the
+    receipt keeping the Go receipt's own tier sentence (model writes are
+    restart tier). Same door, same envelope, tiered translation. */
+export async function performComposerModelWrite(provider: string, model: string): Promise<Feedback> {
+  return translateTieredWriteReply(
+    await requestConfigWrite({ field: "role_chat_pair", provider, model }),
+  );
+}
+
+/** The composer row's thinking-tier switch (ticket 187): the value is one of
+    the snapshot's own thinkingLevels verbatim - never a fourth word invented
+    here - and the receipt keeps the next-task tier sentence the host stamps
+    on this field. */
+export async function performComposerThinkingWrite(level: string): Promise<Feedback> {
+  return translateTieredWriteReply(
+    await requestConfigWrite({ field: "role_chat_thinking", value: level }),
+  );
 }
 
 /** The credential write: the value rides credentialValue and only that key. */

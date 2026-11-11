@@ -115,15 +115,22 @@ const REFUSALS: readonly { match: string; text: string }[] = [
   { match: "密钥已进凭据存储", text: "密钥已保存，但供应商没有更新成功" },
 ];
 
+/** The refusal half both write translators share: a matched sealed sentence
+    becomes its human line; anything else is the generic "保存失败", never a
+    guess dressed up as a diagnosis. */
+function refusalFeedback(reply: string): Feedback {
+  for (const rule of REFUSALS) {
+    if (reply.includes(rule.match)) return { tone: "error", text: rule.text };
+  }
+  return { tone: "error", text: "保存失败" };
+}
+
 /** Translate one write reply into the single sentence shown to the user.
     `null` means no host answered at all. */
 export function translateWriteReply(reply: string | null): Feedback {
   if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
   if (reply.includes("被拒绝")) {
-    for (const rule of REFUSALS) {
-      if (reply.includes(rule.match)) return { tone: "error", text: rule.text };
-    }
-    return { tone: "error", text: "保存失败" };
+    return refusalFeedback(reply);
   }
   if (reply.includes("密钥已录入")) {
     return { tone: "ok", text: restartTier(reply) ? "密钥已保存，重启后生效" : "密钥已保存" };
@@ -133,6 +140,28 @@ export function translateWriteReply(reply: string | null): Feedback {
   }
   // Anything that is neither a known receipt nor a refusal: say so plainly
   // rather than claim a save.
+  return { tone: "error", text: "保存失败" };
+}
+
+/** The composer row's model/thinking switches (ticket 187) translate through
+    this one instead of translateWriteReply. The Go receipt states the
+    effective tier itself ("这一项在下一次任务开始时生效" for a thinking
+    write, "这一项要重启进程…" for a model write - config_handlers.go's
+    tierSentence), and the two halves of the row have DIFFERENT tiers: a
+    translator that collapsed both into one generic "已保存" would let the
+    model half look in force before a restart and the tier half wait for one.
+    So the receipt's own tier wording is kept. Refusals match exactly like
+    translateWriteReply. */
+export function translateTieredWriteReply(reply: string | null): Feedback {
+  if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
+  if (reply.includes("被拒绝")) {
+    return refusalFeedback(reply);
+  }
+  if (reply.includes("已写入")) {
+    if (reply.includes("下一次任务")) return { tone: "ok", text: "已保存，下一次任务开始时生效" };
+    if (reply.includes("重启")) return { tone: "ok", text: "已保存，重启进程后生效" };
+    return { tone: "ok", text: "已保存" };
+  }
   return { tone: "error", text: "保存失败" };
 }
 

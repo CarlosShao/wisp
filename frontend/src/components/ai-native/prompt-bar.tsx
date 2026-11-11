@@ -158,9 +158,21 @@ export function PromptBar({
       : sources.map((s) => ({ key: s.key, name: s.name, desc: s.desc }))
   ).map((r) => ({ key: r.key, name: r.name, desc: "desc" in r ? (r as { desc?: string }).desc ?? "" : "" }));
 
-  const activeModel = models.find((m) => m.key === model) ?? models[0];
+  // Ticket 187's honesty rule for the switchable half: the button names the
+  // value IN FORCE, never a stand-in. A model/effort prop that matches no row
+  // shows its own text verbatim (a pair the config holds but the offerable
+  // list does not, or a tier the file sets outside the declared set) - the
+  // old `?? models[0]` fallback rendered the first row as if it were chosen,
+  // exactly the "displayed value vs value in force" drift ticket 146's family
+  // punishes. An EMPTY prop still falls back to the first row so the harness
+  // demo keeps its shape.
+  const activeModel = model
+    ? (models.find((m) => m.key === model) ?? { key: model, name: model })
+    : models[0];
   const activePermission = permissions.find((p) => p.key === permission);
-  const activeEffort = efforts.find((e) => e.key === effort) ?? efforts[0];
+  const activeEffort = effort
+    ? (efforts.find((e) => e.key === effort) ?? { key: effort, name: effort })
+    : efforts[0];
 
   /* Move wrapped text above the controls, then grow to a compact maximum -
      upstream's measure logic, trimmed to the height part. */
@@ -475,7 +487,7 @@ export function PromptBar({
                 expanded ? "col-start-2 row-start-2" : "col-start-3 row-start-1",
               )}
             >
-              {activeModel?.name}
+              {activeModel?.name ?? "未设置"}
               <span className="text-ink-3">
                 <ChevronDown aria-hidden="true" size={11} strokeWidth={2.4} />
               </span>
@@ -501,7 +513,7 @@ export function PromptBar({
                 pill ? "rounded-full" : "rounded-[8px]",
               )}
             >
-              {activeEffort?.name}
+              {activeEffort?.name ?? "未设置"}
               <span className="text-ink-3">
                 <ChevronDown aria-hidden="true" size={10} strokeWidth={2.4} />
               </span>

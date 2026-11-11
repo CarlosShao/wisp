@@ -38,11 +38,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Activity, Command, Moon, PanelLeft, PanelRight, PanelRightClose, Sun } from "lucide-react";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
-import { ContextMeter } from "@/components/context-meter";
+import { ComposerRow } from "@/components/composer-row";
 import { GitBranchChip } from "@/components/git-branch";
 import { MonitorPopover, type MonitorAgentRow } from "@/components/harness/monitor-popover";
 import { PaletteScreen } from "@/components/palette-screen";
-import { PromptBar } from "@/components/ai-native/prompt-bar";
 import { LineSidebar } from "@/components/react-bits/line-sidebar";
 import { RightRail } from "@/components/harness/right-rail";
 import { SettingsPage } from "@/components/harness/settings-page";
@@ -126,8 +125,6 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     monitorOpen: boolean;
     paletteOpen: boolean;
     sessionId: string | null;
-    model: string;
-    effort: string;
     activeTurn: string | null;
   }>({
     view: null,
@@ -138,8 +135,6 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     monitorOpen: false,
     paletteOpen: false,
     sessionId: null,
-    model: "",
-    effort: "",
     activeTurn: null,
   });
 
@@ -358,16 +353,12 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                   <RetiredView id={view} />
                 ) : (
                   <Conversation
-                    effort={local.effort}
-                    onEffortChange={(effort) => setLocal((c) => ({ ...c, effort }))}
+                    onJump={(id) => setLocal((c) => ({ ...c, activeTurn: id }))}
                     onPermissionChange={() => undefined}
                     onSend={() => undefined}
-                    onJump={(id) => setLocal((c) => ({ ...c, activeTurn: id }))}
                     permission={composer.mode.current}
                     snapshot={snapshot}
                     tiers={tiers}
-                    model={local.model}
-                    onModelChange={(model) => setLocal((c) => ({ ...c, model }))}
                   />
                 )}
               </div>
@@ -439,10 +430,6 @@ function Conversation({
   tiers,
   permission,
   onPermissionChange,
-  model,
-  onModelChange,
-  effort,
-  onEffortChange,
   onSend,
   onJump,
 }: {
@@ -450,10 +437,6 @@ function Conversation({
   tiers: string[];
   permission: string;
   onPermissionChange: (key: string) => void;
-  model: string;
-  onModelChange: (key: string) => void;
-  effort: string;
-  onEffortChange: (key: string) => void;
   onSend: (text: string) => void;
   onJump: (id: string) => void;
 }) {
@@ -501,14 +484,11 @@ function Conversation({
       </div>
       <div className="shrink-0 border-t border-line bg-surface px-6 pb-4 pt-2.5">
         <div className="mx-auto w-full max-w-[720px]">
-          <ContextMeter usage={{}} className="mb-1.5" />
-          <PromptBar
-            effort={effort}
-            efforts={[]}
-            model={model}
-            models={[]}
-            onEffortChange={onEffortChange}
-            onModelChange={onModelChange}
+          {/* Ticket 187's UI half lives in ComposerRow: the model and
+              thinking-tier pickers ride the snapshot's modelSwitch section,
+              and their writes go out through the settings door. */}
+          <ComposerRow
+            modelSwitch={snapshot.modelSwitch}
             onPermissionChange={onPermissionChange}
             onSend={onSend}
             permission={permission}

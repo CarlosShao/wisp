@@ -7,8 +7,10 @@
    neither proves React PAINTS them. That gap is where a component that compiles
    and mounts can still show nothing, or show its own idea of a mode.
 
-   Three states are rendered and checked, each derived from the props rather than
-   from a literal this file invents:
+   Three states of the retired Composer are rendered and checked, each derived
+   from the props rather than from a literal this file invents; a second block
+   (ticket 187) renders ComposerRow - the mounted product row - over the
+   modelSwitch states the snapshot can carry:
      1. no host / no snapshot content: mode "unknown", nothing chosen, and the
         row still paints (an empty permission input must say so out loud);
      2. the ordinary state: a chosen workspace and a stored attachment, with the
@@ -29,7 +31,8 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Composer } from "@/components/composer";
-import type { ComposerState } from "@/lib/panel";
+import { ComposerRow } from "@/components/composer-row";
+import type { ComposerState, ModelSwitchSection } from "@/lib/panel";
 
 /** Same escaping React applies to a text node, so a match here is a match on
     screen and not a match on a substring that never renders. */
@@ -156,6 +159,98 @@ function main(): number {
       // component that reached for window.wispBridge during render would throw
       // here, and that is the failure this case is about.
       html = renderToStaticMarkup(<Composer state={c.state} />);
+    } catch (err) {
+      console.error(`FAIL ${c.name}: renderer threw - ${String(err)}`);
+      failures += 1;
+      continue;
+    }
+    for (const want of c.expect) {
+      if (!html.includes(want)) {
+        console.error(`FAIL ${c.name}: painted markup lacks ${want}`);
+        failures += 1;
+      }
+    }
+    for (const bad of c.forbid ?? []) {
+      if (html.includes(bad)) {
+        console.error(`FAIL ${c.name}: painted markup must not contain ${bad}`);
+        failures += 1;
+      }
+    }
+    console.log(`OK ${c.name}: ${html.length} bytes painted`);
+    pages.push(`<!-- ${c.name} -->\n${html}`);
+  }
+
+  // Ticket 187's UI half: the same instrument, pointed at ComposerRow - the
+  // mounted product composer row - over the modelSwitch states the snapshot
+  // can carry. The values come from fixture sections shaped exactly like
+  // internal/panel/model_switch_187.go's wire.
+  const SWITCHED: ModelSwitchSection = {
+    current: { provider: "deepseek", model: "deepseek-chat" },
+    currentThinking: "medium",
+    models: [
+      { provider: "deepseek", model: "deepseek-chat" },
+      { provider: "deepseek", model: "deepseek-reasoner" },
+    ],
+    thinkingLevels: ["off", "low", "medium", "high"],
+  };
+  const rowCases: {
+    name: string;
+    section?: ModelSwitchSection;
+    expect: string[];
+    forbid?: string[];
+  }[] = [
+    {
+      // Key absent = the pump never assembled a reader: no picker is drawn,
+      // which is honest absence, not a picker with nothing in it.
+      name: "no modelSwitch section",
+      expect: [esc("上下文与用量")],
+      forbid: ["aria-label=\"选择模型\"", "aria-label=\"思考强度\""],
+    },
+    {
+      name: "picker with rows and tiers",
+      section: SWITCHED,
+      expect: [
+        esc("deepseek-chat"),
+        esc("中"),
+        "aria-label=\"选择模型\"",
+        "aria-label=\"思考强度\"",
+      ],
+    },
+    {
+      name: "no offerable rows",
+      section: {
+        current: { provider: "", model: "" },
+        currentThinking: "",
+        models: [],
+        thinkingLevels: [],
+        reason: "配置目录里没有可切换的模型",
+      },
+      expect: [esc("配置目录里没有可切换的模型"), esc("（模型选择器不画）")],
+      forbid: ["aria-label=\"选择模型\"", "aria-label=\"思考强度\""],
+    },
+    {
+      name: "current pair not in the offerable list",
+      section: {
+        ...SWITCHED,
+        current: { provider: "deepseek", model: "deepseek-chat" },
+        models: [{ provider: "deepseek", model: "deepseek-reasoner" }],
+        thinkingLevels: ["high"],
+      },
+      // The button names the pair IN FORCE verbatim; it must not stand in the
+      // first offerable row for it (ticket 146's drift, refused on the page).
+      expect: [esc("deepseek/deepseek-chat"), esc("medium")],
+    },
+  ];
+  for (const c of rowCases) {
+    let html = "";
+    try {
+      html = renderToStaticMarkup(
+        <ComposerRow
+          modelSwitch={c.section}
+          permission="unknown"
+          permissions={[]}
+        />,
+      );
     } catch (err) {
       console.error(`FAIL ${c.name}: renderer threw - ${String(err)}`);
       failures += 1;
