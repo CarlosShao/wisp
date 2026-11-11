@@ -34099,3 +34099,11 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 ### 三、结果
 交接文档 `docs/reports/orchestrator-handover-20261111.md` 扩至 **16 节**（390 行）；§15＝硬规则全表、§16＝启动提示词（含 goal 常驻 max_goal_rounds=400）。
 新会话提示词同步更新：读文档时明确"§15 硬规则全表务必逐条读"、"goal 是常驻目标"。
+## A1705（2026-11-11 18:3x，编排者）**新会话接管 + 档位机制查清 + 163/388 收口：glm 通道跑通；163-v1/388-v1 全绿，翻框+关闭**
+
+- 接管：读 orchestrator-handover-20261111.md / HANDOVER §4.0ga / 前任 handoff；ground truth HEAD bd1315fad（本节基准），票 409 / done 326 / open 83。
+- 档位机制（机主 2026-11-11 令 glm=high / review-and-audit=max 且提示词细，已记入 goal rev2）：实测 `workflow.agent()` 无 reasoning_effort（仅 label/phase/schema/provider/model）；`subagent` 有 reasoning_effort 但报 "not allowed for this Session… limited to parent route"（本会话未记录 model-selection 策略，只许父路由 deepseek）。DSH 文档：`/model-selection-settings` 只在**新会话创建时**记录路由表，后续改动只影响新会话。⇒ 本会话 review-max 无法经 workflow 下发；按铁律 3，子代理统一走 workflow + auto/glm-5.3-flash（合规且能跑通）。review 组本会话经 workflow 返回空/挂起（弱一档），暂用 glm 顶审计腿。
+- 鬼交件复盘：前两波（verdict-wave1/1b）group-review-and-audit 返回空且零落盘；确认为档位/模型弱致，非工具问题（cap-probe 与 glm 小任务均正常）。
+- 交付：163-v1、388-v1 非实现者裁决证据落盘并提交 `d0140b21d`（docs/evidence/s1/163-persistent-shell-session-v1.md、388-announce-attenuation-v1.md）；163 AC#2/#3/#4/#5 翻勾、388 AC#1–#5 翻勾；两票改 `-done`。163 残留 `unwired.go:75 risk.allow_shell_string`＝待机主定"字符串模式"，非欠账；388 AC#2 走 loopback 录回读数支（择一）PASS，机主亲耳可选补。
+- 在飞：297-v1 验收腿（workflow-2b0be23f208c4aa4，glm，后台）。
+- 撤销口令：删本 A1705 条并 `git mv` 两票回原名、撤回本节收口提交即可复原。
