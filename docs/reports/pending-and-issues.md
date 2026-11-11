@@ -33943,3 +33943,22 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **派 wave127（只读普查腿 G）**：产出「面板接线真相矩阵」——全设置面板（config-screen/voice-settings/model-settings/settings-controls/settings-page）每控件判 A 真通/B 只读桩/C **静默假（UI 能改但 Go 零读）**/D 半通，汇总四档数＋C 类逐个点名。**直接回应机主"一堆没接线"**。报告落 `.scratch/wisp/probes/orch/20261110/panel-wiring-matrix.md`。
 - **wave124-A 偏慢**：盘上暂只见 pre-existing 未跟踪测试件（panel_resident_323*），无 124-A 可见改动 ⇒ 可能仍在读/踩复杂点。持续观察，若下轮仍无产出则介入拆小或换法。
 - 在飞：wave124-A（面板后端）＋wave124-B（297 CI）＋wave127（只读矩阵）。未推 6（继续压，等 internal/panel 腾出补 Go 台账后一并推）。
+## A1694（2026-11-11 11:2x，编排者）**★面板接线真相矩阵（回应机主"一堆没接线"）｜wave124-B 297 CI 落（`47d7f9bcd`）｜派 wave128 语音诚实化+模型选择器**
+
+### 一、★面板接线真相矩阵（wave127 只读普查，落 `.scratch/wisp/probes/orch/20261110/panel-wiring-matrix.md`，14.8KB）
+设置面板本体四档：**A 真通 12**（ball.style/ball.size + 模型页 10）｜**B 诚实只读桩 14**（theme/font_size/ball.opacity_idle/click_through/测试连接/导航空类 8——全明标 blocked）｜**★C 静默假 3**｜**D 半通 3**（panel.opacity/animations 页面本地活、panel.width Go 读无写路由）。
+**★C 静默假逐个点名（全在语音页）**：① 听写链 `voice.cloud_asr_chain`（写读都真，但唯一消费者 `ResolveCloudChain` 全仓零调用者，票 255 名册 :292/:372）；② 朗读链 `voice.cloud_tts_chain`（同）；③ 实时语音卡 `voice.realtime.provider/model`（RealtimeEngine 保留接缝无实现，UI 却写"重启后生效"）。
+附加：composer 模型选择器（票 187）从未画出——Go 推 `modelSwitch` 快照＋`role_chat_thinking` 写路由，前端零消费（白捡真通控件）。
+**结论（回机主）**："一堆没接线"真相＝大部分是诚实只读桩或真通；真正"改了没用"的**只有语音页 3 个**。top5：①语音 3 假改诚实标注（C→B，一票文案）②票 61 云级联接进常驻语音腿（2 C→A，杠杆最大）③modelSwitch 补 UI ④实时语音卡改文案⑤过期 waiting 文案。
+
+### 二、wave124-B 297 CI 名册
+`47d7f9bcd`：`scripts/portable-tests.sh` +1 行把 `TestAC297LivePacketByteFace` 登进 windows 账本（附 4 份 verify 日志 9437 行）。CI windows 档不再无账 SKIP 红。
+
+### 三、wave124-A 进行中
+盘上十余件在改（cmd/wisp/config_readers_255、panel_config_store、panel_resident_pump、resident_ball、run.go、internal/ball、config/schema+validate、panel/composer+composer_test+config_handlers+config_write_313+pump）——**注意它也在改 composer_test.go（可能顺带补 ballSize 台账）**。未 commit。等它收口。
+
+### 四、派 wave128-H（前端）
+语音 3 静默假改诚实标注（C→B）＋ composer 模型选择器 UI（票 187，若 187 可做）。
+
+### 五、Go 写车道饱和说明
+wave124-A 占 `cmd/wisp`（每波一枚写腿铁律），19 孤儿字段批、票 61 云链、163/388 组合根接线**都需 cmd/wisp** ⇒ 本波 Go 写车道只能 1 条；124-A 落账后**同一轮立刻**派下一条 Go 腿。在飞：124-A（Go）＋128-H（前端）＝2 写腿。未推 7（压着）。
