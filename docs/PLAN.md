@@ -2750,7 +2750,7 @@ Alfred Workflows · VS Code tasks.json 的 `command` + `args` 数组）：
 | **`[net]`** | `allowlist[]` `block_private_ranges`(true) `proxy{mode,url}` | 🔒 **同上** |
 | `[privacy]` | `redact_paths` `diagnostics_opt_in` `retention_days` · **`keep_transcript`/`keep_audio` 为硬编码 false，只读显示，写入 true 应报错** | `hot`（硬编码项不可改） |
 | `[memory]` | `l1_enabled` `l1_max`(20) `l3_retention_days`(30) `extract_model` | `hot` |
-| `[panel]` | `enabled` `width` `height` `keep_alive_in_session`(true) `scale` | `hot` |
+| `[panel]` | `enabled` `width` `height` `keep_alive_in_session`(true) `scale` `font_size`(12) | `hot` |
 | `[cost]` | `daily_budget` `monthly_budget` `alert_threshold` | `hot` |
 | **`[plugins]`** | `tier2_enabled`(**false**) · `<id>.{enabled,capabilities,net_allowlist,host_api}` | 🔒 **变更即重载该插件并重新确认能力** |
 | `[models]` | `dir` `mirror[]` **`verify_signature`(true，不可关)** `local_override{}` | `hot` |
