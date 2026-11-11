@@ -34235,3 +34235,23 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   3. **314-ac3**（glm high，写）：票 314 AC#3——读 `ci.yml` 找跑 `cmd/wisp` 的那一跳、看它是否覆盖 5 枚死亡点、本机按同形复跑、给"推送前门"落点建议（⛔ 真改门禁）。
 - 写面互斥：323-a1 只写 1 枚 md；313-a1 只写 1 枚 md；314-ac3 只写 1 枚 md＋`D:\tmp\wisp\20261111\314ac3\` ⇒ **三腿零重叠，零 `.go` 写面**（本波无产码腿，因为剩下的可派票都需先普查）。
 - 撤销口令：删本 A1716 条。
+
+## A1717 — ★★314 判错已更正：整包仍早停（换宿主），"四数"不能证明跑完；323-a1 幽灵交件
+
+- **★★ 我此前判 314「修后跑到终态」是错的，已更正**（件 `docs/evidence/s1/314-verdict-v1.md` 加更正段，commit `d7e5ae875`）：
+  - 写腿 `314-ac3` 按 CI 同形复跑（`bash scripts/wisp-cli-tests.sh` cli 档），日志 `D:\tmp\wisp\20261111\314ac3\rerun1-cli-form.txt`（566,794B／3,355 行）我逐字核过：
+    - 四数 **RUN=418 / PASS=325 / FAIL=3 / SKIP=1，rc=1** —— **与我那发 `fullpkg2.log` 逐字一致**；
+    - **最后一条 `=== RUN` ＝ `Test145ArgsJSONComesFromTheBookedForensicsRow`，该枚无 verdict**；
+    - **终点锚 `TestZZ315A1` 0 命中**；`panic:`/`signal`/`killed`/`exit status`/`test timed out` **全 0 命中**；
+    - **分母 618 → 418（≈192 枚没跑）**。
+  - ⇒ **这就是票 314 签名的死法**：整进程静默消失、死点无 verdict。**死法没死透，换了宿主**（窗口区 AC13/AC14 → `Test145ArgsJSONComesFromTheBookedForensicsRow` / panel_run 族）。
+  - **我错在哪**：我拿"四数 + 零 panic/signal"就断言跑到终态，**没查终点锚**。四数一致具欺骗性——没跑的那 192 枚本就不产生 `=== RUN`，早停与跑完可以给出同一组四数。
+  - **净结论**：修笔 `68275983e` **救活了那 5 枚旧死亡点**（实测各自 verdict 行在、AC14 push 1.45s PASS、winlive 档 5/5 PASS）——这部分是真的；但 **314 ⛔ 可收口**，AC#4 处置应改为「修了旧死亡点，整包死亡未消除、换宿主」。
+  - ★**方法论收获（写进下一份交接）**：`portable-tests.sh` 的"四数"**不能证明跑完**，必须加**终点锚断言**（`^=== RUN TestZZ315A1` ≥1 行才算跑完，否则红并声明"四数不作分母"）。314-ac3 已给落点（首选 `scripts/portable-tests.sh` cli 分支末尾；次选 `wisp-cli-tests.sh:302-316`）。**改门禁形状需单独授权，我未改。**
+- **314 AC#3 已取证（写腿 314-ac3 真交）**：commit `1c34c4bcb`，件 `docs/evidence/s1/314-ac3-ci-exposure.md`（12,871B）。我现跑核过：
+  - CI 那一跳＝`ci.yml:888-908` → `bash scripts/wisp-cli-tests.sh`（cli 档，**无 `-timeout`、无 `-tags`**）。
+  - **5 枚死亡点全在 CI 射程内**：skip ledger 逐字 `-skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestAC297LivePacketByteFace|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$` —— **一枚都不含**那 5 枚；且各枚在本次复跑里都有 verdict 行（1 条/枚）。⇒ **下一次推送 CI 必再进窗口区。**
+- **313-a1（glm high，只读现量）真交**：commit `d5dff04e8`，件 `docs/evidence/s1/313-a1-go-side-census.md`（16,548B）。逐格：**AC#1 部分满足**（`defaults.go:34` stepfun 预设在；Go 无"默认选中"承载物＝按 `A877③` 刻意归页面，Go 只送 `configured/configuredKnown` 旗，`panel_config_store.go:112-113`；"改过以用户为准"判据＝运行时零 stepfun 特判＋成对硬门 `catalog.go:99-115`）；**AC#2 已满足**（读面冻结键集＋写面两表 7＋13 枚全通，端到端钉 `panel_config_313_test.go:143-159`）；**AC#3 已满足**（DPAPI 窄门：`credentialValue` 只在写专用封套、读取只问存在性；不回显/不进日志/不进模型文本各有具名测试在守）。⇒ **Go 侧本票射程内还差的＝零**；剩默认高亮常量与页面在 `dsh/feat/frontend-p0-v2` 树（本编队零写面），真机端到端归机主签收。
+- **323-a1（`magpie-max` + review 组，max 档）第四次空交，且踩到幽灵件**：返回 `ok:false` 空串、**零提交**。⚠ 但 `docs/evidence/s1/323-a1-census.md`（9,505B）**存在**——我查了它的 mtime ＝ **2026-11-09 19:22**、来源 commit **`b4d14312f`**，是**上一轮 323-a1 的旧件**，⛔ 本轮产出。**差点被我当成交件**——这正是"完成通知一律当未验证、必须核盘上三把尺"要防的形状。
+  - ⇒ **`group/group-review-and-audit` 四次空交（含 max 档两次）**，结论定死：**该组只能当纯评审器（读+推理+写 md），⛔ 当执行者。** 此后审计腿的派单必须**只给它"读文件并写判定"**，⛔ 给它任何"跑命令/多步流程"的任务。
+- 撤销口令：删本 A1717 条；`git revert d7e5ae875`（314 更正）／`1c34c4bcb`（314-ac3）／`d5dff04e8`（313-a1）。
