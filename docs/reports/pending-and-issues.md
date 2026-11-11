@@ -34003,3 +34003,14 @@ ball.opacity_idle 百分比滑杆（页 0–100%、线上 0..1）／ball.click_t
 - **N**（cmd/wisp）：**163 组合根两行接线＋388 announce 接线**（目标＝可关 163/388 两票）。
 - **O**（只读）：6 DEFERRED＋2 契约项处置表。
 - **压推**：J+K 未推（J 致 internal/panel 设红，等 M 绿后 J+K+M 一并推）。已推基线 227547535。
+## A1698（2026-11-11 14:5x，编排者）**wave131：M 台账清（`a677014b3`）｜N 163+388 接线（`821f4a2d3`）｜O 分诊 4 可接 2 挂账｜5 笔已推｜派 wave132**
+
+### 一、wave131 三腿
+- **M** `a677014b3`（internal/panel/composer_test.go）：删 PanelSnapshot 4 条 gap（ballOpacityIdle/ballClickThrough/panelWidth/panelFontSize）＋补 4 恒等翻译（27→31 types, 15→11 gaps）。`go test ./internal/panel` **ok 20.33s**（编排者复跑 16.14s 绿）。gap 精确集规则未改（收缩非放宽）。
+- **N** `821f4a2d3`（8 件 +298/−2）：**163 组合根两行接线**（BuiltinShellEntries+TaskCleanup，含 proc.OpenJobScope 平台拆分 windows/other）＋**388 announce 接线**（两枚真设备测试前置 Apply/Restore，真机读数 original 1.0→0.15→1.0，unstick 381r2 29/39/49ms、390r1 33/39/49ms ≪400ms）。整包红只 HEAD 存量 3 枚（198/313/33r11）。**163 可关（除 AC#5 unwired 三行文案，Q 收）；388 可关（除 AC#2 机主亲耳，留格）。**
+- **O** `.scratch/wisp/probes/orch/20261110/deferred-disposition.md`：6 DEFERRED 处置——**可立刻接 4**（app.single_instance=proc.WithLayout 最便宜／voice.tts.provider=票61 ⚠180k README 说"云 TTS 未实现"不准，CloudTTS.Speak 全在盘只缺组合根线／privacy.diagnostics_opt_in=票45 加 CLI 子命令／voice.conversation_mode L2 PrivacyConfirm=缝在盘纯实现欠账）＋**搭车 1**（tts.speed 随 provider 零成本）＋**挂账 2**（voice.wake_word.veto_words=需模型资产重生／observe.slo_sample_interval_sec=冻结节拍需裁）＋**删 0**。
+- **编排者裁定**：契约1（watchdog 1s tick 拆分）＝**不拆**（§4.3 冻结，部署面已分进程各归其位，拆无净价值）；slo_sample_interval_sec＝**挂账 DEFERRED**（不改契约文字，标准五字段登记）⇒ **O 不产生新的机主契约项**。
+
+### 二、推送与在飞
+- **5 笔已推** `227547535..821f4a2d3`，未推 **0**（复跑 internal/panel 16.14s 绿、build rc0 后推）。
+- 派 **wave132**：P（cmd/wisp 批接 single_instance＋conversation_mode L2＋diagnostics_opt_in）＋Q（internal/config unwired 三行文案，关 163 AC#5）＋S（语音页控件状态对齐）。
