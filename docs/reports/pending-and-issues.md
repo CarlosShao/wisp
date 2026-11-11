@@ -34458,3 +34458,26 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   3. 跑前 `Set-Location` 到仓库根、DLL 入 PATH；
   4. 若退出码非 0 且非 1 ⇒ 是**原生崩溃**，用 `WER` 或 `procdump` 抓 dump 定死因；若退出码 0/1 ⇒ **没早停**，此前"早停"结论需重审。
 - 撤销口令：删本 A1728 条。**本条撤回 `A1727` 的因果结论，并降级 `A1719` 的死点定位。**
+
+## A1729 — ★★★找到**唯一可信**的早停证据：`314-ac3` 那份日志未截断，330 条顶层测试里**恰好 1 条无判定**
+
+- 停车令下零派腿、零 go test。本轮去验 `A1728` 里我说"`314-ac3` 证据链独立、未受影响"这句**是否成立**——**成立，而且它比我以为的更有力。**
+- **为什么这份可信（两条硬条件，`full2.log` 都不满足）**：
+  1. **有终止摘要行**（逐字末尾）：`portable-tests.sh: FAIL (own line) github.com/CarlosShao/wisp/cmd/wisp` ＋ `portable-tests.sh: strict runner exited 1 for scope=[./cmd/wisp/]` ⇒ **进程正常跑完脚本、打印了结论，不是被杀/截断**；
+  2. **mtime 21:30:05，远早于我 22:04 的 `job_kill`** ⇒ **排除"被我杀掉丢尾部"**。
+  （对照：`full2.log` mtime 22:03:08 距我 `job_kill` 仅约 52 秒，且无终止行 ⇒ 不可信，见 `A1728`。）
+- **★决定性读数（现跑，逐名比对而非数数）**：
+  - 顶层 `=== RUN` = **330**；顶层 `--- PASS/FAIL/SKIP` = **330**；
+  - **顶层无判定行 = 恰好 1 条**：**`Test145ArgsJSONComesFromTheBookedForensicsRow`**。
+  - 终点锚 `TestZZ315A1` = **0/3**（该发 418 条 RUN 里，顶层 330 条，未达最后一个测试文件）。
+  - 3 条 FAIL 是**真红**（与早停无关）：`TestTicket198FirstRunCallerIsTheRunEntryOnly`、`Test313WritableUnionEqualsTheTwoRosters`、`TestLockedSuffixNeverTakesTheLockItself33r11`。
+  - ⚠ 我先按"全部 RUN"数得到 89 条无判定，**那是子测试造成的假象**；剥掉 `/` 子测试后才是 1 条。**这一步必须做，否则结论全错。**
+- **⇒ 可信结论（可写进 314 证据件）**：
+  1. **早停真实存在**：`portable-tests.sh` 的 cli 形态下，`./cmd/wisp` 跑到 `Test145ArgsJSONComesFromTheBookedForensicsRow` 时**无判定地结束**，锚点未达，脚本报 `exited 1`。
+  2. **死点唯一且稳定**：该发是**干净跑完的脚本**，不是被杀，且**只有这一条**无判定 ⇒ **死点就是它**，不是 `TestPanelThreadIsSTA`（`A1719` 的定位**确认作废**，`A1728` 已降级，本条彻底否掉）。
+  3. **`A1727` 的 `RemoveAll` 因果链与此死点无关**：`Test145ArgsJSONComesFromTheBookedForensicsRow`（`panel_run_145_test.go:217`）**不创建窗口、不碰 profile**（它只用 `memory.Open` ＋ `panel.NewRunFeed` ＋ `panel.NewSnapshotPump(...).Marshal()`）⇒ **profile 隔离那 4 处改点治不了这枚**。修面要重新定。
+- **下一步（测量而非推断）**：
+  1. 直跑 `cmd/wisp` 的测试二进制，**定点 `-run '^Test145ArgsJSONComesFromTheBookedForensicsRow$' -count=1`**，抓 `$LASTEXITCODE`：`0` ⇒ 单独跑不出问题（说明是**累积状态**）；`0xC0000005` ⇒ 访问违例；`0xC0000409` ⇒ 栈溢出；其他 ⇒ 记下原值。
+  2. 若单独跑绿，则用 `-run` 二分组（前半/后半）二分，找**触发它的前驱测试**——这才是真死因（累积状态型，主流 harness 里对应"测试间共享全局状态"）。
+  3. ⛔ 再猜 `RemoveAll`/profile；那两类已被本条排除在 `Test145` 之外。
+- 撤销口令：删本 A1729 条。
