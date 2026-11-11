@@ -34175,3 +34175,18 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 处置：**票 238 仍按 A476/A1558 保持不做、不翻框、不再派落地腿**；census 件按 `238-c1`/`238-proc` 同等地位**保留当账、不当待办**。
 - 我的改正：此后派任何票前，**必须读票面 Progress log 全文**，把 owner 裁定/veto/STOP 逐笔抄进派单存档再决定派不派；这条写进下一份交接。
 - 撤销口令：删本 A1712 条。
+
+## A1713 — 收四腿（302-r1 真交、122-r1 底稿、238-a1 已记、314-verdict 空交）＋第二波派发
+
+- **302-r1（glm high，写）真交**：commit `fc08ecb84`，30 路径，越界 0。三枚页面回执判据（`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14AwaitedBindingReplyReachesThePage`／`TestAC14GoSideEvalPushReachesThePage`）从 `--scope=cli` 搬进 **winlive 档**（新文件 `cmd/wisp/panel_page_reply_302_winlive_test.go`，17,050B，`//go:build windows && winlive`）；`panel_resident_windows_test.go` −306/+3；`scripts/portable-tests.sh` **只加 9 行 `#` 注释、零可执行行**（我 `git show` 逐字核过）。**三把尺**：①提交真在 ②件真在（证据 16,394B）③**我自己复跑**：`go vet ./cmd/wisp` rc=0、`go vet -tags winlive ./cmd/wisp` rc=0、`sh -n scripts/portable-tests.sh` rc=0（本机无 bash，用 `D:\work\soft\Git\bin\sh.exe`）、`--scope=census` totals **逐字与腿自报一致**（`packages=42 with-zero-compiled-tests=5 claimed-by-no-scope=5 unclaimed-with-tests=0`）。
+  - ★**该腿诚实披露一件必须留档的事**：那三枚用例**在本机今天不红**（中间隔着票 303 的修复），所以 AC#2"目标档当场红"的判据**随世界变色**，恒红凭据只在托管 runner 世界成立。已按实记，⛔ 当预期红。
+- **122-r1（glm high，写）交底稿**：commit `06a67b40f`，4 路径，越界 0。**两 GOOS 现跑：windows 103 / linux 57**（staticcheck 2026.2.2 (0.8.2)，与 CI 钉版同版）——与票面 34/78、CI 42、批 2 的 98/14 **全不同**，逐块归因：SA4000 已被 `79041f071` 修掉（真缺陷，`||` 两侧逐字同表达式）、SA4006 批1 三条已修、SA1019 4→1（剩 `internal/risk/**` 冻结 1 条）、linux 14→50 主因＝票 418 修好 ball linux 编译面后噪音消失、44 条 linux-only U1000 首次真被数到。**AC#2 五条目标本腿零改动**（前批已修/冻结/越界），**如实报 0 条**（⛔ 假报清账）。U1000 两 GOOS 去重并集 **132 条归属表**（判删候选 3：`shell_exec.go` out/errs＋`shell_session_test.go` closeErr，零引用现核）。
+  - ⚠ 缺陷：U1000 支撑文件（`u1000-*.csv`/`u1000-union.txt`/`ac1-*.txt`/`ac5-observe-count2.log`）**在工作树但未提交**（commit 只含 4 件）⇒ 已派 122-r2 补提交。
+- **238-a1**：见 `A1712`（owner veto 已记，件保留当账）。
+- **314-verdict-v1（review 组 max 档）空交**：返回空串、零 tool 调用、零提交——**review 组第二次空交**（第一次 `workflow-dcf856719f6f4cdb`）。⇒ 我**自己补做裁决**：`docs/evidence/s1/314-verdict-v1.md`（74 行，commit `48d3c3ffb`），**件内署名写明"本件不是 review 组产出、是编排者自跑"**。总判＝**314 可收口（限"整进程死亡"主诉）**，但 AC#0 native 退出码／AC#2 安静桌面／AC#3 CI 暴露**三格欠账必须同时登记**，⛔ 当已做。
+- **第二波派发**（`workflow-0d77d471c050448e`，后台，三腿）：
+  1. **302-v1**（`magpie-max` + review 组，**max 档首次实战**）：裁决 302 的 AC#1..4，重点判"本机不红"那个披露是诚实还是掩盖。
+  2. **314-ac0**（glm high，写）：AC#0 死法取证——`go test -c` 直跑二进制取**真进程退出码**，区分 native 异常码／os.Exit／timeout panic。⛔ 把 `0xC0000135` DLL 缺失当死法。
+  3. **122-r2**（glm high，写）：真删 U1000 判删候选 3 条＋补提交上一腿的支撑文件。
+- 写面互斥：302-v1 只写 evidence；314-ac0 只动 `cmd/wisp`＋自己探针；122-r2 只动 `internal/agent/tools/**`＋证据 ⇒ 无重叠。
+- 撤销口令：删本 A1713 条；`git revert fc08ecb84`（302）／`06a67b40f`（122）／`48d3c3ffb`（314 裁决）。
