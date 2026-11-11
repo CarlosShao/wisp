@@ -264,6 +264,22 @@ type voicePlan struct {
 	// before the Settling window starts. 0 means the session package's own default
 	// (90 s), which is also the config default.
 	WarmTimeout time.Duration
+	// ConversationIdle is [session].conversation_idle_sec: D43 #12's Conversation
+	// row. Ticket 423 wired it: the slot existed (session.ScopeOptions
+	// .ConversationIdle, "0 = 30 s") and nothing fed it, so the config key was
+	// inert. 0 = the session package's own default, which is also the config
+	// default. Note ScopeOptions.BatterySaver overrides this when set; no
+	// production assembly sets it.
+	ConversationIdle time.Duration
+	// SettleStatic is [session].settling_sec: D43 #32's static teardown window.
+	// Same wiring story as ConversationIdle. 0 = 3 s.
+	SettleStatic time.Duration
+	// PunctEnabled is [voice].punctuation. Until ticket 423 the stage was opened
+	// with a hardcoded `true`, so the switch existed only in the schema. false
+	// rides OpenPunctuation's own off contract: nil stage, raw finals - the same
+	// "switched off" state 27-r1 pinned, reached by configuration instead of by
+	// a missing model.
+	PunctEnabled bool
 }
 
 // voiceKwsFiles is the KWS transducer triple plus its token and keyword tables,
@@ -1252,11 +1268,16 @@ func (rv *residentVoice) adopt(r voiceChainReady) (*speech.Transcriber, speech.A
 		fmt.Printf("wisp: 标点级已接上：ASR 的 final 过 %s 标点模型（%s），partial 结构性不带标点\n",
 			"CT-Transformer", rv.plan.PunctModelPath)
 	} else {
-		// "no model on this machine" and "a model that would not attach" are
-		// different facts: the first is a store without the punctuation entry and is
-		// not a problem, the second is a stage this leg failed to wire and is. Only
-		// the second goes through noteProblem.
-		if rv.plan.PunctModelPath == "" {
+		// "no model on this machine", "a model that would not attach", and
+		// "[voice] punctuation=false" are three different facts: the first is a
+		// store without the punctuation entry and is not a problem, the second is
+		// a stage this leg failed to wire and is, the third is the owner's own
+		// switch doing exactly what it says (ticket 423 wired it) - only the
+		// second goes through noteProblem.
+		if !rv.plan.PunctEnabled {
+			slog.Info("voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw")
+			fmt.Printf("wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点\n")
+		} else if rv.plan.PunctModelPath == "" {
 			slog.Info("voice: no punctuation model resolved; finals stay raw (the switched-off state)")
 			fmt.Printf("wisp: 标点级未接：本机模型库没有标点模型（这一进程的 final 是原始假设，不带标点）\n")
 		} else {
@@ -1821,6 +1842,12 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 	plan, why := resolveVoicePlan(dataDir, c)
 	plan.Source = source
 	plan.WarmTimeout = time.Duration(c.Session.WarmTimeoutSec) * time.Second
+	// Ticket 423: the other two [session] keys and the [voice] punctuation
+	// switch ride the same boot-LoadFile feed WarmTimeout has used since
+	// ticket 28.
+	plan.ConversationIdle = time.Duration(c.Session.ConversationIdleSec) * time.Second
+	plan.SettleStatic = time.Duration(c.Session.SettlingSec) * time.Second
+	plan.PunctEnabled = c.Voice.Punctuation
 	if why != "" {
 		rv.verdict = why
 		return rv

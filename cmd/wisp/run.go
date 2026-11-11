@@ -1904,6 +1904,17 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 			PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) *
 				time.Millisecond,
 			SteeringEnabled: cfg.Agent.SteeringEnabled,
+			// Ticket 423: max_rounds / token_budget / loop_guard.repeat_thresholds
+			// are the ticket-10 tail the census caught - the slots exist
+			// (internal/agent loop.Config, guard.go normalizes them) and this
+			// composition root never fed them, so a config.toml edit was inert.
+			// The defaults are behavior-preserving: 0 keeps the loop's own 50,
+			// a non-positive budget keeps the scaled 200k, an empty ladder keeps
+			// 3,5,8 (loop.go's own fallbacks). Read off the LIVE per-task cfg,
+			// the same shape PerToolTimeoutMS above rides.
+			MaxRounds:        cfg.Agent.MaxRounds,
+			TokenBudget:      cfg.Agent.TokenBudget,
+			RepeatThresholds: cfg.Agent.LoopGuard.RepeatThresholds,
 			// The model price card, looked up (never guessed): zero = 价格未知,
 			// which the loop books as tokens-only with Priced=false (AC#4).
 			Price: card,

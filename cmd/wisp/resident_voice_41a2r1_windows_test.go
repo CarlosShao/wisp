@@ -139,6 +139,7 @@ func voice41a2r1Start(t *testing.T, sink voiceTranscriptSink) (*residentVoice, c
 		Source:         "41a2r1 test",
 		HandOff:        residentVoiceHandOff(dataDir),
 		PunctModelPath: voiceWirePunctModel(t),
+		PunctEnabled:   true,
 		Tts:            voiceWireTtsFiles(t),
 		Kws:            kws,
 	}

@@ -283,7 +283,10 @@ func TestWireR1AnnounceEndToEnd(t *testing.T) {
 		Source:         "wire-r1 test",
 		HandOff:        residentVoiceHandOff(dataDir),
 		PunctModelPath: voiceWirePunctModel(t),
-		Tts:            voiceWireTtsFiles(t),
+		// Ticket 423 split the switch out of the hardcoded `true`: a plan built
+		// by hand must say "on" the way the boot plan does for the config default.
+		PunctEnabled: true,
+		Tts:          voiceWireTtsFiles(t),
 	}
 	rv, frames := voiceWireStart(t, plan, ball, sink, func(rv *residentVoice) {
 		rv.newSpeaker = func(rate int) (voiceSpeaker, error) {
@@ -498,6 +501,9 @@ func TestWireR1PunctuationReachesTheAgent(t *testing.T) {
 		Source:         "wire-r1 test",
 		HandOff:        residentVoiceHandOff(dataDir),
 		PunctModelPath: voiceWirePunctModel(t),
+		// Ticket 423: the switch is a plan field now; this case tests the
+		// attached stage, so it says "on" the way the config default does.
+		PunctEnabled: true,
 	}
 	rv, frames := voiceWireStart(t, plan, ball, sink, func(rv *residentVoice) {
 		rv.residency.asrLoader = func() (speech.AsrEngine, error) { return asr, nil }

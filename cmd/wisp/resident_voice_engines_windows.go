@@ -442,7 +442,7 @@ func (r *voiceResidency) loader(kind session.EngineKind) (session.Engine, error)
 		if r.plan.PunctModelPath == "" {
 			return nil, errors.New("语音链：标点模型路径为空")
 		}
-		p, err := speech.OpenPunctuation(speech.PunctuationConfig{ModelPath: r.plan.PunctModelPath}, true)
+		p, err := speech.OpenPunctuation(speech.PunctuationConfig{ModelPath: r.plan.PunctModelPath}, r.plan.PunctEnabled)
 		if err != nil {
 			return nil, err
 		}
@@ -451,13 +451,17 @@ func (r *voiceResidency) loader(kind session.EngineKind) (session.Engine, error)
 	return nil, fmt.Errorf("语音链：本腿不装载引擎族 %q", string(kind))
 }
 
-// openScope creates one epoch's session scope. The hooks are the ordering seams
-// the ticket asks for, each one observable rather than decorative:
+// scopeOptions is the ScopeOptions one epoch's scope opens with, as one pure
+// function of the plan. It exists so the config feed has one addressable seam:
+// ticket 423's readings assert this exact table (the three [session] keys ride
+// it), and a test that rebuilds it by hand would be asserting a copy, not the
+// feed. The hooks are the ordering seams the ticket asks for, each one
+// observable rather than decorative:
 //
 //	MicClose    the Warm transition closes the feed BEFORE the stage lands
 //	Logf        the [audit] family cmd/wisp already prints
 //	FreeOSMemory the cascade's third step (C11 step 4)
-func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
+func (r *voiceResidency) scopeOptions() session.ScopeOptions {
 	hooks := session.Hooks{
 		Logf: func(format string, args ...any) {
 			// 票 12 AC#9 的 T1：scope 自己宣布进 Settling（SCOPE-SETTLING 是它的
@@ -498,7 +502,7 @@ func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
 		// instead of carrying a no-op that looks wired.
 		WarmWindow: r.warmWindow,
 	}
-	return session.NewScope(session.ScopeOptions{
+	return session.ScopeOptions{
 		Loader: r.loader,
 		Clock:  r.clock,
 		Hooks:  hooks,
@@ -506,7 +510,16 @@ func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
 		// session's own comment asks: the package reads no configuration, and 0
 		// means its default (90 s).
 		WarmTimeout: r.plan.WarmTimeout,
-	})
+		// Ticket 423: the other two [session] keys, fed the same option shape -
+		// the slots have been here since ticket 28 with "0 = default" contracts,
+		// and nothing filled them, so the config keys were inert.
+		ConversationIdle: r.plan.ConversationIdle,
+		SettleStatic:     r.plan.SettleStatic,
+	}
+}
+
+func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
+	return session.NewScope(r.scopeOptions())
 }
 
 // attachL1Warm installs ticket 29 AC#1's L1 extraction entry on this residency.
@@ -638,7 +651,9 @@ func (r *voiceResidency) acquireTurn(kind session.EngineKind, reason string) (*v
 	// it is released by the same cascade and cannot outlive the ASR it annotates.
 	// A punctuator that will not load is a degraded dictation path, never a failed
 	// utterance (27-r1's AC4), so the failure is recorded and the turn goes on.
-	if kind == session.EngineASR && r.plan.PunctModelPath != "" {
+	// Ticket 423: the config switch gates the acquire too - punctuation=false
+	// loads no punctuation model at all, instead of loading one and discarding it.
+	if kind == session.EngineASR && r.plan.PunctEnabled && r.plan.PunctModelPath != "" {
 		peng, perr := scope.Acquire(session.EnginePunct)
 		if perr != nil {
 			r.noteProblem("标点级没起来（这一句不带标点）：" + perr.Error())
