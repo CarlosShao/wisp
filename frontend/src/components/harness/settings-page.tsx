@@ -25,7 +25,7 @@ import { ModelSettings } from "@/components/model-settings";
 import { VoiceSettings } from "@/components/voice-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
-import type { BallStyleSection } from "@/lib/panel";
+import type { BallSizeSection, BallStyleSection } from "@/lib/panel";
 
 /** One category: what it is, and what it is still waiting for. The second
     sentence is the reason this table exists rather than a bare label list. */
@@ -120,6 +120,7 @@ export function SettingsPage({
   onSelectSection,
   onClose,
   ballStyle = null,
+  ballSize = null,
 }: {
   activeSection: string;
   onSelectSection: (section: string) => void;
@@ -128,6 +129,10 @@ export function SettingsPage({
       appearance screen. Null when this pump has no reader - the picker then
       says so instead of guessing. */
   ballStyle?: BallStyleSection | null;
+  /** The snapshot's ballSize section (tickets 413/422), handed straight to the
+      appearance screen like ballStyle. Null when this pump has no reader -
+      the size row then says so instead of inventing a diameter. */
+  ballSize?: BallSizeSection | null;
 }) {
   // An unknown name is not guessed at: it lands on the first category, the
   // same way an unknown view does. A rail that lights nothing is worse.
@@ -210,6 +215,7 @@ export function SettingsPage({
               heading={cat.name}
               lede={cat.purpose}
               ballStyle={ballStyle}
+              ballSize={ballSize}
             />
           ) : cat.control === "model" ? (
             <ModelSettings heading={cat.name} lede={cat.purpose} />

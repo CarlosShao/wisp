@@ -342,6 +342,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               onClose={() => setLocal((c) => ({ ...c, settingsOpen: false }))}
               onSelectSection={(next) => setLocal((c) => ({ ...c, settingsSection: next }))}
               ballStyle={snapshot.ballStyle ?? null}
+              ballSize={snapshot.ballSize ?? null}
             />
           ) : (
             <>
