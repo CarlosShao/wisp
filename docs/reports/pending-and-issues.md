@@ -34114,3 +34114,38 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - AC#4 唯一缺口＝整树 `go build ./...` rc=1，我现跑坐实＝gitignored `build/mut_rvw.go`（91,003B，引 voiceTtsFiles/residentBall 等未定义符号＝预存变异副本）；scoped build `./cmd/... ./internal/... ./tools/...` rc=0。**这是全仓"整树 build 红"的公共根因之一**，待机主一句话决定是否把它移出仓（不删、移 D:\tmp）以恢复整树 build 绿。
 - 编号备忘：A1705＝本会话起点（commit `38257bb35`）；A1706 是 handover 刷新提交标题（`bd1315fad`，无 ledger 节）；本会话续用 A1707。
 - 撤销口令：删本 A1707 条并把 297 票 `git mv` 回原名、撤回本节提交即复原。
+
+## A1708（2026-11-11 19:4x，编排者）**314 推进：review 组出对抗审计（事实核实/因果未证/最小修漏 :581）→ 写腿按审计修 :61/:581/:658 去共享（`68275983e`，三把尺全过、已推 origin/dev）；复跑验证腿在飞；review+max 的 model-selection policy 已写入 cordis.patch.yml（待重启生效）**
+
+- 机主令：审计/测试/审查腿一律 review-and-audit 组（不得 glm）、要 max 档、提示词极细。本会话实测坐实：`workflow.agent()` 拒收 reasoning_effort（options 仅 label/phase/schema/provider/model）；经 workflow 派 routing-group 子代理的请求 header **不带 reasoningEffort**（多发生会话 request/header 读数）；provider/model 级默认档（`reasoning` / `reasoningEffort`）均不进请求。正路只剩 `subagent` + `allowedModels` 白名单 + 显式 `reasoning_effort`，而 policy 是**建会话时采样**、当前会话改不动。⇒ 已把 `subagent-model-selection-settings: enabled+allowedModels=[magpie/group-review-and-audit]` 写进 `cordis.patch.yml`（pyyaml 校验 11 项、备份 `cordis.patch.yml.20261111-190359-preSubagentPolicy`），**重启后新会话可 pin max**；本会话 review 组经 workflow 可跑（吃网关默认档）。
+- 审计腿（review 组，会话 `1053bfcf`，非幽灵 89 行）：`docs/evidence/s1/314-audit-v1.md`。结论：固定名共享 WebView2 profile（cmd/wisp 12 处/10 文件）＋408 三枚提交没碰＝**实**；"314 死因由此引起"**未证**（票 314:19 的 q5 反向、q5 日志根 MISSING）；最小修只改 `:61` **漏最高频死点 `:581`**。
+- 写腿（glm high，`68275983e`，+16/−3，仅 `cmd/wisp/panel_resident_windows_test.go`）：`:61/:581/:658` 改 `uniqueProfileLeaf`（根仍 os.TempDir、叶子 pid+纳秒唯一、`t.Cleanup` 清理）。三把尺：提交真在／diff 正确／我亲跑 `gofmt -l` 空 + `go vet ./cmd/wisp` rc=0 + `go test -c` rc=0（62,460,188B，5.6s）。已推 origin/dev（未推 0）。
+- 复跑验证腿（review 组，`workflow-dcf856719f6f4cdb`）**空交幽灵**：21 事件、零 tool 调用、零证据、零提交——review 组是评审器非执行器，跑 `go test` 这种 agentic 执行它直接返回空（印证"不 max 就返回空"）。改由**编排者自跑**（三把尺③）。cmd/wisp 测试需 `Wisp\build\` 里的 sherpa/onnx DLL 在 PATH，否则 `exit status 0xc0000135`（DLL_NOT_FOUND，测试二进制都起不来）。
+- 带 DLL 自跑实数：`TestAC13BringUpSurvivesAReusedThreadQuit` / `TestAC13BringUpRefusesAThreadWithAQueuedClose` 各 PASS×2 发（run2/run3 均 rc=0）；run4 全 5 枚（上述 2 ＋ `TestAC14AwaitedBindingReplyReachesThePage` ＋ `TestAC14GoSideEvalPushReachesThePage` ＋ `TestPanelThreadIsSTAAndExitsCleanly`）**全 PASS，rc=0，9.35s**。⇒ 定点死亡点在"唯一 profile"下全存活、无整进程死亡。
+- 在飞：整包 `go test ./cmd/wisp -count=1 -timeout 1800s` 长跑（314 真收口尺；后台 job pwsh-f4fd383ddeef40e4，timeout 1800s），到终态不死方算 314 解、才翻框。
+- 未解：314 因果未定性、其余 9 处固定名 profile 未动（审计 ③.4）；314 未收口。
+- 撤销口令：删本 A1708 条；`git revert 68275983e` 复原测试夹具；删 `cordis.patch.yml` 末 7 行 policy 或用备份覆盖复原。
+
+## A1709 — 314 整包终态读数（编排者自跑，三把尺③）
+
+- 命令：`go test ./cmd/wisp -count=1 -timeout 1800s -v`，PATH 前置 `Wisp\build`（sherpa/onnx DLL）。
+- 读数：**418 枚 RUN / 325 PASS / 3 FAIL / 1 SKIP；rc=1；353.8s（总 360.2s）跑到终态**。
+- ★关键：全日志 `panic:` / `signal` / `killed` / `exit status` **零命中** ⇒ **无整进程死亡**。历史上本票死法是 157–211s 整进程消失、死点无 verdict；本次跑到终态、每枚都有 verdict。
+- 3 枚 FAIL 全是**断言红**、且**与本修腿无关**（台账 L33986 已归 A1674 批；我现跑 `Select-String` 确认这 3 个文件里 `uniqueProfileLeaf`/`33r5/6/7` 零命中）：
+  1. `TestTicket198FirstRunCallerIsTheRunEntryOnly` — `firstrun_198_test.go:281` 第二调用者 `runConfigSet65`；
+  2. `Test313WritableUnionEqualsTheTwoRosters` — `panel_config_313_test.go:252` 门报 union 与两枚名册不等；
+  3. `TestLockedSuffixNeverTakesTheLockItself33r11` — `panel_locked_naming_33r11_windows_test.go:254` `stampPublishLocked` 未入名册。
+- ⚠ **314 仍未收口**：AC#0（`go test -c` 直跑二进制取 native 退出码）、AC#2（安静桌面 (b)/(d) 对照）、AC#3（CI 暴露＋推送前门）**都没做**；本次只是"修后整包到终态不死"这一枚强读数，**⛔ 当因果已证**（审计已定"共享是否充分死因"未证）。AC#1 的 A/B（fresh ⇄ 旧 profile 各 ≥2 发）也未做。
+- 另：19:35 机主重启 DSH（进程 StartTime 实据），把我 19:29 那发整包作业掐死（日志 0 字节、进程消失）；本读数是 19:36 重启后重跑所得，未被掐。
+- 撤销口令：删本 A1709 条。
+
+## A1710 — 314 收口波派发（四腿并发，写面互斥）
+
+- 314 整包读数（`A1709`）出来之后，cmd/wisp 测试面已空出，同波派四腿（`workflow-3ffcf07bae364679`，后台）：
+  1. **302-r1**（glm high，写）：票 302 AC#1 **甲形**——把三枚"要页面自己回话"的用例从 `--scope=cli` 搬进 `winlive` 档。**编排者选形理由**（按主流 harness，⛔ 按风险小）：主流是按"运行所需世界"分档，GUI/真窗判据只能在有桌面的机器上求值；托管 runner 没那个世界，放 cli 档＝让判据在永远拿不到输入的环境里求值，是死格不是门。乙形（放宽断言）直接违票面 AC#1 硬约束①；丙形（改文案说"它就该红"）＝把常门关掉。写面：`scripts/portable-tests.sh`＋`cmd/wisp/**` 三枚用例的 build tag 行＋自己的探针目录；⛔ 动 ci.yml。
+  2. **122-r1**（glm high，写）：票 122 staticcheck 清账（AC#1 重测两 GOOS／AC#2 只清 SA4000+SA1019+SA4006 五条／AC#3 假阳性只登记／AC#4 U1000 26 条出归属表）。⛔ 加 lint:ignore、⛔ 改 checker 开关、⛔ 挪 lint 步（票面头注逐字禁）。写面：`internal/**` 命中文件＋证据件；⛔ 动 `cmd/wisp/**` 与 `internal/panel/**`（同波写面互斥），命中即跳过并具名归下一波。
+  3. **238-a1**（glm high，只读）：票 238 AC#1 两形代价（甲＝`internal/proc` 自调封条／乙＝装配根先封一次），含"依赖边会不会成环"（现跑 `go list -deps ./internal/winsec`）＋主流 harness 判定。写点唯一＝`probes/238/a1/census.md`。⛔ 产码、⛔ 跑 go test。
+  4. **314-verdict-v1**（**review-and-audit 组**，只读裁决）：读编排者已捕获的 `run4-full.log`＋`fullpkg2.log`，判 314 可不可收口，写 `docs/evidence/s1/314-verdict-v1.md`。⛔ 跑 go test（该组跑执行任务会空交，已两次先例）——本腿只读+判+写 md，规避空交。
+- 写面互斥核对：302-r1 占 `cmd/wisp`+`scripts`；122-r1 只 `internal`；238-a1 只 probes；verdict 只 evidence ⇒ 四腿无重叠。
+- 待办：收件后按三把尺逐腿核（提交真在／件真在／我复跑）；314 若判"可收口"仍须编排者复核 AC#0/#2/#3 的欠账，⛔ 凭一枚裁决腿就翻框。
+- 撤销口令：删本 A1710 条。
