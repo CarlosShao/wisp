@@ -1,154 +1,67 @@
-# 314-rep 重复实测派单（停车期预写，恢复即发）
+# 314-rep 派单（v2 · 按票面 AC#0 重写 · 停车期预写，恢复即发）
 
 - 腿码：**314-rep**
 - 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`（high 档）
-- 写面：**只写 1 枚 md**（`docs/evidence/s1/314-repetition-measurement.md`）＋ `D:\tmp\wisp\<YYYYMMDD>\314rep\`
-- ⚠ **本腿不产码、不改任何 `.go`**——纯测量
+- 写面：**只写 1 枚 md**（`docs/evidence/s1/314-ac0-direct-run.md`）＋ `D:\tmp\wisp\<YYYYMMDD>\314rep\`
+- ⚠ **纯测量，⛔ 改任何 `.go`**
 - 状态：**已写好，等机主说「继续」即发**
 
 ---
 
-## 背景（必读，这是本腿存在的理由）
+## 本腿存在的唯一理由：票面 AC#0 明令"⛔ 只看 wrapper 汇总"
 
-票 314 的整包早停是**间歇性**的，已由两份日志对撞证明：
+票 314 AC#0 **逐字**：
 
-| 日志 | 顶层 `=== RUN` | 终点锚 `TestZZ315A1` | `Test145ArgsJSON` | 终止行 |
-|---|---|---|---|---|
-| `D:\tmp\wisp\20261111\314early\full.log` | **616 / 616 可运行** | **3/3 到达** | **PASS (0.20s)** | 无（直跑二进制） |
-| `D:\tmp\wisp\20261111\314ac3\rerun1-cli-form.txt` | **330 / 616 ≈53%** | **0/3** | **无判定行** | 有（`strict runner exited 1`） |
+> **AC#0 死法取证**：`go test -c` 编出 cmd/wisp 测试二进制 → **直跑它**（`-test.v -test.skip='…'`），拿**进程退出码**（native 异常码 vs `os.Exit(n)` vs `-test.timeout` panic）＋stderr 全量；**⛔ 只看 wrapper 汇总**。
 
-⇒ **同一棵树、同一个二进制，一发跑完、一发停在一半。**
-⇒ **因此"找出那一枚会死的测试"是错误方向**（已被排除两次：`TestPanelThreadIsSTA` 与 `Test145` 都不是稳定死点）。
-⇒ **本腿的唯一目的：拿到退出码与 RUN 数的分布，判定"原生崩溃"还是"逻辑提前返回"。**
+⇒ **编排者此前 8 轮做的都是 wrapper 汇总（`go test` 输出、`portable-tests.sh` 打印），不满足 AC#0。本腿要补的就是"直跑二进制 + 取真退出码"。**
 
-## 必须做的事（逐条照做，⛔ 自创方法）
+## 已知事实（编排者已核，供你定位，⛔ 需你重验）
 
-### 第 0 步：环境（缺一读数全废）
+| 事实 | 读数 |
+|---|---|
+| `go test` 形态一发跑完 | 616 枚顶层测试全部有判定，终点锚 `TestZZ315A1` **3/3**，`Test145ArgsJSON` **PASS (0.20s)** |
+| `go test` 形态一发早停 | 330 枚顶层测试，`TestZZ315A1` **0/3**，`Test145ArgsJSON` **无判定行** |
+| **两发顺序关系** | ac3 的 330 枚是 full 的 616 枚的**精确前缀**（逐位比对，identical prefix = 330） |
+| ⇒ 早停位置 | **确定在第 330 位** ＝ `Test145ArgsJSONComesFromTheBookedForensicsRow`（`cmd/wisp/panel_run_145_test.go:217`） |
+| 该测试函数体 | **75 行，不建窗口、不碰 profile**（只用 `memory.Open` / `panel.NewRunFeed` / `panel.NewSnapshotPump(...).Marshal()`） |
+| 两发环境差异 | cwd（full 那发 cwd 错，104 假红）＋ **SKIP 数不同（4 vs 2）** |
+
+## 第 0 步：环境（缺一读数全废）
 
 ```powershell
 Set-Location 'D:\work\workspace\projects plans\Wisp'
 $env:PATH = 'D:\work\workspace\projects plans\Wisp\build;D:\work\workspace\projects plans\Wisp;' + $env:PATH
 ```
-⚠ DLL 不入 PATH ⇒ rc=`0xC0000135`（DLL_NOT_FOUND），那是**环境问题不是死法**，遇到必须报告而不是当成发现。
+⚠ DLL 不入 PATH ⇒ 退出码 `0xC0000135`，那是**环境问题**，遇到必须报告并修 PATH 重跑，⛔ 当成发现。
 
-### 第 1 步：编译测试二进制（一次）
-
+**同时记录输入快照（防"同树不同输入"，`A1736` 教训）**：
 ```powershell
 New-Item -ItemType Directory -Force -Path 'D:\tmp\wisp\20261111\314rep' | Out-Null
+git rev-parse HEAD | Tee-Object 'D:\tmp\wisp\20261111\314rep\head.txt'
+git status --porcelain -- cmd/wisp | Tee-Object 'D:\tmp\wisp\20261111\314rep\gitstatus.txt'
+```
+
+## 第 1 步：★用**纯净快照**编译（推荐，避免工作树里 2 个未跟踪 323 文件混入）
+
+```powershell
+$snap = 'D:\tmp\wisp\20261111\314rep\snap'
+New-Item -ItemType Directory -Force -Path $snap | Out-Null
+git archive HEAD | tar -x -C $snap
+Set-Location $snap
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\build;D:\work\workspace\projects plans\Wisp;' + $env:PATH
 go test -c -o 'D:\tmp\wisp\20261111\314rep\wisp.test.exe' ./cmd/wisp 2>&1 | Tee-Object 'D:\tmp\wisp\20261111\314rep\build.log'
 Write-Output "build rc=$LASTEXITCODE"
 ```
+⚠ 快照里**没有** `build/` 的 DLL 与 embed 产物 ⇒ 若 `go test -c` 因缺资源失败，**回退到工作树编译**（`Set-Location` 回仓库根），并在证据件里写明走了哪条路。
+⚠ 快照里可运行顶层测试数应比工作树**少 4 枚 `Test323*`**（工作树 196 文件 vs HEAD 194）——用这个验快照是否真干净。
 
-### 第 2 步：★重复直跑 **5 次**（本腿的核心）
+## 第 2 步：★★直跑 5 次，取真退出码（本腿核心）
 
-对 `$i in 1..5` 各跑一次，**每次都必须**：
-- 用 `Start-Process -Wait -PassThru` 或 `& $exe *> file` 拿 **`$LASTEXITCODE`**
-- **⛔ 不要用管道**（`| Out-File` 会缓冲丢尾，这正是 `full2.log` 不可信的原因）
-- 每次独立日志文件：`run$i.log` / `run$i.err.log` / `run$i.rc.txt`
-
-参考形状（照此写，勿改语义）：
-```powershell
-$exe = 'D:\tmp\wisp\20261111\314rep\wisp.test.exe'
-for($i=1; $i -le 5; $i++){
-  $out = "D:\tmp\wisp\20261111\314rep\run$i.log"
-  $err = "D:\tmp\wisp\20261111\314rep\run$i.err.log"
-  $p = Start-Process -FilePath $exe -ArgumentList '-test.v','-test.timeout=1800s' `
-        -NoNewWindow -Wait -PassThru `
-        -RedirectStandardOutput $out -RedirectStandardError $err
-  $rc = $p.ExitCode
-  # 转成十六进制便于认原生码
-  $hex = '0x{0:X8}' -f $rc
-  Set-Content "D:\tmp\wisp\20261111\314rep\run$i.rc.txt" "decimal=$rc hex=$hex"
-  Write-Output "run$i rc=$rc ($hex)"
-}
-```
-
-### 第 3 步：每次跑完立刻统计（**逐次都要算，不许只算最后一次**）
-
-对每次 `run$i.log` 算这四项，**记进表格**：
-1. 顶层 `=== RUN` 数（**剥掉含 `/` 的子测试**——不剥会得出 89 条这种假数，我踩过）
-2. 顶层无判定行数（`=== RUN` 有、`--- PASS/FAIL/SKIP` 无）
-3. 终点锚 `^=== RUN   TestZZ315A1` 命中数（满分 3）
-4. `panic` / `fatal error` / `unexpected fault` / `ACCESS_VIOLATION` / `out of memory` 命中数
-
-参考统计（照此写）：
-```powershell
-$c = @(Get-Content $out)
-$runs = @($c | Select-String '^=== RUN   (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
-$verd = @($c | Select-String '^--- (PASS|FAIL|SKIP): (\S+)' | ForEach-Object { $_.Matches[0].Groups[2].Value } | Where-Object { $_ -notmatch '/' })
-$noV  = @($runs | Where-Object { $verd -notcontains $_ })
-$anchor = @($c | Select-String '^=== RUN   TestZZ315A1').Count
-$crash  = @($c | Select-String 'panic|fatal error|unexpected fault|ACCESS_VIOLATION|out of memory').Count
-Write-Output "topRun=$($runs.Count) noVerdict=$($noV.Count) anchor=$anchor crashHits=$crash"
-```
-
-### 第 4 步：判读（**这是本腿的结论，必须明确写**）
-
-| 退出码 | 含义 | 结论 |
-|---|---|---|
-| `0` | 全部跑完 | 该发正常 |
-| `1` | 有测试红（**不是早停**） | 看 FAIL 名单 |
-| `0xC0000005` | **访问违例**（原生崩溃） | ★真崩溃，需 dump |
-| `0xC0000409` | **栈缓冲溢出** | ★真崩溃 |
-| `0xC00000FD` | **栈溢出** | ★真崩溃 |
-| `0xC0000135` | DLL 未找到 | ⚠ **环境问题，作废该次**，修 PATH 重跑 |
-| 其他 | 记原值 | 不得归类为"崩溃"或"正常" |
-
-**结论必须回答这三问**：
-1. 5 次里几次 `0`、几次非 0？非 0 的原值各是什么？
-2. 每次顶层 RUN 数是**固定同一数字**（确定性）还是**散布**（真间歇）？
-3. 非 0 的几次里，`crashHits` 是否 >0？（>0 ⇒ 原生崩溃；=0 且 RUN 数少 ⇒ **逻辑提前返回**）
-
-## 交付
-
-1. `docs/evidence/s1/314-repetition-measurement.md`，含：
-   - 环境读数（PATH 是否含 build、go 版本、二进制大小）
-   - **5 次逐次表格**：rc(decimal/hex) / topRun / noVerdict / anchor / crashHits
-   - **第 4 步三问的明确回答**
-   - 一句总判：**「间歇性早停已复现 N/5 次；死因为〈原生崩溃 X 型〉或〈逻辑提前返回〉」**
-2. 全部原始日志落 `D:\tmp\wisp\20261111\314rep\`（**只建不删**）
-3. 只 commit 那 1 枚 md（**显式 pathspec**），⛔ push
-
-## 铁律（违反即作废）
-
-- ⛔ 改任何 `.go` 文件（本腿纯测量）
-- ⛔ 改 `scripts/portable-tests.sh`、⛔ 改 `.github/workflows/ci.yml`
-- ⛔ 改任何测试断言/判据；⛔ 动 `thresholds.go`/`golden`/`PLAN.md`/`docs/specs/**`/`frontend/**`/`design/**`
-- ⛔ `git add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；add/commit 两处**显式 pathspec**
-- ⛔ 删文件（含临时件）；⛔ 用管道接测试输出
-- ⛔ 因为"跑一次没复现"就收工——**必须跑满 5 次**
-- `cmd/wisp` 重包同一时刻只跑一个（本波只有你一条腿）
-
-## 回一行
-
-`DONE: 314-rep <N/5 复现早停> <退出码原值清单> <RUN数 固定/散布> <原生崩溃 或 逻辑提前返回>`
-
----
-
-## ⚠⚠ 恢复时必读修正（2026-11-11 22:2x 现跑验尺，**原派单两处会出错**）
-
-我用 `cmd.exe /c exit 5` 与 `exit 3221225477` 实测了抓码方法，**发现原派单第 2 步有两处错**：
-
-### 错处 ①：`Start-Process` 之后 `$LASTEXITCODE` 是**空的**
-实测：
-```
-$p = Start-Process ... -Wait -PassThru
-$p.ExitCode      -> 5        ← 正确来源
-$LASTEXITCODE    -> (空)     ← ⛔ 空的！原派单让你抓这个
-```
-⇒ **必须用 `$p.ExitCode`，⛔ 用 `$LASTEXITCODE`**（`$LASTEXITCODE` 只对 `&` 直接调用有效）。
-
-### 错处 ②：`ExitCode` 对原生崩溃码返回**负的十进制**，必须先转无符号
-实测 `exit 3221225477`：
-```
-$p.ExitCode              -> -1073741819     ← 负值，直接比 0xC0000005 会看错
-'0x{0:X8}' -f $p.ExitCode -> 0xC0000005     ← 正确
-[int32]$p.ExitCode        -> -1073741819
-```
-⇒ **判读时必须 `'0x{0:X8}' -f $p.ExitCode` 再比对**；直接拿负数跟 `0xC0000005` 比在某些写法下会失配。
-⇒ 或者统一用 `[uint32]$p.ExitCode` 转无符号后比对十进制 `3221225477`。
-
-### 修正后的第 2 步（**以本节为准**）
+**⛔ 三个坑（我已实测，别踩）**：
+1. `Start-Process` 之后 **`$LASTEXITCODE` 是空的** ⇒ 必须用 **`$p.ExitCode`**；
+2. `$p.ExitCode` 对原生崩溃码返回**负十进制**（如 `-1073741819`）⇒ 必须 `'0x{0:X8}' -f $rc` 转十六进制再比对；
+3. **⛔ 用管道接测试输出**（会缓冲丢尾）⇒ 必须 `-RedirectStandardOutput` / `-RedirectStandardError`。
 
 ```powershell
 $exe = 'D:\tmp\wisp\20261111\314rep\wisp.test.exe'
@@ -158,24 +71,85 @@ for($i=1; $i -le 5; $i++){
   $p = Start-Process -FilePath $exe -ArgumentList '-test.v','-test.timeout=1800s' `
         -NoNewWindow -Wait -PassThru `
         -RedirectStandardOutput $out -RedirectStandardError $err
-  $rc   = $p.ExitCode                      # ★ 不是 $LASTEXITCODE
-  $hex  = '0x{0:X8}' -f $rc                # ★ 转无符号十六进制
+  $rc   = $p.ExitCode
+  $hex  = '0x{0:X8}' -f $rc
   $code = if($rc -lt 0){ [uint32]$rc } else { $rc }
   Set-Content "D:\tmp\wisp\20261111\314rep\run$i.rc.txt" "decimal=$rc unsigned=$code hex=$hex"
   Write-Output "run$i decimal=$rc unsigned=$code hex=$hex"
 }
 ```
 
-### 判读表（用 `hex` 或 `unsigned` 比对，⛔ 用负的 `decimal`）
+## 第 3 步：每次跑完立刻统计（**逐次都要算**）
+
+```powershell
+$c = @(Get-Content $out)
+$runs = @($c | Select-String '^=== RUN   (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
+$verd = @($c | Select-String '^--- (PASS|FAIL|SKIP): (\S+)' | ForEach-Object { $_.Matches[0].Groups[2].Value } | Where-Object { $_ -notmatch '/' })
+$noV  = @($runs | Where-Object { $verd -notcontains $_ })
+$anchor = @($c | Select-String '^=== RUN   TestZZ315A1').Count
+$crash  = @($c | Select-String 'panic|fatal error|unexpected fault|ACCESS_VIOLATION|out of memory|signal:').Count
+$failBlk = @($c | Select-String '^FAIL$').Count      # ★ 框架自己的结尾块
+$passBlk = @($c | Select-String '^PASS$').Count
+Write-Output "topRun=$($runs.Count) noVerdict=$($noV.Count) anchor=$anchor crashHits=$crash failBlk=$failBlk passBlk=$passBlk"
+```
+⚠ **必须剥掉含 `/` 的子测试**——不剥会得出 89 条这种假数（编排者踩过）。
+
+## 第 4 步：★判读（AC#0 要求的三种死法分类）
+
+**退出码表**（用 `hex` 或 `unsigned` 比，⛔ 用负的 `decimal`）：
 
 | hex | unsigned | 含义 |
 |---|---|---|
-| `0x00000000` | 0 | 全部跑完 |
-| `0x00000001` | 1 | 有测试红（**不是早停**） |
-| `0xC0000005` | 3221225477 | **访问违例**（原生崩溃） |
-| `0xC0000409` | 3221225479 | **栈缓冲溢出** |
-| `0xC00000FD` | 3221225725 | **栈溢出** |
-| `0xC0000135` | 3221225781 | DLL 未找到 ⇒ **环境问题，该次作废、修 PATH 重跑** |
-| `0xC000013A` | 3221225786 | Ctrl+C / 被中断 ⇒ 该次作废 |
+| `0x00000000` | 0 | 全部跑完且全绿 |
+| `0x00000001` | 1 | 有红 **或** 进程内 `os.Exit(1)` —— **必须靠下一步区分** |
+| `0xC0000005` | 3221225477 | **native 访问违例** |
+| `0xC0000409` | 3221225479 | **native 栈缓冲溢出** |
+| `0xC00000FD` | 3221225725 | **native 栈溢出** |
+| `0xC0000135` | 3221225781 | DLL 未找到 ⇒ **环境问题，该次作废重跑** |
+| `0xC000013A` | 3221225786 | 被中断 ⇒ 该次作废 |
 
-**本修正为原派单的缺口，恢复时以本节为准。**
+**★区分"跑完有红"与"`os.Exit(1)` 提前终止"（这是 AC#0 的核心，wrapper 层做不到）**：
+
+| 观察 | 判定 |
+|---|---|
+| 退出码 `1` **且** `failBlk ≥1`（框架打印了 `FAIL` 结尾块）**且** 输出完整到最后一个测试 | **跑完有红** |
+| 退出码 `1` **但** `failBlk = 0`（无框架结尾块）**或** 输出在某个 `=== RUN` 后戛然而止 | **★进程内 `os.Exit(1)` 提前终止** ← 最可能 |
+| 退出码 `0xC0000005`/`0xC0000409`/`0xC00000FD` | **native 崩溃** |
+| 退出码 `0` 但 `topRun` 远小于 616 | **★进程内 `os.Exit(0)` 提前终止** |
+
+## 第 5 步：若 5 次都复现早停 ⇒ 立刻定点单跑（**同轮做，别等下一腿**）
+
+```powershell
+$p = Start-Process -FilePath $exe -ArgumentList '-test.v','-test.run','^Test145ArgsJSONComesFromTheBookedForensicsRow$','-test.count=1' `
+      -NoNewWindow -Wait -PassThru `
+      -RedirectStandardOutput 'D:\tmp\wisp\20261111\314rep\single145.log' `
+      -RedirectStandardError  'D:\tmp\wisp\20261111\314rep\single145.err.log'
+Write-Output ("single145 rc=" + $p.ExitCode + " hex=0x{0:X8}" -f $p.ExitCode)
+```
+- **单跑绿** ⇒ 死因是**前驱测试留下的累积状态** ⇒ 用 `-test.run` 把前 330 枚按文件前缀切两半二分（**显式列举，⛔ 靠 `-test.skip`**）；
+- **单跑也死** ⇒ 死因在**该测试自身或其直接依赖** ⇒ 直接读 `panel_run_145_test.go:217-291` 与 `consoleSink.Publish` 的 `EvToolEnd` 分支。
+
+## 交付
+
+`docs/evidence/s1/314-ac0-direct-run.md`，必须含：
+1. **输入快照**：`git rev-parse HEAD`、`git status --porcelain -- cmd/wisp`、用了快照还是工作树、二进制大小
+2. **5 次逐次表格**：`decimal / unsigned / hex` ＋ `topRun / noVerdict / anchor / crashHits / failBlk / passBlk`
+3. **★死法分类结论**：明确写"native 崩溃 / `os.Exit(n)` 提前终止 / `-test.timeout` panic / 跑完有红"四者中的**哪一个**，并给出支撑读数
+4. **定点单跑结果**（若做了）＋ 下一步二分方案（若需要）
+5. 一句总判：`314 AC#0 ＝ <死法>，证据＝<退出码 hex> + <failBlk/topRun 读数>`
+
+原始日志全部落 `D:\tmp\wisp\20261111\314rep\`（**只建不删**）。只 commit 那 1 枚 md（**显式 pathspec**），⛔ push。
+
+## 铁律
+
+- ⛔ 改任何 `.go`（本腿纯测量）
+- ⛔ 改 `scripts/portable-tests.sh`、⛔ 改 `.github/workflows/ci.yml`
+- ⛔ 改任何断言/判据；⛔ 动 `thresholds.go`/`golden`/`PLAN.md`/`docs/specs/**`/`frontend/**`/`design/**`
+- ⛔ `git add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；add/commit 两处**显式 pathspec**
+- ⛔ 删文件；⛔ 用管道接测试输出
+- ⛔ 跑一次没复现就收工 —— **必须跑满 5 次**
+- `cmd/wisp` 重包同一时刻只跑一个（本波只有你一条腿，你独占）
+
+## 回一行
+
+`DONE: 314-rep <N/5 复现> <退出码hex清单> <topRun 固定/散布> <failBlk 有无> <死法四选一>`
