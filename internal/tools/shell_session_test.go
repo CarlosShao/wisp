@@ -24,12 +24,11 @@ type fakeSessionShell struct {
 	pipeW *io.PipeWriter
 	pipeR *io.PipeReader
 
-	mu       sync.Mutex
-	closes   int
-	kills    int
-	waits    int
-	closeErr error
-	respond  func(f *fakeSessionShell, line string)
+	mu      sync.Mutex
+	closes  int
+	kills   int
+	waits   int
+	respond func(f *fakeSessionShell, line string)
 
 	closeOnce sync.Once
 }

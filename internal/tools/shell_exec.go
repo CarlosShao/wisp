@@ -65,8 +65,6 @@ func (shellExec) Parameters() JSONSchema { return shellExecSchema }
 type waitOutcome struct {
 	state *os.ProcessState
 	err   error
-	out   strings.Builder
-	errs  strings.Builder
 }
 
 func (t shellExec) Execute(ctx context.Context, params json.RawMessage, onUpdate func(string)) (Result, error) {

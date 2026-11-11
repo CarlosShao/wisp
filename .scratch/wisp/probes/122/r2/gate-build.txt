@@ -1,0 +1,12 @@
+# github.com/CarlosShao/wisp/build
+build\mut_rvw.go:255:6: undefined: voiceTtsFiles
+build\mut_rvw.go:341:10: undefined: residentBall
+build\mut_rvw.go:353:13: undefined: voiceOwnerQueue
+build\mut_rvw.go:354:13: undefined: voiceResidency
+build\mut_rvw.go:365:29: undefined: voiceSpeaker
+build\mut_rvw.go:409:20: undefined: voiceAnnounceRequest
+build\mut_rvw.go:446:11: undefined: voiceBargeinMonitor
+build\mut_rvw.go:537:67: undefined: residentBall
+build\mut_rvw.go:1752:47: undefined: residentAudio
+build\mut_rvw.go:1752:66: undefined: residentBall
+build\mut_rvw.go:1752:66: too many errors

@@ -1,0 +1,1 @@
+122-r2 前手：补 commit 122-r1 遗留的 AC#1/U1000 证据件（上腿 commit 06a67b40f 只含 4 件，此 4 枚在工作树未跟踪致证据链缺口）- ac1-windows.txt（115 行预跑原始输出，r1 表正文的 AC#1 读数出处）、u1000-windows.csv（88 条）、u1000-linux.csv（50 条）、u1000-union.txt（132 条去重并集）——r1 归属表的分母与判删候选 3 条（shell_exec.go out/errs + shell_session_test.go closeErr）全部可溯源；零代码改动，显式 pathspec，只 commit 不 push
