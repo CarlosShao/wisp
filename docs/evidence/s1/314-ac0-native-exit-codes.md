@@ -7,7 +7,7 @@
 
 ---
 
-## ★★ 一个必须先说的发现：302-r1 的改动让 AC14 两枚从默认档消失了
+## ★★ 一个必须先说的发现（已于 2026-11-11 21:1x 被回退作废，见文末更正）
 
 `TestAC14AwaitedBindingReplyReachesThePage` 与 `TestAC14GoSideEvalPushReachesThePage` **原在默认档**（`panel_resident_windows_test.go`，`//go:build windows`），302-r1（commit `fc08ecb84`）把它们搬进了 `panel_page_reply_302_winlive_test.go`（`//go:build windows && winlive`）。
 
@@ -90,3 +90,14 @@
 ## 撤销口令
 
 删本件即可；不影响任何代码。
+
+---
+
+## ★★★ 更正（2026-11-11 21:1x，编排者）：上文的"302-r1 使 AC14 需 winlive tag"**已作废**
+
+302-r1 那次搬档（commit `fc08ecb84`）**本身就是违令动作**——票 302 的 2026-10-10 编排者裁（票面 `:92`–`:103`）逐字：CI 改后那一发拿到了页面原话 `REPLIED,REPLIED,REPLIED` ⇒ 前置条件 (ii) 判死 ⇒ **甲（搬 winlive 档）／乙（进 -skip ledger）都⛔ 落**，理由＝"把一枚真回归搬进隐形"。
+
+- 已 `git revert --no-edit fc08ecb84` ⇒ commit **`6232efeb6`**。
+- 回退后现跑验证：`go vet ./cmd/wisp` **rc=0**；`go test -list 'TestAC13ColdStart|TestAC14Awaited|TestAC14GoSide' ./cmd/wisp` **rc=0**，三枚名（含 AC14 两枚）**回到默认档名册**；`cmd/wisp/panel_page_reply_302_winlive_test.go` **不存在**。
+- ⇒ **314 死亡点复跑不需要 `-tags winlive`**。上文"发 1 只跑到 3 枚"是**当时的中间态**（302 搬档期间），不是常态。**本件的发 2（winlive 档 5/5 PASS、退出码 0x00000000）读数仍然有效**——它证明的是"带全 5 枚时全绿且正常退出"，只是现在默认档也能拿到这 5 枚了。
+- 出处：台账 `A1715`（我的违令记录与回退）。
