@@ -33905,3 +33905,15 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - ⇒ **自本条起生效**：`frontend/**` 与 `design/**` ＝**编排者可写面**；**不存在"外部 agent"**；⛔ 再以"前端归外部 agent/我不能碰 frontend"为由不接线或把接线推回机主。前端接线、配置页点亮＝本编队落地事项。
 - 起源教训：我连续多轮把"前端半个"当禁区、只关"后端半个"，导致票关了但屏幕不变（机主当场指出）。本令纠偏。
 - 撤销口令：无（机主直接令，不撤）。
+## A1690（2026-11-11 10:3x，编排者）**wave122：423-followup 接 6 枚孤儿字段（收口成功）｜297 形①仪器定实（声没到麦）｜★前端全权后首派 wave123 球径滑块**
+
+### 一、wave122 两腿
+- **423-followup** `a7f309112`（8 件 +405/−21）：上一枚断线腿的 6 件脏代码**逐件读懂后收口**（语义一字未动，只加纯等价接缝）。**新接 6 枚孤儿字段**：session.settling_sec／session.conversation_idle_sec／voice.punctuation／agent.loop_guard.repeat_thresholds／agent.max_rounds／agent.token_budget。3 枚新测试（真装配根读 `rt.loopOpt.Config` 三值到达／真 `session.NewScope` 三跳／标点开关四半）＋ **7/7 变异 RED→GREEN**。门禁全绿（gofumpt/vet/build/Test423 两 PASS 一 SKIP（System32 onnx 遮蔽诚实跳过）/255 roster 三例/233 三例/d22scan clean 462 文件/path GREEN）。
+- **297-l2** `f12029b7c`（20 件 +6768）：形①判别仪器。**两次真机 5/5 渲染**：端点 tap rms=640/peakrms=1459（端点确实在送声）；麦窗 mean 0.0013–0.0020 **全 ≤ 安静底 0.0021**；音量轴全开。旁证：麦听得见房间突发声（max 0.121）却听不见渲染 ⇒ **形①成立但收敛到物理层（声没到麦），机主耳朵定**。⚠ 遗留：`TestAC297LivePacketByteFace` 落 windows CI 档 scope＋WISP_LIVE_MIC 门＋名册 grep 297=0 ⇒ **CI windows 档预计无账 SKIP 红**（名册在 scripts/**）。
+
+### 二、423 的 19 枚仍悬空（AC#2 三档处置＝编排者裁）
+423-followup 已接 6 枚；**仍悬空 19 枚**：app.single_instance／voice.wake_word.veto_words／voice.tts.provider／voice.tts.speed（死读点）／voice.aec.enabled／voice.aec.echo_ref／voice.conversation_mode／audio.input_device／audio.sample_rate／privacy.redact_paths／privacy.diagnostics_opt_in／privacy.retention_days／memory.l1_enabled／memory.l1_max／memory.l3_retention_days／roll.size_mb／roll.days／observe.level／observe.slo_sample_interval_sec。⇒ 大多与已接 6 枚同型（boot LoadFile 喂 option struct），按批接；少数（tts.speed 死读点/aec 族）需逐判。
+
+### 三、★前端全权（A1689）后首派
+- **wave123（前端腿）**：把「悬浮球大小」滑块端到端接通（panel.ts 加 BallSizeSection＋ballSize 声明、config-screen.tsx 球径行 blocked→live slider、config.set ball_size 写）。**盘上已见改动**（panel.ts:313/444、config-screen.tsx:107/116），腿在跑门禁 typecheck/lint/build＋render 验证。
+- done 326，未结 83。未推 0（wave122 两笔已推）。
