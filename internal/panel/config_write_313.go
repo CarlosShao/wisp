@@ -33,7 +33,11 @@ package panel
 // NO FIELD NAME HERE REACHES A LOCKED FAMILY (risk. / fs. / net. / plugins. /
 // privacy. / models. / audio.), and none carries a word of the approval
 // vocabulary the frozen grant-boundary instrument keys on - both are asserted in
-// config_313_test.go rather than promised in a comment.
+// config_313_test.go rather than promised in a comment. The 本机音频 names are
+// spelled FLAT on purpose (voice_aec_enabled / audio_input_device, no dot): the
+// locked-family ban is about dotted-path spellings a page could use to reach
+// past the roster, and the flat leaf names pass refusedLockedFamily by
+// construction while still naming exactly one guarded write each.
 //
 // TICKET 320's ADDITIONS live in the same roster and follow the same two rules
 // the 313 names follow. They are FIELDS, not methods: no new socket name, no
@@ -87,11 +91,28 @@ const (
 	FieldProviderRowDelete = "provider_row_delete"
 	// FieldRoleChatPair is llm.roles.chat's provider+model, written together.
 	FieldRoleChatPair = "role_chat_pair"
+	// FieldVoiceAecEnabled / FieldAudioInputDevice are the 本机音频 half of the
+	// write face (the 2026-11-11 S-leg alignment): voice.aec.enabled is the
+	// barge-in monitor's config switch and audio.input_device is the capture
+	// open's device resolver - both have real production readers, so the page
+	// may write them. Both are plain values; the guarded write path
+	// (internal/config's writeOneKey, whose validate() runs on the base the
+	// write would produce) is the single source of refusal and neither key
+	// adds a second vocabulary on top. audio.sample_rate deliberately has NO
+	// write field: it is a load-time GUARD key (validate.go refuses every
+	// value but the chain's 16000), so a settings field for it could only
+	// write the number the file already carries or be refused by that same
+	// sentence - a control that is a no-op or a guaranteed refusal is not a
+	// setting. The snapshot carries it as a fact and the door refuses the
+	// name (pinned in config_313_test.go).
+	FieldVoiceAecEnabled  = "voice_aec_enabled"
+	FieldAudioInputDevice = "audio_input_device"
 )
 
 // fields313 is the roster this file owns, sorted at the accessor. It is kept
 // apart from config_handlers.go's allWritableFields on purpose (see the header).
 var fields313 = []string{
+	FieldAudioInputDevice,
 	FieldModelRowCreate,
 	FieldModelRowDelete,
 	FieldProviderBilling,
@@ -99,6 +120,7 @@ var fields313 = []string{
 	FieldProviderRowCreateCustom,
 	FieldProviderRowDelete,
 	FieldRoleChatPair,
+	FieldVoiceAecEnabled,
 	FieldVoiceCloudASRChain,
 	FieldVoiceCloudTTSChain,
 	FieldVoiceRealtimeModel,
@@ -118,8 +140,10 @@ var (
 		FieldModelRowCreate: true, FieldModelRowDelete: true, FieldRoleChatPair: true,
 	}
 	fields313TakesValue = map[string]bool{
-		FieldProviderBilling: true, FieldProviderRowCreateCustom: true,
-		FieldVoiceCloudASRChain: true, FieldVoiceCloudTTSChain: true,
+		FieldAudioInputDevice: true, FieldProviderBilling: true,
+		FieldProviderRowCreateCustom: true,
+		FieldVoiceAecEnabled:         true,
+		FieldVoiceCloudASRChain:      true, FieldVoiceCloudTTSChain: true,
 		FieldVoiceRealtimeProvider: true, FieldVoiceRealtimeModel: true,
 	}
 )

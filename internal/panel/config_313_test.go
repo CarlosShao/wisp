@@ -31,6 +31,8 @@ func fields313Cases() []fields313Case {
 		{field: FieldVoiceCloudTTSChain, extra: map[string]any{"configValue": "stepfun/model-under-test-313"}},
 		{field: FieldVoiceRealtimeProvider, extra: map[string]any{"configValue": "stepfun"}},
 		{field: FieldVoiceRealtimeModel, extra: map[string]any{"configValue": "model-under-test-313"}},
+		{field: FieldVoiceAecEnabled, extra: map[string]any{"configValue": "false"}},
+		{field: FieldAudioInputDevice, extra: map[string]any{"configValue": "Blue Yeti"}},
 		{field: FieldProviderRowCreate, extra: map[string]any{"configProvider": "stepfun"}},
 		{field: FieldProviderBilling, extra: map[string]any{"configProvider": "stepfun", "configValue": "plan"}},
 		{field: FieldProviderRowCreateCustom, extra: map[string]any{
@@ -114,6 +116,8 @@ func Test313SelectorRefusalsOnTheAdditionalRoster(t *testing.T) {
 		{"role_chat_pair without a provider", map[string]any{"configField": FieldRoleChatPair, "configModel": "m"}},
 		{"role_chat_pair without a model", map[string]any{"configField": FieldRoleChatPair, "configProvider": "stepfun"}},
 		{"voice_cloud_asr_chain with an empty value", map[string]any{"configField": FieldVoiceCloudASRChain, "configValue": "   "}},
+		{"voice_aec_enabled with an empty value", map[string]any{"configField": FieldVoiceAecEnabled, "configValue": "   "}},
+		{"audio_input_device with an empty value", map[string]any{"configField": FieldAudioInputDevice, "configValue": "   "}},
 		{"provider_billing without a provider", map[string]any{"configField": FieldProviderBilling, "configValue": "plan"}},
 		{"provider_billing with an empty value", map[string]any{"configField": FieldProviderBilling, "configProvider": "stepfun", "configValue": "   "}},
 		{"provider_row_create_custom without a provider", map[string]any{
@@ -260,6 +264,27 @@ func Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts(t *testing.T) {
 		t.Errorf("a leg that never answered produced preset values: %v", payload["presets"])
 	}
 
+	// The reader-gated half's reverse (the 本机音频 alignment's 摘 reader => 无键):
+	// a leg that answered nothing carries NO aecEnabled / inputDevice /
+	// sampleRate key at all. The nil pointer is omitted from the JSON, so
+	// "nobody read" can never be dressed up on the wire as "AEC off" or
+	// "device default" - delete the three reader lines in
+	// cmd/wisp/panel_config_store.go's ReadSettings and this pin is what goes
+	// red, not a silent zero-value ride.
+	var silentPayload map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(strings.SplitN(reply[idx+len(SettingsPayloadMarker):], "\n", 2)[0]), &silentPayload); err != nil {
+		t.Fatalf("silent leg's payload: %v", err)
+	}
+	var silentVoice map[string]json.RawMessage
+	if err := json.Unmarshal(silentPayload["voice"], &silentVoice); err != nil {
+		t.Fatalf("silent leg's voice payload: %v", err)
+	}
+	for _, k := range []string{"aecEnabled", "inputDevice", "sampleRate"} {
+		if _, ok := silentVoice[k]; ok {
+			t.Errorf("a silent leg's voice payload carries the reader-gated key %q: a leg that never read config must not put the key on the wire at all", k)
+		}
+	}
+
 	unreadable := &cfg248Leg{readView: SettingsView{Readable: false, Credential: CredentialConfigUnreadable}}
 	reply, err = cfg248Dispatch(unreadable).Handle(context.Background(), cfg248Raw(t, map[string]any{
 		"method": MethodConfigGet, "requestId": "r-313-unread", "source": ComposerRequestSource,
@@ -281,11 +306,17 @@ func Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts(t *testing.T) {
 // property (states, counts and references only; the one credential-shaped string
 // is the reference the schema itself writes).
 func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
+	aecOn := false
+	device := "Blue Yeti"
+	rate := 16000
 	line := renderSettingsPayload(SettingsView{
 		Readable: true,
 		Providers: []ProviderSettings{{
 			Name: "stepfun", APIKeyRef: "env:DEEPSEEK_KEY", Models: []string{"m"},
 		}},
+		Voice: VoiceSettingsView{
+			AecEnabled: &aecOn, InputDevice: &device, SampleRate: &rate,
+		},
 	})
 	top := `["chatModel","chatModelKnown","chatProvider","configured","configuredKnown","credential","presets","presetsKnown","providers","readable","voice"]`
 	var payload map[string]json.RawMessage
@@ -327,9 +358,31 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		voiceKeys = append(voiceKeys, k)
 	}
 	sort.Strings(voiceKeys)
-	wantVoice := `["cloudASRChain","cloudTTSChain","realtimeEnabled","realtimeModel","realtimeProvider"]`
+	wantVoice := `["aecEnabled","cloudASRChain","cloudTTSChain","inputDevice","realtimeEnabled","realtimeModel","realtimeProvider","sampleRate"]`
 	if got := `["` + strings.Join(voiceKeys, `","`) + `"]`; got != wantVoice {
 		t.Errorf("voice payload keys = %s, want %s", got, wantVoice)
+	}
+	// The reader-gated half's value shapes, pinned next to the key list: a
+	// answered leg puts the ANSWER on the wire (false is a real "AEC off",
+	// never indistinguishable from "nobody read" - that state is the key's
+	// absence, pinned in Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts).
+	if got := string(voice["aecEnabled"]); got != "false" {
+		t.Errorf("voice.aecEnabled = %s, want the answered false", got)
+	}
+	if got := string(voice["inputDevice"]); got != `"Blue Yeti"` {
+		t.Errorf("voice.inputDevice = %s, want the answered device name", got)
+	}
+	if got := string(voice["sampleRate"]); got != "16000" {
+		t.Errorf("voice.sampleRate = %s, want the answered guard rate", got)
+	}
+	// The byte-level pin of the answered voice object: field order, spelling
+	// and the exact zero shapes the page codes against. A later addition to
+	// voicePayload cannot silently re-order or re-spell the half without this
+	// line going red (the silent-leg reverse - the three keys ABSENT - is
+	// pinned in Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts).
+	wantVoiceJSON := `{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":"","aecEnabled":false,"inputDevice":"Blue Yeti","sampleRate":16000}`
+	if got := string(payload["voice"]); got != wantVoiceJSON {
+		t.Errorf("the answered voice object = %s, want the byte-pinned %s", got, wantVoiceJSON)
 	}
 	// No travelled key is a value-bearing name (exact match: apiKeyRef is the
 	// reference the schema writes, and it is a different name from any value key).
@@ -341,6 +394,34 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		if valueBearing[strings.ToLower(k)] {
 			t.Errorf("the payload travels a value-bearing key %q; the read side carries states, counts and references only", k)
 		}
+	}
+}
+
+// Test313SampleRateStaysAGuardKeyNotAWriteField pins the 本机音频 alignment's
+// disposition for audio.sample_rate: it is a load-time GUARD key
+// (internal/config's validateAudio refuses every value but the chain's 16000),
+// so no write field exists for it on any roster, and the door refuses the name
+// instead of handing the page a control that could only ever write the number
+// the file already carries or be refused by that same sentence. The snapshot
+// carries the fact (voice.sampleRate, reader-gated); the write face does not.
+func Test313SampleRateStaysAGuardKeyNotAWriteField(t *testing.T) {
+	for _, roster := range [][]string{WritableFields(), AdditionalWritableFields()} {
+		for _, f := range roster {
+			if f == "audio_sample_rate" {
+				t.Errorf("%q is on a writable roster: sample_rate is a guard key that only ever accepts the chain's 16000, so a write field would be a no-op or a guaranteed refusal, not a setting", f)
+			}
+		}
+	}
+	leg := &cfg248Leg{}
+	_, err := cfg248Dispatch(leg).Handle(context.Background(), cfg248Raw(t, map[string]any{
+		"method": MethodConfigSet, "requestId": "r-313-rate", "source": ComposerRequestSource,
+		"configField": "audio_sample_rate", "configValue": "48000",
+	}))
+	if !errors.Is(err, ErrConfigFieldRefused) {
+		t.Errorf("audio_sample_rate returned %v, want %v (the field is not on the write face)", err, ErrConfigFieldRefused)
+	}
+	if leg.applyCalls+leg.readCalls+leg.credCalls != 0 {
+		t.Errorf("audio_sample_rate reached the leg anyway: %+v", leg)
 	}
 }
 

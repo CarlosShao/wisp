@@ -93,14 +93,18 @@ func TestTicket255SplitOnlyClaimsSectionsWithALiveReader(t *testing.T) {
 	// 44's per-task CostWiring/QuotaWiring read the LIVE cfg that execute()
 	// re-reads, so a hot-applied [cost] edit reaches the next task's meter and
 	// quota gate. Slice order is the caller's hot list, so cost comes last.
-	if strings.Join(split.claimable, " ") != "llm agent cost" {
-		t.Errorf("claimable = %v, want exactly [llm agent cost]: llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92), agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263), and cost by the per-task CostWiring/QuotaWiring ticket 44 landed (cmd/wisp/run.go:1570). A section with no live reader must never be in this list.", split.claimable)
+	// 2026-11-11: [audio] joined them (the 本机音频 alignment, leg R) - the
+	// settings leg now reads the device/rate half off the LIVE Manager per
+	// config.get (cmd/wisp/panel_config_store.go:103/:104), the same per-call
+	// class [llm] rests on, so the hot list's order puts audio first.
+	if strings.Join(split.claimable, " ") != "audio llm agent cost" {
+		t.Errorf("claimable = %v, want exactly [audio llm agent cost]: llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92), agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263), cost by the per-task CostWiring/QuotaWiring ticket 44 landed (cmd/wisp/run.go:1570), and audio by the settings leg's per-call device/rate read the 本机音频 alignment landed (cmd/wisp/panel_config_store.go:103). A section with no live reader must never be in this list.", split.claimable)
 	}
 	quiet := map[string]bool{}
 	for _, name := range split.quiet {
 		quiet[name] = true
 	}
-	claimed := map[string]bool{"llm": true, "agent": true, "cost": true}
+	claimed := map[string]bool{"audio": true, "llm": true, "agent": true, "cost": true}
 	for _, name := range hot {
 		if claimed[name] {
 			continue
@@ -110,7 +114,7 @@ func TestTicket255SplitOnlyClaimsSectionsWithALiveReader(t *testing.T) {
 		}
 	}
 	if len(quiet) != len(hot)-len(claimed) {
-		t.Errorf("quiet = %v, want the %d non-llm/agent/cost hot names", split.quiet, len(hot)-len(claimed))
+		t.Errorf("quiet = %v, want the %d non-audio/llm/agent/cost hot names", split.quiet, len(hot)-len(claimed))
 	}
 
 	// A name plan() booked that the registry cannot explain is neither claimed nor
@@ -877,7 +881,9 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 		// Manager per task), so the immediate sentence carries it next to [llm].
 		// 2026-11-05: [cost] joined too (ticket 98's C2 re-adjudication) - the
 		// per-task CostWiring/QuotaWiring ticket 44 landed read the same live cfg.
-		if !strings.Contains(immediate, "[llm]") || !strings.Contains(immediate, "[agent]") || !strings.Contains(immediate, "[cost]") {
+		// 2026-11-11: [audio] joined (the 本机音频 alignment, leg R) - the
+		// settings leg's per-call device/rate read (cmd/wisp/panel_config_store.go:103).
+		if !strings.Contains(immediate, "[llm]") || !strings.Contains(immediate, "[agent]") || !strings.Contains(immediate, "[cost]") || !strings.Contains(immediate, "[audio]") {
 			t.Errorf("the live-read sections are not claimed: %q", immediate)
 		}
 		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[models]", "[hotkey]"} {
@@ -891,7 +897,7 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 				t.Errorf("the honest sentence omits %s, so the edit vanished from the receipt: %q", want, honest)
 			}
 		}
-		if strings.Contains(honest, "[llm]") || strings.Contains(honest, "[agent]") || strings.Contains(honest, "[cost]") {
+		if strings.Contains(honest, "[llm]") || strings.Contains(honest, "[agent]") || strings.Contains(honest, "[cost]") || strings.Contains(honest, "[audio]") {
 			t.Errorf("a claimed section is in both buckets: %q", honest)
 		}
 		// Logged for the evidence file (run with -v) so both sentences are quoted

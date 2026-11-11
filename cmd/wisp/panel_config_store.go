@@ -93,6 +93,15 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 	if cfg == nil {
 		return panel.SettingsView{Readable: false, Credential: panel.CredentialConfigUnreadable}, nil
 	}
+	// 本机音频 half (the 2026-11-11 S-leg alignment): the three keys the page's
+	// waiting card graduates on. The locals exist because the view outlives
+	// this call - they snapshot the values off the per-call Config() read
+	// instead of handing out addresses into the config object. This read is
+	// also what cmd/wisp/config_readers_255.go's [audio] row now cites as the
+	// section's live reader (the same per-call class the [llm] row rests on).
+	aecOn := cfg.Voice.AEC.Enabled
+	inputDevice := cfg.Audio.InputDevice
+	sampleRate := cfg.Audio.SampleRate
 	view := panel.SettingsView{
 		Readable:       true,
 		ChatModel:      cfg.LLM.Roles.Chat.Model,
@@ -108,6 +117,9 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 			RealtimeEnabled:  cfg.Voice.Realtime.Enabled,
 			RealtimeProvider: cfg.Voice.Realtime.Provider,
 			RealtimeModel:    cfg.Voice.Realtime.Model,
+			AecEnabled:       &aecOn,
+			InputDevice:      &inputDevice,
+			SampleRate:       &sampleRate,
 		},
 	}
 
@@ -261,6 +273,25 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		written, err = s.mgr.SetVoiceRealtimeProvider(w.Value)
 	case panel.FieldVoiceRealtimeModel:
 		written, err = s.mgr.SetVoiceRealtimeModel(w.Value)
+	case panel.FieldVoiceAecEnabled:
+		// 本机音频（S 腿对齐，2026-11-11）：插话监测的配置开关。门已拒空值；
+		// 非布尔词在这里替它答一句形状话（BallClickThrough 的同款），让页面
+		// 知道是哪一枚字段给错了。更深的把关只有一条单源：writeOneKey 落盘前
+		// 对"写完会是什么"跑 validate()，这枚键不另立第二套词表。档位沿用本
+		// 店 [voice] 各写入腿的 restart 盖章（与两条云链写一致）。
+		on, perr := strconv.ParseBool(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 true/false，收到的值解析不了", w.Field)
+		}
+		written, err = s.mgr.SetVoiceAecEnabled(on)
+	case panel.FieldAudioInputDevice:
+		// 本机音频：采集设备名。空值已被门拒；"default"（和空串）是 schema 与
+		// internal/audio 约定的「跟随系统默认」词。除此之外任何名字照写，这里
+		// 不预判枚举——设备在不在场是开机后的事实，不是配置层的词表；打开时
+		// 解析不到会按设备名响亮拒绝并列出在场端点（internal/audio 的
+		// selectCaptureDevice），那才是这条链的拒绝单源。
+		written, err = s.mgr.SetAudioInputDevice(strings.TrimSpace(w.Value))
 	case panel.FieldProviderRowCreate:
 		written, err = s.mgr.CreateProviderRow(w.Provider, w.Model)
 	case panel.FieldProviderBilling:

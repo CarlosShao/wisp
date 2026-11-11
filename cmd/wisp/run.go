@@ -836,12 +836,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	//
 	//   - ShellDeps.Enabled mirrors [risk] shell_enabled (D14 默认禁用, the
 	//     FSDeps.DeleteEnabled shape): while it is false the family registers
-	//     NOTHING - not a roster of refusing tools, no roster at all. Today
-	//     that flag is held shut by internal/config's unwired guard rows
-	//     (a config carrying shell_enabled = true is refused at load), whose
-	//     three lines of wording are the one residual awaiting the owner's
-	//     ruling recorded on the 163 ticket. This line is the wire that guard
-	//     releases; the assembly adds no second way to turn the family on.
+	//     NOTHING - not a roster of refusing tools, no roster at all. The
+	//     load-time guard rows that used to hold the flag shut were released
+	//     by the 163 closeout (leg Q, 7bcc2ae08): a config carrying
+	//     shell_enabled = true now loads, and the line below is its ONLY
+	//     wire - the assembly adds no second way to turn the family on.
 	//   - ShellDeps.Sessions is ONE task-scoped session roster, and the same
 	//     object's TerminateForTask is what the bridge's Options.TaskCleanup
 	//     janitor seam (further down in tools.New) receives - host and tool

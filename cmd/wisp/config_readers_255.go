@@ -223,14 +223,27 @@ var hotRowClaims = map[string]string{
 	// process's capture assembly reads mic_muted_default at boot and hands it to
 	// audio.WithStartMuted, which is the sentence internal/audio/gate.go:55-56 wrote
 	// when it asked for that boot wiring ("map [audio] mic_muted_default here at
-	// boot wiring") and got none. Two facts keep this row out of "consumed":
-	// the reader is a fresh config.LoadFile at boot, not a re-read of the live
-	// Manager (a changed [audio] waits for a restart), and it lives in the
-	// resident `wisp` process, which builds the capture leg - `wisp run` does
-	// not. The device/rate half of the section still reads from nowhere:
-	// internal/audio takes input_device and sample_rate from the OS default
-	// endpoint and the seam constant, not from cfg.Audio.
-	"audio": hotClaimOtherProcess + "cmd/wisp/resident_audio_windows.go:291 [ra.mutedAtBoot = c.Audio.MicMutedDefault] - the resident capture leg is [audio]'s first production reader and it reads the file once at boot, so a hot reload of this section waits for a restart instead of acting in this run; the 180-census follow-up wired the device half the same way: cmd/wisp/resident_audio_windows.go:312 [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to internal/audio's capture config, whose open path resolves the name per open and per hotplug reopen (sample_rate stays a load-time guard: the chain honours no other rate, so validate.go refuses a non-16000 value instead of accepting a key nothing would act on)",
+	// boot wiring") and got none.
+	//
+	// The 2026-11-11 本机音频 alignment (leg R) re-adjudicated the verdict up to
+	// "consumed": the settings leg now reads the device/rate half off the LIVE
+	// Manager on every settings read (cmd/wisp/panel_config_store.go:103
+	// [inputDevice := cfg.Audio.InputDevice] and :104
+	// [sampleRate := cfg.Audio.SampleRate]), the same per-call class the [llm]
+	// row's claim rests on - a hot-applied [audio] edit changes what the next
+	// config.get answers about the device and the rate, with no restart. The
+	// caveat mirrors [llm]'s: 已立即生效 means the live reader answers
+	// differently, NOT that anything re-opens - the resident capture leg still
+	// reads the file once at boot (cmd/wisp/resident_audio_windows.go:291
+	// [ra.mutedAtBoot = c.Audio.MicMutedDefault], feeding audio.WithStartMuted,
+	// and cmd/wisp/resident_audio_windows.go:312
+	// [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to
+	// internal/audio's capture config, whose open path resolves the boot-fed
+	// name per open and per hotplug reopen), so the device the mic actually
+	// opens with waits for the next resident process. sample_rate stays a
+	// load-time guard: the chain honours no other rate, so validate.go refuses
+	// a non-16000 value instead of accepting a key nothing would act on.
+	"audio": hotClaimConsumed + "cmd/wisp/panel_config_store.go:103 [inputDevice := cfg.Audio.InputDevice] - the settings leg reads [audio]'s device half off the LIVE Manager per config.get (and :104 [sampleRate := cfg.Audio.SampleRate]), so a hot-applied [audio] edit changes what the next settings read answers without a restart - the same per-call reader class the [llm] row's consumed claim rests on; the caveat is [llm]'s: 已立即生效 means the live reader answers differently, not that anything re-opens - the resident capture leg still reads the file once at boot (cmd/wisp/resident_audio_windows.go:291 [ra.mutedAtBoot = c.Audio.MicMutedDefault] feeding audio.WithStartMuted, and cmd/wisp/resident_audio_windows.go:312 [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to internal/audio's capture config, whose open path resolves the boot-fed name per open and per hotplug reopen), so the device the mic actually opens with waits for the next resident process; sample_rate stays a load-time guard: the chain honours no other rate, so validate.go refuses a non-16000 value instead of accepting a key nothing would act on",
 	// The 180-census follow-up re-adjudicated this row out of the reader-less
 	// class: installLogSink feeds the pipeline the four keys
 	// observe.LogConfig exists to carry, all four genuinely consumed downstream
@@ -358,9 +371,13 @@ var sectionReadSites = map[string][]string{
 	// sections: it reads [audio] mic_muted_default into audio.WithStartMuted and
 	// [voice] enabled as "build the collector at all, or not". Both reads are
 	// one fresh config.LoadFile per boot in the resident process (the same
-	// per-boot shape [hotkey] has used since ticket 258), so neither lands in
-	// the "consumed by a live re-reader" class - see the [audio] row above.
-	"Audio": {"cmd/wisp/resident_audio_windows.go"},
+	// per-boot shape [hotkey] has used since ticket 258) - boot-time reads,
+	// not live re-readers. The 本机音频 alignment (leg R) added the second
+	// [audio] file: the settings leg reads the device/rate half off the LIVE
+	// Manager per config.get, and that per-call reader is what moved the
+	// [audio] row's verdict to consumed (the boot half's tense is named in
+	// the row's caveat).
+	"Audio": {"cmd/wisp/panel_config_store.go", "cmd/wisp/resident_audio_windows.go"},
 	// The 180-census follow-up's feeds: the log sink's boot LoadFile reads
 	// [observe] (level + roll window) and [privacy] redact_paths
 	// (cmd/wisp/logsink.go); the retention window helper reads both

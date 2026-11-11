@@ -197,6 +197,22 @@ type VoiceSettingsView struct {
 	RealtimeEnabled  bool
 	RealtimeProvider string
 	RealtimeModel    string
+
+	// AecEnabled / InputDevice / SampleRate are the 本机音频 half (the
+	// 2026-11-11 S-leg alignment): voice.aec.enabled, audio.input_device and
+	// audio.sample_rate all have real production readers behind them (the
+	// barge-in monitor's config switch, the capture open's device resolver,
+	// and the load-time 16000 chain guard), so the snapshot carries them -
+	// but only when the leg actually answered. The POINTER is the gate: nil
+	// means "the leg did not read" and the JSON key stays OFF the wire (the
+	// page renders its waiting state), never a zero value dressed up as
+	// "AEC off" or "device default". sample_rate rides as a fact, not a
+	// control: it is a load-time guard key (internal/config's validateAudio
+	// refuses every non-16000 value), so there is no write field for it -
+	// the reason is written out in config_write_313.go's header.
+	AecEnabled  *bool
+	InputDevice *string
+	SampleRate  *int
 }
 
 // ProviderSettings is one provider's row. APIKeyRef is a reference (dpapi:<id> /
@@ -627,6 +643,9 @@ func renderSettingsPayload(v SettingsView) string {
 			RealtimeEnabled:  v.Voice.RealtimeEnabled,
 			RealtimeProvider: v.Voice.RealtimeProvider,
 			RealtimeModel:    v.Voice.RealtimeModel,
+			AecEnabled:       v.Voice.AecEnabled,
+			InputDevice:      v.Voice.InputDevice,
+			SampleRate:       v.Voice.SampleRate,
 		},
 	}
 	for _, p := range v.Providers {
@@ -681,6 +700,12 @@ type voicePayload struct {
 	RealtimeEnabled  bool     `json:"realtimeEnabled"`
 	RealtimeProvider string   `json:"realtimeProvider"`
 	RealtimeModel    string   `json:"realtimeModel"`
+	// The reader-gated half: a nil pointer is omitted from the JSON, so a leg
+	// that never read config cannot put a zero value on the wire as a fact.
+	// See VoiceSettingsView's note above the fields.
+	AecEnabled  *bool   `json:"aecEnabled,omitempty"`
+	InputDevice *string `json:"inputDevice,omitempty"`
+	SampleRate  *int    `json:"sampleRate,omitempty"`
 }
 
 func (h *ConfigWriteHandler) actor() string {
