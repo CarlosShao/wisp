@@ -27,6 +27,16 @@
    own description text onward, never from the markup start - a global first
    match went stale the moment a second 能改 row entered the screen.
 
+   The appearance wave's four rows joined the same day (ball.opacity_idle /
+   ball.click_through / panel.width / panel.font_size): the live render with
+   no sections asserts each says 等快照 and mounts no control, and a render
+   WITH the four sections asserts the percent slider mounts on the section's
+   own 0..1 band, the switch mounts on the section's own boolean, and the
+   two number fields hold the px values the host read. The four rows' badges
+   are the honest tier words (立即/重启 for the click-through row, 关窗/重启
+   生效 for the other three), never 能改 - the receipt states the exact
+   tier, and the badge must not promise more than the wire does.
+
    The picker's CLOSED popover shows only the current value, so the
    vocabulary rows themselves are not visible in static markup; that the
    section's vocabulary feeds the options is a typecheck-level fact
@@ -38,7 +48,14 @@
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { ConfigScreen } from "@/components/config-screen";
-import type { BallSizeSection, BallStyleSection } from "@/lib/panel";
+import type {
+  BallClickThroughSection,
+  BallOpacityIdleSection,
+  BallSizeSection,
+  BallStyleSection,
+  PanelFontSizeSection,
+  PanelWidthSection,
+} from "@/lib/panel";
 
 const failures: string[] = [];
 function check(label: string, ok: boolean, detail = ""): void {
@@ -109,9 +126,30 @@ check(
   "the snapshot's current family must reach the picker button",
   live.includes(">glass<"),
 );
+// The appearance wave's four rows joined the live class (2026-11-11). The
+// live render above hands down none of their sections, so each row must
+// carry its honest tier badge yet refuse to draw a value it was not handed:
+// 等快照, no slider, no switch, no number field (P9 - the read half is the
+// snapshot's, never a local copy). The badge words, not 能改: promising an
+// instant effect the wire does not carry would be the lie the receipt
+// exists to correct.
 check(
-  "the dormant ball rows must keep saying the native surface owns them (D29, both rows verbatim)",
-  live.includes("那颗球是原生绘制的（D29），页面改不到") && live.includes("同上"),
+  "the appearance wave's four rows must carry their honest tier badges (1 立即/重启 + 3 关窗/重启生效)",
+  live.includes("立即/重启") && (live.match(/关窗\/重启生效/g) ?? []).length === 3,
+  `${(live.match(/关窗\/重启生效/g) ?? []).length} occurrences of 关窗/重启生效`,
+);
+check(
+  "without sections the wave's rows must say 等快照 and mount no control",
+  (live.match(/等快照/g) ?? []).length === 5 && // ball.size + the four wave rows
+    !live.includes('aria-label="空闲球不透明度"') &&
+    !live.includes('role="switch"') &&
+    !live.includes('aria-label="面板宽度"') &&
+    !live.includes('aria-label="面板字号"'),
+  `${(live.match(/等快照/g) ?? []).length} occurrences`,
+);
+check(
+  "the theme row must stay dormant (the host owns the theme, badge 未接线)",
+  live.includes("主题由原生宿主决定，面板只跟随") && live.includes("未接线"),
 );
 check("the live markup must hold zero emoji", !EMOJI_RE.test(live));
 
@@ -156,6 +194,49 @@ check(
 );
 check("the size-bearing markup must hold zero emoji", !EMOJI_RE.test(sizeLive));
 
+// --- the appearance wave's four rows, with their sections -----------------
+// The sections handed down (the real page passes the snapshot's four keys
+// through App -> SettingsPage -> ConfigScreen): the opacity slider mounts on
+// the section's own [0, 1] band shown in percent (0..1 on the wire, 0-100 on
+// the slider), the switch mounts on the section's own boolean, and the two
+// number fields hold the px values the host read - each row's value is the
+// snapshot's, never a copy typed here.
+const BALL_OPACITY: BallOpacityIdleSection = { opacity: 0.7, min: 0, max: 1 };
+const BALL_CLICK: BallClickThroughSection = { enabled: false };
+const PANEL_W: PanelWidthSection = { width: 720 };
+const PANEL_FONT: PanelFontSizeSection = { fontSize: 12 };
+const waveLive = renderToStaticMarkup(
+  <ConfigScreen
+    ballStyle={READ}
+    ballSize={BALL_SIZE}
+    ballOpacityIdle={BALL_OPACITY}
+    ballClickThrough={BALL_CLICK}
+    panelWidth={PANEL_W}
+    panelFontSize={PANEL_FONT}
+  />,
+);
+check(
+  "with the reader the opacity row must mount the snapshot-banded percent slider",
+  waveLive.includes('aria-label="空闲球不透明度"') &&
+    waveLive.includes('min="0"') &&
+    waveLive.includes('max="100"') &&
+    waveLive.includes('value="70"') &&
+    /70<!--\s*-->%|70<[^>]*>%|>70%</.test(waveLive),
+  "slider attrs / percent text",
+);
+check(
+  "with the reader the click-through row must mount the switch on the section's own boolean",
+  /role="switch" aria-checked="false" aria-label="空闲球鼠标穿透"/.test(waveLive),
+);
+check(
+  "with the reader the width and font-size fields must hold the px values the host read",
+  waveLive.includes('aria-label="面板宽度"') &&
+    waveLive.includes('value="720"') &&
+    waveLive.includes('aria-label="面板字号"') &&
+    waveLive.includes('value="12"'),
+);
+check("the wave-bearing markup must hold zero emoji", !EMOJI_RE.test(waveLive));
+
 // --- the write half is a source-level fact --------------------------------
 // The receipt flows through lib/config-actions' one write door; the field
 // name is the Go side's admission word, so it is checked where it is sent.
@@ -164,6 +245,13 @@ const screenSrc = readFileSync("src/components/config-screen.tsx", "utf8");
 check(
   "the ball.style write must ride config.set's ball_style field",
   screenSrc.includes('field: "ball_style"'),
+);
+check(
+  "the appearance wave's four writes must ride config.set's own fields",
+  screenSrc.includes('field: "ball_opacity_idle"') &&
+    screenSrc.includes('field: "ball_click_through"') &&
+    screenSrc.includes('field: "panel_width"') &&
+    screenSrc.includes('field: "panel_font_size"'),
 );
 check(
   "the write must go through the shared performConfigWrite door, not a second channel",
@@ -176,6 +264,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.error(
-  "render-config: OK, ball.style + ball.size rows live (pickers/slider mounted, snapshot values shown, " +
+  "render-config: OK, ball.style + ball.size + the appearance wave's four rows live (pickers/slider/switch/number fields mounted, snapshot values shown, " +
     "no-reader honest states, write rides the settings door, zero emoji)",
 );

@@ -25,7 +25,14 @@ import { ModelSettings } from "@/components/model-settings";
 import { VoiceSettings } from "@/components/voice-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
-import type { BallSizeSection, BallStyleSection } from "@/lib/panel";
+import type {
+  BallClickThroughSection,
+  BallOpacityIdleSection,
+  BallSizeSection,
+  BallStyleSection,
+  PanelFontSizeSection,
+  PanelWidthSection,
+} from "@/lib/panel";
 
 /** One category: what it is, and what it is still waiting for. The second
     sentence is the reason this table exists rather than a bare label list. */
@@ -48,7 +55,7 @@ const CATEGORIES: readonly Category[] = [
   {
     name: "外观",
     purpose: "主题、面板底色深浅、动画档位、字号。",
-    waiting: "", // ConfigScreen renders here; two of its rows are live today.
+    waiting: "", // ConfigScreen renders here; eight of its nine rows are live today.
     control: "config",
   },
   {
@@ -111,7 +118,7 @@ const CATEGORIES: readonly Category[] = [
     // from the 外观 category's ball.style row.
     name: "悬浮球",
     purpose: "球的大小、空闲透明度、鼠标穿透、唤醒词、热键。",
-    waiting: "大小、透明度、穿透还是原生画的（D29），页面改不到。外观风格（玻璃 / Jarvis）已能切：去「外观」类的 ball.style 行，走设置写入通路落盘（票 65）。唤醒词与热键还没有数据源。",
+    waiting: "球的大小、外观风格、空闲透明度、穿透都已能切：去「外观」类的对应行，走设置写入通路落盘。唤醒词与热键还没有数据源。",
   },
 ];
 
@@ -121,6 +128,10 @@ export function SettingsPage({
   onClose,
   ballStyle = null,
   ballSize = null,
+  ballOpacityIdle = null,
+  ballClickThrough = null,
+  panelWidth = null,
+  panelFontSize = null,
 }: {
   activeSection: string;
   onSelectSection: (section: string) => void;
@@ -133,6 +144,15 @@ export function SettingsPage({
       appearance screen like ballStyle. Null when this pump has no reader -
       the size row then says so instead of inventing a diameter. */
   ballSize?: BallSizeSection | null;
+  /** The appearance wave's four sections (ballOpacityIdle /
+      ballClickThrough / panelWidth / panelFontSize), handed straight to the
+      appearance screen the same way ballSize is. Null when this pump has no
+      reader for that key - the row then says so instead of inventing a
+      value (P9). */
+  ballOpacityIdle?: BallOpacityIdleSection | null;
+  ballClickThrough?: BallClickThroughSection | null;
+  panelWidth?: PanelWidthSection | null;
+  panelFontSize?: PanelFontSizeSection | null;
 }) {
   // An unknown name is not guessed at: it lands on the first category, the
   // same way an unknown view does. A rail that lights nothing is worse.
@@ -216,6 +236,10 @@ export function SettingsPage({
               lede={cat.purpose}
               ballStyle={ballStyle}
               ballSize={ballSize}
+              ballOpacityIdle={ballOpacityIdle}
+              ballClickThrough={ballClickThrough}
+              panelWidth={panelWidth}
+              panelFontSize={panelFontSize}
             />
           ) : cat.control === "model" ? (
             <ModelSettings heading={cat.name} lede={cat.purpose} />

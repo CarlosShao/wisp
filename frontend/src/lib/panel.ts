@@ -324,6 +324,55 @@ export interface BallSizeSection {
   max: number;
 }
 
+/** The ballOpacityIdle section (internal/panel/ball_idle_appearance_wave.go
+    BallOpacityIdleSection, the appearance wave): the idle-state opacity the
+    live config holds RIGHT NOW and the band an opacity slider may offer -
+    min/max are the schema's own [0, 1] band (internal/config's
+    BallOpacityIdleOptions), so a slider offers exactly what the load gate
+    accepts, never a copy of the numbers typed here. The write half rides
+    config.set's ball_opacity_idle field (restart tier per the dispatch:
+    the receipt, not this file, states the tier). Same optionality rule as
+    ballStyle: a pump without the reader sends no key at all. */
+export interface BallOpacityIdleSection {
+  opacity: number;
+  min: number;
+  max: number;
+}
+
+/** The ballClickThrough section (internal/panel/ball_idle_appearance_wave.go
+    BallClickThroughSection, the appearance wave): whether the idle ball
+    passes mouse events through, as the live config holds it RIGHT NOW.
+    false is also what a nil-backed read answers; "the config says false"
+    and "nobody could read it" are distinguished by the row's own no-reader
+    shape (a pump without the reader sends no key at all). The write half
+    rides config.set's ball_click_through field; its tier is measured at
+    write time (now when this process hosts the ball, restart when it does
+    not) and the receipt carries it. */
+export interface BallClickThroughSection {
+  enabled: boolean;
+}
+
+/** The panelWidth section (internal/panel/panel_tuning_wave.go
+    PanelWidthSection, the appearance wave): panel.width in px as the live
+    config holds it RIGHT NOW. The schema freezes no range for panel.width
+    and this carrier invents none - the number field offers the write route's
+    own rule (any positive px value), never a band typed here. 0 only when no
+    Manager backed the read; the row then says so rather than editing against
+    a zero base. The write half rides config.set's panel_width field; its
+    effect follows on the next window creation (close and reopen the panel,
+    no process restart), which the receipt's Note states. */
+export interface PanelWidthSection {
+  width: number;
+}
+
+/** The panelFontSize section (internal/panel/panel_tuning_wave.go
+    PanelFontSizeSection, the appearance wave): panel.font_size in px as the
+    live config holds it RIGHT NOW (the schema default is 12). Same shape,
+    same write route family and same no-band rule as PanelWidthSection; the
+    write rides config.set's panel_font_size field. */
+export interface PanelFontSizeSection {
+  fontSize: number;
+}
 
 /** One working-tree file entry (internal/panel TreeEntry). */
 export interface TreeEntryView {
@@ -442,6 +491,21 @@ export interface PanelSnapshot {
       its write rides config.set's ball_size field. Same optionality rule as
       ballStyle: a pump without the reader sends no key at all. */
   ballSize?: BallSizeSection;
+  /** The idle-state opacity and mouse-click-through of the live config's
+      ball (the appearance wave, internal/panel/ball_idle_appearance_wave.go).
+      The settings page's ball.opacity_idle / ball.click_through rows read
+      these; their writes ride config.set's ball_opacity_idle /
+      ball_click_through fields. Same optionality rule as ballStyle: a pump
+      without the reader sends no key at all. */
+  ballOpacityIdle?: BallOpacityIdleSection;
+  ballClickThrough?: BallClickThroughSection;
+  /** The panel window's width and the body font size, in px, as the live
+      config holds them (the appearance wave, internal/panel/
+      panel_tuning_wave.go). The settings page's panel.width /
+      panel.font_size rows read these; their writes ride config.set's
+      panel_width / panel_font_size fields. Same optionality rule. */
+  panelWidth?: PanelWidthSection;
+  panelFontSize?: PanelFontSizeSection;
   /** The working-state rows rendered while a task runs (ticket 145): ended
       tool calls, the reasoning streamed so far, the last classified error
       and the loop's stuck sentence. */
