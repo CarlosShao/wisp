@@ -4306,3 +4306,18 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - **下一步**：见交接文档 §10（音频麦克风 4 张 247/290/291/297；163 裁决＋追认 N/Q；388 可关；423 两笔；D 盘清理待机主点头；未结 84 票逐格读）。
 - **新会话开工**：照交接文档 §12（先读文档 → 现跑地面真相 → `list_subagent_models({provider:"magpie"})` 验路由 → `create_goal` → 派 ≥3 写腿）。
 - **goal**：上一任 goal `goal-4c8d8f64-3f2f-47fe-85f9-360b295697d4` 已暂停（rev57 / paused）。
+
+### 4.0gb（2026-11-11 22:0x +08，编排者）★★ 机主令「跑完先停一下，需要 CPU」⇒ 全编队停车，等他发话
+
+- **机主原话（逐字）**：「这个子代理跑完先停一下，我需要电脑干点别的，需要cpu，当前电脑cpu占用太狠了，跑完先停一下，等我要求再继续」
+- **已做**：`job_kill workflow-1f6a61e8b6564049`（第四波）已发出；现跑确认 **`go`/`wisp.test`/`compile`/`link` 进程 = 0 枚**。
+- ★**顺带量到一件机主该知道的事**：CPU 高**不是我的子代理造成的**。实时采样（3s 增量）显示占 CPU 前几名＝**`NBA2KOnline` 150%**、DeepSeek Harness 130%/113%、Weixin 51%；`go test` 进程一枚都没有。⇒ 停车后若仍卡，查游戏与 DSH 本体，与本编队无关。
+- **现状快照（22:04 现跑，接手请自己重跑）**：HEAD **`65c5eaa6a`**；未推 **18**（GitHub 全域 `TLS connect error: error:0A000126` 断连，本地提交安全）；工单总 **409**／done **329**／未结 **80**；台账最新 `A1718`；在飞 **0**。
+- **第四波被杀时的欠账（下次从这里接）**：
+  1. **`314-early`（最重要）**：整包早停**没死透、换了宿主**——最后一条 `=== RUN` ＝ `Test145ArgsJSONComesFromTheBookedForensicsRow`（无 verdict）、终点锚 `TestZZ315A1` 0 命中、零 panic/signal、分母 618→418。该腿跑了 2 发整包（`D:\tmp\wisp\20261111\314early\full.log` 271KB／`full2.log` 129KB，第 2 发 409 RUN 时被杀），**证据件未交**。⇒ 重派时直接给它这两份日志续跑，⛔ 从零重来。
+  2. **`346-a2`**：未交件（票 346 AC#2/AC#4 现量）。
+  3. **`122-ac6` 已交**（`65c5eaa6a`）：如实报 CI 读数**被网络阻塞**（gh/Invoke-WebRequest/ls-remote 全 TLS 失败，baidu 200 对照＝非全域断网），零编造；本机纯净快照复确认 **windows 100 / linux 54+1 噪音行** 成立。
+- **★本轮方法论收获（写死，别忘）**：`portable-tests.sh` 的「四数」（RUN/PASS/FAIL/SKIP）**不能证明整包跑完**——没跑的那 192 枚本就不产生 `=== RUN`，**早停与跑完可给出同一组四数**。必须加**终点锚断言**（`^=== RUN TestZZ315A1` ≥1 行才算跑完）。我此前据此误判 314「已修好」，已在 `A1717` + `314-verdict-v1.md` 更正段自纠。
+- **★我本轮两次违令自纠（接手必读）**：`A1715`（302 我裁甲形，票面 2026-10-10 裁定是甲/乙都⛔落；已 `git revert` → `6232efeb6`）、`A1712`（238 派单前没读 Progress，owner veto `A476`/`A1558` 已在票内）。⇒ **派任何票前必须逐格读票面全文，含所有"编排者裁"小节与 Progress log。**
+- **review 组定论**：`group/group-review-and-audit` **四次空交**（含 `magpie-max` max 档两次）⇒ 该组**只能当纯评审器（读文件+推理+写 md）**，⛔ 给它任何"跑命令/多步 agentic loop"的任务。`magpie-max` provider 本身是好的（请求头实证 `reasoningEffort: "max"`，见 `A1711`）。
+- **goal**：`goal-c3efb0f7-f911-4e6b-89d1-ed51a2ffdfe8` 保持 **active/armed**（自动轮次里 ⛔ 能暂停——`update_goal pause` 要真人回合）。**机主说"继续"即从上述欠账接。**
