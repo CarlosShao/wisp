@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/audio"
+	"github.com/CarlosShao/wisp/internal/audio/aecspike"
 	"github.com/CarlosShao/wisp/internal/speech"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
@@ -455,6 +456,13 @@ func Test381r2RealDevicePlayingPhaseAbortWithin400ms(t *testing.T) {
 	} else {
 		_ = probe.Close()
 	}
+	// Ticket 388's前置: the sentence below is real matcha speech on the real
+	// device, so the process render session is attenuated BEFORE the first
+	// announce (control round included) and the owner's original volume is
+	// restored in t.Cleanup. The cgo float path only (59-r1's finding #2);
+	// the waveOut stream itself is untouched, so the measured abort-latency
+	// path keeps its exact semantics - only loudness changes.
+	attenuateAnnounce388(t, aecspike.DefaultAnnounceAttenuatedVolume)
 	const sentence = "任务已经完成，明天下午三点的会议改到四点，请准时参加，谢谢。"
 
 	sink := &voice15eSink{}
@@ -513,6 +521,7 @@ func Test381r2RealDevicePlayingPhaseAbortWithin400ms(t *testing.T) {
 	// Five abort rounds: Esc lands 300ms into the playback; the reading is the
 	// distance from the trigger to the device actually stopped.
 	const rounds = 5
+	var unsticks388, resets388 []time.Duration
 	for r := 1; r <= rounds; r++ {
 		walkToThinking381r2(t, rv)
 		if !rv.announce(sentence) {
@@ -546,6 +555,8 @@ func Test381r2RealDevicePlayingPhaseAbortWithin400ms(t *testing.T) {
 		if reset > 400*time.Millisecond {
 			t.Fatalf("round %d: waveOutReset landed %s after the trigger, want within 400ms", r, reset)
 		}
+		unsticks388 = append(unsticks388, unstick)
+		resets388 = append(resets388, reset)
 		if got := rv.ttsSpoken.Load(); got != spokenBefore {
 			t.Fatalf("round %d: the aborted sentence was counted as spoken (%d -> %d)", r, spokenBefore, got)
 		}
@@ -558,6 +569,12 @@ func Test381r2RealDevicePlayingPhaseAbortWithin400ms(t *testing.T) {
 			r, time.Since(parkedRound).Round(time.Millisecond), unstick.Round(time.Millisecond),
 			reset.Round(time.Millisecond), spy.dropped)
 	}
+	// Ticket 388 AC#4's distribution reading: the attenuation rides the
+	// session volume, not the waveOut stream, so the stop-latency
+	// distribution must be unchanged - every sample inside the same 400ms
+	// bound the per-round asserts above already enforce.
+	assertInterruptDistribution388(t, "unstick", unsticks388)
+	assertInterruptDistribution388(t, "waveOutReset", resets388)
 	voice15eWaitFor(t, "every round's gate release to land", func() bool {
 		closed, reopened := gate.count()
 		return closed == rounds+1 && reopened == rounds+1

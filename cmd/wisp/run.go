@@ -824,6 +824,57 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		}
 	}
 
+	// The shell family (ticket 163: shell.exec + shell.session, the D34 rows
+	// PLAN.md:2574/:2575 and the SPEC-07:74/:75 mirror) registers through
+	// BuiltinShellEntries in the same loop shape as every family above - and
+	// this registration is the ONLY way those two names become reachable,
+	// which is exactly why the 163 impl leg left this line unwired: the tools
+	// existed and were green while the model could not knock on either door.
+	//
+	// What the composition root owes and nothing else can supply, per the
+	// 163 impl leg's own wiring recipe (its evidence table §6):
+	//
+	//   - ShellDeps.Enabled mirrors [risk] shell_enabled (D14 默认禁用, the
+	//     FSDeps.DeleteEnabled shape): while it is false the family registers
+	//     NOTHING - not a roster of refusing tools, no roster at all. Today
+	//     that flag is held shut by internal/config's unwired guard rows
+	//     (a config carrying shell_enabled = true is refused at load), whose
+	//     three lines of wording are the one residual awaiting the owner's
+	//     ruling recorded on the 163 ticket. This line is the wire that guard
+	//     releases; the assembly adds no second way to turn the family on.
+	//   - ShellDeps.Sessions is ONE task-scoped session roster, and the same
+	//     object's TerminateForTask is what the bridge's Options.TaskCleanup
+	//     janitor seam (further down in tools.New) receives - host and tool
+	//     look at the SAME table, and a task's end collects its sessions at
+	//     the CloseTask boundary (ticket 163 AC#3; the teeth test kills the
+	//     wiring deliberately and proves the session outlives the task only
+	//     in that unwired world).
+	//   - ShellDeps.NewTree hands out one kill-on-close Job per process tree
+	//     through proc.OpenJobScope - the seam that makes "cancel => the
+	//     whole descendant tree is gone" an OS fact. proc.JobScope is a
+	//     //go:build windows declaration, and this file is untagged, so the
+	//     reference goes through newShellSessionTree's platform split
+	//     (shell_tree_163_windows.go / shell_tree_163_other.go), the same
+	//     shape notify_windows.go / notify_other.go use: fail-closed on any
+	//     non-Windows GOOS, because a command run outside Job containment is
+	//     the exact posture ticket 100/R21 recorded as not landing.
+	//   - ShellDeps.Logf rides this runtime's audit sink, so session
+	//     create/reset events land where every other assembly line logs.
+	shellSessions := tools.NewShellSessions()
+	for _, e := range tools.BuiltinShellEntries(tools.ShellDeps{
+		Enabled:   cfg.Risk.ShellEnabled,
+		Allowlist: cfg.Risk.ShellAllowlist,
+		Paths:     rt.paths,
+		Sessions:  shellSessions,
+		NewTree:   newShellSessionTree,
+		Logf:      rt.auditf,
+	}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
 	// The machine-control family (ticket 23: system.* / window.* / clipboard.* /
 	// media.control / screen.capture / input.type) is registered in the same
 	// loop shape as the fs and task blocks above, and it is the ONLY way those
@@ -1328,7 +1379,16 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// R4 stays dormant: probing every result for sensitive sources needs
 		// the C25 detector's own wiring (ticket 25), and a dormant R4 is the
 		// honest state, not a weakened one.
-		Provenance:     c25,
+		Provenance: c25,
+		// Ticket 163 AC#3's janitor seam: the shell-session roster wired into
+		// ShellDeps.Sessions above is the tenant, and TerminateForTask is its
+		// ONLY collector - CloseTask fires this at the same task-end boundary
+		// the C25 close runs, so a task's session and its taint scope die
+		// together (the collected count lands on the TASK-JANITOR audit line,
+		// which is how "did this task leave a shell running" stays answerable
+		// from the log). It is a callback and not a second close verb: the
+		// boundary is CloseTask, and nothing here adds a parallel one.
+		TaskCleanup:    shellSessions.TerminateForTask,
 		DefaultTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) * time.Millisecond,
 		OnDecision: func(d tools.Decision) {
 			rt.auditf("wisp run: 风险判定 tool=%s level=%s rules=%v reason=%q",
