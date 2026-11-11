@@ -1,3 +1,0 @@
-TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
-TestAC14AwaitedBindingReplyReachesThePage
-TestAC14GoSideEvalPushReachesThePage
