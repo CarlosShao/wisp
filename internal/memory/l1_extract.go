@@ -397,7 +397,7 @@ func (s *Store) ApplyExtraction(ctx context.Context, out ExtractionOutcome) (Ext
 			if err := tx.QueryRowContext(ctx, `SELECT count(*) FROM profile`).Scan(&before); err != nil {
 				return err
 			}
-			if err := evictProfileLRU(ctx, tx, s.logger, ""); err != nil {
+			if err := evictProfileLRU(ctx, tx, s.logger, "", s.profileCap); err != nil {
 				return err
 			}
 			var after int

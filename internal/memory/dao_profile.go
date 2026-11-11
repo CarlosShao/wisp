@@ -45,7 +45,7 @@ func (s *Store) UpsertProfile(ctx context.Context, slot, content string, source 
 		}
 		// Row cap: evict LRU rows (never the row just written — it has the
 		// newest updated_at) until the cap holds.
-		if err := evictProfileLRU(ctx, tx, s.logger, slot); err != nil {
+		if err := evictProfileLRU(ctx, tx, s.logger, slot, s.profileCap); err != nil {
 			return err
 		}
 		// slot is UNIQUE: on conflict LastInsertId is unreliable; fetch it.
@@ -62,12 +62,18 @@ func (s *Store) UpsertProfile(ctx context.Context, slot, content string, source 
 }
 
 // evictProfileLRU deletes the oldest-updated rows while the table holds more
-// than L1MaxProfiles rows. Every eviction logs a warning line (D35: the
-// eviction must be visible).
-func evictProfileLRU(ctx context.Context, tx *sql.Tx, logger *slog.Logger, keepSlot string) error {
+// than cap rows. Every eviction logs a warning line (D35: the eviction must
+// be visible). The cap is the store's own profileCap — the [memory] l1_max
+// feed — which defaults to L1MaxProfiles; a zero cap would evict everything,
+// so Open's option guard keeps the default in that case and this function
+// defends it too.
+func evictProfileLRU(ctx context.Context, tx *sql.Tx, logger *slog.Logger, keepSlot string, cap int) error {
+	if cap <= 0 {
+		cap = L1MaxProfiles
+	}
 	for {
 		var over int
-		if err := tx.QueryRowContext(ctx, `SELECT count(*) - ? FROM profile`, L1MaxProfiles).Scan(&over); err != nil {
+		if err := tx.QueryRowContext(ctx, `SELECT count(*) - ? FROM profile`, cap).Scan(&over); err != nil {
 			return err
 		}
 		if over <= 0 {
@@ -101,8 +107,19 @@ func evictProfileLRU(ctx context.Context, tx *sql.Tx, logger *slog.Logger, keepS
 			"evicted_slot", evictSlot,
 			"evicted_id", evictID,
 			"evicted_updated_at", updatedAt,
-			"reason", fmt.Sprintf("L1 profile cap reached (%d rows)", L1MaxProfiles))
+			"reason", fmt.Sprintf("L1 profile cap reached (%d rows)", cap))
 	}
+}
+
+// ProfileCap returns the L1 profile row cap this store enforces — the value
+// the [memory] l1_max feed handed Open (default L1MaxProfiles). A production
+// read for the boot report and the wiring tests; the enforcement itself is
+// UpsertProfile's eviction above.
+func (s *Store) ProfileCap() int {
+	if s == nil || s.profileCap <= 0 {
+		return L1MaxProfiles
+	}
+	return s.profileCap
 }
 
 // ListProfiles returns all L1 rows, most recently updated first.

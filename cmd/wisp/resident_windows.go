@@ -719,7 +719,12 @@ func runResident() {
 		// the SAME C5 chain this boot built (src.run), and the runtime keeps the
 		// window so execute() can record each finished task's conversation.
 		if src != nil && src.run != nil {
-			rv.attachMemoryL1(src.run)
+			// [memory] l1_enabled (the 180-census follow-up's feed): the gate
+			// reads its own fresh LoadFile and false means the pipeline is not
+			// attached at all - the WarmWindow hook stays body-less, the boot
+			// line says the key decided that, and nothing pretends the profile
+			// is learning.
+			attachMemoryL1IfEnabled180K(rv, src.run, rt.Layout.DataDir)
 		}
 		// Ticket 26's one needle (26r3): the announce path now drives the capture
 		// leg's half-duplex gate. The gate was mounted in assembleCapture (PathT,

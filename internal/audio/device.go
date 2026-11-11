@@ -5,7 +5,12 @@ package audio
 // the D42#2/#12 error mapping from open failures to `Error(audio_device)`
 // with the device name and user guidance text.
 
-import "github.com/CarlosShao/wisp/internal/observe"
+import (
+	"strconv"
+	"strings"
+
+	"github.com/CarlosShao/wisp/internal/observe"
+)
 
 // DeviceDescriptor identifies one audio endpoint. ID is the WASAPI endpoint
 // id, Name the friendly name (best effort).
@@ -44,6 +49,66 @@ type DeviceWatcher interface {
 // fake opener whose streams carry real wav data through the real loop).
 type streamOpener interface {
 	Open(dev DeviceDescriptor) (deviceStream, error)
+}
+
+// captureDeviceLister is the OPTIONAL enumeration face: a DeviceWatcher that
+// can list the present capture endpoints carries it, and [audio] input_device
+// resolves through it. The production watcher implements it over
+// IMMDeviceEnumerator::EnumAudioEndpoints; a watcher that cannot enumerate
+// keeps the default-endpoint contract, and a config that names a device on
+// such a watcher fails loudly instead of silently opening the default.
+type captureDeviceLister interface {
+	CaptureDevices() ([]DeviceDescriptor, error)
+}
+
+// inputDeviceDefault is the [audio] input_device value that means "the OS
+// default capture endpoint" (the schema default and the pre-wire shape).
+const inputDeviceDefault = "default"
+
+// selectCaptureDevice resolves [audio] input_device into one endpoint.
+// name "" or "default" asks the watcher for its default endpoint (the exact
+// pre-wire read); any other name goes through the watcher's enumeration face
+// and matches by endpoint id first, friendly name second (both compared after
+// whitespace trim, the name case-insensitively). A name that matches nothing
+// is a ClassAudioDevice error that lists the present endpoints - "it fell
+// back to the default" and "it was never written" must not look identical
+// (the ticket-83 rule the config layer enforces for the other read-only
+// keys), and a missing enumeration face is refused the same way.
+func selectCaptureDevice(w DeviceWatcher, name string) (DeviceDescriptor, error) {
+	trimmed := strings.TrimSpace(name)
+	if trimmed == "" || trimmed == inputDeviceDefault {
+		dev, err := w.DefaultCaptureDevice()
+		if err != nil {
+			return DeviceDescriptor{}, observe.Wrap(observe.ClassAudioDevice, err, "default capture endpoint")
+		}
+		return dev, nil
+	}
+	lister, ok := w.(captureDeviceLister)
+	if !ok {
+		return DeviceDescriptor{}, observe.New(observe.ClassAudioDevice,
+			"capture device "+strconv.Quote(trimmed)+" was requested but this watcher cannot enumerate endpoints; remove audio.input_device or build against the MMDevice watcher")
+	}
+	devs, err := lister.CaptureDevices()
+	if err != nil {
+		return DeviceDescriptor{}, observe.Wrap(observe.ClassAudioDevice, err,
+			"capture endpoint enumeration failed while resolving audio.input_device")
+	}
+	for _, d := range devs {
+		if strings.TrimSpace(d.ID) == trimmed {
+			return d, nil
+		}
+	}
+	for _, d := range devs {
+		if strings.EqualFold(strings.TrimSpace(d.Name), trimmed) {
+			return d, nil
+		}
+	}
+	names := make([]string, 0, len(devs))
+	for _, d := range devs {
+		names = append(names, d.String())
+	}
+	return DeviceDescriptor{}, observe.New(observe.ClassAudioDevice,
+		"audio.input_device "+strconv.Quote(trimmed)+" matches no capture endpoint; present endpoints: "+strings.Join(names, ", "))
 }
 
 // deviceStream is the capture-thread view of one open endpoint: mono int16

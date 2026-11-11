@@ -1,0 +1,8 @@
+time=2026-11-11T12:50:51.481+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test180KSampleRateOffChainValueIsALoadError (0.01s)
+    validate_180k_test.go:46: sample_rate = 48000 must be a load error: the shipped chain honours no other rate, so accepting it would be a key that lies
+--- FAIL: Test180KAECEchoRefVocabulary (0.01s)
+    validate_180k_test.go:76: echo_ref = loopback must be a load error: no second echo-reference source exists, so accepting it would be a silent fallback
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.104s
+FAIL

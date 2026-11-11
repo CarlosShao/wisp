@@ -67,6 +67,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
@@ -141,12 +142,25 @@ func (s *logSink) logger() *slog.Logger {
 //
 // An empty dataDir is a refusal, not a fallback: "no data root resolved" must
 // never turn into "so write the security log somewhere else".
+//
+// [observe]/[privacy] feed (the 180-census follow-up): the pipeline's level,
+// roll window and path redaction are the config keys observe.LogConfig exists
+// to carry, and until this wire every install ran at the hardcoded
+// logSinkLevel with no roll and no redaction - the census measured all four
+// keys as zero-reader. The read is the boot-seed shape this package's
+// neighbours already use (one fresh config.LoadFile per install), and the
+// install record carries the provenance so "which table decided the posture"
+// stays checkable. The unreadable-file fallback is the compiled default table,
+// which is the exact pre-wire posture (level info, roll 10/7, no redaction),
+// said in the record rather than as a second early record - a slog call before
+// the replay would become the file's first line and break the 131 nail.
 func installLogSink(dataDir string) (*logSink, error) {
 	if dataDir == "" {
 		return nil, errors.New("wisp: no data dir resolved, so the log sink has nowhere to write")
 	}
 	dir := logSinkDir(dataDir)
-	p, err := observe.InitLog(observe.LogConfig{Dir: dir, Level: logSinkLevel})
+	obs, cfgSource := logSinkObserveConfig(dataDir)
+	p, err := observe.InitLog(obs)
 	if err != nil {
 		return nil, err
 	}
@@ -180,10 +194,44 @@ func installLogSink(dataDir string) (*logSink, error) {
 	// last value, which is how the first version of this line read as
 	// "level":"info" next to "level":"INFO". The two early_* counts belong to
 	// ticket 130: without them, "no early record happened" and "the replay never
-	// ran" are the same file.
-	slog.Info("wisp: persistent log sink installed", "dir", dir, "min_level", logSinkLevel,
+	// ran" are the same file. config_source is the 180K feed's provenance
+	// (which table decided level/roll/redact), so a posture read off a file can
+	// be told apart from one read off the compiled defaults.
+	slog.Info("wisp: persistent log sink installed", "dir", dir, "min_level", obs.Level,
+		"config_source", cfgSource, "roll_size_mb", obs.RollSizeMB, "roll_days", obs.RollDays,
+		"redact_paths", obs.RedactPaths,
 		"early_records", earlyFlushed, "early_dropped", earlyDropped)
 	return &logSink{pipeline: p, dir: dir}, nil
+}
+
+// logSinkObserveConfig is the [observe]/[privacy] feed seam: one fresh
+// config.LoadFile over the data root (the per-use boot-seed shape), the four
+// keys the pipeline really consumes lifted into observe.LogConfig, and an
+// honest source string either way. A file that will not load falls back to
+// the compiled default table - the pre-wire posture, level "info" included -
+// and names the failure in the source string the install record carries; it
+// does not log, because any record emitted before the early replay becomes
+// the log file's first line (the 131 nail pins that line to the install
+// record itself).
+func logSinkObserveConfig(dataDir string) (observe.LogConfig, string) {
+	cfgPath := filepath.Join(dataDir, configFileName)
+	c, _, err := config.LoadFile(cfgPath, nil)
+	source := cfgPath
+	level := logSinkLevel
+	if err != nil || c == nil {
+		c = config.NewDefaults()
+		level = logSinkLevel
+		source = "compiled defaults (config.NewDefaults; config.toml unreadable: " + configErrText(err, c) + ")"
+	} else {
+		level = c.Observe.Level
+	}
+	return observe.LogConfig{
+		Dir:         logSinkDir(dataDir),
+		Level:       level,
+		RollSizeMB:  c.Observe.Roll.SizeMB,
+		RollDays:    c.Observe.Roll.Days,
+		RedactPaths: c.Privacy.RedactPaths,
+	}, source
 }
 
 // teeHandler is the fan-out installLogSink installs: one record, two handlers,

@@ -1,0 +1,10 @@
+time=2026-11-11T12:47:10.806+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-11T12:47:10.830+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:\\work\\workspace\\projects plans\\Wisp\\third_party\\spike-models\\silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test180KConversationModeReachesTheSpeakDoneRow2317396304\001\models
+--- FAIL: Test180KConversationModeReachesTheSpeakDoneRow (0.02s)
+    config_wire_180k_windows_test.go:275: speakDoneFacts lost the plan value: the dispatch would walk #26 over a conversation_mode=true file
+time=2026-11-11T12:47:10.838+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:\\work\\workspace\\projects plans\\Wisp\\third_party\\spike-models\\silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test180KAECSwitchGatesTheMonitor782362923\001\models
+--- FAIL: Test180KAECSwitchGatesTheMonitor (0.01s)
+    config_wire_180k_windows_test.go:321: the arm refusal does not name the config switch: "没有 C11 作用域（语音链未启动）"
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.139s
+FAIL

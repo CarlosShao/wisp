@@ -29,3 +29,17 @@
 - **额外回归**：TestTicket324×2、Test41a2r1GuardRows PASS。`Test15eSpeechEndToEnd` 与 `Test41a2r1OptInGate` 在无 staging 的裸机上是红，属 15e/41 系文件头写明的 staging 依赖（System32 旧 DLL 遮蔽；OptInGate 补 WISP_SILERO_MODEL 即绿），与本腿改动无关——本腿 diff 未触碰两例的任何被测路径。
 - **普查账诚实说明**：census §2 的 25 枚悬空里，本票接走 **6 枚**（session.settling_sec、session.conversation_idle_sec、voice.punctuation、agent.loop_guard.repeat_thresholds、agent.max_rounds、agent.token_budget）；其余 **19 枚仍悬空**（single_instance、veto_words、tts.provider/speed、aec 两枚、conversation_mode、audio 两枚、privacy 三枚、memory 三枚、roll 两枚、observe 两枚），AC#2 的三档处置留给编排者裁。
 - commit：`cmd/wisp` 六件＋新测试件＋本票面追加（两处显式 pathspec，只 commit 不 push）。
+
+## Progress log（落地腿 K · 19 枚收尾 · 2026-11-11 12:5x +08）
+- 接 **11 枚**（读数与反向见 `.scratch/wisp/probes/180k/README.md`，12 发突变 12 红全还原绿）：
+  - **installLogSink 自喂**（cmd/wisp/logsink.go，boot LoadFile 形）：observe.level / roll.size_mb / roll.days / privacy.redact_paths 四枚进 observe.LogConfig，下游全真消费（slog 过滤、滚动阈值、保留清扫、路径脱敏）。
+  - **retention job 首次获得生产 owner**（run.go assembleRuntime → memory.StartRetentionJob，close() 先 Dispose 再关库；D35 rule 1 之前是空转）：memory.l3_retention_days + privacy.retention_days 喂同一 task_log 窗口（两键冲突取更小，注释+测试钉）；memory.l1_max 喂 memory.WithProfileCap（internal/memory 新 option，dao_profile/l1_extract 消费）。
+  - **memory.l1_enabled**：resident boot 闸（memoryL1Enabled180K → attachMemoryL1IfEnabled180K），false＝不挂 L1 抽取管线＋自述行。
+  - **voice.conversation_mode**：boot plan → rv.speakDoneFacts() → EvSpeakDone 行选择（#28 Listening vs #26 Warm），conversation 分支跳过 enterWarm。
+  - **voice.aec.enabled**：boot plan → bargein monitor setAECEnabled；false＝拒绝 arm（P15/A1307：无 AEC 必自触发）。
+  - **audio.input_device**：internal/audio 新 WithInputDevice + selectCaptureDevice（ID/友好名双匹配、逐 open 与 hotplug reopen 均走）+ mmDeviceWatcher.CaptureDevices（COM 枚举）；assembleCapture 喂线。
+  - **守卫形 2 枚**（internal/config/validate.go，83 票哲学：不接受的值＝加载错）：audio.sample_rate 必须 16000（16k 链端到端）；voice.aec.echo_ref 词汇表（只认 self-render）。
+- DEFERRED **6 枚**（写面外或无生产对象，逐枚理由在完成报告）：app.single_instance（mutex 在 internal/proc.Boot）、voice.wake_word.veto_words（kwsVetoWords 在 internal/speech/kws.go:83）、voice.tts.provider（云 TTS speak 半边未实现）、voice.tts.speed（同缺口＋本地速度旋钮在 internal/speech tts.go:48）、privacy.diagnostics_opt_in（BuildDiagnosticsBundle 全仓零生产调用点）、observe.slo_sample_interval_sec（watchdog 1s tick 是 SPEC-03 §4.3 冻结的双职责共享节拍，喂 5s 会拉长 sustain 窗口，需裁）。
+- internal/{voice,roll,privacy} 不存在：voice 归口实际在 cmd/wisp 常驻链＋internal/speech（写面外），roll 归口实际在 internal/observe 的 logging/rollingWriter，privacy 归口实际在 cmd/wisp＋internal/observe——按派单口径如实记「归口不适用、按实际落点接」。
+- 门禁：gofumpt 空｜vet rc0（四包）｜build rc0｜internal/config+audio+memory 全包绿｜cmd/wisp 180K/423/255/324 族绿｜255 roster 改判后全绿（四行改判＋3 枚 nil pin 补位＋9 行 :LINE 读数对位）｜d22scan clean｜path GREEN｜整包终态树复跑（首跑与前台突变并发共享树的干扰红已排除，TestRunPacket -count=2 绿）。
+- commit：`cmd/wisp` 10 件＋`internal/{audio,config,memory}` 11 件＋probes 180k＋本票 bullet（两处显式 pathspec，只 commit 不 push）。

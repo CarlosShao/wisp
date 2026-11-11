@@ -137,7 +137,7 @@ var hotRowClaims = map[string]string{
 	// longer sources its config from it. This is the one hot section whose
 	// claim upgraded with ticket 233 - [llm] is the other "consumed" row, its
 	// live reader unchanged (cmd/wisp/panel_config_store.go:92).
-	"agent": hotClaimConsumed + "cmd/wisp/run.go:1263 [cfg = rt.mgr.Config()] - execute() reads the live Manager per task since ticket 233, so the next task after a hot-applied [agent] edit acts on the new values (PerToolTimeoutMS / SteeringEnabled / ProjectInstructionsEnabled, and since ticket 423 also MaxRounds / TokenBudget / LoopGuard.RepeatThresholds, which execute() hands to agent.Config at the loop's construction - the ticket-10 tail the census caught feeding from nowhere)",
+	"agent": hotClaimConsumed + "cmd/wisp/run.go:1875 [cfg = rt.mgr.Config()] - execute() reads the live Manager per task since ticket 233, so the next task after a hot-applied [agent] edit acts on the new values (PerToolTimeoutMS / SteeringEnabled / ProjectInstructionsEnabled, and since ticket 423 also MaxRounds / TokenBudget / LoopGuard.RepeatThresholds, which execute() hands to agent.Config at the loop's construction - the ticket-10 tail the census caught feeding from nowhere)",
 
 	// Read by a DIFFERENT command's process: openModelStore takes the config
 	// (cmd/wisp/models.go:163 [cfg.Models.Mirror]) but its callers are the
@@ -218,7 +218,7 @@ var hotRowClaims = map[string]string{
 	// session.ScopeOptions' SettleStatic / ConversationIdle slots (which had
 	// stood empty since ticket 28 with "0 = default" contracts), so all three
 	// keys now reach the scope at its construction.
-	"session": hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1329 [c.Session.WarmTimeoutSec] - the resident voice leg reads the warm timeout once at its boot LoadFile, so a hand edit reaches the next process, never this run; ticket 423 feeds the other two keys the same way (cmd/wisp/resident_voice_windows.go:1848 [c.Session.ConversationIdleSec] and cmd/wisp/resident_voice_windows.go:1849 [c.Session.SettlingSec], both handed to session.ScopeOptions at the scope's construction)",
+	"session": hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1862 [c.Session.WarmTimeoutSec] - the resident voice leg reads the warm timeout once at its boot LoadFile, so a hand edit reaches the next process, never this run; ticket 423 feeds the other two keys the same way (cmd/wisp/resident_voice_windows.go:1866 [c.Session.ConversationIdleSec] and cmd/wisp/resident_voice_windows.go:1867 [c.Session.SettlingSec], both handed to session.ScopeOptions at the scope's construction)",
 	// Ticket 247 moved [audio] out of the reader-less class: the resident
 	// process's capture assembly reads mic_muted_default at boot and hands it to
 	// audio.WithStartMuted, which is the sentence internal/audio/gate.go:55-56 wrote
@@ -230,9 +230,19 @@ var hotRowClaims = map[string]string{
 	// not. The device/rate half of the section still reads from nowhere:
 	// internal/audio takes input_device and sample_rate from the OS default
 	// endpoint and the seam constant, not from cfg.Audio.
-	"audio":   hotClaimOtherProcess + "cmd/wisp/resident_audio_windows.go:256 [ra.mutedAtBoot = c.Audio.MicMutedDefault] - the resident capture leg is [audio]'s first production reader and it reads the file once at boot, so a hot reload of this section waits for a restart instead of acting in this run",
-	"privacy": hotClaimNoReader + "internal/observe/logging.go:51 [RedactPaths bool] - the mirror field exists and is filled by callers, never from cfg.Privacy",
-	"memory":  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Memory - the L1/L3 knobs have no consumer",
+	"audio": hotClaimOtherProcess + "cmd/wisp/resident_audio_windows.go:291 [ra.mutedAtBoot = c.Audio.MicMutedDefault] - the resident capture leg is [audio]'s first production reader and it reads the file once at boot, so a hot reload of this section waits for a restart instead of acting in this run; the 180-census follow-up wired the device half the same way: cmd/wisp/resident_audio_windows.go:312 [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to internal/audio's capture config, whose open path resolves the name per open and per hotplug reopen (sample_rate stays a load-time guard: the chain honours no other rate, so validate.go refuses a non-16000 value instead of accepting a key nothing would act on)",
+	// The 180-census follow-up re-adjudicated this row out of the reader-less
+	// class: installLogSink feeds the pipeline the four keys
+	// observe.LogConfig exists to carry, all four genuinely consumed downstream
+	// (level filters the JSON handler, RollSizeMB rolls the writer, RollDays
+	// bounds the retention sweep, RedactPaths masks paths in the redactor).
+	// The verdict is snapshot-only, not consumed: the read is one fresh
+	// config.LoadFile per install (logsink.go's boot-seed shape), so a hot
+	// reload of [observe]/[privacy] waits for the next process that installs a
+	// sink, and the mirror handler keeps its fixed INFO gate.
+	"privacy": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:233 [RedactPaths: c.Privacy.RedactPaths] - installLogSink's boot LoadFile feeds privacy.redact_paths into the pipeline's redactor (the mask runs in internal/observe/redact.go:138), and privacy.retention_days rides the same feed through the retention window: cmd/wisp/memory_retention_180k.go:46 [days = c.Privacy.RetentionDays] feeds memory.StartRetentionJob (the job's first production owner), so both keys act at the boot that installs the sink",
+	"memory":  hotClaimSnapshotOnly + "cmd/wisp/run.go:691 [mem, err := memory.Open(s.dataDir, memory.WithProfileCap(cfg.Memory.L1Max))] - the assembly root feeds l1_max into the store's profile-row cap (dao_profile.go's LRU eviction enforces it), and the L3 window rides the retention start: cmd/wisp/memory_retention_180k.go:43 [days = c.Memory.L3RetentionDays] joins [privacy] retention_days on the same knob (the smaller window wins). l1_enabled is the resident boot's gate: cmd/wisp/resident_windows.go reads it once per boot (memoryL1Enabled180K) and false means the L1 extraction pipeline is not attached at all. All reads are boot-time, none re-read the live Manager - snapshot-only",
+	"observe": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:226 [level = c.Observe.Level] - the log sink's boot LoadFile feeds observe.level into the JSON handler's slog filter, and the roll window rides the same feed (cmd/wisp/logsink.go:231 [RollSizeMB:  c.Observe.Roll.SizeMB] and :232 [RollDays:    c.Observe.Roll.Days] into newRollingWriter's size roll and retention sweep). Before the 180-census follow-up this row was no-reader with the hardcoded logSinkLevel cite; the install record now carries the fed posture (min_level / roll_size_mb / roll_days / redact_paths) so which table decided is checkable",
 	// Ticket 44 (C23 money path) landed its composition-root wiring after this
 	// row was written, so the 2026-11-05 re-adjudication moved [cost] out of the
 	// reader-less class: execute() reads the LIVE Manager at the top of every
@@ -245,8 +255,7 @@ var hotRowClaims = map[string]string{
 	// ("扫描零命中 ... the C23 budget knobs (ticket 44) are not landed") became
 	// false the day 44-r3/44-r5 landed, which is exactly the drift ticket 98's
 	// census caught in this roster.
-	"cost":    hotClaimConsumed + "internal/agent/costbook_44.go:183 [b, err := observe.BudgetFrom(cfg.Cost.DailyBudget, cfg.Cost.MonthlyBudget,] - execute() hands the live per-task cfg to agent.CostWiring (cmd/wisp/run.go:1570), whose budget half is built from these four [cost] leaves; agent.QuotaWiring (internal/agent/quota_44r4.go:135) reads the same caps, and both run once per task",
-	"observe": hotClaimNoReader + "cmd/wisp/logsink.go:149 [Level: logSinkLevel] - the log sinks choose their level themselves, never from cfg.Observe",
+	"cost": hotClaimConsumed + "internal/agent/costbook_44.go:183 [b, err := observe.BudgetFrom(cfg.Cost.DailyBudget, cfg.Cost.MonthlyBudget,] - execute() hands the live per-task cfg to agent.CostWiring (cmd/wisp/run.go:1570), whose budget half is built from these four [cost] leaves; agent.QuotaWiring (internal/agent/quota_44r4.go:135) reads the same caps, and both run once per task",
 
 	// [panel]: the section 票 255 was 立 for, and AC#4 landed while this file was
 	// open. The host used to hard-code its own geometry - at HEAD 67ab595d the
@@ -285,7 +294,7 @@ var hotRowClaims = map[string]string{
 	//     request picks it up", never "改完立刻自己变". Pinned by
 	//     TestTicket255PanelRosterVerdictIsTheHonestShape and by
 	//     TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch.
-	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all; the appearance wave added the write half this row's reader always lacked - cmd/wisp/panel_config_store.go:345 [s.mgr.SetPanelWidth(v)] (and :355 [s.mgr.SetPanelFontSize(v)] for the NEW panel.font_size schema key, a font_size the reader above never carried because the key did not exist until that wave's config leg added it) writes both keys through the guarded path, and the receipt's Note says the honest tense: the per-create reader above picks a written value up on the next show request, no process restart required",
+	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:231 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:380 [Width:  uint(width)], reached from the create); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all; the appearance wave added the write half this row's reader always lacked - cmd/wisp/panel_config_store.go:345 [s.mgr.SetPanelWidth(v)] (and :355 [s.mgr.SetPanelFontSize(v)] for the NEW panel.font_size schema key, a font_size the reader above never carried because the key did not exist until that wave's config leg added it) writes both keys through the guarded path, and the receipt's Note says the honest tense: the per-create reader above picks a written value up on the next show request, no process restart required",
 
 	// Per-key sections: planApp/planVoice book the SECTION name into rep.Hot, so
 	// the claim must be settled per key row and only claimed when every hot row
@@ -308,7 +317,7 @@ var hotRowClaims = map[string]string{
 	// RUNS acts on the value) and now names the dead read site instead of
 	// denying it exists; the other three hot [voice] keys have no read site at
 	// all.
-	"voice.tts.speed": hotClaimNoReader + "没有一条运行路径按这个值做事：唯一的生产读点是 internal/speech/cloudcatalog.go:119 [ep.Speed = cfg.Voice.TTS.Speed]，而它住在票 61 的 ResolveCloudChain 里——那枚函数全仓非测试调用者 0 枚（cmd/internal 里只有定义与注释）⇒ 读点存在、没人调用，TTS 的 speed 仍未接进运行的语音链 (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins)",
+	"voice.tts.speed": hotClaimNoReader + "没有一条运行路径按这个值做事：唯一的生产读点是 internal/speech/cloudcatalog.go:119 [ep.Speed = cfg.Voice.TTS.Speed]，而它住在票 61 的 ResolveCloudChain 里——那枚函数全仓非测试调用者 0 枚（cmd/internal 里只有定义与注释）⇒ 读点存在、没人调用，TTS 的 speed 仍未接进运行的语音链 (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins)",
 	// Ticket 423 re-adjudicated this row: the switch used to ride a hardcoded
 	// `true` into speech.OpenPunctuation, so no production line read the key at
 	// all (the row carried the 扫描零命中 wording then). The boot LoadFile now
@@ -322,9 +331,9 @@ var hotRowClaims = map[string]string{
 	// even though the key itself is hot-tier), and the reader lives in the
 	// resident `wisp` process while this receipt prints in `wisp run`, which
 	// builds no voice leg.
-	"voice.punctuation":          hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1850 [c.Voice.Punctuation] - the resident voice leg carries the switch in its boot plan (voicePlan.PunctEnabled) and the punctuation stage opens and attaches under it (cmd/wisp/resident_voice_engines_windows.go:445's OpenPunctuation enabled argument, gated by the ASR-epoch acquire); the section's other production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins",
-	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
-	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
+	"voice.punctuation":          hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1868 [c.Voice.Punctuation] - the resident voice leg carries the switch in its boot plan (voicePlan.PunctEnabled) and the punctuation stage opens and attaches under it (cmd/wisp/resident_voice_engines_windows.go:445's OpenPunctuation enabled argument, gated by the ASR-epoch acquire); the section's other production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins",
+	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
+	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
 }
 
 // sectionReadSites pins, per Config field, which production files the reader scan
@@ -351,9 +360,14 @@ var sectionReadSites = map[string][]string{
 	// one fresh config.LoadFile per boot in the resident process (the same
 	// per-boot shape [hotkey] has used since ticket 258), so neither lands in
 	// the "consumed by a live re-reader" class - see the [audio] row above.
-	"Audio":   {"cmd/wisp/resident_audio_windows.go"},
-	"Privacy": nil,
-	"Memory":  nil,
+	"Audio": {"cmd/wisp/resident_audio_windows.go"},
+	// The 180-census follow-up's feeds: the log sink's boot LoadFile reads
+	// [observe] (level + roll window) and [privacy] redact_paths
+	// (cmd/wisp/logsink.go); the retention window helper reads both
+	// l3_retention_days and privacy.retention_days and run.go feeds l1_max
+	// into memory.Open (cmd/wisp/memory_retention_180k.go + cmd/wisp/run.go).
+	"Privacy": {"cmd/wisp/logsink.go", "cmd/wisp/memory_retention_180k.go"},
+	"Memory":  {"cmd/wisp/memory_retention_180k.go", "cmd/wisp/run.go"},
 	// 2026-11-05 re-adjudication (ticket 98's C2): ticket 44 landed the C23
 	// money path, and both of its adapters read the four [cost] leaves off a
 	// *config.Config they are handed - agent.CostWiring (costbook_44.go, called
@@ -362,7 +376,7 @@ var sectionReadSites = map[string][]string{
 	// The same two files also read [llm] provider cards, which is why they
 	// appear in both lists.
 	"Cost":    {"internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"},
-	"Observe": nil,
+	"Observe": {"cmd/wisp/logsink.go"},
 	// Read by the resident panel host's assembly root, per window creation, since
 	// 票 255 AC#4. The host file itself is NOT in this list and must stay out of
 	// it: it receives a function value, and cmd/wisp/panel_host_windows.go

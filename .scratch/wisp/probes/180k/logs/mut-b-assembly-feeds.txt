@@ -1,0 +1,44 @@
+time=2026-11-11T12:46:07.584+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-11T12:46:09.868+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/11 12:46:09 mockllm: serving on http://127.0.0.1:63884 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-11T12:46:09.920+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=2 early_dropped=0
+time=2026-11-11T12:46:09.959+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-11T12:46:09.967+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-11T04:46:09Z duration_ms=8
+time=2026-11-11T12:46:09.977+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-11T12:46:09.983+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-11T04:46:09Z duration_ms=6
+time=2026-11-11T12:46:09.992+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-11T12:46:09.998+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-11T04:46:09Z duration_ms=5
+time=2026-11-11T12:46:10.009+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-11T12:46:10.018+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-11T04:46:10Z duration_ms=7
+time=2026-11-11T12:46:10.018+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-11T12:46:10.033+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-11T12:46:10.040+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-11T04:46:10Z duration_ms=7
+time=2026-11-11T12:46:10.051+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-11T12:46:10.058+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-11T04:46:10Z duration_ms=6
+time=2026-11-11T12:46:10.064+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-11T12:46:10.067+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-11T12:46:10.068+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-11T12:46:10.092+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=5f15fc4b-c6e5-4b49-8363-4242ef4909da
+time=2026-11-11T12:46:10.093+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-11T12:46:10.097+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- FAIL: Test180KMemoryKnobsReachTheAssemblyRoot (2.53s)
+    config_wire_180k_windows_test.go:211: store.ProfileCap() = 20, want the file's 7 (memory.l1_max feeding memory.WithProfileCap; the compiled default is 20)
+    config_wire_180k_windows_test.go:218: the boot audit does not carry the retention window: want substring of "wisp run: retention job owned（[memory] l3_retention_days / [privacy] retention_days → task_log 窗口 7 天）", stderr="[audit] wisp run: retention job owned（[memory] l3_retention_days / [privacy] retention_days → task_log 窗口 30 天）\n[audit] wisp run: SESSION-MINT id=sess_49c050f3839e35892c066f649cdce55d (结束点＝本进程退出，A435 第 2 条)\n[audit] approval: CLI-VETO-NONE reply_attached=false（票 170：本装配没有声明任何 L1 否决通道；TTY 终端由入口 cmdRun 声明回车通道，非交互支路不假装有否决）\n[audit] perm: MODE-READ origin=startup mode=ask_every_step source=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\\\\002\\\\config.toml\"\n[audit] risk/C25: sync-dir detection has no confirmed (env/registry/config) location — paths under the user profile fall back to sync-suspect (P12 safe default)\n[audit] config: HOT-RELOAD state=armed tick=1s path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\\\\002\\\\config.toml\" goroutine=watchdog owner=config d36_confirm=on restart_notice=on reload_receipt=on detail=\"本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效，重载档会告知事件已收到但本宿主没有可重载的子系统\"\n[audit] wisp run: 项目说明加载器 workspace=\"\" globalDir=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\Test180KMemoryKnobsReachTheAssemblyRoot1195079591\\\\002\" enabled=true budget=2300\n[audit] projctx: projctx: 没有找到任何项目说明文件（工作区逐级向上与数据目录都查过）\n[audit] tools: C25 scope closed task=5f15fc4b-c6e5-4b49-8363-4242ef4909da was_open=true dropped=0 open_scopes=0 close_err=<nil>\n[audit] config: HOT-RELOAD state=stopped reason=run-root-cancelled detail=\"轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到\"\n"
+time=2026-11-11T12:46:10.124+08:00 level=WARN msg="voice: 记忆抽取未装配：本进程没有存储，L1 抽取没有提交面"
+wisp: 语音链：记忆抽取未装配：本进程没有存储，L1 抽取没有提交面
+--- FAIL: Test180KL1EnabledGateGatesTheAttach (0.01s)
+    config_wire_180k_windows_test.go:230: l1_enabled=false still reached the attach path (problems [记忆抽取未装配：本进程没有存储，L1 抽取没有提交面]): the gate does not read the key
+time=2026-11-11T12:46:10.133+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\Temp\Test180KInputDeviceReachesTheCaptureConfig2922902876\001\config.toml path=T
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-11-11T12:46:10.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- FAIL: Test180KInputDeviceReachesTheCaptureConfig (0.01s)
+    config_wire_180k_windows_test.go:358: the capture config carries DeviceName "", want the file's "Blue Yeti": audio.input_device is not riding the boot feed
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.691s
+FAIL

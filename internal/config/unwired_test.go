@@ -180,7 +180,7 @@ cloud_asr_chain = ["openai/gpt-4o-mini"]
 
 [audio]
 input_device = "mic-1"
-sample_rate = 48000
+sample_rate = 16000
 
 [agent]
 max_rounds = 10

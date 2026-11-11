@@ -55,6 +55,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/perm"
+	"github.com/CarlosShao/wisp/internal/plugin"
 	"github.com/CarlosShao/wisp/internal/present"
 	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/risk"
@@ -297,6 +298,11 @@ type agentRuntime struct {
 	settings *configStore
 	paths    *tools.PathCanonicalizer
 	store    *memory.Store
+	// retention owns the D35 retention-job goroutine the 180K wire started
+	// (memory.StartRetentionJob had zero production callers before it). nil
+	// when this boot never reached the store; close() disposes it before the
+	// store closes.
+	retention *plugin.DisposalScope
 	// session is ticket 224's D45 grants ledger for THIS process: it holds the
 	// minted session identity, writes the rows a native 「本会话内允许」 answer
 	// produces, and is the read side the bridge consults. nil means this boot
@@ -682,12 +688,25 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	rt.provs = []llm.LlmProvider{prov}
 	rt.names = []string{ep.String()}
 
-	mem, err := memory.Open(s.dataDir)
+	mem, err := memory.Open(s.dataDir, memory.WithProfileCap(cfg.Memory.L1Max))
 	if err != nil {
 		fmt.Fprintf(s.stderr, "wisp run: 存储不可用：%v\n", err)
 		return rt, 2
 	}
 	rt.store = mem
+
+	// Retention job owner (the 180-census follow-up's wire, D35 rule 1):
+	// StartRetentionJob existed with zero production callers, so no task_log or
+	// tool_call row ever aged out - the windows were contractual and ownerless.
+	// The scope is disposed by agentRuntime.close (before the store closes, so
+	// the job's last pass never races the pool shutdown), and the windows are
+	// the [memory] l3_retention_days / [privacy] retention_days feed.
+	rt.retention = plugin.NewDisposalScope("retention-job-host", context.Background())
+	days := retentionWindowDays180K(cfg)
+	mem.StartRetentionJob(rt.retention, memory.RetentionConfig{
+		TaskLogTTL: time.Duration(days) * 24 * time.Hour,
+	})
+	rt.auditf("%s", retentionBootLine180K(days))
 
 	// Ticket 43: the one-shot crash sweep. The resident boot and the CLI both
 	// walk this line, so a boot that follows a kill -9 marks the dead process's
@@ -1563,6 +1582,11 @@ func (rt *agentRuntime) close() {
 	// the hook that walks the ordered sequence.
 	if rt.scheduler != nil {
 		rt.scheduler.Close()
+	}
+	// The retention job's scope first (the 180K wire): Dispose cancels and
+	// joins the job, so the final pass cannot race the store close below.
+	if rt.retention != nil {
+		_ = rt.retention.Dispose()
 	}
 	if rt.store != nil {
 		_ = rt.store.Close()

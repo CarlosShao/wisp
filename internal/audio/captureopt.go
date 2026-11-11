@@ -39,6 +39,12 @@ type CaptureConfig struct {
 	Registry *observe.Registry
 	// OnLevel receives one level scalar per seam frame, on the capture thread.
 	OnLevel func(float32)
+	// DeviceName is [audio] input_device: the capture device to open, "" or
+	// "default" meaning the OS default endpoint. The picker that resolves the
+	// name lives in device.go (selectCaptureDevice); the open path consults it
+	// on the initial open and on every hotplug reopen, so a named device
+	// survives a default-device change the same way the default one does.
+	DeviceName string
 }
 
 // CaptureOption configures a CaptureConfig.
@@ -71,6 +77,16 @@ func WithCaptureRegistry(r *observe.Registry) CaptureOption {
 // liquid_windows.go:40-41.
 func WithLevelSink(fn func(float32)) CaptureOption {
 	return func(c *CaptureConfig) { c.OnLevel = fn }
+}
+
+// WithInputDevice carries [audio] input_device into the capture config. The
+// empty string and "default" keep the OS default endpoint (the pre-wire
+// shape); any other value names the endpoint the open path resolves through
+// selectCaptureDevice, which matches by endpoint id first and friendly name
+// second (case-insensitive) and refuses a name that matches nothing with a
+// ClassAudioDevice error listing what IS present.
+func WithInputDevice(name string) CaptureOption {
+	return func(c *CaptureConfig) { c.DeviceName = name }
 }
 
 // newCaptureConfig applies opts over the one legal default (the process

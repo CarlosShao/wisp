@@ -280,6 +280,23 @@ type voicePlan struct {
 	// "switched off" state 27-r1 pinned, reached by configuration instead of by
 	// a missing model.
 	PunctEnabled bool
+	// ConversationMode is [voice].conversation_mode (the 180-census follow-up's
+	// feed): the D43 speak-end row selector. false is the shipped default and
+	// the pre-wire shape (the announcement-end dispatch hardcoded it before
+	// this feed existed): Speaking falls back to Warm and the mic closes. true
+	// walks row #28 instead - Speaking lands in Listening with the mic still
+	// open - and the announcement end skips the enterWarm call that would
+	// close the feed the row just kept open. The first-enable L2 privacy
+	// confirmation PLAN.md:2211 asks for is the session scope's own contract
+	// (EnableConversation's PrivacyConfirm hook) and stays that surface's;
+	// this plan field is the machine-side row selector only.
+	ConversationMode bool
+	// AECEnabled is [voice] aec.enabled, the barge-in monitor's config switch
+	// (setAECEnabled). false refuses every arm: the P15 readings (A1307) make
+	// a no-AEC monitor a self-trigger, so the config switch is the feature's
+	// off rather than a degraded run. The schema default is true, so the
+	// pre-wire shape is unchanged.
+	AECEnabled bool
 }
 
 // voiceKwsFiles is the KWS transducer triple plus its token and keyword tables,
@@ -567,6 +584,7 @@ func newResidentVoice(frames <-chan []byte, plan voicePlan, ball *residentBall, 
 	// TICKET 26p: the monitor rides the same seams the leg already holds; the
 	// scope joins it in start(), the conversation window in attachCaptureGate.
 	rv.bargein = newVoiceBargeinMonitor(frames, plan.VadModelPath, nil, rv.TriggerInterrupt)
+	rv.bargein.setAECEnabled(plan.AECEnabled)
 	return rv
 }
 
@@ -1848,6 +1866,10 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 	plan.ConversationIdle = time.Duration(c.Session.ConversationIdleSec) * time.Second
 	plan.SettleStatic = time.Duration(c.Session.SettlingSec) * time.Second
 	plan.PunctEnabled = c.Voice.Punctuation
+	// The 180-census follow-up: the two [voice] keys the state machine and the
+	// barge-in monitor consume, riding the same boot-LoadFile feed.
+	plan.ConversationMode = c.Voice.ConversationMode
+	plan.AECEnabled = c.Voice.AEC.Enabled
 	if why != "" {
 		rv.verdict = why
 		return rv
@@ -1857,6 +1879,8 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 	// TICKET 26p: the monitor rides the production frame channel; the scope
 	// joins it in start(), the conversation window in attachCaptureGate.
 	rv.bargein = newVoiceBargeinMonitor(rv.frames, plan.VadModelPath, nil, rv.TriggerInterrupt)
+	rv.bargein.setAECEnabled(plan.AECEnabled)
+	// TICKET 26p: the monitor rides the production frame channel; the scope
 	// The residency is built with the plan it will load from: the voicePlan the
 	// constructor got is the zero one on this path, and a residency holding no
 	// paths would answer "语音链：ASR 目录为空" for every turn.

@@ -143,9 +143,11 @@ func (m *WASAPIMicrophone) ThreadID() uint32 { return m.threadID.Load() }
 func (m *WASAPIMicrophone) Stats() Stats { return m.meter.snapshot() }
 
 // Endpoints returns the current capture/render endpoint pair (D47: kept
-// queryable for the P15 AEC clock-drift spike).
+// queryable for the P15 AEC clock-drift spike). The capture half resolves
+// through the same picker the open path uses, so a configured
+// [audio] input_device is what the diagnostics pair names too.
 func (m *WASAPIMicrophone) Endpoints() (capture, render DeviceDescriptor, err error) {
-	capture, err = m.watcher.DefaultCaptureDevice()
+	capture, err = m.selectCaptureDevice()
 	if err != nil {
 		return capture, render, err
 	}
@@ -272,13 +274,23 @@ func (m *WASAPIMicrophone) handleStreamError(ctx context.Context, stream *device
 	return true
 }
 
-// openCurrent opens the current default capture endpoint (initial open).
+// openCurrent opens the endpoint selectCaptureDevice resolves: the default
+// capture endpoint when [audio] input_device is unset/"default", otherwise the
+// named endpoint (hotplug reopen included - a named device survives a
+// default-device change, which is exactly the shape a user who pinned one mic
+// expects).
 func (m *WASAPIMicrophone) openCurrent() (deviceStream, error) {
-	dev, err := m.watcher.DefaultCaptureDevice()
+	dev, err := m.selectCaptureDevice()
 	if err != nil {
-		return nil, observe.Wrap(observe.ClassAudioDevice, err, "capture device enumeration failed")
+		return nil, observe.Wrap(observe.ClassAudioDevice, err, "capture device resolution failed")
 	}
 	return m.opener.Open(dev)
+}
+
+// selectCaptureDevice is the [audio] input_device read (device.go's resolver
+// over the injected watcher).
+func (m *WASAPIMicrophone) selectCaptureDevice() (DeviceDescriptor, error) {
+	return selectCaptureDevice(m.watcher, m.cfg.DeviceName)
 }
 
 // reopenOnce is the D42#2 recovery step: re-enumerate once, open once

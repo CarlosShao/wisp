@@ -1,0 +1,14 @@
+time=2026-11-11T12:44:27.980+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-11T12:44:28.004+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KObserveLevelGatesTheFile1242911687\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KObserveLevelGatesTheFile1242911687\001\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=1 early_dropped=0
+--- FAIL: Test180KObserveLevelGatesTheFile (0.02s)
+    config_wire_180k_windows_test.go:72: observe.level=warn still wrote Info records to the file: the level key is not riding the handler's filter
+time=2026-11-11T12:44:28.018+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRedactPathsMasksTheFile3347861529\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRedactPathsMasksTheFile3347861529\001\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0
+--- FAIL: Test180KRedactPathsMasksTheFile (0.01s)
+    config_wire_180k_windows_test.go:94: privacy.redact_paths=true left the raw path in the file: the key is not riding the redactor
+time=2026-11-11T12:44:28.031+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRollSizeGatesTheFile3313537886\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRollSizeGatesTheFile3313537886\001\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0
+--- FAIL: Test180KRollSizeGatesTheFile (0.37s)
+    config_wire_180k_windows_test.go:130: roll.size_mb=1 produced 1 file(s), want at least 2: the writer never rolled, so the size key is not riding the threshold
+time=2026-11-11T12:44:28.408+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRollDaysSweepsTheFile1155867200\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRollDaysSweepsTheFile1155867200\001\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.552s
+FAIL

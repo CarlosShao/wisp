@@ -304,6 +304,12 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 	mic := newSource(
 		audio.WithCaptureRegistry(rt.Registry),
 		audio.WithLevelSink(ra.levelOut(out)),
+		audio.WithInputDevice(c.Audio.InputDevice),
+		// [audio] input_device (the 180-census follow-up's feed): ""/"default"
+		// keeps the OS default endpoint (the pre-wire shape); a named device is
+		// resolved per open and per hotplug reopen inside internal/audio. The
+		// value rides every open, so the named-device posture is said below
+		// instead of being inferred from the gate's verdict.
 	)
 	gate := audio.NewHalfDuplexGate(mic, audio.PathT, audio.WithStartMuted(c.Audio.MicMutedDefault))
 

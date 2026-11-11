@@ -1250,12 +1250,38 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 		"runes", len([]rune(text)), "chunks", chunks, "samples", spoke,
 		"rate", eng.SampleRate(), "acquire", d.String(), "scope", req.scope)
 
-	// HOP 5b: the sentence is done, so the ball leaves Speaking by the row that
-	// exists for it (D43 #26: not-conversation) and the session lands in Warm.
-	rv.dispatch(statemachine.EvSpeakDone,
-		&statemachine.Facts{ConversationMode: false},
-		"播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）")
-	if err := rv.residency.enterWarm("announce-end"); err == nil {
-		rv.warmTurnEnd.Add(1)
+	// HOP 5b: the sentence is done, so the ball leaves Speaking by the row the
+	// config selects. The Facts literal is the 180-census follow-up's feed
+	// (rv.speakDoneFacts): before it, [voice] conversation_mode existed only
+	// in the schema while this dispatch hardcoded `false`, so row #28 was
+	// unreachable by configuration. true walks #28 (Speaking -> Listening:
+	// the mic stays open between turns, PLAN.md:1326's "Speaking 结束直接回
+	// Listening") and the enterWarm call below is skipped - entering Warm
+	// would run the MicClose hook the Conversation row just decided not to
+	// run. false is the shipped default and the pre-wire shape: #26 back to
+	// Warm, engines hot, mic closed.
+	facts := rv.speakDoneFacts()
+	if facts.ConversationMode {
+		rv.dispatch(statemachine.EvSpeakDone, facts,
+			"播报结束：D43#28 Speaking 到 Listening（[voice] conversation_mode=true，麦保持开）")
+	} else {
+		rv.dispatch(statemachine.EvSpeakDone, facts,
+			"播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）")
+		if err := rv.residency.enterWarm("announce-end"); err == nil {
+			rv.warmTurnEnd.Add(1)
+		}
 	}
+}
+
+// speakDoneFacts180K is the EvSpeakDone facts the announcement end dispatches,
+// one pure function of the plan so the config feed has one addressable seam
+// (the scopeOptions shape ticket 423 established for the same reason).
+func speakDoneFacts180K(conversationMode bool) *statemachine.Facts {
+	return &statemachine.Facts{ConversationMode: conversationMode}
+}
+
+// speakDoneFacts is the production read: the plan's [voice] conversation_mode
+// value, carried into the D43 row selector the dispatch walks.
+func (rv *residentVoice) speakDoneFacts() *statemachine.Facts {
+	return speakDoneFacts180K(rv.plan.ConversationMode)
 }

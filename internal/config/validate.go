@@ -27,6 +27,7 @@ func validate(c *Config) error {
 		validateBall(c),
 		validateAudio(c),
 		validatePrivacy(c),
+		validateVoice(c),
 		validateModels(c),
 		validateRisk(c),
 		validateBlacklistOverrides(c),
@@ -103,11 +104,51 @@ func validateBall(c *Config) error {
 }
 
 // validateAudio enforces the hard-coded read-only audio.half_duplex (D36:
-// hard-coded true; writing false is an error, never a setting).
+// hard-coded true; writing false is an error, never a setting) and the one
+// sample_rate the shipped chain can honour. The voice chain is a 16k chain
+// by construction: internal/audio resamples every device stream to its
+// TargetRate constant, and that same constant is baked into the frame
+// geometry (FrameSamples/FrameDuration) and the VAD/ASR engines' 16k
+// contract. Accepting 48000 here would be ticket 83's lie again - a key the
+// file can carry and no code honours - so a non-16000 value is a load error
+// naming the chain, the same shape the half_duplex refusal keeps.
 func validateAudio(c *Config) error {
 	if !c.Audio.HalfDuplex {
 		return observe.New(observe.ClassConfig,
 			"config.toml: audio.half_duplex is hard-coded true (read-only); writing false is rejected")
+	}
+	if c.Audio.SampleRate != audioSampleRateChain {
+		return observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config.toml: audio.sample_rate %d is rejected: this build's voice chain is a %d Hz chain end to end (capture resample target, frame geometry, VAD/ASR engines); other values would be written and never honoured",
+			c.Audio.SampleRate, audioSampleRateChain))
+	}
+	return nil
+}
+
+// audioSampleRateChain is the one sample_rate the shipped chain honours
+// (internal/audio's TargetRate seam constant). internal/config must not
+// import internal/audio (audio sits under the observe edge; the dependency
+// graph stays one-directional), so the number is written here; the guard test
+// in this package keeps the two from drifting apart by construction.
+const audioSampleRateChain = 16000
+
+// voiceAECEchoRefSelfRender is the one echo-reference source the AEC path
+// implements (SPEC-03 sec 3 [voice] aec.echo_ref="self-render": the app's own
+// render output loops back as the far-end reference - the 26p barge-in feed).
+// No second source exists, so an unknown value is a load error naming the
+// vocabulary instead of a silent fallback to self-render ("it fell back" and
+// "it was never written" look identical in the field - the validateRisk rule).
+const voiceAECEchoRefSelfRender = "self-render"
+
+// validateVoice checks the [voice] value enums this layer owns. The echo_ref
+// vocabulary is the one key the section carries without a schema-level enum,
+// and it is reload-tier: a hand-edited value that the AEC path cannot map
+// must refuse at load, not wait for a restart to do nothing.
+func validateVoice(c *Config) error {
+	if ref := c.Voice.AEC.EchoRef; ref != "" && ref != voiceAECEchoRefSelfRender {
+		return observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config.toml: voice.aec.echo_ref %q must be one of %s (the only echo-reference source the AEC path implements)",
+			ref, vocabList([]string{voiceAECEchoRefSelfRender})))
 	}
 	return nil
 }

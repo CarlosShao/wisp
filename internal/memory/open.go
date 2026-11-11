@@ -96,6 +96,9 @@ type Store struct {
 	logger *slog.Logger
 	reg    *observe.Registry
 	target int // schema version this store migrates to
+	// profileCap is the L1 profile row cap this store enforces (the
+	// [memory] l1_max feed; ProfileCap reads it).
+	profileCap int
 
 	reader *sql.DB // concurrent read pool (WAL readers never block)
 	writer *sql.DB // single-connection write pool behind db-writer
@@ -117,6 +120,9 @@ type storeOptions struct {
 	reg         *observe.Registry
 	idleConnTTL time.Duration
 	target      int // schema version this store migrates to (tests override)
+	// profileCap is the L1 profile row cap ([memory] l1_max; models.go's
+	// L1MaxProfiles is its default). Zero/negative keeps the default.
+	profileCap int
 }
 
 func defaultStoreOptions() storeOptions {
@@ -125,6 +131,7 @@ func defaultStoreOptions() storeOptions {
 		reg:         observe.Default,
 		idleConnTTL: defaultIdleConnTTL,
 		target:      SchemaVersionTarget,
+		profileCap:  L1MaxProfiles,
 	}
 }
 
@@ -137,6 +144,18 @@ func WithRegistry(r *observe.Registry) Option { return func(o *storeOptions) { o
 // WithIdleConnTTL overrides the on-demand connection idle lifetime (tests).
 func WithIdleConnTTL(d time.Duration) Option {
 	return func(o *storeOptions) { o.idleConnTTL = d }
+}
+
+// WithProfileCap sets the L1 profile row cap ([memory] l1_max, D20/D35). The
+// schema default is L1MaxProfiles (20); a value at or below zero keeps it, so
+// a caller feeding an unset config value cannot zero the cap out. The cap is
+// enforced application-side by UpsertProfile's LRU eviction (dao_profile.go).
+func WithProfileCap(n int) Option {
+	return func(o *storeOptions) {
+		if n > 0 {
+			o.profileCap = n
+		}
+	}
 }
 
 // withSchemaTarget overrides the migration target version. Unexported: the
@@ -259,6 +278,7 @@ func Open(dir string, opts ...Option) (*Store, error) {
 		logger:       o.logger,
 		reg:          o.reg,
 		target:       o.target,
+		profileCap:   o.profileCap,
 	}
 	if err := winsec.PrivateDirAll(s.artifactsDir, 0o700); err != nil {
 		return nil, fmt.Errorf("memory: create artifacts dir: %w", err)

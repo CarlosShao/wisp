@@ -262,6 +262,11 @@ type voiceBargeinMonitor struct {
 	// applies at the APM's per-window construction, so every window judges
 	// through exactly the parameters its readings name.
 	aecTuning aec.Tuning
+	// aecEnabled is [voice] aec.enabled (the 180K feed, setAECEnabled): false
+	// refuses every arm - the P15 readings make a no-AEC monitor a
+	// self-trigger, so the config switch is the feature's off, not a degraded
+	// run.
+	aecEnabled bool
 
 	// armed state (owner goroutine, before the drain starts)
 	cancel    context.CancelFunc
@@ -307,15 +312,32 @@ type voiceBargeinMonitor struct {
 // newVoiceBargeinMonitor wires the monitor to the leg's seams. Everything is
 // nil-tolerant downstream: a monitor without a frame channel, a VAD model, a
 // scope or a trigger answers every arm with its reason instead of arming.
+// aecEnabled starts true - the pre-180K shape, where no config read existed to
+// say otherwise; the assembly root flips it from [voice] aec.enabled right
+// after construction (setAECEnabled).
 func newVoiceBargeinMonitor(frames <-chan []byte, vadModel string, scope *plugin.DisposalScope, trigger func()) *voiceBargeinMonitor {
 	m := &voiceBargeinMonitor{
-		frames:    frames,
-		vadModel:  vadModel,
-		scope:     scope,
-		trigger:   trigger,
-		keepalive: true, // the 401 flip: the cleared warm posture IS the default
+		frames:     frames,
+		vadModel:   vadModel,
+		scope:      scope,
+		trigger:    trigger,
+		keepalive:  true, // the 401 flip: the cleared warm posture IS the default
+		aecEnabled: true,
 	}
 	return m
+}
+
+// setAECEnabled carries [voice] aec.enabled (the 180-census follow-up's feed)
+// into the monitor. false means the APM is never built and every arm refuses:
+// the P15 measurements (A1307) showed a no-AEC monitor self-triggers on the
+// announcement loopback, so "barge-in without AEC" is not a degraded mode the
+// monitor may run - it is the mode the config switched off, and the refusal
+// reason says so.
+func (m *voiceBargeinMonitor) setAECEnabled(on bool) {
+	if m == nil {
+		return
+	}
+	m.aecEnabled = on
 }
 
 // setReverseCriteria installs the integration tests' mutant switches. It
@@ -367,6 +389,8 @@ func (m *voiceBargeinMonitor) arm() bool {
 		return false
 	}
 	switch {
+	case !m.aecEnabled:
+		m.reason = "[voice] aec.enabled=false：AEC 插话检测不装配（无 AEC 的插话必自触发，P15/A1307；D47 Path C 由配置关闭）"
 	case m.frames == nil:
 		m.reason = "没有 C8 帧通道（本进程没有采集腿）"
 	case m.vadModel == "":

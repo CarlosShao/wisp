@@ -94,12 +94,16 @@ func fullConfig(t *testing.T) *Config {
 	c.Voice.TTS = TTSConfig{Provider: "acme", Voice: "v1", Speed: 1.25}
 	c.Voice.Punctuation = false
 	c.Voice.ConversationMode = true
-	c.Voice.AEC = AECConfig{Enabled: false, EchoRef: "loopback"}
+	// echo_ref/self-render and sample_rate/16000 are the guard values, not the
+	// census's loopback/48000: the 180-census follow-up made both keys load-time
+	// guarded (the chain honours no other rate and no second echo reference), so
+	// the full-config fixture must carry the vocabulary the guards accept.
+	c.Voice.AEC = AECConfig{Enabled: false, EchoRef: "self-render"}
 	c.Voice.Realtime = RealtimeConfig{Enabled: false, Provider: "acme", Model: "m2", APIKeyRef: "env:RT", BaseURL: "https://rt.example"}
 	c.Voice.CloudASRChain = []string{"acme/m2"}
 	c.Voice.CloudTTSChain = []string{"acme/m2"}
 	c.Audio.InputDevice = "mic-1"
-	c.Audio.SampleRate = 48000
+	c.Audio.SampleRate = 16000 // the chain rate (the 180K sample_rate guard rejects anything else)
 	c.Audio.MicMutedDefault = false
 	c.LLM.TextChain = []string{"acme/m1", "acme/m2"}
 	c.LLM.Roles.Chat = Role{Provider: "acme", Model: "m1", Temperature: 0.3, ThinkingIntensity: ThinkingLow, MaxOutputTokens: 1024}

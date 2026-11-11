@@ -100,6 +100,54 @@ func (w *mmDeviceWatcher) defaultEndpoint(flow uint32) (DeviceDescriptor, error)
 	return DeviceDescriptor{ID: id, Name: friendlyName(dev)}, nil
 }
 
+// CaptureDevices implements the captureDeviceLister face: every ACTIVE
+// capture endpoint present right now, id and friendly name. A fresh
+// enumerator per call, the same no-cross-thread-object-sharing rule
+// defaultEndpoint runs under; slot 3 is IMMDeviceEnumerator::
+// EnumAudioEndpoints, and IMMDeviceCollection is GetCount (slot 3) + Item
+// (slot 4). A device whose friendly name cannot be read still appears (the
+// descriptor falls back to the endpoint id, device.go's String rule). The
+// ACTIVE-state mask is the file's own deviceStateActive constant below (the
+// same one nClientOnDeviceStateChanged judges state changes against).
+func (w *mmDeviceWatcher) CaptureDevices() ([]DeviceDescriptor, error) {
+	enum, release, err := createEnumerator()
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+
+	var coll unsafe.Pointer
+	if hr, _, _ := comCall(enum, 3, uintptr(eCapture), uintptr(deviceStateActive),
+		uintptr(unsafe.Pointer(&coll))); !hrOK(hr) || coll == nil {
+		return nil, observe.New(observe.ClassAudioDevice,
+			"EnumAudioEndpoints(eCapture) failed ("+hresultString(hr)+")")
+	}
+	defer comRelease(&coll)
+
+	var count uint32
+	if hr, _, _ := comCall(coll, 3, uintptr(unsafe.Pointer(&count))); !hrOK(hr) {
+		return nil, observe.New(observe.ClassAudioDevice,
+			"IMMDeviceCollection::GetCount failed ("+hresultString(hr)+")")
+	}
+	devs := make([]DeviceDescriptor, 0, count)
+	for i := uint32(0); i < count; i++ {
+		var dev unsafe.Pointer
+		if hr, _, _ := comCall(coll, 4, uintptr(i), uintptr(unsafe.Pointer(&dev))); !hrOK(hr) || dev == nil {
+			continue
+		}
+		var pid unsafe.Pointer
+		if hr, _, _ := comCall(dev, 5, uintptr(unsafe.Pointer(&pid))); !hrOK(hr) || pid == nil {
+			comRelease(&dev)
+			continue
+		}
+		id := windows.UTF16PtrToString((*uint16)(pid))
+		pCoTaskMemFree.Call(uintptr(pid))
+		devs = append(devs, DeviceDescriptor{ID: id, Name: friendlyName(dev)})
+		comRelease(&dev)
+	}
+	return devs, nil
+}
+
 // DefaultCaptureDevice implements DeviceWatcher.
 func (w *mmDeviceWatcher) DefaultCaptureDevice() (DeviceDescriptor, error) {
 	return w.defaultEndpoint(eCapture)
