@@ -34149,3 +34149,20 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 写面互斥核对：302-r1 占 `cmd/wisp`+`scripts`；122-r1 只 `internal`；238-a1 只 probes；verdict 只 evidence ⇒ 四腿无重叠。
 - 待办：收件后按三把尺逐腿核（提交真在／件真在／我复跑）；314 若判"可收口"仍须编排者复核 AC#0/#2/#3 的欠账，⛔ 凭一枚裁决腿就翻框。
 - 撤销口令：删本 A1710 条。
+
+## A1711 — ★max 档真的打通了（不需要重启、不需要开新会话）：`magpie-max` provider
+
+- 机主原话（愤怒，逐字）："又nm让我开新对话，卧槽你大爷的，我这就是新会话啊" ⇒ **"开新对话"不是解法**，是我一直改错文件。已自证并修好。
+- **根因（从 DSH 源码 asar 抠出，非猜测）**：
+  1. `dsh-tool-subagent/lib/index.js:95`：会话无策略时**只允许父路由**，显式传 provider/model/reasoning_effort 任一即抛错。
+  2. `dsh-tool-subagent/lib/model-selection-settings.js`：策略只在 `firstLiveSeq === 0`（**零历史会话**）写入 ⇒ 本会话有几百轮历史，永远拿不到 ⇒ **重启也救不回**。
+  3. `dsh-llm-pi-ai/lib/index.js:1993`：`options.reasoningEffort ?? profile.reasoning` ⇒ **provider 级 `reasoning` 是默认档**；`:1062` schema 确认该字段合法（`off/minimal/low/medium/high/xhigh/max`）。
+  4. ★**关键**：`settings.yaml` 的 `llm-pi-ai` 改完**不生效**（adapter 只在启动注册，实测 `NO_ADAPTER`）；**`cordis.patch.yml` 的 `llm-pi-ai` 才热更新**（源码注释逐字 `serialized with Loader hot reload`，`:3000` 有 `loader/volatile-update` 重注册）。该文件 `:39` 本来就有 `reasoning: high` 先例。
+- **做法**：`cordis.patch.yml`（profile 插件配置层）里 `magpie` provider 之后（原 2161 行后）新增同源 provider **`magpie-max`**：`baseURL` 同 `http://127.0.0.1:3425/v1`、`reasoning: max`、只挂 `group/group-review-and-audit`（`reasoningEfforts: {high, max}`）。**原 `magpie` 112 个模型一字未动**（写腿仍 glm high）。
+- **实证（三把尺）**：
+  - 派发成功：`workflow-bd73536b58b84579` 回 `PROBE-MAX3-OK`（前两次 `NULL`）。
+  - ★**请求头真的带 max**：子会话 `9e3b3864` 的 `request/header.config` ＝ **`{"provider":"magpie-max","model":"group/group-review-and-audit","maxTokens":262144,"reasoningEffort":"max"}`**；对照失败那发（`6c75f0e9`）同字段**无 reasoningEffort**。
+  - pyyaml 校验：11 条目、`magpie-max.reasoning=max`、`magpie` nmodels=112 未变。
+- 备份：`D:\tmp\wisp\20261111\cordis.patch.yml.20261111-preMagpieMax`。**撤销口令**：用该备份覆盖 `C:\Users\swq\.dsh\profiles\desktop\cordis.patch.yml` 即复原（`magpie-max` 消失）。
+- ⚠ 副作用登记：`settings.yaml` 里我也加过一个同名 `magpie-max`（无效、需重启才注册 adapter）——**它不影响运行**（cordis 层优先/同名合并），保留作为重启后的冗余；若要清干净，用 `D:\tmp\wisp\20261111\settings.yaml.20261111-preProviderMax` 覆盖。
+- 结论：**此后所有审计/测试/审查腿一律走 `provider:"magpie-max", model:"group/group-review-and-audit"`（max 档，请求头实证）**；写腿继续 `provider:"magpie", model:"auto/glm-5.3-flash"`（high）。
