@@ -18,6 +18,17 @@
    provider's catalog - there is no typed-id path here, and a provider with no
    models says so instead of offering a doomed save.
 
+   HONEST-BLOCKED RULING (census 2026-11-10, .scratch/wisp/probes/orch/
+   20261110/panel-wiring-matrix.md §①): all three cards on this page are
+   PLACEHOLDER cards. Their writes are real - the config.set route lands the
+   values in config and the read-back shows them - but no runtime path reads
+   them: the resident voice leg is local-only (internal/speech/engines.go),
+   the only cloud-chain consumer ResolveCloudChain has zero callers (ticket
+   255's roster), and the RealtimeEngine seam is Reserved with no
+   implementation. So the copy says so, and every ok receipt on this page is
+   restated: the SAVE is real, the EFFECT is not. C-class silent fakes were
+   re-graded B (honest read-write stubs); un-restating them re-opens the lie.
+
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
@@ -36,10 +47,21 @@ import {
   StateTag,
 } from "@/components/settings-controls";
 
+/** The census ruling these three cards carry: the save is real, the effect is
+    not. The generic translated receipt ("已保存，重启后生效") promises an
+    effect no runtime path can deliver today, so every ok answer on this page
+    is restated as a warn - and the tone downgrade is the point: a green
+    "saved" line on a card that cannot take effect reads as "working". */
+function placeholderReceipt(feedback: Feedback): Feedback {
+  return feedback.tone === "ok"
+    ? { tone: "warn", text: "已写入配置文件；这一项还没有接到运行路径，当前不生效" }
+    : feedback;
+}
+
 
 export function VoiceSettings({
   heading = "语音",
-  lede = "配置听写、朗读与实时语音使用的供应商和模型。",
+  lede = "云端听写链、云端朗读链与实时语音的供应商和模型。三张卡都是占位：写入会保存，但云端链路与实时引擎还没有接到运行路径，当前不生效。",
 }: {
   heading?: string;
   lede?: string;
@@ -102,7 +124,7 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
         <>
           <ChainEditor
             busy={busy}
-            description="听写优先走这里列出的顺序，都不可用时回退到本地引擎。"
+            description="占位卡：常驻语音的听写目前只走本地引擎。这里列出的云端顺序可以写入配置，但还没有接到听写运行路径，接入前改它不会生效。"
             field="voice_cloud_asr_chain"
             initial={view.voice.cloudASRChain}
             performWrite={performWrite}
@@ -112,7 +134,7 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
           />
           <ChainEditor
             busy={busy}
-            description="朗读优先走这里列出的顺序，都不可用时回退到本地引擎。"
+            description="占位卡：朗读的云端引擎尚未接入。这里列出的顺序可以写入配置，但当前没有运行路径按它取朗读，接入前改它不会生效。"
             field="voice_cloud_tts_chain"
             initial={view.voice.cloudTTSChain}
             performWrite={performWrite}
@@ -208,12 +230,13 @@ function ChainEditor({
         field,
         value: segments.map((seg) => `${seg.provider}/${seg.model}`).join(","),
       }),
-    ).then(setFeedback);
+    ).then((feedback) => setFeedback(placeholderReceipt(feedback)));
   }
 
   return (
     <SettingsCard title={title} description={description}>
       <div className="flex flex-col gap-2">
+        <StateTag text="占位·当前不生效" tone="warn" />
         <div className="flex flex-col gap-1.5">
           {segments.map((seg, index) => (
             <div className="flex flex-wrap items-center gap-2" key={`${index}-${seg.provider}`}>
@@ -292,13 +315,14 @@ function RealtimeCard({
       const head = await performWrite({ field: "voice_realtime_provider", value: provider });
       if (head.tone !== "ok") return head;
       const tail = await performWrite({ field: "voice_realtime_model", value: model });
-      return tail.tone === "ok" ? { tone: "ok" as const, text: "已保存，重启后生效" } : tail;
+      return tail.tone === "ok" ? placeholderReceipt(tail) : tail;
     }).then(setFeedback);
   }
 
   return (
-    <SettingsCard title="实时语音" description="陪聊模式的实时通话；通话开关由应用控制，这里配置供应商与模型。">
+    <SettingsCard title="实时语音" description="占位卡：实时通话引擎尚未实现，这里配置的供应商与模型暂时没有通话链使用；写入会保存，接入前不生效。">
       <div className="flex flex-col gap-2">
+        <StateTag text="占位·当前不生效" tone="warn" />
         <div className="flex flex-wrap items-center gap-2">
           <PairFields
             manualFallback
