@@ -34304,3 +34304,22 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **给下次重派的直接指令（`314-early` 续跑）**：①**先把这 9 处也改成 `uniqueProfileLeaf`**（同一手法、逐处显式 pathspec、⛔ 改判据）；②改完跑整包，**必须验终点锚** `^=== RUN TestZZ315A1` ≥1 行才算跑完（四数不作数，见 `A1717`）；③若仍早停，再查 `Test145` 那条 `panel` 包路径（它不碰窗口，可能是**第二类**根因）。
 - **技术选型理由（铁律⓪⓪⓪：按主流 harness、最有价值）**：per-test 隔离临时目录是主流做法（Go 官方 `t.TempDir()` 的语义就是"每个测试独立目录"）；这里不能用 `t.TempDir()` 而用 `uniqueProfileLeaf` 是因为**根要留在 `os.TempDir()` 而非 `t.TempDir()` 的子目录**（`68275983e` 已定的口径，历史原因见该 commit）。**继续按这个手法把剩余 9 处补齐**，⛔ 改成 `t.TempDir()`（会改变既有口径）。
 - 撤销口令：删本 A1720 条。
+
+## A1721 — ★零 CPU 精化 `A1720`：9 处里**只有 4 处**真该改（`A1720` 那张表要按本条收窄）
+
+- 接 `A1720`。本轮现跑把 9 处逐处**按"默认档是否会跑"× "是否真创建窗口"** 两维切开，结论比上一条精确得多。
+- **第一刀：档位**（`//go:build` 逐枚现读）
+  - **默认档（会真跑）5 处**：`panel_assets_299_windows_test.go:161`、`panel_holder_319_windows_test.go:53`、`panel_host_windows_test.go:620`、`panel_host_windows_test.go:919`、`panel_unbound_253r6_windows_test.go:73`
+  - **winlive 档（默认不跑，与 314 主诉无关）4 处**：`panel_death_replay_319_winlive_test.go:75`、`panel_host_windows_live_test.go:37`、`panel_reshow_255r8_winlive_test.go:125`、`panel_transport_live_35v2_windows_test.go:186` ⇒ **⛔ 动它们**（超出 314 射程，改了也证明不了任何事）。
+- **第二刀：是否真创建窗口**（逐枚现读调用点）
+  | 位置 | 归属 | 创建窗口？ | 判定 |
+  |---|---|---|---|
+  | `panel_assets_299_windows_test.go:161` | `TestPanelPageFetchesItsOwnAssets299` | **是**（`:170 hh.bringUp(mgr, ctx)`） | **必改** |
+  | `panel_unbound_253r6_windows_test.go:73` | `startPanelFor253r6`（`:205 showAndWait(t, rp)`） | **是** | **必改** |
+  | `panel_host_windows_test.go:620` | `TestPanelHostRealWindowHopAndLifecycle` | **是**（真 `CreateWindowExW` 跳转） | **必改** |
+  | `panel_host_windows_test.go:919` | `TestAC4FocusReturnToPriorWindowGap33r5` | **是** | **必改** |
+  | `panel_holder_319_windows_test.go:53` | `panel319DataPath` | **否**——注释逐字 `Nothing here creates a window (the headless half never asks bringUp)` 且 `:46-50` 明写 `shared here on purpose: two fixtures in one run would otherwise race over one WebView2 profile if a later edit ever gave them a window` | **⛔ 不改**（这是**已论证过的故意共享**，改它反而违背原作者的防御意图） |
+- ⇒ **314 真正的修面＝4 处**（不是我上一条说的 9 处）。**4 处全部改成 `uniqueProfileLeaf(<原前缀>)`**（helper 已存在于 `cmd/wisp/panel_resident_windows_test.go`：`filepath.Join(os.TempDir(), fmt.Sprintf("%s-%d-%d", prefix, os.Getpid(), time.Now().UnixNano()))`），并各自加 `t.Cleanup(func(){ _ = os.RemoveAll(dataPath) })`。
+- ⚠ **`panel_host_windows_test.go` 两处在同一文件**：改它时注意 `:620` 与 `:919` 是**两枚不同测试**，各自独立 leaf；⛔ 让它们共用同一个 leaf（那就等于没改）。
+- **给 `314-early` 续跑的最终指令（覆盖 `A1720` 那句"9 处"）**：只改这 **4 处**；改完 `go vet ./cmd/wisp` 必须 rc=0；跑整包**必须验终点锚** `^=== RUN TestZZ315A1` ≥1 行才算跑完（四数不作数，`A1717`）；若仍早停，再查 `Test145` 那条 `panel` 包路径（不碰窗口，属另一类根因）。
+- 撤销口令：删本 A1721 条（`A1720` 的"9 处"表述由本条收窄为"4 处"，两条并存，以本条为准）。
