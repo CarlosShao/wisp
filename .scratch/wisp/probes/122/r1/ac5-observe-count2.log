@@ -1,0 +1,601 @@
+=== RUN   TestFrozenCapAccessors
+--- PASS: TestFrozenCapAccessors (0.00s)
+=== RUN   TestTimeoutIsMonotonic
+--- PASS: TestTimeoutIsMonotonic (0.10s)
+=== RUN   TestWallTimestampUTC
+--- PASS: TestWallTimestampUTC (0.00s)
+=== RUN   TestAC2TodayReadsOnlyItsOwnDay
+--- PASS: TestAC2TodayReadsOnlyItsOwnDay (0.00s)
+=== RUN   TestAC2DayRolloverMovesTheBucket
+--- PASS: TestAC2DayRolloverMovesTheBucket (0.00s)
+=== RUN   TestAC2MonthRolloverResetsTheMonthRange
+--- PASS: TestAC2MonthRolloverResetsTheMonthRange (0.00s)
+=== RUN   TestAC2ReconcileAgreesAndDisagrees
+time=2026-11-11T20:12:06.291+08:00 level=INFO msg="cost: day aggregate refreshed" day=2026-11-02 tasks=3 micros=632
+--- PASS: TestAC2ReconcileAgreesAndDisagrees (0.01s)
+=== RUN   TestAC2ReconcileRefusesWithoutBothMouths
+--- PASS: TestAC2ReconcileRefusesWithoutBothMouths (0.00s)
+=== RUN   TestPostTaskRefusesNegativesAndNamesTheDay
+--- PASS: TestPostTaskRefusesNegativesAndNamesTheDay (0.00s)
+=== RUN   TestAC3BudgetBoundaries79And80And100
+--- PASS: TestAC3BudgetBoundaries79And80And100 (0.00s)
+=== RUN   TestAC3OverBudgetWarnModeNeverBlocksAndNamesItself
+--- PASS: TestAC3OverBudgetWarnModeNeverBlocksAndNamesItself (0.00s)
+=== RUN   TestAC3BindingCapIsTheTighterOneAndBothAreListed
+--- PASS: TestAC3BindingCapIsTheTighterOneAndBothAreListed (0.00s)
+=== RUN   TestAC3UnsetBudgetsAreUncappedNotBlocking
+--- PASS: TestAC3UnsetBudgetsAreUncappedNotBlocking (0.00s)
+=== RUN   TestBudgetFromRejectsBadConfig
+--- PASS: TestBudgetFromRejectsBadConfig (0.00s)
+=== RUN   TestBasisPointsSaturateInsteadOfWrapping
+--- PASS: TestBasisPointsSaturateInsteadOfWrapping (0.00s)
+=== RUN   TestDayBoundsUseTheInjectedCalendar
+--- PASS: TestDayBoundsUseTheInjectedCalendar (0.00s)
+=== RUN   TestMeterRefusesWithoutReader
+--- PASS: TestMeterRefusesWithoutReader (0.00s)
+=== RUN   TestDayKeyIsTheShapeMemoryValidates
+--- PASS: TestDayKeyIsTheShapeMemoryValidates (0.00s)
+=== RUN   TestPostModelTaskBooksOneBatchUnderTheMeterDay
+--- PASS: TestPostModelTaskBooksOneBatchUnderTheMeterDay (0.00s)
+=== RUN   TestPostModelTaskRefusesBadShapes
+--- PASS: TestPostModelTaskRefusesBadShapes (0.00s)
+=== RUN   TestMonthFirst
+--- PASS: TestMonthFirst (0.00s)
+=== RUN   TestQuotaLedgerSeedFromBucketsDayMonthPlan
+--- PASS: TestQuotaLedgerSeedFromBucketsDayMonthPlan (0.00s)
+=== RUN   TestQuotaLedgerSeedRolloverIsModelCorrect
+--- PASS: TestQuotaLedgerSeedRolloverIsModelCorrect (0.00s)
+=== RUN   TestDiagnosticsBundleCollectsAndRedacts
+--- PASS: TestDiagnosticsBundleCollectsAndRedacts (0.11s)
+=== RUN   TestDiagnosticsBundleFailClosedOnSurvivingKey
+--- PASS: TestDiagnosticsBundleFailClosedOnSurvivingKey (0.01s)
+=== RUN   TestDiagnosticsBundleRecordsMissingPieces
+--- PASS: TestDiagnosticsBundleRecordsMissingPieces (0.05s)
+=== RUN   TestEarlyLogBufferReplaysInCaptureOrderThenStops
+--- PASS: TestEarlyLogBufferReplaysInCaptureOrderThenStops (0.00s)
+=== RUN   TestEarlyLogBufferOverflowIsABookedFact
+--- PASS: TestEarlyLogBufferOverflowIsABookedFact (0.00s)
+=== RUN   TestEarlyLogBufferByteCapAlsoStopsAppending
+--- PASS: TestEarlyLogBufferByteCapAlsoStopsAppending (0.00s)
+=== RUN   TestEarlyLogBufferCarriesTheWithChain
+--- PASS: TestEarlyLogBufferCarriesTheWithChain (0.00s)
+=== RUN   TestEarlyTeeNeverStopsMirroring
+--- PASS: TestEarlyTeeNeverStopsMirroring (0.00s)
+=== RUN   TestEarlyTeeLevelGateIsTheConsoles
+--- PASS: TestEarlyTeeLevelGateIsTheConsoles (0.00s)
+=== RUN   TestInstalledEarlyTeeMirrorsToAConcreteHandler
+--- PASS: TestInstalledEarlyTeeMirrorsToAConcreteHandler (0.00s)
+=== RUN   TestInstallAsDefaultTakesOverTheBootRecord130R1
+--- PASS: TestInstallAsDefaultTakesOverTheBootRecord130R1 (0.11s)
+=== RUN   TestHandoverBelongsToTheFirstListener130R1
+--- PASS: TestHandoverBelongsToTheFirstListener130R1 (0.03s)
+=== RUN   TestInstallThenFlushDeliversOnce130R1
+--- PASS: TestInstallThenFlushDeliversOnce130R1 (0.02s)
+=== RUN   TestHandoverKeepsTheRedaction130R1
+--- PASS: TestHandoverKeepsTheRedaction130R1 (0.02s)
+=== RUN   TestAllClassesHasExactly17
+--- PASS: TestAllClassesHasExactly17 (0.00s)
+=== RUN   TestClassMappingAndRetry
+--- PASS: TestClassMappingAndRetry (0.00s)
+=== RUN   TestMappedStatesAreValidBallStates
+--- PASS: TestMappedStatesAreValidBallStates (0.00s)
+=== RUN   TestErrorTypeAndClassOf
+--- PASS: TestErrorTypeAndClassOf (0.00s)
+=== RUN   TestValidateErrorClass
+--- PASS: TestValidateErrorClass (0.00s)
+=== RUN   TestMessageKeys
+--- PASS: TestMessageKeys (0.00s)
+=== RUN   TestNoopTaskReturnsToBaseline
+--- PASS: TestNoopTaskReturnsToBaseline (0.01s)
+=== RUN   TestPanicInWorkerSurvivesAndCancelsRoot
+--- PASS: TestPanicInWorkerSurvivesAndCancelsRoot (0.00s)
+=== RUN   TestUnknownNameIsLeakSymptom
+time=2026-11-11T20:12:06.666+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mystery-worker owner=test
+--- PASS: TestUnknownNameIsLeakSymptom (0.00s)
+=== RUN   TestRootWaitTimeout
+--- PASS: TestRootWaitTimeout (0.07s)
+=== RUN   TestClassifyGoroutine
+--- PASS: TestClassifyGoroutine (0.00s)
+=== RUN   TestAC2DiskGuardTripsAtThresholdAndRecovers
+time=2026-11-11T20:12:06.744+08:00 level=WARN msg="disk-full guard: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2DiskGuardTripsAtThresholdAndRecovers2448639706\\001\\data has 208666624 bytes free, below the 209715200 byte threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+--- PASS: TestAC2DiskGuardTripsAtThresholdAndRecovers (0.01s)
+=== RUN   TestAC2DiskGuardCachesOnlyWhileHealthy
+time=2026-11-11T20:12:06.751+08:00 level=WARN msg="disk-full guard: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2DiskGuardCachesOnlyWhileHealthy228918412\\001\\data has 1 bytes free, below the 209715200 byte threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+--- PASS: TestAC2DiskGuardCachesOnlyWhileHealthy (0.01s)
+=== RUN   TestAC2DiskGuardProbeFailureFailsClosed
+--- PASS: TestAC2DiskGuardProbeFailureFailsClosed (0.00s)
+=== RUN   TestGatedLogsHoldTheLastLineAndReplayItAfterRecovery
+time=2026-11-11T20:12:06.758+08:00 level=WARN msg="disk-full guard: C:\\Users\\swq\\AppData\\Local\\Temp\\TestGatedLogsHoldTheLastLineAndReplayItAfterRecovery1291584180\\001\\data has 10485760 bytes free, below the 209715200 byte threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+time=2026-11-11T20:12:06.780+08:00 level=WARN msg="disk-full guard: C:\\Users\\swq\\AppData\\Local\\Temp\\TestGatedLogsHoldTheLastLineAndReplayItAfterRecovery1291584180\\001\\data has 10485760 bytes free, below the 209715200 byte threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+--- PASS: TestGatedLogsHoldTheLastLineAndReplayItAfterRecovery (0.03s)
+=== RUN   TestGatedLogsPutBytesBackWhenTheVolumeRefusesThem
+--- PASS: TestGatedLogsPutBytesBackWhenTheVolumeRefusesThem (0.00s)
+=== RUN   TestAC3WalStaysBoundedUnderSustainedWrites
+time=2026-11-11T20:12:06.822+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=4608 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.825+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=5120 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.826+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=5632 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.828+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=6144 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.831+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=6656 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.834+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=7168 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.836+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=7680 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+time=2026-11-11T20:12:06.840+08:00 level=WARN msg="observe: WAL over its bound under sustained writes" path=C:\Users\swq\AppData\Local\Temp\TestAC3WalStaysBoundedUnderSustainedWrites4127899860\001\wisp.db-wal size_bytes=8192 bound_bytes=4096 action=wal_checkpoint(TRUNCATE)
+--- PASS: TestAC3WalStaysBoundedUnderSustainedWrites (0.06s)
+=== RUN   TestAC5ArtifactsQuotaEvictsOldestFirst
+time=2026-11-11T20:12:06.860+08:00 level=WARN msg="observe: artifacts quota eviction" file=a-old-1.bin bytes=100 quota_bytes=120 total_before_bytes=300 mod_utc=2026-05-28T20:26:40Z
+time=2026-11-11T20:12:06.861+08:00 level=WARN msg="observe: artifacts quota eviction" file=b-old-2.bin bytes=100 quota_bytes=120 total_before_bytes=300 mod_utc=2026-05-28T21:26:40Z
+--- PASS: TestAC5ArtifactsQuotaEvictsOldestFirst (0.02s)
+=== RUN   TestAC1BundleContentsAreExactlyAsPreviewed
+time=2026-11-11T20:12:06.885+08:00 level=WARN msg="disk-full guard: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC1BundleContentsAreExactlyAsPreviewed1006850627\\002\\data has 208666624 bytes free, below the 209715200 byte threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+--- PASS: TestAC1BundleContentsAreExactlyAsPreviewed (0.09s)
+=== RUN   TestRedactSecretAttrKeepsLast4Only
+--- PASS: TestRedactSecretAttrKeepsLast4Only (0.00s)
+=== RUN   TestRedactInlineKeyShapes
+--- PASS: TestRedactInlineKeyShapes (0.00s)
+=== RUN   TestRedactAudioBufferNeverLogged
+--- PASS: TestRedactAudioBufferNeverLogged (0.00s)
+=== RUN   TestRedactFetchBodyNeverLogged
+--- PASS: TestRedactFetchBodyNeverLogged (0.00s)
+=== RUN   TestRedactLongArgTruncated
+--- PASS: TestRedactLongArgTruncated (0.00s)
+=== RUN   TestRedactPathsOptIn
+--- PASS: TestRedactPathsOptIn (0.00s)
+=== RUN   TestRedactBakedInAttrsRedacted
+--- PASS: TestRedactBakedInAttrsRedacted (0.00s)
+=== RUN   TestRollingWriterSizeRoll
+--- PASS: TestRollingWriterSizeRoll (0.02s)
+=== RUN   TestRollingWriterDayRoll
+--- PASS: TestRollingWriterDayRoll (0.02s)
+=== RUN   TestRollingWriterRetentionSweep
+--- PASS: TestRollingWriterRetentionSweep (0.01s)
+=== RUN   TestLogPipelineEndToEnd
+--- PASS: TestLogPipelineEndToEnd (0.02s)
+=== RUN   TestLogPipelineConcurrentWrites
+--- PASS: TestLogPipelineConcurrentWrites (0.02s)
+=== RUN   TestLogDirIsSealedAtCreation132r1
+    logprivate_132_windows_test.go:71: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestLogDirIsSealedAtCreation132r13912396508\001\logs
+        C:\Users\swq\AppData\Local\Temp\TestLogDirIsSealedAtCreation132r13912396508\001\logs NT AUTHORITY\SYSTEM:(F)
+                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+                                                                                             BUILTIN\Administrators:(F)
+                                                                                             BUILTIN\Administrators:(OI)(CI)(IO)(F)
+                                                                                             DESKTOP-LVS7839\swq:(F)
+                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(IO)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:71: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestLogDirIsSealedAtCreation132r13912396508\001\logs: private, explicit ACEs for [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+--- PASS: TestLogDirIsSealedAtCreation132r1 (0.11s)
+=== RUN   TestLogFileIsSealedBeforeTheFirstContentByte132r1
+    logprivate_132_windows_test.go:73: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r1367120448\001\wisp-20261111-001.jsonl
+        C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r1367120448\001\wisp-20261111-001.jsonl NT AUTHORITY\SYSTEM:(F)
+                                                                                                                               BUILTIN\Administrators:(F)
+                                                                                                                               DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:73: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r1367120448\001\wisp-20261111-001.jsonl: private, explicit ACEs for [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    logprivate_132_windows_test.go:73: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r1367120448\001\wisp-20261111-001.jsonl
+        C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r1367120448\001\wisp-20261111-001.jsonl NT AUTHORITY\SYSTEM:(F)
+                                                                                                                               BUILTIN\Administrators:(F)
+                                                                                                                               DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:73: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r1367120448\001\wisp-20261111-001.jsonl: private, explicit ACEs for [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+--- PASS: TestLogFileIsSealedBeforeTheFirstContentByte132r1 (0.09s)
+=== RUN   TestExistingWideLogTreeIsRepaired132r1
+    logprivate_132_test.go:98: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r11490078708\001
+        C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r11490078708\001 NT AUTHORITY\Authenticated Users:(OI)(CI)(M)
+                                                                                             NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                             BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                             DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:71: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r11490078708\001
+        C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r11490078708\001 NT AUTHORITY\SYSTEM:(F)
+                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+                                                                                             BUILTIN\Administrators:(F)
+                                                                                             BUILTIN\Administrators:(OI)(CI)(IO)(F)
+                                                                                             DESKTOP-LVS7839\swq:(F)
+                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(IO)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:71: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r11490078708\001: private, explicit ACEs for [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+--- PASS: TestExistingWideLogTreeIsRepaired132r1 (0.15s)
+=== RUN   TestSealFailureRefusesTheWrite132r1
+--- PASS: TestSealFailureRefusesTheWrite132r1 (0.01s)
+=== RUN   TestUnsealableLogDirIsRefusedLoudly132r1
+    logprivate_132_windows_test.go:186: ticket132 refusal: config: observe: create private log dir: winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestUnsealableLogDirIsRefusedLoudly132r14114745477\002\logs-through-a-junction\logs: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestUnsealableLogDirIsRefusedLoudly132r14114745477\002\logs-through-a-junction\logs traverses a reparse point at C:\Users\swq\AppData\Local\Temp\TestUnsealableLogDirIsRefusedLoudly132r14114745477\002\logs-through-a-junction, which is not the tree this call names
+--- PASS: TestUnsealableLogDirIsRefusedLoudly132r1 (0.09s)
+=== RUN   TestNoBareGoFuncInProductionCode
+--- PASS: TestNoBareGoFuncInProductionCode (0.46s)
+=== RUN   TestInTreeCPURowRecordedNeverGated
+--- PASS: TestInTreeCPURowRecordedNeverGated (0.00s)
+=== RUN   TestOutOfTreeCPURowStillGatesAtSameLimit
+--- PASS: TestOutOfTreeCPURowStillGatesAtSameLimit (0.06s)
+=== RUN   TestInTreeDemotionTouchesOnlyTheCPURow
+--- PASS: TestInTreeDemotionTouchesOnlyTheCPURow (0.00s)
+=== RUN   TestAC1PriceMicrosMatchesHandComputedFixture
+--- PASS: TestAC1PriceMicrosMatchesHandComputedFixture (0.00s)
+=== RUN   TestAC1PriceMicrosIsIntegerAndSaturates
+--- PASS: TestAC1PriceMicrosIsIntegerAndSaturates (0.00s)
+=== RUN   TestAC4UnknownCardPricesNothing
+--- PASS: TestAC4UnknownCardPricesNothing (0.00s)
+=== RUN   TestAC4TableLookupMissesSayUnknownAndCostNoMoney
+--- PASS: TestAC4TableLookupMissesSayUnknownAndCostNoMoney (0.00s)
+=== RUN   TestPricingRejectsFabricatedAndMalformedRows
+--- PASS: TestPricingRejectsFabricatedAndMalformedRows (0.00s)
+=== RUN   TestAC6EmbeddedTableIsValidAndVersioned
+--- PASS: TestAC6EmbeddedTableIsValidAndVersioned (0.00s)
+=== RUN   TestOverrideValidationMatchesTableValidation
+--- PASS: TestOverrideValidationMatchesTableValidation (0.00s)
+=== RUN   TestFakeTreeEmptyScriptFailsClosedAndNotPanics
+--- PASS: TestFakeTreeEmptyScriptFailsClosedAndNotPanics (0.00s)
+=== RUN   TestFakeTreeScriptedReadsStillRepeatLastReading
+--- PASS: TestFakeTreeScriptedReadsStillRepeatLastReading (0.00s)
+=== RUN   TestBareFakeTreeNormalSamplingCaseGoesRedThroughErrorChannel
+--- PASS: TestBareFakeTreeNormalSamplingCaseGoesRedThroughErrorChannel (0.00s)
+=== RUN   TestCheckSettleSingleTrustworthyReadReportsItsLoss
+--- PASS: TestCheckSettleSingleTrustworthyReadReportsItsLoss (0.10s)
+=== RUN   TestCheckSettleHalfTheReadsFailedReportsItsLoss
+--- PASS: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.10s)
+=== RUN   TestCheckSettleZeroFootprintDropsAreCountedToo
+--- PASS: TestCheckSettleZeroFootprintDropsAreCountedToo (0.10s)
+=== RUN   TestCheckSettleFullyMeasuredWindowReportsNoLoss
+--- PASS: TestCheckSettleFullyMeasuredWindowReportsNoLoss (0.10s)
+=== RUN   TestSettleCoverageRowExistsAndPassesWhenFullyMeasured
+--- PASS: TestSettleCoverageRowExistsAndPassesWhenFullyMeasured (0.20s)
+=== RUN   TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed
+--- PASS: TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed (0.20s)
+=== RUN   TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured
+--- PASS: TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured (0.40s)
+=== RUN   TestFoldSettlePassOnlyGateRowsVeto
+--- PASS: TestFoldSettlePassOnlyGateRowsVeto (0.00s)
+=== RUN   TestSettleReportPassNeverContradictsItsGateRows
+--- PASS: TestSettleReportPassNeverContradictsItsGateRows (0.80s)
+=== RUN   TestStateReportVerdictBuilderStaysSinglePurpose
+--- PASS: TestStateReportVerdictBuilderStaysSinglePurpose (0.00s)
+=== RUN   TestCheckSettleZeroTrustworthySamplesFailsClosed
+--- PASS: TestCheckSettleZeroTrustworthySamplesFailsClosed (0.10s)
+=== RUN   TestCheckSettleTrustworthyReadsAreRecorded
+--- PASS: TestCheckSettleTrustworthyReadsAreRecorded (0.10s)
+=== RUN   TestSLOStateNamesPinnedToMachineStates
+--- PASS: TestSLOStateNamesPinnedToMachineStates (0.00s)
+=== RUN   TestSampleStateAllMetricsAndVerdicts
+--- PASS: TestSampleStateAllMetricsAndVerdicts (0.12s)
+=== RUN   TestSampleStateSleepingDiskWriteGateFails
+--- PASS: TestSampleStateSleepingDiskWriteGateFails (0.06s)
+=== RUN   TestSampleStateSleepingTCPGateFails
+--- PASS: TestSampleStateSleepingTCPGateFails (0.04s)
+=== RUN   TestSampleStateHandleGateUsesRulingLimit
+--- PASS: TestSampleStateHandleGateUsesRulingLimit (0.04s)
+=== RUN   TestSampleStateWorkPeakMemoryIsTargetNotGate
+--- PASS: TestSampleStateWorkPeakMemoryIsTargetNotGate (0.04s)
+=== RUN   TestSampleStateLeakFixtureFlipsRed
+--- PASS: TestSampleStateLeakFixtureFlipsRed (0.04s)
+=== RUN   TestSampleStateCPUTotalDrivenMean
+--- PASS: TestSampleStateCPUTotalDrivenMean (0.10s)
+=== RUN   TestSampleStateUnknownStateAndReaderError
+--- PASS: TestSampleStateUnknownStateAndReaderError (0.00s)
+=== RUN   TestMarkTransitionTimestamps
+--- PASS: TestMarkTransitionTimestamps (0.00s)
+=== RUN   TestCheckSettleVerifiesReleaseCounter
+--- PASS: TestCheckSettleVerifiesReleaseCounter (0.20s)
+=== RUN   TestCheckSettleNeverReachesCap
+--- PASS: TestCheckSettleNeverReachesCap (0.08s)
+=== RUN   TestSamplerGoroutineAccountingFollowsRegistry
+--- PASS: TestSamplerGoroutineAccountingFollowsRegistry (0.03s)
+=== RUN   TestLiveRegistryBaselineWithinSleepingGate
+--- PASS: TestLiveRegistryBaselineWithinSleepingGate (0.00s)
+=== RUN   TestThresholdTableCoversAllStates
+--- PASS: TestThresholdTableCoversAllStates (0.00s)
+=== RUN   TestSampleStateZeroSampleWindowFailsClosed
+--- PASS: TestSampleStateZeroSampleWindowFailsClosed (0.05s)
+=== RUN   TestSampleStateTrustworthyWindowNotMarkedUnmeasurable
+--- PASS: TestSampleStateTrustworthyWindowNotMarkedUnmeasurable (0.06s)
+=== RUN   TestSampleStateMeasuredRowsFoldToPass
+--- PASS: TestSampleStateMeasuredRowsFoldToPass (0.06s)
+=== RUN   TestSampleStateZeroSampleRowsFoldToFailClosed
+--- PASS: TestSampleStateZeroSampleRowsFoldToFailClosed (0.00s)
+=== RUN   TestSealEntryPointsHaveProductionCallers132r1
+    sealcalls_132_test.go:92: ticket132 door: 10 sealing references outside internal/winsec, from 476 production files:
+          internal/agent -> winsec.PrivateDirAll (call)
+          internal/config -> winsec.SealFile (call)
+          internal/memory -> winsec.PrivateDirAll (call)
+          internal/memory -> winsec.PrivateDirAll (call)
+          internal/memory -> winsec.PrivateDirAll (call)
+          internal/observe -> winsec.PrivateDirAll (call)
+          internal/observe -> winsec.SealFile (call through alias sealLogFile)
+          internal/observe -> winsec.SealFile (value (nothing calls it))
+          internal/secret -> winsec.PrivateDirAll (call)
+          internal/secret -> winsec.SealFile (call)
+--- PASS: TestSealEntryPointsHaveProductionCallers132r1 (0.79s)
+=== RUN   TestFrozenCapAccessors
+--- PASS: TestFrozenCapAccessors (0.00s)
+=== RUN   TestTimeoutIsMonotonic
+--- PASS: TestTimeoutIsMonotonic (0.09s)
+=== RUN   TestWallTimestampUTC
+--- PASS: TestWallTimestampUTC (0.00s)
+=== RUN   TestAC2TodayReadsOnlyItsOwnDay
+--- PASS: TestAC2TodayReadsOnlyItsOwnDay (0.00s)
+=== RUN   TestAC2DayRolloverMovesTheBucket
+--- PASS: TestAC2DayRolloverMovesTheBucket (0.00s)
+=== RUN   TestAC2MonthRolloverResetsTheMonthRange
+--- PASS: TestAC2MonthRolloverResetsTheMonthRange (0.00s)
+=== RUN   TestAC2ReconcileAgreesAndDisagrees
+--- PASS: TestAC2ReconcileAgreesAndDisagrees (0.00s)
+=== RUN   TestAC2ReconcileRefusesWithoutBothMouths
+--- PASS: TestAC2ReconcileRefusesWithoutBothMouths (0.00s)
+=== RUN   TestPostTaskRefusesNegativesAndNamesTheDay
+--- PASS: TestPostTaskRefusesNegativesAndNamesTheDay (0.00s)
+=== RUN   TestAC3BudgetBoundaries79And80And100
+--- PASS: TestAC3BudgetBoundaries79And80And100 (0.00s)
+=== RUN   TestAC3OverBudgetWarnModeNeverBlocksAndNamesItself
+--- PASS: TestAC3OverBudgetWarnModeNeverBlocksAndNamesItself (0.00s)
+=== RUN   TestAC3BindingCapIsTheTighterOneAndBothAreListed
+--- PASS: TestAC3BindingCapIsTheTighterOneAndBothAreListed (0.00s)
+=== RUN   TestAC3UnsetBudgetsAreUncappedNotBlocking
+--- PASS: TestAC3UnsetBudgetsAreUncappedNotBlocking (0.00s)
+=== RUN   TestBudgetFromRejectsBadConfig
+--- PASS: TestBudgetFromRejectsBadConfig (0.00s)
+=== RUN   TestBasisPointsSaturateInsteadOfWrapping
+--- PASS: TestBasisPointsSaturateInsteadOfWrapping (0.00s)
+=== RUN   TestDayBoundsUseTheInjectedCalendar
+--- PASS: TestDayBoundsUseTheInjectedCalendar (0.00s)
+=== RUN   TestMeterRefusesWithoutReader
+--- PASS: TestMeterRefusesWithoutReader (0.00s)
+=== RUN   TestDayKeyIsTheShapeMemoryValidates
+--- PASS: TestDayKeyIsTheShapeMemoryValidates (0.00s)
+=== RUN   TestPostModelTaskBooksOneBatchUnderTheMeterDay
+--- PASS: TestPostModelTaskBooksOneBatchUnderTheMeterDay (0.00s)
+=== RUN   TestPostModelTaskRefusesBadShapes
+--- PASS: TestPostModelTaskRefusesBadShapes (0.00s)
+=== RUN   TestMonthFirst
+--- PASS: TestMonthFirst (0.00s)
+=== RUN   TestQuotaLedgerSeedFromBucketsDayMonthPlan
+--- PASS: TestQuotaLedgerSeedFromBucketsDayMonthPlan (0.00s)
+=== RUN   TestQuotaLedgerSeedRolloverIsModelCorrect
+--- PASS: TestQuotaLedgerSeedRolloverIsModelCorrect (0.00s)
+=== RUN   TestDiagnosticsBundleCollectsAndRedacts
+--- PASS: TestDiagnosticsBundleCollectsAndRedacts (0.02s)
+=== RUN   TestDiagnosticsBundleFailClosedOnSurvivingKey
+--- PASS: TestDiagnosticsBundleFailClosedOnSurvivingKey (0.01s)
+=== RUN   TestDiagnosticsBundleRecordsMissingPieces
+--- PASS: TestDiagnosticsBundleRecordsMissingPieces (0.01s)
+=== RUN   TestEarlyLogBufferReplaysInCaptureOrderThenStops
+--- PASS: TestEarlyLogBufferReplaysInCaptureOrderThenStops (0.00s)
+=== RUN   TestEarlyLogBufferOverflowIsABookedFact
+--- PASS: TestEarlyLogBufferOverflowIsABookedFact (0.00s)
+=== RUN   TestEarlyLogBufferByteCapAlsoStopsAppending
+--- PASS: TestEarlyLogBufferByteCapAlsoStopsAppending (0.00s)
+=== RUN   TestEarlyLogBufferCarriesTheWithChain
+--- PASS: TestEarlyLogBufferCarriesTheWithChain (0.00s)
+=== RUN   TestEarlyTeeNeverStopsMirroring
+--- PASS: TestEarlyTeeNeverStopsMirroring (0.00s)
+=== RUN   TestEarlyTeeLevelGateIsTheConsoles
+--- PASS: TestEarlyTeeLevelGateIsTheConsoles (0.00s)
+=== RUN   TestInstalledEarlyTeeMirrorsToAConcreteHandler
+--- PASS: TestInstalledEarlyTeeMirrorsToAConcreteHandler (0.00s)
+=== RUN   TestInstallAsDefaultTakesOverTheBootRecord130R1
+--- PASS: TestInstallAsDefaultTakesOverTheBootRecord130R1 (0.02s)
+=== RUN   TestHandoverBelongsToTheFirstListener130R1
+--- PASS: TestHandoverBelongsToTheFirstListener130R1 (0.03s)
+=== RUN   TestInstallThenFlushDeliversOnce130R1
+--- PASS: TestInstallThenFlushDeliversOnce130R1 (0.02s)
+=== RUN   TestHandoverKeepsTheRedaction130R1
+--- PASS: TestHandoverKeepsTheRedaction130R1 (0.05s)
+=== RUN   TestAllClassesHasExactly17
+--- PASS: TestAllClassesHasExactly17 (0.00s)
+=== RUN   TestClassMappingAndRetry
+--- PASS: TestClassMappingAndRetry (0.00s)
+=== RUN   TestMappedStatesAreValidBallStates
+--- PASS: TestMappedStatesAreValidBallStates (0.00s)
+=== RUN   TestErrorTypeAndClassOf
+--- PASS: TestErrorTypeAndClassOf (0.00s)
+=== RUN   TestValidateErrorClass
+--- PASS: TestValidateErrorClass (0.00s)
+=== RUN   TestMessageKeys
+--- PASS: TestMessageKeys (0.00s)
+=== RUN   TestNoopTaskReturnsToBaseline
+--- PASS: TestNoopTaskReturnsToBaseline (0.01s)
+=== RUN   TestPanicInWorkerSurvivesAndCancelsRoot
+--- PASS: TestPanicInWorkerSurvivesAndCancelsRoot (0.00s)
+=== RUN   TestUnknownNameIsLeakSymptom
+--- PASS: TestUnknownNameIsLeakSymptom (0.00s)
+=== RUN   TestRootWaitTimeout
+--- PASS: TestRootWaitTimeout (0.06s)
+=== RUN   TestClassifyGoroutine
+--- PASS: TestClassifyGoroutine (0.00s)
+=== RUN   TestAC2DiskGuardTripsAtThresholdAndRecovers
+--- PASS: TestAC2DiskGuardTripsAtThresholdAndRecovers (0.00s)
+=== RUN   TestAC2DiskGuardCachesOnlyWhileHealthy
+--- PASS: TestAC2DiskGuardCachesOnlyWhileHealthy (0.00s)
+=== RUN   TestAC2DiskGuardProbeFailureFailsClosed
+--- PASS: TestAC2DiskGuardProbeFailureFailsClosed (0.00s)
+=== RUN   TestGatedLogsHoldTheLastLineAndReplayItAfterRecovery
+--- PASS: TestGatedLogsHoldTheLastLineAndReplayItAfterRecovery (0.00s)
+=== RUN   TestGatedLogsPutBytesBackWhenTheVolumeRefusesThem
+--- PASS: TestGatedLogsPutBytesBackWhenTheVolumeRefusesThem (0.00s)
+=== RUN   TestAC3WalStaysBoundedUnderSustainedWrites
+--- PASS: TestAC3WalStaysBoundedUnderSustainedWrites (0.03s)
+=== RUN   TestAC5ArtifactsQuotaEvictsOldestFirst
+--- PASS: TestAC5ArtifactsQuotaEvictsOldestFirst (0.01s)
+=== RUN   TestAC1BundleContentsAreExactlyAsPreviewed
+--- PASS: TestAC1BundleContentsAreExactlyAsPreviewed (0.05s)
+=== RUN   TestRedactSecretAttrKeepsLast4Only
+--- PASS: TestRedactSecretAttrKeepsLast4Only (0.00s)
+=== RUN   TestRedactInlineKeyShapes
+--- PASS: TestRedactInlineKeyShapes (0.00s)
+=== RUN   TestRedactAudioBufferNeverLogged
+--- PASS: TestRedactAudioBufferNeverLogged (0.00s)
+=== RUN   TestRedactFetchBodyNeverLogged
+--- PASS: TestRedactFetchBodyNeverLogged (0.00s)
+=== RUN   TestRedactLongArgTruncated
+--- PASS: TestRedactLongArgTruncated (0.00s)
+=== RUN   TestRedactPathsOptIn
+--- PASS: TestRedactPathsOptIn (0.00s)
+=== RUN   TestRedactBakedInAttrsRedacted
+--- PASS: TestRedactBakedInAttrsRedacted (0.00s)
+=== RUN   TestRollingWriterSizeRoll
+--- PASS: TestRollingWriterSizeRoll (0.02s)
+=== RUN   TestRollingWriterDayRoll
+--- PASS: TestRollingWriterDayRoll (0.01s)
+=== RUN   TestRollingWriterRetentionSweep
+--- PASS: TestRollingWriterRetentionSweep (0.01s)
+=== RUN   TestLogPipelineEndToEnd
+--- PASS: TestLogPipelineEndToEnd (0.01s)
+=== RUN   TestLogPipelineConcurrentWrites
+--- PASS: TestLogPipelineConcurrentWrites (0.01s)
+=== RUN   TestLogDirIsSealedAtCreation132r1
+    logprivate_132_windows_test.go:71: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestLogDirIsSealedAtCreation132r14025204885\001\logs
+        C:\Users\swq\AppData\Local\Temp\TestLogDirIsSealedAtCreation132r14025204885\001\logs NT AUTHORITY\SYSTEM:(F)
+                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+                                                                                             BUILTIN\Administrators:(F)
+                                                                                             BUILTIN\Administrators:(OI)(CI)(IO)(F)
+                                                                                             DESKTOP-LVS7839\swq:(F)
+                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(IO)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:71: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestLogDirIsSealedAtCreation132r14025204885\001\logs: private, explicit ACEs for [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+--- PASS: TestLogDirIsSealedAtCreation132r1 (0.05s)
+=== RUN   TestLogFileIsSealedBeforeTheFirstContentByte132r1
+    logprivate_132_windows_test.go:73: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r12600569946\001\wisp-20261111-001.jsonl
+        C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r12600569946\001\wisp-20261111-001.jsonl NT AUTHORITY\SYSTEM:(F)
+                                                                                                                                BUILTIN\Administrators:(F)
+                                                                                                                                DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:73: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r12600569946\001\wisp-20261111-001.jsonl: private, explicit ACEs for [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    logprivate_132_windows_test.go:73: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r12600569946\001\wisp-20261111-001.jsonl
+        C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r12600569946\001\wisp-20261111-001.jsonl NT AUTHORITY\SYSTEM:(F)
+                                                                                                                                BUILTIN\Administrators:(F)
+                                                                                                                                DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:73: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestLogFileIsSealedBeforeTheFirstContentByte132r12600569946\001\wisp-20261111-001.jsonl: private, explicit ACEs for [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+--- PASS: TestLogFileIsSealedBeforeTheFirstContentByte132r1 (0.06s)
+=== RUN   TestExistingWideLogTreeIsRepaired132r1
+    logprivate_132_test.go:98: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r13712014525\001
+        C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r13712014525\001 NT AUTHORITY\Authenticated Users:(OI)(CI)(M)
+                                                                                             NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                             BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                             DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:71: ticket132 reading: icacls C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r13712014525\001
+        C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r13712014525\001 NT AUTHORITY\SYSTEM:(F)
+                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+                                                                                             BUILTIN\Administrators:(F)
+                                                                                             BUILTIN\Administrators:(OI)(CI)(IO)(F)
+                                                                                             DESKTOP-LVS7839\swq:(F)
+                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(IO)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    logprivate_132_windows_test.go:71: ticket 132: sealed: C:\Users\swq\AppData\Local\Temp\TestExistingWideLogTreeIsRepaired132r13712014525\001: private, explicit ACEs for [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+--- PASS: TestExistingWideLogTreeIsRepaired132r1 (0.09s)
+=== RUN   TestSealFailureRefusesTheWrite132r1
+--- PASS: TestSealFailureRefusesTheWrite132r1 (0.00s)
+=== RUN   TestUnsealableLogDirIsRefusedLoudly132r1
+    logprivate_132_windows_test.go:186: ticket132 refusal: config: observe: create private log dir: winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestUnsealableLogDirIsRefusedLoudly132r180212567\002\logs-through-a-junction\logs: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestUnsealableLogDirIsRefusedLoudly132r180212567\002\logs-through-a-junction\logs traverses a reparse point at C:\Users\swq\AppData\Local\Temp\TestUnsealableLogDirIsRefusedLoudly132r180212567\002\logs-through-a-junction, which is not the tree this call names
+--- PASS: TestUnsealableLogDirIsRefusedLoudly132r1 (0.05s)
+=== RUN   TestNoBareGoFuncInProductionCode
+--- PASS: TestNoBareGoFuncInProductionCode (0.30s)
+=== RUN   TestInTreeCPURowRecordedNeverGated
+--- PASS: TestInTreeCPURowRecordedNeverGated (0.00s)
+=== RUN   TestOutOfTreeCPURowStillGatesAtSameLimit
+--- PASS: TestOutOfTreeCPURowStillGatesAtSameLimit (0.06s)
+=== RUN   TestInTreeDemotionTouchesOnlyTheCPURow
+--- PASS: TestInTreeDemotionTouchesOnlyTheCPURow (0.00s)
+=== RUN   TestAC1PriceMicrosMatchesHandComputedFixture
+--- PASS: TestAC1PriceMicrosMatchesHandComputedFixture (0.00s)
+=== RUN   TestAC1PriceMicrosIsIntegerAndSaturates
+--- PASS: TestAC1PriceMicrosIsIntegerAndSaturates (0.00s)
+=== RUN   TestAC4UnknownCardPricesNothing
+--- PASS: TestAC4UnknownCardPricesNothing (0.00s)
+=== RUN   TestAC4TableLookupMissesSayUnknownAndCostNoMoney
+--- PASS: TestAC4TableLookupMissesSayUnknownAndCostNoMoney (0.00s)
+=== RUN   TestPricingRejectsFabricatedAndMalformedRows
+--- PASS: TestPricingRejectsFabricatedAndMalformedRows (0.00s)
+=== RUN   TestAC6EmbeddedTableIsValidAndVersioned
+--- PASS: TestAC6EmbeddedTableIsValidAndVersioned (0.00s)
+=== RUN   TestOverrideValidationMatchesTableValidation
+--- PASS: TestOverrideValidationMatchesTableValidation (0.00s)
+=== RUN   TestFakeTreeEmptyScriptFailsClosedAndNotPanics
+--- PASS: TestFakeTreeEmptyScriptFailsClosedAndNotPanics (0.00s)
+=== RUN   TestFakeTreeScriptedReadsStillRepeatLastReading
+--- PASS: TestFakeTreeScriptedReadsStillRepeatLastReading (0.00s)
+=== RUN   TestBareFakeTreeNormalSamplingCaseGoesRedThroughErrorChannel
+--- PASS: TestBareFakeTreeNormalSamplingCaseGoesRedThroughErrorChannel (0.00s)
+=== RUN   TestCheckSettleSingleTrustworthyReadReportsItsLoss
+--- PASS: TestCheckSettleSingleTrustworthyReadReportsItsLoss (0.11s)
+=== RUN   TestCheckSettleHalfTheReadsFailedReportsItsLoss
+--- PASS: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.10s)
+=== RUN   TestCheckSettleZeroFootprintDropsAreCountedToo
+--- PASS: TestCheckSettleZeroFootprintDropsAreCountedToo (0.10s)
+=== RUN   TestCheckSettleFullyMeasuredWindowReportsNoLoss
+--- PASS: TestCheckSettleFullyMeasuredWindowReportsNoLoss (0.10s)
+=== RUN   TestSettleCoverageRowExistsAndPassesWhenFullyMeasured
+--- PASS: TestSettleCoverageRowExistsAndPassesWhenFullyMeasured (0.20s)
+=== RUN   TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed
+--- PASS: TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed (0.20s)
+=== RUN   TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured
+--- PASS: TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured (0.40s)
+=== RUN   TestFoldSettlePassOnlyGateRowsVeto
+--- PASS: TestFoldSettlePassOnlyGateRowsVeto (0.00s)
+=== RUN   TestSettleReportPassNeverContradictsItsGateRows
+--- PASS: TestSettleReportPassNeverContradictsItsGateRows (0.80s)
+=== RUN   TestStateReportVerdictBuilderStaysSinglePurpose
+--- PASS: TestStateReportVerdictBuilderStaysSinglePurpose (0.00s)
+=== RUN   TestCheckSettleZeroTrustworthySamplesFailsClosed
+--- PASS: TestCheckSettleZeroTrustworthySamplesFailsClosed (0.10s)
+=== RUN   TestCheckSettleTrustworthyReadsAreRecorded
+--- PASS: TestCheckSettleTrustworthyReadsAreRecorded (0.10s)
+=== RUN   TestSLOStateNamesPinnedToMachineStates
+--- PASS: TestSLOStateNamesPinnedToMachineStates (0.00s)
+=== RUN   TestSampleStateAllMetricsAndVerdicts
+--- PASS: TestSampleStateAllMetricsAndVerdicts (0.12s)
+=== RUN   TestSampleStateSleepingDiskWriteGateFails
+--- PASS: TestSampleStateSleepingDiskWriteGateFails (0.06s)
+=== RUN   TestSampleStateSleepingTCPGateFails
+--- PASS: TestSampleStateSleepingTCPGateFails (0.04s)
+=== RUN   TestSampleStateHandleGateUsesRulingLimit
+--- PASS: TestSampleStateHandleGateUsesRulingLimit (0.04s)
+=== RUN   TestSampleStateWorkPeakMemoryIsTargetNotGate
+--- PASS: TestSampleStateWorkPeakMemoryIsTargetNotGate (0.04s)
+=== RUN   TestSampleStateLeakFixtureFlipsRed
+--- PASS: TestSampleStateLeakFixtureFlipsRed (0.04s)
+=== RUN   TestSampleStateCPUTotalDrivenMean
+--- PASS: TestSampleStateCPUTotalDrivenMean (0.10s)
+=== RUN   TestSampleStateUnknownStateAndReaderError
+--- PASS: TestSampleStateUnknownStateAndReaderError (0.00s)
+=== RUN   TestMarkTransitionTimestamps
+--- PASS: TestMarkTransitionTimestamps (0.00s)
+=== RUN   TestCheckSettleVerifiesReleaseCounter
+--- PASS: TestCheckSettleVerifiesReleaseCounter (0.20s)
+=== RUN   TestCheckSettleNeverReachesCap
+--- PASS: TestCheckSettleNeverReachesCap (0.09s)
+=== RUN   TestSamplerGoroutineAccountingFollowsRegistry
+--- PASS: TestSamplerGoroutineAccountingFollowsRegistry (0.03s)
+=== RUN   TestLiveRegistryBaselineWithinSleepingGate
+--- PASS: TestLiveRegistryBaselineWithinSleepingGate (0.00s)
+=== RUN   TestThresholdTableCoversAllStates
+--- PASS: TestThresholdTableCoversAllStates (0.00s)
+=== RUN   TestSampleStateZeroSampleWindowFailsClosed
+--- PASS: TestSampleStateZeroSampleWindowFailsClosed (0.05s)
+=== RUN   TestSampleStateTrustworthyWindowNotMarkedUnmeasurable
+--- PASS: TestSampleStateTrustworthyWindowNotMarkedUnmeasurable (0.06s)
+=== RUN   TestSampleStateMeasuredRowsFoldToPass
+--- PASS: TestSampleStateMeasuredRowsFoldToPass (0.06s)
+=== RUN   TestSampleStateZeroSampleRowsFoldToFailClosed
+--- PASS: TestSampleStateZeroSampleRowsFoldToFailClosed (0.00s)
+=== RUN   TestSealEntryPointsHaveProductionCallers132r1
+    sealcalls_132_test.go:92: ticket132 door: 10 sealing references outside internal/winsec, from 476 production files:
+          internal/agent -> winsec.PrivateDirAll (call)
+          internal/config -> winsec.SealFile (call)
+          internal/memory -> winsec.PrivateDirAll (call)
+          internal/memory -> winsec.PrivateDirAll (call)
+          internal/memory -> winsec.PrivateDirAll (call)
+          internal/observe -> winsec.PrivateDirAll (call)
+          internal/observe -> winsec.SealFile (call through alias sealLogFile)
+          internal/observe -> winsec.SealFile (value (nothing calls it))
+          internal/secret -> winsec.PrivateDirAll (call)
+          internal/secret -> winsec.SealFile (call)
+--- PASS: TestSealEntryPointsHaveProductionCallers132r1 (1.13s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/observe	11.280s
