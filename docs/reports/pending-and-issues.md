@@ -34409,3 +34409,31 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   ⇒ **判据在两种已知结局上都给出了正确答案**，可以放心用作 `314-profile` 的完成判据。
 - **给派单的精确化（已写进 `314-profile-dispatch.txt` 的判据 ③）**：锚点应断言 **≥1 命中**（保守），更严可断言 **=3 命中**；但 ⚠ 若将来 `zz315a1probe_test.go` 增删用例，`=3` 会腐烂 ⇒ **派单用 `≥1`**，并在证据件里报实际命中数。
 - 撤销口令：删本 A1726 条。
+
+## A1727 — ★★★零 CPU 重大发现：`68275983e` 自己引入了新死因（`t.Cleanup(os.RemoveAll)` 与浏览器收尾抢锁）
+
+- 停车令下零派腿、零 go test。本轮只读两份真日志 ＋ 源码，**推翻了我此前"根因只是固定名共享"的判断**。
+- **实证对比（同一枚测试，两发不同结局）**：
+  | 日志 | `TestPanelThreadIsSTAAndExitsCleanly` | 备注 |
+  |---|---|---|
+  | `full.log`（跑完，锚点 3/3） | **`--- PASS … (0.93s)`** | 该发**工作目录错**但窗口族正常 |
+  | `full2.log`（早停，锚点 0/3） | **`=== RUN` 后无 verdict**，最后一行 `:1063 panel thread up and down: hwnd 0x4ea1590, exits observed, shows=1` | 函数体**全部走完**（含最后 `t.Logf`）后消失 |
+  ⇒ **不是测试逻辑死，是测试收尾期进程消失。**
+- **窗口创建计数**：`full2.log` 里 `panel window is up` **4 次**（cold 1077/1179/1025.9/1130.2 ms）后死亡；`full.log` 里 **7 次**且跑完 ⇒ **不是"创建次数超限"**，是收尾竞态。
+- **★根因（源码 + 注释双向坐实）**：
+  - `68275983e`（11-11 19:22，就是那枚"修 314"的 commit）**在去共享的同时自己加了 `t.Cleanup(func(){ _ = os.RemoveAll(dataPath) })`**（`git show 68275983e` 三处均见 `+ t.Cleanup(...RemoveAll...)`，`:72`/`:581`/`:658` 形状）。
+  - 而 `cmd/wisp/panel_host_windows_test.go:615-619` **逐字警告过这个动作**：
+    > `The WebView2 user-data folder is created here and deliberately NOT deleted (repo rule: throwaways are only ever created). t.TempDir's auto-RemoveAll races the browser's own profile-DB teardown and fails on a locked file - that is the teardown, not a product assertion.`
+  - **★且清理顺序是错的（LIFO 实测）**：`startPanelForTest`（`:69-78`）先注册 `t.Cleanup(os.RemoveAll)`（`:72`），后注册 `t.Cleanup(rp.stop)`（`:76`）⇒ `t.Cleanup` **后进先出** ⇒ **`rp.stop` 先跑、`os.RemoveAll` 紧接着跑**，此时 WebView2 浏览器子进程**可能仍在退出中**，profile 目录里的 DB 仍被锁 ⇒ 删除撞锁。**这正是 `:615-619` 说的那种竞态。**
+  ⇒ **`68275983e` 只治了"共享"，却用 `RemoveAll` 引入了"抢锁"这一类新死因**，恰好解释为什么修完仍早停、且死点漂移（哪枚测试的收尾撞上锁，取决于浏览器退出时序）。
+- **★这修正了我 `A1722` 的指令（重要）**：我上一条写"`panel_unbound_253r6` / `panel_assets_299` 可加 `t.Cleanup(os.RemoveAll)`" —— **这个建议现在应当撤回**。正确做法是：
+  1. **把 `68275983e` 已加的三处 `t.Cleanup(os.RemoveAll)` 全部去掉**（`:72`/`:581`/`:658`），**只保留 leaf 唯一化**——唯一化解决了共享，`RemoveAll` 则是新祸根；
+  2. 新增的 4 处**同样只做 leaf 唯一化、⛔ 加 RemoveAll**；
+  3. 若担心临时目录堆积：按 `panel_host` 注释的既定口径——**"throwaways are only ever created"**（本仓规则：临时件只建不删，`issues/README` 规则 8）⇒ **不删才是符合本仓规矩的做法**，删除反而是越界。
+  ⇒ **本仓规则与 `:615-619` 的警告本来就一致：不删。`68275983e` 加 RemoveAll 同时违反了这条规则。**
+- **给 `314-profile` 派单的最终修订（覆盖此前所有版本）**：
+  - ① 删掉 `panel_resident_windows_test.go:72`/`:581`/`:658` 三处 `t.Cleanup(...RemoveAll...)`；
+  - ② 把 `panel_host_windows_test.go:620`/`:919`、`panel_unbound_253r6:73`、`panel_assets_299:161` 四处改为 `uniqueProfileLeaf(...)`（各用不同前缀），**⛔ 加 RemoveAll**；
+  - ③ 删 `panel_unbound_253r6` 与 `panel_assets_299` 的 `"os"`/`"path/filepath"` import（改后未使用，见上一轮）；
+  - ④ 验证：`go vet` rc=0；整包**终点锚 3/3**（不是 ≥1——已知应有 3 枚）；定点两发 rc=0。
+- 撤销口令：删本 A1727 条。**本条推翻 `A1722` 里"可加 RemoveAll"那句。**
