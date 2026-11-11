@@ -34342,3 +34342,23 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **修法定式（给续跑腿）**：把这 4 处（实际是 3 个独立 leaf：`33r1-panel-profile` 那对**各改各的**、`253r6`、`299r1`）换成 `uniqueProfileLeaf("<原前缀>")`；`panel_host_windows_test.go` 那两处**必须分别调用**（⛔ 两处共用一个变量/一个名字，否则等于没改）。`uniqueProfileLeaf` 定义在 `cmd/wisp/panel_resident_windows_test.go`（`fmt.Sprintf("%s-%d-%d", prefix, os.Getpid(), time.Now().UnixNano())`）。
 - **验证判据（三条，缺一不算）**：① `go vet ./cmd/wisp` rc=0；② 跑整包**必须验终点锚** `^=== RUN TestZZ315A1` ≥1 行（四数不作数，`A1717`）；③ 定点跑 `-run 'TestPanelHostRealWindowHopAndLifecycle|TestAC4FocusReturnToPriorWindowGap33r5' -count=1` 与 `-count=2` 都 rc=0。
 - 撤销口令：删本 A1722 条（`A1720`→`A1721`→本条逐次收窄，**以本条为准**）。
+
+## A1723 — 停车期预写 `314-profile` 派单存档（恢复即发，⛔ 现跑）
+
+- 机主停车令仍生效，本轮**零派腿、零 go test**。只做一件零 CPU 的事：把恢复后要发的派单**预先写好并核对行号**，避免恢复时再花时间思考。
+- 存档：**`.scratch/wisp/probes/orch/20261111/txt/314-profile-dispatch.txt`**（按铁律"派单先存档再发"）。
+- **行号已现跑核对，4/4 全部 MATCH**（不是凭记忆）：
+  | 文件:行 | 现读内容 |
+  |---|---|
+  | `cmd/wisp/panel_host_windows_test.go:620` | `dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")` |
+  | `cmd/wisp/panel_host_windows_test.go:919` | `dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")` |
+  | `cmd/wisp/panel_unbound_253r6_windows_test.go:73` | `dataPath := filepath.Join(os.TempDir(), "wisp-253r6-panel-profile")` |
+  | `cmd/wisp/panel_assets_299_windows_test.go:161` | `dataPath := filepath.Join(os.TempDir(), "wisp-299r1-panel-profile")` |
+  - `uniqueProfileLeaf` 定义仍在 `cmd/wisp/panel_resident_windows_test.go`（现跑 1 命中）。
+- 存档内含（恢复时腿照做即可，⛔ 需我重新推演）：
+  1. **精确改点表**（4 处，含"⛔ 加 RemoveAll"的两处陷阱、以及 #1/#2 **必须用不同前缀**否则等于没改）；
+  2. **⛔ 不碰清单**：`panel_holder_319:53`（故意共享，逐字理由已引）＋ 4 处 winlive 档站点；
+  3. **三条验证判据**：`go vet` rc=0；定点两发（`-count=1`/`-count=2` 撞车对）rc=0；**整包 + 终点锚** `^=== RUN   TestZZ315A1` ≥1（**四数不作数**，`A1717` 教训逐字写进存档）；
+  4. **必须先 `Set-Location` 到仓库根再跑**（否则重演 `A1719` 那 104 个假红）。
+- **恢复口令**：机主说「继续」⇒ 我直接把该存档内容作为 prompt 发 `workflow`（`provider:"magpie", model:"auto/glm-5.3-flash"`，`run_in_background:true`），⛔ 再改动。
+- 撤销口令：删本 A1723 条与那份存档文件。

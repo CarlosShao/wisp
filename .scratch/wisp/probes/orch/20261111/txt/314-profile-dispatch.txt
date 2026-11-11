@@ -1,0 +1,84 @@
+# 314-profile 写腿派单（停车期预写，恢复即发）
+
+- 腿码：**314-profile**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`（high 档）
+- 写面：**`cmd/wisp/**`（本波只此一条腿动它）**
+- 状态：**已写好，等机主说「继续」即发**
+
+---
+
+## 一句话任务
+
+票 314 的整包早停**换宿主且漂移**，根因是**多个会创建窗口的测试共用同一个固定名 WebView2 user-data-folder**。把剩下 **4 处**改成每测试独立 leaf，然后**用终点锚**证明整包跑完。
+
+## 精确改点（逐处，⛔ 不许自己扩大范围）
+
+`uniqueProfileLeaf` 已存在于 `cmd/wisp/panel_resident_windows_test.go`：
+```go
+func uniqueProfileLeaf(prefix string) string {
+	return filepath.Join(os.TempDir(), fmt.Sprintf("%s-%d-%d", prefix, os.Getpid(), time.Now().UnixNano()))
+}
+```
+
+| # | 文件:行 | 现在 | 改成 | ⚠ 注意 |
+|---|---|---|---|---|
+| 1 | `cmd/wisp/panel_host_windows_test.go:620` | `filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")` | `uniqueProfileLeaf("wisp-33r1-panel-profile-hop")` | **⛔ 加 `os.RemoveAll`**（`:615-619` 明令：该文件夹故意永不删除，删会与浏览器 profile-DB 收尾抢锁造出假红） |
+| 2 | `cmd/wisp/panel_host_windows_test.go:919` | `filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")` | `uniqueProfileLeaf("wisp-33r1-panel-profile-focus")` | **⛔ 加 `os.RemoveAll`**；**必须与 #1 用不同的前缀**（否则等于没改——这两枚共用同名才是撞车点） |
+| 3 | `cmd/wisp/panel_unbound_253r6_windows_test.go:73` | `filepath.Join(os.TempDir(), "wisp-253r6-panel-profile")` | `uniqueProfileLeaf("wisp-253r6-panel-profile")` | 可加 `t.Cleanup(func(){ _ = os.RemoveAll(dataPath) })`（该文件无"故意不删"注释） |
+| 4 | `cmd/wisp/panel_assets_299_windows_test.go:161` | `filepath.Join(os.TempDir(), "wisp-299r1-panel-profile")` | `uniqueProfileLeaf("wisp-299r1-panel-profile")` | 同上可加 cleanup |
+
+**⛔ 绝对不改**：`cmd/wisp/panel_holder_319_windows_test.go:53`（`panel319DataPath`）。理由逐字见该文件 `:46-50`：`Nothing here creates a window (the headless half never asks bringUp)` ＋ `shared here on purpose`。
+
+**⛔ 绝对不碰**（winlive 档，默认不跑，超出 314 射程）：
+- `panel_death_replay_319_winlive_test.go:75`
+- `panel_host_windows_live_test.go:37`
+- `panel_reshow_255r8_winlive_test.go:125`
+- `panel_transport_live_35v2_windows_test.go:186`
+
+## 验证判据（三条，缺一不算完成）
+
+### ① 编译门
+```
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\build;D:\work\workspace\projects plans\Wisp;' + $env:PATH
+go vet ./cmd/wisp        # 必须 rc=0
+```
+⚠ DLL 不入 PATH 会 rc=0xC0000135（DLL_NOT_FOUND），那是环境问题不是死法。
+
+### ② 定点两发（撞车对）
+```
+go test ./cmd/wisp -count=1 -run '^(TestPanelHostRealWindowHopAndLifecycle|TestAC4FocusReturnToPriorWindowGap33r5)$' -v
+go test ./cmd/wisp -count=2 -run '^(TestPanelHostRealWindowHopAndLifecycle|TestAC4FocusReturnToPriorWindowGap33r5)$' -v
+```
+两发都必须 rc=0。
+
+### ③ ★整包 + 终点锚（**这一条是核心，四数不作数**）
+```
+Set-Location 'D:\work\workspace\projects plans\Wisp'   # ⚠ 必须先 cd 到仓库根
+go test ./cmd/wisp -count=1 -timeout 1800s -v *> D:\tmp\wisp\20261111\314profile\full.log
+```
+然后**必须**检查：
+```
+$c = Get-Content D:\tmp\wisp\20261111\314profile\full.log
+($c | Select-String '^=== RUN').Count                                   # RUN 数
+@($c | Select-String '^=== RUN   TestZZ315A1').Count                    # ★终点锚，必须 ≥1
+@($c | Select-String 'panic:|signal|killed|exit status').Count          # 必须 0
+```
+- **终点锚 0 命中 ⇒ 整包仍早停，判失败**，如实报（⛔ 拿四数说"跑完了"）。
+- 历史教训（`A1717`）：早停与跑完**可以给出同一组四数**（RUN=418/PASS=325/FAIL=3/SKIP=1），因为没跑的那 192 枚本就不产生 `=== RUN`。
+
+## 交付
+
+1. 证据件 `docs/evidence/s1/314-profile-isolation.md`：
+   - 改了哪 4 处（逐处 file:line + 改前改后）
+   - 三条判据的读数（vet rc / 定点两发 rc / 整包 RUN+终点锚+panic 计数）
+   - **一句结论**：早停是否消失；若未消失，死在哪一枚
+2. 日志落 `D:\tmp\wisp\20261111\314profile\`（只建不删）
+3. 只 commit 自己的改动（**显式 pathspec**），⛔ push
+4. 回一行：`DONE: 314-profile <vet rc> <定点两发 rc> <整包 RUN 数/终点锚命中数/panic数> <早停消失与否>`
+
+## 铁律
+- ⛔ `git add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；add/commit 两处**显式 pathspec**
+- ⛔ 删文件；⛔ 改任何判据/断言；⛔ 动 `thresholds.go`/`golden`/`PLAN.md`/`docs/specs/**`/`frontend/**`/`design/**`
+- ⛔ 改 `scripts/portable-tests.sh` 或 `ci.yml`（门禁形状，需机主单独授权）
+- ⛔ 扩大写面到上述 4 处之外
+- `cmd/wisp` 重包**同一时刻只跑一个**（本波只有你一条腿，你独占）
