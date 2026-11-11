@@ -33937,3 +33937,9 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 - **ball.size 现状**：前端 100% 通；**只差 Go 台账两行**（`composer_test.go`：删 `PanelSnapshot:{"ballSize"}` ＋ 加 `BallSizeSection→BallSizeSection`）才能 `go test ./internal/panel` 绿并推。internal/panel 仍被 wave124-A 占用 ⇒ 待其完成派 Go 腿补并推。
 - **派 wave126**（第三条写腿，前端）：修 `render-config-screen.tsx:66` 的过期切片（`live.indexOf("能改")` 全局首个被球径行抢，改锚定 style 行自身），并认到球径行也活了；D29 钉子保留。
 - 在飞：wave124-A（面板后端 ball 透明度/穿透/panel 宽/字号）＋ wave124-B（297 CI 名册）＋ wave126（仪器）。未推 3（压着，等台账修复一并推）。
+## A1693（2026-11-11 11:1x，编排者）**wave126 仪器修好（`a27ce6039`）｜派 wave127 只读「面板接线真相矩阵」回应机主｜wave124-A 偏慢观察**
+
+- **wave126** `a27ce6039`（`render-config-screen.tsx` +63/−7）：切片锚点改锚 style 行自身（不再全局首个"能改"）＋新增 ball.size 活类 4 枚检查＋D29 钉子收紧到完整句。仪器 **exit 0 全绿（16 枚 check）**，typecheck/lint/build rc0。
+- **派 wave127（只读普查腿 G）**：产出「面板接线真相矩阵」——全设置面板（config-screen/voice-settings/model-settings/settings-controls/settings-page）每控件判 A 真通/B 只读桩/C **静默假（UI 能改但 Go 零读）**/D 半通，汇总四档数＋C 类逐个点名。**直接回应机主"一堆没接线"**。报告落 `.scratch/wisp/probes/orch/20261110/panel-wiring-matrix.md`。
+- **wave124-A 偏慢**：盘上暂只见 pre-existing 未跟踪测试件（panel_resident_323*），无 124-A 可见改动 ⇒ 可能仍在读/踩复杂点。持续观察，若下轮仍无产出则介入拆小或换法。
+- 在飞：wave124-A（面板后端）＋wave124-B（297 CI）＋wave127（只读矩阵）。未推 6（继续压，等 internal/panel 腾出补 Go 台账后一并推）。
