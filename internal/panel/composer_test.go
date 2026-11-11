@@ -164,16 +164,24 @@ func composerTSNameMap() map[string]string {
 		"ModelOption":            "ModelOptionView",
 		"BallStyleSection":       "BallStyleSection",
 		"BallSizeSection":        "BallSizeSection",
-		"TreeView":               "FilesSection",
-		"TreeEntry":              "TreeEntryView",
-		"RunSection":             "RunSection",
-		"ToolRunRow":             "ToolRunRowView",
-		"RunErrorRow":            "RunErrorRowView",
-		"RunStuckRow":            "RunStuckRowView",
-		"PluginInventorySection": "PluginsSection",
-		"PluginRow":              "PluginRowView",
-		"GitView":                "GitView",
-		"GitWorktree":            "GitWorktree",
+		// The appearance wave's four carriers (ball_idle_appearance_wave.go /
+		// panel_tuning_wave.go): the page half landed with the frontend leg's
+		// 4017962b3, so the identity translations below are live contract, not
+		// registrations.
+		"BallOpacityIdleSection":  "BallOpacityIdleSection",
+		"BallClickThroughSection": "BallClickThroughSection",
+		"PanelWidthSection":       "PanelWidthSection",
+		"PanelFontSizeSection":    "PanelFontSizeSection",
+		"TreeView":                "FilesSection",
+		"TreeEntry":               "TreeEntryView",
+		"RunSection":              "RunSection",
+		"ToolRunRow":              "ToolRunRowView",
+		"RunErrorRow":             "RunErrorRowView",
+		"RunStuckRow":             "RunStuckRowView",
+		"PluginInventorySection":  "PluginsSection",
+		"PluginRow":               "PluginRowView",
+		"GitView":                 "GitView",
+		"GitWorktree":             "GitWorktree",
 	}
 }
 
@@ -208,16 +216,16 @@ func composerTSGapLedger() map[string][]string {
 		// two-way comparison judges that key from here on and
 		// composerTSNameMap carries the BallSizeSection translation.
 		//
-		// The appearance wave's TOP-LEVEL additions: ballOpacityIdle,
-		// ballClickThrough, panelWidth and panelFontSize are live on the Go
-		// wire (the wave's carriers, ball_idle_appearance_wave.go /
-		// panel_tuning_wave.go) and PanelSnapshot does not declare them yet -
-		// the page half belongs to the external UI agent (frontend/** is
-		// outside every Go leg's write face, Q-51), the same judgement the
-		// ballSize entry used to carry. Registered, never silenced: the
-		// moment panel.ts declares any of them the stale-red fires and the
-		// ordinary two-way comparison takes over for that key.
-		"PanelSnapshot":      {"ballOpacityIdle", "ballClickThrough", "panelWidth", "panelFontSize"},
+		// The appearance wave's TOP-LEVEL entry is GONE too: the external UI
+		// agent's frontend leg (4017962b3) declared PanelSnapshot's
+		// ballOpacityIdle / ballClickThrough / panelWidth / panelFontSize (and
+		// the BallOpacityIdleSection / BallClickThroughSection /
+		// PanelWidthSection / PanelFontSizeSection interfaces), the same
+		// stale-red the ledger's both-ways rule promised for the wave's
+		// carriers (ball_idle_appearance_wave.go / panel_tuning_wave.go). The
+		// gaps closed, so the ordinary two-way comparison judges those four
+		// keys from here on and composerTSNameMap carries the four section
+		// translations.
 		"ModelOptionView":    {"display"},
 		"ModelSwitchSection": {"adapter", "adapterThinkingLevels"},
 		"ToolRunRowView":     {"argsJson", "level"},
