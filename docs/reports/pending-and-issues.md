@@ -34190,3 +34190,20 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   3. **122-r2**（glm high，写）：真删 U1000 判删候选 3 条＋补提交上一腿的支撑文件。
 - 写面互斥：302-v1 只写 evidence；314-ac0 只动 `cmd/wisp`＋自己探针；122-r2 只动 `internal/agent/tools/**`＋证据 ⇒ 无重叠。
 - 撤销口令：删本 A1713 条；`git revert fc08ecb84`（302）／`06a67b40f`（122）／`48d3c3ffb`（314 裁决）。
+
+## A1714 — 收第二波：122-r2 真交（删 3 条、两 GOOS 各降 3）、314-ac0 半成品（我补完 AC#0）、302-v1 又空交
+
+- **122-r2（glm high，写）真交，三把尺全过**：两笔 commit `f64d9752d`（补 r1 遗留 4 证据件：`ac1-windows.txt`／`u1000-windows.csv`／`u1000-linux.csv`／`u1000-union.txt`）＋`1bb73e6d5`（真删 3 条）。
+  - 删的是 `internal/tools/shell_exec.go` 的 `waitOutcome.out`／`.errs` ＋ `internal/tools/shell_session_test.go` 的 `fakeSessionShell.closeErr`（+4 行对齐）。**我现读 `shell_exec.go` 确认 `waitOutcome` 现在只剩 `state`／`err` 两字段**；`git show --stat` ＝ −8/+5。
+  - **两 GOOS 同版快照对照：windows 103→100、linux 57→54，差集恰好＝3 条目标行**（⛔ 多删）。U1000 并集 147→144。
+  - **三把尺**：①提交真在 ②件真在（`docs/evidence/s1/122-r2-u1000-deletions.md` 7,769B）③**我自己复跑**：`go build ./internal/tools/` rc=0、`go vet ./internal/tools/` rc=0、`go test -count=1 ./internal/tools/` **rc=0（37.58s）**。
+  - 判据一字未放宽（无 `//lint:ignore`、无 checker 开关、lint 步未挪）。**如实登记派单笔误**：路径实为 `internal/tools/`（非我写的 `internal/agent/tools/`）。
+- **314-ac0（glm high，写）交半成品**：证据件 `docs/evidence/s1/314-ac0-native-exit-codes.md` 里发 1/发 2 读数**全写"待补"**，`full-direct.log` 只 29KB 且进程已消失、退出码文件未生成。
+  - ⇒ **我补完**（三把尺③）：直跑二进制取**真进程退出码**——
+    - **默认档 3 枚**（`TestAC13BringUpSurvivesAReusedThreadQuit`／`TestAC13BringUpRefusesAThreadWithAQueuedClose`／`TestPanelThreadIsSTAAndExitsCleanly`）：**退出码 `0x00000000`**，3/3 PASS。
+    - **winlive 档 5 枚**（含 AC14 两枚）：**退出码 `0x00000000`**，**5/5 PASS**。
+    - **判定＝(ii) `os.Exit(0)`**：⛔ native 异常码（零 `0xC…`）、⛔ timeout panic（零 `panic:`／零 `test timed out`）。
+  - ★**顺带查出一个 314 复跑口径变化（重要）**：302-r1 把 AC14 两枚搬进 `//go:build windows && winlive` 后，**默认档 `go test ./cmd/wisp` 不再包含它们**。我第一发无 tag 直跑只跑到 3 枚即证。⇒ **此后 314 死亡点复跑必须带 `-tags winlive`**，⛔ 拿"5 枚全 PASS"说默认档。
+- **302-v1（`magpie-max` + review 组，max 档）第二次空交**：返回空串、零提交。**max 档也救不了 review 组当执行器的空交**——它只能当评审器。⇒ 302 的 AC#1..4 裁决**改由我自己做**（下一轮）。
+- **推送故障**：GitHub `TLS connect error: error:0A000126:SSL routines::unexpected eof while reading`，连续 4 次失败（含 `http.version=HTTP/1.1` 重试）。**本地 7 笔提交安全在盘**，`unpushed=7`。恢复后自动推。
+- 撤销口令：删本 A1714 条；`git revert f64d9752d 1bb73e6d5`（122-r2）／删 `314-ac0-native-exit-codes.md` 的补完段（314 AC#0）。
