@@ -160,7 +160,7 @@ list_subagent_models({provider:"magpie"})
 
 ## 9. 当前状态（2026-11-11 18:0x 现跑；新会话开工前必须自己再跑一遍）
 
-- **HEAD** `13e8bc9ae`（A1704）；**未推 0**。
+- **HEAD**：以 `git log --oneline -1` 现跑为准（交接时最后业务提交 `13e8bc9ae`／A1704；其后仅文档刷新提交）；**未推 0**。
 - **工单池**：总 **410** / done **326** / **未结 84**。
 - **tracked 脏**：仅 2 件 —— `.scratch/wisp/probes/291/mic/resident_audio_291_probe_windows_test.go`（他腿的）＋ `frontend/fixtures/composer-states.html`（render churn）。**⛔ 别碰**。
 - **untracked**：约 1600 项（多为 `.scratch` 历史 + 临时件）。⛔ 别清。
@@ -386,7 +386,7 @@ list_subagent_models({provider:"magpie"})
 - 写腿优先，别只搞只读子代理。
 
 【当前状态（交接时快照，动手前必须自己重跑）】
-HEAD 13e8bc9ae；未推 0；工单总 410 / done 326 / 未结 84；台账最新 A1704；在飞 0；goal 已暂停（前一任 rev57）。
+HEAD 以现跑为准（交接时最后业务提交 13e8bc9ae）；未推 0；工单总 410 / done 326 / 未结 84；台账最新 A1704；在飞 0；goal 已暂停（前一任 rev57）。
 第一优先：①音频麦克风 4 张 247/290/291/297 真机仪器读数（cmd/wisp 空闲时跑 WISP_LIVE_MIC=1 go test ... -run TestAC247LiveMicrophoneLevelsReachTheBallSeam，每波只一枚 cmd/wisp）②163 裁决+追认 N/Q ③388 可关 ④423 两笔 ⑤未结 84 票逐格读铺满写腿≥3 ⑥D 盘清理（报告 .scratch/wisp/probes/orch/20261111/cleanup-inventory.md，可回收≈48.7GB，删前机主点头）。
 
 【开工】读完文档+跑完地面真相+验完路由后，立即建 goal、派第一批 ≥3 写腿，然后持续常驻干活，别等我。
