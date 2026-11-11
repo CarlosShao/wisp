@@ -72,3 +72,30 @@
 
 - 删本件 + `git revert 68275983e` ⇒ 回到修前状态（整包重新可能死）。
 - 撤销 `magpie-max` provider：用 `D:\tmp\wisp\20261111\cordis.patch.yml.20261111-preMagpieMax` 覆盖 `C:\Users\swq\.dsh\profiles\desktop\cordis.patch.yml`。
+
+---
+
+## ★★★ 重大更正（2026-11-11 21:3x，编排者自纠）：上文"跑到终态"是**错的**
+
+写腿 `314-ac3` 按 CI 同形复跑（`bash scripts/wisp-cli-tests.sh` 的 cli 档形态）后抓到硬读数，我逐字核了它的日志 `D:\tmp\wisp\20261111\314ac3\rerun1-cli-form.txt`（566,794B / 3,355 行）：
+
+| 项 | 读数 | 含义 |
+|---|---|---|
+| 四数 | RUN=418 / PASS=325 / FAIL=3 / SKIP=1（rc=1） | **与我此前那发逐字一致** |
+| 最后一条 `=== RUN` | `Test145ArgsJSONComesFromTheBookedForensicsRow` | **该枚无 verdict** |
+| 终点锚 `TestZZ315A1` | **0 命中** | **没跑到终点** |
+| `panic:` / `signal` / `killed` / `exit status` / `test timed out` | **0 命中** | **进程安静消失** |
+| 分母 | 618 → 418（≈192 枚没跑） | 早停 |
+
+⇒ **这发正是票 314 签名的死法**：整进程静默消失、死点无 verdict、零 panic/signal。
+
+**为什么我此前判错**：我拿 `fullpkg2.log` 的"四数 + 零 panic/signal"就断言"跑到终态"，**没有查终点锚**。四数一致具有欺骗性——早停和跑完可能给出同样的 418/325/3/1，因为**没跑的那 192 枚本来就不产生 `=== RUN`**。**我的错，记我。**
+
+**更正后的总判**：
+- 314 的**主诉今天仍然成立**（整包仍会早停/静默消失），只是**宿主从窗口区（AC13/AC14）漂到了 `Test145ArgsJSONComesFromTheBookedForensicsRow` / panel_run 族**。
+- 修笔 `68275983e`（去共享 profile）**救活了那 5 枚旧死亡点**（AC14 push 那枚 1.45s PASS，winlive 档 5/5 PASS）——这部分是真的。
+- ⇒ **314 ⛔ 可收口。** AC#4 的"处置"应改为「修了旧死亡点，但整包死亡未消除、换宿主」。
+- **判据缺口（本轮最重要的方法论收获）**：`portable-tests.sh` 的"四数"**不能证明跑完**，必须加**终点锚断言**（`^=== RUN TestZZ315A1` ≥1 行才算跑完，否则红并声明"四数不作分母"）。314-ac3 已给落点建议（首选 `scripts/portable-tests.sh` cli 分支末尾），**改门禁形状需单独授权**，我未改。
+
+## 撤销口令
+删本更正段即可（⛔ 建议：这段是唯一正确的读数）。
