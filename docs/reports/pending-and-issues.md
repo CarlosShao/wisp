@@ -34280,3 +34280,27 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - ⇒ **新死点精确到 `TestPanelThreadIsSTAAndExitsCleanly`**（不是 `Test145…`——那是 `314-ac3` 在 cli 档形态下抓到的另一处早停）。⚠ **两发死在不同地方** ⇒ 早停位置**不稳定/竞态**，不是固定一枚。
 - **给下次重派的直接指令**：`314-early` 续跑时 **①必须先 `Set-Location` 到仓库根再直跑**（否则重演 `full.log` 那类假红）；**②死点候选两枚**＝`TestPanelThreadIsSTAAndExitsCleanly`（本发）与 `Test145ArgsJSONComesFromTheBookedForensicsRow`（`314-ac3` 发）⇒ 先查这两枚的共同点（是否都碰窗口/WebView2 生命周期），而不是只盯一枚。
 - 撤销口令：删本 A1719 条。
+
+## A1720 — ★★零 CPU 读源码：两个早停死点的共同根因＝**还有 9 处固定名 WebView2 profile 没修**
+
+- 停车期间只读源码（零 `go test`、零派腿）。读了两个死点的测试体：
+  - `TestPanelThreadIsSTAAndExitsCleanly`（`cmd/wisp/panel_resident_windows_test.go:1034`）：`startPanelForTest(t)` → `showAndWait` → `rp.stop()` → 等 `rp.finished`。**该枚日志最后一行是 `:1063` 的 `t.Logf`（函数体最后一句），之后无 verdict** ⇒ **死在测试体走完之后、testing 框架收尾阶段**。
+  - `Test145ArgsJSONComesFromTheBookedForensicsRow`（`cmd/wisp/panel_run_145_test.go:217`）：`memory.Open` → `consoleSink.Publish` → `panel.NewSnapshotPump(...).Marshal()`。**不碰窗口，但碰 `panel` 包**。
+- ★**共同根因（现跑 grep 实证）**：`68275983e` 只把 `panel_resident_windows_test.go` 的 **3 处**（`:61`/`:581`/`:658`）改成 `uniqueProfileLeaf`，**其余 9 处固定名 profile 仍在**：
+  | 文件:行 | 固定名 |
+  |---|---|
+  | `panel_assets_299_windows_test.go:161` | `wisp-299r1-panel-profile` |
+  | `panel_death_replay_319_winlive_test.go:75` | `wisp-319r2-live-profile` |
+  | `panel_holder_319_windows_test.go:53` | `wisp-319r1-holder-profile` |
+  | `panel_host_windows_live_test.go:37` | `wisp-33r1-panel-profile` |
+  | `panel_host_windows_test.go:620` | `wisp-33r1-panel-profile` |
+  | `panel_host_windows_test.go:919` | `wisp-33r1-panel-profile` |
+  | `panel_reshow_255r8_winlive_test.go:125` | `wisp-255r8-panel-profile` |
+  | `panel_transport_live_35v2_windows_test.go:186` | `wisp-35v2-panel-profile` |
+  | `panel_unbound_253r6_windows_test.go:73` | `wisp-253r6-panel-profile` |
+  尺（可复跑）：`Select-String -Path 'cmd/wisp/*_test.go' -Pattern 'filepath\.Join\(os\.TempDir\(\), "wisp'`
+- **为什么这解释"死点不稳定"**：这些用例共用**同一批固定名 profile 目录**。WebView2 的 user-data-folder 是**进程级/目录级独占**资源——两枚用例若落到同一个 profile（或同一 profile 的前一次 WebView2 进程尚未完全退出），后一枚的 WebView2 初始化会失败/挂死/静默带走进程。**哪个用例撞上取决于执行顺序与残留状态 ⇒ 死点漂移**（本会话实测：一发死 `TestPanelThreadIsSTA`、一发死 `Test145`）。
+- **这也解释了为什么 `68275983e` 只治了 5 枚旧死亡点**：它修的那 3 处正是 AC13/AC14/PanelThreadIsSTA 自己用的 profile；但**其余 9 处仍会与它们抢**，所以整包仍会早停，只是换到了"下一个撞上共享 profile 的用例"。
+- **给下次重派的直接指令（`314-early` 续跑）**：①**先把这 9 处也改成 `uniqueProfileLeaf`**（同一手法、逐处显式 pathspec、⛔ 改判据）；②改完跑整包，**必须验终点锚** `^=== RUN TestZZ315A1` ≥1 行才算跑完（四数不作数，见 `A1717`）；③若仍早停，再查 `Test145` 那条 `panel` 包路径（它不碰窗口，可能是**第二类**根因）。
+- **技术选型理由（铁律⓪⓪⓪：按主流 harness、最有价值）**：per-test 隔离临时目录是主流做法（Go 官方 `t.TempDir()` 的语义就是"每个测试独立目录"）；这里不能用 `t.TempDir()` 而用 `uniqueProfileLeaf` 是因为**根要留在 `os.TempDir()` 而非 `t.TempDir()` 的子目录**（`68275983e` 已定的口径，历史原因见该 commit）。**继续按这个手法把剩余 9 处补齐**，⛔ 改成 `t.TempDir()`（会改变既有口径）。
+- 撤销口令：删本 A1720 条。
