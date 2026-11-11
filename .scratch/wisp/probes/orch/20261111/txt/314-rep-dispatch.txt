@@ -122,3 +122,60 @@ Write-Output "topRun=$($runs.Count) noVerdict=$($noV.Count) anchor=$anchor crash
 ## 回一行
 
 `DONE: 314-rep <N/5 复现早停> <退出码原值清单> <RUN数 固定/散布> <原生崩溃 或 逻辑提前返回>`
+
+---
+
+## ⚠⚠ 恢复时必读修正（2026-11-11 22:2x 现跑验尺，**原派单两处会出错**）
+
+我用 `cmd.exe /c exit 5` 与 `exit 3221225477` 实测了抓码方法，**发现原派单第 2 步有两处错**：
+
+### 错处 ①：`Start-Process` 之后 `$LASTEXITCODE` 是**空的**
+实测：
+```
+$p = Start-Process ... -Wait -PassThru
+$p.ExitCode      -> 5        ← 正确来源
+$LASTEXITCODE    -> (空)     ← ⛔ 空的！原派单让你抓这个
+```
+⇒ **必须用 `$p.ExitCode`，⛔ 用 `$LASTEXITCODE`**（`$LASTEXITCODE` 只对 `&` 直接调用有效）。
+
+### 错处 ②：`ExitCode` 对原生崩溃码返回**负的十进制**，必须先转无符号
+实测 `exit 3221225477`：
+```
+$p.ExitCode              -> -1073741819     ← 负值，直接比 0xC0000005 会看错
+'0x{0:X8}' -f $p.ExitCode -> 0xC0000005     ← 正确
+[int32]$p.ExitCode        -> -1073741819
+```
+⇒ **判读时必须 `'0x{0:X8}' -f $p.ExitCode` 再比对**；直接拿负数跟 `0xC0000005` 比在某些写法下会失配。
+⇒ 或者统一用 `[uint32]$p.ExitCode` 转无符号后比对十进制 `3221225477`。
+
+### 修正后的第 2 步（**以本节为准**）
+
+```powershell
+$exe = 'D:\tmp\wisp\20261111\314rep\wisp.test.exe'
+for($i=1; $i -le 5; $i++){
+  $out = "D:\tmp\wisp\20261111\314rep\run$i.log"
+  $err = "D:\tmp\wisp\20261111\314rep\run$i.err.log"
+  $p = Start-Process -FilePath $exe -ArgumentList '-test.v','-test.timeout=1800s' `
+        -NoNewWindow -Wait -PassThru `
+        -RedirectStandardOutput $out -RedirectStandardError $err
+  $rc   = $p.ExitCode                      # ★ 不是 $LASTEXITCODE
+  $hex  = '0x{0:X8}' -f $rc                # ★ 转无符号十六进制
+  $code = if($rc -lt 0){ [uint32]$rc } else { $rc }
+  Set-Content "D:\tmp\wisp\20261111\314rep\run$i.rc.txt" "decimal=$rc unsigned=$code hex=$hex"
+  Write-Output "run$i decimal=$rc unsigned=$code hex=$hex"
+}
+```
+
+### 判读表（用 `hex` 或 `unsigned` 比对，⛔ 用负的 `decimal`）
+
+| hex | unsigned | 含义 |
+|---|---|---|
+| `0x00000000` | 0 | 全部跑完 |
+| `0x00000001` | 1 | 有测试红（**不是早停**） |
+| `0xC0000005` | 3221225477 | **访问违例**（原生崩溃） |
+| `0xC0000409` | 3221225479 | **栈缓冲溢出** |
+| `0xC00000FD` | 3221225725 | **栈溢出** |
+| `0xC0000135` | 3221225781 | DLL 未找到 ⇒ **环境问题，该次作废、修 PATH 重跑** |
+| `0xC000013A` | 3221225786 | Ctrl+C / 被中断 ⇒ 该次作废 |
+
+**本修正为原派单的缺口，恢复时以本节为准。**
