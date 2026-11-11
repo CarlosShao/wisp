@@ -69,8 +69,12 @@ const CATEGORIES: readonly Category[] = [
   },
   {
     // Ticket 313's voice half: the two cloud chains and the realtime head.
+    // 2026-11-11 state alignment: the backend grew real readers/guards for
+    // voice.aec.enabled / audio.input_device / audio.sample_rate, so the page
+    // also carries the 本机音频 card (waiting state until the snapshot keys
+    // and the write fields land on the Go side).
     name: "语音",
-    purpose: "配置听写、朗读与实时语音使用的供应商和模型。",
+    purpose: "配置听写、朗读与实时语音使用的供应商和模型，以及本机音频的回声消除与输入设备。",
     waiting: "",
     control: "voice",
   },

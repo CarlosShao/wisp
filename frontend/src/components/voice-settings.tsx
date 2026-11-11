@@ -29,6 +29,23 @@
    restated: the SAVE is real, the EFFECT is not. C-class silent fakes were
    re-graded B (honest read-write stubs); un-restating them re-opens the lie.
 
+   STATE ALIGNMENT (2026-11-11): the backend grew three REAL readers/guards
+   this page did not show - voice.aec.enabled feeds the barge-in monitor
+   (cmd/wisp/resident_voice_windows.go:1872 -> :1882), audio.input_device
+   resolves per capture open and hotplug reopen
+   (cmd/wisp/resident_audio_windows.go:307), and audio.sample_rate is a
+   load-time guard pinned to 16000 (internal/config/validate.go; the roster
+   sentence at cmd/wisp/config_readers_255.go:233). What the backend does NOT
+   have for them is a panel channel: the config.get snapshot's voice payload
+   carries five keys only (pinned in config_313_test.go - no aecEnabled, no
+   inputDevice, no sampleRate), and the config.set whitelist has no write
+   field for any of the three (grep over internal/panel + panel_config_store.go:
+   zero hits). So the new 本机音频 card renders the WAITING state - the
+   backend fact as words plus "等快照" - never a guessed value and never a
+   control that looks switchable. When Go adds the snapshot keys and the write
+   fields, this card graduates to real controls; drawing them now would
+   re-open the C-class lie this page exists to keep shut.
+
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
@@ -61,7 +78,7 @@ function placeholderReceipt(feedback: Feedback): Feedback {
 
 export function VoiceSettings({
   heading = "语音",
-  lede = "云端听写链、云端朗读链与实时语音的供应商和模型。三张卡都是占位：写入会保存，但云端链路与实时引擎还没有接到运行路径，当前不生效。",
+  lede = "云端听写链、云端朗读链与实时语音的供应商和模型（三张卡都是占位：写入会保存，但云端链路与实时引擎还没有接到运行路径，当前不生效）；本机音频的后端读者已接真，面板先等快照。",
 }: {
   heading?: string;
   lede?: string;
@@ -149,6 +166,7 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
             run={run}
             view={view}
           />
+          <LocalAudioCard />
         </>
       )}
     </div>
@@ -275,6 +293,60 @@ function ChainEditor({
         </div>
         <p className="text-[11.5px] text-ink-3">当前：{chainText(initial)}</p>
         <FeedbackLine feedback={feedback} />
+      </div>
+    </SettingsCard>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   本机音频 (voice.aec.enabled / audio.input_device / audio.sample_rate).
+   --------------------------------------------------------------------------- */
+
+/** One row of the local-audio card: the key as the config spells it, the
+    backend fact (why it is real today), and the waiting state. */
+const LOCAL_AUDIO_ROWS: readonly { key: string; name: string; fact: string }[] = [
+  {
+    key: "voice.aec.enabled",
+    name: "回声消除",
+    fact: "后端已接：喂给打断监测的回声消除开关（重启后生效）",
+  },
+  {
+    key: "audio.input_device",
+    name: "输入设备",
+    fact: "后端已接：每次开麦与热插拔重开都按这个名字解析设备",
+  },
+  {
+    key: "audio.sample_rate",
+    name: "采样率",
+    fact: "后端守卫：采集链只跑 16000，配置里写别的值会被拒",
+  },
+];
+
+/** The three local-audio keys the backend already reads for real, but the
+    panel cannot show or change yet: the config.get snapshot's voice payload
+    carries five keys only (pinned in config_313_test.go), none of them these
+    three, and the config.set whitelist has no write field for them either.
+    So this card is the honest WAITING state - the backend fact as words plus
+    "等快照" - never a guessed value, never a control that looks switchable.
+    When Go adds the snapshot keys and the write fields, this card graduates
+    to real controls; drawing them now would re-open the C-class lie. */
+function LocalAudioCard() {
+  return (
+    <SettingsCard
+      title="本机音频"
+      description="这三项的后端读者/守卫已接（真），但配置读口的快照还没有它们的当前值，写入路由也未接。快照补上之前这里显示等待态，不画能点但改不动的控件。"
+    >
+      <div className="flex flex-col gap-1.5">
+        {LOCAL_AUDIO_ROWS.map((row) => (
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5" key={row.key}>
+            <span className="text-[12px] font-medium text-ink">{row.name}</span>
+            <span className="font-mono text-[10.5px] text-ink-3">{row.key}</span>
+            <span className="min-w-0 flex-1 basis-40 text-[11.5px] leading-[1.6] text-ink-2">
+              {row.fact}
+            </span>
+            <StateTag text="等快照" tone="neutral" />
+          </div>
+        ))}
       </div>
     </SettingsCard>
   );
