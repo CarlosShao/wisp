@@ -34014,3 +34014,14 @@ ball.opacity_idle 百分比滑杆（页 0–100%、线上 0..1）／ball.click_t
 ### 二、推送与在飞
 - **5 笔已推** `227547535..821f4a2d3`，未推 **0**（复跑 internal/panel 16.14s 绿、build rc0 后推）。
 - 派 **wave132**：P（cmd/wisp 批接 single_instance＋conversation_mode L2＋diagnostics_opt_in）＋Q（internal/config unwired 三行文案，关 163 AC#5）＋S（语音页控件状态对齐）。
+## A1699（2026-11-11 17:0x，编排者）**wave132：P 三 deferred 接（`9e595c2e0`）｜Q 163 AC#5 文案（`7bcc2ae08`）｜S 语音页对齐（`22096887b`）｜3 笔已推｜派 wave133**
+
+### 一、wave132 三腿（已推）
+- **P** `9e595c2e0`（cmd/wisp 12 件）：deferred 三枚真接——①**app.single_instance**（boot 前读 config，false 经 proc.WithLayout 清锁，fail-closed）②**voice.conversation_mode=true 首次 L2 隐私确认**（共享闸+机器面+scope 面共用，没面=拒绝）③**privacy.diagnostics_opt_in**（`wisp diagnostics` 子命令=票45 Preview/Build 首个生产调用点）。反向实红；整包与 HEAD 基线逐名作差**本腿红=0**。
+- **Q** `7bcc2ae08`（internal/config 2 件）：163 AC#5——unwired.go `shell_enabled`/`shell_allowlist` 两行删（已被 N 组合根消费）、`allow_shell_string` 保留守卫改诚实文案；反向钉「landed key 能载/仍守卫的仍拒」。**注：cmd/wisp/run.go:840-844 注释随之过期，归 R 腿修。**
+- **S** `22096887b`（frontend 2 件）：语音页对齐后端真实——aec.enabled/input_device/sample_rate 三枚后端已真读但**快照无值+写路由无**⇒加"本机音频"卡作"等快照"（不画假控件）；云链×2+实时保持诚实占位。**需 Go 补快照键 aecEnabled/inputDevice/sampleRate + 写字段 voice_aec_enabled/audio_input_device（归 R 腿）。**
+
+### 二、推送与在飞
+- **3 笔已推** `ff0e61d66..9e595c2e0`，未推 **0**（复跑 internal/config 2.34s、build rc0、cmd/wisp 定向 12.2s、frontend typecheck 后推）。
+- 派 **wave133**：R（cmd/wisp 补语音快照键+写字段+修 run.go 注释）＋V（frontend 清设置页过期文案）＋W（只读裁决 163/388/423 可关性）。
+- **机主侧**（等着）：font_size 入契约（PLAN.md:2753 已核真缺）、真机/听觉签收（297/388/247/290/291/293/220）、视觉验收 4 屏。**票池现状**：扫描多张"ready"是旧脚手架已被近期波次吃掉（180 面板宽、187 模型档位均已落），真干净可派以 cmd/wisp 独苗为主。
