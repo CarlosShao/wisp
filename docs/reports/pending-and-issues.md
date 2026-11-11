@@ -34827,3 +34827,60 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
      - **若这一发活** ⇒ 需要更多前驱，继续按 index 二分（254→330 之间只有 76 枚）；
   3. 这条**把"5 次碰运气"变成"2 发定位"**，是本轮最省 CPU 的路径。
 - 撤销口令：删本 A1743 条。
+
+## A1744 — ★★★"累积状态"的**实体物证**：固定名 WebView2 profile 已累积 **635 文件 / 220 目录 / 86MB**，另有 **39 个**唯一名 profile 未清
+
+- 停车令下零派腿、零 go test。本轮把"accumulated state"（票面原话）从抽象词变成**可数的物证**。
+- **★发现一：死点前 11 枚测试**全是"建窗口"的（ac3 index 314–324），且**全部集中在 `panel_resident_windows_test.go` 一个文件**：
+  ```
+  [314] TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe        WINDOW
+  [315] TestAC13BringUpSurvivesAReusedThreadQuit                   WINDOW
+  [316] TestAC13BringUpRefusesAThreadWithAQueuedClose              WINDOW
+  [317] TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever WINDOW
+  [318] TestAC14AwaitedBindingReplyReachesThePage                  WINDOW
+  [319] TestAC14GoSideEvalPushReachesThePage                       WINDOW
+  [320] TestPanelThreadIsSTAAndExitsCleanly                        WINDOW
+  [321] TestPanelThreadNameIsNotInResidentRoster                   WINDOW
+  [322] TestBallPanelGesturesReachThePanelThread                   WINDOW
+  [323] TestBallGestureWithoutPanelHostStillRecords                WINDOW
+  [324] TestAC4PriorFocusSurvivesARefusedPanelSample               WINDOW
+  [325-329] Test145* 五枚                                          （不建窗）
+  ```
+  ⇒ **死点紧跟在"连续 11 枚建窗测试"之后**。这不是巧合。
+- **★发现二：这些建窗测试用**固定名** WebView2 user-data 夹，且**永不删除**（现跑逐处）**：
+  | 文件:行 | profile 名 | 是否固定名 |
+  |---|---|---|
+  | `panel_assets_299_windows_test.go:161` | `wisp-299r1-panel-profile` | **固定** |
+  | `panel_host_windows_live_test.go:37` | `wisp-33r1-panel-profile` | **固定** |
+  | `panel_host_windows_test.go:620` | `wisp-33r1-panel-profile` | **固定** |
+  | `panel_host_windows_test.go:919` | `wisp-33r1-panel-profile` | **固定** |
+  | `panel_reshow_255r8_winlive_test.go:125` | `wisp-255r8-panel-profile` | **固定** |
+  | `panel_transport_live_35v2_windows_test.go:186` | `wisp-35v2-panel-profile` | **固定** |
+  | `panel_unbound_253r6_windows_test.go:73` | `wisp-253r6-panel-profile` | **固定** |
+  | `panel_resident_windows_test.go:71` | `uniqueProfileLeaf("wisp-33r5-…")` | **唯一**（唯一一处对的） |
+  ⇒ **8 处里 7 处是固定名**，只有 `panel_resident_windows_test.go` 用了 `uniqueProfileLeaf`。
+- **★发现三：这些固定名夹**现在就躺在盘上**，是"累积状态"的实体**（现跑 `%TEMP%` 逐枚数）**：
+  ```
+  wisp-33r1-panel-profile   files= 181  dirs= 68  7.7MB   mtime=2026-11-09 21:42:11
+  wisp-299r1-panel-profile  files= 289  dirs= 85  69.1MB  mtime=2026-11-11 11:39:15
+  wisp-253r6-panel-profile  files= 165  dirs= 67  9.3MB   mtime=2026-11-11 21:50:33   ← ac3 那发之后
+  wisp-255r8 / wisp-35v2    MISSING
+  ---------------------------------------------------------------
+  TOTAL                     files= 635  dirs= 220  86MB
+  ```
+  另：**`wisp-33r5-*` 唯一名夹 = 39 个未清**（`uniqueProfileLeaf` 造了却不收，因为 `A1727` 那条"repo rule: throwaways are only ever created"）。
+- **★为什么这就是 314 的机制（推理链，每步可现跑核）**：
+  1. 每枚建窗测试都**起一个 WebView2 浏览器子进程**（`panel_host_windows_test.go:619` 逐字：`The AC#1 exit deadline below is the thing that actually bounds the child processes`）；
+  2. 这些子进程**共用同一个固定名 profile 夹**（`wisp-33r1` 被 3 个文件 4 处共用）；
+  3. WebView2 的 profile 夹里有**锁文件/LOCK/SQLite WAL**，**上一次没退干净 ⇒ 下一次打开时等待或拒绝**；
+  4. **`wisp-253r6` 的 mtime = 2026-11-11 21:50:33**，而 ac3 死在 **21:30:05** ⇒ 这是**之后**别的运行留下的，说明该夹**一直在被反复写**；
+  5. ⇒ **跑到第 325 枚（Test145 系列）时，前面 11 枚建窗测试留下的浏览器子进程/profile 锁/句柄恰好达到临界**，进程静默结束 —— **完全符合票面原话"accumulated state / timing"**，也解释了 `A1735` 的"同树同二进制、不同结局"。
+- **★这条把 314 从"查不出原因"变成"有明确修法"**：
+  - 修法＝**把 7 处固定名 profile 改成 `uniqueProfileLeaf` 的每发独立名**（`panel_resident_windows_test.go:71` 已经是正确样板，**照抄即可**）；
+  - ⚠ **`panel_holder_319_windows_test.go:53` 是刻意共享的**（注释逐字 `Nothing here creates a window` / `shared here on purpose`）⇒ **⛔ 动它**；
+  - ⚠ 这**正是票 314 AC#1 写的修法候选**（逐字：`若成立 ⇒ 修法候选＝夹具改用每发独立 profile`）⇒ **票面早就指对了方向，我前面几轮绕远了。**
+- **⇒ `314-rep` 派单最终定型（覆盖前几版）**：
+  1. **A/B 两发即可定论**（票面 AC#1 原话 "q5 A/B 式"）：**fresh profile（把 3 个固定名夹先改名挪走）** vs **旧 profile（原样）**，各 ≥2 发；
+  2. 若 **fresh 全绿 / 旧的全早停** ⇒ **归因成立，AC#1 结案**，直接进修法；
+  3. ⚠ 挪夹子是**移动不是删除**（`Move-Item` 到 `D:\tmp\wisp\<date>\314rep\parked-profiles\`），**只建不删**。
+- 撤销口令：删本 A1744 条。
