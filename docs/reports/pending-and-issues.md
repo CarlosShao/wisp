@@ -34025,3 +34025,23 @@ ball.opacity_idle 百分比滑杆（页 0–100%、线上 0..1）／ball.click_t
 - **3 笔已推** `ff0e61d66..9e595c2e0`，未推 **0**（复跑 internal/config 2.34s、build rc0、cmd/wisp 定向 12.2s、frontend typecheck 后推）。
 - 派 **wave133**：R（cmd/wisp 补语音快照键+写字段+修 run.go 注释）＋V（frontend 清设置页过期文案）＋W（只读裁决 163/388/423 可关性）。
 - **机主侧**（等着）：font_size 入契约（PLAN.md:2753 已核真缺）、真机/听觉签收（297/388/247/290/291/293/220）、视觉验收 4 屏。**票池现状**：扫描多张"ready"是旧脚手架已被近期波次吃掉（180 面板宽、187 模型档位均已落），真干净可派以 cmd/wisp 独苗为主。
+## A1700（2026-11-11 17:0x，编排者）**机主音频验收（本对话阻塞式）：297扬声器✓ / 388 AC#2✓ / 293 AC#5✓｜font_size 入契约已推（`be73612bf`）｜余 4 张麦克风电平自动跑**
+
+### 一、font_size 入契约（机主「按推荐」＝A 批准入）
+`PLAN.md:2753` `[panel]` 行补 `font_size`(12)；`be73612bf` 已推；internal/config 测试绿。
+
+### 二、机主音频验收（阻塞式，逐项弹窗确认）
+| 票 | 方式 | 机主判定 | 结论 |
+|---|---|---|---|
+| **297** | 扬声器连放 3 声 Windows 提示音 | 「听到了，很清楚」 | 扬声器物理正常 ⇒ 297 残差归麦克风/环境路由，非扬声器坏 |
+| **388** AC#2 | 生成并放 15% 音量播报（仿真衰减后） | 「正好：听得见、明显小声、不吓人」 | AC#2 出声可闻度 ✓ |
+| **293** AC#5 | 启动 build\wisp.exe，机主右键托盘看静音勾 | 「两形都对：点开→勾在、再点→勾没」 | AC#5 托盘勾跟随 ✓ |
+
+- **真麦 rig 本机可用**（现跑）：`TestLiveWasapiSmoke` PASS（capture="麦克风 (Realtek(R) Audio)"，25 帧/825ms）；`TestAC247RealCaptureLoopEmitsLevels` PASS。
+- 随后收掉为 293 起的 wisp（taskkill PID 20412 成功，腾出麦克风）。
+
+### 三、余 4 张＝仪器读数，机主选 A（自动跑，不占耳朵）
+247 / 290 / 291 / 297(麦克风那半) 的真麦电平/四形/两形读数为**仪器活**（`TestAC247LiveMicrophoneLevelsReachTheBallSeam` 会自放警报测麦克风回采，quietA<loud、quietB≤loud 断言）。**cmd/wisp 正被 wave133-R 占用，待其落后派腿跑并报数字。**
+
+### 四、wave133 现状
+V 已提交 `b59575fba`（frontend 设置页"通用"过期文案刷新）；R（cmd/wisp 语音快照键）／W（只读裁决 163/388/423）仍跑。
