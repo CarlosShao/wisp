@@ -72,6 +72,16 @@ func ballSizeRangeError(v int) error {
 		"config.toml: ball.size %d out of range [%d, %d]", v, ballSizeMinPx, ballSizeMaxPx))
 }
 
+// ballOpacityIdleRangeError is the ONE out-of-range refusal for
+// ball.opacity_idle, the same single-source shape ballSizeRangeError keeps
+// for ball.size: the load gate (validateBall, a hand-edited file) and the
+// write gate (the settings setter, a slider value) hand out this same
+// sentence, so the two can never drift.
+func ballOpacityIdleRangeError(v float64) error {
+	return observe.New(observe.ClassConfig, fmt.Sprintf(
+		"config.toml: ball.opacity_idle %v out of range [0, 1]", v))
+}
+
 // validateBall checks the [ball] ranges (SPEC-03 sec 3: size 44-160; the
 // ceiling moved 72 -> 160 with owner approval A1636, 2026-11-08 "可放大，按
 // 你推荐的试试" - the default stays 56, only the configurable range widened) and the
@@ -83,8 +93,7 @@ func validateBall(c *Config) error {
 		return ballSizeRangeError(c.Ball.Size)
 	}
 	if c.Ball.OpacityIdle < 0 || c.Ball.OpacityIdle > 1 {
-		return observe.New(observe.ClassConfig, fmt.Sprintf(
-			"config.toml: ball.opacity_idle %v out of range [0, 1]", c.Ball.OpacityIdle))
+		return ballOpacityIdleRangeError(c.Ball.OpacityIdle)
 	}
 	if !slices.Contains(ballStyles, c.Ball.Style) {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(

@@ -158,6 +158,36 @@ type Snapshot struct {
 	// it - the write half rides config.set's ball_size field
 	// (config_write_65.go).
 	BallSize *BallSizeSection `json:"ballSize,omitempty"`
+	// BallOpacityIdle is the appearance wave's carrier: the idle-state opacity
+	// the live config holds and the [0, 1] band the row may offer. See
+	// ball_idle_appearance_wave.go for the shape.
+	//
+	// It is a pointer with omitempty for the same reason the fields above are:
+	// a pump assembled WITHOUT the reader sends no key, and a pump that has
+	// one always sends the key. The page-side declaration is not written yet
+	// (frontend/** is the external UI agent's write face, Q-51), so the
+	// reconciliations against frontend/src/lib/panel.ts judge the key through
+	// the gap ledger (composerTSGapLedger's PanelSnapshot entry). No C17
+	// method arrives with it - the write half rides config.set's
+	// ball_opacity_idle field (config_write_wave.go).
+	BallOpacityIdle *BallOpacityIdleSection `json:"ballOpacityIdle,omitempty"`
+	// BallClickThrough is the appearance wave's carrier: the idle
+	// click-through switch the live config holds. Same shape, same
+	// reader-gated absence, same judged gap; the write half rides config.set's
+	// ball_click_through field (config_write_wave.go).
+	BallClickThrough *BallClickThroughSection `json:"ballClickThrough,omitempty"`
+	// PanelWidth is the appearance wave's carrier, panel half: the panel width
+	// the live config holds - the number the panel host's per-creation
+	// geometry source (ticket 255 AC#4) re-reads, so the page's row shows what
+	// the next window creation acts on. Same reader-gated shape; the write
+	// half rides config.set's panel_width field (config_write_wave.go).
+	PanelWidth *PanelWidthSection `json:"panelWidth,omitempty"`
+	// PanelFontSize is the appearance wave's carrier, panel half: the body
+	// font size (panel.font_size, the schema key the same wave's config leg
+	// added, default 12) the live config holds, consumed by the panel page
+	// with the frontend wiring leg. Same reader-gated shape; the write half
+	// rides config.set's panel_font_size field (config_write_wave.go).
+	PanelFontSize *PanelFontSizeSection `json:"panelFontSize,omitempty"`
 	// Run is ticket 145's working-state carrier: the tool calls that ended
 	// (with their booked args), the calls in flight right now, the task's
 	// cumulative usage, the reasoning streamed so far, the last classified

@@ -55,6 +55,8 @@ var (
 	pGetDC                         = modUser32.NewProc("GetDC")
 	pReleaseDC                     = modUser32.NewProc("ReleaseDC")
 	pSetForegroundWindow           = modUser32.NewProc("SetForegroundWindow")
+	pGetWindowLongPtrW             = modUser32.NewProc("GetWindowLongPtrW")
+	pSetWindowLongPtrW             = modUser32.NewProc("SetWindowLongPtrW")
 
 	pCreateCompatibleDC = modGDI32.NewProc("CreateCompatibleDC")
 	pDeleteDC           = modGDI32.NewProc("DeleteDC")
@@ -65,13 +67,24 @@ var (
 	pShellNotifyIconW = modShell32.NewProc("Shell_NotifyIconW")
 )
 
-// Window styles / extended styles (SPEC-08 §2 frozen set).
+// Window styles / extended styles (SPEC-08 §2 frozen set). wsExTransparent
+// is NOT part of that frozen creation set: it is the click-through bit the
+// idle-appearance option toggles per state (idle_appearance_windows.go), a
+// runtime toggle and not a new member of what the window is born with. The
+// bit itself is declared where the orb page's own toggles declare theirs
+// (orb_windows.go).
 const (
 	wsExLayered    = 0x00080000
 	wsExTopmost    = 0x00000008
 	wsExToolWindow = 0x00000080
 	wsExNoActivate = 0x08000000
 	wsPopup        = 0x80000000
+
+	// gwlExStyle is GWL_EXSTYLE, the GetWindowLongPtrW/SetWindowLongPtrW
+	// index for the extended style word. The API takes it as a signed index;
+	// call sites convert through an int32 VARIABLE (a constant conversion of
+	// a negative number to uintptr does not compile).
+	gwlExStyle = -20
 
 	swShownoactivate = 4
 	idcArrow         = 32512

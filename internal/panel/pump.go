@@ -248,6 +248,28 @@ type PumpSources struct {
 	// reader that exists always sends the key, a not-yet-configured diameter
 	// traveling as the section's Size 0 rather than as a vanished key.
 	BallSize func() BallSizeSection
+	// BallOpacityIdle reads the snapshot's idle-opacity dimension (the
+	// appearance wave): ball.opacity_idle as the live config holds it and the
+	// schema's own [0, 1] band, read off the live config by the assembly root
+	// (internal/config's BallOpacityIdleOptions is the production reader). It
+	// is a reader like every field above; a nil reader is the ONLY way the
+	// packet carries no "ballOpacityIdle" key at all - the shape the four-key
+	// byte nails pin - and a reader that exists always sends the key.
+	BallOpacityIdle func() BallOpacityIdleSection
+	// BallClickThrough reads the snapshot's idle click-through dimension (the
+	// appearance wave): ball.click_through as the live config holds it,
+	// internal/config's BallClickThroughOptions the production reader. Same
+	// reader-gated absence as the field above.
+	BallClickThrough func() BallClickThroughSection
+	// PanelWidth reads the snapshot's panel-width dimension (the appearance
+	// wave): panel.width as the live config holds it, internal/config's
+	// PanelWidthOptions the production reader - the same number the panel
+	// host's per-creation geometry source re-reads. Same reader-gated absence.
+	PanelWidth func() PanelWidthSection
+	// PanelFontSize reads the snapshot's font-size dimension (the appearance
+	// wave): panel.font_size as the live config holds it, internal/config's
+	// PanelFontSizeOptions the production reader. Same reader-gated absence.
+	PanelFontSize func() PanelFontSizeSection
 	// Run reads the working-state section (ticket 145): the ended tool rows,
 	// accumulated reasoning, last classified error and stuck sentence the
 	// assembly root's RunFeed holds. The console sink's event switch already
@@ -487,6 +509,25 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// here to render as []).
 		sec := p.src.BallSize()
 		snap.BallSize = &sec
+	}
+	if p.src.BallOpacityIdle != nil {
+		// The appearance wave: same reader-gated rule one block up - a reader
+		// that exists always sends the key. The opacity and its band travel
+		// verbatim from the config side; the pump invents nothing.
+		sec := p.src.BallOpacityIdle()
+		snap.BallOpacityIdle = &sec
+	}
+	if p.src.BallClickThrough != nil {
+		sec := p.src.BallClickThrough()
+		snap.BallClickThrough = &sec
+	}
+	if p.src.PanelWidth != nil {
+		sec := p.src.PanelWidth()
+		snap.PanelWidth = &sec
+	}
+	if p.src.PanelFontSize != nil {
+		sec := p.src.PanelFontSize()
+		snap.PanelFontSize = &sec
 	}
 	if p.src.Run != nil {
 		// Ticket 145: same reader-gated rule one block up - a reader that

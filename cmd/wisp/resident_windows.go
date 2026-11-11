@@ -424,7 +424,15 @@ func runResident() {
 	// handed to startResidentBall with withBallSizePx because ball.New is the
 	// only place the size can enter the window.
 	ballSizePx413, _ := ballSizeSeed413(rt.Layout.DataDir)
-	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withBallSizePx(ballSizePx413), withPanelHost(func(via string) bool {
+	// The appearance wave: the [ball].opacity_idle / click_through seed reads
+	// the same per-use shape as the size seed above (one LoadFile, both keys,
+	// ballIdleAppearanceSeed). A nil opacity is the seed's "unreadable file"
+	// carrier - the ball package's own idle rendering stands - and the
+	// click-through half passes as-is, so the pre-wave clickable idle ball is
+	// what an unreadable file keeps. Both values ride withBallIdleAppearance
+	// because the idle look is an Options-only construction fact.
+	ballIdleOpacityWave, ballClickThroughWave, _ := ballIdleAppearanceSeed(rt.Layout.DataDir)
+	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withBallSizePx(ballSizePx413), withBallIdleAppearance(ballIdleOpacityWave, ballClickThroughWave), withPanelHost(func(via string) bool {
 		return holder.toggle(via)
 	}), withStopRequest(residentTrayStop228(rt)))
 	defer rb.stop()
@@ -439,6 +447,12 @@ func runResident() {
 	if ballStyleOK65 && rb.b != nil {
 		rb.b.ApplyStyle(ballStyleName65)
 	}
+	// The appearance wave, runtime half: the idle-opacity and click-through
+	// applier seams are installed over the live ball the same way, so
+	// ApplySetting's two new [ball] cases can act on the running ball
+	// (applyBallIdleOpacity / applyBallClickThrough answer now when this
+	// process hosts one, restart when it does not).
+	installBallIdleAppearanceAppliers(rb.b)
 
 	// The gate is bound to the ball only if the ball exists, and it is detached
 	// BEFORE the window goes away: after Ball.Close posts WM_QUIT there is no STA

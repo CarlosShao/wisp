@@ -61,13 +61,31 @@ type Events struct {
 
 // Options configures New.
 type Options struct {
-	SizePx   int // configured orb size 44..160 (0 = default 56)
-	Theme    Theme
-	Initial  statemachine.State
-	Hotkeys  HotkeyConfig   // zero value = DefaultHotkeys()
-	Store    *PositionStore // nil = no persistence (position defaults)
-	Events   Events
-	Registry *observe.Registry // nil = observe.Default
+	SizePx int // configured orb size 44..160 (0 = default 56)
+	// OpacityIdle is the configured idle-state opacity 0..1 (ball.opacity_idle,
+	// the appearance wave's feed). nil = no configured value reached this
+	// option (the seed's own Warn already said so), and the package's own idle
+	// rendering stands. A POINTER ON PURPOSE, not a plain float64 with a
+	// sentinel: 0 is a REAL configured value inside the schema band (an
+	// invisible idle orb), so a zero-value field would silently swallow it -
+	// the lying-option shape the repo refuses - and would also dim every
+	// Options literal built without the field (balldebug, the tests) to an
+	// invisible resting ball. Applied to the Sleeping visual only; every
+	// other state keeps its own opacity.
+	OpacityIdle *float64
+	// ClickThrough passes mouse events through the idle (Sleeping) ball:
+	// WS_EX_TRANSPARENT while Sleeping, interactive again in every other
+	// state - the active ball must stay clickable, because OnClickBall (the
+	// ticket-390 interrupt) and the drag hop ride those clicks. The window is
+	// born with the option's answer for its initial state, and the toggle is
+	// re-applied on every state change.
+	ClickThrough bool
+	Theme        Theme
+	Initial      statemachine.State
+	Hotkeys      HotkeyConfig   // zero value = DefaultHotkeys()
+	Store        *PositionStore // nil = no persistence (position defaults)
+	Events       Events
+	Registry     *observe.Registry // nil = observe.Default
 	// StartHidden skips ShowWindow (tests that only need the COM stack).
 	StartHidden bool
 	// WindowTitle overrides the Win32 window title (default "Wisp"). The
@@ -231,6 +249,12 @@ func (b *Ball) createOnSTA(s *staThread) error {
 	s.mu.Unlock()
 	b.hwnd = windows.HWND(hwnd)
 
+	// Idle click-through from the first shown frame: the initial state's
+	// answer is applied HERE, before ShowWindow below - not only in
+	// applyStateLocked at the end of this function, which would leave a
+	// shown-then-clickable gap between the two.
+	b.applyClickThroughStyleLocked(b.opts.Initial)
+
 	// Window DPI + initial size/position (per-monitor restore). The window is
 	// MOVED while hidden, so no WM_DPICHANGED fires - the destination
 	// monitor DPI is read explicitly after the move (SPEC-08 §2).
@@ -370,7 +394,7 @@ func (b *Ball) applyStateLocked(s statemachine.State) {
 	prev := b.curState
 	b.curState = s
 	b.motionStateChanged(prev, s) // liquid session start/stop on state edges
-	b.curVisual = VisualFor(pal, b.opts.SizePx, s, 0)
+	b.curVisual = b.visualForLocked(s)
 	b.badge = 0
 	b.progress = -1
 	b.badgeText = ""
@@ -395,13 +419,19 @@ func (b *Ball) applyStateLocked(s statemachine.State) {
 	// Warm breathing and the Settling fade ramp drive this value per tick.
 	b.constAlpha = 255
 
+	// Idle click-through: the WS_EX_TRANSPARENT bit follows the state (the
+	// appearance wave). Sleeping carries it when the option says so, every
+	// other state clears it again - the re-apply is a no-op Win32 write when
+	// the word did not move.
+	b.applyClickThroughStyleLocked(s)
+
 	b.rend.setAssets(b.curVisual)
 	b.renderFrame()
 }
 
 // repaintCurrent re-renders the current state (badge/progress/text updates).
 func (b *Ball) repaintCurrent() {
-	v := VisualFor(pal, b.opts.SizePx, b.curState, 0)
+	v := b.visualForLocked(b.curState)
 	v.BadgeCount = b.badge
 	if b.progress >= 0 {
 		v.Progress = b.progress

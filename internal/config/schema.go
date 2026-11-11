@@ -574,6 +574,16 @@ type PanelSection struct {
 	KeepAliveInSession bool `toml:"keep_alive_in_session" default:"true"`
 	// Scale is the UI zoom factor; 0 = follow system DPI.
 	Scale float64 `toml:"scale"`
+	// FontSize is the panel body font size in px. Default 12 = the size the
+	// panel document's body text de-facto renders at today (the token table's
+	// own reading), so wiring this key changes nothing at the default - only
+	// a written value moves it. No load-time band is pinched here on purpose:
+	// the consumer (the panel page's font rendering) lands with the frontend
+	// wiring leg, and the write route refuses non-positive values by name.
+	// CONTRACT NOTE: the schema inventory in docs/PLAN.md's [panel] row
+	// (PLAN.md:2753) and SPEC-03 sec 3 does NOT name this key yet; the row's
+	// contract text is that approval's to carry, not this file's to write.
+	FontSize int `toml:"font_size" default:"12"`
 }
 
 // CostSection is [cost]. Budgets are micro-USD; 0 = no budget. Reaching 100%

@@ -148,7 +148,7 @@ var hotRowClaims = map[string]string{
 	"models": hotClaimOtherProcess + "cmd/wisp/models.go:163 [cfg.Models.Mirror] - only the wisp models subcommands read it, in their own process, off a fresh LoadFile",
 
 	// Since ticket 258 (form A): the resident leg's ball host takes [hotkey]
-	// from config (cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,],
+	// from config (cmd/wisp/resident_ball_windows.go:452 [Hotkeys:      cfg,],
 	// mapped by the chain in cmd/wisp/resident_windows.go) and its ticket-64
 	// bridge rebinds the ball on a real diff. The reader is real, but it lives
 	// in the RESIDENT `wisp` process - this receipt prints in `wisp run`, which
@@ -156,7 +156,7 @@ var hotRowClaims = map[string]string{
 	// adjudicated into when its reader moved to the resident panel host. The
 	// rebind drops an in-flight Esc borrow (internal/ball/ball_windows.go:807-812);
 	// that residual stays ticket 245's, named rather than hidden.
-	"hotkey": hotClaimOtherProcess + "cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] - the resident ball host binds from [hotkey] and its reloader bridge rebinds on change (cmd/wisp/resident_windows.go), but the ball lives in the resident process, not in this `wisp run` host",
+	"hotkey": hotClaimOtherProcess + "cmd/wisp/resident_ball_windows.go:452 [Hotkeys:      cfg,] - the resident ball host binds from [hotkey] and its reloader bridge rebinds on change (cmd/wisp/resident_windows.go), but the ball lives in the resident process, not in this `wisp run` host",
 
 	// Ticket 419 re-adjudicated this row, and it stays no-reader while the two
 	// fields behind the section carry different facts, so the verdict text says
@@ -190,7 +190,21 @@ var hotRowClaims = map[string]string{
 	// [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235
 	// [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are
 	// boot/invocation-time LoadFile passes too.
-	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..160 (0 = default 56)] - the option the configured size rides; ticket 413 landed the feed: cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] (the resident ball host's boot seed) hands the file's number to ball.New through cmd/wisp/resident_ball_windows.go, so the size reaches the window at construction; the verdict stays no-reader because the read is one boot-time LoadFile that never re-reads the live Manager and the ball has no live re-size, and the style field keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither",
+	// The APPEARANCE WAVE closed the feed side for the two remaining [ball]
+	// keys the same way, and the verdict stays no-reader for the same three
+	// reasons: cmd/wisp/ball_idle_appearance_windows.go:56 [c.Ball.OpacityIdle]
+	// is the boot seed for opacity_idle AND click_through (one LoadFile, both
+	// keys; a nil opacity is the seed's unreadable-file carrier (0 is a real configured value the pointer carries)), the
+	// assembly root hands both over pre-New through
+	// cmd/wisp/resident_ball_windows.go:449 [OpacityIdle:  hs.idleOpacity]
+	// (the ClickThrough feed rides the same Options literal), and the settings
+	// write route cmd/wisp/panel_config_store.go:322
+	// [s.mgr.SetBallOpacityIdle(v)] / :333 [s.mgr.SetBallClickThrough(on)]
+	// answers its measured tier - now when the resident process hosts the
+	// ball (its applier seams), restart when it does not. The read is still
+	// one boot-time LoadFile that never re-reads the live Manager, and this
+	// `wisp run` host builds neither the ball nor the write route's applier.
+	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx int // configured orb size 44..160 (0 = default 56)] - the option the configured size rides; ticket 413 landed the feed: cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] (the resident ball host's boot seed) hands the file's number to ball.New through cmd/wisp/resident_ball_windows.go, so the size reaches the window at construction; the verdict stays no-reader because the read is one boot-time LoadFile that never re-reads the live Manager and the ball has no live re-size, and the style field keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither; the appearance wave closed the feed side for the section's two remaining keys the same way and the verdict stays no-reader for the same three reasons: cmd/wisp/ball_idle_appearance_windows.go:56 [c.Ball.OpacityIdle] is the boot seed for opacity_idle AND click_through (one LoadFile, both keys; a nil opacity is the seed's unreadable-file carrier (0 is a real configured value the pointer carries)), the assembly root hands both over pre-New through cmd/wisp/resident_ball_windows.go:449 [OpacityIdle:  hs.idleOpacity] (the ClickThrough feed rides the same Options literal), and the settings store's two new write cases (SetBallOpacityIdle at :322 and SetBallClickThrough at :333 of the same store file the style route lives in) answer the measured tier - now when the resident process hosts the ball (its applier seams), restart when it does not",
 	// Ticket 233 re-adjudicated this row: since ticket wire-r1 the resident
 	// voice leg reads one [session] key at boot (cmd/wisp/resident_voice_windows.go
 	// [c.Session.WarmTimeoutSec], handed to the voice plan's warm timeout), so
@@ -271,7 +285,7 @@ var hotRowClaims = map[string]string{
 	//     request picks it up", never "改完立刻自己变". Pinned by
 	//     TestTicket255PanelRosterVerdictIsTheHonestShape and by
 	//     TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch.
-	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all",
+	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all; the appearance wave added the write half this row's reader always lacked - cmd/wisp/panel_config_store.go:345 [s.mgr.SetPanelWidth(v)] (and :355 [s.mgr.SetPanelFontSize(v)] for the NEW panel.font_size schema key, a font_size the reader above never carried because the key did not exist until that wave's config leg added it) writes both keys through the guarded path, and the receipt's Note says the honest tense: the per-create reader above picks a written value up on the next show request, no process restart required",
 
 	// Per-key sections: planApp/planVoice book the SECTION name into rep.Hot, so
 	// the claim must be settled per key row and only claimed when every hot row
@@ -322,10 +336,12 @@ var hotRowClaims = map[string]string{
 var sectionReadSites = map[string][]string{
 	// Ticket 419 gave this list its first two entries (the style half); ticket
 	// 413 added the third: the [ball].size boot seed is a production read site
-	// now (see the [ball] roster row above). The verdict itself stays
-	// no-reader: all three reads are boot / invocation-time config.LoadFile
+	// now (see the [ball] roster row above). The appearance wave added the
+	// fourth: the idle-opacity/click-through boot seed reads [ball] the same
+	// one-LoadFile way. The verdict itself stays
+	// no-reader: all four reads are boot / invocation-time config.LoadFile
 	// passes, not live re-readers, and this `wisp run` host builds neither.
-	"Ball": {"cmd/wisp/ball_size_413_windows.go", "cmd/wisp/ball_style_65_windows.go", "cmd/wisp/config_cmd_65.go"},
+	"Ball": {"cmd/wisp/ball_size_413_windows.go", "cmd/wisp/ball_style_65_windows.go", "cmd/wisp/config_cmd_65.go", "cmd/wisp/ball_idle_appearance_windows.go"},
 	// Ticket 233: the resident voice leg's boot LoadFile reads WarmTimeoutSec
 	// (see the roster row above), so [session] left the reader-less class.
 	"Session": {"cmd/wisp/resident_voice_windows.go"},

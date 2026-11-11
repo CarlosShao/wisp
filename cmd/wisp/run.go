@@ -1163,6 +1163,28 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 			v := mgr.BallSizeOptions()
 			return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
 		},
+		// The appearance wave's four readers: the two [ball] rows the config
+		// screen left locked and the two [panel] rows (width; the font size
+		// the same wave's schema leg added), read off this run's own Manager
+		// by internal/config's production readers - the same Manager the
+		// settings leg above (rt.settings) writes through, so each row shows
+		// what the next ApplySetting would act on. The values travel
+		// verbatim; this literal spells neither the [0, 1] band nor a
+		// default. Without these lines the snapshot carries none of the four
+		// keys at all (the reader-gated 213/187/65 shape).
+		BallOpacityIdle: func() panel.BallOpacityIdleSection {
+			v := mgr.BallOpacityIdleOptions()
+			return panel.BallOpacityIdleSection{Opacity: v.Opacity, Min: v.Min, Max: v.Max}
+		},
+		BallClickThrough: func() panel.BallClickThroughSection {
+			return panel.BallClickThroughSection{Enabled: mgr.BallClickThroughOptions().Enabled}
+		},
+		PanelWidth: func() panel.PanelWidthSection {
+			return panel.PanelWidthSection{Width: mgr.PanelWidthOptions().Width}
+		},
+		PanelFontSize: func() panel.PanelFontSizeSection {
+			return panel.PanelFontSizeSection{FontSize: mgr.PanelFontSizeOptions().FontSize}
+		},
 		// Ticket 145's hop 2, the working-state reader: the feed the sink
 		// fills (Publish's EvToolEnd / EvReasoningDelta / EvError / EvStuck
 		// branches) hands its Section here, so the packet's top-level "run"

@@ -163,6 +163,7 @@ func composerTSNameMap() map[string]string {
 		"ModelSwitchSection":     "ModelSwitchSection",
 		"ModelOption":            "ModelOptionView",
 		"BallStyleSection":       "BallStyleSection",
+		"BallSizeSection":        "BallSizeSection",
 		"TreeView":               "FilesSection",
 		"TreeEntry":              "TreeEntryView",
 		"RunSection":             "RunSection",
@@ -200,17 +201,23 @@ func composerTSNameMap() map[string]string {
 // eleven times and any movement on either side flips the ruler red.
 func composerTSGapLedger() map[string][]string {
 	return map[string][]string{
-		// Ticket 422's TOP-LEVEL entry: the snapshot's ballSize key is live on
-		// the Go wire (ticket 413's carrier, wired by 422) and
-		// PanelSnapshot does not declare it yet - the page half belongs to
-		// the external UI agent (frontend/** is outside every Go leg's write
-		// face, Q-51; the 413 contract §2.1 names the declaration as its
-		// deliverable). Registered, never silenced: the pairs-table
-		// reconciliation below judges this entry both ways like the nested
-		// walk does, so the moment panel.ts declares ballSize the stale-red
-		// fires and the ordinary two-way comparison takes over - the ledger
-		// may never stand between the two sides once the gap is gone.
-		"PanelSnapshot":      {"ballSize"},
+		// Ticket 422's TOP-LEVEL entry is GONE: the external UI agent's 422
+		// frontend leg declared PanelSnapshot.ballSize (and the
+		// BallSizeSection interface), which is exactly the stale-red the
+		// ledger's both-ways rule promised - the gap closed, so the ordinary
+		// two-way comparison judges that key from here on and
+		// composerTSNameMap carries the BallSizeSection translation.
+		//
+		// The appearance wave's TOP-LEVEL additions: ballOpacityIdle,
+		// ballClickThrough, panelWidth and panelFontSize are live on the Go
+		// wire (the wave's carriers, ball_idle_appearance_wave.go /
+		// panel_tuning_wave.go) and PanelSnapshot does not declare them yet -
+		// the page half belongs to the external UI agent (frontend/** is
+		// outside every Go leg's write face, Q-51), the same judgement the
+		// ballSize entry used to carry. Registered, never silenced: the
+		// moment panel.ts declares any of them the stale-red fires and the
+		// ordinary two-way comparison takes over for that key.
+		"PanelSnapshot":      {"ballOpacityIdle", "ballClickThrough", "panelWidth", "panelFontSize"},
 		"ModelOptionView":    {"display"},
 		"ModelSwitchSection": {"adapter", "adapterThinkingLevels"},
 		"ToolRunRowView":     {"argsJson", "level"},

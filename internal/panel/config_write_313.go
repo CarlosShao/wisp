@@ -143,25 +143,27 @@ func additionalWritableField(field string) bool {
 	return false
 }
 
-// acceptedWritableFields is the union of all four rosters, sorted, for the
+// acceptedWritableFields is the union of all five rosters, sorted, for the
 // refusal text: a page told "可写的只有 ..." must be told about every name the
 // door would actually accept, or the sentence sends it chasing the wrong list.
-// (Ticket 187's roster joined the two older ones, and ticket 65's joined the
-// same way; the union grew with each.)
+// (Ticket 187's roster joined the two older ones, ticket 65's joined the same
+// way, and the appearance wave's roster (config_write_wave.go) joined the
+// same way again; the union grew with each.)
 func acceptedWritableFields() []string {
 	out := append(WritableFields(), AdditionalWritableFields()...)
 	out = append(out, WritableFields187()...)
 	out = append(out, WritableFields65()...)
+	out = append(out, WritableFieldsWave()...)
 	sort.Strings(out)
 	return out
 }
 
 // needsProviderFor / needsModelFor / takesValueFor answer one selector question
-// across all four rosters, so the gate's three checks stay one loop-shaped
+// across all five rosters, so the gate's three checks stay one loop-shaped
 // question each instead of growing a second branch per column. The 187 roster
-// (config_write_187.go) and the 65 roster (config_write_65.go) join the
-// selector maps below; neither carries a provider/model selector and both take
-// the plain value half.
+// (config_write_187.go), the 65 roster (config_write_65.go) and the appearance
+// wave's roster (config_write_wave.go) join the selector maps below; none
+// carries a provider/model selector and all take the plain value half.
 func needsProviderFor(field string) bool {
 	return fieldNeedsProvider[field] || fields313NeedsProvider[field]
 }
@@ -172,5 +174,6 @@ func needsModelFor(field string) bool {
 
 func takesValueFor(field string) bool {
 	return fieldTakesValue[field] || fields313TakesValue[field] ||
-		fields187TakesValue[field] || fields65TakesValue[field]
+		fields187TakesValue[field] || fields65TakesValue[field] ||
+		fieldsWaveTakesValue[field]
 }

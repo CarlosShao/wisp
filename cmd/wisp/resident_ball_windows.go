@@ -144,10 +144,20 @@ type ballHostHook func(*panelHostHooks)
 // (internal/ball's WindowEdgePx / VisualFor), and no re-size path exists after
 // construction. Zero is legal and means "the seed read nothing" (the seed's
 // own Warn already said so); ball.New answers it with the package default 56.
+//
+// idleOpacity / clickThrough (the appearance wave) ride the same rule: the
+// seed's answer (ballIdleAppearanceSeed) handed over pre-New because the idle
+// look is an Options-only construction fact. idleOpacity is the seed's
+// pointer (nil = the seed read nothing and the ball package's own idle
+// rendering stands; 0 is a real configured value the pointer carries); the
+// clickThrough half passes as-is, so an unreadable file keeps the pre-wave
+// clickable idle ball.
 type panelHostHooks struct {
-	showPanel   func(via string) bool
-	requestStop stopRequestFunc
-	sizePx      int
+	showPanel    func(via string) bool
+	requestStop  stopRequestFunc
+	sizePx       int
+	idleOpacity  *float64
+	clickThrough bool
 }
 
 // withBallSizePx hands the ball host the configured [ball] size (ticket 413).
@@ -155,6 +165,13 @@ type panelHostHooks struct {
 // the existing call sites of startResidentBall keep compiling untouched.
 func withBallSizePx(px int) ballHostHook {
 	return func(h *panelHostHooks) { h.sizePx = px }
+}
+
+// withBallIdleAppearance hands the ball host the configured [ball]
+// opacity_idle / click_through pair (the appearance wave). Same hook shape as
+// withBallSizePx.
+func withBallIdleAppearance(opacity *float64, clickThrough bool) ballHostHook {
+	return func(h *panelHostHooks) { h.idleOpacity = opacity; h.clickThrough = clickThrough }
 }
 
 // withPanelHost hands the ball host the thing that opens the panel window
@@ -420,10 +437,20 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 		// is listening, thinking, acting or waiting on anyone. A card that IS
 		// waiting moves the orb through the injected gate's UI, which returns it
 		// here the moment nobody is being waited on.
-		SizePx:   hs.sizePx,
-		Initial:  statemachine.StateSleeping,
-		Hotkeys:  cfg,
-		Registry: reg,
+		SizePx: hs.sizePx,
+		// The appearance wave: the configured [ball] idle opacity and
+		// click-through reach the options they name (internal/ball's
+		// OpacityIdle / ClickThrough) instead of stopping at config.toml.
+		// The assembly root sourced both from the same boot seed read
+		// (ballIdleAppearanceSeed) and handed them over with
+		// withBallIdleAppearance; a negative opacity means the seed read
+		// nothing and the ball package's own idle rendering stands - no
+		// second copy of the band or the default lives here.
+		OpacityIdle:  hs.idleOpacity,
+		ClickThrough: hs.clickThrough,
+		Initial:      statemachine.StateSleeping,
+		Hotkeys:      cfg,
+		Registry:     reg,
 		Events: ball.Events{
 			OnClickBall:     func() { rb.clickInterruptGesture() },
 			OnSummonHotkey:  func() { recordBallGesture("summon-hotkey") },

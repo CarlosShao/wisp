@@ -123,6 +123,21 @@ func residentPumpSources65(gate *approval.Gate, cfg *config.Manager, disp *panel
 		// settings door writes through. The vocabulary rides verbatim from
 		// the schema; nothing here spells glass or jarvis.
 		src.BallStyle = func() panel.BallStyleSection { return ballStyleSectionFromConfig(cfg) }
+		// Ticket 413's size dimension (wired by 422 into run.go's pump; this
+		// degraded shape's pump gains the same reader so the shipping
+		// double-click shape's size row stops waiting on a snapshot that
+		// never carried the key). Same Manager, same verbatim rule.
+		src.BallSize = func() panel.BallSizeSection { return ballSizeSectionFromConfig(cfg) }
+		// The appearance wave's four readers, same Manager, same verbatim
+		// rule: the two [ball] rows the config screen left locked and the two
+		// [panel] rows (width; the font size the same wave's schema leg
+		// added). A nil cfg leaves all of them off the pump instead of
+		// backing them with zero values - the no-source posture this file's
+		// header names (无源不冒充).
+		src.BallOpacityIdle = func() panel.BallOpacityIdleSection { return ballOpacityIdleSectionFromConfig(cfg) }
+		src.BallClickThrough = func() panel.BallClickThroughSection { return ballClickThroughSectionFromConfig(cfg) }
+		src.PanelWidth = func() panel.PanelWidthSection { return panelWidthSectionFromConfig(cfg) }
+		src.PanelFontSize = func() panel.PanelFontSizeSection { return panelFontSizeSectionFromConfig(cfg) }
 		// Ticket 187's picker row, same Manager, same verbatim rule.
 		src.ModelSwitch = func() panel.ModelSwitchSection { return modelSwitchSectionFromConfig(cfg) }
 		// Ticket 215a's inventory, same Manager, same pre-shaped rule.
@@ -161,6 +176,34 @@ func (r *residentPanelPump) publish() {
 func ballStyleSectionFromConfig(m *config.Manager) panel.BallStyleSection {
 	v := m.BallStyleOptions()
 	return panel.BallStyleSection{Style: v.Style, Vocabulary: v.Vocabulary}
+}
+
+// ballSizeSectionFromConfig is the config->panel mapping for ticket 413's
+// size dimension, over the same Manager. Same convergence note as above: the
+// values travel verbatim, and this helper spells neither 44 nor 160.
+func ballSizeSectionFromConfig(m *config.Manager) panel.BallSizeSection {
+	v := m.BallSizeOptions()
+	return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
+}
+
+// The appearance wave's four config->panel mappings, over the same Manager.
+// The bands and defaults travel verbatim from internal/config's read faces;
+// these helpers spell neither the [0, 1] band nor a default number.
+func ballOpacityIdleSectionFromConfig(m *config.Manager) panel.BallOpacityIdleSection {
+	v := m.BallOpacityIdleOptions()
+	return panel.BallOpacityIdleSection{Opacity: v.Opacity, Min: v.Min, Max: v.Max}
+}
+
+func ballClickThroughSectionFromConfig(m *config.Manager) panel.BallClickThroughSection {
+	return panel.BallClickThroughSection{Enabled: m.BallClickThroughOptions().Enabled}
+}
+
+func panelWidthSectionFromConfig(m *config.Manager) panel.PanelWidthSection {
+	return panel.PanelWidthSection{Width: m.PanelWidthOptions().Width}
+}
+
+func panelFontSizeSectionFromConfig(m *config.Manager) panel.PanelFontSizeSection {
+	return panel.PanelFontSizeSection{FontSize: m.PanelFontSizeOptions().FontSize}
 }
 
 // modelSwitchSectionFromConfig is the config->panel mapping for ticket 187's

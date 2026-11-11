@@ -204,6 +204,12 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 	var (
 		written []string
 		err     error
+		// The appearance wave's measured-tier inputs, captured by their cases
+		// and read after the switch (the same shape FieldBallStyle uses for
+		// its applier answer below).
+		waveOpacity       float64
+		waveClickOn       bool
+		waveOpacityParsed bool
 	)
 	switch w.Field {
 	case panel.FieldProviderBaseURL:
@@ -300,6 +306,53 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 				fmt.Errorf("字段 %q 要的是 44..160 的整数（px），收到的值解析不了", w.Field)
 		}
 		written, err = s.mgr.SetBallSize(v)
+	case panel.FieldBallOpacityIdle:
+		// 外观波：空闲不透明度。值＝0..1 的浮点字符串（"0.9"）。带由 config 侧
+		// SetBallOpacityIdle 先拒后写，拒绝句＝validate.go 的
+		// ballOpacityIdleRangeError 单源句，与加载闸逐字同一串，永不分叉；
+		// 这里只在值根本不是浮点数时替它答一句形状话（上面数值字段的同款）。
+		// 档位是实测的（下面）：本进程有球＝applyBallIdleOpacity 把空闲观感换
+		// 过去，答 now；无球＝下次启动的种子读取会落到它，答 restart。
+		v, perr := strconv.ParseFloat(strings.TrimSpace(w.Value), 64)
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 0..1 的数字，收到的值解析不了", w.Field)
+		}
+		waveOpacity, waveOpacityParsed = v, true
+		written, err = s.mgr.SetBallOpacityIdle(v)
+	case panel.FieldBallClickThrough:
+		// 外观波：空闲鼠标穿透开关。值＝布尔字面量（"true"/"false"）；布尔没有
+		// 带可单源，config 侧 setter 直接走受守写路径。档位同上实测：有球＝
+		// WS_EX_TRANSPARENT 位当场翻，答 now；无球＝restart。
+		on, perr := strconv.ParseBool(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 true/false，收到的值解析不了", w.Field)
+		}
+		waveClickOn = on
+		written, err = s.mgr.SetBallClickThrough(on)
+	case panel.FieldPanelWidth:
+		// 外观波：面板宽度。值＝整数 px 的字符串。config 侧 SetPanelWidth 拒
+		// 非正值；无 live applier（面板宿主每次建窗现读，写完内存热生效但可见
+		// 尺寸要等下一次显示请求——像 ball_size 的静态标法，但读者不是重启才
+		// 到：收据的 Note 把「关窗再开即跟上」写明，档位仍答 restart，这是词表
+		// 里最接近而不说谎的一枚）。
+		v, perr := strconv.Atoi(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是正整数（px），收到的值解析不了", w.Field)
+		}
+		written, err = s.mgr.SetPanelWidth(v)
+	case panel.FieldPanelFontSize:
+		// 外观波：面板正文字号（panel.font_size，本波 schema 新键，默认 12＝
+		// 面板文档正文今天的事实字号，默认下接线不动观感）。同 width 的形状：
+		// 页面侧消费随前端接线腿落地；写路由先通，档位与 Note 同款。
+		v, perr := strconv.Atoi(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是正整数（px 字号），收到的值解析不了", w.Field)
+		}
+		written, err = s.mgr.SetPanelFontSize(v)
 	case panel.FieldProviderCredential:
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
 			fmt.Errorf("凭据值不走这条写入路径（它只写不回显，必须走 StoreCredential），字段 %q 未落盘", w.Field)
@@ -320,6 +373,24 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		if applyBallStyle65(strings.TrimSpace(w.Value)) {
 			res.Tier = panel.EffectiveNow
 		}
+	}
+	// 外观波的两枚 [ball] 写：档位同样实测（65 的同款），不是盖出来的。
+	if w.Field == panel.FieldBallOpacityIdle && waveOpacityParsed {
+		if applyBallIdleOpacity(waveOpacity) {
+			res.Tier = panel.EffectiveNow
+		}
+	}
+	if w.Field == panel.FieldBallClickThrough {
+		if applyBallClickThrough(waveClickOn) {
+			res.Tier = panel.EffectiveNow
+		}
+	}
+	// 外观波的两枚 [panel] 写：档位盖 restart（词表里最接近的静态档），但
+	// Note 把真实的读者节奏写明——面板宿主每次建窗现读 [panel]，已建好的窗
+	// 在下一次重新显示时也会把此刻解析出的数发一次（票 255-r1），所以「关窗
+	// 再开」就跟上，不需要重启进程。重启档在这里是保守档，不是谎报的档。
+	if w.Field == panel.FieldPanelWidth || w.Field == panel.FieldPanelFontSize {
+		res.Note = "面板宿主每次建窗现读 [panel]：关窗再开面板（下一次显示请求）即按新值重算，无需重启进程。"
 	}
 	return res, nil
 }
