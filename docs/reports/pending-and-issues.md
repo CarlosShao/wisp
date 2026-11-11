@@ -33962,3 +33962,10 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 
 ### 五、Go 写车道饱和说明
 wave124-A 占 `cmd/wisp`（每波一枚写腿铁律），19 孤儿字段批、票 61 云链、163/388 组合根接线**都需 cmd/wisp** ⇒ 本波 Go 写车道只能 1 条；124-A 落账后**同一轮立刻**派下一条 Go 腿。在飞：124-A（Go）＋128-H（前端）＝2 写腿。未推 7（压着）。
+## A1695（2026-11-11 11:4x，编排者）**wave128 双落：语音诚实化（`55486ba80`）＋composer 模型选择器（`1c820d4e5`）｜★揪出 PromptBar 4 空桩｜派 wave129-I**
+
+- **wave128-①语音诚实化** `55486ba80`（voice-settings.tsx +30/−6）：听写链/朗读链/实时语音卡三张"静默假"全部改为诚实占位——文案明说"常驻语音只走本地、云端/实时引擎尚未接入，改它当前不生效"，橙色 StateTag「占位·当前不生效」，撒谎收据「已保存重启后生效」经 `placeholderReceipt` 改橙色警告。编辑器仍写真实（写入/读回真），只不再假装生效。**C→B 完成**。
+- **wave128-②composer 模型选择器（票 187）** `1c820d4e5`（7 件 +341/−38）：产品 composer 行是 App.tsx 的 PromptBar（不是退役 composer.tsx），一直 `models={[]}` 故选择器从未画出。新件 `composer-row.tsx`：选项/档位/原因句全从快照 `modelSwitch` 逐字取（⛔ 造数据）；写路由换模型走 `role_chat_pair`、换档位走 `role_chat_thinking`；收据保留 Go 档位句（模型＝重启生效、档位＝下次任务生效）。门禁：typecheck/lint/build/render:composer(7 态)/render:nav 全 rc0 + Go 对账 `TestComposerContractTypesMatchFrontend` ok 0.327s。
+- **★新发现（wave128 上报）**：PromptBar 的权限档位/工作区/附件/发送 4 个回调是 `() => undefined` 空桩（普查矩阵从退役 composer.tsx 误判为 A，实为静默假）⇒ **派 wave129-I**：接既有 `requestModeSwitch`/`sendMessage`/attachment 路由，缺路由则改诚实禁用态。
+- **wave124-A 进行中**：go/link 进程在跑，新建 `internal/ball/idle_appearance`／`internal/panel/ball_idle_appearance`／`cmd/wisp/appearance_wave` 一批件＋十余件改，未 commit（大任务，非卡死）。
+- 在飞：124-A（Go）＋129-I（前端）＝2 写腿。未推 10（继续压，等 124-A 落账补 Go 台账一并推）。
