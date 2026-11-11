@@ -19,6 +19,14 @@
      5. zero emoji in the painted markup (ban #8's belt on this file's own
         output, not a replacement for the repo scanner).
 
+   ball.size joined the live class (tickets 413/422, 2026-11-11): the same
+   render also asserts that row - 能改 badge with 等快照 and no slider when
+   no ballSize section is handed down, and a second render WITH a section
+   asserts the slider mounts on the snapshot's own min/max band with the
+   current diameter shown. Both rows' badge words are sliced from each row's
+   own description text onward, never from the markup start - a global first
+   match went stale the moment a second 能改 row entered the screen.
+
    The picker's CLOSED popover shows only the current value, so the
    vocabulary rows themselves are not visible in static markup; that the
    section's vocabulary feeds the options is a typecheck-level fact
@@ -30,7 +38,7 @@
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { ConfigScreen } from "@/components/config-screen";
-import type { BallStyleSection } from "@/lib/panel";
+import type { BallSizeSection, BallStyleSection } from "@/lib/panel";
 
 const failures: string[] = [];
 function check(label: string, ok: boolean, detail = ""): void {
@@ -62,12 +70,31 @@ check(
 );
 // The config-write badge: extract the row's own span (from the style
 // description to the badge word) and assert the picker sits between them and
-// no 即时 leaks into that row.
-const styleRow = live.slice(live.indexOf("悬浮球外观风格"), live.indexOf("能改") + 2);
+// no 即时 leaks into that row. The badge word is searched AFTER the style
+// description, not from the markup start: ball.size joined the 能改 class
+// (tickets 413/422) and its row precedes this one, so a global first match
+// slices backwards and hands this check an empty row.
+const styleRowStart = live.indexOf("悬浮球外观风格");
+const styleRow = live.slice(styleRowStart, live.indexOf("能改", styleRowStart) + 2);
 check(
   "the ball.style row must carry the config-write badge 能改",
   live.includes("能改") && styleRow.includes("能改") && styleRow.includes('aria-label="球风格"') && !styleRow.includes("即时"),
   styleRow.slice(0, 120),
+);
+// ball.size joined the live class too (tickets 413/422). The live render above
+// hands down no ballSize section, so the row must carry the same 能改 badge
+// yet refuse to draw a diameter it was not handed: 等快照, no slider, no
+// invented number (P9 - the read half is the snapshot's, never a local copy).
+const sizeRowStart = live.indexOf("悬浮球直径");
+const sizeRow = live.slice(sizeRowStart, live.indexOf("能改", sizeRowStart) + 2);
+check(
+  "the ball.size row must carry 能改 but say 等快照 with no slider while the reader is absent",
+  sizeRow.includes("能改") && sizeRow.includes("等快照") && !sizeRow.includes('type="range"'),
+  sizeRow.slice(0, 120),
+);
+check(
+  "no reader means no ball-size slider mounts anywhere in the live markup",
+  !live.includes('aria-label="悬浮球大小"'),
 );
 check(
   "the page-local rows must keep their 即时 badges (2 row badges + 1 footer mention, needle words verbatim)",
@@ -83,8 +110,8 @@ check(
   live.includes(">glass<"),
 );
 check(
-  "the dormant ball rows must keep saying the native surface owns them (D29)",
-  live.includes("D29"),
+  "the dormant ball rows must keep saying the native surface owns them (D29, both rows verbatim)",
+  live.includes("那颗球是原生绘制的（D29），页面改不到") && live.includes("同上"),
 );
 check("the live markup must hold zero emoji", !EMOJI_RE.test(live));
 
@@ -99,6 +126,35 @@ check(
   noReader.includes("快照里还没有球风格这一节"),
 );
 check("the no-reader markup must hold zero emoji", !EMOJI_RE.test(noReader));
+
+// --- the with-reader case: the snapshot's own band -------------------------
+// Same render with the ballSize section handed down (the real page does this
+// once its settings leg passes it through): the slider mounts with the
+// section's own min/max - the schema's range, never a copy typed here - and
+// the current diameter reaches the row as the host read it.
+const BALL_SIZE: BallSizeSection = { size: 96, min: 44, max: 160 };
+const sizeLive = renderToStaticMarkup(
+  <ConfigScreen ballStyle={READ} ballSize={BALL_SIZE} />,
+);
+const sizeRowLiveStart = sizeLive.indexOf("悬浮球直径");
+const sizeRowLive = sizeLive.slice(
+  sizeRowLiveStart,
+  sizeLive.indexOf("能改", sizeRowLiveStart) + 2,
+);
+check(
+  "with the reader the ball.size row must mount the snapshot-banded slider",
+  sizeRowLive.includes("能改") &&
+    sizeRowLive.includes('type="range"') &&
+    sizeRowLive.includes('aria-label="悬浮球大小"') &&
+    sizeRowLive.includes('min="44"') &&
+    sizeRowLive.includes('max="160"'),
+  sizeRowLive.slice(0, 160),
+);
+check(
+  "the snapshot's current diameter must reach the row, not an invented one",
+  /96<!--\s*-->px|96<[^>]*>px|>96px</.test(sizeLive),
+);
+check("the size-bearing markup must hold zero emoji", !EMOJI_RE.test(sizeLive));
 
 // --- the write half is a source-level fact --------------------------------
 // The receipt flows through lib/config-actions' one write door; the field
@@ -120,6 +176,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.error(
-  "render-config: OK, ball.style row live (picker mounted, current family shown, " +
-    "no-reader honest state, write rides the settings door, zero emoji)",
+  "render-config: OK, ball.style + ball.size rows live (pickers/slider mounted, snapshot values shown, " +
+    "no-reader honest states, write rides the settings door, zero emoji)",
 );
