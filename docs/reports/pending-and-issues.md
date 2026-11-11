@@ -34207,3 +34207,18 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **302-v1（`magpie-max` + review 组，max 档）第二次空交**：返回空串、零提交。**max 档也救不了 review 组当执行器的空交**——它只能当评审器。⇒ 302 的 AC#1..4 裁决**改由我自己做**（下一轮）。
 - **推送故障**：GitHub `TLS connect error: error:0A000126:SSL routines::unexpected eof while reading`，连续 4 次失败（含 `http.version=HTTP/1.1` 重试）。**本地 7 笔提交安全在盘**，`unpushed=7`。恢复后自动推。
 - 撤销口令：删本 A1714 条；`git revert f64d9752d 1bb73e6d5`（122-r2）／删 `314-ac0-native-exit-codes.md` 的补完段（314 AC#0）。
+
+## A1715 — ★★★编排者严重违令：我裁 302 落甲形，而票面 2026-10-10 的裁定是"甲/乙都⛔落"；已回退
+
+- **事实（我逐字读票面核出来的）**：票 302 `:84` 写明 `AC#1` 的具名前置条件 **(ii)** ＝「只有当归因结论是『这一跳在 CI 台面上永远拿不到回执』时，搬档／进 ledger 才有意义——若结论是"能拿到，是某笔改动弄断了它"，那修完之后这三枚本该回绿，**本票甲／乙两形都⛔ 该落**（落了就是把一枚真回归搬进隐形）」。
+  票面 `:92`–`:103` 是**已作出的编排者裁（2026-10-10 19:1x）**：CI 改后那一发（run `38045508579`／job `114194107792`／headSha `05db4bc6`＝票 303 修复那笔）**拿到了页面原话** `AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED"` ⇒ **前置条件 (ii) 判死 ⇒ 甲（搬 winlive 档）／乙（进 `portable-tests.sh` 的 `-skip` ledger）都⛔ 落**。
+- **我做了什么（违令）**：我 2026-11-11 派 `302-r1` 时**只读了票面 AC 段，没读 `:84`–`:103` 这两段裁定**，自己"裁"了甲形。302-r1 交件 `:3` 逐字写「**编排者已裁甲形，本腿未自选形**」——**责任在我，不在腿**。腿甚至诚实披露了"那三枚在本机今天不红"（我上一轮还把它当"诚实披露"表扬，其实那正是"真回归已被 303 修好"的证据）。
+- **我的自裁件也是错的**：我据此写了 `docs/evidence/s1/302-verdict-orchestrator.md` 判 302「可收口、AC#1 PASS」——**已删**（未提交，无需 revert）。
+- **回退（已做，可核）**：`git revert --no-edit fc08ecb84` ⇒ commit **`6232efeb6`**。现跑验证：
+  - `go vet ./cmd/wisp` **rc=0**
+  - `go test -list 'TestAC13ColdStart|TestAC14Awaited|TestAC14GoSide' ./cmd/wisp` **rc=0**，三枚名回到**默认档**名册：`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14AwaitedBindingReplyReachesThePage`／`TestAC14GoSideEvalPushReachesThePage`
+  - `cmd/wisp/panel_page_reply_302_winlive_test.go` **已不存在**（`Test-Path` ＝ False）
+- **连带更正**：我上一轮在 `A1714` 与 `314-ac0-native-exit-codes.md` 里写的"**302-r1 使 AC14 两枚需 `-tags winlive`**"这条**现已作废**——回退后它们回到默认档。⚠ `314-ac0` 件里那段"发现"要按本账更正：**回退后默认档重新包含 AC14 两枚**，314 死亡点复跑**不需要** `-tags winlive` 了。（我保留该件原文不改写历史，以本账为准。）
+- **票 302 现态**：`AC#0` 已勾；`AC#1`/`AC#2`/`AC#3`/`AC#4` **仍四枚未勾**，且按 `:92` 裁定「本票⛔ 有可落的形」⇒ **302 不派落地腿、不翻框、不改 `-done`**。302-v1/302-r1 两笔投入全部作废。
+- **我的改正（写进下一份交接）**：派任何票前，**必须逐格读票面全文（含 Progress log 与所有"编排者裁"小节）**，把"⛔ 落 / 判死 / owner-vetoed / 不做"逐笔抄进派单存档，再决定派不派、派哪一形。**上一轮 A1712 已因同样原因踩过一次（238），这轮又在 302 踩了第二次。**
+- 撤销口令：`git revert 6232efeb6` ⇒ 重新落甲形（但那违令，⛔ 做）；删本 A1715 条。
