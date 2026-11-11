@@ -366,7 +366,7 @@ var sectionReadSites = map[string][]string{
 	// (cmd/wisp/logsink.go); the retention window helper reads both
 	// l3_retention_days and privacy.retention_days and run.go feeds l1_max
 	// into memory.Open (cmd/wisp/memory_retention_180k.go + cmd/wisp/run.go).
-	"Privacy": {"cmd/wisp/logsink.go", "cmd/wisp/memory_retention_180k.go"},
+	"Privacy": {"cmd/wisp/logsink.go", "cmd/wisp/memory_retention_180k.go", "cmd/wisp/diagnostics_cmd.go"},
 	"Memory":  {"cmd/wisp/memory_retention_180k.go", "cmd/wisp/run.go"},
 	// 2026-11-05 re-adjudication (ticket 98's C2): ticket 44 landed the C23
 	// money path, and both of its adapters read the four [cost] leaves off a
@@ -383,12 +383,17 @@ var sectionReadSites = map[string][]string{
 	// importing internal/config or naming config.toml would be the dependency edge
 	// AC#4 forbids (TestTicket255HostStillDoesNotParseConfigItself checks both).
 	"Panel": {"cmd/wisp/panel_resident_windows.go"},
-	"App":   {"cmd/wisp/autostart_windows.go"},
+	"App":   {"cmd/wisp/autostart_windows.go", "cmd/wisp/single_instance_boot_180p.go"},
 	// 票 43: the resident boot's autostart sync is [app]'s first production
 	// reader outside internal/config - it reads App.Autostart (restart tier,
 	// ticket 233) once per boot and makes HKCU's Run key agree with it. The
 	// restart tier is why the read is boot-time only: the key's own verdict
 	// (需要重启进程生效) is what makes this the honest consumer shape.
+	// Deferred-disposition 20261110 #1 added the second: single_instance_boot
+	// _180p.go reads App.SingleInstance (the same restart tier) once per boot
+	// in front of proc.Boot and turns the mutex off when the file says false -
+	// the same boot-time-only shape, which is what makes it the same honest
+	// consumer class (no live re-read, the key decides the next process start).
 	// 票 313 added two more [voice] readers to the scan's list: the settings leg
 	// cmd/wisp/panel_config_store.go reads the cloud chains and realtime keys off
 	// the LIVE Manager (ReadSettings), and internal/panel/config_handlers.go

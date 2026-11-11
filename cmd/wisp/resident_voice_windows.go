@@ -287,9 +287,13 @@ type voicePlan struct {
 	// walks row #28 instead - Speaking lands in Listening with the mic still
 	// open - and the announcement end skips the enterWarm call that would
 	// close the feed the row just kept open. The first-enable L2 privacy
-	// confirmation PLAN.md:2211 asks for is the session scope's own contract
-	// (EnableConversation's PrivacyConfirm hook) and stays that surface's;
-	// this plan field is the machine-side row selector only.
+	// confirmation PLAN.md:2211 asks for runs at assembly (the deferred
+	// disposition 20261110 contract item C2 wiring): the value this field
+	// carries into the dispatch is the POST-gate one - startResidentVoice
+	// applies conversationPrivacyGate180P before rv.start, so a mode whose
+	// first-enable card was denied (or that had no card surface to ask on)
+	// arrives here as false, and the scope's own EnableConversation contract
+	// (Hooks.PrivacyConfirm) runs on the same gate.
 	ConversationMode bool
 	// AECEnabled is [voice] aec.enabled, the barge-in monitor's config switch
 	// (setAECEnabled). false refuses every arm: the P15 readings (A1307) make
@@ -1785,14 +1789,22 @@ func (rv *residentVoice) stopLine() string {
 // process's own data root, build the handle, book the thread, and hand both ends
 // of the wake-pause hop to the ball host (ticket 15e's third seam).
 //
+// conversationPrivacyConfirm is the L2 card surface for the mode's first-enable
+// privacy confirmation (deferred disposition 20261110 contract item C2,
+// PLAN.md:2211): the gate runs BEFORE rv.start, so the mode the D43 speak-end
+// row selector walks is always the post-gate value. nil is fail-closed - the
+// mode stays off and the boot says so loudly - the same direction
+// session.EnableConversation takes for a nil PrivacyConfirm hook.
+//
 // It never stops the boot. Every branch that cannot build a voice chain returns a
 // handle with its verdict already written, and the boot report prints that
 // verdict - the same posture startResidentAudio takes for the microphone.
-func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink, voiceAudit func(statemachine.Effect)) *residentVoice {
+func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink, voiceAudit func(statemachine.Effect), conversationPrivacyConfirm func() bool) *residentVoice {
 	if rt == nil {
 		return nil
 	}
 	rv := buildResidentVoice(rt.Layout.DataDir, ra, rb, tasks, voiceAudit)
+	rv.applyConversationPrivacyGate180P(rt.Layout.DataDir, conversationPrivacyConfirm)
 	rv.start(rt.Registry)
 	if rb != nil {
 		// Both ends of the tray's pause-wake hop, attached here because this leg

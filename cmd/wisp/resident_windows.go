@@ -131,8 +131,23 @@ func runResident() {
 		os.Exit(2)
 	}
 
-	rt, err := proc.Boot(env)
+	// Deferred-disposition 20261110 #1: [app] single_instance rides the
+	// proc.WithLayout seam (boot_windows.go:81-85 left it open for exactly this)
+	// BEFORE proc.Boot - the mutex is taken inside Boot, so the config read has
+	// to happen in front of it or a second launch is refused before anything
+	// read the key. Missing/unreadable config leaves the lock on (the schema
+	// default and the fail-closed side); false clears the mutex names and the
+	// boot below prints the line naming the key and the file that said so.
+	bootLayout, siOffByConfig, siSource := singleInstanceBootLayout180P(env)
+	var bootOpts []proc.BootOption
+	if siOffByConfig {
+		bootOpts = append(bootOpts, proc.WithLayout(bootLayout))
+	}
+	rt, err := proc.Boot(env, bootOpts...)
 	if errors.Is(err, proc.ErrAlreadyRunning) {
+		// Unreachable when siOffByConfig: with the mutex off, Boot acquires
+		// nothing and cannot refuse. The branch keeps its pre-180P shape for
+		// the default (single_instance=true) path.
 		layout, lerr := proc.DefaultLayout(env)
 		if lerr == nil && layout.MutexEnabled {
 			_ = proc.SignalExistingInstance(layout.ActivateEventName)
@@ -244,6 +259,18 @@ func runResident() {
 	sum := rt.Layout.Summary()
 	fmt.Printf("wisp: resident runtime booted (%s, data dir = %s, portable = %v, job object = on, single instance = %v)\n",
 		sum.EnvBadge(), sum.DataDir, sum.Portable, rt.Instance != nil)
+	// Deferred-disposition 20261110 #1: when the KEY (not the env fork) turned
+	// the mutex off, the summary line above reads single-instance=false with no
+	// reason attached. This line is the reason, with its provenance: the key
+	// name, the file it was read from, and the two things that therefore do not
+	// happen (no refusal, no activation - D42#7's second-launch semantics are
+	// off by the user's own switch, the same shape the test env has always run).
+	if siOffByConfig {
+		fmt.Printf("wisp: 单实例=关（[app] single_instance=false，来源 %s）：第二个实例不会被拒绝，也不会再激活已运行的实例（D42#7 的二实例激活随此键关闭；该键是重启档，改动要重启进程才生效）\n",
+			siSource)
+		slog.Info("lifecycle: single instance disabled by config",
+			"key", "app.single_instance", "value", false, "source", siSource)
+	}
 
 	// The boot report has to match what happens next: if an exit request already
 	// arrived during the ball path, printing "resident event loop running" and
@@ -689,7 +716,12 @@ func runResident() {
 			vlg.Info(fmt.Sprintf("resident: effect d43=%d name=%s", e.D43, e.Name))
 		}
 	}
-	rv := startResidentVoice(rt, raudio, rb, voiceTasks, voiceAudit273)
+	// The last argument is the L2 card surface for the mode's first-enable
+	// privacy confirmation (deferred disposition 20261110 contract item C2,
+	// PLAN.md:2211): this process's own approval gate, on the task root
+	// D38(e) step 3 owns. nil would be fail-closed, but the gate above is
+	// built unconditionally at boot, so the real surface is always handed in.
+	rv := startResidentVoice(rt, raudio, rb, voiceTasks, voiceAudit273, ra.conversationPrivacyConfirm180P)
 	// Ticket wire-r1: the announce path's PRODUCTION TRIGGER. The D10 result
 	// presenter in run.go's execute() is the one place in this process that holds
 	// the agent's answer text, so it is the only place a sentence can be handed to

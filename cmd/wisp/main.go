@@ -74,6 +74,15 @@ Usage:
                    router; -data names the data root (this leg never resolves one)
   wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
                    verdict; driven by scripts/slo-check.ps1
+  wisp diagnostics  diagnostics bundle (ticket 45 engine, wired by the
+                    deferred-disposition 20261110 #5): the total switch is
+                    [privacy] diagnostics_opt_in in config.toml - false refuses
+                    the whole command (fail-closed, no preview, no log read),
+                    true runs preview (what the zip WOULD carry, nothing
+                    written) and export (same preview, then the bundle zip;
+                    -o names the output, -slo-snapshot attaches a sampler JSON).
+                    Transcripts and watchdog snapshots stay default-excluded
+                    with per-item consent recorded in the manifest
   wisp version     print version information
   wisp help        show this help
 
@@ -156,6 +165,19 @@ func main() {
 		os.Exit(cmdModels(args[1:], modelsIO{stdout: os.Stdout, stderr: os.Stderr}))
 	case "slo":
 		os.Exit(cmdSLO(args[1:]))
+	case "diagnostics":
+		// Deferred-disposition 20261110 #5: the first production caller of
+		// observe.PreviewDiagnosticsBundle / observe.BuildDiagnosticsBundle
+		// (ticket 45's engine had zero production callers). A console leg like
+		// `wisp config`: it resolves the env and data root itself, consults the
+		// [privacy] diagnostics_opt_in total switch before touching anything,
+		// and writes only the bundle zip the export subcommand names. Coverage
+		// is carried by the diagnostics_cmd tests driving this leg's own
+		// runners (cmdDiagnostics -> runDiagnosticsPreview180P /
+		// runDiagnosticsExport180P); it reaches no installLogSink, so the
+		// ticket-131 sink gate owes it no nail.
+		attachParentConsole()
+		os.Exit(cmdDiagnostics(args[1:], diagnosticsIO{stdout: os.Stdout, stderr: os.Stderr}))
 	case "panel-assets":
 		attachParentConsole()
 		os.Exit(cmdPanelAssets(args[1:]))

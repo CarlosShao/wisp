@@ -350,6 +350,19 @@ type voiceResidency struct {
 	// nil = this process has no extraction pipeline (a boot with no C5 chain or
 	// no store), and the hook then does nothing at all.
 	l1Warm func()
+
+	// conversationPrivacyDataDir / conversationPrivacyConfirm180P are the two
+	// halves the conversation first-enable privacy gate needs (deferred
+	// disposition 20261110, contract item C2): the data dir that owns the
+	// once-marker, and the L2 card surface. startResidentVoice fills both
+	// BEFORE rv.start, and scopeOptions hands them to Hooks.PrivacyConfirm -
+	// so session.Scope.EnableConversation's own contract (first enable through
+	// the confirm, later enables free, nil fail-closed) runs on the same card
+	// and the same marker the machine-side gate ran, instead of a lookalike.
+	// An empty dir / nil confirm here is the scope's own fail-closed shape: the
+	// hook refuses, EnableConversation refuses, nothing silently opens.
+	conversationPrivacyDataDir string
+	conversationPrivacyConfirm func() bool
 }
 
 func newVoiceResidency(plan voicePlan, queue *voiceOwnerQueue, clock session.Clock) *voiceResidency {
@@ -501,6 +514,17 @@ func (r *voiceResidency) scopeOptions() session.ScopeOptions {
 		// warm entry" and a process that attached no pipeline stays nil here
 		// instead of carrying a no-op that looks wired.
 		WarmWindow: r.warmWindow,
+		// Deferred disposition 20261110 contract item C2: the first Conversation
+		// enable's L2 privacy confirm, on the same gate the boot's machine-side
+		// face ran (see conversation_privacy_180p.go). A nil confirm (a boot
+		// that never handed a card surface in) keeps the session package's own
+		// fail-closed direction: EnableConversation refuses rather than silently
+		// enabling a mode that keeps a microphone open.
+		PrivacyConfirm: func() bool {
+			granted, outcome := conversationPrivacyGate180P(r.conversationPrivacyDataDir, r.conversationPrivacyConfirm)
+			slog.Info("voice[scope]: conversation 首次开启隐私确认", "outcome", string(outcome), "granted", granted)
+			return granted
+		},
 	}
 	return session.ScopeOptions{
 		Loader: r.loader,
