@@ -34051,3 +34051,28 @@ V 已提交 `b59575fba`（frontend 设置页"通用"过期文案刷新）；R（
 - W 裁决：163＝待 R 已落，走验收裁决关＋追认 N/Q 写面＋补 Q 收件行；388＝可关（AC#2 录回已在盘 A1688 750.3→46.5 平方律，机主亲耳亦已确认）；423＝需 2 件（SPEC-12 §5 补四残键五字段＋开票 61 收尾票）。
 - 已推：d64d48e03 → origin/dev，未推 0。
 - ★路由封锁（待机主）：审计/测试/审查子代理（group-review-and-audit）与 glm auto/glm-5.3-flash 均 not allowed for this Session，本会话仅放行 magpie/auto/deepseek-v4.1-flash；新腿派不出，编队补位暂停，等机主在会话白名单放行。
+## A1702（2026-11-11 17:5x，编排者）**交接给新会话：`orchestrator-handover-20261111.md`＋HANDOVER §4.0ga；goal 已暂停 rev57；D 盘清理盘点出报告（可回收≈48.7GB，头号 D:\tmp\wisp≈39.3GB）**
+
+### 一、为什么交接
+机主决定新开一个会话继续 Wisp。本会话的子代理允许路由被会话级冻结（`list_subagent_models({provider:"magpie"})` 只回 `magpie/auto/deepseek-v4.1-flash`；`auto/glm-5.3-flash`、`group/group-review-and-audit` 均报 `not allowed for this Session`），而主会话模型必须固定 deepseek ⇒ 本会话无法按机主 2026-11-11 模型分工派腿（审计/测试/审查→review-and-audit，其余→glm）。故换新会话，交接文档已落盘。
+
+### 二、交接物（新会话先读）
+- `docs/reports/orchestrator-handover-20261111.md`（14 节完整交接：机主偏好/⓪⓪⓪铁律/模型分工＋冻结坑/项目/环境/运行铁律/平台陷阱/刚完成/现状/待办/文档索引/开工第一步/待拍板/防漂移）。
+- `docs/reports/HANDOVER.md` 新增 §4.0ga（指向上述文件＋现状快照）。
+- 本账 A1702。
+- D 盘盘点报告：`.scratch/wisp/probes/orch/20261111/cleanup-inventory.md`（只读，未删任何东西）。
+
+### 三、交接时现状快照（17:55 现跑，接手请重跑）
+HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84**；台账最新 `A1701`（本账 A1702）；tracked 脏仅 2 件他腿（`.scratch/wisp/probes/291/mic/resident_audio_291_probe_windows_test.go`、`frontend/fixtures/composer-states.html`）；untracked≈1600；在飞 **0**；goal `goal-4c8d8f64-…` **rev57 paused**。
+
+### 四、D 盘清理盘点（只读，未删；删除待机主点头）
+- **D 盘 370.3G 用 / 500G 总 / 129.7G 空**；Wisp 项目 11.29G。
+- **头号垃圾＝`D:\tmp\wisp` ≈39.293GB**（历史临时件：20261108 17.98G、20261105~07 各≈5.8G、20261103 1.47G、20261109 1.36G、20261111 0.85G、20261104 0.11G）。
+- `.scratch\wisp\probes` 6.93G（其中 probes\145 4.32G 最肥）；`Wisp\build` 1.15G（删后要重编）；`D:\.pnpm-store` 0.123G；`D:\work\base\gopath\pkg\mod`(GOMODCACHE) 1.515G。
+- **合计可回收 ≈48.7GB（D 盘）**；剔除 build+bin 后纯无痛 ≈47.5GB。
+- **GOCACHE 16.45G 在 E 盘**（`E:\work\data\caches\go-build`），清它不改善 D 盘 —— 别被误导。
+- `D:\tmp` 整体递归 >90s 未测完（根下约 250 个实验目录），实际可回收可能更高。
+- **建议**：先清 `D:\tmp\wisp` 最老日期档 20261103~20261107 试水；⛔ 别碰 `.scratch\wisp\probes\orch\20261111`（存本报告）。
+
+### 五、新会话开工（见交接文档 §12）
+先读文档 → 现跑地面真相 → `list_subagent_models({provider:"magpie"})` 验路由（出现 `group/group-review-and-audit`＋`auto/glm-5.3-flash` 才按分工派）→ `create_goal` 建常驻目标 → 派 ≥3 写腿（音频麦克风 4 张 247/290/291/297 优先）。

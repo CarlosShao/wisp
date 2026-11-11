@@ -4298,3 +4298,11 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 **在飞**：**0 条**（降载令下不派腿）。
 
 **台账最新**：`A1673`。**HEAD**（现跑）：`ae487127b`。**票池**（现跑）：总 406／已结 316／未结 **90**。**路径门禁**：VERDICT GREEN。
+### 4.0ga（2026-11-11 17:5x +08，编排者）★★★ 交接给「新会话」：完整交接＝`docs/reports/orchestrator-handover-20261111.md`
+
+- **为什么交接**：机主决定新开会话继续跑 Wisp（本会话的子代理允许路由被「会话级冻结」＝只有 deepseek，`review-and-audit`/`glm` 都派不了；见交接文档 §3）。**主会话模型永远 deepseek，⛔ 不换。**
+- **现状快照（17:55 现跑，接手请自己重跑）**：HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84**；台账最新 `A1701`；tracked 脏仅 2 件他腿（`291/mic/resident_audio_291_probe_windows_test.go`、`frontend/fixtures/composer-states.html`）；在飞 **0**。
+- **本轮刚完成**：`font_size` 入契约（`be73612bf`）；wave133 R `d64d48e03` ＋ V `b59575fba` ＋ W 报告 `.scratch/wisp/probes/orch/20261110/closeout-163-388-423.md`；机主音频验收 297/388AC#2/293AC#5（`A1700`）；D 盘清理盘点 `.scratch/wisp/probes/orch/20261111/cleanup-inventory.md`（可回收 ≈48.7GB，头号 `D:\tmp\wisp` ≈39.3GB）。
+- **下一步**：见交接文档 §10（音频麦克风 4 张 247/290/291/297；163 裁决＋追认 N/Q；388 可关；423 两笔；D 盘清理待机主点头；未结 84 票逐格读）。
+- **新会话开工**：照交接文档 §12（先读文档 → 现跑地面真相 → `list_subagent_models({provider:"magpie"})` 验路由 → `create_goal` → 派 ≥3 写腿）。
+- **goal**：上一任 goal `goal-4c8d8f64-3f2f-47fe-85f9-360b295697d4` 已暂停（rev57 / paused）。
