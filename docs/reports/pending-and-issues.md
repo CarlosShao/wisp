@@ -34710,3 +34710,26 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **⇒ 给 `314-rep` 派单的最终修订**：判读**以"终点锚命中数"为主轴**，退出码为副轴；⛔ 用 `FAIL` 块判"跑完"。**终点锚是唯一已用两种已知结局反验过的尺（`A1726`：full 3/3、ac3 0/3）。**
 - 诚实登记：这是我第 **4** 次修正自己的判据（`A1727`→`A1728`、`A1729`→`A1730`、`A1733`→`A1737`、本条）。每次都是拿真数据回测发现的，**没有一次是靠推理"觉得对"**。
 - 撤销口令：删本 A1739 条（并据此更正 `A1729` 的"330 vs 330"与 `A1738` 的"failBlk 判跑完"）。
+
+## A1740 — ★★★找到"官方已记录"的同一死法：`portable-tests.sh:104-108` 逐字写了 "a test binary that dies without running its cleanup … for the `go test -timeout` panic and for an external TerminateProcess"
+
+- 停车令下零派腿、零 go test。本轮在 `scripts/portable-tests.sh` 的注释里找到**与本票死法同型的历史记录**。
+- **★逐字原文（`scripts/portable-tests.sh:104-114`）**：
+  > `# WHAT THIS BUYS, MEASURED. A test binary that dies without running its cleanup`
+  > `# leaves its `t.TempDir()` directory on disk: the census leg (310-a1 20-shapes.md)`
+  > `# and the orchestrator (probes/orch/20261012/logs/orch-310-recheck-b.txt) each`
+  > `# measured exactly one new directory per death, twice over, for the `go test`
+  > `# -timeout` panic and for an external TerminateProcess.`
+  ⇒ **仓里已经记录过"测试二进制不跑 cleanup 就死"这件事，且明确了两种成因：`go test -timeout` panic 与 外部 `TerminateProcess`。**
+- **★这给了 314 一条**可核的历史线索**（不是我猜的）**：
+  - 该注释指向两份既有证据：**`310-a1 20-shapes.md`** 与 **`probes/orch/20261012/logs/orch-310-recheck-b.txt`**；
+  - **下一步应当去读这两份**——若它们记录的正是"整包跑到中途、进程消失、无 panic 输出"的形状，**314 就不是新 bug，而是 310 已量过的同一现象**，处置可以复用（`A1727` 之后我一直没找到的可比对象）。
+- **★另一条硬读数：`392.721s` 不是超时**：
+  - `go test` 默认超时 = **600s**，`392 < 600` ⇒ **不是默认 `-timeout` 触发**；
+  - 全日志 `panic|timed out|killed|signal:` 命中 **7 条，逐条读过全是测试自己打印的文本**（如 `:2990 "…then ran bringUp - panick…"`、`:3043 "panel host: show failed…"`），**无一条是真 panic 头**；
+  - ⇒ **392s 是"跑到第 330 枚时被结束"的真实耗时，不是超时**。⇒ 若为 `TerminateProcess`，则**来自外部**（脚本/CI/我）——而 ac3 那发 mtime 21:30:05 早于我 22:04 的 `job_kill`，**不是我的**。⇒ **嫌疑转向 `portable-tests.sh`/`runtests.sh` 自己**（是否有 `kill`/`timeout` 包裹，待读）。
+- **⇒ 下一步（零 CPU 可做，下次直接读）**：
+  1. 读 `310-a1 20-shapes.md`（找形状是否同型）；
+  2. 读 `probes/orch/20261012/logs/orch-310-recheck-b.txt`；
+  3. 在 `portable-tests.sh` / 那个 `$strict` 脚本里 grep `kill|TerminateProcess|timeout|taskkill`——**若脚本自己有 kill 逻辑，314 的死因就在脚本层，不在测试层**。
+- 撤销口令：删本 A1740 条。
