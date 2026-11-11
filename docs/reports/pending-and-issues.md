@@ -34076,3 +34076,26 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 
 ### 五、新会话开工（见交接文档 §12）
 先读文档 → 现跑地面真相 → `list_subagent_models({provider:"magpie"})` 验路由（出现 `group/group-review-and-audit`＋`auto/glm-5.3-flash` 才按分工派）→ `create_goal` 建常驻目标 → 派 ≥3 写腿（音频麦克风 4 张 247/290/291/297 优先）。
+## A1704（2026-11-11 18:1x，编排者）**交接文档深度审计：补 13 类漏项（未定义即停/禁止代码形状/票状态机/前端归属/凭据白名单/证据纪律/盘根零污染/授权口令表等），交接文档扩至 16 节**
+
+### 一、审计方法
+拿 4 份权威源逐条对照交接文档：`C:\Users\swq\.dsh\AGENTS.md`（机主全局：铁律3＋偏好16条）、`AGENTS.md`（项目根：§0 进场三句/§1 禁止清单/§2 未定案/§3 五件事）、`.scratch/wisp/issues/README.md`（状态机 10 条规矩＋Hard global constraints）、`docs/reports/orchestrator-handoff-20261013.md`（§1 工作模式/§3 八组铁律/§10 授权表/§8 陷阱）。
+
+### 二、补进 `docs/reports/orchestrator-handover-20261111.md` 的漏项（13 类）
+1. **§1 机主偏好补 4 条**：连续两次"按你的"→转告知式；别的 AI 产出要审（逐条独立取证/引用层与判断层分开报/不照单采纳/不自动执行/落档）；验收用 `ask_user_question` 阻塞式弹选项一门一门来；零术语＋定性词不重于证据＋涉安全三行。
+2. **§3 模型 id 笔误更正**：旧 goal/旧文档写 `auto/review-and-audit` 是笔误，正确 `group/group-review-and-audit`（显示名 group/review-and-audit · routing group）。
+3. **§5 环境补全**：cgo 工具链 E:\work\base\msys64、`scripts/build.ps1`、自托管 runner、Docker、minisign dev 密钥、`third_party/spike-models`。
+4. **§7 平台陷阱补**：`go build ./...` rc=1 来自未跟踪/被忽略的 `build/mut_rvw.go`（别人遗留 91KB，⛔碰）；`go test ./cmd/wisp` 同时只跑一个；推送前凭据扫描（仓 PUBLIC）。
+5. **§15.1 进场三句**：未定义即停（D22）/改契约=人工批准（D1–D47、C1–C32、R1–R9、D43）/裁决者≠实现者。
+6. **§15.2 禁止清单**：禁止代码形状 8 类（裸 go func/PathResolver 外 Clean|Abs/明文密钥/墙钟超时/镜像哈希/面板侧 L2/宿主 artifacts 门控 Tool/UI emoji）＋三枚冻结测试件＋d22scan allowlist＋.github＋DEFERRED 1:1＋config_readers_255 行号钉。
+7. **§15.3 测试注入面**：C8/C5/C17/CLI wisp run；不许 mock 代替真的；never weaken SLO。
+8. **§15.4 票状态机与角色**：5 状态＋开工前置 in-progress＋腿边界（⛔翻框/⛔动 Status/⛔加 -done/⛔改票面）＋结案 git mv 双名＋-done 零残余＋非实现者裁决表（AC 1:1，缺行即 FAIL）＋验收腿攻判据真假/红形演示＋新立票 ≤100 字符＋同票 ≤2 子代理＋24h 无日志 resumed 不重置已勾框。
+9. **§15.5 每片五件事**：缺口审计/失败预演/对抗验收/场景↔切片核对/推迟登记五字段。
+10. **§15.6 未定案 6 项**：AwaitingApproval 系统挂起/web.search 路径/Go module 组织名/便携模式×DPAPI/C24 初始集/C17 白名单/WebView2 冷拉起。
+11. **§15.7 前端与 design 归属**：frontend/**、design/** 归机主外部 agent，本编队⛔写；界面需求唯一出口=票面/证据件；⛔ builtin 跨会话工具；⛔"要不要我转过去"（机主发火三次原话）；门禁读不违规写才违规；按 pathspec 不按 author。
+12. **§15.8 凭据与安全**：API key⛔进对话；config.set 白名单 7+6 字段；credentialValue 只写键；设置写不能新建行；自动模式改凭据硬拦。
+13. **§15.9–15.15**：cmd/wisp 起手三问/GOTMPDIR 只许 C 卷/件纪律（§/超长/.out/rc=N/probes 下 .go）/测量台面六件套/证据纪律（三把尺＋幽灵七形＋行号复认＋HEAD 锚＋尺的射程＋假 0＋overlay 变异）/盘根零污染（唯一落点 D:\tmp\wisp\<YYYYMMDD>\<腿短码>）＋临时件规矩 8 细节/高危陷阱补充/授权与撤销口令全表（A813/A873/A870/294-295/145/299/313/312/前端归属/Ctrl+Alt+P）/工作模式停车点门禁链/Git 附加纪律。
+
+### 三、结果
+交接文档 `docs/reports/orchestrator-handover-20261111.md` 扩至 **16 节**（390 行）；§15＝硬规则全表、§16＝启动提示词（含 goal 常驻 max_goal_rounds=400）。
+新会话提示词同步更新：读文档时明确"§15 硬规则全表务必逐条读"、"goal 是常驻目标"。
