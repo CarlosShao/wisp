@@ -34789,3 +34789,41 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   3. **定点单跑 `Test145ArgsJSON`** 仍然是决定性实验：**单跑若 PASS 且无异常 ⇒ 死因不在它自身**，而在"它之前的累积"或"框架层"。
 - 诚实登记：这是第 **5** 次修正判据。**每次都是回测真数据发现的**；这次修正掉的是我自己 `A1741` 里"最省力"的那条——**越是"省力"的判据越该先回测**。
 - 撤销口令：删本 A1742 条（并据此撤回 `A1741` 的"残渣一刀切"判据）。
+
+## A1743 — ★★★找到机制候选：`cmd/wisp` 测试会**从测试内部再起 `go` 子进程**（5 处），其中 `TestCleanCheckoutBuilds_AC11` 跑 **54.66s**、位于 **index 254**，离死点 330 只差 76 位
+
+- 停车令下零派腿、零 go test。本轮查脚本层有没有 kill 逻辑（`A1740` 的第二个靶子），**脚本层是干净的**，但挖到了更硬的机制候选。
+- **★先排掉脚本层（现跑）**：
+  - `tools/d22scan/runtests.sh`：`kill|TerminateProcess|timeout|taskkill|SIGKILL|Stop-Process` 命中 **0**；
+  - `scripts/wisp-cli-tests.sh`：唯一命中是 `:246` 的**注释**（`the shape this ticket exists to kill`）；
+  - ⇒ **脚本层没有自己的 kill/timeout 逻辑**，314 不是被脚本杀的。
+- **★关键发现一：`cmd/wisp` 的测试二进制**不是纯计算**，它起子进程**：
+  ```
+  嵌套 go 调用 = 5 处
+    cmd/wisp/approval_always_219ac2_test.go:379          -> Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack
+    cmd/wisp/lifecycle_live_43_windows_test.go:66
+    cmd/wisp/panel_host_gate_test.go:416                 -> TestCleanCheckoutBuilds_AC11
+    cmd/wisp/resident_approval_live_246_windows_test.go:417 -> TestLive246ExitAbandonsAHangingL1Window
+    cmd/wisp/secret_argv_windows_test.go:179
+  ```
+  其中 `approval_always_219ac2_test.go:379` 逐字是 **`exec.Command("go", "test", "./cmd/wisp", "-run", "^Test219AC2RevokeRoundTripByteForByte$", "-count=1", "-timeout", "20m", "-overlay="+overlayPath)`** ⇒ **测试内部再跑一遍 `go test`**（嵌套、递归形状）。
+- **★关键发现二：这些嵌套测试的实测耗时（ac3 现读）**：
+  | 测试 | ac3 位置 | 耗时 | 判定 |
+  |---|---|---|---|
+  | `Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack` | **index 12** | **43.92s** | PASS |
+  | `TestCleanCheckoutBuilds_AC11` | **index 254** | **54.66s** | PASS |
+  | `TestLive246ExitAbandonsAHangingL1Window` | **不在 ac3 的 330 里**（index −1） | — | 未跑（在 330 之后） |
+  ⇒ **`TestCleanCheckoutBuilds_AC11` 位于 index 254，离死点 330 只差 76 位**，且它**跑 54.66 秒、起嵌套 `go` 子进程**。
+- **★为什么这是最可信的机制候选（推理链，每步可核）**：
+  1. 314 的死法是**静默提前返回、无 panic、无残渣、`=== RUN` 后零输出**（`A1742`）；
+  2. **`exec.Command` 起的子进程**在父进程被终止时**不会自动被杀**（Windows 无进程组语义），反之亦然——**子进程若持有父进程的 stdout 句柄，父进程退出时会话/句柄状态会异常**；
+  3. `go test` 嵌套 `go test` 会产生**两个测试二进制同时存在**（外层 `cmd/wisp` + 内层 `cmd/wisp`），**两者都链接 sherpa-onnx cgo、都写同一个 GOTMPDIR 家族**；
+  4. ⇒ **`A1736` 查到的"工作树多 2 个未跟踪 323 测试文件"在这个机制下会更危险**：内层 `go test ./cmd/wisp` **会重新编译整个包**，若外层与内层编译的输入不同（工作树在变），**行为不可复现**；
+  5. ⇒ 这与票面原话 **"accumulated state / timing"** 完全吻合，且解释了"**同一棵树、同一二进制、不同结局**"（`A1735` 的 330 是 616 的前缀）：**外层跑到 330 时，某个嵌套子进程/句柄/临时目录的状态恰好越界**。
+- **⇒ 给 `314-rep` 派单的**新增决定性实验**（比 5 次直跑更省力，建议同轮做）**：
+  1. **先跑 `-test.run '^TestCleanCheckoutBuilds_AC11$'` 单发**，记退出码与耗时；
+  2. **再跑 `-test.run '^(TestCleanCheckoutBuilds_AC11|Test145ArgsJSONComesFromTheBookedForensicsRow)$'`**（只有这两枚）；
+     - **若这一发死** ⇒ **死因锁定在 `TestCleanCheckoutBuilds_AC11` 的副作用**（它起的嵌套 `go` 进程/临时树）；
+     - **若这一发活** ⇒ 需要更多前驱，继续按 index 二分（254→330 之间只有 76 枚）；
+  3. 这条**把"5 次碰运气"变成"2 发定位"**，是本轮最省 CPU 的路径。
+- 撤销口令：删本 A1743 条。
