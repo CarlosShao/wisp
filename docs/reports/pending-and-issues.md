@@ -33917,3 +33917,17 @@ orb_test.go:39: embedded orb page still contains CRLF; the asset must be LF
 ### 三、★前端全权（A1689）后首派
 - **wave123（前端腿）**：把「悬浮球大小」滑块端到端接通（panel.ts 加 BallSizeSection＋ballSize 声明、config-screen.tsx 球径行 blocked→live slider、config.set ball_size 写）。**盘上已见改动**（panel.ts:313/444、config-screen.tsx:107/116），腿在跑门禁 typecheck/lint/build＋render 验证。
 - done 326，未结 83。未推 0（wave122 两笔已推）。
+## A1691（2026-11-11 10:5x，编排者）**wave123 前端球径滑块落地（`17e210c33`）｜★两层诚实后续：Go 台账红线＋settings-page 装配｜压推等一并修**
+
+### 一、wave123 结果（前端腿，commit `17e210c33`，2 文件 +103/−12）
+- `frontend/src/lib/panel.ts`：加 `BallSizeSection{size,min,max}`（与 Go `ball_size_413.go` 逐键同形）＋ `PanelSnapshot` 加 `ballSize?`——Go 早发的键现在前端有声明了。
+- `frontend/src/components/config-screen.tsx`：`Row.control` 加 `"ballSize"`；`ball.size` 行**解封**（blocked:""、滑块 44–160 走快照自带 min/max、无快照如实"等快照"、徽章"能改"）；`moveBallSize`＝`performConfigWrite({field:"ball_size"})` 照 moveBallStyle 同形；lede 三行→四行；删掉"球径原生 D29 页面改不到"过期话。
+- 门禁：`pnpm typecheck` rc0、`pnpm lint` rc0（0 error，36 存量警告均不在改动件）、`pnpm build` rc0、`render:composer` rc0。
+
+### 二、★两层诚实后续（腿主动上报，非缺陷）
+1. **`go test ./internal/panel` 现在红 2 —— 设计内 stale-red**：panel.ts 一声明 ballSize，Go 的 TS-合约台账（`composer_test.go` 的 `composerTSGapLedger`/`composerTSNameMap`，`approval_test.go` 同账本）就按设计报警。修复＝Go **测试文件**两行（删 `PanelSnapshot:{"ballSize"}` 条目 ＋ 加 `BallSizeSection→BallSizeSection` 映射）。**internal/panel 本波被 wave124-A 占用** ⇒ 待其完成派 Go 腿补这两行。
+2. **真机暂不显示滑块**：装配点 `settings-page.tsx:212` 只传 ballStyle 没传 ballSize ⇒ 真机该行仍"等快照"。**已派前端腿 D（wave125）**补一行 `ballSize={snapshot.ballSize ?? null}`。
+
+### 三、★压推策略（防 CI 红窗）
+- **wave123 暂不推**（未推=1）：单独推 panel.ts 会让 `internal/panel` 先红。等 wave124-A 释放 internal/panel → 派 Go 腿补台账两行并验 `go test ./internal/panel` 绿 → **wave123＋台账修复＋其余一并推**，CI 一次见全绿。
+- 在飞：wave124（A 面板后端四字段／B 297 CI 名册）＋ wave125（前端 settings-page）。
