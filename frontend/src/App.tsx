@@ -353,9 +353,8 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                   <RetiredView id={view} />
                 ) : (
                   <Conversation
+                    composer={composer}
                     onJump={(id) => setLocal((c) => ({ ...c, activeTurn: id }))}
-                    onPermissionChange={() => undefined}
-                    onSend={() => undefined}
                     permission={composer.mode.current}
                     snapshot={snapshot}
                     tiers={tiers}
@@ -429,15 +428,15 @@ function Conversation({
   snapshot,
   tiers,
   permission,
-  onPermissionChange,
-  onSend,
+  composer,
   onJump,
 }: {
   snapshot: PanelSnapshot;
   tiers: string[];
   permission: string;
-  onPermissionChange: (key: string) => void;
-  onSend: (text: string) => void;
+  /** The snapshot's composer section: the write targets (the attachments a
+      send carries, the workspace in force) ride with it into ComposerRow. */
+  composer: ComposerState;
   onJump: (id: string) => void;
 }) {
   // One turn per result chunk, keyed by correlationId. The rail needs at least
@@ -486,13 +485,19 @@ function Conversation({
         <div className="mx-auto w-full max-w-[720px]">
           {/* Ticket 187's UI half lives in ComposerRow: the model and
               thinking-tier pickers ride the snapshot's modelSwitch section,
-              and their writes go out through the settings door. */}
+              and their writes go out through the settings door. The four
+              composer callbacks - permission tier, workspace, attachment,
+              send - are wired to lib/panel's routes inside ComposerRow, which
+              is also where the write receipts and the errors are shown. */}
           <ComposerRow
+            composer={composer}
             modelSwitch={snapshot.modelSwitch}
-            onPermissionChange={onPermissionChange}
-            onSend={onSend}
             permission={permission}
-            permissions={tiers.map((t) => ({ key: t, name: TIER_NAMES[t] ?? t }))}
+            permissions={tiers.map((t) => ({
+              key: t,
+              name: TIER_NAMES[t] ?? t,
+              gated: composer.mode.l2ConfirmNames.includes(t),
+            }))}
           />
         </div>
       </div>

@@ -383,17 +383,24 @@ export function PromptBar({
               >
                 <Paperclip aria-hidden="true" size={12} />
                 <span className="max-w-36 truncate">{file.name}</span>
-                <button
-                  type="button"
-                  aria-label={`移除 ${file.name}`}
-                  onClick={() => onRemoveAttachment?.(file.key)}
-                  className={cn(
-                    "flex size-4 items-center justify-center text-ink-3 transition-colors duration-100 hover:bg-line/70 hover:text-ink",
-                    pill ? "rounded-full" : "rounded-[4px]",
-                  )}
-                >
-                  <X aria-hidden="true" size={10} strokeWidth={2.5} />
-                </button>
+                {/* The remove control exists only when the parent has a real
+                    route behind it. With no handler this chip used to draw an
+                    X that did nothing - a control teaching the user to stop
+                    believing the bar. No attachment-removal route exists yet,
+                    so the product row simply does not pass one. */}
+                {onRemoveAttachment ? (
+                  <button
+                    type="button"
+                    aria-label={`移除 ${file.name}`}
+                    onClick={() => onRemoveAttachment?.(file.key)}
+                    className={cn(
+                      "flex size-4 items-center justify-center text-ink-3 transition-colors duration-100 hover:bg-line/70 hover:text-ink",
+                      pill ? "rounded-full" : "rounded-[4px]",
+                    )}
+                  >
+                    <X aria-hidden="true" size={10} strokeWidth={2.5} />
+                  </button>
+                ) : null}
               </span>
             ))}
           </div>
