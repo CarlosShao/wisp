@@ -33989,3 +33989,17 @@ wave124-A 占 `cmd/wisp`（每波一枚写腿铁律），19 孤儿字段批、�
 ### 四、推送与在飞
 - **13 笔已推** `073276055..6c0cbd244`，未推 **0**。
 - 派 **wave130**：J（前端接 4 控件，会触发 gap ledger 4 条需后续 Go 腿清）＋ K（Go 批接 19 孤儿 config 字段读者）。
+## A1697（2026-11-11 13:0x，编排者）**wave130：J 四控件前端接好（`4017962b3`）｜K 19 孤儿字段 11 接+2 守卫+6 DEFERRED（`e83494cf5`）｜派 wave131 收尾**
+
+### 一、wave130-J `4017962b3`（5 文件 +491/−45）面板 4 控件前端接好
+ball.opacity_idle 百分比滑杆（页 0–100%、线上 0..1）／ball.click_through Switch（发 "true"/"false"）／panel.width 数字框（blur/Enter 提交）／panel.font_size 数字框。⚠ 与派单简写偏差：Go 线上是**节对象**（BallOpacityIdleSection 等 4 接口），腿按线上权威形状声明（对）。无快照→"等快照"不造数。门禁 typecheck/lint/build/render:composer/render:nav 全绿，render-config-screen 更新 OK。
+- **副作用（预期）**：`go test ./internal/panel` 红 = gap ledger 4 条（ballOpacityIdle/ballClickThrough/panelWidth/panelFontSize）⇒ **等 Go 腿 M 清**。
+
+### 二、wave130-K `e83494cf5`（29 文件 +1244/−51）19 孤儿字段处置
+**11 真接**（observe.level/roll.size_mb/roll.days/privacy.redact_paths 走 logsink boot 喂 observer；memory.l1_max/l3_retention_days/privacy.retention_days/l1_enabled 走 run.go 装配；voice.conversation_mode/aec.enabled 走常驻 plan；audio.input_device 走 internal/audio 新 WithInputDevice+COM 枚举）＋**2 守卫形**（voice.aec.echo_ref/audio.sample_rate＝validate 拒非法值非白改）＋**6 DEFERRED**（app.single_instance=proc 写面外／voice.wake_word.veto_words=speech 写面外／voice.tts.provider/speed=云 TTS speak 半边未实现／privacy.diagnostics_opt_in=BuildDiagnosticsBundle 零调用点／observe.slo_sample_interval_sec=watchdog 1s 冻结节拍需裁）。内部 config/audio/memory 全包 ok；cmd/wisp 整包红只 HEAD 存量 3 枚（198/313/33r11）。反向突变实红（README probes/180k）。需契约裁 2 处（voice.conversation_mode 首次 L2 隐私确认 PLAN.md:2211／observe.slo tick 拆分）。
+
+### 三、派 wave131
+- **M**（internal/panel）：清 gap ledger 4 条＋补 4 翻译，`go test ./internal/panel` 转绿（解压推）。
+- **N**（cmd/wisp）：**163 组合根两行接线＋388 announce 接线**（目标＝可关 163/388 两票）。
+- **O**（只读）：6 DEFERRED＋2 契约项处置表。
+- **压推**：J+K 未推（J 致 internal/panel 设红，等 M 绿后 J+K+M 一并推）。已推基线 227547535。
