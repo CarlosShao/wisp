@@ -82,3 +82,25 @@ $c = Get-Content D:\tmp\wisp\20261111\314profile\full.log
 - ⛔ 改 `scripts/portable-tests.sh` 或 `ci.yml`（门禁形状，需机主单独授权）
 - ⛔ 扩大写面到上述 4 处之外
 - `cmd/wisp` 重包**同一时刻只跑一个**（本波只有你一条腿，你独占）
+
+---
+
+## ⚠⚠ 恢复时必读补充（2026-11-11 22:1x 零 CPU 现查，**原派单漏了这一步**）
+
+**改完会编译失败**——下面两个文件里 `os` 与 `path/filepath` 的**唯一用途就是那行固定名 profile**，换成 `uniqueProfileLeaf` 后这两个 import 变成未使用 ⇒ Go 编译报 `"os" imported and not used`。
+
+| 文件 | `os.` 出现次数 | `filepath.` 出现次数 | 处理 |
+|---|---|---|---|
+| `cmd/wisp/panel_unbound_253r6_windows_test.go` | **1**（仅 `:73`） | **1**（仅 `:73`） | **改完必须删 import `"os"` 与 `"path/filepath"`**（`:50`、`:51`） |
+| `cmd/wisp/panel_assets_299_windows_test.go` | **1**（仅 `:161`） | **1**（仅 `:161`） | **改完必须删 import `"os"` 与 `"path/filepath"`**（`:44`、`:45`） |
+| `cmd/wisp/panel_host_windows_test.go` | 6 | 2 | **⛔ 不删**（其他用途仍在） |
+
+尺（可复跑，改前改后各跑一次）：
+```
+Select-String -Path 'cmd/wisp/panel_unbound_253r6_windows_test.go','cmd/wisp/panel_assets_299_windows_test.go' -Pattern '\bos\.|\bfilepath\.'
+```
+- 改完后**这两枚文件应 0 命中**；若有命中，说明还有别处用到，就**别删 import**。
+- 删 import 后必须 `go vet ./cmd/wisp` rc=0 验证（判据 ①）。
+- ⚠ 也可选择"保留 `os` 的其他用法"这条路线——但现查是 **1 处**，所以删是唯一正确解。
+
+**这条补充是原派单的缺口，恢复时以本节为准。**
