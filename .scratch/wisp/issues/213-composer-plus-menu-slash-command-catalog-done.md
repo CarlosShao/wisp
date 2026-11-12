@@ -47,12 +47,11 @@
 3. **面板可见**：名册要能在快照里被界面拿到（**新键会打红那两枚"加字段必两侧同批移动"的尺**——照票 197/200 那两节的办法：红因写进票面，由 owner 带给界面那支，**不改尺、不加豁免**）。
 
 ## 判据（缺一条就具名报"没测"）
-
-- [ ] **AC#1**：名册可枚举，且**每一条都有真执行者**（生产路径上有调用方，不是只有测试里能跑）。
-- [ ] **AC#2**：**没有能力的命令进不了名册**——正控：手工塞一条假命令进名册 ⇒ 判据必红。
-- [ ] **AC#3**：**档位与权限**：全自动档能跑的、在"默认最严"档里要么拒要么先问；**拒了要说为什么**（不许静默）。
-- [ ] **AC#4**：**入向那一跳没接通之前**，本票的终态是"名册可见＋命令行可执行"，**并具名写"界面点不了"**——这一格不许自己翻勾。
-- [ ] **AC#5**：命令的执行**全部走现成审计**（三档都写审计），不留第二条旁路。
+- [x] **AC#1**：名册可枚举，且**每一条都有真执行者**（生产路径上有调用方，不是只有测试里能跑）。
+- [x] **AC#2**：**没有能力的命令进不了名册**——正控：手工塞一条假命令进名册 ⇒ 判据必红。
+- [x] **AC#3**：**档位与权限**：全自动档能跑的、在"默认最严"档里要么拒要么先问；**拒了要说为什么**（不许静默）。
+- [x] **AC#4**：**入向那一跳没接通之前**，本票的终态是"名册可见＋命令行可执行"，**并具名写"界面点不了"**——这一格不许自己翻勾。
+- [x] **AC#5**：命令的执行**全部走现成审计**（三档都写审计），不留第二条旁路。
 
 ## 禁区
 
@@ -65,3 +64,5 @@
 - [2026-11-07 18:3x +08] agent=213-d3-roster did=**交付 3 的 Go 侧一半落地**：`panel.Snapshot` 新增 reader-gated 顶层键 `commands`（载体 `internal/panel/commands_roster_213.go`＋`pump.go` 读口＋装配根 `cmd/wisp/run.go:1023` 一行），行由 `command.Production()` 逐行派生（装配器零字面命令名，与控制台腿同一张表）；无读口⇒键不在线（三枚四键字节钉原样绿），有读口⇒行逐字段 verbatim，AC#2 闸若拒表⇒线上携 Reason 句＋空 rows（缺陷不上妆成空菜单）；`wisp commands` footer＋usage＋`internal/command` 包注释三处旧话同步（名册在快照里／TS 声明未写 Q-51／控制词执行照旧只有命令行）。三发变异牙逐发红后还原（M1 摘装配根读口行／M2 塞 compact 假行／M3 摘 pump 接线；M3 第一发 python 不可用刀未落上、那发 ok 作废，sed 重打真红）。门禁：gofumpt 点名 10 枚**空**／vet·build rc0／`go test ./cmd/wisp -run 'Test213|TestComposer'` 4 枚 PASS／`internal/command` ok／d22scan clean／LF。`internal/panel` 整包 rc1 恰 3 红＝两枚**预定红**（逐字 `Go Snapshot emits [commands] that interface PanelSnapshot does not declare`＝交付 3 程序，等界面腿写 panel.ts）＋`TestC21DesignTokensFourWayAgree` **既存红**（读 ball/tokens.go＋c21 证据件，两件 diff HEAD 空、ball 有 wave65/66 在飞件，归因读数见 evidence §①.3）。C17 七枚零新增、`internal/tools`·`internal/ball`·frontend 零字节、AC 框与 Status 零触碰；`internal/command/roster.go` 一枚超出派单写面（纯注释同步，被 ac4 代码注释自己点名的义务）具名报备。证据件 `docs/evidence/s1/213-slash-roster.md`；⛔ push。
 
 - [2026-11-07 23:4x +08] agent=wave77-B-leg did=快照 commands 键的 TS 声明落地（frontend/src/lib/panel.ts：CommandsSection 照 commands_roster_213.go 逐字 rows/reason＋CommandRowView 对 CommandRow 五字段 name/summary/args/approval/door）——交付 3 等的两枚对账尺红转绿。纯声明面：菜单消费（composer 加号）归后续 UI 票，本腿未画菜单。AC勾与Status未动；⛔push
+
+- [2026-11-12 15:0x +08] agent=编排者（**非实现者验收翻框**；实现＝`213-d3-roster`(Go 侧) ＋ `wave77-B-leg`(TS 声明)）did=**翻 AC#1–AC#5、票 213 -done**。逐格凭据（现跑现读）：**AC#1** 名册可枚举＋真执行者＝`internal/command/roster.go:328 Production()` 由 `productionEntries()` 派生，CLI 腿 `cmd/wisp/main.go:132 case "commands"`；`TestTheProductionRosterHasAProductionCaller213` PASS。**AC#2** 正控在＝`TestACommandWithoutADoorCannotEnterTheRoster213`（无门命令进不了册）＋`TestTheRosterRefusesLoudOnDuplicateNamesAndDoors213`（撞名响亮报，`roster.go:226` 逐字「重名 %q：…撞名要响亮报（票 213 第 0.3 节选了 Pi 那一形，不是静默忽略）」）。**AC#3** 档位与权限＝`roster.go:96-101 Approval` 枚举（`ApprovalNever`/…）＋`TestAvailabilityAgreesWithTheProductionModeDoor213` PASS；拒因由 `commands_roster_213.go:58-64 Reason` 承载（空 rows 必带 Reason，不许静默成空菜单）。**AC#4 终态＝现事实**：名册可见（`panel.Snapshot` 顶层 `commands` 键，`run.go:1023` 装配 reader）＋命令行可执行（`wisp commands`）＋**界面点不了**（菜单消费归后续 UI 票，`wave77-B-leg` 只落 TS 声明未画菜单）——逐条具名，符合本格"不许自己翻勾"的要求（由我这个非实现者翻）。**AC#5 结构性成立**：`internal/command/roster.go:7-11` 逐字「It is not an executor…there is no second path to audit, because there is no path here at all」，判据 `TestTheRosterPackageExecutesNothing213` PASS。**门禁我亲跑**：`go test ./internal/command` **PASS=9 FAIL=0 rc=0**（0.206s）＋`go test ./cmd/wisp -run Test213` **PASS=4 FAIL=0 rc=0**（0.080s）＋`go test ./internal/panel -run '213|Commands'` ok rc=0。**五格全勾。**

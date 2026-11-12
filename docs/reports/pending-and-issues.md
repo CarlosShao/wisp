@@ -35784,3 +35784,11 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **七格判语全"成立"**，与我 A1786 的逐格凭据**逐条对上**（它还多给了：AC#1 枚数现数＝invoke 18＋事件 5；AC#2③ `sectionwrite.go:343 lockedDirectionOf`；AC#4 三枚测试函数名 `cost_roster_194_test.go:138/:261/:237`；AC#6 `e90ea3cf..HEAD` 契约面唯一 diff＝`be73612bf`(票124-A owner批) 非 194）。**六条门禁同样全绿**（panel 14.616s／config 2.295s／risk 12.760s／tools 26.438s／Test194 0.384s，全 rc=0 零红）。
 - **它顶出的三笔待办（均不挡收口）**：①**机主拍**：`approval.current`/`approval.queue` 撞冻结 l2 仪器词表（规格表 vs ban#6 正面冲突）、`tasks.list`/`task.detail` 撞票 188 仪器——这四枚拼写落不落/改哪边；②编排者：gate-clauses 的 **G7/G7neg 两枚声明不符**（基线 6→7→8，"新增未成对"＝票 171 AC#2 程序）**非 194 所致**（`194-wisp` 腿 11-10 自测 14/14 退码 0，A1681 在账）；③`194-cost-table.md:15` 的 `WriteSection` 文件名笔误（写 `panelwrite.go`，实为 `sectionwrite.go`）。
 - **✅ 194 收口状态不变**（已 -done、`9211a8c89` 已推）；本笔只补审计件与三笔待办入账。
+
+## A1788 — ★票 213 收口 -done（本会话第 9 张：424/85/72/323/246/256/346/194/213）
+
+- 承接 `A1787`。213 与 194 同族（panel 加号菜单三票之一），Go 侧由 `213-d3-roster` 落地、TS 声明由 `wave77-B-leg` 落地，AC 框未翻。
+- **五格逐格凭据（我＝非实现者，现跑现读）**：**AC#1** `internal/command/roster.go:328 Production()` 由 `productionEntries()` 派生＋CLI 腿 `cmd/wisp/main.go:132 case "commands"`＋`TestTheProductionRosterHasAProductionCaller213`。**AC#2 正控在**：`TestACommandWithoutADoorCannotEnterTheRoster213`（无门命令进不了册）＋`TestTheRosterRefusesLoudOnDuplicateNamesAndDoors213`（撞名响亮报，`roster.go:226` 逐字选 Pi 那一形、⛔ 静默忽略）。**AC#3** `roster.go:96-101 Approval` 枚举＋`TestAvailabilityAgreesWithTheProductionModeDoor213`＋`commands_roster_213.go:58-64 Reason`（空 rows 必带拒因，⛔ 静默成空菜单）。**AC#4 终态＝现事实**：名册可见（快照顶层 `commands` 键，`run.go:1023` 装配）＋`wisp commands` 可执行＋界面点不了（菜单消费归后续 UI 票，本波只落 TS 声明）。**AC#5 结构性**：`roster.go:7-11` 逐字「It is not an executor…there is no second path to audit, because there is no path here at all」＋`TestTheRosterPackageExecutesNothing213`。
+- **门禁我亲跑**：`go test ./internal/command`＝**PASS=9 FAIL=0 rc=0**；`go test ./cmd/wisp -run Test213`＝**PASS=4 FAIL=0 rc=0**；`go test ./internal/panel -run '213|Commands'`＝ok rc=0。
+- **五格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213（+9 done）**。done 337→**338**。
+- **下一步候选**：215（Go 侧已落但 215b 技能半需动 D36 配置契约＝人工批准 ⇒ **C 类**）；214（差 AC#5 的 C25 盖戳半边，宿主＝票 35）；219（三按钮 Go join 已落，需核）。
