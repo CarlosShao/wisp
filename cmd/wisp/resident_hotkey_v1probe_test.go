@@ -63,6 +63,13 @@ func Test258V1ProbeSummonEditRebindsLiveBall(t *testing.T) {
 		t.Fatalf("258-v1 PROBE: bridge did not arm with a live src")
 	}
 
+	// Branch 甲 (environment, not product): this probe's boot assertion below is
+	// "Win32 holds 'Z'" and its closing assertion is the verdict's "hotkeys live
+	// 3/4" shape. Both need mute and panel to be ours as well: with either one
+	// owned by another program the verdict reads 2/4 or lower and the case goes
+	// red on a machine fact (round 89 measured live=1). See skipIfOccupied258.
+	skipIfOccupied258(t, "the v1 positive control (it requires the boot summon/mute/panel to be registered)", rb.b.HotkeyReport(), hkSummon258, hkMute258, hkPanel258)
+
 	// BOOT: Win32 must hold 'Z' (the planted value, not any compiled literal).
 	if got := rb.b.RegisteredHotkeys()[hkSummon258].VK; got != 'Z' {
 		t.Fatalf("258-v1 PROBE BOOT RED: summon VK = 0x%X, want 'Z' (planted Ctrl+Alt+Z)", got)

@@ -68,12 +68,56 @@ import (
 // the four real ones works; 9 keeps clear of hkSummon..hkPanel (1..4).
 const spareHKID258 = 9
 
-// hkSummon258 / hkPanel258 are the wParam ids internal/ball registers the four
-// slots under (internal/ball/hotkey_windows.go's hkSummon=1, hkPanel=4).
+// hkSummon258 / hkMute258 / hkPanel258 are the wParam ids internal/ball
+// registers the four slots under (internal/ball/hotkey_windows.go's hkSummon=1,
+// hkMute=2, hkPanel=4).
 const (
 	hkSummon258 uint32 = 1
+	hkMute258   uint32 = 2
 	hkPanel258  uint32 = 4
 )
+
+// skipIfOccupied258 is branch 甲 (the ENVIRONMENT) made executable, and it is
+// the one line of this file that decides whether a case may judge at all.
+//
+// WHY IT EXISTS. Three cases here plant combinations and then read what Win32
+// holds. RegisterHotKey is desktop-wide: when another program owns one of those
+// combinations - a second Wisp resident left running by a concurrent leg, or
+// any other app - the boot registration is refused with
+// ERROR_HOTKEY_ALREADY_REGISTERED, and the premise the case is built on ("the
+// old binding survived", "boot reads hotkeys live 3/4") never comes into
+// existence. Round 89 measured exactly that: a concurrent leg's resident held
+// Ctrl+Alt+Q, Ctrl+Alt+M and Ctrl+Alt+P from 21:22:48, and all three cases went
+// red at 21:23:33 with VK=0x0 and live slots=1. Judging the product on that
+// state judges the machine, not the code.
+//
+// WHY IT IS NARROW. It skips ONLY for HotkeyTaken, the status registerAllWith
+// assigns when Win32 itself answered ERROR_HOTKEY_ALREADY_REGISTERED
+// (internal/ball/hotkey_windows.go:506). A slot that was never attempted,
+// failed for any other Win32 reason, or is live under the wrong key still falls
+// through to the case's own assertions and still goes red: a product regression
+// cannot hide behind this skip. That narrowness is the difference between this
+// guard and "放宽断言".
+//
+// WHY IT IS LOUD. It never skips silently (the ticket forbids it, and a silent
+// skip is how a dead ruler survives for months). The message names every
+// occupied slot with its combination, says the premise is what is missing, and
+// names the two ways to get a judging run back.
+func skipIfOccupied258(t *testing.T, what string, rep ball.HotkeyReport, ids ...uint32) {
+	t.Helper()
+	var taken []string
+	for _, id := range ids {
+		b, ok := rep.Binding(id)
+		if ok && b.Status == ball.HotkeyTaken {
+			taken = append(taken, b.Name+"="+b.Binding)
+		}
+	}
+	if len(taken) == 0 {
+		return
+	}
+	t.Skipf("SKIP-LOUD: %s needs Win32 to hand THIS process its own combinations, but another program on this machine already owns %s (RegisterHotKey answered ERROR_HOTKEY_ALREADY_REGISTERED). The premise this case judges is missing, not the product: a second Wisp resident, or any other app holding the key, produces exactly this reading. Re-run where those combinations are free (or stop the holder) to get a judging run.",
+		what, strings.Join(taken, ", "))
+}
 
 // writeConfig258 writes a config.toml body and returns the path. The canonical
 // branch uses SaveFile - what the product itself writes (firstrun.go) - so the
@@ -346,6 +390,11 @@ panel = "Ctrl+Alt+P"`)
 	if rb.hotkeyBridgeArmed {
 		t.Fatalf("the bridge armed with a nil hotReload: the mutation did not remove the hop, so this control proves nothing")
 	}
+	// Branch 甲: the whole case rests on Ctrl+Alt+Q being OURS at boot. If Win32
+	// refused it, "the old binding survived" is unanswerable here - see
+	// skipIfOccupied258. Checked after the arming assertion above, so a wiring
+	// regression still reds this case whatever the desktop is doing.
+	skipIfOccupied258(t, "the no-rebind control (it requires the boot Ctrl+Alt+Q to be registered)", rb.b.HotkeyReport(), hkSummon258)
 	writeConfig258(t, dir, `summon = "Ctrl+Alt+R"
 mute = "Ctrl+Alt+M"
 cancel = "Esc"
@@ -386,6 +435,15 @@ panel = "Ctrl+Alt+P"`)
 		t.Skipf("SKIP-LOUD: no ball window on this host (%q)", rb.verdictStatusLineFor258())
 	}
 	defer rb.stop()
+
+	// Branch 甲: the boot sentence this case pins is "hotkeys live 3/4", and the
+	// squat below is built on the ball's OWN window under a spare id. Both need
+	// summon/mute/panel to be ours at boot: with any of them taken by another
+	// program the count is 2/4 or lower before this case does anything, and the
+	// "live slots = 2 after the rebind" reading below becomes unanswerable
+	// (round 89 measured live=1 for exactly this reason). See
+	// skipIfOccupied258.
+	skipIfOccupied258(t, "the occupied-combination case (it requires the boot summon/mute/panel to be registered)", rb.b.HotkeyReport(), hkSummon258, hkMute258, hkPanel258)
 
 	// Squat Ctrl+Alt+V on the ball's own window under a spare id: RegisterHotKey
 	// is desktop-wide and id-blind, so from panel's point of view "another

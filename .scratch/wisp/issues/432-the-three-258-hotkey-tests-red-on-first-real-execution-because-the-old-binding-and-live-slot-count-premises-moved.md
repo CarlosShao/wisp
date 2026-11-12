@@ -88,3 +88,43 @@
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\432-<腿码>\`。
 - **仪器**：运行时行为检查 ⇒ `go test -overlay`（拷贝放**仓外**）有效。
+
+## Progress log
+
+### 2026-11-12 22:0x · 写腿 `432-hotkey258` · 判**甲（环境件）**，修台面一处，产码零改
+
+**结论一句话**：三枚红在**前提缺失**（Q／M／P 当时被别人占着），不在产品、不在断言。修法＝检测到占用就 `t.Skipf` 并逐字说明（⛔ 没选"换冷门键"）。证据件：`docs/evidence/s1/432-hotkey-258-premises.md`。
+
+**★先纠了票面一个前提（重要）**：`## ★历史` 说"round 88 只跑了四枚且全 PASS、这三枚没跑到"。**现读 round 88 整包日志（`D:\tmp\wisp\20261112\fullclean\cmdwisp.log`，19:09:19）＝11 枚 `Test258` 全跑、11 枚全 PASS，三枚在册**（`=== RUN` 11／`--- PASS: Test258` 11／`--- FAIL: Test258` 0）。⇒ 这三枚**不是"首次真跑"**；round 88 绿、round 89 红，**两轮之间零提交**（最近动 `cmd/wisp/resident_hotkey*` 的是 11-08 `eec09a028`）。**结论（不是退化）恰好对，但票面给的依据不成立**，建议编排者更正那一节。
+
+**甲／乙／丙**：判**甲**。
+- 甲成立：`internal/ball/hotkey_windows.go:504-509` 把"别人占键"判成 `HotkeyTaken`；round 89 现数 **32 条** `occupied by another program, not registered`（M×12／P×12／Q×7／V×1 后者是 ② 自己的 squat），逐字 `err="Hot key is already registered."`。占位者＝**431 腿 21:22:48 起的常驻进程**（`431-ac1budget/boot1/logs/wisp-20261112-001.jsonl` 逐字 `hotkeys_live:3 ... summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, panel=... live`），而三枚在 21:23:32–21:23:38 跑。
+- 乙排除：两轮之间零提交＋同码 19:09 绿 21:23 红；且 round 89 里**产品行为是对的**（老实报 occupied、`hotkeys_live=0/1`）。
+- 丙排除：`:447` 要 `3/4` 与产码一致（`resident_ball_windows.go:526-527` 印 `len(rep.Live())`，idle 按票 245 就是 3）；`:452` 要 2 也与设计一致（Z+M live／cancel standby／panel 被 squat）；**干净桌面上四发全绿**＝断言不过严。
+
+**★票面点名要答的那格：要不要独占桌面前台／热键？**
+- **要「热键注册」（`RegisterHotKey`），不要「前台」。** 断言只读 Win32 注册集与启动时算好的 `len(rep.Live())`，`git grep 'SetForegroundWindow|GetForegroundWindow|SetFocus'` 在这两枚测试文件**零命中**（命中全在 `panel_*`／`*winlive*` 族）。
+- 所以「有人在用电脑时是否必然红」＝**否**，取决于有没有人占住 Q／M／P：没占⇒照绿（本次 run1／run2／run4／run5 就是机主在用、四发全绿）；占了⇒必红（round 89 与我的 M1）；占了且修复在盘上⇒skip 并说明（mut-control-1）。
+
+**突变控制（真跑，仓外 `holder.exe -keys Q,M,P` 在锁线程持三枚键，只持键不抢前台）**：
+
+| 台面 | 三枚读数 |
+|---|---|
+| 修复前／桌面干净（run1、run2） | PASS 1.19s／0.81s／0.74s；PASS 1.19s／0.84s／0.78s |
+| 修复后／桌面干净（run4、run5） | PASS 1.17s／0.78s／1.05s；PASS 1.24s／0.75s／0.75s |
+| **修复后＋holder（mut-control-1）** | **SKIP 1.31s／0.74s／0.92s**，三条 `SKIP-LOUD` 逐字点名占用的槽与键 |
+| **修复删掉＋holder（M1）** | **FAIL 1.11s／0.69s／0.79s**，三句与 round 89 同形（`VK=0x0`／`live 1/4`／`live slots=1`） |
+| 恢复修复＋holder | SKIP 0.68s／0.73s／0.74s |
+
+⇒ 有牙：删掉修好的那处，三枚**精确回到** round 89 的红；恢复即回 skip。
+
+**改了什么（只台面，产码零改）**：`cmd/wisp/resident_hotkey_258_windows_test.go`（+62：补 `hkMute258=2` 常量、新增 `skipIfOccupied258`、两处调用）＋`cmd/wisp/resident_hotkey_v1probe_test.go`（+7：一处调用）。skip **只**对 `ball.HotkeyTaken`（`hotkey_windows.go:506` 那条 1409 分支）生效；`HotkeyDisabled`／`HotkeyUnparsable`／`HotkeyError`／键活着但值不对 ⇒ **照旧红**，产品退化躲不过它。
+
+**门禁**：`go build ./cmd/wisp/` rc=0 · `go vet ./cmd/wisp/` rc=0 · `gofumpt -l` 零输出 · `scripts/d22scan.sh` rc=0（`clean - no D22 ban violations`，runtests `PASS=45 FAIL=0 SKIP=0`）。`build/mut_rvw.go` 未删。
+
+**越界**：本腿只碰上面两枚；`docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`d22scan/allowlist.txt`／`frontend/**`／`design/**` 在**本腿名下**零命中（`git diff --name-only` 里其余 9 枚是别人在飞的件）。
+
+**并发事故如实记**：21:58:04 撞上 431 腿正在改 `cmd/wisp/resident_sink_nail_127_windows_test.go`（共享编译面）的半成品，`go test -c` 报 `undefined: waitForFact127` 两处；非我改动引起（我两枚当时 build/vet/gofumpt 全绿），等它补上后复跑即绿。按"`cmd/wisp/**` 每波只许一枚写腿"，**排程问题，我只记录不裁定**。
+
+**没做**：没改产码／没碰 `TestAC4Focus*`／`TestAC246*`／`TestAC1ResidentLeg*`／没翻任何 AC 框／没 push。AC 框一律留空。
+
