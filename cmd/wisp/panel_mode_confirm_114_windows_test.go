@@ -89,14 +89,6 @@ func (c *countingPermConfirm) asked() []risk.Mode {
 	return append([]risk.Mode(nil), c.to...)
 }
 
-// modeRequest114r2 is one panel.mode.request envelope, spelled the way the page
-// spells it: bridge.go accepts exactly one sender identity, and anything else is
-// refused by a door in front of the one under test.
-func modeRequest114r2(rid, to string) string {
-	return `{"method":"panel.mode.request","requestId":"` + rid + `","source":"` +
-		inboundPanelSource + `","to":"` + to + `"}`
-}
-
 // TestTicket114r2ResidentPanelChainFromRefusalToTheWriteLeg is readings 1 and 2:
 // the resident door, the nil it used to be handed, and the leg it is handed now.
 // Its name is the reading 114-r2 asked for; the no-leg expectation inside is R9's
