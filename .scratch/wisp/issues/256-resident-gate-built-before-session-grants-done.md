@@ -12,8 +12,8 @@
 ## 要建什么（ⓘ 那一支，⛔ 一动手就撞上"改票 246 AC#1 裁过的乙形次序"）
 
 - [x] **AC#0（本票第一格，且是闸门）＝先把"移动会不会破 `Confirming` 那一维"量出来**：现读 `approval.New` 现在吃哪三项、挪进 `assembleRuntime` 之后谁在挪之前需要那枚门（常驻卡片 UI／热键答复／托盘「允许一次」各一处），逐处带 `file:line` 与"挪之后还拿不拿得到"。⛔ **本格不许直接改产码**；交件判据＝量不到的那一处要具名说"量不到"，⛔ 不许用"应该没问题"填空。**〔10-02 14:3x 编排者现读复认后翻勾；凭据与"我票面三句被推翻"在下面第 7 节；第三处并列不成立〕**
-- [ ] **AC#1 只在 AC#0 交完并由编排者落一枚具名 `A##` 批准之后才许动**：`approval.New` 的 `Options` 里补上 `Grants` ＋ 来自 `[risk]` 的两项（超时／L1 窗口），常驻腿那次运行里「本会话内允许」**真落一行**。凭据形状**复用票 224 r2 那套授权仪器**，⛔ 不许新造一台。
-- [ ] **AC#2 反向判据＋正控**：种一发 `confirm_timeout_sec` 改动 ⇒ 常驻腿那枚窗口的实际钳位值随它变（正控）；⛔ 且 `GRANT-DROPPED` 那行**必须不再出现**（母票 AC#10 写的就是这个形状）。
+- [x] **AC#1 只在 AC#0 交完并由编排者落一枚具名 `A##` 批准之后才许动**：`approval.New` 的 `Options` 里补上 `Grants` ＋ 来自 `[risk]` 的两项（超时／L1 窗口），常驻腿那次运行里「本会话内允许」**真落一行**。凭据形状**复用票 224 r2 那套授权仪器**，⛔ 不许新造一台。
+- [x] **AC#2 反向判据＋正控**：种一发 `confirm_timeout_sec` 改动 ⇒ 常驻腿那枚窗口的实际钳位值随它变（正控）；⛔ 且 `GRANT-DROPPED` 那行**必须不再出现**（母票 AC#10 写的就是这个形状）。
 - [x] **AC#3 越界检查**：`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。⛔ **D43 转移表一个字不许动**——如果量出来"必须新增一个状态才挪得动"，那**不是本票的活**，停下来上报。
 
 ## 编排者收件（2026-10-04 15:4x，收非实现者验收腿 `256-v1`；⛔ AC 框只有 AC#3 被我翻，凭据出处在下面）
@@ -144,3 +144,4 @@ cmd/wisp/resident_approval_windows.go:401  ra.gate = approval.New(approval.Optio
 **5. 排程**：AC#2 需跑 `cmd/wisp` 测试 ⇒ **降载令 `A1658` 下不派**。恢复后写面＝`cmd/wisp/resident_approval_risk_256_windows_test.go`（**已存在**，起手先读它缺什么），⛔ 碰 `run.go`（P7：第 424 行以后任何位移红 `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`）。
 
 **6. 撤销口令**：第 9 节那枚批准 **「256 AC#1 批准撤回」** —— 现已证明它批的是已完成的事，**建议作废**（我不自删，留档说明）。
+- [2026-11-12 13:4x +08] agent=编排者（**非实现者验收/归属，实现＝265-r1 及测试件 256-r1**）did=**翻 AC#1+AC#2、票 256 -done**。三把尺（自查腿 `256-ac2-a` 后我亲复核）：①提交 `2d9e06c18`（1 件 13+/6-）在、`2a10134e8`(256-r1 交付测试件)+`a04a095f7`(265 收编)均在 HEAD；②`resident_approval_windows.go:401-407` 现读含 `ApprovalTimeout: timeout`+`Grants: ra.grants`（AC#1 实现已在盘）；③**我 2026-11-12 亲跑** `go test ./cmd/wisp -run 'TestTicket256|TestTicket265' -count=1` ＝ **ok 0.145s、PASS=21 FAIL=0 rc=0**（5 枚 TestTicket256Resident* 全绿 + 9 枚 TestTicket265 全绿）。**AC#1 处置＝并入票 265**（265 -done，form ⓐ-Ⅰ，A601§4/A602；A1666 自证实现早落盘）。**AC#2 处置**：(a) 反向判据＋正控＝测试件 ruler②（seed `confirm_timeout_sec=45` ⇒ `Queue().Timeout()=45s` 真值进门，`Window()` 只作钳位反控）；(b) `GRANT-DROPPED` 须不再现＝265 测试 `resident_grant_writer_265_windows_test.go:435` banned 列表钉住。**另修**：ruler④ 期望集因票 375（`b63d56413`）合法加 `Answer` 而过期、红；腿 `256-ac2-a` 补 `Answer` 进期望集(6→7)、断言零削弱（`2d9e06c18`）。**4 格 AC 全勾。**
