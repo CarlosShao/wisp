@@ -35799,3 +35799,11 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **九格逐格凭据（我＝非实现者）**：AC#1 定档在 `187-model-switchable.md:35-48`（思考档位＝next_task 读者每次现读、模型＝restart 牵 C5）＋齿 `Test187ThinkingReceiptNamesTheMeasuredTier`；AC#2 写口＝`config.set` 名册 `role_chat_thinking`＋`SetRoleChatThinking` 双检（model/pair 已在册零新增）；AC#3 写腿零碰 `Modes.Set`；AC#4 `ChatSwitchOptions` 只列 enabled＋声明档＋空形显式句；AC#5 next_task 逐支＋两枚齿；AC#6 覆盖面在 `:101-103`（BudgetsFor 现跑、进行中那一轮不受影响、voice 不做）；**AC#7 五笔提交逐笔零触碰契约面**；AC#8 我亲跑 config/panel/agent/cmd-wisp 四包全绿；AC#9 需求表 `187-panel-ask.md` 已出。
 - **九格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213、187（+10 done）**。done 338→**339**。
 - **panel 族进度**：7 张中已收 **194/213/187 三张**；剩 214（差 AC#5 盖戳半边＝票 35）、215（215b 技能半需 D36 契约批准＝C 类）、216（chk5/unc2，待核）、219（AC#3 明写"退回状态不许勾"＋AC#6 L1/L2 分表＝硬活）。
+
+## A1790 — ★★174 的 AC#4 不是 C 类！机主 A1571 已白纸黑字批过「174 [fs] allowed_dirs」＋"改契约文字那步照批" ⇒ 已派写腿落地
+
+- **纠正我自己 A1783 的误判**：我一直把 174 归"C 类＝改 PLAN 契约文字需机主批"。**现读 A1571 原文**（台账 `:31348`/`:31352`）逐字：`**批复**：A(56/58/60)全批；B(211/215/256/345/350/354/**174**/177/138/150/148)全批` ＋ `契约类改动（211 D38d / 215 D36 / 256 C18 / **174 [fs] allowed_dirs** / …）按本次批复执行，**改契约文字那步照批**`。批项原文＝`docs/evidence/s1/census-199.md:102`「要不要把 artifacts 加进授权根」。
+- ⇒ **174 AC#4 有完整授权，且筛查腿已判 `PLAN.md:431`/`:2564` 零字节不改**（落地后"按需再读"自然成真）。**这不是 C 类，是可落地的写活。**
+- **派写腿 `174-landing`**（glm，`workflow-2ffc0a213c89440e`，后台）：作业书＝`docs/evidence/s1/174-landing-readiness-v1.md`（筛查腿已把最小改点、两向判据、四条风险、派单要点全写好）。唯一改点＝`cmd/wisp/run.go:762-764` 追加 `filepath.Join(rt.spec.dataDir, "artifacts")`；三条 gotcha 必须处置（拼写对齐／预创建须走 `winsec.PrivateDirAll` ⛔ `os.MkdirAll`／workspace 收窄是设计内）；两向判据＋变异自证；AC#5 两行分账草稿随件。
+- **同时派 `230-ac5`**（glm，`workflow-55ddd160043f439e`）：票 230 只剩 AC#5 整包终态，跑 `go test ./cmd/wisp ./internal/... -count=1 -timeout 90m` 到终态＋逐名比红名册（已在册：ball 1／panel 4／risk 争用型）。给足超时，⛔ 中途 kill。
+- **本轮筛票结论**：23＝AC#3 残余全在真机/前端（R1 真 fixture／R2 真提权窗／R3 前端 UI）⇒ 等机主窗口期；195＝AC#0 具名永缺＝终态；216＝AC#5 已由前编排者判"不适用"归口 S6 DEFERRED（账 A1010）⇒ 排除；219＝AC#3 票面明写"今天退回状态不许勾"＋AC#6 L1/L2 分表＝硬活。
