@@ -25,6 +25,8 @@ import (
 	"bytes"
 	"context"
 	"log/slog"
+	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"testing"
@@ -181,7 +183,63 @@ func runWatchdogE2E384(t *testing.T) (*proc.Runtime, *residentVoice, *watchdog.L
 // unload pass over a real over-cap tree, the D43 #9 Armed self-loop (stay
 // Armed + keep-alive effect), and the D43 #35 fatal row (WatchdogAlert +
 // one-click restart) after three consecutive settle failures.
+//
+// THE FALLBACK READING RUNS IN A FRESH PROCESS (ticket 429). The phase-1 hold
+// is released and the tree must come back under 80MB, and that number is an
+// ABSOLUTE private working set: it counts everything this process has resident,
+// not just what this case allocated. In a whole-package or six-family run the
+// voice families (15e / 26R3 / 41a2r1 / 390r1) load real sherpa-onnx ASR, TTS
+// and KWS engines into this same process and leave them resident, so the tree
+// sits at ~100MB BEFORE this case allocates anything - 20MB over the line and
+// 10MB over the Armed cap - and no collection can return it, because a loaded
+// cgo engine is live state, not garbage. Measured 2026-11-12: the same binary
+// and the same 64MB hold read 13.1MB alone and 104.4MB after the six-family
+// run, and a forced runtime.GC()+debug.FreeOSMemory() under load freed 5.0MB
+// and left 100.1MB. The release itself is not at fault in either context (the
+// tree falls 167.0 -> 100.0MB under load: the whole hold comes back).
+//
+// So the promise this case exists for - "a real within-cap reading is observed
+// after the release" - is measured where it is a statement about the release
+// rather than about the process's history: a fresh child of this same binary
+// running only this case. The 80MB threshold and the 3s window are UNCHANGED;
+// what moves is which process is measured. The parent runs the same child and
+// fails if it does not come back green, so a genuine release defect still reds.
 func Test384ResidentWatchdogEndToEnd(t *testing.T) {
+	if os.Getenv(env384IsolatedChild) == "" {
+		run384IsolatedChild(t)
+		return
+	}
+	run384EndToEnd(t)
+}
+
+// env384IsolatedChild marks the child that measures the fallback reading. It is
+// set only by run384IsolatedChild, so the ordinary invocation takes the parent
+// arm and an inherited environment cannot silently skip the body.
+const env384IsolatedChild = "WISP_TEST_384_ISOLATED_CHILD"
+
+// run384IsolatedChild runs this same case in a fresh process and requires it to
+// pass. A child that cannot start, or that exits non-zero, fails the parent:
+// the isolation is a measurement vehicle, never a way to skip the assertion.
+func run384IsolatedChild(t *testing.T) {
+	t.Helper()
+	cmd := exec.Command(os.Args[0], "-test.run=^Test384ResidentWatchdogEndToEnd$",
+		"-test.v", "-test.timeout=300s")
+	cmd.Env = append(os.Environ(), env384IsolatedChild+"=1")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("384: the isolated child that measures the fallback reading failed (%v); "+
+			"its output follows:\n%s", err, out)
+	}
+	if !bytes.Contains(out, []byte("--- PASS: Test384ResidentWatchdogEndToEnd")) {
+		t.Fatalf("384: the isolated child exited zero without passing the case; its output follows:\n%s", out)
+	}
+	// The child's own readings are the evidence, so they are carried into this
+	// run's log rather than left in a buffer nobody prints on success.
+	t.Logf("384-READ isolated child passed; its readings:\n%s", out)
+}
+
+// run384EndToEnd is the case body, run in the isolated child.
+func run384EndToEnd(t *testing.T) {
 	rt, rv, loop, sinkLog, buf := runWatchdogE2E384(t)
 
 	// Phase 0 - the loop really ticks. The tick line is Debug-level, so it

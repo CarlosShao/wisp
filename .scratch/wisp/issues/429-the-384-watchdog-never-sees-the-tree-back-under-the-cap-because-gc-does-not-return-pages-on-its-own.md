@@ -103,3 +103,56 @@
 - 只 commit，⛔ push。
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\429-<腿码>\`。
+
+## Progress log
+
+### 2026-11-12 20:26–20:5x +08 — 腿 `429-384`（⛔ 未翻任何 AC 框）
+
+**判定＝第三条，票面给的甲／乙两岔都不成立。** 一句话：**释放本身是好的，量错的是「哪个进程」**。
+
+- **AC#0 只读取证（零写，`go test -overlay`，拷贝在仓外 `D:\tmp\wisp\20261112\429-384\`）**：
+  - **复跑定性**：单发 `^Test384ResidentWatchdogEndToEnd$` **PASS 1.36s／1.55s** ⇒ 票面「恒红」**单发不可复现**；
+    红只在**合跑**出现（round 88 `:230` 3.36s，与 390/392/394/395/397/400/401/402 各件同形）。
+  - **三个数值**（overlay 探针）：
+    | 读数 | 单发 | 六族合跑 |
+    |---|---|---|
+    | 释放前 `PrivateWorkingSetBytes` | **92,311,552 B = 88.0MB** | **175,157,248 B = 167.0MB** |
+    | 释放后 3 秒 | **13,688,832 B = 13.1MB**（under80=true） | **109,498,368 B = 104.4MB**（under80=**false**，超 **25,612,288 B**） |
+    | cap（`memCapArmed` 冻结值） | 94,371,840 B = **90MB** | 同左 |
+    | 本用例动手**之前**的基线 | **13,905,920 B = 13.3MB** | **104,820,736 B = 100.0MB** |
+  - **判据实测（强制 `runtime.GC(); debug.FreeOSMemory()`）**：单发 13.5→12.9MB（放 667,648 B，本就在线下）；
+    **合跑 104.9→100.1MB，只放 5,046,272 B，仍差 80MB 线 20.1MB**。
+  - **结论**：⛔ 不是甲（窗口不够——强制释放后仍差 20.1MB，再等也不降）；
+    ⛔ 不是乙（64MB 被抓住——hold 在两种语境下都还回来了，合跑里 167.0→100.0MB 掉 **67.0MB**＝整发 hold）；
+    ✓ **是基线**：合跑时本用例还没分配任何东西，进程已 100.0MB——语音族（15e/26R3/41a2r1/390r1）
+    把真 sherpa-onnx ASR/TTS/KWS 引擎装进同一进程并常驻，那是**活的 cgo 状态不是垃圾**，任何 GC 都还不了。
+    同一二进制、同一枚用例、同一发 64MB hold：单发 **13.1MB** vs 合跑 **104.4MB**。
+- **修形：只改台面**（产码零字节）。回落读数放进**同一个二进制的干净子进程**
+  （`exec.Command(os.Args[0], "-test.run=^Test384…$")`，本仓既有同形先例 `slo_exit_os_156_windows_test.go:322`／
+  `secret_argv_windows_test.go:455`）。**`80<<20` 与 `3*time.Second` 一个字节没动**；
+  父臂**要求子进程退出码 0 且输出含 `--- PASS`**，两条任一不满足即 `t.Fatalf` 并贴子进程全文
+  ⇒ 隔离是测量载体，⛔ 不是跳过断言的通道。
+- **突变控制两发（仓外 overlay 真跑）**：
+  - **M1 摘掉隔离**（`if false {`，回到修前形状）⇒ **FAIL 3.41s**，红句**逐字同原案**
+    `:288: 384: never observed the tree back under the Armed cap (a real within-cap reading) within 3s`，
+    同族三读数照常（tick=3／名册=1／unload 趟=1）。
+  - **M2 让 hold 真被抓住**（包级 sink 保活，任何 GC 都放不掉）⇒ **FAIL 3.57s**，
+    父臂 `:211: the isolated child … failed (exit status 1)`＋子进程红句 `:289: never observed … within 3s`
+    ⇒ **80MB 断言在子进程里仍然有牙**，隔离不会把真缺陷洗绿。
+  - **还原** ⇒ **PASS 1.44s**，五条 `384-READ` 全在。
+- **六族合跑**（`Test43|Test15e|Test41a2r1|Test381r2|Test390r1|Test26R3|Test384`）：
+  **修前红（EXIT=1，同句同点）／修后绿（EXIT=0）**，同二进制同命令。
+- **133 账本未失效**：`TestAC1AC2DispatchHopGate133` **PASS**，
+  `leg slo … covered=test Test384ResidentWatchdogEndToEnd drives settleBeforeSample`
+  （用例体搬进 helper 后，`testClosure133` 走本目录测试 helper 仍认账）；
+  `TestAC4EveryLegIsNailedOrRuled`／`TestAC3SelfProof133*` 全 PASS。
+- **门禁**：`go build ./cmd/wisp/` rc=0 · `go vet ./cmd/wisp/` rc=0 · `gofumpt -l` 零输出 ·
+  `scripts/d22scan.sh` rc=0（`clean - no D22 ban violations`）。
+- **证据件**：`docs/evidence/s1/429-384-watchdog-fallback.md`。
+- **越界**：`git diff --name-only` 只有 `cmd/wisp/resident_watchdog_windows_test.go`（+58/−0）与证据件；
+  `thresholds.go`／golden／`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`frontend/**`／`design/**` 全未动，
+  `build/mut_rvw.go` 未删。
+- **★诚实残余（本票不解决）**：①合跑基线仍是 ~100MB——那是语音引擎常驻的**真实成本**，
+  要动得走「引擎是否该常驻」的票，⛔ 不在本票射程；②子进程多花约 1.3 秒；
+  ③票面提的「等看门狗那条 `FreeOSMemory` 级联」**未采用**——那条级联属 settle 路径、
+  `Sleeping` 无 D43 行时不为这条读数触发，等它等于把「释放后回落」偷换成「级联跑过后回落」。
