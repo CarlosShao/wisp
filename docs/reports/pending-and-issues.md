@@ -35202,3 +35202,45 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - job＝`workflow-6e610615694f416d`（`run_in_background:true`）
 - **★314-rep 的简化（比派单更省 CPU，已写进派发提示词）**：**第一步只跑单枚 `TestPanelThreadIsSTAAndExitsCleanly`**（不是整包、不是 5 次），数 `msedgewebview2` 进程增量；**增量 > 0 ⇒ 结论成立**（夹具不收尾浏览器子进程），再跑 3 发确认散布。⇒ **把"5 次整包"压成"1+3 次单枚"**。
 - 撤销口令：删本 A1754 条。
+
+## A1755 — ★★★开工第一轮：**两条 group 腿又是空交件**（第 5 次）⇒ 路由改判；我自己跑出 314 的**反证**；票池普查出"真能干的活极少"
+
+- 机主 2026-11-12 09:33 解除停车令。**开工前现跑**：CPU 40–43%、HEAD `65cc3a074`、unpushed 0、在飞 0。
+- **★事件一：两条 `group/group-review-and-audit` max 腿全部空交件**（三把尺全空）：
+  | 腿 | 返回 | 提交 | 件 |
+  |---|---|---|---|
+  | `346-a2` | `"I'll start with the environment setup (Step 0)."` | 无 | **MISSING** |
+  | `314-rep` | **空字符串** | 无 | **MISSING** |
+  - 尺①：`git log` 最新仍是我自己的台账提交；尺②：两件均 `MISSING`；尺③：`go`/`wisp` 进程 0。
+  - ⇒ **本会话第 5 次证实**：`group/group-review-and-audit` **作为执行者返回空**（`323-a1` 曾 4 次空返回）。
+  - ⇒ **处置（写死）**：**执行/测量类腿 → `auto/glm-5.3-flash` high**；**group 组只用于"读已存在材料出判语"的纯评审**（它做纯评审时正常）。
+- **★事件二：我自己跑 314，跑出对 `A1746` 的反证**（件 `docs/evidence/s1/314-ac0-direct-run.md`）：
+  | 测试 | 开窗 | rc | 退出码 | 耗时 | **浏览器进程增量** |
+  |---|---|---|---|---|---|
+  | `TestPanelThreadIsSTAAndExitsCleanly` | 否 | 0 | `0x00000000` | 25s | **0**（66→66） |
+  | `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` | **是** | 0 | `0x00000000` | 10s（测试 3.13s） | **0**（66→66） |
+  - 开窗那发日志逐字：`panel thread ending why="the library pump returned" window_opened=true` / `panel thread exited cleanly shows=1 toggles=0 disposals=0`
+  - ⇒ **`A1746` 的"夹具不收尾 WebView2 子进程"猜测被推翻**。正常路径**零泄漏**。
+  - ⇒ 78 个泄漏进程的真凶候选改为：**甲＝崩溃/被杀路径**（`t.Cleanup` 不跑）／**丁＝`-timeout` 触发的那一发**。**要抓真凶必须在崩溃路径上量。**
+  - ⇒ **票 314 的下一步不是"修夹具"**（正常路径无泄漏），而是**在崩溃路径上取证**。
+- **★事件三：票池可执行性普查（现跑，结论比前几轮更硬）**：
+  - **前置全部满足的 `ready-for-agent` 票只有 3 张**：`32`（S4 验收）、`46`（S6 验收）、`60`（C32 realtime）；
+  - **但这 3 张都不可由本编队独立执行**：
+    | 票 | 为什么不能派 |
+    |---|---|
+    | **32** | 逐字要求 `human (user) sign-off required for both subjective scores (D29 rule: human acceptance is the bar)` ＋ `screen recordings` ＋ 打分表（≥8/10、≥7/10）⇒ **必须机主本人听音/打分/录屏** |
+    | **46** | 逐字 `SLO runs (sampler, real desktop)` ＋ 七枚 pre-mortem **真触发**（拔麦/断电/时钟跳）⇒ **必须真机操作** |
+    | **60** | `Gate condition #2: user provides a realtime provider Key` ⇒ **必须机主给 Key** |
+  - **`247`（8/10 勾）差的两格也都需真机**：AC#2「对麦克风说话与不说话时 `SetAudioLevel` 收到值不同」／AC#6「拔麦／无权限／设备被占三形任取两形」⇒ **必须机主配合**。
+  - **`168`** 明写 `立而不派`（前置 50/51 未做完）。
+  - **`58/57/56/55`** 全部 `Blocked by: 54-s7-acceptance`，而 54 又 `Blocked by: 48+49`（48/49 均 OPEN）。
+  - **`25`** deps `23=OPEN`；**`36/37/40`** deps `35=OPEN`；**`53`** deps `48=OPEN`。
+  - ⇒ **结论：票池里"不需要机主参与、不需要前置、能从零开工"的票 = 0 张。** 这是本轮最重要的结论，且**是逐票现跑得出的，不是估计**。
+- **★在飞的正确路由腿**：`346-a3`（`auto/glm-5.3-flash` high，job `workflow-e4ba01ac3b87484d`）—— 票 346 只差 AC#4，纯测量，**不需要机主**。这是**唯一**一条真能推进的腿。
+- **★给机主的决策清单（必须他参与才能推进的活）**：
+  1. **票 32**（S4 验收）：需要他录屏 + 听 TTS 打分（≥7/10）+ 口述打分（≥8/10）
+  2. **票 46**（S6 验收）：需要他配合拔麦/断网/时钟跳等七枚 pre-mortem
+  3. **票 247 AC#2/AC#6**：需要他对麦克风说话 + 拔麦
+  4. **票 60**：需要他给 realtime provider Key
+  ⇒ **这四件是票池里唯一剩下的"真活"，且全部需要他本人**。
+- 撤销口令：删本 A1755 条。
