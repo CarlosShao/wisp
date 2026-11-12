@@ -40,6 +40,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -258,6 +259,74 @@ func filesCarrying320(t *testing.T, root, needle string) []string {
 	return hits
 }
 
+// filesCarryingSince320 is filesCarrying320 scoped to a modification window.
+// Ticket 323 AC#1 added the temp directory and the user's home directory as
+// watched roots (docs/evidence/s1/323-a1-census.md mutant m6: a leg that wrote
+// the resolved key straight into os.TempDir() stayed green, because every ruler
+// had eyes only inside the config root and the working tree). Those two roots
+// are real machine-sized shares - the census measured the home tree at over a
+// million files - so walking them whole in a unit test is not an option. The
+// window makes the walk whole-depth but bounded: a file the fetch leg writes is
+// new or renamed, so its own modification time and the modification time of the
+// directory it landed in both move past notBefore, and every directory whose
+// mtime did not move is skipped whole. What gets walked is therefore
+// proportional to what happened during the test window, not to the size of the
+// machine. The blind spot is stated, not hidden: an IN-PLACE rewrite of a
+// pre-existing file outside the config root moves no directory mtime and is not
+// seen here - but the same rewrite under the config root is refused by the
+// snapshot ruler, under the working tree by the unscoped walk, and m6's shape
+// (a NEW file holding the resolved key) is exactly the shape this window keeps
+// at any depth. Entries that cannot be read for permission reasons are skipped,
+// not fatal: a path this process's user cannot enumerate is a path the same
+// user's fetch leg cannot have written either.
+func filesCarryingSince320(t *testing.T, root, needle string, notBefore time.Time) []string {
+	t.Helper()
+	var hits []string
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			if errors.Is(err, os.ErrPermission) {
+				return nil
+			}
+			return err
+		}
+		info, ierr := d.Info()
+		if ierr != nil {
+			if errors.Is(ierr, os.ErrPermission) {
+				return nil
+			}
+			return ierr
+		}
+		if info.ModTime().Before(notBefore) {
+			if d.IsDir() && path != root {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if strings.Contains(filepath.Base(path), needle) {
+			hits = append(hits, path+" (file name)")
+			return nil
+		}
+		b, rerr := os.ReadFile(path)
+		if rerr != nil {
+			if errors.Is(rerr, os.ErrPermission) {
+				return nil
+			}
+			return rerr
+		}
+		if strings.Contains(string(b), needle) {
+			hits = append(hits, path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk %s: %v", root, err)
+	}
+	return hits
+}
+
 // dirSnapshot320 is one reading of a directory: every regular file's path
 // relative to the root, and the sha256 of its bytes. Ticket 323 AC#1 names this
 // ruler for a reason the substring detector above cannot cover: a fetch leg can
@@ -387,6 +456,16 @@ func Test320FetchLegWritesTheKeyNowhereOnDisk(t *testing.T) {
 	// base_url) so the ruler measures the fetch leg and nothing else.
 	before := snapDir320(t, dir)
 
+	// Ticket 323 AC#1: the leak window opens here, after the fixture's own
+	// writes and before the fetch, so only the fetch leg and the positive
+	// controls at the bottom of this test can fall inside it. Two seconds are
+	// subtracted because clock reads and file mtimes do not share one
+	// granularity; every file the fixture wrote before this line may therefore
+	// be walked too, which is harmless - none of them can contain the resolved
+	// key, because the key has never been on disk (that is the very property
+	// under test).
+	leakWindowOpen := time.Now().Add(-2 * time.Second)
+
 	receipt, _ := modelsPath320(t, disp, "deepseek")
 	if strings.Contains(receipt, key) {
 		t.Errorf("the successful fetch's receipt carries the resolved key: %q", receipt)
@@ -426,6 +505,27 @@ func Test320FetchLegWritesTheKeyNowhereOnDisk(t *testing.T) {
 		}
 	}
 
+	// Ticket 323 AC#1 widening (docs/evidence/s1/323-a1-census.md mutant m6): the
+	// two roots above have eyes, everything outside them did not - the census
+	// wrote the resolved key straight into os.TempDir() and the whole suite
+	// stayed green while the file really landed. The watched root set therefore
+	// grows by the two every process on this platform can reach without any
+	// privilege: the temp directory and the user's home directory. Both are
+	// shared machine-sized roots, so the walk is the window-scoped one above
+	// (whole-depth for anything written during the window, old subtrees skipped
+	// whole), and every red names the root the credential landed in.
+	tempRoot := os.TempDir()
+	homeRoot, homeErr := os.UserHomeDir()
+	if homeErr != nil {
+		t.Fatalf("os.UserHomeDir: %v", homeErr)
+	}
+	for _, root := range []string{tempRoot, homeRoot} {
+		if hits := filesCarryingSince320(t, root, key, leakWindowOpen); len(hits) > 0 {
+			t.Errorf("the fetch leg left the resolved credential in %d file(s) under %s (leak window opened at %s): %v",
+				len(hits), root, leakWindowOpen.Format(time.RFC3339Nano), hits)
+		}
+	}
+
 	// The honest reading is taken here, BEFORE any control file exists, so the
 	// two controls below can be read as their own diffs and a leak above cannot
 	// contaminate them (a control that folds the leak into its own count reports
@@ -459,6 +559,50 @@ func Test320FetchLegWritesTheKeyNowhereOnDisk(t *testing.T) {
 		!strings.Contains(diff[0], configFileName) || !strings.Contains(diff[0], "bytes changed") {
 		t.Fatalf("the snapshot ruler cannot see a rewritten %s (diff = %v); it proves nothing about a rewrite",
 			configFileName, diff)
+	}
+
+	// The dir-root control file above still holds the key and still sits in the
+	// fixture directory, which lives INSIDE os.TempDir(); the widened controls
+	// below scan that root and must not count a control planted for another root
+	// as their own plant, so it is removed here. Removal weakens nothing: every
+	// ruler that read it (the substring control, both snapshot diffs) has already
+	// returned, and the fixture directory itself is the test framework's to clean.
+	if rerr := os.Remove(planted); rerr != nil {
+		t.Fatalf("remove the dir-root control file: %v", rerr)
+	}
+
+	// Positive controls for the two widened roots, one each: a detector that was
+	// handed a key planted in a root it claims to watch and did not see it proves
+	// nothing, so each new root gets its own plant-and-read. Each planted file is
+	// removed again immediately - these are real shared roots (the machine's temp
+	// directory, the user's home) and nothing may linger in them; the t.Cleanup
+	// re-removes in case a Fatalf fires between plant and remove.
+	plantedTemp := filepath.Join(tempRoot, "planted-key-320-temp.txt")
+	if werr := os.WriteFile(plantedTemp, []byte(key), 0o600); werr != nil {
+		t.Fatalf("plant the temp-root control key: %v", werr)
+	}
+	t.Cleanup(func() { _ = os.Remove(plantedTemp) })
+	hits = filesCarryingSince320(t, tempRoot, key, leakWindowOpen)
+	if len(hits) != 1 || hits[0] != plantedTemp {
+		t.Fatalf("the widened detector cannot see a key planted at %s (hits = %v); it proves nothing about a leak",
+			plantedTemp, hits)
+	}
+	if rerr := os.Remove(plantedTemp); rerr != nil {
+		t.Fatalf("remove the temp-root control file: %v", rerr)
+	}
+
+	plantedHome := filepath.Join(homeRoot, "planted-key-320-home.txt")
+	if werr := os.WriteFile(plantedHome, []byte(key), 0o600); werr != nil {
+		t.Fatalf("plant the home-root control key: %v", werr)
+	}
+	t.Cleanup(func() { _ = os.Remove(plantedHome) })
+	hits = filesCarryingSince320(t, homeRoot, key, leakWindowOpen)
+	if len(hits) != 1 || hits[0] != plantedHome {
+		t.Fatalf("the widened detector cannot see a key planted at %s (hits = %v); it proves nothing about a leak",
+			plantedHome, hits)
+	}
+	if rerr := os.Remove(plantedHome); rerr != nil {
+		t.Fatalf("remove the home-root control file: %v", rerr)
 	}
 }
 
