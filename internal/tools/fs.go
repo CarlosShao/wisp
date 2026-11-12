@@ -284,7 +284,7 @@ func joinForListing(dir, name string) string {
 	if strings.HasSuffix(dir, `\`) || strings.HasSuffix(dir, "/") {
 		return dir + name
 	}
-	return dir + `\` + name
+	return dir + string(os.PathSeparator) + name
 }
 
 // ---------------------------------------------------------------------------

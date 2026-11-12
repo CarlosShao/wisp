@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 
 	"golang.org/x/sys/windows"
@@ -33,9 +32,8 @@ import (
 //     activation host. This is recorded in the launch result text and in
 //     the ticket-22 evidence, not papered over.
 
-// windowsAUMIDPattern is the conservative shape gate for !Name!App ids
-// (package family name + app id, no path characters).
-var windowsAUMIDPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{1,255}![A-Za-z0-9._-]{1,255}$`)
+// windowsAUMIDPattern (the AUMID shape gate) lives in launcher_aumid.go,
+// a platform-neutral file, so every GOOS classifies the shape identically.
 
 // platformLaunch delivers one accepted web/file/uri open via ShellExecute.
 // kind was already vetted by the tool ("url"|"file"|"uri"); the target is

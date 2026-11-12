@@ -5,6 +5,7 @@ package tools
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -54,6 +55,13 @@ func (w *webShared) resolveApp(_ context.Context, name string) (launchTarget, er
 		}
 		return launchTarget{Kind: "path", Path: name}, nil
 	}
+	// Same shape gate as launcher_windows.go (launcher_aumid.go): an AUMID
+	// must classify as Kind "aumid" HERE, before the name resolvers, so the
+	// startApp aumid arm answers the honest platform refusal instead of the
+	// name resolvers answering "找不到应用" for a shape they cannot resolve.
+	if windowsAUMIDPattern.MatchString(name) {
+		return launchTarget{Kind: "aumid", AUMID: name}, nil
+	}
 	if res := w.deps.AppResolver; res != nil {
 		if p, ok := res.ResolveApp(name); ok {
 			return launchTarget{Kind: "path", Path: p}, nil
@@ -71,7 +79,10 @@ func (w *webShared) startApp(_ context.Context, target launchTarget, args []stri
 		cmd := exec.Command(target.Path, args...)
 		if w.deps.Jobs != nil {
 			if _, err := w.deps.Jobs.StartInJob(cmd); err != nil {
-				return "", err
+				// Same failure shape as the Windows side (startInJobOrBare):
+				// the refusal must name the Job it failed to enter, never a
+				// bare transport error that reads as a half-truth.
+				return "", fmt.Errorf("进入 Job Object 失败（C30）：%w", err)
 			}
 			return "进程已纳入 Job Object（C30）", nil
 		}
