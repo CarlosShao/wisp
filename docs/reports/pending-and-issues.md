@@ -35854,3 +35854,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **220 的"界面差哪一跳"已具名**（AC#5 后半要求）：**渲染跳整节断**——传输/接收跳已通、页面类型已声明，但 `snapshot.tasks` 在 `frontend/src` 零消费（`App.tsx:246` 喂死 `agents={[]}`）⇒ 前端地界，只写票面不代做。
 - **两票全五格清零，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213、187、174、230、220（+13 done）**。done 340→**342**。
 - **★新发现（待办，不属任何票）**：`System32\onnxruntime.dll` 1.17.1 这一枚机器级环境红**压着 39 枚语音/球/托盘/保活测试**，是本机整包红的**最大单一块**。治法已在 `:32533` 具名（⛔ 改 System32；DLL 与 exe 同目录或 `LoadLibraryEx` 绝对路径）——**但那是部署形状变更，属"改契约/不可逆"边界，须机主点头**。
+
+## A1796 — ★★治掉整包红的最大单一块：`cmd/wisp` 补上票 409 同款 DLL staging carrier（39 枚环境红 → 0）
+
+- 承接 `A1795`（整包 52 枚红里 39 枚同一根因）。**根因不是任何票的欠账，是"治法已知但没搬过去"**：
+  - 票 409（2026-11-08 已 -done）为 `internal/speech` 造了 `scripts/speech-tests.sh`——`go test -c` → 把 `deps.toml` 钉的三枚 DLL **拷到二进制旁** → 从包目录跑。理由：exe 所在目录是 Windows 加载器**第一**搜索位置，在 System32 之前。
+  - 但 `cmd/wisp` **没有**同款：`scripts/wisp-cli-tests.sh` 只做 PATH 前置，`portable-tests.sh` 的 `cli)` 分支落进 `else` 走 strict ⇒ **同一台机器上 speech 治好了，cmd/wisp 的 39 枚语音红还在**。
+- **落地（2 新改 + 1 新件）**：
+  1. **新件 `scripts/wisp-cli-staged-tests.sh`**：与 `speech-tests.sh` 同形五步——GOOS 非 windows 则 exit 2 响亮拒绝／`go test -c` 到 stage／复用 `scripts/stage-sherpa-dlls.sh`（不复制名单）／**断言 stage 目录里真有 `onnxruntime.dll`**（静默空 stage 会原样复现遮蔽，测试会看起来"因别的原因红"而不是"没测到"）／从包目录跑二进制。
+  2. **改 `scripts/portable-tests.sh` 两处**：`cli)` 分支注释写明 PATH 是**错**杠杆＋39/52 读数；执行段新增 `elif [ "$mode" = cli ]` 走 carrier，carrier 缺失则 **exit 2 拒绝造更弱跑法**。**⛔ 未动** strict 的 SKIP 规则／ticket-98 GUARD／四数读取／任何断言／scope／pin。
+- **★决定性读数（我亲跑）**：
+  - 单枚 `Test15eSpeechEndToEndHandsTheTranscriptToTheAgent`：改前 **0.01s FAIL**（加载即死，红句＝onnxruntime 1.17.1）→ 改后 **21.07s FAIL**，断言变为 `timed out waiting for the utterance to be transcribed`（＝**语音链真起来了**）。
+  - 语音族批量（11 族）：**`onnxruntime 1.17` 遮蔽错误 = 0**；**PASS=19／FAIL=20／SKIP=7**。
+  - **13 枚由红转绿**（上一轮整包 FAIL → 本次 PASS），具名入证据件 §6a。
+  - 脚本语法检查：两件 `bash -n` 均 rc=0。
+- **残余 20 枚红＝另一层，已诚实分账**：逐枚断言全为 `install the streaming ASR into <tmp>: WISP_...`。**根因现读＝模型夹具根本没下载**：`models/` 与 `build/models/` 下**只有 `manifest.json`＋`.minisig`，零个 `.onnx`/`.bin`**（`Get-ChildItem -Include *.onnx,*.bin` 空）。⇒ 属**夹具层**，与本治法无关，⛔ 混算，⛔ 宣称 39 枚"全绿"。
+- 证据件 `docs/evidence/s1/cmd-wisp-dll-staging-carrier.md`（含 §5 边界、§6 批量读数、§7 结论）。提交 `23e3814a9` 已推。
+- **⛔ 未做**：未改 System32（账 `dll-shadow-2` 禁令）、未提交任何 DLL（10MB+ 不入库，stage 目录在 `.scratch/wisp/stage-cli`）、未动 thresholds/golden/契约。
+- **★给机主的下一步（需他点头或他动手）**：残余 20 枚要绿，得把模型下载到 `models/`（`manifest.json` 里有 url＋sha256＋size）。这属"花钱/下载外部件"，按铁律⓪⓪⓪ 第 4 条摆他。
