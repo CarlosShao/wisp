@@ -94,3 +94,26 @@
 - 只 commit，⛔ push（推送由编排者做）。
 - ⛔ 翻任何 AC 框（翻框由编排者做，非实现者）。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\426-<腿码>\`。
+
+## Progress log
+
+### 2026-11-12 20:0x–20:1x +08 — 腿 `426-warmidle`（⛔ 未翻任何 AC 框）
+
+**判定＝甲形（断言过严），根因是测量竞态，不是产品缺陷。**
+一句话：`micCloseCount() >= 2` 这条承诺本身是对的（级联确实该关第二次），但测试在 `StageDisposed` 一可读时就读计数器，
+而 `StageDisposed` 由 `beginDisposeLocked` 在 `internal/session/scope.go:654` **先落**、级联的 `MicClose` 在 `internal/session/scope.go:691` **后跑** ⇒ 读早了，只读到 Warm 行那一次。
+
+- **红发（carrier）**：`resident_voice_wire_r1_windows_test.go:745: mic close counted 1 times, want at least 2 …` / **FAIL 6.90s**，与票面 5.19s／6.81s 同句同数。
+- **★决定性读数**：仓外 overlay 探针在断言前插 owner 队列屏障（等完级联）⇒ **`mic_closes=2`、`stages_at_mic_close=[Awake Disposed]`、`disposals=1`、PASS 17.17s`**，**产码一行未改** ⇒ 第二次关麦从未缺失。
+- **铁证（同一份日志时间戳）**：`:745` 红在 `T20:03:03.177`，`SCOPE-DISPOSED`（`scope.go:693`，排在 `:691` 的 `MicClose` 之后）在 `T20:03:03.228` ⇒ 断言时级联还没跑完。
+- **三处产码**：`EnterWarm` 在落 `StageWarm`（`:474`）**之前**调 `MicClose`（`scope.go:470`，看到 `Awake`）；`runCascade` 末尾再调一次（`scope.go:691`，看到 `Disposed`）；`closeEpoch`／`rv.stop()` 不走 `session.Hooks.MicClose` ⇒ **生产里恰好两条路径、各一次**。
+- **`R28-2` 语义**：`tri-v1-verdict.md:118`＋`:123` 逐字"mic closed＝唤醒闩，不是设备/喂食门"；`MicClose` 钩子在本仓关的是 **FEED**（`resident_voice_engines_windows.go:336-343`、`resident_voice_windows.go:738-745`）⇒ **断言数的正是唤醒闩，语义没错**。票 28 `:20`／`:42` 的 `Warm` 定义要求"关麦 FIRST"，两次的承诺与设计一致。
+- **修形：只改测试**（产码零改动）。**未放宽**成"≥1 就算过"：仍要求 `closes >= 2`，并新增 `len(stages) >= 2` ＋ 两条顺序钉子 `stages[0]=="Awake"`、`stages[last]=="Disposed"`。
+- **突变控制三发（全经 `go test -overlay`，拷贝全在仓外 `D:\tmp\wisp\20261112\426-warmidle\`）**：
+  - **M1** 删 `:497` 的 `micCloses++` ⇒ **红** `counted 0 times` 6.52s；恢复 ⇒ **绿** 6.59s。
+  - **M2** 把 `EnterWarm` 的 `mute()` 挪到落状态**之后** ⇒ **红** `the first mic close saw stage "Warm", want Awake` 6.93s，**次数仍 2**（证明顺序钉子有独立牙）。
+  - **M3** 只删新加的屏障 ⇒ **红** `counted 1 times` 7.19s，逐字复现原红句（证明屏障承重）。
+- **门禁**：`go build ./cmd/wisp/` exit=0 · `go vet ./cmd/wisp/` exit=0 · `gofumpt -l cmd/wisp/` 零输出 · `scripts/d22scan.sh` exit=0（`clean - no D22 ban violations`，`runtests.sh: OK PASS=45 FAIL=0 SKIP=0`）。
+- **越界**：只改 `cmd/wisp/resident_voice_wire_r1_windows_test.go`（+40／−4）＋ 本证据件 ＋ 本 Progress 条。未删 `build/mut_rvw.go`，未动 `PLAN.md`／`specs/**`／`thresholds.go`／golden／`allowlist.txt`／`design/**`。
+- **证据件**：`docs/evidence/s1/426-warmidle-mic-close.md`
+- **AC#4 需编排者回填**：建议把 `tri-v1-verdict.md:123` 那句"必须写在 `Warm` 定义旁"落到 `28-session-scope-warm-done.md:20` 旁（本腿按禁令**未自行改票 28**）。

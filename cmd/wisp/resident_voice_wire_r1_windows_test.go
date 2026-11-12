@@ -741,15 +741,51 @@ func TestWireR1WarmIdleDisposesOnTheOwner(t *testing.T) {
 	if st := rv.residency.stats(); st.EnginesHot != 0 {
 		t.Fatalf("engines hot after dispose = %d, want 0", st.EnginesHot)
 	}
-	if got := rv.residency.micCloseCount(); got < 2 {
-		t.Fatalf("mic close counted %d times, want at least 2 (the Warm row and the cascade's defence in depth)", got)
+	// The two closes below are the cascade's OWN work, and the cascade is not
+	// finished when StageDisposed is readable: beginDisposeLocked lands the
+	// transition atomically under the mutex (scope.go:654) and only then does
+	// runCascade walk the hooks outside it (scope.go:691). So "stage == Disposed"
+	// says the atomic half ran, NOT that the cascade's defence-in-depth close has
+	// happened, and a counter read there races the very hook it asserts - it reads
+	// the Warm row's close and calls the missing second one a product defect.
+	// Barrier on the owner queue instead: the cascade runs on the owner goroutine
+	// (voiceOwnerClock marshals the timer fire onto it), so a job posted after the
+	// settle fire is ordered BEHIND the cascade and the two closes become
+	// observable rather than sampled.
+	cascadeDone := make(chan struct{})
+	if !rv.queue.post(func() { close(cascadeDone) }) {
+		t.Fatal("the owner queue refused the cascade barrier")
+	}
+	select {
+	case <-cascadeDone:
+	case <-time.After(20 * time.Second):
+		t.Fatal("the owner queue never ran the cascade barrier")
+	}
+	closes := rv.residency.micCloseCount()
+	stages := rv.residency.micCloseStages()
+	if closes < 2 {
+		t.Fatalf("mic close counted %d times, want at least 2 (the Warm row and the cascade's defence in depth)", closes)
+	}
+	if len(stages) < 2 {
+		t.Fatalf("only %d mic close(s) recorded a stage (%v), want the Warm row and the cascade", len(stages), stages)
+	}
+	// The demand is not just "twice": it is that the FIRST close is the Warm row's
+	// (it must see Awake, which is what makes "the mic was closed FIRST" an order
+	// and not a sentence - EnterWarm calls the hook before it lands the
+	// transition) and that the LAST is the cascade's defence in depth (it must see
+	// Disposed, so it cannot be a second Warm-row close wearing the cascade's name).
+	if stages[0] != string(session.StageAwake) {
+		t.Fatalf("the first mic close saw stage %q, want Awake: the Warm row must close the mic BEFORE the transition lands", stages[0])
+	}
+	if last := stages[len(stages)-1]; last != string(session.StageDisposed) {
+		t.Fatalf("the last mic close saw stage %q, want Disposed: the cascade's defence in depth must run after the transition", last)
 	}
 	if rv.drainsFrames() != true {
 		t.Fatalf("the leg stopped draining, so this case cannot separate the dispose from a crash")
 	}
-	t.Logf("WARM-IDLE stage=%s engines_hot=%d mic_closes=%d stages_at_mic_close=%v engine_closes=%d",
+	t.Logf("WARM-IDLE stage=%s engines_hot=%d mic_closes=%d stages_at_mic_close=%v engine_closes=%d disposals=%d",
 		string(rv.residency.stage()), rv.residency.stats().EnginesHot, rv.residency.micCloseCount(),
-		rv.residency.micCloseStages(), asr.closes.Load())
+		rv.residency.micCloseStages(), asr.closes.Load(), rv.residency.stats().Disposals)
 }
 
 // voiceVadNone is the empty VAD path: a case that drives the announce path with no
