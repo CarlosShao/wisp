@@ -436,6 +436,15 @@ func Test52SchemaViolationsAreRejected(t *testing.T) {
 		def.Parameters = map[string]any{"type": "object", "properties": props, "required": req}
 		return def
 	}
+	// The screen inspects only the parameters the argv template binds
+	// (command_argv.go substitutes the placeholders, then screens those
+	// values). The base template binds {{to}}/{{text}} alone, so a schema
+	// constraint on `days` would never be consulted; the range cases below
+	// carry a template that actually binds {{days}} so the constraint is live.
+	withArgv := func(def ToolDef, tail ...string) ToolDef {
+		def.ArgvTemplate = append(append([]string{}, def.ArgvTemplate...), tail...)
+		return def
+	}
 
 	cases := []struct {
 		name string
@@ -447,9 +456,9 @@ func Test52SchemaViolationsAreRejected(t *testing.T) {
 		{"over maxLength", withProps(map[string]any{"text": map[string]any{"type": "string", "maxLength": 4}}, "text"), `{"text":"12345"}`, ErrParamSchema},
 		{"under minLength", withProps(map[string]any{"text": map[string]any{"type": "string", "minLength": 3}}, "text"), `{"text":"ab"}`, ErrParamSchema},
 		{"outside enum", withProps(map[string]any{"text": map[string]any{"type": "string", "enum": []any{"a", "b"}}}, "text"), `{"text":"c"}`, ErrParamSchema},
-		{"below minimum", withProps(map[string]any{"days": map[string]any{"type": "integer", "minimum": 1, "maximum": 30}}, "days"), `{"days":0}`, ErrParamSchema},
-		{"above maximum", withProps(map[string]any{"days": map[string]any{"type": "integer", "minimum": 1, "maximum": 30}}, "days"), `{"days":31}`, ErrParamSchema},
-		{"not an integer", withProps(map[string]any{"days": map[string]any{"type": "integer"}}, "days"), `{"days":1.5}`, ErrParamSchema},
+		{"below minimum", withArgv(withProps(map[string]any{"days": map[string]any{"type": "integer", "minimum": 1, "maximum": 30}}, "days"), "--days", "{{days}}"), `{"days":0}`, ErrParamSchema},
+		{"above maximum", withArgv(withProps(map[string]any{"days": map[string]any{"type": "integer", "minimum": 1, "maximum": 30}}, "days"), "--days", "{{days}}"), `{"days":31}`, ErrParamSchema},
+		{"not an integer", withArgv(withProps(map[string]any{"days": map[string]any{"type": "integer"}}, "days"), "--days", "{{days}}"), `{"days":1.5}`, ErrParamSchema},
 		{"missing required", withProps(map[string]any{"text": map[string]any{"type": "string"}}, "text"), `{}`, ErrParamSchema},
 		{"undeclared parameter", withProps(map[string]any{"text": map[string]any{"type": "string"}}, "text"), `{"text":"ok","extra":"x"}`, ErrParamSchema},
 		{"no type declared", withProps(map[string]any{"text": map[string]any{"maxLength": 4}}, "text"), `{"text":"ok"}`, ErrParamSchema},
@@ -975,7 +984,13 @@ path = ".data.message_id"
 		mutate func(string) string
 		field  string
 	}{
-		{"unknown kind", func(s string) string { return strings.Replace(s, `kind = "command"`, `kind = "shell"`, 1) }, ".kind"},
+		// "unknown kind" names the AUDIT finding, not the .kind branch of
+		// Validate: kind = "shell" does not select the command key table, so
+		// the entry's D46 fields are refused as unknown keys (tools[0].exe …)
+		// and ParseManifest returns at the audit gate before field validation
+		// runs. The manifest is still refused and the error still names the
+		// offending tools[0] entry; only the field specificity differs.
+		{"unknown kind", func(s string) string { return strings.Replace(s, `kind = "command"`, `kind = "shell"`, 1) }, "tools[0]"},
 		{"unknown irreversible class", func(s string) string {
 			return strings.Replace(s, `irreversible = ["send"]`, `irreversible = ["reformat-disk"]`, 1)
 		}, ".irreversible[0]"},
