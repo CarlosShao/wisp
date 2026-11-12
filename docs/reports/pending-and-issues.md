@@ -35792,3 +35792,10 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **门禁我亲跑**：`go test ./internal/command`＝**PASS=9 FAIL=0 rc=0**；`go test ./cmd/wisp -run Test213`＝**PASS=4 FAIL=0 rc=0**；`go test ./internal/panel -run '213|Commands'`＝ok rc=0。
 - **五格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213（+9 done）**。done 337→**338**。
 - **下一步候选**：215（Go 侧已落但 215b 技能半需动 D36 配置契约＝人工批准 ⇒ **C 类**）；214（差 AC#5 的 C25 盖戳半边，宿主＝票 35）；219（三按钮 Go join 已落，需核）。
+
+## A1789 — ★票 187 收口 -done（本会话第 10 张：424/85/72/323/246/256/346/194/213/187）
+
+- 承接 `A1788`。187 是 panel 加号菜单三票之一（213 命令／214 加内容／215 技能插件／187 模型思考档），Go 侧由 187 落地腿落、TS 声明由 `wave77-B-leg` 落，AC 九格未翻。
+- **九格逐格凭据（我＝非实现者）**：AC#1 定档在 `187-model-switchable.md:35-48`（思考档位＝next_task 读者每次现读、模型＝restart 牵 C5）＋齿 `Test187ThinkingReceiptNamesTheMeasuredTier`；AC#2 写口＝`config.set` 名册 `role_chat_thinking`＋`SetRoleChatThinking` 双检（model/pair 已在册零新增）；AC#3 写腿零碰 `Modes.Set`；AC#4 `ChatSwitchOptions` 只列 enabled＋声明档＋空形显式句；AC#5 next_task 逐支＋两枚齿；AC#6 覆盖面在 `:101-103`（BudgetsFor 现跑、进行中那一轮不受影响、voice 不做）；**AC#7 五笔提交逐笔零触碰契约面**；AC#8 我亲跑 config/panel/agent/cmd-wisp 四包全绿；AC#9 需求表 `187-panel-ask.md` 已出。
+- **九格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213、187（+10 done）**。done 338→**339**。
+- **panel 族进度**：7 张中已收 **194/213/187 三张**；剩 214（差 AC#5 盖戳半边＝票 35）、215（215b 技能半需 D36 契约批准＝C 类）、216（chk5/unc2，待核）、219（AC#3 明写"退回状态不许勾"＋AC#6 L1/L2 分表＝硬活）。
