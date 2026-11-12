@@ -50,7 +50,7 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/85-*.md`）
 
-- [ ] **AC#1** `ci.yml` 里两把工具都钉成具体版本，**并给出一次真 run 的日志行**证明它下载的就是那个版本
+- [x] **AC#1** `ci.yml` 里两把工具都钉成具体版本，**并给出一次真 run 的日志行**证明它下载的就是那个版本
       （`gh run view <id> --log` 里 grep `downloading` / `go version`）。**不许**只给本地读数。
 - [ ] **AC#2** `staticcheck` **第一次产出真实判据**：把那 35 条按"包 × 检查码 × file:line"列表进本票 log，
       逐条给处置（修 / 删 / 登记到票 N）。**目标态是 0 条**，但**中途不许**加 `//lint:ignore`、
@@ -218,3 +218,5 @@ GOOS=windows 78 条 / 21 个包；分类 linux＝`26×U1000 / 3×SA1019 / 2×S10
   日志取数用正向形状四条（HTTP 200 + 字节数 + 首行时间戳 + `##[group]Run` 在）。取到读数后：AC#1/AC#2 的前提格才谈得上翻，
   清账走票 122；`gofumpt` 钉版本与 AC#4 改名建议并入票 122 或另开 85c。
 
+
+- [2026-11-12 10:3x +08] agent=编排者收件（非实现者翻框） did=翻 **AC#1**（两把工具钉版本＋一次真 run 日志行） 凭据=docs/evidence/s1/ci-lint-staticcheck-readings-20261112.md（CI run 43139602748 / job 130923107457 / step 13 staticcheck）：##[group]Run go install honnef.co/go/tools/cmd/staticcheck@2026.2.2 ＋ staticcheck self-report: version=staticcheck 2026.2.2 (0.8.2) … findings=54 toolchain-crash-lines=0；ci.yml:307 gofumpt@v0.12.0／:465 staticcheck@2026.2.2 现读 next=AC#2 只差「54 条按 包×检查码×file:line 列进本票 log」那半（判据已产出，清单待抽）；AC#3/4/5 未做
