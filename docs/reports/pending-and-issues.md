@@ -35578,3 +35578,26 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 翻票 424 各 AC（凭 CI run + 三把尺）；评票 85 AC#5。
 - **★在飞**：无（CI 已出结论）。
 - 撤销口令：删本 A1767。
+
+## A1768 — ★两票收官：**票 424 done（7/7）** ＋ **票 85 done（6/6）** —— 424 修好 cmd/wisp Linux 编译，直接把 85 AC#5 的 `go vet ./...` 从"不可能过"变绿
+
+- 机主 2026-11-12 白天。承接 `A1767`。
+
+### 一、票 424 → done
+- 三批修完 8 处（residentVoice／configErrText×2+applyBall×3／modeRequest114r2），CI run `43146479546` lint step 11 `go vet (module)` **failure→success**（真容器）。
+- `424-review`（非实现者 glm）验收 **7/7 AC**，判词 `docs/evidence/s1/424-verdict.md`；改名 `-done`（`f4f3a540d`）。
+
+### 二、票 85 → done（6/6）
+- AC#5 四项在 **CI 参考环境**（AC 原文"逐字同 CI 那一行"）全绿：
+  - gofmt/gofumpt → CI step 9/10 success（CI 按构造排除 `.scratch/**`）
+  - **`go vet ./...` rc=0 → CI step 11 success**（正是被 424 挡死、424 修完转绿的那一格）
+  - `sh scripts/d22scan.sh` + 阳性对照红 → 本票 log `:206` ＋ CI step4-6
+  - `go test -count=2` → 零 Go 改动豁免（log `:210`）
+- 改名 `-done`（`19f1dc481`）。
+- ⚠ 诚实边界：本地工作树因 `.scratch/**` 探针与未跟踪 `build/mut_rvw.go`，**裸 `gofumpt -l .` / 本地 `go vet ./...` 会显红**——那是**工作树探针污染**（删需机主点头），**不在 CI 干净检出判据内**。已在票 85 里写清。
+
+### 三、这一步的连锁价值
+- **424 不是只为一张票**：它把"cmd/wisp 在 Linux 编不过"这个**系统性根因**修了，任何"要 CI 绿"的 AC 都因此受益。85 AC#5 就是第一个受益者。
+- 下一个 infra 红清单（供后续）：**test-core**（portable tests 既存红）、**staticcheck 54 条**（票 122）、**SLO nail census**（票 266）。
+- **★在飞**：无（两票已收）。CPU 正常。
+- 撤销口令：删本 A1768；`git revert` 对应两票收尾提交。
