@@ -17,10 +17,7 @@ import (
 // for the same purpose; restated here so internal/risk's test build owns its
 // own instrument.
 func processCPUTime() (time.Duration, error) {
-	proc, err := windows.GetCurrentProcess()
-	if err != nil {
-		return 0, err
-	}
+	proc := windows.CurrentProcess()
 	var created, exited, kernel, user windows.Filetime
 	if err := windows.GetProcessTimes(proc, &created, &exited, &kernel, &user); err != nil {
 		return 0, err
