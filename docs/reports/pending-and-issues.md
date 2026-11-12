@@ -35777,3 +35777,10 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **七格逐格凭据**：AC#1 代价表两件在盘；AC#2 `SPEC-08:167` allow 禁面板来源仍在＋`approval_reply.go:327` 说明；AC#3 `bridge.go:107` 常量＋`cost_handlers.go:3` handler＋台账 A1681/A1686；AC#4 `panel_cost_194_test.go` 三枚含接线钉；AC#5 ★原"零调用者"已被 `fbd677803` 解决（`panel_cost_194.go:57 st.ListCostDaily`、`panel_inbound.go:349`）；AC#6 三笔腿提交逐笔零触碰契约面；**AC#7 六条门禁我亲跑全绿**（config 2.34s／risk 13.13s／panel 14.50s／tools 26.86s／cmd/wisp Test194 0.38s，全 rc=0 零 FAIL，比票面旧记的"panel 3 枚红"更绿）。
 - **七格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194（+8 done）**。done 336→**337**。
 - ⚠ **教训**：`group/group-review-and-audit` 被本会话路由拒绝＝owner 令里的审计组今天用不上，审计腿两发皆空（第一发因路由、第二发 glm 也无交件）。**审计类活只能我自己顶**——已在 A1785 明写，⛔ 静默当默认。
+
+## A1787 — 194-verdict 审计腿补交（`c6b029090`）：七格判语与我独立核证**完全一致**，194 收口得独立复认
+
+- 承接 `A1786`。`194-verdict-r2`（glm，因 group 路由被禁）**这次真交了件**：`docs/evidence/s1/194-verdict.md`（9657B，`c6b029090`，只 1 件、零产码、零翻框）。
+- **七格判语全"成立"**，与我 A1786 的逐格凭据**逐条对上**（它还多给了：AC#1 枚数现数＝invoke 18＋事件 5；AC#2③ `sectionwrite.go:343 lockedDirectionOf`；AC#4 三枚测试函数名 `cost_roster_194_test.go:138/:261/:237`；AC#6 `e90ea3cf..HEAD` 契约面唯一 diff＝`be73612bf`(票124-A owner批) 非 194）。**六条门禁同样全绿**（panel 14.616s／config 2.295s／risk 12.760s／tools 26.438s／Test194 0.384s，全 rc=0 零红）。
+- **它顶出的三笔待办（均不挡收口）**：①**机主拍**：`approval.current`/`approval.queue` 撞冻结 l2 仪器词表（规格表 vs ban#6 正面冲突）、`tasks.list`/`task.detail` 撞票 188 仪器——这四枚拼写落不落/改哪边；②编排者：gate-clauses 的 **G7/G7neg 两枚声明不符**（基线 6→7→8，"新增未成对"＝票 171 AC#2 程序）**非 194 所致**（`194-wisp` 腿 11-10 自测 14/14 退码 0，A1681 在账）；③`194-cost-table.md:15` 的 `WriteSection` 文件名笔误（写 `panelwrite.go`，实为 `sectionwrite.go`）。
+- **✅ 194 收口状态不变**（已 -done、`9211a8c89` 已推）；本笔只补审计件与三笔待办入账。
