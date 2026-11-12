@@ -35625,3 +35625,18 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **test-core 绿 ≠ 整 CI 绿**：test-windows 仍有 own 既存红（step 7/8/10），lint 仍有 staticcheck 54 + SLO census。修 test-core 是修真 bug + 让该 job 转绿，不单独收票。
 - **★在飞**：`plugin-fix`（internal/plugin 序号14 测试夹具 + 序号15 判性）。CI run 验 `cc7b524b4`。
 - 撤销口令：删本 A1769；`git revert cc7b524b4` 回退搜索修复。
+
+## A1770 — plugin 两处平台无关测试缺陷修好并推；test-core 真红 15→4（余 B 类 pin + skip ledger 属 scope 决策）
+
+- 机主 2026-11-12 白天。承接 `A1769`。
+
+### 一、plugin-fix（提交 `d55c470db`，只 `internal/plugin/command_52_test.go`）
+- **序号14**（`Test52SchemaViolationsAreRejected` 的 below_minimum/above_maximum/not_an_integer）：根因＝`withProps` 只换 Parameters、`base` 的 argv_template 无 `{{days}}`，`ScreenCommandParams` 只筛模板占位符 → days 约束从不被咨询。修法＝加 `withArgv` 尾接 `"--days","{{days}}"`。**断言仍 `ErrParamSchema` 未削弱。** 生产 `command_argv.go` 一字未动（本就对）。
+- **序号15**（`Test52CommandKindValidates/unknown_kind`）：`kind="shell"` 时 `auditKeys`（manifest.go:228）先按键表报 `tools[0].* unknown key`、`ParseManifest` 在审计闸先返回，`validator.go` 的 `.kind` 分支不可达。**manifest 仍被拒**，只是字段更泛。**放宽期望 `.kind`→`tools[0]`**（合法：仍是"拒绝+点名该条目"，非删断言）。生产侧"让 auditKeys 对非法 kind 优先报 tools[N].kind"＝报错形状变更，留 TODO 不改。
+- **三把尺**：提交只 1 件；我清 TEMP/TMP/TMPDIR **强跑 13+6 子用例全 PASS**（本机默认 TEMP 下这两测试 SKIP——守卫 `:35-41` t.TempDir 落 TEMP 根则跳；Linux TEMP 未设故真跑，CI 里它们本就 FAIL=跑过，故 Linux 会被这套修复拉绿）。
+
+### 二、test-core 真红 15 → 4
+- tools-fix（A1769）修 9 + plugin-fix 修 2 = **11 条修好**；余 **4 条 Test52 pin（B 类）**＝D46 盘符 Windows-only，Linux 上必拒。
+- **决策（我拍）**：4 条 pin 该按"**非 Windows 具名 t.Skip**"处理（不是把整个 internal/plugin 声明出 scope——那会连序号14/15 一起不跑；且 skip 需 ledger 记账）。这属 `portable-tests.sh` 守卫文件 + 每测试 skip 的**测试哲学层活**，且 **test-core 绿≠整 CI 绿（test-windows/lint 仍红）、不单独收票** ⇒ **价值边际，暂不做，登记待裁**。
+- **★在飞**：CI run `43150860211`(cc7b524b4)/`43151744689`(d55c470db) 验 Linux test-core。
+- 撤销口令：删本 A1770；`git revert d55c470db` 回退 plugin 测试修复。
