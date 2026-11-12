@@ -1,4 +1,4 @@
-# 435 — `TestLockedSuffixNeverTakesTheLockItself33r11` 红：四个新出现的 `…Locked` 函数未登记进名册（且各自体内零加锁操作）
+# 435 — `TestLockedSuffixNeverTakesTheLockItself33r11` 红：**只有一枚**新名字 `panelHolder.stampPublishLocked` 未登记进名册
 
 - Status: **ready-for-agent**（写面＝`cmd/wisp/panel_locked_naming_33r11_windows_test.go` 的 **`lockedNamingRoster33r11` 名册表**（`:86` 起）；⚠ 先只读取证，判清"该登记"还是"该改名"，再定改法）
 - 来源：round 89 整包（`D:\tmp\wisp\20261112\round89\full.log`，`PASS=583 / FAIL=11`）＋台账 `:32512` 存量真红
@@ -12,7 +12,7 @@
 于是有个检查：**每一个带 `Locked` 后缀的函数，都必须在名册里登记**，说明"它为什么不自己加锁"。
 **新出现的名字必须被人审过、写进名册**——这样下一个加名字的人不会悄悄绕过这条规矩。
 
-现在实测：**四个新名字没登记**。
+现在实测：**只有一枚没登记**——`panelHolder.stampPublishLocked`。
 
 ## 现量（逐字，可复跑）
 
@@ -105,3 +105,17 @@ waveOutSpeaker.unprepareLocked in voice_out_windows.go line 376: 0 lock operatio
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\435-<腿码>\`。
 - **⚠ 本票与真窗族测试（`Test258*`／`TestAC4Focus*`）⛔ 并行**。
+---
+
+## ⚠ 本票的更正记录（编排者 2026-11-12 23:0x，⛔ 删，留档）
+
+**我初版票面写「四个新名字没登记」，这是错的。** 实测（`D:\tmp\wisp\20261112\435-probe\run.log`）：
+
+- `:245` 那 4 行是 **`t.Logf` 的普查日志**（列出所有带 `Locked` 后缀的函数及其体内锁调用数），**⛔ 红句**。
+- **真正的红句只有 1 条**（`:254`）：`panelHolder.stampPublishLocked (resident_windows.go line 1008) carries the "Locked" suffix but no roster entry`。
+- `waveOutSpeaker.releaseLocked`／`unprepareLocked` **在名册里已有条目**（`:88`、`:89`），`PanelManager.setPriorFocusLocked` 也有（`:87`）⇒ **这三枚是绿的**。
+
+**教训（第 9 次同根）**：我把「普查日志的 4 行」当成了「4 条红句」。**这是"读日志只看形状不看级别"的错**——`t.Logf` 与 `t.Errorf` 在日志里长得很像，我该看 `:245` 与 `:254` 的行号差异和 `--- FAIL` 只出现一次这件事。
+
+⇒ **本票的范围缩为一枚：`panelHolder.stampPublishLocked`。** 判定逻辑不变（该登记还是该改名）。
+
