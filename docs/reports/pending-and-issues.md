@@ -35646,3 +35646,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - **`ok  github.com/CarlosShao/wisp/internal/tools  20.230s`**（原 9 条 FAIL 全清）⇒ **tools-fix 的真 bug 修复在真 ubuntu 容器验证通过**。
   - 四数：`PASS=2046 FAIL=6 SKIP=4`（原 `PASS=2037 FAIL=15`）⇒ **FAIL 15→6**，剩 6 全 internal/plugin Test52（此 run 未含 plugin-fix d55c470db）。
   - 含 plugin-fix 的 run `43151744689` @ `d55c470db` 预计再降到 4（仅剩 4 条 pin B 类）——待其完成复核。
+
+## A1771 — 票 72 非实现者验收收 done（真票 +1）；补完 424/85 rename 的旧名残留删除
+
+- 机主 2026-11-12 白天。承接 `A1770`。
+
+### 一、票 72 收 done（6/6，commit `81c7e3563`，已推 origin/dev）
+- **AC#4**：runner 侧＝CI run `43146479546` test-windows **step 11 = success**（命令 `bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows`，`ci.yml:1118`，真 run）；本机侧＝`go test ./internal/risk -run TestPathResolverJunctionWindows -count=3` **rc=0**（三发独立进程全绿）、整包 `-count=2` **rc=0**、`-count=1 -v` = **RUN=175 PASS=174 SKIP=1 FAIL=0**（票面旧读 123/122 因后续加测增长，0 FAIL 不变）。
+- **AC#6**：票 70 AC#3 已 `[x]` + `:22/:69` 回指；`ci.yml:1095` 步骤名已非 placeholder（「stale placeholder wording retired by ticket 85 AC#4」）⇒ 改名后半**不是票 71 落、是票 85 AC#4 顺手落成**，现态达标。
+- **诚实**：本机首发瞬时 FAIL 一次（残留 junction 目录碰撞），二次起稳绿 ⇒ 判抖动、非系统性（`-count=3`＋三发全绿佐证）。
+- 三把尺：`f1033e1` 真在 / `probes/72/r1/` 四件在 / 我自己复跑。裁决件 `docs/evidence/s1/72-verdict.md`。**非实现者＝编排者**（实现腿＝agent 72 / 72-r1，AC#4 原文即"交编排者跑"）。
+
+### 二、补完 424/85 rename 旧名残留（我自己的尾巴）
+- 现象：HEAD 里票 424、85 各有 **非done + done 两文件**（早先收票时 rename 只提交了新增边、旧名留盘）⇒ 影响"开放票计数"（把已 done 的算成 open）。
+- 核对：`-done` 是新内容（done status + 进度 log），非done 是旧 `open` 快照 ⇒ **删非done（staged D），只留 `-done`**。
+- 撤销口令「**424/85 旧名复原**」：`git checkout 81c7e3563^ -- .scratch/wisp/issues/424-linux-...residentVoice.md .scratch/wisp/issues/85-lint-tools-never-produced-a-verdict.md`。
+
+### 三、计数
+- 本会话真票落地＝**424、85、72（+3）**。补删 424/85 旧名后重号消失，票池去重口径修正。
