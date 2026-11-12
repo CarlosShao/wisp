@@ -35942,3 +35942,13 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★这一票的立意值得记住**：原断言唯一判据"末位"在票 43 之后**恒假**——**一个恒假的判据不测任何东西，它的绿也买不到任何东西**。改后三条判据**每条都有对应实测红**，且②③覆盖原断言**从来测不到**的两种退化（序列重排／回放挪位）。
 - **票池**：done 342 / open 67 / total 409。票 425 已 `-done` 改名。
 - **腿报的一枚副产品（⛔ 我没动）**：`go build ./...` 在工作树里红，红在 `build/mut_rvw.go`——**未跟踪、被 `.gitignore:14` 吃掉、mtime 2026-11-04**，`git ls-files build/` = 0 文件。HEAD 导出树 `rc=0`。**这不是任何票的债，是残留件，需其主人清理**（⛔ 不在我写面，未删）。
+
+## A1803 — round 88 剩余真红的分诊台账（⛔ 一枚未修，只定性；防丢失）
+
+- **背景**：整包 `cmd/wisp` 终态 `PASS=593 / FAIL=14`（`A1801`）。14 枚里：4 枚台账 `:32512` 存量真红、1 枚已知偶发（复跑 PASS）、**8 枚环境修好后暴露的真红**、1 枚已由票 425 修好（`628eb5b96`）。剩 7 枚待办，本账逐枚定性。
+- **已立票**：`426`（Warm mic close 只 1 次，腿在飞）／`427`（12r2 AST 锚点过期，腿在飞）。
+- **本账新定性三枚**：
+  - **`Test26PWithoutAECTheEchoTranscribesVerbatim`**（`resident_voice_bargein_26p_echo_windows_test.go:216`）：逐字 `MUTANT 26p-M2 SHAPE: the raw echo opened zero episodes - the judge did not see the announcement audio the mic surface carried`。**性质**：无 AEC 时麦克风收到自己播报的声音，回声判定器应捕获 episode，实测**零捕获**。⇒ **产品行为**（判定器没看见音频），需专票查「麦克风面到底有没有把那批音频送进判定器」。
+  - **`Test384ResidentWatchdogEndToEnd`**（`resident_watchdog_windows_test.go:230`）：逐字 `never observed the tree back under the Armed cap (a real within-cap reading)`。机制：`:210` 造 64MB hold → 破 cap → `:227` 释放 → `:230` 等 3s 要 `PrivateWorkingSetBytes < 80MB`。**性质**：**真实资源读数**——Go 把页还给 OS 需要 GC＋`FreeOSMemory`，3 秒窗口可能不够。⛔ 不是断言过严也不是产品退化，**是"释放到可观测回落"的窗口问题**；判据＝窗口加长或改为等 `FreeOSMemory` 之后的事件，⛔ 不许直接放宽 80MB 阈值。
+  - **`Test365RunRowsAStuckTaskAsStuck`**（`tasklogstate_365_test.go:181/184`）：逐字 `屏幕逐字: …任务 … 结束（completed，1 轮，0 次工具调用…）`／`库逐字: task_log.state = "done"`／`this run did not end stuck (screen word "completed", exit 0), so it cannot testify about stuck`。**性质**：**测试自身前置条件未建立**——它想注入一个"卡住"的任务，结果那发正常 completed 了，于是它**诚实地拒绝为自己不能作证的事作证**（这句断言写得很好）。⇒ **台面/夹具问题**，需查注入卡住的手法是哪一步失效。
+- **★这枚测试的写法值得留档**：`this run did not end stuck … so it cannot testify about stuck`——**它宁可不作证也不假作证**。这正是本仓"诚实高于好看"的一个正面样本。
