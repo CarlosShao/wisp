@@ -35292,3 +35292,25 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★票 65 不可派**：`Status: blocked-on-owner（缺参考图）`，AC#1 逐字 `参考图已入库（design/refs/ball-glass-*.png）` ⇒ **必须机主给图**。
 - **★票 85 未 done**（`85-lint-tools-never-produced-a-verdict.md` 仍在池）⇒ **票 122 的 `Blocked by: 85` 严格说未解**；但 122 已实际推进到 98 条（说明 85 的门已能跑）⇒ **本条一并请非实现者核 85 是否已实质满足**。
 - 撤销口令：删本 A1757 条（并撤 risk 解冻）。
+
+## A1758 — ★★票 122 的 SA1019 **已清**（解冻落地成功）——三把尺全过，我自己复跑读数与交件逐字一致
+
+- 腿 `122-sa1019-fix`（`auto/glm-5.3-flash` high）**交件成功**（本会话**第一条 glm 写腿成功**）。
+- **★三把尺（我自己核）**：
+  | 尺 | 读数 |
+  |---|---|
+  | ① 提交真在 | `dc8a2d536`，`git show --stat` ＝ **恰好 2 枚件**：`internal/risk/proccpu_windows_test.go`（5 行改）＋ `docs/evidence/s1/122-sa1019-fixed.md`（60 行） |
+  | ② 件真在 | `docs/evidence/s1/122-sa1019-fixed.md` **2,999B** |
+  | ③ **自己复跑** | 我自己跑 `go test ./internal/risk/ -count=1 -v` ⇒ **rc=0**、**RUN=175 PASS=174 FAIL=0 SKIP=1**（唯一 SKIP＝`TestSyncRegistryProbeLive`，联网 live 测试）⇒ **与交件逐字一致** |
+- **★改动逐字（`git show` 现读）**：
+  - `internal/risk/proccpu_windows_test.go:20`：`proc, err := windows.GetCurrentProcess()` → **`proc := windows.CurrentProcess()`**
+  - 连带删掉 `if err != nil { return 0, err }` 三行
+  - **全包 `GetCurrentProcess` 命中 = 0**（现跑）
+- **★SA1019 消失的判据**：交件称 staticcheck 已无 SA1019（余 4 条为**他文件既有** U1000/ST1018，非本腿写面）。⇒ **票 122 的 windows 侧不再背那条冻结面红**。
+- **★越界自证（现跑）**：`internal/risk/**` **只有那 1 枚文件**被改；其他包零改动。
+- **★票 122 现状**：`Blocked by: 85` **仍未 `-done`**（`85-lint-tools-never-produced-a-verdict.md` 在池），但 122 的实质工作已到 **windows 109→98、linux 20→14**，且**最后的 SA1019 卡点已清** ⇒ **票 122 只剩 `AC#6`（步级 CI 读数：`lint` job 里 staticcheck 步的 run id + job id + step 号 + 结论）**。
+  - ⚠ **AC#6 必须等 CI 真跑一次**（推上去取 run 读数）。**这是"推"动作 ⇒ 已获机主授权 A813（只推 `origin/dev`）**，可做。
+- **★本轮方法论收获（写死）**：
+  - **`auto/glm-5.3-flash` high 是唯一可用的子代理路由**：本会话 8 次子代理，**glm 写腿 2/2 成功**（`346-a3`、`122-sa1019-fix`），**group 组 0/6 成功**（全空返回）。
+  - ⇒ **group 组在本编队彻底不可用**，⛔ 再派。
+- 撤销口令：删本 A1758 条 ＋ `git revert dc8a2d536`（若要撤那一行改动）。
