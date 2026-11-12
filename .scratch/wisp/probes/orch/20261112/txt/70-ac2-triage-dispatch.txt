@@ -1,0 +1,46 @@
+# 70-ac2-triage 派单（test-core 15 条 Linux 红的只读分诊）
+
+- 腿码：**70-ac2-triage**（**只读诊断，⛔ 改任何 .go / portable-tests.sh / ci.yml**）
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`
+- 写面：**只** 新建 `docs/evidence/s1/70-ac2-testcore-triage.md`（分诊表）＋ 票 70 末尾**一条**只追加 bullet。⛔ 别的任何文件。
+- 目的：票 70 **AC#2「test-core 分诊」**——把 CI 里 `test-core`（ubuntu）那批失败**逐条**定性：是**真可移植性缺陷**（测试该改用跨平台 API）还是**该声明出 scope**（portable-tests.sh 具名理由）。
+
+---
+
+## 现成材料（⛔ 别自己猜，先读）
+
+1. **CI 原始日志（ubuntu test-core 全量，1.8MB）**：`D:\tmp\wisp\20261112\tc-log.zip`（直接用 `Get-Content -Raw` 当文本读，它是纯文本行，不是真 zip）
+2. **portable-tests.sh**：`scripts/portable-tests.sh`（核心：:22「cases declared NOT IN SCOPE for a stated reason」、:187 `core` scope 定义、:78-88 各 scope 用法）
+3. CI run：`43146479546`，test-core job `130945374182`，失败步 = step 7 `Portable package tests`
+
+## 已知的 15 条失败（父测试名，从日志现取；你可复核+补漏）
+
+**internal/tools**（FAIL 20.053s）：
+`Test24R2ASearchContentFindsMatches`、`Test24R2ASearchContentNeverListsBlacklistedFiles`、`Test24R2ASearchContentCapsAndSkips`、`Test24R2ASearchContentThroughResolverReportsTruncated`、`Test24R3SearchFilesMatchesNameGlobCaseInsensitive`、`Test24R3SearchFilesDepthCapBothWays`、`Test24R3SearchFilesCancelMarksPartialResult`、`Test22AppLaunchJobFailureSurfaces`、`Test22AUMIDIsWindowsOnlyHere`
+
+**internal/plugin**（FAIL 5.140s）：
+`Test52PinComputesAndVerifiesHash`、`Test52OneByteTamperRefusesAndAlerts`、`Test52ManifestPinMismatchIsRefusedAsASwap`、`Test52ManifestPinsEveryCommandTool`、`Test52SchemaViolationsAreRejected`、`Test52CommandKindValidates`
+
+（日志尾：`portable-tests.sh: four numbers: === RUN=3037 --- PASS=2037 --- FAIL=15 --- SKIP=4`）
+
+## 你要做的（每一条都靠现跑/现读，⛔ 抄）
+
+1. 从 `tc-log.zip` 里把**每条失败的断言行**（`*_test.go:NN: ...`）逐条摘出，尤其：
+   - internal/plugin：注意 `command_52_test.go:265: no TEMP in this environment`、`:303 native spelling ... has no separator`、`:101/:131/:181/:335 command exe is not a fixed absolute local path`、`:464 accepted {...}`、`:1002 manifest failed C14 validation`
+   - internal/tools：现取 `search_24*` / `web_launch_test.go` / `document_text_test.go` 的断言原文
+2. 对**每条**判定根因类型：`TEMP/TMPDIR 环境变量` / `原生路径分隔符` / `AUMID 仅 Windows` / `golden 哈希随换行(CRLF/LF)漂移` / `其它（写明）`。
+3. 对**每条**给**正确处置建议**（⛔ 不许建议"删断言/裸 Skip"）：
+   - **A 类＝改成可移植**（如 `os.Getenv("TEMP")`→`t.TempDir()`；`\`→`filepath.Join`；AUMID 测试加 `if runtime.GOOS!="windows"{t.Skip("AUMID 仅 Windows，见票号")}` 具名跳过）——写明**具体文件:行 + 该改成什么**；
+   - **B 类＝声明出 core scope**（在 `portable-tests.sh:22` 那片"NOT IN SCOPE with a stated reason"里具名登记，写清为什么这个包/测试不该在 Ubuntu 跑）——写明**理由**。
+   - 二选一，逐条给，⛔ 含糊。
+4. 输出 `docs/evidence/s1/70-ac2-testcore-triage.md`：一张表 `序号｜测试名｜包｜file:line｜根因类型｜A/B 处置｜具体动作`，末尾一节"总数核对（15 vs 票面写的 4 的差异说明）"。
+5. 票 70 末尾**只追加一条** bullet：`[2026-11-12 11:xx +08] agent=70-ac2-triage 只读分诊 15 条 test-core Linux 红，表见 docs/evidence/s1/70-ac2-testcore-triage.md，A 类 N 条/B 类 M 条。` ⛔ 翻 AC 框（翻框须非实现者、且 AC#2 是否算满足留编排者裁）。
+
+## 铁律
+- ⛔ 改任何 .go / scripts / ci.yml；⛔ 跑 `go test`（本腿只读日志与源码）；⛔ push
+- add/commit 显式 pathspec（只证据件 + 票 70）；⛔ add -A/amend/reset/rebase/stash/checkout ./clean
+- 临时件只落 `D:\tmp\wisp\20261112\`；证据件用 `write` 建（中文正文⛔走 PowerShell 内联）
+- **别信本单"15 条"字样，以你自己从日志现取的为准；对不上如实报**
+
+## 回一行
+`DONE: 70-ac2-triage fails=<你数到几条> A-portable=<n> B-outofscope=<n> 证据=<路径>`
