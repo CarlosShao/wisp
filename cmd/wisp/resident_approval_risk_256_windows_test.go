@@ -376,8 +376,9 @@ func optionsFieldSet256(t *testing.T, path string) (sets [][]string, literals in
 }
 
 // declaredOptionsFields256 reads the denominator off approval's own declaration
-// instead of hard-coding "10": a field added to Options shows up here, which is
-// what makes ④'s "5 of N" a reading rather than a remembered number.
+// instead of hard-coding a remembered number: a field added to Options shows up
+// here, which is what makes ④'s field count a reading rather than a remembered
+// number.
 func declaredOptionsFields256(t *testing.T) []string {
 	t.Helper()
 	root := filepath.Dir(filepath.Dir(risk256Dir(t)))
@@ -422,10 +423,15 @@ func declaredOptionsFields256(t *testing.T) []string {
 // file. Either direction of change reddens - deleting a field, or adding one
 // nobody adjudicated.
 //
+// Answer was then added to the resident leg's literal by ticket 375 (commit
+// b63d56413), a legitimate adjudicated addition of a declared Options field, so
+// this ruler's expectation set follows it and the claimed count is 7 now
+// (UI / Channels / Window / ApprovalTimeout / Logf / Grants / Answer).
+//
 // The name still reads "Five" and is not renamed: A602's boundary says this file
 // is not to be reordered or renamed, and acceptance legs compare red-name sets
 // verbatim, so a rename would read as a new failure to whoever runs next. The
-// count the ruler actually claims is the six above.
+// count the ruler actually claims is the seven above.
 //
 // Grants is asserted PRESENT now. It was asserted ABSENT until ticket 265 was
 // adjudicated (the old message said so: "the half was filed as pending ticket
@@ -452,7 +458,7 @@ func TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims(t *testing.T) {
 		}
 		got[n] = true
 	}
-	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf", "Grants"}
+	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf", "Grants", "Answer"}
 	for _, w := range want {
 		if !got[w] {
 			t.Errorf("the resident leg does NOT pass Options.%s to approval.New. That is the whole of ticket 256's "+
@@ -491,8 +497,9 @@ func TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims(t *testing.T) {
 	}
 
 	declared := declaredOptionsFields256(t)
-	t.Logf("landing site reading: resident leg passes %d of %d declared approval.Options fields (was 3 of %d before ticket 256)",
-		len(got), len(declared), len(declared))
+	t.Logf("landing site reading: resident leg passes %d of %d declared approval.Options fields (was 3 before "+
+		"ticket 256; the count is 7 now - Answer was added by ticket 375's commit b63d56413 and this ruler's "+
+		"expectation set followed it)", len(got), len(declared))
 	if len(declared) < 10 {
 		t.Errorf("approval.Options now declares %d fields, fewer than the 10 the 256-a2 census §1 rostered: "+
 			"the denominator moved, so that census table has to be re-adjudicated", len(declared))
