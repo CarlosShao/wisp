@@ -72,3 +72,36 @@ exe 所在目录是加载器**第一**搜索位置 ⇒ 在 System32 之前命中
 - ⛔ 未改 System32（账 `dll-shadow-2` 的禁令）。
 - ⛔ 未提交任何 DLL（10MB+ 二进制不入库；stage 目录在 `.scratch/wisp/stage-cli`，本就在忽略面）。
 - 门禁：本件是 shell 脚本改动，不动 Go 产品码、不动断言、不动 thresholds/golden。
+
+## 6. 批量读数（终态，我亲跑，2026-11-12 15:35）
+
+命令：`stage-cli/wisp.test.exe -test.run '^(Test15e|Test26P|Test41a2r1|Test392|Test381r2|Test390r1|Test394R1|Test26R3|Test382WR2|TestWireR1|Test12r2)' -test.v -test.count=1 -test.timeout=30m`
+日志：`D:\tmp\wisp\20261112\carrier\voice-families.log`
+
+| 指标 | 读数 |
+|---|---|
+| `--- PASS` | **19** |
+| `--- FAIL` | **20** |
+| `--- SKIP` | **7** |
+| **`onnxruntime 1.17` 遮蔽错误** | **0**（改前 39 枚红的唯一根因） |
+
+### 6a. 由红转绿的具名证据（上一轮整包 FAIL → 本次 PASS）
+
+`Test15eSilenceNeverCallsTheHandOff` · `Test15eARefusedHandOffLeavesTheAsrUnopened` · `Test15ePauseStopsTheListenerAndTheTrayFollows` · `Test15eTheChannelHasNoConsumerWithoutTheLeg` · `Test41a2r1ProductionTableRejectsTheDemoWavs` · `Test41a2r1GuardRowsWalkWithTheProductionFact` · `Test381r2StaleTokenDoesNotKillTheNextAnnouncement` · `Test381r2PlayingPhaseInterruptAbortsAndWalks27` · `Test381r2RealDevicePlayingPhaseAbortWithin400ms` · `Test381r2IdleInterruptIsInert` · `Test381r2VetoSubstringFinalsReachTheAgent` · `Test390r1BallClickPlayingInterruptAbortsAndWalks27` · `Test392JSONSentinelClampsNonFiniteReadings`
+
+### 6b. 残余 20 枚红的根因（**另一层，与本治法无关**）
+
+逐枚读断言，20 枚的失败行全是同一句：
+
+> `install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test...\001: WISP_...`
+
+⇒ **ASR 模型夹具未装到测试临时目录**（环境变量/模型件缺失）。这是**夹具层**问题：
+- 与 DLL 遮蔽**无关**（遮蔽已归零）；
+- 与本 carrier **无关**（carrier 只改加载形状，不供模型）；
+- 属**另一张票**的射程，⛔ 与本治法混算，⛔ 宣称 39 枚"全绿"。
+
+## 7. 结论（可核）
+
+1. **治法成立**：`shadow errors = 0`，语音测试从"加载即死"变为"真跑"（19 枚 PASS，多枚由红转绿）。
+2. **治法边界**：carrier 治的是**加载形状**这一层；模型夹具是另一层，残余 20 枚红属它。
+3. **⛔ 未做**：未改 System32、未提交 DLL、未动断言/scope/pin/SKIP 规则/ticket-98 GUARD。
