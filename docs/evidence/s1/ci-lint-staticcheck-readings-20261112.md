@@ -71,7 +71,7 @@ staticcheck self-report: version=staticcheck 2026.2.2 (0.8.2) modules=3 packages
 
 - **第一次产出**：`findings=54`、`toolchain-crash-lines=0` ⇒ **计数器真跑起来了**（此前是"跑不动/零判据"）。
 - ⚠ **"按 包×检查码×file:line 列表"那一半需从 `m_out` 全文抽**（日志里 `printf '%s\n' "$m_out"` 后有 54 行 finding）。**本件只证"判据产出了"，具体 54 行的清单要另取**。
-- ⚠ **`findings=54` 与票 122 自报的 `linux 20→14` 不一致**——两发跑在**不同提交**上（122 的读数是批 2 后、本 run 是 `a6d203613`）。**这个差必须核**，别当成同一件事。
+- ⚠ **`findings=54` 与票 122 自报的 `linux 20→14` 口径不同、⛔ 矛盾（已核清）**：122 的 `14` 是 **`U1000` 单码子集**（`122-staticcheck-batch2.md:13-14` 逐字：`linux 28 行（20 finding + 8 行 internal/ball 编译噪音）/**14×U1000**`）；`54` 是 **SA/ST/S/QF/U 全码总数**。⇒ **两个数是不同分母，不是同一件事。**
 
 ### 票 122 — AC#6（步级 CI 读数：run id + job id + step 号 + 结论）
 
