@@ -1,6 +1,6 @@
 # 72 — A 表（受保护路径）在 CI runner 上退化成 B 表：C26 的纵深防御真破了一格
 
-**Status:** review（修复与用例已入库 `f1033e1` + 插单回执 commit；AC#1/#2/#3/#5 本机可证已勾，**AC#4 的 runner 半边与 AC#6 的改名都不在代理手里**）
+**Status:** **done（6/6，2026-11-12 编排者非实现者验收）**——凭 CI run `43146479546` test-windows step11=success ＋ 本机 `-count=3` rc=0（见文末验收 log）。⚠ 原 Status 逐字留档：`review（修复与用例已入库 f1033e1 + 插单回执 commit；AC#1/#2/#3/#5 本机可证已勾，AC#4 的 runner 半边与 AC#6 的改名都不在代理手里）`。
 **Claimed by:** implementer（票 72 代理，2026-09-21 10:05 接手；根因已由票 70 的 run 35549859581 诊断输出提供）
 **Last update:** 2026-09-21 11:00（implementer：执行 10:08 插单，放行侧改窄 + round-3 变异）
 **Blocked by:** —（与票 70 共享同一条测试，但**修的是实现不是 CI**；票 70 只负责"这条 CI 变绿"）
@@ -71,7 +71,7 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
       `TestClassifySpellingInvariance` / `TestClassifyFailClosedWhenSpellingUnprovable` 三条转红，其余票 18 用例**仍绿**
       （本机 USERPROFILE 拼写恰好等于句柄拼写 ⇒ 只有新用例看得见这个洞，正是 AC#4 需要 runner 的原因）；
       退回后 `git diff --quiet -- internal/risk` rc=0。②= `TestAListWinsWhereBothTablesHit`。
-- [ ] **AC#4 本机 + runner 两侧都过**：贴出两侧**逐字同命令**的输出与真实 exit code；
+- [x] **AC#4 本机 + runner 两侧都过**：贴出两侧**逐字同命令**的输出与真实 exit code；
       runner 侧必须来自一次**真 run**，不是本地等价环境。
       **本机侧已量（`go test ./internal/risk/... -count=2` rc=0；`-count=1 -v` = 123 `=== RUN` / 122 PASS / 1 SKIP / 0 FAIL，
       那 1 条 SKIP 是 `TestSyncRegistryProbeLive`，HEAD 纯净树同样 SKIP，非本票引入）**。
@@ -96,7 +96,7 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
       **改动的爆炸半径也被钉住了**：`TestCanonicalInputGainsNoSecondForm` 断言
       "已经是句柄拼写的输入（= Resolve 交给每个生产 caller 的东西）只产一种比较形且 `certain()`"，
       也就是"对没有第二种拼写的路径，本票一个字都不改变判定"这句话现在是可跑的，不是口头承诺。
-- [ ] **AC#6 顺带把票 70 的 AC#3 闭掉**：本票的修复就是那条 CI 步骤转绿的因；
+- [x] **AC#6 顺带把票 70 的 AC#3 闭掉**：本票的修复就是那条 CI 步骤转绿的因；
       修好后在票 70 的 log 里补一行指回本票，并把"步骤名陈旧"这件事改成非误导性命名（改名不算放宽门）。
       前半done：票 70 log 已补指回本票的一行。**后半没做，因为 `.github/workflows/ci.yml` 是票 71 在途的文件**（共树禁改清单）；
       建议的新步骤名（逐字可用）：`PathResolver red-team cases (junction/8.3/UNC/\\?\ - tickets 18/20/72)`，
@@ -293,3 +293,9 @@ A 表判定**遍历所有拼写形式**，任一命中即判 A ⇒ 这是从严�
 
 **撤销本节**：口令**「72 取证尺换回逐字节」**——回到 `AC#5` 原文那把 `git diff --quiet … -- pathresolver_junction_windows_test.go` 尺，代价＝甲族 4 枚红⛔ 有合法的修路（任何修它们的 commit 都会把已勾的 `AC#5` 打红）。
 - [2026-10-11 11:4x +0800] agent=**72-r1（写腿，锚 `9c83598d`）** did=按本节 §2 的新尺交甲族 7 枚**期望侧**（⛔ 动产码一字：三笔 commit 逐笔 `--numstat` 非 `_test.go` 命中＝0 行）＝#1 `anchor_spelling:57` 前提句换成"两串是不是同一枚文件"（`namesSameFile`，句柄管线；`t.Fatalf` ⛔ 降级、报错句逐字留），#2 `:140` 的 `want 1` 计数⛔ 再问形状、改问判定（五枚名册一枚⛔ 删、含那枚缺失叶子，每枚带绝对期望 `ClassA/ClassNone` ＋各形同判定＋`certain()` 原样；选型＝**Ⓐ**，Ⓑ 为什么建不忠实与代价逐字在 `probes/72/r1/10-class-a-expected-side.md` §#2，★请编排者裁这一枚），#3 `:238`／#7 `junction:292` 的 override 键＝票面 §3 第 1 条给的窄规则配套（键与入参都换成解析器交回的已解析形＋正控文件先 `mustWrite`，**⛔ 动 `overrideApplies`**、两枚正控一句没删没反转），#4/#5/#6 `junction:135/:164/:182` 的 `EqualFold(res.Canonical, long)` 换成同一把 `namesSameFile`＋#5/#6 各**新增**一枚 `Classify==ClassA`（收紧；`junction:126` 票 18 那枚既有 `t.Skip` 原地留、⛔ 收掉，新增 Skip／build tag＝0）；同批交票 307 归口的乙组 2 枚**负向钉**（`TestSyncFallbackNotDisarmableByWeakRoot`／`TestSyncUnverifiedRootKeepsFallback` 各补"界外必须 `Sync:false`"，正向断言逐字保留；`syncdirs.go:442` 那枚守卫退成恒真 ⇒ 响的文案**只有**新负向那两句 `:230`/`:254`，旧三枚正向全绿＝旧仪器哑）。凭据＝仓外导出树（`git archive … go.mod go.sum internal cmd`，648 枚 `.go`）两台面×改前改后×两发：别名 7 枚 `rc=1/FAIL=7/SKIP=0`→`rc=0/PASS=7/FAIL=0`、别名全量 `PASS=13/FAIL=7`→`PASS=20/FAIL=0`、本机两发颜色⛔ 变（`20/20` 前后同），红名册 `comm` 作差四发＝`only_in_after=0`；反形三发（ⓐ 退回旧形⇒恰 3 枚红、ⓑ 恒真形⇒恰我两句新文案响、ⓒ 拔掉 `blacklist.go:122` 已解析形守卫⇒恰 `TestOverrideOnlyAcceptsTheResolvedForm` 红而我改的 #3/#7 仍绿）逐发还原 `sha256` 前 16 位对得住（`aa4779bb…`/`b8f31679…`/`ab07caa3…`）；门禁三把 `build_rc=0`／`vet_rc=0`／`d22scan_rc=0`，格式名册两档射程（工作树 1 枚＝`provenance.go` CRLF 假枚、HEAD blob 0 枚，我三枚写面⛔ 出现）。⛔ 做到并具名的：CI／runner 台面（`AC#4` 那一半仍归编排者）、POSIX 档零求值、#2"恰 1 形"那半句承诺现在零仪器（补它＝动 `Resolve` 缺失叶子分支＝产码，⛔ 本票射程）、恒真形下 11 枚既有 sync 用例同发转红＝⛔ 我引入的形状。件＝`.scratch/wisp/probes/72/r1/{00-anchor,10-class-a-expected-side,20-class-b-negative-nails,30-evidence-readings-gates-mutations}.md`＋`logs/`。⛔ 翻任何一枚框、⛔ 写判语（验收＝下一枚非实现者腿）。⛔ push。
+
+- [2026-11-12 12:0x +0800] 编排者（**非实现者验收**，现 dev HEAD 含 `f1033e1`）did=**闭 AC#4／AC#6，票 72 全 6/6 收 done**。三把尺：①提交 `f1033e1` 真在（`git cat-file -t f1033e1`=commit）；②件真在（本票 + `.scratch/wisp/probes/72/r1/` 四件）；③**我自己复跑**：
+  - **AC#4 runner 侧**：CI run `43146479546` test-windows **step 11「PathResolver junction real case (tickets 18/20; wiring first-green tickets 72/75)」= success**（真 run、非本地等价）；其命令＝`bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows`（`ci.yml:1118`）。
+  - **AC#4 本机侧**：`go test ./internal/risk/ -run TestPathResolverJunctionWindows -count=3` **rc=0**（另连跑三发独立进程全 rc=0）；`go test ./internal/risk/... -count=2` **rc=0**；`-count=1 -v` = **RUN=175 PASS=174 SKIP=1 FAIL=0**（票面旧读 123/122 因后续加测而增长；SKIP=1 仍 `TestSyncRegistryProbeLive`、0 FAIL 不变）。⚠ 首发瞬时 FAIL 一次、二次起稳定绿＝残留 junction 目录碰撞的抖动、非系统性（`-count=3`＋三发全绿佐证，如实记账）。
+  - **AC#6**：票 70 `:22`「AC#3 → 移交票 72」＋`:69` 根因回指；票 70 AC#3 已 `[x]`；`ci.yml:1095` 步骤名已为非 placeholder 名「PathResolver junction real case (tickets 18/20; wiring first-green tickets 72/75)」（`:772` 注释「stale "placeholder" wording was retired by ticket 85 AC#4」）⇒「改名」后半非票 71 落、是**票 85 AC#4 顺手落成**，现态即达标。
+  ⇒ **6/6 收 done，文件名加 `-done`**。裁决件 `docs/evidence/s1/72-verdict.md`。**撤销口令「72 收回 done」**：`git mv` 回原名 + 把 AC#4／AC#6 两框改回 `- [ ]`、Status 回 `review`（原件原句已在上方留档）。
