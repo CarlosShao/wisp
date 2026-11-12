@@ -35456,3 +35456,37 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 定位**整包挂死真凶**（本 A1763），为 230/220 的"不可达终态"提供根因而非"跑不动"。
 - **★在飞**：无。CPU 已回落。
 - 撤销口令：删本 A1763 条。
+
+## A1764 — ★★★票 85 推到 **5/6**（AC#1/2/3/4 全翻，证据齐）＋ ★★发现**真 bug**：Linux 编译断裂（建票 424＋派腿修）＋ AC#5 另被本机遗留探针绊倒
+
+- 机主 2026-11-12 白天。本轮把票 85 从 2/6 推到 **5/6**，并挖出一条**真缺陷**。
+
+### 一、票 85 翻到 5/6（4 格，全有凭据）
+| 格 | 凭据 |
+|---|---|
+| **AC#1** | CI 真日志（`A1760`）：`go install ...staticcheck@2026.2.2` ＋ `self-report: version=2026.2.2 (0.8.2)` |
+| **AC#2** | **54 条 finding 逐条列进票 85 log**（按码：U1000=47／S1011=2／ST1018=2／S1016=1／SA5000=1／SA9009=1；按包：`internal/ball`=38 最多）。来源＝CI run `43139602748` step 13 日志 |
+| **AC#3** | **变异回验现跑**（`docs/evidence/s1/85-ac3-mutation-reverify.md`）：`internal/observe` 种入未使用符号 ⇒ staticcheck **立即报 U1000**；删掉 ⇒ 不再报；`git status` 空 |
+| **AC#4** | `ci.yml:1095` 步骤名**已是** `PathResolver junction real case (tickets 18/20; wiring first-green tickets 72/75)`（"placeholder"已除）；CI run `43139602748` / job `130923107815` / **step 11 = success** |
+- **剩 AC#5（门禁）** 未翻，被两件绊住（见下）。
+
+### 二、★★★发现真 bug：**Linux 编译断裂**（建票 424，已派腿修）
+- **现跑铁证**：CI `go vet (module)` step 逐字 **`vet: cmd/wisp/memory_retention_180k.go:73:38: undefined: residentVoice`**
+- **本机语义复核**：`type residentVoice struct` **只在** `cmd/wisp/resident_voice_windows.go:375`；而 `cmd/wisp/memory_retention_180k.go` **无 build 约束** ⇒ **任何 Linux/非 Windows 构建必挂**。
+- **引入提交**：`e83494cf5`（票 423 wave 2 / 180-census leg K）。⚠ 那腿自报"vet rc0"是**在 Windows 上跑的**，跨平台缺口只在 Linux 显形。
+- **修复判据**：该文件 4 函数里，**只有 `attachMemoryL1IfEnabled180K` 用 `residentVoice`**（调用者 `resident_windows.go:759` Windows-only）；另 3 个（`retentionWindowDays180K`→`run.go:705`、`memoryL1Enabled180K`→`config_readers_255.go:257`、`retentionBootLine180K`→`run.go:709`）**跨平台**。
+- **修法**：**只把那一枚函数搬进新建 `cmd/wisp/memory_retention_180k_windows.go`**，其余不动。⛔ 整文件改名（会把 3 个跨平台函数也变 Windows-only，反过来挂 Linux）。
+- ⇒ **已建票 `424`** 并**派腿 `424-fix`（glm high，job `workflow-15b8b85e3f534b5c`）**。
+- ⇒ **这条修完，票 85 AC#5 的 vet 门（和票 122 AC#6 的 lint 绿）才谈得上过。**
+
+### 三、AC#5 的另一半阻塞：本机**遗留探针污染**（删前需机主点头）
+- `go vet ./...` 在本机还挂在 **`build\mut_rvw.go:255:6: undefined: voiceTtsFiles`** —— 这是一枚**未跟踪的遗留变异探针**（91,003B，2026-11-04 建，`build/` 在 `.gitignore`，⛔ tracked）。
+- `gofumpt -l . tools/d22scan tools/mockllm` 本机输出 **462 行**，几乎全在 `.scratch/wisp/probes/**`／`.scratch/*census/clone/**`；**tracked 集里也有 31 枚 `.scratch/wisp/probes/**.go` 未格式化**。
+- ⇒ **AC#5 的"门禁空/rc0"在本机被这些遗留探针绊住**；`build/mut_rvw.go` 这类是**清理类动作，删前须机主点头**（`只建不删` 铁律）。
+- ⇒ 但 **CI 是干净检出（无这些未跟踪件）**，所以 **CI 的 vet 只挂在 residentVoice 那个真 bug 上**（票 424）。
+
+### 四、结论
+- **票 85：5/6，差 AC#5**；AC#5 的**真阻塞＝票 424 的 Linux 编译断裂**（CI 侧）＋ 本机遗留探针（本地侧，需清理授权）。
+- **票 424 是本轮最重要的产出**：一条**真跨平台缺陷**，阻塞整个 Linux CI。
+- **★在飞**：`424-fix`（glm high）。CPU 正常。
+- 撤销口令：删本 A1764 条 ＋ 删票 424 ＋ `git revert 595155bc7`（若要撤票 85 三格翻框则 revert 对应提交）。
