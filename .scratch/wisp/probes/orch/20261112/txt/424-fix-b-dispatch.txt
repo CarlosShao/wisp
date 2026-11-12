@@ -1,0 +1,115 @@
+# 424-fix-b 派单（Linux 编译断裂·第二批 5 处·glm high）
+
+- 腿码：**424-fix-b**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`, `reasoning_effort:"high"`
+- 写面：`cmd/wisp/` 里搬 2 族符号；新建 1 枚跨平台文件；写 1 枚证据件
+- ⛔ 动其他包、⛔ 改函数体/断言/契约
+
+---
+
+## ★背景
+
+`go vet ./...` 在 ubuntu 上因 cmd/wisp 有 Windows-only 符号被无 build 约束的文件引用而编不过。
+第一腿 `424-fix` 已修第一枚 `residentVoice`（commit `e98276632`）。**还剩 5 处 / 2 族**（用 `-gcflags=all=-e` 全量现测，`go vet` 只报每包第一条会遮住其余）：
+
+```
+cmd/wisp/logsink.go:224:80              undefined: configErrText
+cmd/wisp/memory_retention_180k.go:62:28 undefined: configErrText
+cmd/wisp/panel_config_store.go:404:6    undefined: applyBallStyle65
+cmd/wisp/panel_config_store.go:410:6    undefined: applyBallIdleOpacity
+cmd/wisp/panel_config_store.go:415:6    undefined: applyBallClickThrough
+```
+
+## ★修法（照做，已由编排者判定性质；⛔ 自己发挥改语义）
+
+### 族 A：`configErrText`
+- 现定义在 `cmd/wisp/resident_audio_windows.go:475`（windows-only 文件），**是纯函数**：
+  ```go
+  func configErrText(err error, c *config.Config) string {
+      if err != nil { return err.Error() }
+      if c == nil { return "config.LoadFile returned a nil config with a nil error" }
+      return ""
+  }
+  ```
+- **搬到跨平台文件**（新建 `cmd/wisp/config_err_text.go`，无 build tag，`package main`，import `config`），从 `resident_audio_windows.go` 删掉它。
+- 调用点有 4 处：`logsink.go:224`、`memory_retention_180k.go:62`、`resident_audio_windows.go` 内 2 处——都在同 package，搬走后自动可见，无需改调用点。
+
+### 族 B：3 个 `applyBall*` 包装 + 其 applier 变量
+- 现状（都在 windows 文件）：
+  | 符号 | 现在位置 |
+  |---|---|
+  | `var ballStyleApplier65 func(name string) bool` | `ball_style_65_windows.go:57` |
+  | `func applyBallStyle65(name string) bool` | `ball_style_65_windows.go:71` |
+  | `var ballIdleOpacityApplier func(v float64) bool` | `ball_idle_appearance_windows.go:64` |
+  | `var ballClickThroughApplier func(on bool) bool` | `ball_idle_appearance_windows.go:68` |
+  | `func applyBallIdleOpacity(v float64) bool` | `ball_idle_appearance_windows.go:84` |
+  | `func applyBallClickThrough(on bool) bool` | `ball_idle_appearance_windows.go:93` |
+- 包装函数体都是同一形状（nil 检查 + 调 applier）：
+  ```go
+  func applyBallX(...) bool { if <applier> == nil { return false }; return <applier>(...) }
+  ```
+- **把这 6 个（3 个 var + 3 个 func）搬进跨平台文件**（可放新建 `cmd/wisp/ball_config_appliers.go`，无 build tag，`package main`）。Linux 下 var 为 nil ⇒ 包装返 false，安全。
+- **⛔ 不要搬** `installBallStyleApplier65`（`ball_style_65_windows.go:61`）与 `installBallIdleAppearanceAppliers`（`ball_idle_appearance_windows.go:72`）——它们接 `*ball.Ball`、赋真 applier，**留 windows 文件**。也⛔ 搬 `ballStyleSeed65`／`ballIdleAppearanceSeed`。
+- 搬后 windows 文件里若有 import 变成未用，按 gofmt 清理最小集（只删确实未用的 import）。
+
+## 步骤
+
+### 1. 现读现状（⛔ 抄本单行号，先 read）
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+git rev-parse HEAD
+```
+用 read 工具**完整读**：`cmd/wisp/resident_audio_windows.go`（configErrText 段）、`cmd/wisp/ball_style_65_windows.go`、`cmd/wisp/ball_idle_appearance_windows.go`。
+
+### 2. 建两个跨平台文件并搬符号
+- `cmd/wisp/config_err_text.go`：`package main` + import "github.com/CarlosShao/wisp/internal/config"（现读模块路径确认）+ `configErrText` 全文。
+- `cmd/wisp/ball_config_appliers.go`：`package main` + 3 个 var + 3 个包装函数全文。
+- 从 3 个 windows 文件删掉被搬走的符号（连同其专属注释）。
+
+### 3. 判据（核心：Linux type-check 全量零 undefined）
+复用第一腿的 overlay（**已存在**，直接可用）：
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+$gm = 'D:\tmp\wisp\20261112\424fix\overlay-gomod.json'
+New-Item -ItemType Directory -Force -Path 'D:\tmp\wisp\20261112\424fixb' | Out-Null
+$env:GOOS='linux'; $env:CGO_ENABLED='0'
+$out = @(& 'D:\work\base\go\bin\go.exe' build -overlay $gm -gcflags=all=-e -o NUL ./cmd/wisp 2>&1 | ForEach-Object { [string]$_ })
+$env:GOOS=''; $env:CGO_ENABLED=''
+$out | Out-File 'D:\tmp\wisp\20261112\424fixb\linux-full.log' -Encoding utf8
+Write-Output "=== linux full errors ==="; $out | ForEach-Object { $_ }
+Write-Output ("undefined 行数 = " + @($out | Where-Object { $_ -match 'undefined:' }).Count)
+```
+**要求 `undefined 行数 = 0`**（若有别的族冒出来——`go vet` 只报每包第一条、`-gcflags=-e` 全量——把它们也一并修掉，同一前提：windows-only 符号被无 build 约束文件引用。若新冒出的符号性质复杂（真依赖 win32 无法搬），照实报编排者，别硬改）。
+- ⚠ 若 overlay 的 sherpa 桩缺失或路径变了，用 `Test-Path $gm` 确认；缺了就照 `docs/evidence/s1/424-fix-linux-build.md` §判据重建桩（纯 Go，放 `D:\tmp\wisp\20261112\424fixb\`）。
+
+### 4. Windows 不回归
+```powershell
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx;D:\work\workspace\projects plans\Wisp\build;' + $env:PATH
+& 'D:\work\base\go\bin\go.exe' build ./cmd/wisp 2>&1; Write-Output "win build rc=$LASTEXITCODE"
+& 'D:\work\base\go\bin\go.exe' vet ./cmd/wisp 2>&1; Write-Output "win vet rc=$LASTEXITCODE"
+& 'D:\work\base\go\bin\go.exe' test ./cmd/wisp -run 'Test180K|Test423|TestTicket255|Test65|Test255|Test324' -count=1 -v 2>&1 | Tee-Object 'D:\tmp\wisp\20261112\424fixb\win-test.log'
+Write-Output "win test rc=$LASTEXITCODE"
+```
+四数数法（剥子测试＋去重）：
+```powershell
+$c = @(Get-Content 'D:\tmp\wisp\20261112\424fixb\win-test.log')
+function Top($l,$p){ @($l | Select-String $p | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' } | Sort-Object -Unique) }
+"RUN=$((Top $c '^=== RUN   (\S+)').Count) PASS=$((Top $c '^--- PASS: (\S+)').Count) FAIL=$((Top $c '^--- FAIL: (\S+)').Count) SKIP=$((Top $c '^--- SKIP: (\S+)').Count)"
+```
+
+### 5. 越界自证
+```powershell
+git status --porcelain
+```
+要求**只有**：`cmd/wisp/config_err_text.go`（新）、`cmd/wisp/ball_config_appliers.go`（新）、`cmd/wisp/resident_audio_windows.go`（删 configErrText）、`cmd/wisp/ball_style_65_windows.go`（删符号）、`cmd/wisp/ball_idle_appearance_windows.go`（删符号）、证据件（新）。其余 `??` 是别的腿既有件，⛔ 提交。
+
+### 6. 交件 `docs/evidence/s1/424-fixb-linux-build.md`
+写：改了哪些符号（逐字 diff）、linux 全量错误数=0 的日志读数、win build/vet/test 四数、（若冒出更难的族）如实记。
+
+## 铁律
+- ⛔ 动 internal/** frontend/** design/**；⛔ 改函数体语义/断言/阈值/契约
+- ⛔ `git add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；add/commit **显式 pathspec**
+- ⛔ push；⛔ 删文件（搬＝原处删、新处增，都是你本腿自己搬，允许）；临时件只落 `D:\tmp\wisp\20261112\424fixb\`
+
+## 回一行
+`DONE: 424-fix-b linuxundefined=0 winbuild=<rc> winvet=<rc> wintest=RUN/PASS/FAIL/SKIP 件=<路径>`
