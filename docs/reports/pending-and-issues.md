@@ -35519,3 +35519,33 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **424 全绿后，票 85 AC#5（vet rc=0）、票 122 AC#6（lint 绿）才谈得上翻**。
 - **★在飞**：`424-fix-b`（cmd/wisp 写面独占，1 条）。CPU 正常。
 - 撤销口令：删本 A1765 ＋ 删票 424 与 `424-fix-b` 产出，`git revert` 对应提交。
+
+## A1766 — 424 修复三批收官：`r9_mode_card_test.go` test 泄漏已除（编我直做）→ cmd/wisp **Linux build+test 全 type-check 通过** → 推 `aa23f834b`，CI run `43146479546` 验证中
+
+- 机主 2026-11-12 白天。承接 `A1765`。
+
+### 一、第三批（最后一块）
+- **病灶**：`r9_mode_card_test.go:146/162 undefined: modeRequest114r2`——`modeRequest114r2` 只在 `panel_mode_confirm_114_windows_test.go`（`//go:build windows`），却被**无 tag 的** `r9_mode_card_test.go` 用 ⇒ `go vet ./...`（含 test）在 Linux 红。
+- **修法（零逻辑改动）**：把纯字符串构造 `modeRequest114r2` **逐字搬**进新建无 tag 的 `cmd/wisp/mode_request_114r2_helper_test.go`，从 windows test 文件删掉。它只依赖跨平台 test 常量 `inboundPanelSource`。
+- 证据：`docs/evidence/s1/424-fixc-r9-test-helper.md`。
+
+### 二、判据（我复跑，全绿）
+| 项 | 读数 |
+|---|---|
+| **Linux `go vet -overlay ./cmd/wisp`（含 test）** | **rc=0，undefined=0** |
+| **Linux `go test -overlay -c ./cmd/wisp`（build+test 变体全量）** | **rc=0，undefined=0** |
+| Windows build／vet | 均 rc=0 |
+| Windows 定向 test（114r2/R9/255/324/180K/423/65） | **RUN=50 PASS=49 FAIL=0 SKIP=1** |
+
+### 三、424 全三批小结（cmd/wisp 在 Linux 上**终于 type-check 通过**）
+- 批1 `e98276632`：`residentVoice`（1）
+- 批2 `3f15ede4d`：`configErrText`×2 ＋ `applyBallStyle65/IdleOpacity/ClickThrough`（5）
+- 批3 `aa23f834b`：`modeRequest114r2`（test，2 处引用）
+- **CI `go vet (module)` 日志只挂 cmd/wisp 一个包**（其余包当时已绿）⇒ cmd/wisp 修完，`go vet ./...` 应转绿。
+
+### 四、验证中
+- **推 `aa23f834b`（unpushed=0）→ CI run `43146479546`（lint job `130945374154`）in_progress**。
+- 待该 run 的 `go vet (module)` 步出绿 ⇒ 即证 **CI 侧 Linux 编译面真恢复**（这是 424 的终判据，也是我本地 overlay 近似之外的**真容器**读数）。
+- 绿后：非实现者翻票 424 各 AC ＋ 票 85 AC#5／票 122 AC#6 的 CI 侧依据到手。
+- **★在飞**：CI run（非 LLM）。CPU 正常。
+- 撤销口令：删本 A1766 ＋ `git revert aa23f834b`。
