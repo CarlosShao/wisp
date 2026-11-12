@@ -35271,3 +35271,24 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   | **AC#2** | **仍未做**：去牙反形（摘掉弃权守卫 ⇒ 应从"弃权红"变"假绿"）。⚠ 本台面 13 发 **SKIP=0、弃权红句 0 触发** ⇒ **弃权路径根本没走到**，所以"摘守卫会变假绿"这一维**在本机能跑的环境里无法证**——要证必须在"真到不了窗口"的环境（CI 那种）。
 - ⇒ **票 346 仍不可 `-done`**：AC#2 缺"能走到弃权路径"的世界。**这是票面自己写死的判据，不是我加戏。**
 - 撤销口令：删本 A1756 条。
+
+## A1757 — ★★★编排者裁定：**解冻 `internal/risk/proccpu_windows_test.go` 一枚文件、一条 SA1019**（采纳 `122-sa1-census` 甲案）＋票 33 普查腿发出
+
+- 机主 2026-11-12 白天。**技术选型我自己拍**（铁律⓪⓪⓪：只有改契约文字／花钱／不可逆动作才摆机主；解冻一枚测试文件**不属那三类**）。
+- **★裁定：解冻 `internal/risk/proccpu_windows_test.go`（只这一枚文件、只这一条 SA1019）**
+  - **理由（按"最有价值＋主流 harness"判，⛔ 按"风险小"）**：
+    1. **改法是 1 行 drop-in**：`windows.GetCurrentProcess()` → `windows.CurrentProcess`（x/sys 自己的 deprecated 注释逐字写 `Deprecated: use CurrentProcess for the same Handle without the nil error`）；连带的 `if err != nil` 三行要删（新 API 无 error 返回）。
+    2. **行为逐位不变**：`GetCurrentProcess` 的文档逐字 `The returned error is always nil` ⇒ 删掉那段 error 分支**不改变任何可达路径**。
+    3. **买得到真价值**：`AC#6` 的 CI 读数是**步级**判据（`lint` job 的 staticcheck 步），这条不修则 windows 侧**永远背 1 条红**，每次读数都要向每个看的人解释一遍"那条是冻结面"⇒ **账目噪音永久化**。
+    4. **⛔ 选"单开票"（乙）**：对 1 行替换开一张新票＝开票＋派单＋非实现者验收＋CI 读数核验的全套开销，**买不到任何超出"顺手 1 行"的收益**（这正是铁律⓪⓪③"复杂必须买得到真价值，买不到就不选"）。
+    5. **⛔ 选"留着不修"（丙）**：等于承认 windows staticcheck 永久红，`AC#6` 永远兑不了现。
+  - **★边界（写死，落地腿不许越）**：解冻**只具名这一枚文件**；**只许**这一处改法（`:20` 改 `windows.CurrentProcess`、删 `:21-23` 的 error 分支）；**⛔ 顺手动 `internal/risk/**` 任何其他字节**；⛔ 改任何断言／阈值／golden。
+  - **措辞照票 126 教训**：「**编排者在派单里解冻了它**」。
+  - **撤销口令**：「**撤 risk 测试件解冻，SA1019 留红**」。
+- **★票 122 现状（现跑）**：6 枚证据件（`122-r1/r2/sa1019/staticcheck-batch1/batch2/ac6-ci-reading`）；staticcheck 已从 **109→98**（windows）、**20→14**（linux）；**唯一卡点就是这条 SA1019** ⇒ **解冻后 122 可收口**。
+- **★票 33 现状（现跑，本轮最重要发现之一）**：**17 枚证据件但只勾 1/14 格**（`AC#2/3/4/5/6/8/9/10/11/12/13/14` 未勾）⇒ **典型"已完成但未翻框"**；且 `Blocked by: 07, 12` **两枚都已 `-done`**（现跑 `12-cli-text-path-s1-gate-done.md`；`07-*` 已 `-done`）⇒ **票面 `:7` 的 blocked 已过期**。
+  - ⇒ **已发 `33-census` 只读审计腿**（`group/group-review-and-audit` max，job `workflow-189a87769ef044af`），逐格判三态：有证据可翻／部分／真没做。
+  - 派单存档：`.scratch/wisp/probes/orch/20261112/txt/33-census-dispatch.txt`（新建）。
+- **★票 65 不可派**：`Status: blocked-on-owner（缺参考图）`，AC#1 逐字 `参考图已入库（design/refs/ball-glass-*.png）` ⇒ **必须机主给图**。
+- **★票 85 未 done**（`85-lint-tools-never-produced-a-verdict.md` 仍在池）⇒ **票 122 的 `Blocked by: 85` 严格说未解**；但 122 已实际推进到 98 条（说明 85 的门已能跑）⇒ **本条一并请非实现者核 85 是否已实质满足**。
+- 撤销口令：删本 A1757 条（并撤 risk 解冻）。

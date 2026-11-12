@@ -1,0 +1,126 @@
+# 33-census 派单（票 33 真实完成度核对 · 只读审计腿 · group max）
+
+- 腿码：**33-census**
+- 路由：`provider:"magpie"`, `model:"group/group-review-and-audit"`, `reasoning_effort:"max"`
+- 写面：**只写 1 枚 md**：`docs/evidence/s1/33-ac-box-census.md`
+- ⚠ **⛔ 改任何 `.go`／票面任何框／`Status:`／票名**
+
+---
+
+## 你是谁、你要回答什么问题
+
+**只读审计腿**。票 33（`33-panel-host-c27.md`）**有 17 枚证据件、13 格未勾**。你的活是回答一个问题：
+
+> **这 13 格未勾的，哪些其实已经有证据（只是框没翻）？哪些是真的没做？**
+
+**⛔ 修任何东西。⛔ 跑测试。** 你只读盘上的证据件 + 读票面 + 读代码。
+
+## 第一步：把票面 14 格逐格抄下来
+
+用 read 工具读：
+`D:\work\workspace\projects plans\Wisp\.scratch\wisp\issues\33-panel-host-c27.md`
+
+**注意**：这票 123KB、很长。**先读 AC 段**（搜 `- [ ]` 和 `- [x]`）。把 14 格**逐字抄进你的交件**（每格只抄第一句，长格抄到能辨认即可）。
+
+## 第二步：把 17 枚证据件逐枚读标题和结论
+
+```
+docs/evidence/s1/33-panel-host-c27-r1.md      (22520B)
+docs/evidence/s1/33-panel-host-c27-r4.md      (61085B)
+docs/evidence/s1/33-panel-host-c27-r5.md      (42606B)
+docs/evidence/s1/33-panel-host-c27-r6.md      (14753B)
+docs/evidence/s1/33-panel-host-c27-r7.md      (33193B)
+docs/evidence/s1/33-panel-host-c27-r9.md      (44165B)
+docs/evidence/s1/33-panel-host-c27-r14.md     (10108B)
+docs/evidence/s1/33-panel-host-c27-v1.md      (60796B)
+docs/evidence/s1/33-panel-host-c27-v2.md      (57915B)
+docs/evidence/s1/33-r14-verdict.md            (14745B)
+docs/evidence/s1/33-gateway-r3.md             (13453B)
+docs/evidence/s1/33-inbound-hop-design-a1.md  (45515B)
+docs/evidence/s1/33-inbound-listener-r2.md    (19283B)
+docs/evidence/s1/33-inbound-listener-r3.md    (21799B)
+docs/evidence/s1/33-minimal-inbound-hop-r1.md (20407B)
+docs/evidence/s1/33-ball-thread-owner-r8.md   (10389B)
+docs/evidence/s1/33-35-preflight.md           (33261B)
+docs/evidence/s1/33r11r2-impl.md              (9701B)
+```
+
+**每枚只读三样**（⛔ 通读全文，那会耗光上下文）：
+1. **第一行标题**（它说这条腿干了什么）；
+2. **搜 `AC#` 看它提到哪几格**；
+3. **搜 `结论`/`判`/`VERDICT`/`终裁`/`翻勾` 看它的结论句**。
+
+用 `Select-String` 高效取：
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+foreach($f in Get-ChildItem 'docs/evidence/s1' -Filter '33*' | Sort-Object Name){
+  Write-Output "===== $($f.Name) ($($f.Length)B) ====="
+  Get-Content $f.FullName -TotalCount 3 | ForEach-Object { '  H: ' + $_.Substring(0,[Math]::Min(140,$_.Length)) }
+  Select-String -Path $f.FullName -Pattern 'AC#\d+' | Select-Object -First 6 | ForEach-Object { '  AC: ' + $_.Line.Trim().Substring(0,[Math]::Min(130,$_.Line.Trim().Length)) }
+  Select-String -Path $f.FullName -Pattern '结论|终裁|VERDICT|翻勾|判语' | Select-Object -First 3 | ForEach-Object { '  V: ' + $_.Line.Trim().Substring(0,[Math]::Min(130,$_.Line.Trim().Length)) }
+  Write-Output ''
+}
+```
+
+## 第三步：交叉成表（**这是你的核心交付**）
+
+对 13 格未勾的，逐格判三态：
+
+| 三态 | 判据 |
+|---|---|
+| **有证据可翻** | 某枚证据件明确覆盖这一格，且写了"通过/成立/绿" |
+| **部分有证据** | 证据件提到这格，但结论是"部分/不可判/待 X" |
+| **真没做** | 没有任何证据件提到这格 |
+
+## 第四步：还要回答两个问题
+
+1. **`Blocked by: 07-ball-state-machine-core, 12-cli-text-path-s1-gate`** 这两枚**现在是不是都 `-done` 了**？
+   ```powershell
+   Get-ChildItem '.scratch/wisp/issues' -Filter '07-*' | ForEach-Object { '  07: ' + $_.Name }
+   Get-ChildItem '.scratch/wisp/issues' -Filter '12-*' | ForEach-Object { '  12: ' + $_.Name }
+   ```
+   ⇒ 如果都 `-done`，**票 33 的 blocked 已解除**（票面 `:7` 那句要标注过期）。
+
+2. **票 33 最后一条 Progress log 说什么？**（它通常写着"卡在哪"）
+
+## 交件格式
+
+`docs/evidence/s1/33-ac-box-census.md`：
+
+```markdown
+# 票 33 AC 框核对（只读审计 · 13 格未勾逐格判三态）
+
+- 锚：<git rev-parse --short HEAD>
+- 时刻：<YYYY-MM-DD HH:mm +08>
+- 本腿 ⛔ 改任何 .go、⛔ 跑测试、⛔ 改票面
+
+## 一、票面 14 格现状
+（逐格抄第一句 + 勾/未勾）
+
+## 二、13 格未勾逐格三态
+
+| # | AC（简） | 三态 | 覆盖它的证据件 | 证据件里的结论句 |
+|---|---|---|---|---|
+| AC#2 | ... | 有证据可翻/部分/真没做 | 33-xxx.md | ... |
+
+## 三、Blocked by 现况
+| 前置票 | 是否 -done |
+|---|---|
+| 07 | |
+| 12 | |
+
+## 四、一句话总判
+13 格未勾里：<N> 格有证据可翻、<M> 格部分、<K> 格真没做。
+票 33 能否闭：<能/不能，缺什么>
+```
+
+## 铁律
+
+- ⛔ 改任何 `.go`；⛔ 跑任何 `go test`／`go build`；⛔ 改票面任何框／`Status:`／票名
+- ⛔ `frontend/**`／`design/**`（读可以，⛔ 写）
+- ⛔ `git add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；add/commit **显式 pathspec**
+- ⛔ push；⛔ 删文件
+
+## 回一行
+
+`DONE: 33-census 可翻<N>格 部分<M>格 真没做<K>格 件=docs/evidence/s1/33-ac-box-census.md`
