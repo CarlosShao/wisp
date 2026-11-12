@@ -35893,3 +35893,15 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★读数（我亲跑，`bash -c` 调用，env 由脚本自解析，日志 `D:\tmp\wisp\20261112\envrun3\carrier.log`）**：`WISP_SPIKE_MODELS is not set`＝**0**／`checkpoint is incomplete`＝**0**／`onnxruntime 1.17` 遮蔽＝**0**／该族 `--- FAIL`＝**0**。**具名转绿**：`Test15eSpeechEndToEndHandsTheTranscriptToTheAgent` **PASS 9.89s**（整包发里长期 FAIL）／`Test15eTheProductionHandOffIsTheModelStoreWalk` 3.95s／`Test15e` 其余 4 枚／`Test381r2` 四枚（`StaleToken` 4.25s、`PlayingPhaseInterrupt` 5.56s 等）／`Test392JSONSentinelClampsNonFiniteReadings`。
 - **边界**：本件治**夹具寻址**这一层，⛔ 不宣称整包 52 枚红全绿——`cmd/wisp` 另有 5 枚台账 `:32512` 具名的**存量真红**（`TestTicket198FirstRunCallerIsTheRunEntryOnly`／`Test313WritableUnionEqualsTheTwoRosters`／`TestAC4FocusReturnToPriorWindowGap33r5`／`TestLockedSuffixNeverTakesTheLockItself33r11`／`TestAC247HandingTheLevelToTheSeamIsNotVisibility`），与本件无关。⛔ 未下载模型／未改 System32／未提交二进制／未动断言与 SKIP 规则。
 - **★教训**：报"根因＝X 没下载/没装"之前，必须**先把全仓可能位置都列出来逐个 `Test-Path`**，不能只查两个显而易见的目录就下结论——我这次因此给机主提了个**不必要的花钱请求**（"下模型 598MB"），实际一分钱不用花。
+
+## A1799 — round 88：三类环境红全部归零；★纠正我上轮"要花钱下模型"的错误请求
+
+- **★先纠错**：`A1796` 我报"残余 20 枚语音红＝模型未下载，要机主花 598MB 流量下模型"——**错**。模型**早就在盘**：`third_party/spike-models/`（~300MB）＋`third_party/model-fetch/`（~428MB），**零下载需要**。我只查了 `models/` 与 `build/models/` 两个显眼目录就下结论。**教训已入 `A1798`**：报"没下载/没装"之前必须把全仓可能位置逐个 `Test-Path`。
+- **真根因＝环境变量**（散文在 `12r2-impl.md:21`／`15a-r1-impl.md:115`，无任何可执行来源）。落地 `scripts/wisp-cli-staged-tests.sh` 的 `voice_env()`：五变量逐个默认＋逐目录验存在，调用方值优先，缺失则 exit 1 响亮报 setup 失败。
+- **★三个假信号（全部实测，留档防再踩）**：
+  - **① `WISP_TTS_DIR` 指 `model-fetch/x-matcha` ⇒ PASS=15／FAIL=31**（比不设还差）：`voiceTtsFiles.complete()` 要五件齐（Acoustic/Vocoder/Lexicon/Tokens/DictDir），x-matcha 无 vocoder 无 dict。正确＝`spike-models/matcha-icefall-zh-baker`。
+  - **② `WISP_PUNC_MODEL` 指目录 ⇒ 腿打"标点级未接上"**：`voiceWirePunctModel` 把该变量**原样当模型路径**。正确＝指向 `.../model.int8.onnx` **文件**。修后 `标点级未接上`＝**0**，`TestWireR1PunctuationReachesTheAgent` **PASS 5.20s**。
+  - **③ PowerShell 调 bash 的引号陷阱**：`& $sh script.sh -test.run '^(...)'` 拆成两参 ⇒ 裸 `-test` ⇒ 整页 usage rc=2，**看起来像脚本坏了**。正确 `& $sh -c "script.sh '-test.run' '^(...)'"`。
+- **★读数（我亲跑）**：11 族 **24 PASS / 0 FAIL**；`is not set`＝0／`checkpoint is incomplete`＝0／`onnxruntime 1.17`＝0／`标点级未接上`＝0。转绿具名：`Test15eSpeechEndToEnd…` **9.89s**（整包发长期 FAIL）· `Test15eTheProductionHandOff…` 3.95s · `Test381r2RealDevice…` **36.00s** · `Test390r1BallClickRealDevice…` **36.93s** · `Test26R3AnnounceClosesTheCaptureGate` 19.85s · `Test382WR2TTSCleanSentence…` 8.37s · `TestWireR1PunctuationReachesTheAgent` 5.20s。
+- **★环境层修好后暴露的一枚真红（⛔ 不算环境）**：`TestWireR1WarmIdleDisposesOnTheOwner` FAIL 5.19s，断言逐字 `resident_voice_wire_r1_windows_test.go:745: mic close counted 1 times, want at least 2 (the Warm row and the cascade's defence in depth)`。**同一个名字两个不同原因**——整包发里它 FAIL 于 `WISP_SPIKE_MODELS is not set`，现在才暴露真实断言。**这是产品缺陷**（Warm 行＋级联防御应各关一次麦），需单独立票或并入 `resident_voice_wire` 写面，⛔ 本件不算已修。
+- **提交**：`32ef54dcd`（env 解析）／`946355c13`（标点文件路径）／`b7697197f`（A1798 纠错）均已推。**零 Go 产码改动**，⛔ 未下载模型／未改 System32／未提交二进制／未动断言与 SKIP 规则。
