@@ -51,9 +51,9 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
 - [ ] **AC#2** 第一批只清三组（`SA4000` 1 条 + `SA1019` 3 条 + `SA4006` 1 条）。
       `SA4000` 那格要有**行为证据**：修完之后原来那枚用例仍然红于"它本来该红的形状"
       （即：它不是变成恒真，而是真的验到了两个维度）。
-- [ ] **AC#3** 假阳性那格**只登记不修**，并明写为什么（`SA9009`/`frontend/embed.go:4` 是散文注释、真指令在 `:19`、改它撞票 77 AC#1）。
+- [x] **AC#3** 假阳性那格**只登记不修**，并明写为什么（`SA9009`/`frontend/embed.go:4` 是散文注释、真指令在 `:19`、改它撞票 77 AC#1）。
       ⚠ **不许**为了消除这条而加 `//nolint` 之类的全局抑制——那是把门拆了。
-- [ ] **AC#4** `U1000` 那 26 条**逐条判归属**（该删 / 该留 / 归哪张票），出一张表；
+- [x] **AC#4** `U1000` 那 26 条**逐条判归属**（该删 / 该留 / 归哪张票），出一张表；
       **本票不修它们**，表交回我，由我决定哪几条变成后续票。
 - [ ] **AC#5** 门禁：受影响包 `-count=2 -v` 四数逐条点名（`-count=2` 不缓存；`=== RUN` 行数 == 不同测试名 × 2；
       非 `-v` 既不印 PASS 也不印 SKIP）；`gofmt -l` + `"$(go env GOPATH)/bin/gofumpt.exe" -l` 真跑
@@ -132,3 +132,8 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   next=编排者推送后取 CI `lint` job staticcheck 步读数（期望 linux 14 / windows 98，须同报版本）关 AC#6。
 
 - [2026-11-08 15:2x +08] agent=122-sa1-census did=risk 那条 SA1019 取证腿交件（只读＋出件，零 .go 改动；表 `docs/evidence/s1/122-sa1019-risk-verdict.md`）：API=`windows.GetCurrentProcess`（x/sys v0.49.0 `syscall_windows.go:483-484` 逐字 Deprecated→`CurrentProcess`，"same Handle without the nil error"，error 恒 nil）；修法=改 `:20` 一行＋删 `:21-23` 死码分支，行为逐位不变；该文件是纯测试 helper 件（票 86 `4d0e2577d` 立的仪器，仅 `pathresolver_budget_norace_test.go` 5 处调用，零产码引用）；冻结出处如实核过＝PLAN/specs 无「risk 冻结」字面，权威＝台账 A35（`pending-and-issues.md:883` 冻结区首裁）＋各票禁改列，防的是 C18/C19/C25/C26 语义漂移；**裁决建议＝甲：具名解冻 `proccpu_windows_test.go` 这一枚文件这一条，让批 2/3 顺手修**（drop-in、有批 1 speech 先例 `4df9964d1`、票 216「非测试字节零动」同形先例；单开票对 1 行是负价值、留着永久背 1 条红兑不了 AC#6 读数）；解冻授权在编排者——须具名落派单＋台账补 A##，措辞照票 126 教训。 next=编排者裁甲/乙/丙；若甲，批 2/3 修后 windows 读数 98→97。
+
+- [2026-11-12 12:4x +08] agent=编排者（**非实现者验收**，波1 交件 `e918b4952`，现 HEAD `5d17b9aaf`）did=**翻 AC#3、AC#4 两格**。三把尺：①提交 `e918b4952` 在；②只 6 件无冻结面；③我复跑 GOOS=linux staticcheck 对 4 改动包＝S1011/S1016/ST1018 **0 命中**、`go build` rc0。
+  - **AC#3**：`docs/evidence/s1/122-staticcheck-inventory.md:37` 已登记 SA9009（`frontend/embed.go:4` 散文注释恰以 `// go:embed` 开头、真指令在 `:19`、不修只登记，票面 AC#3 明令）⇒ 勾。
+  - **AC#4**：`docs/evidence/s1/122-u1000-judgment.md` 100 行，**47 条 U1000 逐条判**（真死码候选删 3：`releasedCount`/`l1WaitFor`/`(*scriptGate).levels`；留 44 全具名 GOOS 盲区原因；本波零删、删留交回）⇒ 勾。
+  - **未勾（具名）**：AC#1 缺"预做 34/78"并列对比（部分）；AC#2 需 SA4000 行为证据（本轮未复核那格、不盲翻）；AC#5 需 `-count=2 -v` 四数（本波跑的是 `-count=1`）；AC#6 步级 CI 读数——**lint 步仍红（staticcheck 49=47 U1000, GOOS 盲区需 `ci.yml` 按 GOOS 分分母的口径裁定，属票 71/85a 地界）**⇒ 票 122 **不整票收**。
