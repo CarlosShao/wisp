@@ -85,3 +85,19 @@
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\434-<腿码>\`。
 - **⚠ 本票与真窗族测试（`Test258*`／`TestAC4Focus*`）⛔ 并行**——它们要 `RegisterHotKey`，会互相污染（台账 `A1807`）。
+
+## Progress log
+
+- **2026-11-12 23:0x 写腿 `434-firstrun198`：判乙，断言侧修完（AC 框一枚未翻、未 push）**
+  - **AC#0 只读**：carrier 复现红句逐字 `AC J1 RED: ensureFirstRunConfig is called by [runConfigSet65 runTextTask], want exactly [runTextTask]`、**0.44s**。AC J1 原文逐字（票 198 `:13` ＋台账 `A514:10469`）＝**"首建只挂在 `wisp run` 这一条「用户明确发起」的入口；⛔ 不许进 `assembleRuntime`；⛔ 不许改那两枚钉"**，理由具名是"常驻腿直达装配根"。
+  - **加调用的提交＝`ef00174ac`**（2026-11-07 20:29，票 65 CLI 切球路径），说明里那句逐字：**"缺文件set走ensureFirstRunConfig唯一首建口,get只答默认不建文件"**。它是新入口**出生自带**的一跳（该提交新增 `config_cmd_65.go` 236 行），不是某腿顺手多写。
+  - **判乙**：J1 原文的禁止对象是"进 `assembleRuntime`"（理由＝常驻腿直达），`runConfigSet65`（`cmd/wisp/config_cmd_65.go:173`）只从 `main.go:149-157` 的独立 `case "config"` 来、全程不碰 `assembleRuntime` ⇒ **不违反原文**；被违反的是断言自己硬化的"计数＝1"。甲会红掉票 65 自己的钉子 `config_cmd_65_test.go:84-86`（逐字 "set on missing file must first-run-create"）⇒ 甲是拆别人票已验收的判据。
+  - **产品语义判定**：`wisp config set` 在无配置文件时**该创建**。依据＝①`config.NewManager` 第一句就 `LoadFile`，缺文件即错（`manager.go:111-123`），不建就恒不可用；②创建能力/形状已由票 198 定死（`SaveFile(NewDefaults())`，单一默认源，禁第二真相源），复用 `ensureFirstRunConfig` 是唯一合规写法；③主流形状同向（`git config`／`kubectl config set` 都建文件，正是票 65 自陈的选形依据 `config_cmd_65.go:12-18`）；④`get` 读不建／`set` 写建的分界是票 65 明写已验收的设计（`config_cmd_65.go:161-163`）。
+  - **修法（只改一处＝断言）**：`cmd/wisp/firstrun_198_test.go` 的 `want` 改成精确集合 `[]string{"runConfigSet65","runTextTask"}` ＋ `slices.Sort`（读数来自 map，两个调用者后无序比较＝抛硬币）＋ `slices.Equal`。**⛔ 没放宽成"不含常驻腿就算过"**：多一个红、少一个也红。
+  - **突变控制（仓外磁盘改写，⛔ 非 overlay）**：台件 `D:\tmp\wisp\20261112\434-firstrun198\` 三棵 269 枚 `.go` 全拷贝树，**同一个二进制**（`sha256 89A527C3…D183F`，三发前后逐字相同）只换 `cd`：`tree-pristine` ⇒ **PASS 0.31s**；`tree-no-set-call`（删 `config_cmd_65.go:173-176`）⇒ **FAIL**，红句 `…called by [runTextTask], want exactly [runConfigSet65 runTextTask]`；`tree-assemble`（种进 `assembleRuntime`）⇒ **FAIL**，红句 `…called by [assembleRuntime runConfigSet65 runTextTask]`。
+  - **仪器有效性怎么确认（三把尺）**：①**同一二进制两种判定**（唯一变量是读哪棵树；若读编译期烘焙内容三发必同色）；②红句里的**集合逐字跟着树变**；③红句**行号从 `:281` 漂到 `:305`**（因为我同文件加了注释行）⇒ 读的是盘上当前那份文件，不是缓存。⚠ 先踩一坑记我：PowerShell 直接 `& $exe -test.run …` 会把旗标吞掉、三发全 rc=2 输出 `-help` 文本；改经 `D:\work\soft\Git\bin\bash.exe -c` 才拿到真读数。
+  - **越界**：本腿写面＝`cmd/wisp/firstrun_198_test.go` 一枚（＋本票 log ＋证据件）。`cmd/wisp/run.go` **零改动**（`git diff --name-only -- cmd/wisp/run.go` 空）⇒ 与票 174 的 `[fs]` 授权面（已回退 `7dcb145ff`）**无关**。禁止面（`PLAN.md`／`specs`／`thresholds.go`／golden／`allowlist.txt`／`frontend`／`design`）零命中。⚠ `git diff --name-only` 的全量输出里另有 12 枚**别人的在飞腿**改动（票 426–433 票面、291 探针、247 测试件、前端 fixture、346 派单件），本腿未碰、commit 用显式 pathspec 只提三枚。
+  - **门禁四读数**：build `rc=0`／vet `rc=0`／gofumpt `list-count=0`／`scripts/d22scan.sh` **clean**（正控 `PASS=45 FAIL=0 SKIP=0`，分母 `bans #1-5 internal/=403 cmd/=77`、`ban #8 internal/=1004 cmd/=276`）。`build/mut_rvw.go` 未删未碰。
+  - **附带复跑**：`^TestTicket198` 整族 **10/10 PASS**（含 `TestTicket198R2J1TheAssemblyRootStillCreatesNothing` 0.03s）／`^TestConfig`（票 65 族）**6/6 PASS**（含逐字要求"set 建件"的那枚）⇒ 乙没拆票 65 的判据。
+  - **残余三条**（详证据件 §6）：①测试名 `…IsTheRunEntryOnly` 名不副实但**不改名**（≥12 份证据件／台账按名引用，改名会让历史读数失联），已在函数头注释写清读法；②台账 `:10953` 那句"唯一产码调用点仍是 `run.go:245`"**自本票起过期**，但它描述的真缺口（双击链不建件）没变、本票没动，归票 256 族；③"将来加第三条入口怎么办"＝必须显式改这枚断言，那是有意的摩擦。
+  - **证据件**：`docs/evidence/s1/434-firstrun-198-second-caller.md`。**撤销口令：「434 回甲」**。

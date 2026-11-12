@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -253,12 +254,38 @@ func TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences(t *testing.T) {
 }
 
 // TestTicket198FirstRunCallerIsTheRunEntryOnly is J1 as a standing instrument,
-// not a comment: the AST call set of ensureFirstRunConfig must be exactly
-// {runTextTask}. Adding the call to assembleRuntime - which the resident leg
+// not a comment: the AST call set of ensureFirstRunConfig must be exactly the
+// two user-started entries below, and in particular must never grow the
+// assembly root. Adding the call to assembleRuntime - which the resident leg
 // shares (resident_task_source_windows.go:265), and whose two pins
 // (resident_task_source_246_windows_test.go:389-391,
 // logsink_windows_test.go:159-164) this placement keeps green - turns this
 // case red before any of them can be "loosened to land".
+//
+// WHY THE SET IS TWO AND NOT ONE (ticket 434). J1's ruling text names the
+// harm it is buying protection against: the resident leg reaches the shared
+// assembly root directly, so creation shared THERE would make "first run"
+// mean "any path that reaches the assembly root". `wisp config set` is not
+// that path - it is a separate CLI dispatch branch (main.go:149-157) that
+// never touches assembleRuntime - and on a machine where wisp has never run
+// it is the only command that can put a value INTO the file, so refusing to
+// create there would deadlock the write surface behind a `wisp run` that
+// exits 2 for want of the very file (config_cmd_65.go:37-42, and ticket 65's
+// own pin at config_cmd_65_test.go:84-86 demands the create). The rule the
+// ruling states is "user-started entries only, never the assembly root"; the
+// count is a consequence of that rule today, not the rule itself.
+//
+// WHAT IS DELIBERATELY NOT RELAXED: this is an exact set, not a "no assembly
+// root" predicate. A third caller reddens it, and so does dropping either of
+// the two - the harm half is separately pinned behaviourally by
+// TestTicket198R2J1TheAssemblyRootStillCreatesNothing, which is why the count
+// here can carry the extra entry without the ticket losing an instrument.
+//
+// ON THE NAME: "IsTheRunEntryOnly" now under-describes the rule it enforces.
+// It is kept because it is the name a dozen evidence files and ledger entries
+// cite by hand; renaming it would make every prior reading unfindable, which
+// is a worse lie than an imprecise one. Read the name as "the caller set is
+// the user-started entries, not the assembly root".
 func TestTicket198FirstRunCallerIsTheRunEntryOnly(t *testing.T) {
 	pkg, err := loadMainPackage131(".")
 	if err != nil {
@@ -266,7 +293,7 @@ func TestTicket198FirstRunCallerIsTheRunEntryOnly(t *testing.T) {
 	}
 	// Non-vacuity: the loader must see both the creation function and the two
 	// entries the ruling names, or the call-set reading below proves nothing.
-	for _, mustSee := range []string{"ensureFirstRunConfig", "runTextTask", "assembleRuntime"} {
+	for _, mustSee := range []string{"ensureFirstRunConfig", "runTextTask", "runConfigSet65", "assembleRuntime"} {
 		if _, ok := pkg.funcs[mustSee]; !ok {
 			t.Fatalf("the call-graph reader does not see %q; this instrument is blind", mustSee)
 		}
@@ -277,7 +304,10 @@ func TestTicket198FirstRunCallerIsTheRunEntryOnly(t *testing.T) {
 			callers = append(callers, name)
 		}
 	}
-	if len(callers) != 1 || callers[0] != "runTextTask" {
-		t.Errorf("AC J1 RED: ensureFirstRunConfig is called by %v, want exactly [runTextTask] - the resident leg reaches the assembly root directly, and first-run creation shared there writes a config.toml its pins forbid", callers)
+	// Sorted because the reading comes off a map: with one caller the order
+	// was moot, with two an unsorted comparison would be a coin flip.
+	slices.Sort(callers)
+	if want := []string{"runConfigSet65", "runTextTask"}; !slices.Equal(callers, want) {
+		t.Errorf("AC J1 RED: ensureFirstRunConfig is called by %v, want exactly %v - first-run creation may only hang on entries the user starts, and the resident leg reaches assembleRuntime directly, so creation shared there writes a config.toml its pins forbid", callers, want)
 	}
 }
