@@ -35872,3 +35872,12 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 证据件 `docs/evidence/s1/cmd-wisp-dll-staging-carrier.md`（含 §5 边界、§6 批量读数、§7 结论）。提交 `23e3814a9` 已推。
 - **⛔ 未做**：未改 System32（账 `dll-shadow-2` 禁令）、未提交任何 DLL（10MB+ 不入库，stage 目录在 `.scratch/wisp/stage-cli`）、未动 thresholds/golden/契约。
 - **★给机主的下一步（需他点头或他动手）**：残余 20 枚要绿，得把模型下载到 `models/`（`manifest.json` 里有 url＋sha256＋size）。这属"花钱/下载外部件"，按铁律⓪⓪⓪ 第 4 条摆他。
+
+## A1797 — ★机主下令暂停（2026-11-12 15:37「任务先停一下，我要玩会儿游戏了」）
+
+- **停工动作**：全部后台 job 已终态（`job_list` 无 running）；`go`/`wisp.test`/`wisp`/`docker` 残留进程 **0**；CPU 从 100% 回落至 **36–45%**（占用者＝常驻程序：微信／DSH 本身／FlClash／Tabbit）。**未推提交 0 件**（`23e3814a9`、`9b88fbbd1` 均已推）。
+- **工作树 3 件改动非本编队**（`.scratch/wisp/probes/291/...`、`.../346-a2-dispatch.txt`、`frontend/fixtures/composer-states.html`）⇒ 按"盘根零污染＋不删别人活"留原样。
+- **本会话真票 13 张 done**：424／85／72／323／246／256／346／194／213／187／174／230／220。池子 done **342** / 总 409 / open **67**。
+- **本轮（round 87）唯一新增交付**：`cmd/wisp` 补上票 409 同款 DLL staging carrier（`scripts/wisp-cli-staged-tests.sh` 新件 ＋ `portable-tests.sh` 加 `elif cli` 分支），读数＝**onnxruntime 遮蔽错误 39 → 0**、语音族 PASS=19／FAIL=20／SKIP=7、**13 枚由红转绿**。证据件 `docs/evidence/s1/cmd-wisp-dll-staging-carrier.md`。**⛔ 未改 System32／未提交 DLL／未动断言。**
+- **★下次接手的第一件事**（两件待机，均不需预热）：①残余 20 枚语音红的根因＝**模型从未下载**（`models/` 与 `build/models/` 只有 `manifest.json`＋`.minisig`，零 `.onnx`/`.bin`）——**下载属"花钱"类，等机主一句话**；②215（技能半动 D36 配置契约）／214（C25 stamp 等票 35）各等机主一句话。
+- **撤销口令**：本停工令由机主下一句「继续」解除；carrier 若判不当，`git revert 23e3814a9` 可退回（不影响任何 Go 产码与断言）。
