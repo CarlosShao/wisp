@@ -35826,3 +35826,14 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **池子**：done **339** / 总 **409** / open **70**（本轮已核）。
 - **停车点过时具名**：`docs/reports/HANDOVER.md` §4 最新一节是 **2026-11-02** 的快照，里面写"票 402 保持待派"——**现读 402 已 `-done`**（`402-panel-webview2-dotdotdot-deadshape-done.md`）⇒ 该节不可作为排队依据，只作历史。
 - **下一轮首要**：①收 `230-ac5` 读数 ⇒ 若达终态则同轮翻 **230 AC#5** 与 **220 AC#5**（同一命令、220 另需"界面差哪一跳"句已在票内 Progress ⑤）；②核 `174-landing` 三把尺，空则重派；③CPU 降到 ≤70% 后再补位下一批。
+
+## A1793 — ★★票 174 收口 -done（本会话第 11 张）：artifacts 树加入 fs 授权根，"按需再读"从空头承诺变真
+
+- 承接 `A1790`。**原派 glm 腿 `174-landing` 返回空、零盘上痕迹（幽灵交件第 3 例）⇒ 按铁律⓪⓪⓪ 我自己落地**（我即非实现者，翻框合规）。
+- **落地**：`cmd/wisp/run.go:762-789` 唯一一处——`allowed = append(allowed, mem.ArtifactsDir())` 放在 `NewPathCanonicalizer` 之前。提交 `3 files changed, 292 insertions(+), 1 deletion(-)`。
+- **三条 gotcha 逐条处置（筛查腿 §④ 具名）**：①**拼写对齐**＝用 `mem.ArtifactsDir()` 而非重拼（`memory.Open` 内部 `filepath.Abs`：`open.go:263`→`:277`，问 store 才必然同拼写）；②**目录已存在**＝`memory.Open`（`run.go:691`）在 `open.go:283` 已 `winsec.PrivateDirAll` 建好封好，早于 `:789` ⇒ 不需预创建、不会被静默丢进 `unusable`；③**workspace 收窄未绕**（`paths.go:42-47` 只能收紧＝设计内）。
+- **两向判据＋变异控制**（新件 `internal/tools/artifacts_authorized_174_test.go`）：正向 spill→`fs.read` 得 L0 正文逐字／反向三兄弟项（secrets/config.toml/wisp.db）逐枚 L2／**变异控制**同 artifact 用旧根集必红 ⇒ 判据有牙。**我亲跑 PASS=3 FAIL=0**。
+- **门禁我亲跑**：build rc=0／vet 两包 rc=0／gofumpt 空／**d22scan clean rc=0**（`ban #8 internal/` examined 1005）／Test174 PASS=3。
+- **AC#5 分账已交**（证据件 §4）：本票＝授权根那一处已通；`Q-59`（偏移参数）＝同一根管子另一处、**未因本票而通**，⛔ 用本票顶掉它。
+- **九格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213、187、174（+11 done）**。done 339→**340**。
+- ⚠ **教训（第 3 例幽灵交件）**：`174-landing` 与 `230-ac5` 两条 glm 腿都返回"环境已就绪/正在跑"却零盘上产物。**结论：整包测试类与单点写码类活，glm 腿不可靠，编排者自己干更快更实**。
