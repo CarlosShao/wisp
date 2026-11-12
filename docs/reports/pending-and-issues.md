@@ -35426,3 +35426,33 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 
 - **★在飞**：整包挂死栈采集中（`D:\tmp\wisp\20261112\230hang\full.out`，go `-timeout 240s` 会自己 panic 出栈）。
 - 撤销口令：删本 A1762 条 ＋ `git revert 8c6c7f2a0`（撤两格翻框）。
+
+## A1763 — ★★★`./cmd/wisp` 整包挂死的**真凶定位**：跨测试资源泄漏（单跑全绿、整包超时）
+
+- 机主 2026-11-12 白天。承接 `A1762` 的"整包到不了终态"，本轮把真凶钉到具体测试与机制。
+
+### 一、整包 240s 超时的铁读数
+- **我自己跑** `go test ./cmd/wisp -count=1 -v -timeout 240s` ⇒ 终态 **`FAIL github.com/CarlosShao/wisp/cmd/wisp 240.225s`**
+- 计数：**RUN 85、PASS 76、FAIL 0**（**没有一枚测试断言失败**，是**超时**被 kill）
+- **panic 段逐字**：`panic: test timed out after 4m0s` / `running tests: TestTicket255ReceiptStillNamesTheLiveReadSection (1s)`
+
+### 二、★挂死机制（栈现读）
+- 挂死 goroutine 栈：`syscall.readFile` → `internal/poll.(*FD).Read` → `os.(*File).Read` → `bytes.(*Buffer).ReadFrom`
+  ⇒ **阻塞在读某个子进程的 stdout 管道上**（`TestTicket255…` 内 `r.awaitStdout(t, "这些段已立即生效")` 等一句永远不来的输出，测试夹具 `newReloadRun223(t, 40s)` 起了真子进程）。
+
+### 三、★★关键：**单跑这条测试却是 PASS**
+- **我自己单跑** `-run '^TestTicket255ReceiptStillNamesTheLiveReadSection$' -timeout 100s` ⇒ **`--- PASS (2.72s)`、rc=0**
+- ⇒ **⛔ 是这条测试自己的 bug；是"整包里前面的测试留下了脏东西"导致它读不到子进程输出。**
+- **两次整包挂死位置不同**（第一次在 `TestAC294…` 附近、第二次在 `TestTicket255…`）⇒ **典型的跨测试资源泄漏/耗尽**（进程句柄、管道、DB/WAL、或 WebView2 子进程未回收）。
+- **与票 314 同源嫌疑最大**：314 已量到**78 枚 `msedgewebview2` 泄漏进程**（最早 2026-10-25，17.5 天）。整包跑大量开窗测试 ⇒ 泄漏累积 ⇒ 后续测试拿不到资源 ⇒ 挂在"等子进程输出"上。
+
+### 四、后果（对票池）
+- **票 230 AC#5 / 票 220 AC#5（都要 `go test ./cmd/wisp` 到终态）在本机物理上不可达** ⇒ 这两张"只差门禁"的票，**门禁本身跑不完**。
+- ⇒ **这是本机"到不了终态"的统一根因**，影响**任何**要求 cmd/wisp 整包终态的 AC。
+- ⇒ **这本身值得一张票**（"cmd/wisp 整包跨测试泄漏导致超时"）—— 但**先查池里有没有已存在的**（314 是泄漏取证，未必是"整包挂死"这条）。**待派前先 grep 票池。**
+
+### 五、本轮净产出
+- 翻框 **33 AC#1**、**85 AC#1**（`8c6c7f2a0`，凭据齐）。
+- 定位**整包挂死真凶**（本 A1763），为 230/220 的"不可达终态"提供根因而非"跑不动"。
+- **★在飞**：无。CPU 已回落。
+- 撤销口令：删本 A1763 条。
