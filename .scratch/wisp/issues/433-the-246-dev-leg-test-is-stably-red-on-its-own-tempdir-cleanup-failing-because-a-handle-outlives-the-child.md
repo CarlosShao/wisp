@@ -87,3 +87,37 @@ TempDir RemoveAll cleanup: unlinkat C:\Users\swq\AppData\Local\Temp\TestAC246Dev
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\433-<腿码>\`。
 - **仪器**：运行时行为检查 ⇒ `go test -overlay`（拷贝放**仓外**）有效。
+
+## Progress log
+
+### 2026-11-12 22:46 +08 — 写腿（AC#0 取证＋AC#1 修＋突变控制真跑）
+
+**先纠正票面两处**（都按现量，⛔ 按记忆）：
+
+1. **⛔ 稳定红，是竞态。** 同一台机、桌面干净、无并行腿，连跑：FAIL 23.31s → **PASS 13.42s**（代码一字未改）→ FAIL 11.24s → FAIL 13.13s。票面 `:23` 的"稳定红、⛔ 偶发"与派单 `:8` 的"稳定红"都被这次绿读数推翻。
+2. **完整文件名补全了**（票面 `EB…` 截断处）：`…\boot-1\EBWebView\lockfile`，即 WebView2 用户数据目录的锁文件。
+
+**那一刻子进程是否已退出 ⇒ 已退出。** 用 `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` ＋ `GetExitCodeProcess` 直接读进程表：`childAlive=false`、`waited=true`。**句柄活着，进程死了。**
+
+**判：乙（WebView2 句柄残留），⛔ 甲、⛔ 丙。**
+
+- ⛔ 甲：子进程确实退了（上面那条读数），且 `stop()`／`exitedWithin()` 确实 join 了 `cmd.Wait`（`resident_sink_nail_127_windows_test.go:290-301`）。
+- ⛔ 丙：子进程 `cmd.Dir` 是 `…\001`（build 目录），被删的树是 `…\002`（APPDATA），两个子树不同；只有 `\002` 报错。
+- 真凶：`wisp.exe` 被杀后**遗孤**的 5 个 `msedgewebview2.exe`（父＝死掉的 38616），其中一个占着 `EBWebView\lockfile`。链路＝`LOCALAPPDATA` 指向该树（`:459`）→ `internal/ball/orb_windows.go:471-477`（`orbDataBase` 读 `LOCALAPPDATA`）→ `:529-535`（`orbBootDataDir` 拼 `boot-<n>`）→ `:315`（`browser.DataPath = bootDir`）。
+
+**关键数字**：树在子进程退出后 **5.58s** 才可删；Go 框架 `testing.go:1650` 的 `arbitraryTimeout` 只有 **2s**。5.58 > 2，这就是全部红因。判据用的是框架真正用的谓词（`os.RemoveAll` 那棵树），⛔ "锁文件能否打开"（delete-pending 会永远答 `ERROR_FILE_NOT_FOUND`，那是假读数）。
+
+**修（只一处，台面侧）**：`:451` 的 `appData := t.TempDir()` → `managedDir433(t, "ac246-dev-leg-appdata")`；helper 用 `uniqueProfileLeaf`（`panel_resident_windows_test.go:61`，仓里**已有**的、panel WebView2 profile 用的同一招）＋ `t.Cleanup` 里**按次数**有界重试（150×100ms，⛔ 墙钟 deadline，D42#9）。**⛔ 不是那个被禁的修法**：删除照跑、每次跑都跑、`t.Fatalf` 路径也跑，超预算会**响亮失败**并说明是这棵树，⛔ 藏起来。
+
+**突变控制（真跑）**：修好 PASS 14.48s ⇒ 只把那一行还原成 `t.TempDir()` ⇒ **FAIL 9.82s，逐字复现原红句**（同一文件 `EBWebView\lockfile`）⇒ 恢复 ⇒ PASS 8.30s ⇒ 再跑 PASS 13.48s。
+
+**回归**：`-test.run '^TestAC246'` 全族 **PASS**，0 失败，14 例（含三条 shipped-leg 7.37s／8.01s／8.70s／15.18s）。
+
+**门禁**：`go build ./cmd/wisp/` 0 · `go vet ./cmd/wisp/` 0 · `gofumpt -l` 零输出 · `scripts/d22scan.sh` `clean - no D22 ban violations`（PASS=45 FAIL=0 SKIP=0）。`build/mut_rvw.go` 未删（`Test-Path`=True）。
+
+**证据件**：`docs/evidence/s1/433-ac246-tempdir-cleanup.md`。
+
+**⛔ 未做**：未翻任何 AC 框；未碰 `thresholds.go`／golden／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`／`design/**`；未删 `build/mut_rvw.go`；未 push。
+
+**留给下一张票（⛔ 本票修）**：产品侧"被杀常驻进程会遗留 `msedgewebview2.exe` 约 5.6s"未改——对用户不可见（下次 boot 由 `orbSweepStaleDirs`，`internal/ball/orb_windows.go:544-569` 扫掉死叶），要改得把 WebView2 的 browser 进程塞进 Job Object，属产品改动，本票没有证据支持它。
+

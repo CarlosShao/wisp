@@ -448,7 +448,22 @@ func TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline(t *testi
 // the no-console branch, and host its ball as usual.
 func TestAC246DevLegIgnoresTheTestTaskInjection(t *testing.T) {
 	exe := buildWispForTest(t)
-	appData := t.TempDir()
+	// The throwaway APPDATA is deliberately NOT t.TempDir(). Ticket 433 measured
+	// why: pointing LOCALAPPDATA at the managed dir puts the ball's WebView2
+	// user-data tree (internal/ball/orb_windows.go:529-535, boot-<n>\EBWebView)
+	// inside the tree the test framework removes, and that tree outlives BOTH the
+	// child's exit and its hard kill - the browser process keeps EBWebView\lockfile
+	// open. Measured on this host: the child was already gone (childAlive=false)
+	// and the five msedgewebview2.exe it had spawned were still running, holding
+	// the lock; the tree only became removable 5.58s later, while testing.go:1650
+	// retries for 2s. So the red was never an assertion - it was this file
+	// borrowing a managed directory for a process it cannot outlive.
+	//
+	// The rule this now follows is the one panel_reshow_255r8_winlive_test.go:118-125
+	// states for the panel profile, and it is NOT the forbidden fix: the tree is
+	// still swept, by this cleanup, on every run - it is only moved out from under
+	// the framework's 2s retry budget so that cleanup is ours to wait on.
+	appData := managedDir433(t, "ac246-dev-leg-appdata")
 	dataDir := filepath.Join(appData, "wisp-dev")
 	if err := os.MkdirAll(dataDir, 0o700); err != nil {
 		t.Fatal(err)
@@ -482,6 +497,52 @@ func TestAC246DevLegIgnoresTheTestTaskInjection(t *testing.T) {
 }
 
 // ------------------------------------------------------------------ helpers
+
+// managedDir433 hands a case a throwaway directory the TEST owns, for the
+// resources a spawned child leaves behind after it is gone.
+//
+// WHY NOT t.TempDir() (ticket 433, measured): t.TempDir's cleanup is
+// testing.go:1615-1619 -> removeAll (testing.go:1649), which retries a Windows
+// sharing violation for exactly 2s (arbitraryTimeout, testing.go:1650) and then
+// reports the failure AS THE TEST'S. That budget is not enough for a WebView2
+// user-data tree: the browser process outlives the child that spawned it
+// (measured here: wisp.exe had exited, childAlive=false, while the five
+// msedgewebview2.exe it had started - and the EBWebView\lockfile one of them
+// holds - were still running), and the tree only became removable 5.58s after
+// the child's exit. A directory handed to t.TempDir therefore converts somebody
+// else's teardown latency into a red assertion about THIS ticket's subject.
+//
+// WHAT THIS IS NOT: the forbidden "hand-made temp dir that is never cleaned".
+// The removal is registered here, it runs on every exit path including a
+// t.Fatalf, and it is bounded by an ATTEMPT COUNT rather than a wall-clock
+// deadline (D42#9) - the same shape exitedWithin(attempts) uses at
+// resident_sink_nail_127_windows_test.go:265. It only gives the wait a budget
+// big enough for what was measured, and it names a failure as cleanup of a tree
+// this file created instead of as a broken assertion.
+//
+// The path itself comes from uniqueProfileLeaf (panel_resident_windows_test.go:61),
+// the repo's existing answer to this exact problem for the panel's WebView2
+// profile: a unique leaf under the system temp dir, with the caller registering
+// its own removal.
+func managedDir433(t *testing.T, label string) string {
+	t.Helper()
+	dir := uniqueProfileLeaf("wisp-433-" + label)
+	t.Cleanup(func() {
+		// 150 attempts x 100ms = 15s, nearly three times the 5.58s measured, so
+		// a slower host still lands inside the budget while a genuine leak still
+		// fails loudly instead of hanging.
+		var last error
+		for i := 0; i < 150; i++ {
+			if last = os.RemoveAll(dir); last == nil {
+				return
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+		t.Errorf("cleanup of the %s tree %q still failing after 150 attempts: %v",
+			label, dir, last)
+	})
+	return dir
+}
 
 // bootResidentLegWithEnv is bootResidentLeg with the child's environment spelled
 // out, because three of AC#7's readings are about which ENVIRONMENT the shipped
