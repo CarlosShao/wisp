@@ -35640,3 +35640,9 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **决策（我拍）**：4 条 pin 该按"**非 Windows 具名 t.Skip**"处理（不是把整个 internal/plugin 声明出 scope——那会连序号14/15 一起不跑；且 skip 需 ledger 记账）。这属 `portable-tests.sh` 守卫文件 + 每测试 skip 的**测试哲学层活**，且 **test-core 绿≠整 CI 绿（test-windows/lint 仍红）、不单独收票** ⇒ **价值边际，暂不做，登记待裁**。
 - **★在飞**：CI run `43150860211`(cc7b524b4)/`43151744689`(d55c470db) 验 Linux test-core。
 - 撤销口令：删本 A1770；`git revert d55c470db` 回退 plugin 测试修复。
+
+### ★A1770 追加（CI 实证，2026-11-12 12:1x）
+- CI run `43150860211` @ `cc7b524b4`（含 tools-fix、未含 plugin-fix）test-core step7 现读：
+  - **`ok  github.com/CarlosShao/wisp/internal/tools  20.230s`**（原 9 条 FAIL 全清）⇒ **tools-fix 的真 bug 修复在真 ubuntu 容器验证通过**。
+  - 四数：`PASS=2046 FAIL=6 SKIP=4`（原 `PASS=2037 FAIL=15`）⇒ **FAIL 15→6**，剩 6 全 internal/plugin Test52（此 run 未含 plugin-fix d55c470db）。
+  - 含 plugin-fix 的 run `43151744689` @ `d55c470db` 预计再降到 4（仅剩 4 条 pin B 类）——待其完成复核。
