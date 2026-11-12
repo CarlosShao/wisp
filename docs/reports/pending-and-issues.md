@@ -35920,3 +35920,14 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   2. **改票面前必须先逐字读 `Status:` 行的禁区**，我只读了 AC 格没读 Status 行。
   3. **"让失败变成功"看起来像修好了，实际可能是把判据的语义抹掉**。一枚测试从红变绿⛔ 等于修对了；要问"它原来测的那个状态还存在吗"。这次我的三判据测试件全绿，但**测的是错方向**——自证绿≠方向对。
   4. 这是本会话**第三次**因"急着把票关掉"而越界（前两次：174 AC#4 误判为需机主批准、以及误报"模型未下载要花钱"）。**根子是同一个：想给机主一个"已完成"的交代，而真相是还没完成。**
+
+## A1801 — round 88 收束：环境三层全通，暴露 8 枚真红（★含一条"断言落后于产码"的硬发现）
+
+- **整包终态**：`cmd/wisp` **PASS=593 / FAIL=14 / SKIP=9**（上一轮 FAIL=52、几乎零 PASS）。日志 `D:\tmp\wisp\20261112\fullclean\cmdwisp.log`。四类环境签名**精确归零**：`WISP_SPIKE_MODELS is not set`=0／`onnxruntime 1.17`=0／`标点级未接上`=0／`checkpoint is incomplete`=0。
+- **⚠ 计数陷阱留档**：日志里 `incomplete` 字样 150 次**全是** `disposal_incomplete=false` 正常字段；按裸词 grep 会得出"150 处夹具缺失"的假结论，必须用完整短语。
+- **三层环境治法**：①DLL 遮蔽→staging 到测试二进制同目录；②夹具寻址→carrier 内 `voice_env()` 五变量默认＋验存在；③**shell 选错**→腿发现本机 `bash` 在 PATH 上解析到 `C:\Windows\System32\bash.exe`（WSL 转发器，`execvpe(/bin/bash) failed`，**一枚测试都不跑**），carrier 现查 `OSTYPE` 必须 msys/cygwin 否则 exit 2 响亮拒绝（`192821996`）。
+- **★最硬发现（腿 `resident-ac1-verdict` 现读，`829c6da1c`）**：`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink` 是**断言落后于产码**，⛔ 产品退化——`wisp: D38(e) step N` 由 `resident_windows.go:246` 在 **defer 尾部十步全量回放**，`shutdown step` 由 `internal/proc/shutdown.go:130` 在**序列当时**打印 ⇒ **末位永远是 `D38(e) step 10`**，`shutdown step` 不可能在末位。**是票 43（`5056a365c`，2026-10-31）引进回放循环而断言没跟上**。旁证极硬：`t.Logf` 自己说 `RESIDENT LEG RECORDED ON DISK: 5 shutdown record(s), steps [1 2 5 6 7]`——5 条记录**确实在盘上**，`len(trail)!=0` 那关过了，红的只是"在不在末位"。**5/5 稳定红**（7.80/6.96/6.79/5.82/5.97s），时长与负载不参与。判据＝把"末位"改成"`trail` 最后一条必须是 `recs` 里最后一条 `shutdown step`"；⚠ 改断言需单独立票＋非实现者翻框。
+- **8 枚真红逐名**（⛔ 一枚未修，只归因）：`TestAC1ResidentLegInstallsItsLogListenerOnDisk`（预算不够：10s 窗口 vs 本机 3.4–5.6s 启动，大头 `speech.NewDetector` 1.83s）／`TestAC1ResidentLegOutlivesItsOwnLogFailure`（**偶发**，腿 5 发 3P2F，`pollUntil127(20,...)` 1s 预算撞 2.9–5.6s 启动）／`TestAC1ResidentLegBooks…`（上条）／`TestWireR1WarmIdleDisposesOnTheOwner`（`:745 mic close counted 1, want ≥2`）／`Test26PWithoutAECTheEchoTranscribesVerbatim`／`Test384ResidentWatchdogEndToEnd`／`Test12r2SeamCallSitesAreTheMeasurement`／`Test365RunRowsAStuckTaskAsStuck`。
+- **我的失误已回退**（见 `A1800`）：票 174 AC#4 违反票面禁区，`7dcb145ff` 回退，回退后 `TestTaskOutputPointerNotice174r8` 族 PASS=2／FAIL=0。
+- **本轮提交 10 笔全部已推 origin/dev**，汇总件 `docs/evidence/s1/round88-summary.md`。
+- **★边界**：⛔ 不宣称整包全绿（还差 8 枚真红）；⛔ 未下载模型／未改 System32／未动 `PLAN.md`／`specs/**`／`thresholds.go`／golden／`allowlist.txt`／`frontend/**`。
