@@ -35952,3 +35952,14 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - **`Test384ResidentWatchdogEndToEnd`**（`resident_watchdog_windows_test.go:230`）：逐字 `never observed the tree back under the Armed cap (a real within-cap reading)`。机制：`:210` 造 64MB hold → 破 cap → `:227` 释放 → `:230` 等 3s 要 `PrivateWorkingSetBytes < 80MB`。**性质**：**真实资源读数**——Go 把页还给 OS 需要 GC＋`FreeOSMemory`，3 秒窗口可能不够。⛔ 不是断言过严也不是产品退化，**是"释放到可观测回落"的窗口问题**；判据＝窗口加长或改为等 `FreeOSMemory` 之后的事件，⛔ 不许直接放宽 80MB 阈值。
   - **`Test365RunRowsAStuckTaskAsStuck`**（`tasklogstate_365_test.go:181/184`）：逐字 `屏幕逐字: …任务 … 结束（completed，1 轮，0 次工具调用…）`／`库逐字: task_log.state = "done"`／`this run did not end stuck (screen word "completed", exit 0), so it cannot testify about stuck`。**性质**：**测试自身前置条件未建立**——它想注入一个"卡住"的任务，结果那发正常 completed 了，于是它**诚实地拒绝为自己不能作证的事作证**（这句断言写得很好）。⇒ **台面/夹具问题**，需查注入卡住的手法是哪一步失效。
 - **★这枚测试的写法值得留档**：`this run did not end stuck … so it cannot testify about stuck`——**它宁可不作证也不假作证**。这正是本仓"诚实高于好看"的一个正面样本。
+
+## A1804 — 票 426＋427 双收（第 15、16 枚）：一枚是"读太早"，一枚是"看错地方"，★还挖出一个假绿仪器
+
+- **两腿交件**：426 `263b8dd87`（证据件 13441B）／427 `3b5acf857`（13519B）。**三把尺我全核**：两笔 `git cat-file -t` 均 commit；两件均在盘；**我亲跑** 426 ⇒ **PASS 7.70s**（`mic_closes=2 stages_at_mic_close=[Awake Disposed]`）、427 ⇒ **PASS 0.01s**。**越界**：两笔各只改一枚测试文件，**产码零改动**。
+- **★426 的根因比"断言过严"更精确＝断言读得太早（测量竞态）**：`StageDisposed` 由 `beginDisposeLocked` 在 `internal/session/scope.go:654` **先落**，级联的 `MicClose` 在 `scope.go:691` **后跑** ⇒ 测试在 `StageDisposed` 一可读时就读计数器，读早了。**铁证在同一份日志时间戳**：红句在 `20:03:03.177`，`SCOPE-DISPOSED`（`scope.go:693`）到 `.228` 才出现。**决定性读数**：加 owner 队列屏障等级联跑完 ⇒ `mic_closes=2 stages_at_mic_close=[Awake Disposed]` ⇒ **第二次关麦从来没缺失**。突变四发全真跑（删自增⇒0 次红／恢复⇒2 次绿／挪 `mute()` 到落状态后⇒红但次数仍 2 ⇒**顺序钉子有独立牙**／只删屏障⇒逐字复现原红句 ⇒**屏障承重**）。
+- **★427 的选形＝乙，理由是"甲对最坏情形照样绿"**：甲只证"两样在同一函数里"，而真正承诺是**打戳被前缀判断门控**——把 `markSettling` 提到 `if` 外会给**每条**审计行打 T1（**错读数**），**甲对此绿**；乙要求 `markSettling` 必须在**条件为 `HasPrefix(..., "session: SCOPE-SETTLING")` 的那个 `IfStmt` 的 `Body` 内**。**甲/乙判别力用仓外 `go/ast` 探针实测**：基线 A绿B绿／删除 A红B红／**提到外面 A绿B红** ⇒ 票面预言证实。
+- **★★最重要的副产品：`-overlay` 对"读磁盘源码"的静态检查是假绿仪器**。427 那枚 AST 检查**运行时从磁盘读源码**，overlay 只换编译期输入 ⇒ 用"删掉打戳"的突变体做的 overlay **对未动的磁盘文本跑出 PASS rc=0**。腿改用**仓外磁盘改写**，**同一枚测试二进制**（`sha256 9173453721…A012F2`）读三棵不同树给出三种判定 ⇒ 读数非空转。
+  **⚠ 分界线（后续派单必须照此选仪器）**：425／426 是**运行时行为**检查 ⇒ overlay 有效；427 是**读磁盘源码**的静态检查 ⇒ overlay **无效**，必须用磁盘改写。
+- **★另一枚坑**：`go run ./tools/d22scan` 从根模块跑**会失败**（独立 module），**必须走 `scripts/d22scan.sh`**。
+- **票池**：done **344** / open **65** / total 409（本轮 +4：425/426/427 三枚新票全收，174 那笔是回退不是新收）。
+- **⛔ 仍未做（按禁令未自行改）**：`tri-v1-verdict.md:123` 那句「`R28-2` 必须写在 `Warm` 定义旁」还没落到 `28-session-scope-warm-done.md:20` 旁，需单独立票或并入票 28 收尾。
