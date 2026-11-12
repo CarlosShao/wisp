@@ -35397,3 +35397,32 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **已在后台跑**（`pwsh-21d40b450ebf43d9`，`D:\tmp\wisp\20261112\230gate\gate.out`）——**本地测试不花 LLM 积分**，零成本推进。
 - 跑完判：终态绿 ⇒ 翻 AC#5 ＋ 改 `-done` 后缀（本编队收件权，参照 `A##` 先例）；红 ⇒ 逐名比红名册（在册 `internal/ball` 1＋`internal/panel` 4 不算本票新增）。
 - 撤销口令：删本 A1761 条。
+
+## A1762 — ★★三件实事落地：翻 33 AC#1＋85 AC#1（凭据齐）；★`./cmd/wisp` 整包**在本机到不了终态**（230/220 的 AC#5 因此卡死）
+
+- 机主 2026-11-12 白天。
+
+### 一、已翻两格（非实现者翻框，凭据齐）
+| 票 | 格 | 凭据 |
+|---|---|---|
+| **33** | **AC#1 翻**（现量成立） | `docs/evidence/s1/33-ac1-census.md`（commit c24dcd45a）：旧树枚数尺已删（`panel_host_windows_test.go:709`「counts are reported, not judged」）＋ 2s 退净断言（`panel_host_windows_live_test.go:62`）＋ 盘上日志 `tree webview 0→7→0` |
+| **85** | **AC#1 翻**（钉版本＋一次真 run 日志） | `docs/evidence/s1/ci-lint-staticcheck-readings-20261112.md`：`##[group]Run go install ...staticcheck@2026.2.2` ＋ `self-report: version=staticcheck 2026.2.2 (0.8.2) … findings=54 toolchain-crash-lines=0`；`ci.yml:307/:465` 现读 |
+- 票 33 现 **2/14 勾**；票 85 现 **2/6 勾**（AC#2 未翻：还差"54 条按 包×检查码×file:line 列进 log"）。
+
+### 二、★★关键新事实：`./cmd/wisp` 整包**本机到不了终态**（这卡死 230/220 的 AC#5）
+- **我自己现跑**：`go test ./cmd/wisp ./internal/... -count=1` 后台跑，**卡在 `wisp.test` 进程上 4 分钟只耗 3 秒 CPU（＝挂死非慢）**，`go test` 输出 0 字节。
+- **单跑 `TestAC294MuteHotkeyRegistersLiveOnARealBallWindow` 却 rc=0 PASS 1.28s**（`10:32:49` 日志 `AC#2 reading: id=2 name="mute" binding="Ctrl+Alt+X" status="live"`）⇒ **不是它单独挂，是整包的交互/资源问题**。
+- **第二次整包跑（240s timeout）**：11 个 RUN 后挂在 `Test219AC2RevokeRoundTripByteForByte` 附近（每次挂的测试**不一样** ⇒ **flaky/资源型**，疑似与 314 的泄漏进程／DB-WAL 争用同源）。
+- **旁证**：票 `220` 的 Progress log 逐字记录 **`./cmd/wisp` 整包三发 40m/60m/60m 全部⛔终态**。
+- ⇒ **结论：票 230 的 AC#5（`go test ./cmd/wisp ./internal/... -count=1` 到终态）与票 220 的 AC#5 在**本机物理上到不了终态**。**
+- ⇒ **票 230 "只差门禁"是假象**：门禁本身在这台机器上跑不完。**230 与 220 同属"环境卡死"，⛔ 本编队能收。**
+
+### 三、票 33 / 85 / 122 的收尾条件（都需外部）
+| 票 | 还差什么 | 谁能解 |
+|---|---|---|
+| **33** | AC#12（`frontend/dist` 由界面侧 agent 填）＋ AC#4 manual 半（真机手点） | 机主前端 agent／真机 |
+| **85** | AC#2（54 行清单）、AC#3（变异回验）、AC#4（ci.yml step 改名）、AC#5（门禁） | 本编队可做，但 AC#3/#5 需 staticcheck 本机可跑 |
+| **122** | AC#6（`lint` 步绿）—— 要 54 条 finding 全清（含 U1000 26+ 与 SA9009 那条假阳性） | 长链，需多波清账 |
+
+- **★在飞**：整包挂死栈采集中（`D:\tmp\wisp\20261112\230hang\full.out`，go `-timeout 240s` 会自己 panic 出栈）。
+- 撤销口令：删本 A1762 条 ＋ `git revert 8c6c7f2a0`（撤两格翻框）。
