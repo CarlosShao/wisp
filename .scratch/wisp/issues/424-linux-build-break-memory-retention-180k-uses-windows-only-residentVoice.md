@@ -51,3 +51,24 @@
 ## Progress
 
 - [2026-11-12 10:5x +08] agent=编排者 建票 + 现跑取证（见上）。派腿修复。
+
+## Progress（续）
+
+- [2026-11-12 11:0x +08] agent=编排者 用 424-fix 的 overlay 技法（`GOOS=linux CGO_ENABLED=0 go build -overlay go.mod→sherpa桩 -gcflags=all=-e`）拿到**权威全量错误清单**。`go vet` 只报每包第一枚，`-gcflags=all=-e` 才全量；结果 **5 处 / 2 族**：
+  ```
+  cmd/wisp/logsink.go:224:80              undefined: configErrText
+  cmd/wisp/memory_retention_180k.go:62:28 undefined: configErrText
+  cmd/wisp/panel_config_store.go:404:6    undefined: applyBallStyle65
+  cmd/wisp/panel_config_store.go:410:6    undefined: applyBallIdleOpacity
+  cmd/wisp/panel_config_store.go:415:6    undefined: applyBallClickThrough
+  ```
+  ⇒ **424-fix 只修了第一枚 residentVoice；这 5 处（configErrText×2 + applyBall×3）是同一族的第二批**，须第二腿修完 Linux 才真绿。
+- [2026-11-12 11:0x] agent=编排者 判每枚性质（决定搬法）：
+  - `configErrText(err error, c *config.Config) string` = **纯函数**（`resident_audio_windows.go:475`，只 err.Error()/nil 判，无 win32）⇒ **搬进跨平台文件**。
+  - `applyBallStyle65`/`applyBallIdleOpacity`/`applyBallClickThrough` = **薄包装**（各自 `if <applier> == nil { return false }; return <applier>(…)`），applier 变量 `ballStyleApplier65`/`ballIdleOpacityApplier`/`ballClickThroughApplier` 现声明在 windows 文件 ⇒ **把 3 个 applier 变量声明 + 3 个包装函数搬进跨平台文件**（Linux 下 nil 返 false），`installBallStyleApplier65`/`installBallIdleAppearanceAppliers`（真赋值，接 `*ball.Ball`）**留 windows 文件**。
+- [2026-11-12 11:0x] agent=编排者 **派第二腿 `424-fix-b`（glm high）**修这 5 处。判据：`GOOS=linux go build -overlay … -gcflags=all=-e ./cmd/wisp` **零 undefined 行** ＋ Windows build/vet/test 不回归。
+
+## AC（续）
+
+- [ ] **AC#6 第二批 5 处清零**：`configErrText` 搬跨平台；3 个 `applyBall*` 包装 + 3 个 applier 变量声明搬跨平台；`install*` 留 windows。判据 `GOOS=linux go build -overlay … -gcflags=all=-e ./cmd/wisp` 零 `undefined:` 行。
+- [ ] **AC#7 两平台不回归**：Windows `go build ./cmd/wisp` rc=0、`go vet ./cmd/wisp` rc=0、`go test ./cmd/wisp -run 'Test180K|Test423|TestTicket255|Test65|Test255'` 与改前同绿。
