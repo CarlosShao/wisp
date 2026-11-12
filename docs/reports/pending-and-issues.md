@@ -35601,3 +35601,27 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 下一个 infra 红清单（供后续）：**test-core**（portable tests 既存红）、**staticcheck 54 条**（票 122）、**SLO nail census**（票 266）。
 - **★在飞**：无（两票已收）。CPU 正常。
 - 撤销口令：删本 A1768；`git revert` 对应两票收尾提交。
+
+## A1769 — test-core（ubuntu）15 红挖成可修清单；挖出真生产 bug `joinForListing` 硬编码反斜杠并已修＋推送
+
+- 机主 2026-11-12 白天。承接 `A1768`。
+
+### 一、分诊（只读腿 70-ac2-triage，提交 `da6447ec2`，只 2 件）
+- test-core（run `43146479546` / job `130945374182` / step 7）现取 **FAIL=15（tools 9 + plugin 6）、SKIP=4**。
+- 分诊表：`docs/evidence/s1/70-ac2-testcore-triage.md`。A 类（修可移植）11 / B 类（声明出 core scope）4。
+- 派单已纠一条：`:265/:303 no TEMP/native spelling` 是 **SKIP 不是 FAIL**；票面旧数"4"来自更早 run-37166458550。
+
+### 二、★真生产 bug（我亲验）：`internal/tools/fs.go:287 joinForListing` 硬编码 `\`
+- `return dir + "\" + name`（POSIX 目录末尾无分隔符 → `/tmp/x\name` 不存在）⇒ **Linux 上 search.content/search.files 0 命中**。
+- 一处修七条：`tools-fix` 改 `dir + string(os.PathSeparator) + name`（Windows `os.PathSeparator='\'` 逐字节不回归）。
+- 另补 `launcher_other.go` 两缺臂（Job 失败措辞 + AUMID 形状臂），`windowsAUMIDPattern` 挪到无 build 标签 `launcher_aumid.go`。
+- **提交 `cc7b524b4`**（只 4 个 internal/tools 文件，零测试改动，零断言删），我复跑 win-test rc=0 / linux-vet rc=0 undefined=0；**已推 origin/dev**。
+- 结果判：**真 bug 修好**；Linux 真绿待 CI step7 复核。
+
+### 三、B 类与 SKIP（下一趟 guard 文件活，未做）
+- 4 条 Test52 pin（D46 盘符 Windows-only）→ 声明出 core scope；4 条 SKIP → ledger 登记。均需改 `portable-tests.sh`（票 111 守卫文件），单独谨慎趟。
+
+### 四、诚实边界
+- **test-core 绿 ≠ 整 CI 绿**：test-windows 仍有 own 既存红（step 7/8/10），lint 仍有 staticcheck 54 + SLO census。修 test-core 是修真 bug + 让该 job 转绿，不单独收票。
+- **★在飞**：`plugin-fix`（internal/plugin 序号14 测试夹具 + 序号15 判性）。CI run 验 `cc7b524b4`。
+- 撤销口令：删本 A1769；`git revert cc7b524b4` 回退搜索修复。
