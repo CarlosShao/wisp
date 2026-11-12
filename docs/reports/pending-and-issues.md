@@ -35549,3 +35549,32 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 绿后：非实现者翻票 424 各 AC ＋ 票 85 AC#5／票 122 AC#6 的 CI 侧依据到手。
 - **★在飞**：CI run（非 LLM）。CPU 正常。
 - 撤销口令：删本 A1766 ＋ `git revert aa23f834b`。
+
+## A1767 — ★★★CI 真容器验证：`go vet (module)` **failure→SUCCESS**（run `43146479546` @ `aa23f834b`）——Linux 编译面真恢复
+
+- 机主 2026-11-12 白天。承接 `A1766`。
+
+### 一、CI 真读数（gh 现读，run `43146479546` / lint job `130945374154`）
+| step | 名 | 结论 |
+|---|---|---|
+| 4/5/6 | D22 scanner 阳性对照／自测／七禁扫 | **success** |
+| 7 | Tracked path-length budget (266) | success |
+| **8** | **SLO nail census (266)** | **failure（既存，非本修）** |
+| 9/10 | gofmt (gofumpt) ／ tracked-set form A | **success** |
+| **11** | **`go vet (module)`** | **success（原为 failure！本修所致）** |
+| 12 | `go vet (tools/d22scan module)` | **success** |
+| **13** | **staticcheck** | **failure（54 条，票 122 的活，非本修）** |
+| 14 | mockllm module vet | success |
+| 15/16 | Portable carrier／Attribution 自测 | success |
+
+### 二、判
+- **`go vet ./...` 在真 ubuntu 容器 = rc=0**（step 11 success 就是它）⇒ **cmd/wisp 三批修复（residentVoice／configErrText×2+applyBall×3／modeRequest114r2）真的把 Linux 编译面修好了。**
+- **票 424 的核心目的达成**（真容器判据，非本地 overlay 近似）。
+- **票 85 AC#5** 的 `go vet ./... rc=0` 现由 **step 11 success** 背书；`gofmt` 由 step 9/10 success 背书；`d22scan` 由 step 4-6 success 背书。
+- **票 122 AC#6（lint 绿）仍不绿**：step 13 staticcheck 还挂 54 条（那是 122 自己的活，长链）。
+- **step 8 SLO nail census（266）也是既存红**，与本修无关，另计。
+
+### 三、下一步
+- 翻票 424 各 AC（凭 CI run + 三把尺）；评票 85 AC#5。
+- **★在飞**：无（CI 已出结论）。
+- 撤销口令：删本 A1767。
