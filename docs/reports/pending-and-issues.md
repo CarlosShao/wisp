@@ -35881,3 +35881,15 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **本轮（round 87）唯一新增交付**：`cmd/wisp` 补上票 409 同款 DLL staging carrier（`scripts/wisp-cli-staged-tests.sh` 新件 ＋ `portable-tests.sh` 加 `elif cli` 分支），读数＝**onnxruntime 遮蔽错误 39 → 0**、语音族 PASS=19／FAIL=20／SKIP=7、**13 枚由红转绿**。证据件 `docs/evidence/s1/cmd-wisp-dll-staging-carrier.md`。**⛔ 未改 System32／未提交 DLL／未动断言。**
 - **★下次接手的第一件事**（两件待机，均不需预热）：①残余 20 枚语音红的根因＝**模型从未下载**（`models/` 与 `build/models/` 只有 `manifest.json`＋`.minisig`，零 `.onnx`/`.bin`）——**下载属"花钱"类，等机主一句话**；②215（技能半动 D36 配置契约）／214（C25 stamp 等票 35）各等机主一句话。
 - **撤销口令**：本停工令由机主下一句「继续」解除；carrier 若判不当，`git revert 23e3814a9` 可退回（不影响任何 Go 产码与断言）。
+
+## A1798 — ★★更正 A1796 的错误结论 + 语音夹具真根因（20 枚"看起来像产品缺陷"的红变成真跑）
+
+- **先更正我自己的错**：`A1796` 与 `docs/evidence/s1/cmd-wisp-dll-staging-carrier.md` §6b 写"根因＝模型夹具根本没下载"，**这是错的**——我只查了 `models/` 与 `build/models/` 两处，而夹具根本不在那里。现量：`third_party/spike-models/`（~300MB：asr-encoder 157.8MB／asr-decoder 68.3MB／asr-tokens／silero_vad／vocos／`matcha-icefall-zh-baker/`／`sherpa-onnx-kws-.../`）＋`third_party/model-fetch/`（~428MB：x-kws／x-matcha／x-punc／x-sensevoice 含原件 tar.bz2）**全在盘上，零下载需要，一分钱不花**。
+- **真根因（逐字）**：`cmd/wisp/resident_voice_15e_windows_test.go:166-168` 读 `WISP_SPIKE_MODELS`，空则 `return fmt.Errorf("WISP_SPIKE_MODELS is not set")` ⇒ `t.Fatalf("install the streaming ASR into %s: %v")`，**读起来像装配坏了，实际是环境没指路**。这套变量在仓库里**只有散文**（`12r2-impl.md:21`、`15a-r1-impl.md:115`），散文不能执行 ⇒ 每条腿重新推导，推导错就得到假信号。
+- **落地**：`scripts/wisp-cli-staged-tests.sh` 加 `voice_env()`——五个变量**逐个默认＋逐目录验存在**，调用方值优先，目录缺失则 exit 1 响亮报 setup 失败（⛔ 变成红测试）。提交 `32ef54dcd`。
+- **★两种假信号（我踩了 4a，留档防再踩）**：
+  - **4a `WISP_TTS_DIR` 指向 `model-fetch/x-matcha` ⇒ PASS=15／FAIL=31（比不设还差）**：`voiceTtsFiles.complete()`（`resident_voice_engines_windows.go:85-87`）要五件齐（Acoustic/Vocoder/Lexicon/Tokens/DictDir），`x-matcha` **无 vocoder、无 dict 目录** ⇒ 逐枚 `the matcha checkpoint is incomplete`。正确树＝`spike-models/matcha-icefall-zh-baker`（`resident_voice_wire_r1_windows_test.go:213` 自己的 fallback 就是它）。
+  - **4b PowerShell 调 bash 的引号陷阱**：`& $sh script.sh -test.run '^(...)'` 会被拆成两个参数 ⇒ 二进制收到裸 `-test` ⇒ `flag provided but not defined: -test`＋整页 usage，rc=2。**看起来像脚本坏了，实际是调用方引号问题**；正确姿势 `& $sh -c "script.sh '-test.run' '^(...)'"`。
+- **★读数（我亲跑，`bash -c` 调用，env 由脚本自解析，日志 `D:\tmp\wisp\20261112\envrun3\carrier.log`）**：`WISP_SPIKE_MODELS is not set`＝**0**／`checkpoint is incomplete`＝**0**／`onnxruntime 1.17` 遮蔽＝**0**／该族 `--- FAIL`＝**0**。**具名转绿**：`Test15eSpeechEndToEndHandsTheTranscriptToTheAgent` **PASS 9.89s**（整包发里长期 FAIL）／`Test15eTheProductionHandOffIsTheModelStoreWalk` 3.95s／`Test15e` 其余 4 枚／`Test381r2` 四枚（`StaleToken` 4.25s、`PlayingPhaseInterrupt` 5.56s 等）／`Test392JSONSentinelClampsNonFiniteReadings`。
+- **边界**：本件治**夹具寻址**这一层，⛔ 不宣称整包 52 枚红全绿——`cmd/wisp` 另有 5 枚台账 `:32512` 具名的**存量真红**（`TestTicket198FirstRunCallerIsTheRunEntryOnly`／`Test313WritableUnionEqualsTheTwoRosters`／`TestAC4FocusReturnToPriorWindowGap33r5`／`TestLockedSuffixNeverTakesTheLockItself33r11`／`TestAC247HandingTheLevelToTheSeamIsNotVisibility`），与本件无关。⛔ 未下载模型／未改 System32／未提交二进制／未动断言与 SKIP 规则。
+- **★教训**：报"根因＝X 没下载/没装"之前，必须**先把全仓可能位置都列出来逐个 `Test-Path`**，不能只查两个显而易见的目录就下结论——我这次因此给机主提了个**不必要的花钱请求**（"下模型 598MB"），实际一分钱不用花。
