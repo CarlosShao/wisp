@@ -87,3 +87,41 @@
 1. **派单前提过期四格**：AC#1/#2/#3/#5 的牙已在 HEAD（`eda34703f`／`d1b1a2d22`），本腿实测**除 AC#1 的根射程外全部有牙**。
 2. **唯一真缺口＝AC#1 的扫描根**：密钥写到 `os.TempDir()`／用户目录**今天全绿**（本腿造出来了）。最小修法＝把那把尺的根从 `{配置根, 工作树}` 扩到 `{＋Temp, ＋用户目录}`，**1 轮、零产码、不撞禁区**。
 3. **AC#4 别并行派**：同两枚文件正被另一条腿写（未 commit），要么等它交件，要么收编。
+
+## 6. 复测节（2026-11-12 12:3x–12:5x +08；派单 `probes/orch/20261112/txt/323-a1-dispatch.txt` 复跑）
+
+- **复测锚**：`git rev-parse --short HEAD` = **`29c4b160a`**（分支 `dev`）。共享工作树本节零字节改动；全部突变复跑在仓外一次性 `git clone --shared` LF 导出树 `D:/work/tmp/wisp323a1-recheck/clean`（起手/收尾 `git status --porcelain` 均空），脚本＝同目录 `mutate.ps1`（每处替换断言"恰好 1 次命中"）、日志＝`logs-m3-full.txt`/`logs-m4.txt`/`logs-m5.txt`（只建不删）。
+- **零漂移凭据**：本档 §0–§5 所依赖的六枚文件在 `18ce9f5bc..29c4b160a` **零漂移**（`git diff --name-only` 空；`panel_models_320_test.go`/`settings_320_test.go` 两枚 blob `git hash-object` 逐枚同值）⇒ §1–§5 结论原则上延续；下面四发突变体仍**从现树重建实测**，不复抄。
+
+### 6.1 AC#0 六条在 `29c4b160a` 的现读数
+
+| # | 票面残余 | 本轮突变体/读法 | rc | 现读数 | 三态 |
+|---|---|---|---|---|---|
+| ① | 不落盘明文零敏感 | **m1** 密钥 `os.WriteFile` 进工作树 | **1** | `Test320FetchLegWritesTheKeyNowhereOnDisk` 红，`panel_models_320_test.go:424` 逮住 `[…\cmd\wisp\wisp323a1r-keyleak.txt]` | **半收口** |
+| ①b | 同上，仓外形（派单原形＝"写到仓外"） | **m6** 密钥写 `os.TempDir()` | **0** | **rc=0 全绿而 39 字节密钥文件真落到 `%TEMP%\wisp323a1r-keyleak.txt`**（跑完已删）⇒ §1 AC#1 行"配置根与工作树之外零射程"的漏洞在现 HEAD **原样复现** | **仍零敏感（半缺）** |
+| ② | 超时预算 8s→8h 仍全绿 | **m3** `8 * time.Second`→`8 * time.Hour`，全 `-run Test320` | **1** | 恰 1 红：`--- FAIL: Test320FetchLegBudgetIsTheOneThePageWaitsOn`，`:543` 逐字 `the fetch budget is 8h0m0s; A972 ruling 3 caps this page-blocking call at 10s…`；其余 12 枚 PASS ⇒ 票面②"仍全绿"**不再成立** | **已闭** |
+| ③ | 本跳错误分类缺世界 | 静读＋**m4**（见④） | OK | `panel_models_320_test.go` `WriteHeader` 命中 **3**（500 夹具 `:371`、401/500 表 `:572`/`:617`）、`ClassAuth` 命中 **1**；`internal/llm -run TestDiscoverModels` ok rc=0 | **已闭** |
+| ④ | 上游首行进页面可见回执 | 静读＋**m4** 错误句改回 `fmt.Errorf("拉取失败（%s）：%s", provider, err.Error())`（同时摘 observe 导入，防编译假红） | **1** | 诚实树 `panel_models_320.go` `HTTPError` 命中 **0**（`:120-121` 只带 `observe.ClassOfOrInternal(err)`；`err.Error()` 仅存于 `:116` 注释）；m4 下 401/500 两子测同红 `:599`，红句逐字含 `UPSTREAM_LEAK_320XYZ: the provider's own words` ⇒ `A1483` 裁④的牙两形都有 | **已闭** |
+| ⑤ | `protocol` 字段级预检没牙 | **m5** `isProtocol`→恒真 | **1** | `--- FAIL: Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum`，`settings_320_test.go:178` 逐字 `the refusal came from the whole-file gate instead of the field's own pre-check` ⇒ `323-ac5` 的分层断言有牙 | **已闭** |
+| ⑥ | 常驻宿主装配无端到端台件 | 静读（无突变） | n/a | 已跟踪树 `newResidentPanelManager` 测试引用仍只有 4 枚（`panel_config_ac10_windows_test.go`/`panel_host_gate_test.go`/`panel_mode_confirm_114_windows_test.go`/`panel_resident_pump_windows_test.go`，无端到端）；两枚在飞件**仍是未跟踪**：`panel_resident_323_windows_test.go:253 Test323ResidentHostAnswersThePageRows`＋`panel_resident_assembly_323_test.go:65 Test323ResidentHostAssemblyEndToEnd`（自 2026-11-05 起未 commit） | **仍缺（在飞未收）** |
+
+**基线与其余读数**：`go test ./cmd/wisp -run Test320 -count=1 -v` = **rc=0，13/13 PASS**（导出树）；超时牙 `-count=5` **rc=0 无假红**（§1 记的 1/15 竞态本轮 5 趟未复现，仍以前腿 1/15 为准、不销账）；`internal/config -run '320|Protocol'` 还原后 ok rc=0；每发突变后 `git status --porcelain` 空。★**环境读数（给下一个跑 `cmd/wisp` 测试的人）**：本进程 PATH 无 sherpa DLL 目录时 `cmd/wisp` 测试二进制**起动即 `exit status 0xc0000135`**（DLL 未找到；CGO=0 则 sherpa-onnx-go 直接构建不出）——把主树 `third_party\sherpa-onnx\`（gitignore 不进克隆）加进 PATH 后即正常；`internal/config`/`internal/llm` 不受影响。
+
+### 6.2 落地腿施工图（现量更新版；细节仍以 §1 五问表为准）
+
+| 格 | 还要不要腿 | 写面 | 要点 |
+|---|---|---|---|
+| AC#1 | **要（唯一真缺口）** | `cmd/wisp/panel_models_320_test.go` 一枚（零产码） | `filesCarrying320` 根集合 `{dir, wd}` 扩到 `{dir, wd, os.TempDir(), 用户主目录}`（m6 形即变红）；正控随根集合各补一枚"植了就能看见"。1 轮 |
+| AC#2 | 台件不要；假红**可选** | 同一枚测试件 `:520-522` | `attempted==1` 改"≥1"或加同步；本轮 5/5 绿，前腿 1/15，不销账 |
+| AC#3 / AC#5 | **不要** | — | 判据已闭（§6.1 ③⑤），建议编排者据本档＋`323-a0`/`323-ac5` 两件翻框 |
+| AC#6 | **要，但⛔并行** | 两枚在飞未跟踪件（同 `cmd/wisp` 面） | 等那条腿交件或编排者收编；收编后按 `33-panel-host-c27-r14.md` 的克隆姿势验证 |
+| AC#7 | — | — | `internal/panel` 5 枚既有红不算本票（票面已具名）；`gofumpt` 用绝对路径 `D:\work\base\gopath\bin\gofumpt.exe`（`323-a0` 先例） |
+
+**波次建议**：第 1 波＝AC#1 扩根（＋AC#2 假红顺手同件修），`cmd/wisp` 测试面**只此一枚**；第 2 波＝AC#6 收编（第 1 波交件后再动，同面禁并行）。全程零产码、不碰禁区（`frontend/**`/`design/**`/PLAN/specs/阈值/golden/allowlist/`.github`），扩根是**加严**不是放宽，不触 `320-r1`/`7c80ac03` 既有钉。
+
+### 6.3 复测节诚实自报
+
+- m1/m6 真写出了密钥文件（克隆 `cmd/wisp\wisp323a1r-keyleak.txt` 与 `%TEMP%\wisp323a1r-keyleak.txt`），跑完**均已删**（"尺有眼/无眼"的证据，非泄漏）；密钥值＝测试进程内随机 `uniqueKey320`，非仓内字面量。
+- m4 第一版 rc=1 是**编译失败**（observe 导入未用），已具名作废并修正重跑（§6.1 ④ 的读数是修正版）。
+- 本节**未跑**：`d22scan`/路径长度门（零产码无对象，§3 的绿读数按零漂移延续）；`cmd/wisp` 整包（票 314 死区，铁律）。
+- 本节写面＝本档追加的这一节；克隆、脚本、日志全在仓外 `D:/work/tmp/wisp323a1-recheck/`，只建不删；共享工作树零字节改动。撤销口令：删本节即复原（前五节原样保留）。
