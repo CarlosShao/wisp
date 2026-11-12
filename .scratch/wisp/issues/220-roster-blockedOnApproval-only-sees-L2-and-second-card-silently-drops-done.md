@@ -26,7 +26,7 @@
   ⇒ 判据本身：种一枚正在 L1 短窗口里等的任务 ⇒ 名册那一格**必须为真**；**改前读数要当场跑出来贴回票上**（不许写"应该会红"）。
 - [x] **AC#3 两形各有正控**：L1 等待中／同任务第二张卡，**逐枚**"种 X 必响"；本仓规矩＝负向尺必配正控。
 - [x] **AC#4 不许把布尔改成态、不许新造 D43 名**：改状态拼写＝契约级（D43 转移表冻结），本票射程外。
-- [ ] **AC#5 整包终态读数**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...` 跑到终态、逐名比红名集合（**`-run` 单跑不算终态**），并**具名写清"这一格修完之后界面上还差哪一跳"**——那一跳属界面地界，只写票面、不代做。
+- [x] **AC#5 整包终态读数**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...` 跑到终态、逐名比红名集合（**`-run` 单跑不算终态**），并**具名写清"这一格修完之后界面上还差哪一跳"**——那一跳属界面地界，只写票面、不代做。
 
 ## 禁区
 
@@ -66,3 +66,5 @@
   - ④ 门禁四数：gofumpt 空／vet rc0／build rc0／d22scan clean（963+241 Go 文件，rc0）。
   - ⑤ **具名「这一格修完之后界面上还差哪一跳」（现读现树，非旧结论）＝渲染跳整节断**：传输/接收跳已通（`a5f84886f` resident pump＋`33b264d70` 接收器，frontend 现 33 枚命中）、页面类型已声明（`panel.ts:213` `blockedOnApproval`／`:414` `tasks?`，Go↔页面契约尺今日绿），但 **`snapshot.tasks` 在 `frontend/src` 零消费**——`App.tsx:246` 的任务监控 popover 喂写死的 `agents={[]}`，且 `MonitorAgentRow`（`monitor-popover.tsx:28`）只有 running/done/failed 三态、"等批准"连载体都没有 ⇒ 界面对"卡在等批准"可见 **0 维**（L2 卡与「待审批 N」计数可见，但名册那一格没有像素）。拆两枚前端面小跳（①取数跳＝`snapshot.tasks?.rows` 接进 popover；②画格跳＝行上画附加的一维）写在件 §五，⛔ 代做；「附加维不吃运行态」的对照约束原文仍有效。
   - ⑥ 台面定式清单加一枚：导出树第 8 件＝`third_party/spike-models/`（缺它 `internal/speech` 整族 ~30 枚 0.00s 假红，红句自述 `silero model not found`，补上即绿＝尺自证）。
+
+- [2026-11-12 15:3x +08] agent=编排者（**非实现者验收翻框**）did=**AC#5 翻勾，票 220 全五格清零**。**读数共用**：本票 AC#5 与票 230 AC#5 是**逐字同一条命令**（`go test ./cmd/wisp ./internal/...` 到终态＋逐名比红名集合）⇒ 直接采用同一发读数（`docs/evidence/s1/230-ac5-terminal.md`，2026-11-12，rc=1 elapsed=761s，35 个 internal 包全 ok，`cmd/wisp` 52 枚红）。**逐名比红名集合**：39 枚机器级环境红（System32 onnxruntime 1.17.1 遮蔽，账 `dll-shadow-2`）／5 枚台账 `:32512` 存量真红／1 枚整包内互扰（定向单跑 PASS）／7 枚归环境族。**本票新增红＝0 枚**。**"这一格修完之后界面上还差哪一跳"（AC#5 后半，票面要求具名）**＝**渲染跳整节断**：传输/接收跳已通（`a5f84886f` resident pump ＋ `33b264d70` 接收器）、页面类型已声明（`panel.ts:213 blockedOnApproval`／`:414 tasks?`），但 **`snapshot.tasks` 在 `frontend/src` 零消费**（`App.tsx:246` 喂写死 `agents={[]}`）⇒ **那一跳属前端地界，本编队零写面，只写票面不代做**（与本票 Progress ⑤ 2026-11-08 的读数一致，本次为独立复跑复证）。

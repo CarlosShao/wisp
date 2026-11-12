@@ -35844,3 +35844,13 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **整包现状（现读）**：`go test ./cmd/wisp ./internal/... -count=1 -timeout 90m` 已跑 8+ 分钟，`wisp.test` CPU 从 39.84s → 49.53s **持续增长**（＝真在推进、非挂死），CPU 68%。按 314 经验（票 408 已修 UDF 进程唯一化，进程不再消失）≥40 分钟属正常，⛔ 中途 kill。
 - **本轮排除的票（逐格读正文）**：313＝三格 AC 全是设置页 UI（外部 agent 面）；293＝AC#5 票面明写"归机主在场，不算腿的欠账"（本仓无"托盘菜单可见态"仪器，`grep showMenu|mfCheckd|appendItem` 零命中）；290/291/247＝机主真机/桌面读数（unc 1/3/2）。
 - **本会话累计 11 张 done**：424/85/72/323/246/256/346/194/213/187/**174**。池子 done **340** / 总 409 / open **69**。
+
+## A1795 — ★★票 230 与 220 双收口 -done（本会话第 12、13 张）：整包终态跑通，**票面在册三组红全部消失**
+
+- 承接 `A1794`。**glm 腿 `230-ac5` 幽灵交件 ⇒ 我自己跑整包**（`go test ./cmd/wisp ./internal/... -count=1 -timeout 90m`）：**rc=1、elapsed=761s**，日志 `D:\tmp\wisp\20261112\230ac5-self\full.log`（4348 行）。
+- **★关键读数：票面在册的三组红本次全部为零**——`internal/ball` **ok 1.119s**（在册 1 枚已消失）／`internal/panel` **ok 57.755s**（在册 4 枚已消失）／`internal/risk` **ok 27.632s**（争用型 `TestResolvePerCallBudget` 未出现）。**35 个 internal 包全 ok**，红只在 `cmd/wisp` 52 枚 ⇒ **两票新增红＝0 枚**。
+- **52 枚逐名归因**（证据件 `docs/evidence/s1/230-ac5-terminal.md`）：①**39 枚机器级环境红**＝`C:\Windows\System32\onnxruntime.dll` **1.17.260311** 遮蔽 `third_party` 的 **1.28.2**（红句逐字「onnxruntime 1.17.1 is older than the 1.28 … a second onnxruntime.dll is shadowing」；台账专账 `dll-shadow-2` 在 `:32533`，⛔ 改 System32，主流做法＝DLL 与 exe 同目录或 `LoadLibraryEx` 绝对路径）；②**5 枚存量真红**（台账 `:32512` 已具名，断言逐字入证据件 §2b）；③**1 枚整包内互扰**（`Test320FetchLegWritesTheKeyNowhereOnDisk` 定向单跑 **PASS 0.10s**）；④7 枚归环境族（**具名未逐枚单跑**，诚实标注）。
+- **票 408 的 UDF 进程唯一化本发独立复证**：整包 761s **无进程消失、无 panic、无超时** ⇒ 314 那格"根因已修、只欠验证"的结论现在有第二发独立读数。
+- **220 的"界面差哪一跳"已具名**（AC#5 后半要求）：**渲染跳整节断**——传输/接收跳已通、页面类型已声明，但 `snapshot.tasks` 在 `frontend/src` 零消费（`App.tsx:246` 喂死 `agents={[]}`）⇒ 前端地界，只写票面不代做。
+- **两票全五格清零，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194、213、187、174、230、220（+13 done）**。done 340→**342**。
+- **★新发现（待办，不属任何票）**：`System32\onnxruntime.dll` 1.17.1 这一枚机器级环境红**压着 39 枚语音/球/托盘/保活测试**，是本机整包红的**最大单一块**。治法已在 `:32533` 具名（⛔ 改 System32；DLL 与 exe 同目录或 `LoadLibraryEx` 绝对路径）——**但那是部署形状变更，属"改契约/不可逆"边界，须机主点头**。
