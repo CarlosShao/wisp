@@ -249,9 +249,7 @@ func (t webSearch) Execute(ctx context.Context, params json.RawMessage, onUpdate
 	}
 	cctx, cancel := context.WithTimeout(ctx, t.w.searchTimeout)
 	defer cancel()
-	hits, err := p.Search(cctx, SearchQuery{
-		Query: a.Query, MaxResults: a.MaxResults, Zone: a.Zone, Language: a.Language,
-	})
+	hits, err := p.Search(cctx, SearchQuery(a))
 	if err != nil {
 		return Result{Text: "web.search: " + err.Error(), IsError: true}, nil
 	}

@@ -45,9 +45,7 @@ func (m *memStore) DeleteInstalled(_ context.Context, id string) error {
 
 func (m *memStore) ListInstalled(_ context.Context) ([]InstalledRecord, error) {
 	out := make([]InstalledRecord, 0, len(m.saved))
-	for _, r := range m.saved {
-		out = append(out, r)
-	}
+	out = append(out, m.saved...)
 	return out, nil
 }
 

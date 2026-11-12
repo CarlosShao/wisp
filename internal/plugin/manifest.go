@@ -228,9 +228,7 @@ func auditKeys(raw []byte) ValidationErrors {
 		if kind, _ := table["kind"].(string); kind == ToolKindCommand {
 			allowed = commandToolKeys()
 		}
-		for _, e := range auditTable(table, prefix, allowed) {
-			errs = append(errs, e)
-		}
+		errs = append(errs, auditTable(table, prefix, allowed)...)
 	}
 	return errs
 }

@@ -21,7 +21,7 @@ import (
 // spelling, so raw-vs-raw the two share nothing — only the NORMALIZED forms
 // meet. A seam that recorded raw content could never produce the refusal the
 // tests below demand, which is what pins "normalizeTaint 履行在缝内".
-const seam394Raw = "  SECRET　Ｔｏｋｅｎ－３９４Ｒ１ＳＥＡＭ​（十分钟内有效）  "
+const seam394Raw = "  SECRET　Ｔｏｋｅｎ－３９４Ｒ１ＳＥＡＭ\u200b（十分钟内有效）  "
 
 // seam394Quote is the announcement that quotes the taint's normalized form.
 const seam394Quote = "令牌是 token394r1seam，请确认"
@@ -159,7 +159,7 @@ func Test394SeamNotRecordedWhenMarkRecordsNothing(t *testing.T) {
 	gate := NewTTSGate(prov, DefaultTTSGateConfig())
 
 	prov.OpenScope("task-394empty")
-	if prov.Mark("task-394empty", SrcFSRead, "o", "   \u3000​  ") {
+	if prov.Mark("task-394empty", SrcFSRead, "o", "   \u3000\u200b  ") {
 		t.Fatal("Mark accepted whitespace-only content")
 	}
 	if got := gate.CountInheritanceLinks(); got != 0 {
