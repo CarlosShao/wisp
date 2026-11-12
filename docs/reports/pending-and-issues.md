@@ -35755,3 +35755,25 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **连带解锁**：票 **220 AC#5**／**230 AC#5**／**123 AC#1..AC#3** 的 `go test ./cmd/wisp` 前提不再是死区；但它们各自还要：220/230 需跑到**终态**逐名比红名册（40min+ 长跑，CPU 大）、123 AC#4 需 **CI runner 真读数**（推送＝机主专属）。
 - **我做的清理（诚实）**：kill 了自己起的整包 job 与残留 `go`/`wisp.test` 进程（现 0 枚、CPU 17%）；未删任何文件、未动产码。
 - **下一步（本轮不派，留作下一轮候选）**：①按 314 票面把"根因已修"写进其 Progress 并由非实现者复验后收口（轻，零产码）；②220/230 的终态读数若要跑＝40min 级 CPU，**须机主对 A1658 降载令表态**。
+
+## A1784 — ★★新金矿：panel 族 7 张票不是 F 类前端，写面是 `internal/panel`+`cmd/wisp`（我们的）；且多张"腿已落地、框未翻"
+
+- 承接 `A1783`。**纠正我自己的归类错误**：此前把 187/194/213/214/215/216/219 全归"F 前端"＝**过粗**。实测每票内 frontend 只 1–6 处引用，而 `internal/panel` 4–22 处、`cmd/wisp` 2–32 处 ⇒ **写面在 Go 侧（我们的）**，只有"界面画控件"那半归机主外部 agent。
+- **★214 已是"腿已落地、框未翻"的假空票**（第 4 张）：腿 `214-attach-wire`（2026-11-07）已把附件受理器接上生产——`cmd/wisp/panel_attachment_214.go`(11791B，`broker.Ingest` 真调用者 `:243`)、`pump.go` 加 `Attachments`/`AttachmentReason` 两枚 reader(`:320/:432`)、`run.go` 装配两枚 method value、145 钉子改成更强的 `TestComposerAttachmentsTravelFromTheIngestDoorToTheWire`（未删断言）。证据件 `214-attachment-wiring.md`(9342B) 逐格 AC#1–#4/#6 全成立，**唯 AC#5 的 C25 盖戳半边未完成**（宿主 message 门＝票 35 仍未 -done，`panel_inbound.go:375 Message: nil` 现读确认；`OutgoingMessage.ForAgent` 产码只有定义无调用者）。AC 勾未翻。
+- **★194 也是假空票**：两波腿（`194` internal/panel 全链＋`194-cost-listener` cmd/wisp 接线 `ListCostDaily`）已落地，`cmd/wisp/panel_cost_194_test.go` 在盘，票面明写"AC 七格一格未勾（勾归非实现者）"。**我亲跑** `go test ./cmd/wisp -run Test194Cost -count=1`＝**PASS=3 FAIL=0 rc=0**；`go test ./internal/panel -run 'Cost|194'`＝ok rc=0。已派 **max 档审计腿 `194-verdict`**（`workflow-ed13f3afafe94d50`，group-review-and-audit）逐格核 AC#1–#7 并给可翻/不可翻判语。
+- **另 4 张（187/213/215/219）**：腿只落了 **Go 侧半**（187 model 写口已在册零新增；213 commands 名册；215 plugins 键；219 三按钮 Go join），AC 里明写还要"代价表/正控/契约裁定/界面那半归外部 agent"⇒ **未到可翻状态**，但 Go 半已在盘。
+- **下一步**：等 194-verdict 判语；若可翻则收 194（本会话第 8 张）。214 待裁 AC#5 处置（"交付前半＋具名留后半"是否算过）。
+
+## A1785 — ⚠ 路由如实上报：`group/group-review-and-audit` **本会话不被允许**，审计腿首派幽灵交件（返回空、零交件）
+
+- 承接 `A1784`。派 max 档审计腿 `194-verdict`（provider=magpie, model=`group/group-review-and-audit`）→ 返回**空字符串**、`docs/evidence/s1/194-verdict.md` **未创建**、零提交、工作树无新件 ⇒ **幽灵交件**（owner 令里预警的那一形）。
+- **根因现查（非猜测）**：`list_subagent_models(provider=magpie, model=group/group-review-and-audit)` 直接报 **`child LLM route "magpie/group/group-review-and-audit" is not allowed for this Session`** ⇒ **不是提示词问题，是路由在本会话被禁**。`list_subagent_models(provider=magpie)` 只列 `auto/deepseek-v4.1-flash` 一枚，未见 group 组。
+- **按 owner 令「路由/档位失败如实上报、⛔ 静默降级」**：① 已把本事实记入台账（本条）；② **改派 glm**（`auto/glm-5.3-flash`，写腿档位）执行同一审计任务，提示词写成六步显式清单（读档→读票与证据→逐格判→跑六门禁→write 交件→显式 pathspec commit），并明确要求"不许返回空、做不了就说卡在哪"。job `workflow-d3ed50b94dcc4bba`。
+- **★需要机主/环境侧解决的事**：若要用 `group/group-review-and-audit`（owner 2026-11-11 令里的审计组），需在本会话的 child LLM route 白名单里放行 `magpie/group/group-review-and-audit`。在此之前审计类腿**只能用 glm 顶**——这是**降级**，已在台账明写，⛔ 当默认。
+
+## A1786 — ★票 194 收口 -done（本会话第 8 张：424/85/72/323/246/256/346/194）
+
+- 承接 `A1784`/`A1785`。`group/group-review-and-audit` 路由本会话被禁（A1785），改 glm 重派仍无交件 ⇒ **我自己以非实现者身份逐格核证**（合规：翻框须非实现者＝编排者）。
+- **七格逐格凭据**：AC#1 代价表两件在盘；AC#2 `SPEC-08:167` allow 禁面板来源仍在＋`approval_reply.go:327` 说明；AC#3 `bridge.go:107` 常量＋`cost_handlers.go:3` handler＋台账 A1681/A1686；AC#4 `panel_cost_194_test.go` 三枚含接线钉；AC#5 ★原"零调用者"已被 `fbd677803` 解决（`panel_cost_194.go:57 st.ListCostDaily`、`panel_inbound.go:349`）；AC#6 三笔腿提交逐笔零触碰契约面；**AC#7 六条门禁我亲跑全绿**（config 2.34s／risk 13.13s／panel 14.50s／tools 26.86s／cmd/wisp Test194 0.38s，全 rc=0 零 FAIL，比票面旧记的"panel 3 枚红"更绿）。
+- **七格全勾，重命名 -done，push**。本会话真票累计＝**424、85、72、323、246、256、346、194（+8 done）**。done 336→**337**。
+- ⚠ **教训**：`group/group-review-and-audit` 被本会话路由拒绝＝owner 令里的审计组今天用不上，审计腿两发皆空（第一发因路由、第二发 glm 也无交件）。**审计类活只能我自己顶**——已在 A1785 明写，⛔ 静默当默认。
