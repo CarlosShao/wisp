@@ -35490,3 +35490,32 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **票 424 是本轮最重要的产出**：一条**真跨平台缺陷**，阻塞整个 Linux CI。
 - **★在飞**：`424-fix`（glm high）。CPU 正常。
 - 撤销口令：删本 A1764 条 ＋ 删票 424 ＋ `git revert 595155bc7`（若要撤票 85 三格翻框则 revert 对应提交）。
+
+## A1765 — 424-fix 成功（residentVoice 已除·三把尺过）＋ 全量测出**第二批 5 处**同族 Linux 错误 → 派 424-fix-b
+
+- 机主 2026-11-12 白天。承接 `A1764`。
+
+### 一、424-fix 收货（三把尺过）
+- **尺1 提交**：`e98276632`，只 3 个落点（原文件 −16 行／新 `memory_retention_180k_windows.go` 首行 `//go:build windows`／证据件）。
+- **尺2 件在**：`cmd/wisp/memory_retention_180k_windows.go`（1135B）、`docs/evidence/s1/424-fix-linux-build.md`（6263B）。
+- **尺3 自核**：原 `memory_retention_180k.go` 现 3 个跨平台函数、`residentVoice` 命中 **0**；新文件 `attachMemoryL1IfEnabled180K` 逐字搬。
+- 判据：win build/vet rc=0、win test RUN=34 PASS=33 FAIL=0 SKIP=1；linux type-check 阴性对照逐字复现 CI `undefined: residentVoice`、阳性零命中 ⇒ **residentVoice 真除**。
+
+### 二、★★`-gcflags=all=-e` 全量测出第二批 5 处（`go vet` 只报每包第一条会遮）
+- 用 424-fix 的 overlay 技法现跑，把剩下错误全挖出：
+  ```
+  logsink.go:224 / memory_retention_180k.go:62  undefined: configErrText
+  panel_config_store.go:404/410/415  undefined: applyBallStyle65 / applyBallIdleOpacity / applyBallClickThrough
+  ```
+- **性质判定（我）**：`configErrText`＝**纯函数**（可搬跨平台）；3 个 `applyBall*`＝**薄 nil-检查包装**＋其 applier 变量声明（可搬跨平台，Linux 下返 false），`install*` 留 windows。
+- 我初筛脚本 17 枚候选里，其余 12 枚**经编译器证实是误报**（`const()` 组块定义我的正则没抓到）。
+
+### 三、已派 `424-fix-b`（glm high，job `workflow-4676b8aafeb740ff`）
+- 修这 5 处；判据 `GOOS=linux … -gcflags=all=-e` **undefined=0** ＋ win 不回归。
+- 若修完又冒出更难的族（真依赖 win32 不可搬），照实报我，不硬改。
+
+### 四、这一步的意义
+- **cmd/wisp 在 Linux 上"编不过"是本机 `go vet ./...`＋CI `lint` 一直红的系统性根因**（不止 residentVoice 一枚）。
+- **424 全绿后，票 85 AC#5（vet rc=0）、票 122 AC#6（lint 绿）才谈得上翻**。
+- **★在飞**：`424-fix-b`（cmd/wisp 写面独占，1 条）。CPU 正常。
+- 撤销口令：删本 A1765 ＋ 删票 424 与 `424-fix-b` 产出，`git revert` 对应提交。
