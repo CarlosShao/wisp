@@ -36,11 +36,11 @@
 
 ## AC
 
-- [ ] **AC#1 迁移函数**：`attachMemoryL1IfEnabled180K`（含它用到的私有 helper，若有）从 `memory_retention_180k.go` 移到新 `memory_retention_180k_windows.go`（`//go:build windows`）；`memory_retention_180k.go` 保留 3 个跨平台函数、删掉移走的那个。
-- [ ] **AC#2 Linux 编过（判据核心）**：`GOOS=linux CGO_ENABLED=1 go build ./cmd/wisp`（或 CI 等价）**必须 rc=0 且不再出现 `undefined: residentVoice`**。⚠ 若本机无 cgo/onnx 工具链导致 sherpa 依赖先挂，改用 **`GOOS=linux go vet` 的 type-check 面**或说明"本机无法完整交叉编译"并以"CI run 不再报 undefined: residentVoice"为判据。
-- [ ] **AC#3 Windows 不回归**：`go build ./cmd/wisp` rc=0；`go vet ./cmd/wisp` rc=0；`go test ./cmd/wisp -run 'Test180K|Test423|TestTicket255' -count=1` 与改前同绿（点名）。
-- [ ] **AC#4 越界**：只动 `cmd/wisp/memory_retention_180k.go` ＋ 新建 `cmd/wisp/memory_retention_180k_windows.go`；⛔ 改任何断言/阈值/契约/其它包。
-- [ ] **AC#5 门禁**：`gofumpt -l <两个文件>` 空、`go vet ./cmd/wisp` rc=0。
+- [x] **AC#1 迁移函数**：`attachMemoryL1IfEnabled180K`（含它用到的私有 helper，若有）从 `memory_retention_180k.go` 移到新 `memory_retention_180k_windows.go`（`//go:build windows`）；`memory_retention_180k.go` 保留 3 个跨平台函数、删掉移走的那个。
+- [x] **AC#2 Linux 编过（判据核心）**：`GOOS=linux CGO_ENABLED=1 go build ./cmd/wisp`（或 CI 等价）**必须 rc=0 且不再出现 `undefined: residentVoice`**。⚠ 若本机无 cgo/onnx 工具链导致 sherpa 依赖先挂，改用 **`GOOS=linux go vet` 的 type-check 面**或说明"本机无法完整交叉编译"并以"CI run 不再报 undefined: residentVoice"为判据。
+- [x] **AC#3 Windows 不回归**：`go build ./cmd/wisp` rc=0；`go vet ./cmd/wisp` rc=0；`go test ./cmd/wisp -run 'Test180K|Test423|TestTicket255' -count=1` 与改前同绿（点名）。
+- [x] **AC#4 越界**：只动 `cmd/wisp/memory_retention_180k.go` ＋ 新建 `cmd/wisp/memory_retention_180k_windows.go`；⛔ 改任何断言/阈值/契约/其它包。
+- [x] **AC#5 门禁**：`gofumpt -l <两个文件>` 空、`go vet ./cmd/wisp` rc=0。
 
 ## 禁区
 
@@ -68,7 +68,11 @@
   - `applyBallStyle65`/`applyBallIdleOpacity`/`applyBallClickThrough` = **薄包装**（各自 `if <applier> == nil { return false }; return <applier>(…)`），applier 变量 `ballStyleApplier65`/`ballIdleOpacityApplier`/`ballClickThroughApplier` 现声明在 windows 文件 ⇒ **把 3 个 applier 变量声明 + 3 个包装函数搬进跨平台文件**（Linux 下 nil 返 false），`installBallStyleApplier65`/`installBallIdleAppearanceAppliers`（真赋值，接 `*ball.Ball`）**留 windows 文件**。
 - [2026-11-12 11:0x] agent=编排者 **派第二腿 `424-fix-b`（glm high）**修这 5 处。判据：`GOOS=linux go build -overlay … -gcflags=all=-e ./cmd/wisp` **零 undefined 行** ＋ Windows build/vet/test 不回归。
 
+## Progress（424-review 验收）
+
+- [2026-11-12 11:2x +08] agent=424-review 验收：CI run 43146479546 step11 go vet=success；尺3 linux undefined=0、win build/vet rc=0；翻 AC#1-7。判词见 `docs/evidence/s1/424-verdict.md`。
+
 ## AC（续）
 
-- [ ] **AC#6 第二批 5 处清零**：`configErrText` 搬跨平台；3 个 `applyBall*` 包装 + 3 个 applier 变量声明搬跨平台；`install*` 留 windows。判据 `GOOS=linux go build -overlay … -gcflags=all=-e ./cmd/wisp` 零 `undefined:` 行。
-- [ ] **AC#7 两平台不回归**：Windows `go build ./cmd/wisp` rc=0、`go vet ./cmd/wisp` rc=0、`go test ./cmd/wisp -run 'Test180K|Test423|TestTicket255|Test65|Test255'` 与改前同绿。
+- [x] **AC#6 第二批 5 处清零**：`configErrText` 搬跨平台；3 个 `applyBall*` 包装 + 3 个 applier 变量声明搬跨平台；`install*` 留 windows。判据 `GOOS=linux go build -overlay … -gcflags=all=-e ./cmd/wisp` 零 `undefined:` 行。
+- [x] **AC#7 两平台不回归**：Windows `go build ./cmd/wisp` rc=0、`go vet ./cmd/wisp` rc=0、`go test ./cmd/wisp -run 'Test180K|Test423|TestTicket255|Test65|Test255'` 与改前同绿。
