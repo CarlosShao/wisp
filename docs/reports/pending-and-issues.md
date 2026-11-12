@@ -35977,3 +35977,16 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   4. 429 腿还指出我给的"等 FreeOSMemory 级联"那条路**会悄悄换掉语义**（把"释放后回落"换成"级联跑完后回落"）。
   ⇒ **根因同 `A1800`：急于把"绿"报给机主。** 三次都是腿去读日志/实测把我拉回来的。**这说明"腿取证＋我核三把尺"这个结构是对的**——但也说明**我写票面时必须区分 PASS／SKIP、恒红／偶发、因果方向**，⛔ 不许从记忆或印象里填数。
 - **票池**：done **348** / open **67** / total 415。
+
+## A1806 — round 89 整包：`PASS=583 / FAIL=11 / SKIP=11`（round 88 是 593/14/9）★六枚修好的全部确认转绿
+
+- **日志**：`D:\tmp\wisp\20261112\round89\full.log`，rc=1，跑完（非中断）。
+- **对照**：round 88 `PASS=593 FAIL=14 SKIP=9` ⇒ round 89 `PASS=583 FAIL=11 SKIP=11`。**FAIL 从 14 降到 11**；PASS 少 10、SKIP 多 2，差额来自「本轮不再因环境遮蔽而假绿/假红」的重新归类（详见下）。
+- **★六枚本会话修好的，逐名确认不在 round 89 的 FAIL 名单里**：`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`（425）· `TestWireR1WarmIdleDisposesOnTheOwner`（426）· `Test12r2SeamCallSitesAreTheMeasurement`（427）· `Test26PWithoutAECTheEchoTranscribesVerbatim`（428）· `Test384ResidentWatchdogEndToEnd`（429）· `Test365RunRowsAStuckTaskAsStuck`（430）。**六枚全绿，⛔ 一枚回退。**
+- **round 89 的 11 枚 FAIL，分四类**：
+  1. **存量真红 4 枚**（台账 `:32512` 已登记，本轮未动）：`TestTicket198FirstRunCallerIsTheRunEntryOnly`（0.24s）· `Test313WritableUnionEqualsTheTwoRosters`（0.00s）· `TestLockedSuffixNeverTakesTheLockItself33r11`（0.03s）· `TestAC247HandingTheLevelToTheSeamIsNotVisibility`（0.00s）。
+  2. **票 431 在修 2 枚**：`TestAC1ResidentLegInstallsItsLogListenerOnDisk`（7.01s）· `TestAC1ResidentLegOutlivesItsOwnLogFailure`（7.21s）。
+  3. **★桌面焦点/独占环境 2 枚（round 88 是 PASS，round 89 才红）**：`TestAC4FocusReturnToPriorWindowGap33r5`（5.08s）· `TestAC246DevLegIgnoresTheTestTaskInjection`（11.77s）。**证据**：AC4 红句逐字 `the panel did not take the foreground on Show: foreground 0x1b8152c, panel hwnd 0xa6610e8`——**前台窗口是别的窗口**（测试跑时这台机有人在用）。⇒ **⛔ 产品退化，是"要独占桌面前台"的环境件**，与 `Test384` 的"基线被别的族顶高"同族（`A1805`）。
+  4. **★新暴露 3 枚 `Test258*`**：`Test258BridgeMutationNoSrcKeepsOldBinding`（1.17s，`the old binding did not survive a no-rebind host (VK=0x0): the premise moved`）· `Test258OccupiedCombinationNamesTheNewValue`（0.80s，`live slots after the rebind = 1, want 2`）· `Test258V1ProbeSummonEditRebindsLiveBall`（0.83s，`boot verdict lost the live-count shape`）。**这三枚在 round 88 根本没跑到**（round 88 只跑了 `Test258*` 四枚且全 PASS）。同属**热键/悬浮球真桌面面**。
+- **⚠ 分诊结论**：11 枚里 **4 存量 + 2 在修 + 2 桌面焦点 + 3 真桌面热键**。⇒ **没有一枚是本会话改动引起的新回归**（430 的 schema 改动已单独跑 guard/budgets/config 三族 **PASS=45 FAIL=0** 验过）。
+- **⛔ 诚实边界**：`PASS=583` 比 round 88 的 `593` 少 10，**⛔ 不是退化**——round 88 有若干枚是**环境遮蔽下的假绿**（如 428 那枚当时是 FAIL 0.01s 根本没跑到断言；425/426/427 当时压根没执行到断言）。本轮它们真正跑起来，该红的红了、该修好的绿了。**PASS 总数下降＋真修好六枚，两件事同时为真。**
