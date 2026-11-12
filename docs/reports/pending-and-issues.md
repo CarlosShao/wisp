@@ -35687,3 +35687,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **结果**：linux staticcheck **54→49**（U1000 47 不变 = 本波只出表未删；SA5000 `panic_isolation_51_test.go:62` 是夹具本身、**有意不修**具名登记；SA9009 frontend/embed.go 已知假阳登记）。判表 `docs/evidence/s1/122-u1000-judgment.md`：**3 条真死码候选**（`releasedCount` internal/agent／`l1WaitFor` internal/memory／`(*scriptGate).levels` internal/tools，双 GOOS 皆报 unused+git grep 零引用）＋**44 条"留"**（全 GOOS 仪器盲区：ball jarvis 族 38 由 `jarvis_windows.go` 消费、audio 设备簇、argInt/argBool 由 `system_backend_windows.go` 用…）。
 - **★口径结论（我裁定，记此）**：票 122 的 staticcheck 段要"CI linux 真清绿"，**不是靠删符号**——47 U1000 里 44 条是"linux 构建下真 unused、windows 构建下有主"的 GOOS 盲区，删了会把 windows 功能搞坏。真正主流做法＝**staticcheck 按 GOOS 分分母**（CI linux 只对"两种 GOOS 下都 unused"的真死码判红），这要动 `ci.yml` staticcheck 调用＝**票 71/85a 地界**（跨票）⇒ **不在本波、另行裁定/派单**。本波买到的＝5 条真实跨平台缺陷清洗 + 完整 inventory/判表。
 - **票 122 不整票收**（AC#6 lint 绿还需 SLO census 票 266 + 上述 GOOS 口径）。已推 origin/dev（含写腿 commit）。
+
+## A1774 — round75：238 是 owner-VETOED（差点误派），转派真正可派的票 323 普查腿
+
+- 承接 `A1773`。机主 2026-11-12 白天仍静默（自动续跑）。
+- **★差点误派一张否决票（读正文救回）**：我原把票 **238**（首启数据根封条）列为"最有价值后端活"。**逐格读正文才发现它是 owner VETOED**：`A476`（09-30 16:5x 原话「锁个屁…」）整体否决；`A1558`（2026-11-05 20:1x）记「238 STOP（owner-vetoed）／勿再派」；且原缺陷已被票 132 收口（`internal/observe/logging.go:99` 已 `winsec.PrivateDirAll(cfg.Dir,0o700)`、`obs.Note` 经 observe 传递获得封根）。重开仅认 owner 说「Q-72 重开」。⇒ **238 withdrawn，不派**。教训重申：**派单前逐格读正文排除归口/不适用/等票/withdrawn/vetoed**。
+- **真可派的后端票＝323**（票 320 验收的判据残余：安全 AC 只因"没人验"而成立＝测试尺零敏感/缺世界）。状态"已立未派"，**票面明令先派 `323-a1` 只读普查"台件该怎么造"、落地腿随后**。已按票面顺序派普查腿 `workflow-0c2da6d480714e6f`（glm，后台；只读、只出 `docs/evidence/s1/323-a1-census.md`），派单档 `.scratch/wisp/probes/orch/20261112/txt/323-a1-dispatch.txt`。待其交件核三把尺后再派落地写腿（cmd/wisp 每波一枚，本波无并发 cmd/wisp 腿）。
+- 本会话真票累计仍 424/85/72（+3）；122 已推（5 条真缺陷 + AC#3/#4）。票池 410/done 332/open 78。
+- ⚠ **口径**：323 落地是**真测试质量活**（封 320 那批安全 AC 的尺盲），但 cmd/wisp 共享面、8 AC，预计分 2-3 波；本波仅普查，不入产码。
+
+## A1775 — round76：票 323 普查确认"其实只剩两件"（AC#2/3/4/5 代码早闭、只是没人翻框），已派落地写腿收口
+
+- 承接 `A1774`。普查腿 `323-a1`（`workflow-0c2da6d480714e6f`）交件 **`cbcf54957`**（只 1 件 323-a1-census.md §6 复测）。**非实现者三把尺（我）**：
+  1. 提交在：cbcf54957 =commit，1 件 +38。
+  2. **落地腿真是 HEAD 祖先**：`eda34703f`（323-a0-ac1-ac2）/`d1b1a2d22`（323-ac5）/`b4d14312f`（323-a1 初查）`git merge-base --is-ancestor` 全 True。
+  3. 现读断言行在：`panel_models_320_test.go:543`（AC#2 预算≤10s 钉）、`:599`（AC#4 上游原文不回显）；AC#5 在 `internal/config/settings_320_test.go`（283 行，独立包）。
+- **★结论：票 323 不是 chk=0 的空票**——普查六条现量：AC#2 已闭（8s→8h 恰 1 红 :543）、AC#3 已闭、AC#4 已闭（A1483 裁④在树、m4 转述形 :599 红）、AC#5 已闭（isProtocol 恒真 :178 红）；**只剩** AC#1（半收口：只扫配置根+工作树，密钥写 os.TempDir 时 rc=0 全绿＝漏洞原样）＋ AC#6（两枚 AC#6 端到端测试件自 11-05 起 untracked 未 commit，现读存在 330+131 行、package main cmd/wisp、注释明写"Ticket 323 AC#6"）。
+- **已派落地写腿 `323-land`**（`workflow-e7baa87eb94d49db`，glm，后台；本波唯一 cmd/wisp 写腿）：AC#1 扩根（扫 os.TempDir+用户主目录+每根正控，加严）+ AC#6 收编两枚在飞件（能编译能过才 git add）。派单档 `.scratch/wisp/probes/orch/20261112/txt/323-land-dispatch.txt`。收件后核三把尺 → 若 AC#1/#6 满足，我（非实现者）翻 AC#1-6 → **票 323 可 -done（真 +1）**。
+- ⚠ **诚实边界**：AC#6 两件是 11-05 别人的在飞件，可能漂移编译差——腿只"能过才收编"，坏件不收；AC#1 扩根涉及真实 os.TempDir/主目录正控的清理，腿须删干净死文件。这些我在验收时复核。
