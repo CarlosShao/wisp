@@ -72,3 +72,14 @@
 - 只 commit，⛔ push（推送由编排者做）。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\425-<腿码>\`。
 - 跑测试**只经 carrier**，⛔ 裸 `go test ./cmd/wisp`（DLL 遮蔽会给出假读数）。
+
+## Progress log（append-only；⛔ 本腿未翻任何 AC 复选框，翻框归编排者）
+
+- [2026-11-12T11:52Z] agent=425-w1 did=落地腿（写面 `cmd/wisp/resident_sink_nail_127_windows_test.go` ＋ `docs/evidence/s1/425-shutdown-record-assert.md` 两枚；产码零字节）:
+  - **AC#0 复现到位**：carrier 首发 `--- FAIL: TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink (14.70s)`，逐字红句含 `the last record in the sink is "wisp: D38(e) step 10 (exit): ok elapsed=0s", want a shutdown-step record`；同发 `t.Logf` 逐字 `5 shutdown record(s), steps [1 2 5 6 7]` ⇒ `len(trail) != 0` 那关本来就过，红只红在末位。
+  - **AC#1 选形＝乙**（票面原文那一支）。理由：甲形"`trail` 末位是最后一条 `shutdown step`"是**读自己的过滤器**、恒真无内容；乙直接钉"关停记录早于第一条回放记录"这个真正的产品承诺，且新增两条原断言从来测不到的退化判据（步序严格递增／次序先于回放），另加时间戳佐证。⛔ 未放宽成 exists-only（`len(trail) != 0` 原样保留，是三个合取项里的第一项）。回放若被删／改名则 `replayAt < 0` 会**红并说明要重新锚定到哪里**，不静默跳过。
+  - **AC#2 突变控制实测两发（都是真跑，⛔ 不是注释）**：① 用 `go test -overlay`（副本在仓外 `D:\tmp\wisp\20261112\425-shutdown\mut\`）把 `internal/proc/shutdown.go:130` 的 `slog.Info` 抹掉 ⇒ **红**：`the D38(e) trail is not in the file the same process closed`，记录 45→40（恰好少掉那 5 条）；恢复 ⇒ **绿** `--- PASS (8.39s)`。② 补强发：在回放**之后**插一条 `shutdown step` 记账 ⇒ **红在新判据上**：`the last shutdown-step record is record 45 of 46, but the first "wisp: D38(e) step" record is record 35` ＋ 时间戳判据同时响，而同一发里 `6 shutdown record(s), steps [1 2 5 6 7 99]` 证明判据 1／2 仍绿 ⇒ 新锚点自己有牙。仓内产码起手＝终态＝HEAD blob（`shutdown.go` `745d0303…`、`resident_windows.go` `b7d54320…`）。
+  - **AC#3 越界**：`git diff --name-only -- cmd/ internal/ docs/` 只有 `cmd/wisp/resident_sink_nail_127_windows_test.go` 一枚；全量 `git diff --name-only` 另有三枚（`probes/291/mic/…`、`probes/orch/20261112/txt/346-a2-dispatch.txt`、`frontend/fixtures/composer-states.html`）**起手即脏**、非本腿，逐行归因在证据件 §6。
+  - **AC#4 门禁**：`go vet ./cmd/wisp/` rc=0、`gofumpt v0.12.0 -l` 零输出、`d22scan` rc=0（`clean - no D22 ban violations`，自测 PASS=45／FAIL=0）。`go build ./...` 在工作树 rc=1，但红在 **`build/mut_rvw.go`**（`.gitignore:14` 吃掉、`git ls-files build/`＝0、mtime 2026-11-04，非本票）；**HEAD 导出树 `go build ./...` rc=0**，工作树排除该残留包后亦 rc=0，`go build ./cmd/wisp/ ./internal/...` rc=0。
+  - **AC#5**：只修这一枚断言；票 127 其他格未宣称、未翻框；本票"不解决"三条照办。
+  - next=编排者翻框；证据件 `docs/evidence/s1/425-shutdown-record-assert.md`。

@@ -129,6 +129,13 @@ const (
 	// nothing attached; on this leg most steps are of that kind, and their
 	// landing in the same file is the ordering proof.
 	residentShutdownRecord = "shutdown step"
+	// residentReplayRecord is the prefix of the ten-step replay ticket 43 added
+	// to resident_windows.go's shutdown defer, AFTER the sequence itself has run.
+	// Ticket 425 re-anchored this file's ordering claim onto it: the trail is
+	// read as "booked before the replay", which is the promise the two defers
+	// make, instead of "last record in the file", which the replay made
+	// unsatisfiable. Copied as a literal on the same rule as the two above.
+	residentReplayRecord = "wisp: D38(e) step"
 	// residentEarlyResolverMsg is internal/winsec's sealing-seam verdict, emitted
 	// from internal/risk's package init() - before installLogSink can exist - and
 	// replayed into this leg's file by ticket 130's buffer. Copied as a literal on
@@ -620,19 +627,97 @@ func TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink(t *testing.T) {
 		t.Fatalf("install booking is record %d, want 1: only the records ticket 130 replays may precede the "+
 			"listener's own booking (records: %v)", installIdx, msgsOf127(recs))
 	}
+	// Ticket 425: this is the ordering claim, re-anchored on the promise the two
+	// defers actually make instead of on "the last record in the file".
+	//
+	// WHY THE OLD SHAPE HAD TO GO. It asserted `recs[len(recs)-1]` contained
+	// residentShutdownRecord. Ticket 43 (5056a365c) then put the ten-step replay
+	// loop at resident_windows.go:246 - inside the same defer as the sequence,
+	// but AFTER it - so the file's last record is necessarily
+	// "wisp: D38(e) step 10 (exit) ..." and a "shutdown step ..." record can
+	// never be last again. That assertion was red for a reason that has nothing
+	// to do with the product, and the non-empty guard below it was already green
+	// (this case's own log line reports 5 shutdown records, steps [1 2 5 6 7]).
+	//
+	// WHY THIS SHAPE IS NOT THE WEAKENING THE TICKET FORBIDS. "The trail exists"
+	// alone would be no assertion at all: that reading already passed before this
+	// change. What is asserted here is the thing the two defers exist for, read
+	// off the sink in its own append order (and corroborated by the stamps), as
+	// three conjuncts:
+	//
+	//  1. the trail is not empty - the guard is kept, and it is the conjunct that
+	//     fires when the per-step booking is deleted (delete the slog.Info at
+	//     internal/proc/shutdown.go:130 and this case goes red: measured through
+	//     a go test -overlay, not asserted in a comment);
+	//  2. the steps are booked in D38(e) order - strictly increasing step
+	//     numbers, which is what "in order" means for an audit trail, and which
+	//     a reordered sequence (or a reordered run() roster) breaks while every
+	//     record is still present;
+	//  3. EVERY shutdown-step record precedes the FIRST "wisp: D38(e) step"
+	//     record. This is the ordering itself: the sequence books each step while
+	//     the sink is open, the replay that follows is the same still-open sink,
+	//     so the trail must land entirely ahead of the replay. Move the replay
+	//     ahead of the sequence, or book a step from inside the replay, and this
+	//     conjunct goes red while conjuncts 1 and 2 stay green.
+	//
+	// The old assertion could not distinguish any of those three; it could only
+	// say "some shutdown record is last", which after ticket 43 is unsatisfiable
+	// and therefore measures nothing.
 	var trail []sinkInstallRecord
-	for _, r := range recs[installIdx+1:] {
-		if strings.Contains(r.Msg, residentShutdownRecord) {
-			trail = append(trail, r)
+	var trailAt []int
+	for i := installIdx + 1; i < len(recs); i++ {
+		if strings.Contains(recs[i].Msg, residentShutdownRecord) {
+			trail = append(trail, recs[i])
+			trailAt = append(trailAt, i)
 		}
 	}
 	if len(trail) == 0 {
 		t.Fatalf("the D38(e) trail is not in the file the same process closed: %d record(s) after the install, all msgs %v",
 			len(recs)-installIdx-1, msgsOf127(recs))
 	}
-	last := recs[len(recs)-1]
-	if !strings.Contains(last.Msg, residentShutdownRecord) {
-		t.Errorf("the last record in the sink is %q, want a shutdown-step record: the shutdown must be logged before the sink closes (records: %v)", last.Msg, recs)
+	for i := 1; i < len(trail); i++ {
+		if trail[i].Step <= trail[i-1].Step {
+			t.Errorf("the D38(e) trail books step %d (record %d) after step %d (record %d), steps %v: the sequence's "+
+				"contract is that the steps are booked in D38(e) order, so a trail that runs backwards is not an audit of "+
+				"that order even though every record is present",
+				trail[i].Step, trailAt[i], trail[i-1].Step, trailAt[i-1], stepsOf127(trail))
+		}
+	}
+	replayAt := -1
+	for i := installIdx + 1; i < len(recs); i++ {
+		if strings.HasPrefix(recs[i].Msg, residentReplayRecord) {
+			replayAt = i
+			break
+		}
+	}
+	if replayAt < 0 {
+		t.Errorf("no %q record after the install booking, so this case cannot read the ordering it was re-anchored on "+
+			"(ticket 425): ticket 43's replay loop is what the trail is read against. If the replay was deliberately "+
+			"removed or reworded, this case has to be re-anchored onto wherever the exit path now books itself - do not "+
+			"delete the claim (records: %v)", residentReplayRecord, msgsOf127(recs))
+	} else {
+		lastTrailAt := trailAt[len(trailAt)-1]
+		if lastTrailAt > replayAt {
+			t.Errorf("the last shutdown-step record is record %d of %d, but the first %q record is record %d: the "+
+				"D38(e) sequence must book its steps BEFORE the replay runs, in the sink the same process closes "+
+				"(records: %v)", lastTrailAt, len(recs), residentReplayRecord, replayAt, msgsOf127(recs))
+		}
+		// The stamps corroborate the append order rather than replace it: the file
+		// order above is the sink's own contract, and a record dated after the
+		// replay began would say the booking happened later than the position says.
+		// Equal stamps are allowed - a tie is not evidence of a regression.
+		trailTime, trailErr := time.Parse(time.RFC3339Nano, trail[len(trail)-1].Time)
+		replayTime, replayErr := time.Parse(time.RFC3339Nano, recs[replayAt].Time)
+		switch {
+		case trailErr != nil || replayErr != nil:
+			t.Errorf("the stamps are not the RFC3339Nano form the pipeline writes: trail %q (%v), replay %q (%v)",
+				trail[len(trail)-1].Time, trailErr, recs[replayAt].Time, replayErr)
+		case trailTime.After(replayTime):
+			t.Errorf("the last shutdown-step record is stamped %s, after the first replay record's %s: the booking "+
+				"must happen before the replay, not during or after it", trailTime, replayTime)
+		}
+		t.Logf("RESIDENT LEG ORDERING: %d shutdown record(s) at records %v, first replay record %d of %d, last trail stamp %s, first replay stamp %s",
+			len(trail), trailAt, replayAt, len(recs), trail[len(trail)-1].Time, recs[replayAt].Time)
 	}
 	if !leg.stdout.has(residentShutdownLine) {
 		t.Errorf("the child printed no D38(e) exit report; captured:\n%s", leg.console())
