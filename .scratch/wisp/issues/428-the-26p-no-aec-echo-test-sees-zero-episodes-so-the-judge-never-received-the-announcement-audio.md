@@ -85,3 +85,47 @@
 - 只 commit，⛔ push（推送由编排者做）。
 - ⛔ 翻任何 AC 框（翻框由编排者做，非实现者）。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\428-<腿码>\`。
+
+## Progress log
+
+### 2026-11-12 20:26–20:5x +08 — 腿 `428-26p`（⛔ 未翻任何 AC 框）
+
+**判定＝台面问题（"音频没送到判定器"），根因是判定器从未 armed，不是判定器行为。**
+一句话：commit `e83494cf5`（2026-11-11 180-census leg K）给 `newResidentVoice` 加了
+`rv.bargein.setAECEnabled(plan.AECEnabled)`（`resident_voice_windows.go:591`），而 `newVoice26pRig` 手搓的
+`voicePlan` 从不设这一格（`resident_voice_bargein_26p_windows_test.go:139-143`）⇒ 零值 `false` 让
+`arm()` 的第一个 case 直接拒绝（`resident_voice_bargein_windows.go:392-393`），整族判定器再没起来过。
+
+- **稳定性＝稳定红，3/3**：22.86s / 24.42s / 23.81s，同句同读数。⛔ 不是偶发。
+- **★决定性读数（仓外 overlay 探针插在 `:214` 之前）**：`armed=false`、
+  `reason="[voice] aec.enabled=false：AEC 插话检测不装配（…P15/A1307…）"`、**`frames_drained=0`**、
+  **`processed_samples=0`**、`episodes=0`、`aec_bypass=true`；同时 `tts samples=281536`（播报确实出声）。
+  ⇒ **判定器实际收到 0 帧** ⇒ 按票面判据＝前者（台面/注入），后者（判定器没开 episode）**排除**。
+- **同一探针的对照发**：唯一差别是 plan 补 `AECEnabled: true` ⇒ **`frames_drained=200`、
+  `processed_samples=102080`、`episodes=1`**、`lag=501`、逐字转写
+  `"我已经完成明天下午三点的会议改到四点请准时参加谢谢"`（`distinctive=true`）。
+  日志行 `voice: barge-in monitor armed for the announcement window` 修复前**零次**、修复后两次。
+  ⇒ 断点在 **arm**，不在 `rig.inject`。
+- **三个岔路的另外两条**：(2) **没有 `WISP_26P_*` 别名变量**（`git grep` 零命中）；真正缺的不是 env，
+  是 `voicePlan.AECEnabled` 这个**编译期零值**字段 —— 所以"查 env 齐不齐"这个方向查不到它。
+  (3) **与票 392 的 AEC 调参语义无关，但同根**：392 三枚**也用 `newVoice26pRig`**，
+  只因 `requireAEC3()` 先 Skip 把同一缺陷掩盖了；且**票面"本轮 Test392* 两枚 PASS"与本程现读的
+  round-88 日志不符**（实测是 `--- SKIP`，原因是 `-tags webrtcap` 缺绑定），请编排者核。
+- **修形：只改台面**（产码零字节）。`newVoice26pRig` 的 plan 补 `AECEnabled: true` ＋ 六行注释说明
+  为什么手搓 plan 必须说出生产默认值（沿用票 423 对 `PunctEnabled` 的同一条裁定，
+  `resident_voice_wire_r1_windows_test.go:286-288`）。**断言一个字节未动**（`:215-217` 原样）。
+- **修复后 carrier 两发**：`M2-VERBATIM episodes=1 passed=0 triggers=0 transcript="…"`，
+  26.94s / 24.37s ⇒ **`:216` 红句消失**。⚠ 但两发都是 **SKIP 而非 PASS**：
+  测试继续走到**还回 AEC 的那半**（`:249-250` 的 `rig2.requireAEC3()`）Skip，
+  本机 `third_party/webrtc-audio-processing` 源码树 MISSING ⇒ 本机证明的是 M2 前半
+  （判定器活、200 帧进、开 episode、逐字复现），**restore 半本机不可测**（具名记残余）。
+- **突变控制两发（全经 `go test -overlay`，拷贝在仓外 `D:\tmp\wisp\20261112\428-26p\mut\`）**：
+  - **发①** 删掉修好的那行（`true`⇒`false`）⇒ **红**，逐字复现原红句，21.75s。
+  - **发②** 恢复 ⇒ 红句消失、`episodes=1`、逐字转写命中，27.26s。
+- **门禁**：`go build ./cmd/wisp/` rc=0 · `go vet ./cmd/wisp/` rc=0 · `gofumpt -l` 两尺零输出 ·
+  `scripts/d22scan.sh` rc=0（`clean - no D22 ban violations`，`runtests.sh: OK PASS=45 FAIL=0 SKIP=0`）。
+- **证据件**：`docs/evidence/s1/428-26p-echo-episodes.md`。
+- **越界**：`git diff --name-only` 本腿只有 `cmd/wisp/resident_voice_bargein_26p_windows_test.go`
+  与证据件；其余五行是他腿（426/427 收件改名、429 在飞、既存脏改）。禁面全未动，`build/mut_rvw.go` 未删。
+- **★需回填（⛔ 本程未改票）**：修好的是**共享 rig**，26P 另外四枚与 392 三枚也一并解封，
+  但它们在本机仍 SKIP ⇒ **其真实状态仍未被测**，需带 `-tags webrtcap` 的 staging 才能判。

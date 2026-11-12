@@ -139,7 +139,16 @@ func newVoice26pRig(t *testing.T, tune func(*voiceBargeinMonitor)) *voice26pRig 
 	plan := voicePlan{
 		VadModelPath: voice15eVadModel(t),
 		Source:       "26p test",
-		Tts:          voiceWireTtsFiles(t),
+		// Ticket 428: a plan built by hand must say "on" the way the boot plan
+		// does for the [voice] aec.enabled schema default (true). Since
+		// e83494cf5 newResidentVoice feeds plan.AECEnabled into the monitor's
+		// setAECEnabled, and setAECEnabled(false) refuses EVERY arm - so the
+		// zero value here silently disabled the whole 26p/392 integration
+		// family (the M2 reading saw frames_drained=0 and read it as "the
+		// judge saw nothing"). Same shape ticket 423 ruled for PunctEnabled
+		// (resident_voice_wire_r1_windows_test.go:286-288).
+		AECEnabled: true,
+		Tts:        voiceWireTtsFiles(t),
 	}
 	rig := &voice26pRig{t: t, gate: &voice381r2Gate{}}
 	rv, frames := voiceWireStart(t, plan, &residentBall{}, &voice15eSink{}, func(rv *residentVoice) {
