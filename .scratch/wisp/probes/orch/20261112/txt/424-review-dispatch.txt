@@ -1,0 +1,66 @@
+# 424-review 派单（验收：凭 CI 真容器读数翻票 424 的 7 个 AC）
+
+- 腿码：**424-review**（**非实现者**，只验收翻框，不改任何代码）
+- 路由：`provider:"magpie"`, `model:"group/group-review-and-audit"`, `reasoning_effort:"max"`
+- 写面：**只** `.scratch/wisp/issues/424-…md`（翻框＋追加 Progress）＋新建 `docs/evidence/s1/424-verdict.md`（判词）
+- ⛔ 改任何 `.go`／`ci.yml`／其它票；⛔ push
+
+---
+
+## 你的任务（三件事）
+
+### 一、独立取证（⛔ 别信任何转述，自己现跑 gh 与三把尺）
+
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+# 1) CI：run 43146479546 / lint job 130945374154，看 step 11 "go vet (module)" 是否 success
+$gh = 'C:\Program Files\GitHub CLI\gh.exe'
+& $gh api "repos/CarlosShao/wisp/actions/jobs/130945374154" --jq '.steps[] | "\(.number) \(.name) => \(.conclusion)"'
+```
+- **判据核心**：step **11 `go vet (module)` = success**（原为 failure）⇒ `go vet ./...` 在真 ubuntu 容器 rc=0 ⇒ Linux 编译面恢复。
+- 附带可核：step 9/10 gofumpt success、step 12 `go vet (tools/d22scan)` success、step 4/5/6 d22scan success；step 8（SLO nail census 266）、step 13（staticcheck 54 条，票 122）是**既存红，非本修**。
+
+### 二、三把尺（盘上核）
+```powershell
+# 尺1 提交真在
+git log --oneline -6
+git show --stat --oneline e98276632 3f15ede4d aa23f834b
+# 尺2 件真在
+foreach($p in @('cmd/wisp/memory_retention_180k_windows.go','cmd/wisp/config_err_text.go','cmd/wisp/ball_config_appliers.go','cmd/wisp/mode_request_114r2_helper_test.go','docs/evidence/s1/424-fix-linux-build.md','docs/evidence/s1/424-fixb-linux-build.md','docs/evidence/s1/424-fixc-r9-test-helper.md')){ "$([bool](Test-Path $p)) $((Get-Item $p -ErrorAction SilentlyContinue).Length) $p" }
+# 尺3 自己复跑（Windows build/vet + Linux type-check overlay 全量 undefined=0）
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx;D:\work\workspace\projects plans\Wisp\build;' + $env:PATH
+& 'D:\work\base\go\bin\go.exe' build ./cmd/wisp 2>&1 | Out-Null; "win build rc=$LASTEXITCODE"
+& 'D:\work\base\go\bin\go.exe' vet ./cmd/wisp 2>&1 | Out-Null; "win vet rc=$LASTEXITCODE"
+$gm='D:\tmp\wisp\20261112\424fix\overlay-gomod.json'
+$env:GOOS='linux'; $env:CGO_ENABLED='0'
+$o=@(& 'D:\work\base\go\bin\go.exe' vet -overlay $gm ./cmd/wisp 2>&1 | ForEach-Object {[string]$_})
+$ot=@(& 'D:\work\base\go\bin\go.exe' test -overlay $gm -gcflags=all=-e -c -o 'D:\tmp\wisp\20261112\424review\w.test.exe' ./cmd/wisp 2>&1 | ForEach-Object {[string]$_})
+$env:GOOS=''; $env:CGO_ENABLED=''
+"linux vet undefined=" + @($o|Where-Object{$_ -match 'undefined:'}).Count
+"linux test-c undefined=" + @($ot|Where-Object{$_ -match 'undefined:'}).Count
+```
+（overlay 若缺，照 `docs/evidence/s1/424-fix-linux-build.md` §判据重建 sherpa 纯 Go 桩到 `D:\tmp\wisp\20261112\424review\`。）
+
+### 三、翻框（凭上面读数，逐条判）
+票 424 的 7 个 AC 现全部 `[ ]`。**逐条核，成立就翻 `[x]`，不成立就留着并写明为什么**：
+- AC#1 迁移函数（residentVoice 搬进 `_windows.go`）→ 已做（e98276632，文件在、原文件 0 命中 residentVoice）
+- AC#2 Linux 编过（判据核心）→ **CI step 11 success** ＝成立
+- AC#3 Windows 不回归（build/vet/test）→ 尺3 自核
+- AC#4 越界（只动既定文件）→ `git show --stat` 核
+- AC#5 门禁（gofumpt/go vet ./cmd/wisp）→ CI step 9/10/11 success
+- AC#6 第二批 5 处清零（configErrText/applyBall×3）→ 3f15ede4d + linux undefined=0
+- AC#7 两平台不回归 → 尺3
+
+翻框后在票 424 末尾追加一行 Progress：`[时刻] agent=424-review 验收：CI run 43146479546 step11 go vet=success；尺3 linux undefined=0、win build/vet rc=0；翻 AC#1-7`。
+
+### 四、写判词 `docs/evidence/s1/424-verdict.md`
+含：CI 读数表（step 4-16 结论）、三把尺读数、逐 AC 判、你**自己复跑**的原始数字（⛔ 抄本单）、越界自证（`git status --porcelain` 只有票 424 与判词件）。
+
+## 铁律
+- ⛔ 改任何代码/ci.yml/其它票；⛔ push；⛔ `add -A`/amend/reset/rebase/stash/checkout ./clean
+- add/commit **显式 pathspec**（只 `.scratch/wisp/issues/424-…md` 与 `docs/evidence/s1/424-verdict.md`）
+- 临时件只落 `D:\tmp\wisp\20261112\424review\`
+- **别信本单任何"已完成"字样，一切以你自己现跑的 gh 与三把尺为准；对不上就如实报红。**
+
+## 回一行
+`DONE: 424-review vetstep=<success/failure> linuxundefined=<n> winbuild=<rc> winvet=<rc> 翻框=<x/7> 判词=<路径>`
