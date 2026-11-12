@@ -58,7 +58,7 @@
 **第 6 面（我自己代提那半发增量）被定向突变验过不是装饰**：MUT-6a 中和 `if !rb.cancelHosted` 守卫 ⇒ 红句逐字「bindBallHost loaded the cancel channel with no executor behind it (ball up = true)」＋`--- FAIL: TestAC246ChannelNeedsBothWindowAndExecutor`。**记它一功：这发增量从没被写腿完整验证过，是这枚腿第一次替我兜住。**
 
 - [x] **AC#7（新补）常驻进程今天还没有"举卡的来源"**：`newResidentApproval()` 有产码调用者（`resident_windows.go:122`，双击那个二进制里真装配），但 **`askConfirmation`／`AskOnTaskRoot` 的产码调用者＝0**（只有用例）⇒ 门在、卡进得来，**还没有任务会去举它**。完成判据＝常驻那条腿真起一条任务管线（或经装配根注入一条最小任务源），一发真机走通"起任务 → 举卡 → Esc 否决 → 任务被取消"四步；⛔ 不许用测试构造的任务源冒充。**这是票 246 标题那句"永久之家"真正落地的地方，属后端主链，排队列最前。**
-- [ ] **AC#8（新补）那枚 boot 时序 flake 要有归属**：修法在常驻启动路径（候选＝把 `signal.Notify(bootExit)` 提到 `installLogSink` 之前，消掉 `[sink→Notify]` 那段窗口），**地界属票 228**（用例名就是它的 `TestAC228…`）⇒ 本格只做"归口＋判据"，⛔ 不在本票改；判据＝整包序 `-count=10` 该用例**零枚** `0xc000013a`＋红，且不得靠放宽断言或加 `sleep` 达成。
+- [x] **AC#8（新补）那枚 boot 时序 flake 要有归属**：修法在常驻启动路径（候选＝把 `signal.Notify(bootExit)` 提到 `installLogSink` 之前，消掉 `[sink→Notify]` 那段窗口），**地界属票 228**（用例名就是它的 `TestAC228…`）⇒ 本格只做"归口＋判据"，⛔ 不在本票改；判据＝整包序 `-count=10` 该用例**零枚** `0xc000013a`＋红，且不得靠放宽断言或加 `sleep` 达成。
 
 **编排者收件（2026-10-01 09:3x，`246-v2` 判语到手 ⇒ AC#7 翻勾）**
 
@@ -104,3 +104,5 @@
 - ★**裁定（那一问：起管线算不算满足 `AC#7`）**：**算**——`AC#7` 的完成判据是"起一条任务管线（或经装配根注入）"，该半今天**静态成立**（无控制台则打 claim 返回 nil，⛔ 不冒充）；**"真举出一张卡"不是这一格**，它要的是**行为凭据**（任务真跑到需要批准那一步 ⇒ 门调 `ui.Prompt`），今天零凭据（winlive 被抑制、〔真模型〕空）。⇒ ⛔ **不撤勾**；把"真举卡行为凭据"**另立为一条待人派的真机读数**（归"真控制台/真窗"那一族，⛔ 不是契约问题、⛔ 不需要 owner 拍板），已登记进台账当下一波候选。
 - ⚠ **两处引用修正（都在我或旧票面上）**：①我 `A725` 引 `resident_windows.go:261`，实测 `src := startResidentTaskSource(rt, ra)` 落 **`:260`**（今日第三次"行号与短语错位"，⛔ 不回改、就地打旧）；②**票面旧引 `:122` 已过期**，现读作 `WithConfig:132`（它现取）。
 - ⛔ 本轮**不派码**：`AskOnTaskRoot`／`Replay` 两条"建了但没接"只登记（是死路还是备用路＝待裁，不在本格）。
+
+- [2026-11-12 13:3x +08] agent=编排者（**非实现者验收/归属裁定**，修＝腿 `246ac8` 2026-11-07）did=**翻 AC#8、票 246 -done**。三把尺：①修在 HEAD＝`resident_windows.go` 的 `signal.Notify(bootExit)` 现读 `:123` **在** `installLogSink :173` **之前**；②证据件 `docs/evidence/s1/246-ac8-boot-exit-notify.md`（修前 5发1红／修后 10/10绿）在盘；③**我 2026-11-12 亲跑** `go test ./cmd/wisp -run '^TestAC228ExitRequestDuringBootStillLeavesThroughD38E$' -count=10 -timeout 30m` ＝ **ok 65.381s、rc=0、零 0xc000013a、零 FAIL**（真修非 skip/sleep）。**归属裁定**：原 AC#8 写"地界属票 228、本格不改"，但 2026-11-07 派单已改道由 `246ac8` 腿在 `resident_windows.go` 真修 ⇒ 作为编排者我裁定该 boot-exit 时序 flake 的"修＋判据"归 **246** 收口；票 228（球/托盘进程拓扑大票）是另一枚、不因本修而变。撤销口令：若判应改归 228，回「AC#8 改归 228」再把 `-done` 退回。**9 格 AC 全勾。**

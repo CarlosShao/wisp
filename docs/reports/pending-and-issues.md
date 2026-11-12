@@ -35705,3 +35705,20 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★结论：票 323 不是 chk=0 的空票**——普查六条现量：AC#2 已闭（8s→8h 恰 1 红 :543）、AC#3 已闭、AC#4 已闭（A1483 裁④在树、m4 转述形 :599 红）、AC#5 已闭（isProtocol 恒真 :178 红）；**只剩** AC#1（半收口：只扫配置根+工作树，密钥写 os.TempDir 时 rc=0 全绿＝漏洞原样）＋ AC#6（两枚 AC#6 端到端测试件自 11-05 起 untracked 未 commit，现读存在 330+131 行、package main cmd/wisp、注释明写"Ticket 323 AC#6"）。
 - **已派落地写腿 `323-land`**（`workflow-e7baa87eb94d49db`，glm，后台；本波唯一 cmd/wisp 写腿）：AC#1 扩根（扫 os.TempDir+用户主目录+每根正控，加严）+ AC#6 收编两枚在飞件（能编译能过才 git add）。派单档 `.scratch/wisp/probes/orch/20261112/txt/323-land-dispatch.txt`。收件后核三把尺 → 若 AC#1/#6 满足，我（非实现者）翻 AC#1-6 → **票 323 可 -done（真 +1）**。
 - ⚠ **诚实边界**：AC#6 两件是 11-05 别人的在飞件，可能漂移编译差——腿只"能过才收编"，坏件不收；AC#1 扩根涉及真实 os.TempDir/主目录正控的清理，腿须删干净死文件。这些我在验收时复核。
+
+## A1776 — ★票 323 收口 -done（本会话第 4 张 done：424/85/72/323）；发现"假空票"模式
+
+- 承接 `A1775`。落地写腿 `323-land`（`workflow-e7baa87eb94d49db`）交件 **`fede46a06`**（3 件 +607、**0 删除**）。**非实现者三把尺（我）**：
+  1. 提交 `fede46a06` 在；2. 只 3 件、无冻结面、纯测试件、0 删除＝无削断言；3. 我复跑 `go build`/`go vet ./cmd/wisp` rc=0、`Test320`(13)+`Test323Resident`(4) 全 PASS、`gofumpt -l` 三件空、`d22scan` rc=0。
+- **AC#1 命门复核**：扩根后 TempDir/Home 正控是真牙（`panel_models_320_test.go:580-604` 每新根"种密钥→断言尺恰好看见、否则 Fatalf『证明不了漏』→t.Cleanup+立即删"），我跑的测试通过＝尺在 TempDir/Home 确有牙。AC#6 两枚 11-05 在飞件收编（其一补 `//go:build windows`）＋Test323Resident PASS。
+- **8 格 AC 全勾，重命名 `-done`**，commit **`66d182d8d`** 推 origin/dev（含普查 `cbcf54957`＋落地 `fede46a06`）。旧名已删、`-done` 在。
+- **★复核口径（诚实）**：票 323 表面 chk=0 像空票，**实为"代码早干完、落地腿在 HEAD、只差翻框＋两件收编"的假空票**。教训：不能只看 chk 数判死活，要读落地腿是否已在 HEAD、evidence 是否已存在。
+- **本会话真票累计：424、85、72、323（+4 done）**。票池 done 332→**333**。
+- **下一步**：全池扫出约 12 张"近完成"后端票，但末格多卡 owner 硬件(247/290/291)、owner 契约(174)、cmd/wisp 整包＝314 死区(220/230)、设计选形(274)、要我落 A##(256)。已派只读分诊腿 `workflow-183adc4cf4dd47bf` 精确归类、挑下一批可自办写腿。
+
+## A1777 — ★票 246 收口 -done（本会话第 5 张：424/85/72/323/246）；又一张"修早落、只差翻框"的假空票
+
+- 承接 `A1776`。承接分诊腿 `triage-nd`（`2d07fec9f`）判 246＝A 类"修已落盘、只欠非实现者复认+翻框"。**三把尺（我）**：①`resident_windows.go` 现读 `signal.Notify(bootExit)` `:123` 在 `installLogSink` `:173` 之前（修在 HEAD）；②证据件 `246-ac8-boot-exit-notify.md` 在盘（修前 5发1红／修后 10/10绿）；③**我亲跑** `TestAC228ExitRequestDuringBootStillLeavesThroughD38E -count=10` ＝ **ok 65.381s rc=0 零 0xc000013a 零 FAIL**。
+- **归属裁定**：AC#8 原写"地界属票 228/本格不改"，2026-11-07 派单改道由 `246ac8` 腿真修 ⇒ 我裁归 246 收口；228 是另一大票不动。撤销口令：若判应改归 228，回「246 改归 228」再把 -done 退回。
+- **9 格 AC 全勾，重命名 -done。** 本会话真票累计＝**424、85、72、323、246（+5 done）**。done 333→**334**。
+- ⚠ triage 腿把"246ac8"写成像 commit（实为证据件标签）——我 `git rev-parse` 一度 fatal，靠"读证据件+git log+现读代码"才对上真修。再次印证：**完成通知/腿报的 hash 一律先 grep/现读核实**。
