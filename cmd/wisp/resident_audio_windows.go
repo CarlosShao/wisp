@@ -470,18 +470,6 @@ func (ra *residentAudio) unrunningClaim() string {
 	return "采集腿未装配：本进程没有任何麦克风路径"
 }
 
-// configErrText keeps the warn record honest about a read that produced no
-// value at all (err non-nil) versus a read that returned nothing usable.
-func configErrText(err error, c *config.Config) string {
-	if err != nil {
-		return err.Error()
-	}
-	if c == nil {
-		return "config.LoadFile returned a nil config with a nil error"
-	}
-	return ""
-}
-
 // trayMuteState is ticket 293 AC#2's READ half of the tray checkmark projection:
 // it answers with the gate's own mute flag - the single truth source this leg was
 // told not to copy (internal/audio/gate.go, HalfDuplexGate.Muted) - and with

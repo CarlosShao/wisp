@@ -50,12 +50,6 @@ func ballStyleSeed65(dataDir string) (string, bool) {
 	return c.Ball.Style, true
 }
 
-// ballStyleApplier65 is the runtime-apply seam: the ball host installs it over
-// Ball.ApplyStyle once the ball exists; the settings write path (ApplySetting's
-// ball_style case) calls applyBallStyle65 with the written family. nil means
-// this process hosts no ball and the write answers restart honestly.
-var ballStyleApplier65 func(name string) bool
-
 // installBallStyleApplier65 wires the seam over the host's ball. A nil ball
 // (the no-window boot) installs nothing.
 func installBallStyleApplier65(b *ball.Ball) {
@@ -63,14 +57,4 @@ func installBallStyleApplier65(b *ball.Ball) {
 		return
 	}
 	ballStyleApplier65 = func(name string) bool { return b.ApplyStyle(name) }
-}
-
-// applyBallStyle65 applies one family to the live ball. False = no applier is
-// installed or the name is outside the vocabulary; the caller (ApplySetting)
-// answers EffectiveRestart in that case instead of claiming a live switch.
-func applyBallStyle65(name string) bool {
-	if ballStyleApplier65 == nil {
-		return false
-	}
-	return ballStyleApplier65(name)
 }

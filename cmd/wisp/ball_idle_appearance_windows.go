@@ -56,17 +56,6 @@ func ballIdleAppearanceSeed(dataDir string) (opacity *float64, clickThrough bool
 	return &c.Ball.OpacityIdle, c.Ball.ClickThrough, true
 }
 
-// ballIdleOpacityApplier is the runtime-apply seam for the idle opacity: the
-// ball host installs it over Ball.SetIdleOpacity once the ball exists; the
-// settings write path (ApplySetting's ball_opacity_idle case) calls
-// applyBallIdleOpacity with the written value. nil means this process hosts
-// no ball and the write answers restart honestly.
-var ballIdleOpacityApplier func(v float64) bool
-
-// ballClickThroughApplier is the runtime-apply seam for the idle click-through
-// switch, the same shape as the opacity seam above.
-var ballClickThroughApplier func(on bool) bool
-
 // installBallIdleAppearanceAppliers wires both seams over the host's ball. A
 // nil ball (the no-window boot) installs nothing.
 func installBallIdleAppearanceAppliers(b *ball.Ball) {
@@ -75,24 +64,4 @@ func installBallIdleAppearanceAppliers(b *ball.Ball) {
 	}
 	ballIdleOpacityApplier = func(v float64) bool { return b.SetIdleOpacity(v) }
 	ballClickThroughApplier = func(on bool) bool { return b.SetClickThrough(on) }
-}
-
-// applyBallIdleOpacity applies one idle-opacity value to the live ball.
-// False = no applier is installed (this process hosts no ball); the caller
-// (ApplySetting) answers EffectiveRestart in that case instead of claiming a
-// live switch.
-func applyBallIdleOpacity(v float64) bool {
-	if ballIdleOpacityApplier == nil {
-		return false
-	}
-	return ballIdleOpacityApplier(v)
-}
-
-// applyBallClickThrough applies the idle click-through switch to the live
-// ball, the same measured shape as applyBallIdleOpacity.
-func applyBallClickThrough(on bool) bool {
-	if ballClickThroughApplier == nil {
-		return false
-	}
-	return ballClickThroughApplier(on)
 }
