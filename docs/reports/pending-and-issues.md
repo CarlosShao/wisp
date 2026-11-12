@@ -35664,3 +35664,26 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 
 ### 三、计数
 - 本会话真票落地＝**424、85、72（+3）**。补删 424/85 旧名后重号消失，票池去重口径修正。
+
+## A1772 — round73 深挖：123/262/314/48 全卡外部/终态，票池确无可快赢；转派票 122 staticcheck 波1
+
+- 机主 2026-11-12 白天。承接 `A1771`。
+- **本会话真票累计落地＝424、85、72（+3）**；本轮未能再收整票（逐张核到底，见下）。
+- **逐张核（三把尺，不采信旧叙述）**：
+  - **123**（cmd/wisp CLI 测试假设人工批准者）：修复已落（`abf2a35a6`+`446831ea9`），AC#1/2/3/5/6 PASS、AC#4 runner 读数也有（run `42336011115` step7 四枚 PASS）；但 AC#4 原文要"该 step 整步 PASS=33/FAIL=0"，被**别票红（223/198/313/LockedSuffix）+ 票 314 的 cmd/wisp 整进程硬死（panel_* 族把进程打死、Ticket101 没跑到）**占着 ⇒ 收不了，卡 314。
+  - **262**（路径长度门）：终态票（AC#5ⓑ 结构不可能、不加 -done）。leg `262-close-r1`(11-09) 报门 RED 已**过时**——我现跑 `bash scripts/check-path-length-budget.sh`＝**rc=0／VERDICT GREEN／over-budget 62＝roster 62＝not-in-roster 0**（roster 已补到 62 覆盖那 4 枚）。三把尺阻止了我瞎修。
+  - **314**（cmd/wisp 整包硬死）：AC#2 需"静桌面运行（机主别用机器，腿不能自约）"+ 未定性归因 ⇒ 非可派。
+  - **48**（审批队列全量）：**Blocked by 37-approval-ui-l2（前端面板票）**+ AC 含 panel badge ⇒ 卡前端。
+- **结论（又验一轮）**：剩余"可收"票为 0；78 开放＝19 withdrawn＋16 terminal＋17 frontend/panel＋4 s8/hw＋4 acceptance＋18 backend（后端里 48/53/57/314/122/123/168/238/313/323 全卡 owner-frontend-hardware-bigcampaign，23/70/188/192 blocked，262/312 terminal）。
+- **本轮派单（唯一自洽无外部依赖的后端真活）**：票 **122 staticcheck 欠账清理 波1**（纯 Go，清 lint step13 一类红）。派单档 `.scratch/wisp/probes/orch/20261112/txt/122-wave1-dispatch.txt`；写腿 workflow job `workflow-3635bb20d44245a5`（glm，后台）。波1＝修 6 条非-U1000 小缺陷 + 出 38 条 U1000 逐符号判表，不鲁莽删。待其交件核三把尺。
+- ⚠ **口径诚实**：122 不会单票收（AC#6 lint 绿还需 SLO census 票 266）；本波买的是"清掉 staticcheck 真缺陷 + 推进 122"，非整票收。
+
+## A1773 — 票 122 staticcheck 波1 验收通过（5 条真修掉、证据齐）；U1000 清绿需"读数口径"裁定，非删符号
+
+- 派单 `workflow-3635bb20d44245a5`（glm）交件 **`e918b4952`**（6 files +176/−11）。**非实现者三把尺（我）**：
+  1. 提交真在：`git cat-file -t e918b4952`=commit。
+  2. 只 6 件、无冻结面：改动＝`internal/plugin/manifest.go`(S1011)／`manifestslot/install_50r1f_test.go`(S1011)／`internal/tools/web_search.go`(S1016)／`internal/risk/markseam_394_test.go`(ST1018×2，字面 U+200B→`\u200b` 转义、**串值逐字节不变**)＋两证据件；`git show --name-only` 对 rules_gateway/assessor/thresholds/golden/PLAN/specs/frontend/ci.yml **0 命中**。
+  3. 我复跑：GOOS=linux staticcheck 对 4 包 → **S1011/S1016/ST1018 = 0**（5 条真消失）、无新增；`go build` 4 包 rc=0。
+- **结果**：linux staticcheck **54→49**（U1000 47 不变 = 本波只出表未删；SA5000 `panic_isolation_51_test.go:62` 是夹具本身、**有意不修**具名登记；SA9009 frontend/embed.go 已知假阳登记）。判表 `docs/evidence/s1/122-u1000-judgment.md`：**3 条真死码候选**（`releasedCount` internal/agent／`l1WaitFor` internal/memory／`(*scriptGate).levels` internal/tools，双 GOOS 皆报 unused+git grep 零引用）＋**44 条"留"**（全 GOOS 仪器盲区：ball jarvis 族 38 由 `jarvis_windows.go` 消费、audio 设备簇、argInt/argBool 由 `system_backend_windows.go` 用…）。
+- **★口径结论（我裁定，记此）**：票 122 的 staticcheck 段要"CI linux 真清绿"，**不是靠删符号**——47 U1000 里 44 条是"linux 构建下真 unused、windows 构建下有主"的 GOOS 盲区，删了会把 windows 功能搞坏。真正主流做法＝**staticcheck 按 GOOS 分分母**（CI linux 只对"两种 GOOS 下都 unused"的真死码判红），这要动 `ci.yml` staticcheck 调用＝**票 71/85a 地界**（跨票）⇒ **不在本波、另行裁定/派单**。本波买到的＝5 条真实跨平台缺陷清洗 + 完整 inventory/判表。
+- **票 122 不整票收**（AC#6 lint 绿还需 SLO census 票 266 + 上述 GOOS 口径）。已推 origin/dev（含写腿 commit）。
