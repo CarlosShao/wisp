@@ -137,7 +137,13 @@ voice_env WISP_SILERO_MODEL "$root/third_party/spike-models/silero_vad.onnx"
 # took the voice family from 20 failures to 31.
 voice_env WISP_TTS_DIR "$root/third_party/spike-models/matcha-icefall-zh-baker"
 voice_env WISP_KWS_DIR "$root/third_party/spike-models/sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01"
-voice_env WISP_PUNC_MODEL "$root/third_party/model-fetch/x-punc"
+# WHY THIS IS A FILE AND NOT A DIRECTORY: voiceWirePunctModel
+# (resident_voice_wire_r1_windows_test.go:198-205) returns WISP_PUNC_MODEL
+# verbatim as the model path and only falls back to a file when it is unset -
+# its own fallback names .../model.int8.onnx. Pointing at the x-punc directory
+# instead made the leg log "标点级未接上（这一进程的 final 是原始假设，不带标点）"
+# and TestWireR1PunctuationReachesTheAgent failed, measured 2026-11-12.
+voice_env WISP_PUNC_MODEL "$root/third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx"
 echo "wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)"
 
 # Run from the package directory: the same cwd contract "go test" itself uses,

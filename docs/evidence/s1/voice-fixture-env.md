@@ -89,3 +89,48 @@ return f.Acoustic != "" && f.Vocoder != "" && f.Lexicon != "" && f.Tokens != "" 
 - 本件治的是**夹具寻址**这一层，⛔ 不宣称整包 52 枚红全绿——`cmd/wisp` 另有 5 枚台账 `:32512` 已具名的**存量真红**（`TestTicket198FirstRunCallerIsTheRunEntryOnly` 等），与本件无关。
 - ⛔ 未下载任何模型、未改 System32、未提交二进制、未动断言/scope/pin/SKIP/GUARD。
 - 上一轮"模型未下载"的结论**已在 §0 明确更正**，台账同步更正。
+
+## 7. 标点模型：一个文件而非一个目录（第三个假信号）
+
+`WISP_PUNC_MODEL` 指向 `third_party/model-fetch/x-punc`（**目录**）时，腿日志打：
+
+> `voice: 标点级未接上（这一进程的 final 是原始假设，不带标点）：…/x-punc`
+
+`voiceWirePunctModel`（`resident_voice_wire_r1_windows_test.go:198-205`）把 `WISP_PUNC_MODEL`
+**原样当作模型路径**，只有未设时才 fallback 到一个**文件**（`.../model.int8.onnx`）。
+⇒ 该变量是**文件路径**，不是目录。
+
+正确值：`third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx`
+
+**修正后复跑 `^TestWireR1`（我亲跑，日志 `D:\tmp\wisp\20261112\puncfix\run.log`）**：
+
+| 指标 | 读数 |
+|---|---|
+| `标点级未接上` | **0**（改前每次必现） |
+| `--- PASS` | **6** |
+| `--- FAIL` | **1** |
+
+转绿具名：`TestWireR1AnnounceEndToEnd` 19.02s · `TestWireR1WarmSecondTurnAcquiresNothing` 12.08s ·
+**`TestWireR1PunctuationReachesTheAgent` 5.20s**（就是标点那一格）· `TestWireR1AnnounceGateRefusesTaintedText` 0.45s ·
+`TestWireR1SilenceAndEmptyTextNeverSpeak` 4.30s · `TestWireR1TheRealDeviceTakesTheAudio` 0.32s
+
+## 8. 环境层修好后暴露的一枚真红（⛔ 不是环境问题）
+
+`TestWireR1WarmIdleDisposesOnTheOwner` FAIL 5.19s，断言逐字：
+
+> `resident_voice_wire_r1_windows_test.go:745: mic close counted 1 times, want at least 2 (the Warm row and the cascade's defence in depth)`
+
+**性质判定**：这是**产品缺陷**，不是夹具问题。
+- 整包发里该枚也 FAIL，但当时原因是 `WISP_SPIKE_MODELS is not set`（环境）⇒ **同一个名字、两个不同原因**；
+- 环境层修好后它才暴露出真实断言：Warm 行与级联防御应各关一次麦，实测只关 1 次；
+- 我本轮**零 Go 产码改动**（只动 `scripts/**` 与 `docs/**`），⛔ 不是我引入的。
+
+**去向**：该枚需单独立票或并入现有票（`mic close` 计数属 `resident_voice_wire` 写面），⛔ 在本件里不算"已修"。
+
+## 9. 总计（本轮实测，11 族）
+
+| 族 | 读数 |
+|---|---|
+| `Test15e*`(6) · `Test392*`(1) · `Test381r2*`(5) · `Test390r1*`(4) · `Test394R1*`(2) · `Test26R3*`(3) · `Test382WR2*`(3) · `TestWireR1*`(6/7) | **24 PASS / 0 FAIL**（第一次 11 族发），`TestWireR1` 单独复跑 6 PASS / 1 FAIL |
+| 三类环境错误 | `is not set`＝0 · `checkpoint is incomplete`＝0 · `onnxruntime 1.17`＝0 |
+| 转绿具名 | `Test15eSpeechEndToEnd…` 9.89s · `Test15eTheProductionHandOff…` 3.95s · `Test381r2RealDevice…` 36.00s · `Test390r1BallClickRealDevice…` 36.93s · `Test26R3AnnounceClosesTheCaptureGate` 19.85s · `Test382WR2TTSCleanSentence…` 8.37s · `TestWireR1PunctuationReachesTheAgent` 5.20s 等 |
