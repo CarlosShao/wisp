@@ -65,22 +65,6 @@ func memoryL1Enabled180K(dataDir string) (enabled bool, source string) {
 	return c.Memory.L1Enabled, cfgPath
 }
 
-// attachMemoryL1IfEnabled180K is the resident boot's l1_enabled gate, the
-// addressable seam the wiring test drives: enabled runs the ticket-29 attach,
-// disabled leaves the WarmWindow hook body-less and says the key decided
-// that. It runs where the assembly root used to call attachMemoryL1
-// unconditionally (resident_windows.go).
-func attachMemoryL1IfEnabled180K(rv *residentVoice, run *agentRuntime, dataDir string) {
-	l1, src := memoryL1Enabled180K(dataDir)
-	if !l1 {
-		slog.Info("memory: L1 extraction not attached",
-			"reason", "[memory] l1_enabled=false", "config_source", src)
-		fmt.Printf("wisp: 记忆抽取未接（[memory] l1_enabled=false，来源 %s）：Warm 窗口不挂抽取管线，画像不学习\n", src)
-		return
-	}
-	rv.attachMemoryL1(run)
-}
-
 // retentionBootLine180K is the one audit sentence the retention start books,
 // lifted out so the feed test can assert the same numbers the log carries.
 func retentionBootLine180K(days int) string {
