@@ -35336,3 +35336,32 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★在飞腿**：`33-ac1`（`auto/glm-5.3-flash` high，job `workflow-f702b078d4c74a7b`）—— 核票 33 唯一剩余的 AC#1。
 - 派单存档：`.scratch/wisp/probes/orch/20261112/txt/33-ac1-dispatch.txt`（新建）。
 - 撤销口令：删本 A1759 条。
+
+## A1760 — ★★★票 33 的 AC#1 **现量成立**（三把尺全过）；★票 85 的 AC#1/AC#2 证据**已从 CI 真日志取到**；票 122 AC#6 只差"含修复的终读数"
+
+- 机主 2026-11-12 白天。本轮三件实事：
+
+### 一、票 33 AC#1 ＝ **成立**（腿 `33-ac1`，`auto/glm-5.3-flash` high，commit `c24dcd45a`）
+- **三把尺**：①提交 `c24dcd45a`（1 枚 md、55 行）；②件 `docs/evidence/s1/33-ac1-census.md` **4,552B**；③**我自己核两条代码断言 + 盘上日志**：
+  - 问题①（旧"树枚数相等"尺误归因）：**已消**——`panel_host_windows_test.go:709` 逐字 `the counts are reported, not judged`；换成 **host-pid 身份判据**。
+  - 问题②（≤2s 退净未量）：**有断言且现跑**——`panel_host_windows_live_test.go:36` 测试在、`:62 deadline := time.Now().Add(2 * time.Second)`；**我核盘上日志逐字** `winlive exit clause: our tree webview baseline 0 -> peak 7 -> now 0 (tree pids 0)`。
+  - 我核盘上日志逐字：`AC#1 denominators (head 9e1a8dde5): our tree webview=6 … same HWND 0xa840e28 across hide->re-show=true`。
+- ⇒ **票 33 的 14 格里 13 格现已确认有落地/证据，只剩 AC#4、AC#12 两格"部分"需非实现者裁**（AC#4 自动半绿、手动半缺；AC#12 判据齐但归口未定）。
+
+### 二、★票 85 的 AC#1 / AC#2 **正面证据已取到**（CI run `43139602748`）
+- **件**：`docs/evidence/s1/ci-lint-staticcheck-readings-20261112.md`（commit `d8b58b353`）。
+- **`lint` job（id `130923107457`）step 13 = `staticcheck`**，逐字自报：
+  `staticcheck self-report: version=staticcheck 2026.2.2 (0.8.2) modules=3 packages=42 findings=54 toolchain-crash-lines=0 (step exit is 1)`
+- **AC#1 满足**：`##[group]Run go install honnef.co/go/tools/cmd/staticcheck@2026.2.2` ⇒ 下载的与自报的版本一致（`2026.2.2 (0.8.2)`），**并且 `ci.yml:307/:465` 两把工具都钉了版本**（现读）。
+- **AC#2 的核心满足**：**staticcheck 第一次产出真判据**（`findings=54`、`toolchain-crash-lines=0`）⇒ **"跑不动/零判据"的旧状已不存在**。
+  - ⚠ AC#2 还要"按 包×检查码×file:line 的 54 行清单"——**具体 54 行要另取**（日志 `printf` 段有），本件只证"判据产出了"。
+- **★口径澄清（重要）**：CI 的 `findings=54` 是**全码总数**（SA/ST/S/QF/U）；票 122 自报的 `linux 14` 是 **`U1000` 单码子集**（`122-staticcheck-batch2.md:13-14` 逐字）⇒ **两个数不同分母，⛔ 矛盾**。
+
+### 三、票 122 AC#6 只差"含修复的终读数"
+- **AC#6 四件已取到 3.5 件**：run id `43139602748`、job id `130923107457`、step 号 **`13`**、结论 `failure`（因 `findings=54`，是门禁**正常工作**）。
+- ⚠ **但 `43139602748` 跑在 `a6d203613`，在 122 的 SA1019 修复 `dc8a2d536` 之前** ⇒ **只能证"门在工作"，⛔ 证"已清绿"**。
+- ⇒ **要取 122 的终读数是哪个 run**：现在 `9e1a8dde5` 的 run `43140706797` **in_progress**（最新）。**等它跑完再取一次**，那才是含 `dc8a2d536` 的读数。
+- ⇒ **注意**：`findings=54` 里 **`U1000` 占多数**（122 批 2 已 96→? 在降），而 122 的 AC#6 要的是 **`lint` 步 conclusion＝success**——那要求 **54 条全清**（含 U1000 26+ 条与 `SA9009` 那条假阳性）。**这条账很长**，⛔ 短期能绿。
+
+- **★在飞**：无（`33-ac1` 已收）。CPU 正常。
+- 撤销口令：删本 A1760 条。
