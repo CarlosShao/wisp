@@ -1,0 +1,38 @@
+# plugin-fix 派单（internal/plugin：序号14 测试夹具 bug + 序号15 判性；⛔ 不碰 scope/ledger）
+
+- 腿码：**plugin-fix**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`
+- 写面：**只** `internal/plugin/` 内文件（优先 `command_52_test.go`）。⛔ 别的包 / ⛔ `portable-tests.sh` / ⛔ `ci.yml` / ⛔ 生产语义（除序号15 确证为测试侧）
+- 目标：把 test-core（ubuntu）里 **internal/plugin 的 2 条平台无关失败**弄清并修好；**4 条 Test52 pin 家族（B 类）⛔ 本腿动**（那是"声明出 scope"，属另一趟 guard 文件活）。
+
+## 先读
+- 分诊证据：`docs/evidence/s1/70-ac2-testcore-triage.md` 序号 14、15
+- CI 原始日志：`D:\tmp\wisp\20261112\tc-log.zip`（纯文本，`Get-Content -Raw` 读）
+
+## 序号14 `Test52SchemaViolationsAreRejected` 的 3 个子用例（below_minimum / above_maximum / not_an_integer）
+- **已核定的根因（测试夹具 bug，非生产 bug）**：`command_52_test.go:430` 的 `withProps` 只设 `def.Parameters`，但 `base` 的 `argv_template` 只有 `{{to}}{{text}}` 占位符、**没有 `{{days}}`**。`ScreenCommandParams` 只筛"argv 占位符里出现的参数"，所以 `days` 从不被筛 → `{"days":0}` 被"accepted"。
+- **修法（测试侧）**：让这三个 days 用例的 `def` 带上一个含 `{{days}}` 的 `argv_template`（例如给 withProps 增加可选 argv 覆写，或这几个 case 单独构造 def 时把 `{{days}}` 放进 argv_template）。改完 `{"days":0}`（minimum:1）、`{"days":31}`（maximum:30）、`{"days":1.5}`（integer）应分别返回 `ErrParamSchema`。
+- ⛔ 别改生产 `command_argv.go`（`:149` integer 分支已调 `checkNumberConstraints`，是对的）。⛔ 删断言。
+
+## 序号15 `Test52CommandKindValidates` 的 unknown_kind 子用例
+- 现象：期望 `err` 里含字段 `.kind`，实得通用 `plugin: manifest failed C14 validation:`（更早的 `auditKeys`/C14 校验先爆）。
+- **先判性（⛔ 盲改）**：读 `command_52_test.go` 该 case 的 `mutate` 与该 `tmpl`，再读 `internal/plugin` 里 `auditKeys` 与 `.kind` 校验的先后。判定是：
+  - **(a) 纯测试侧**（测试期望过窄，把字段断言放宽到能接受通用 C14 错误即可，或夹具构造使 kind 检查先到）⇒ **可修**（只改测试）；
+  - **(b) 生产校验顺序**（要让 `.kind` 判定先于 auditKeys，会改生产报错序）⇒ **⛔ 不改，如实写进回件让我裁**。
+- 只做 (a)，(b) 只报。
+
+## 自验
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+& 'D:\work\base\go\bin\go.exe' test ./internal/plugin -run 'Test52SchemaViolationsAreRejected|Test52CommandKindValidates' -count=1 -v 2>&1 | Select-Object -Last 20
+```
+- 期望：两测试（含子用例）在 **Windows 本机**全绿 rc=0。
+- ⚠ Linux 真绿靠 CI；⛔ 把 Windows 绿谎报成 Linux 绿。
+
+## 铁律
+- 只 commit 不 push；两处显式 pathspec（逐枚字面路径 `internal/plugin/command_52_test.go` 等）；⛔ add -A/amend/reset/rebase/stash/checkout ./clean
+- ⛔ 动 `portable-tests.sh`/`ci.yml`/其它包；临时件只落 `D:\tmp\wisp\20261112\pluginfix\`；中文写文件用 write 工具
+- 改前 `git status` 看清只碰 internal/plugin
+
+## 回一行
+`DONE: plugin-fix 序号14=<y/n> 序号15=<fixed-test-only|reported-production|n/a> plugin-test=<rc> 备注=<一句>`
