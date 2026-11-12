@@ -81,3 +81,12 @@
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\431-<腿码>\`。
 - **仪器**：运行时行为检查 ⇒ `go test -overlay`（拷贝放**仓外**）有效。
+
+## Progress log
+
+- **2026-11-12 22:1x +08 — 写腿（431-ac1budget）**：AC#0 只读取证完成，**票面一处假设被实测推翻**：①的红**不是** 10s 窗口不够——它的盘上记录轮询 **611ms 就成功**（预算从未绑住），红在 `resident_sink_nail_127_windows_test.go:505`，因为用例在 ~0.6s 就 `leg.stop()` 了子进程，而它要读的 `resident event loop running` 要到 **2.8–4.3s** 才出现（16 发实测 2.77–4.32s，中位 ~3.4s；`speech.NewDetector` 实测 **2.4–2.6s**，非票面写的 1.83s）。②才是真预算病：`pollUntil127(20,…)`=1s vs 启动 2.84–2.99s。⇒ **两枚不同根，同一修法：等事实不等时间。**
+  选形＝**乙（等真实信号）**，⛔ 加大秒数、⛔ 算系数——因为甲/丙**买不到①的绿**（事实在 `stop()` 之后永不到来），且只会让真故障多等。新增 `bootFactCeiling127 = 60s`（**上限**，非等待，注释写明 16 发实测依据）＋ `waitForBootFact127`（`observe.NewTimeout` 单调钟；事实一到立刻返回；**子进程一死立刻报**，⛔ 坐满上限）。断言事实**逐字未改**，无 `t.Skip`，⛔ 碰 `thresholds.go`/golden。
+  **突变控制真跑**（产码 `resident_windows.go:851` 那句标记删除，经仓外 `-overlay` 映射，仓内零字节）：① `FAIL (66.69s)` `the child never reached the event loop within 1m0s`、② `FAIL (66.90s)` `the refusal stopped the app: … within 1m0s` ⇒ **超时红，不是空转绿**；同发里**不相关的那个事实照常到达**（盘上记录 609ms / 拒绝句 151ms），证明各自钉的是自己那句话。
+  改后：① 3/3 PASS（10.65 / 10.12 / 10.32s）、② 3/3 PASS（10.02 / 9.32 / 9.67s）；同族三枚同跑全绿（含票 425 那枚）。
+  门禁：`go build ./cmd/wisp/` rc=0 · `go vet ./cmd/wisp/` rc=0 · `gofumpt -l cmd internal` 零输出 · `scripts/d22scan.sh` rc=0（`PASS=45 FAIL=0 SKIP=0`，`clean - no D22 ban violations`）。
+  证据：`docs/evidence/s1/431-ac1-boot-budget.md`。⛔ 未翻任何 AC 框；⛔ 未 push。

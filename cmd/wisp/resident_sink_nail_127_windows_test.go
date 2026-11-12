@@ -331,6 +331,97 @@ func pollUntil127(attempts int, done func() bool) bool {
 	return done()
 }
 
+// bootFactCeiling127 is the CEILING on a wait for a boot fact. It is not the
+// wait and it is not the measurement: a wait built on it ends the instant the
+// fact becomes observable, and the number below only decides how long a boot
+// that never produces the fact takes to report red instead of hanging the
+// package.
+//
+// WHY THIS SHAPE AND NOT A BIGGER ATTEMPT COUNT (ticket 431). The two cases in
+// this file used to hand `pollUntil127` a fixed attempt count, which is a
+// duration written as a multiplication: 200 x 50ms = 10s, 20 x 50ms = 1s. Both
+// numbers are guesses about how long this machine takes to boot, and both were
+// wrong in a way no amount of tuning fixes, because the quantity being waited
+// for is not a duration - it is a fact ("this process reached its event loop"),
+// and a duration either outlives the fact (and then hides a real hang behind a
+// long silence) or does not (and then reports red on a slow machine for the
+// crime of being slow). Ticket 431 asked which of the two shapes is the
+// mainstream one; the answer is the fact, with a monotonic ceiling as the only
+// duration in sight, because the ceiling is spent ONLY when the fact never
+// arrives.
+//
+// MEASURED, NOT ASSUMED (ticket 431 AC#0, this host, 2026-11-12). The
+// boot-complete line "resident event loop running" first becomes observable at
+// 2.80s / 3.31s / 3.49s / 3.28s / 3.32s / 3.18s / 3.86s / 3.71s / 4.11s /
+// 3.35s over ten boots, and 2.77-4.32s over six more with the log directory
+// blocked; the VAD construction that dominates it (speech.NewDetector,
+// resident_voice_windows.go:713) is 2.4-2.6s of that, and a boot with no voice
+// chain finishes at 1.75-1.84s. So 60s is ~14x the worst measured boot: a
+// machine ten times slower than this one still passes, and a boot that is
+// actually wedged still reports inside the package's own -timeout.
+//
+// The ceiling is NOT what a real fault costs, and that is the point of
+// waitForBootFact127's second exit below: a child that dies during boot is
+// reported the moment it is reaped, so the ceiling is spent only by the one
+// failure mode it is actually for - a process that is alive and never arrives.
+const bootFactCeiling127 = 60 * time.Second
+
+// bootFact127 is the outcome of one wait for a boot fact.
+type bootFact127 struct {
+	// ok says the fact became observable before either exit below fired.
+	ok bool
+	// elapsed is how long the wait took, whichever way it ended.
+	elapsed time.Duration
+	// exitedEarly says the child was reaped without ever producing the fact:
+	// the boot died rather than merely being slow. This is a DIFFERENT finding
+	// from a spent ceiling and the failure messages say which one happened.
+	exitedEarly bool
+	// exitStatus is the child's ending, when it ended.
+	exitStatus string
+}
+
+// waitForBootFact127 waits for one boot fact on a monotonic ceiling, and gives
+// up EARLY when the child it is watching has already exited: a boot that died
+// cannot produce the fact however long the ceiling is, so making that case sit
+// out the full 60s would be the exact cost ticket 431 refused to accept from a
+// bigger fixed number. Two exits, one duration.
+//
+// The budget is an observe.Timeout (D42#9: monotonic clock only, never a
+// wall-clock delta), so a system clock jump cannot shorten or extend it. The
+// elapsed time is returned rather than only logged so a caller can put the
+// measurement in its own failure message: "waited 60s for X" and "died after
+// 3s without X" are different findings, and a reader should not have to guess
+// which one a red is reporting.
+func waitForBootFact127(leg *residentLeg, budget time.Duration, fact func() bool) bootFact127 {
+	tm := observe.NewTimeout(budget)
+	for {
+		if fact() {
+			return bootFact127{ok: true, elapsed: tm.Elapsed()}
+		}
+		// reap(0) is non-blocking and idempotent, so this neither steals the
+		// Wait result from leg.stop nor races the reaper goroutine. cmd.Wait
+		// also flushes both copy goroutines before the reaper reports, so once
+		// this is true the two buffers hold every byte the child wrote - which
+		// is why the fact is re-read here rather than assumed absent: a child
+		// that printed the fact and exited inside the same tick is a pass, not
+		// an early death.
+		if leg.reap(0) {
+			if fact() {
+				return bootFact127{ok: true, elapsed: tm.Elapsed()}
+			}
+			return bootFact127{
+				elapsed:     tm.Elapsed(),
+				exitedEarly: true,
+				exitStatus:  leg.exitStatus(),
+			}
+		}
+		if tm.Expired() {
+			return bootFact127{elapsed: tm.Elapsed()}
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
+
 // readResidentSink returns the records the resident process wrote, refusing a
 // directory that holds no pipeline file. The file naming rule comes from
 // observe itself (CountLogFiles), so a renamed pipeline is a red case here
@@ -425,17 +516,29 @@ func TestAC1ResidentLegInstallsItsLogListenerOnDisk(t *testing.T) {
 	leg := bootResidentLeg(t, exe, dataDir)
 	sinkDir := logSinkDir(dataDir)
 
-	// The pipeline's flusher runs every 500ms (internal/observe/logging.go), so
-	// a 10s budget is ~20 flush ticks: enough for a slow disk, not enough to
-	// hide a missing install.
-	if !pollUntil127(200, func() bool { return sinkHasARecord(sinkDir) }) {
+	// Wait for the FACT that the listener booked itself on disk, not for a
+	// duration. The old shape handed this a fixed 200 x 50ms = 10s and the
+	// comment below claimed that was "~20 flush ticks"; ticket 431 AC#0 measured
+	// the record arriving at 611ms, so the budget never bound at all and the
+	// number was doing no work. What the case needs is the fact, and the ceiling
+	// is only what a boot that never produces it spends before reporting red.
+	sawRecord := waitForBootFact127(leg, bootFactCeiling127, func() bool { return sinkHasARecord(sinkDir) })
+	if !sawRecord.ok {
 		files := jsonlFilesUnder(t, dataDir)
 		leg.stop()
-		t.Fatalf("the resident process wrote no log file under %s within the budget.\n"+
+		if sawRecord.exitedEarly {
+			t.Fatalf("the resident process exited (%s) after %s without writing a log file under %s: "+
+				"the boot died before its listener booked itself.\n"+
+				"data root tree holds %d *.jsonl: %v\n%s\n"+
+				"that is the claim this case exists for: the leg owner actually runs has no listener on disk.",
+				sawRecord.exitStatus, sawRecord.elapsed, sinkDir, len(files), files, leg.console())
+		}
+		t.Fatalf("the resident process wrote no log file under %s within %s.\n"+
 			"data root tree holds %d *.jsonl: %v\n%s\n"+
 			"that is the claim this case exists for: the leg owner actually runs has no listener on disk.",
-			sinkDir, len(files), files, leg.console())
+			sinkDir, bootFactCeiling127, len(files), files, leg.console())
 	}
+	t.Logf("resident listener booked itself on disk after %s", sawRecord.elapsed)
 
 	recs := readResidentSink(t, sinkDir)
 	if len(recs) == 0 {
@@ -487,6 +590,27 @@ func TestAC1ResidentLegInstallsItsLogListenerOnDisk(t *testing.T) {
 		t.Errorf("install record min_level = %q, want the schema default %q", booking.MinLevel, "info")
 	}
 
+	// Ticket 431 AC#0's finding, and the reason this wait is here rather than a
+	// bigger number on the old one: this case used to stop the child as soon as
+	// the on-disk record appeared (measured: 611ms), and THEN assert the console
+	// carried the boot-complete line - which this host prints at 2.8-4.3s,
+	// because the voice chain's VAD construction (speech.NewDetector,
+	// resident_voice_windows.go:713) alone costs 2.4-2.6s. So the child was
+	// killed roughly 2.7s BEFORE the fact the next assertion is about could
+	// exist, and the case reported "the child never reached the event loop"
+	// about a process that had simply not been allowed to get there. That is not
+	// a budget being too small; it is the assertion's own fact being unobservable
+	// at the moment it was read.
+	//
+	// The fix is to wait for the fact before stopping the child. The fact is
+	// unchanged - still the shipped binary's own "resident event loop running"
+	// line, still asserted below - and the ceiling only decides how long a boot
+	// that never prints it takes to report red.
+	sawLoop := waitForBootFact127(leg, bootFactCeiling127, func() bool { return leg.stdout.has(residentReachedLoop) })
+	if sawLoop.ok {
+		t.Logf("resident leg reached its event loop after %s", sawLoop.elapsed)
+	}
+
 	leg.stop()
 	// The console half of the fan-out, read from the child's own captured
 	// stderr: this is what ties the FILE to THIS process, so the pass cannot be
@@ -501,8 +625,14 @@ func TestAC1ResidentLegInstallsItsLogListenerOnDisk(t *testing.T) {
 		t.Errorf("the boot-time sealing verdict reached the child's console %d times, want exactly 1 "+
 			"(a-with-mirror: never switched off, never doubled).\n%s", n, leg.console())
 	}
-	if !leg.stdout.has(residentReachedLoop) {
-		t.Errorf("the child never reached the event loop, so the disk read above proves little.\n%s", leg.console())
+	if !sawLoop.ok {
+		if sawLoop.exitedEarly {
+			t.Errorf("the child exited (%s) after %s without ever reaching the event loop, so the disk read above proves little.\n%s",
+				sawLoop.exitStatus, sawLoop.elapsed, leg.console())
+		} else {
+			t.Errorf("the child never reached the event loop within %s, so the disk read above proves little.\n%s",
+				bootFactCeiling127, leg.console())
+		}
 	}
 	// Placement on this leg, same rule as the run leg's AC#3: the bytes stay
 	// inside <data root>\logs.
@@ -533,17 +663,47 @@ func TestAC1ResidentLegOutlivesItsOwnLogFailure(t *testing.T) {
 	}
 	leg := bootResidentLeg(t, exe, dataDir)
 
-	sawRefusal := pollUntil127(200, func() bool { return leg.stderr.has(residentRefusalPrefix) })
-	sawLoop := pollUntil127(20, func() bool { return leg.stdout.has(residentReachedLoop) })
+	// Both waits below are on a FACT, on the same monotonic ceiling, and each
+	// reports what it spent. The old shape gave the refusal 200 x 50ms = 10s and
+	// then the boot 20 x 50ms = 1s, which is the ticket-431 defect in its purest
+	// form: two durations picked by hand for two facts that arrive at completely
+	// different times. The refusal is printed at ~0.1s (it is the sink's first
+	// act); the boot-complete line cannot arrive before the voice chain finishes,
+	// which this host measures at 2.8-4.3s. So the second number was not a
+	// tolerance, it was a coin flip against a construction that takes three to
+	// four times as long - and on this host it lost 5 runs out of 5.
+	//
+	// The ceiling is shared rather than doubled on purpose: it bounds the WHOLE
+	// boot, and each fact gets the remainder of that one budget, so a boot that
+	// never produces either fact cannot burn 2 x 60s.
+	bootCeiling := observe.NewTimeout(bootFactCeiling127)
+	sawRefusal := waitForBootFact127(leg, bootCeiling.Remaining(), func() bool {
+		return leg.stderr.has(residentRefusalPrefix)
+	})
+	sawLoop := waitForBootFact127(leg, bootCeiling.Remaining(), func() bool {
+		return leg.stdout.has(residentReachedLoop)
+	})
 	leg.stop()
 
-	if !sawRefusal {
-		t.Fatalf("a log directory that cannot be opened produced no refusal on the console.\n%s\n"+
-			"the operator has to be told the security notices are not being kept; that is the other half of the 20 lines.",
-			leg.console())
+	if sawRefusal.ok {
+		t.Logf("the refusal reached the console after %s", sawRefusal.elapsed)
 	}
-	if !sawLoop {
-		t.Fatalf("the refusal stopped the app: the child never reached the event loop.\n%s", leg.console())
+	if sawLoop.ok {
+		t.Logf("the resident leg reached its event loop after %s", sawLoop.elapsed)
+	}
+
+	if !sawRefusal.ok {
+		t.Fatalf("a log directory that cannot be opened produced no refusal on the console within %s.\n%s\n"+
+			"the operator has to be told the security notices are not being kept; that is the other half of the 20 lines.",
+			bootFactCeiling127, leg.console())
+	}
+	if !sawLoop.ok {
+		if sawLoop.exitedEarly {
+			t.Fatalf("the refusal stopped the app: the child exited (%s) after %s without ever reaching the event loop.\n%s",
+				sawLoop.exitStatus, sawLoop.elapsed, leg.console())
+		}
+		t.Fatalf("the refusal stopped the app: the child never reached the event loop within %s.\n%s",
+			bootFactCeiling127, leg.console())
 	}
 	if !leg.stderr.has(residentRefusalPromise) {
 		t.Errorf("the refusal does not say what is lost (%q); captured stderr:\n%s", residentRefusalPromise, leg.stderr.String())
