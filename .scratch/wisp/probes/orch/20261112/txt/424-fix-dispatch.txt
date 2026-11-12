@@ -1,0 +1,140 @@
+# 424-fix 派单（Linux 编译断裂修复 · 只切一枚函数 · glm high）
+
+- 腿码：**424-fix**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`, `reasoning_effort:"high"`
+- 写面：`cmd/wisp/memory_retention_180k.go`（改）＋ 新建 `cmd/wisp/memory_retention_180k_windows.go` ＋ 写 1 枚证据件
+- ⛔ 动其他任何文件
+
+---
+
+## ★问题（一句话）
+
+`cmd/wisp/memory_retention_180k.go` **没有 build 约束**，却用了 `*residentVoice`；而 `residentVoice` 只在 `cmd/wisp/resident_voice_windows.go:375` 定义（Windows-only）⇒ **Linux 编译必挂**（CI 逐字：`vet: cmd/wisp/memory_retention_180k.go:73:38: undefined: residentVoice`）。
+
+## ★修法（照做，⛔ 自己发挥）
+
+该文件有 4 个函数：
+
+| 函数 | 调用点 | 平台 |
+|---|---|---|
+| `retentionWindowDays180K` | `run.go:705` | 跨平台 |
+| `memoryL1Enabled180K` | `config_readers_255.go:257` | 跨平台 |
+| **`attachMemoryL1IfEnabled180K(rv *residentVoice, run *agentRuntime, dataDir string)`** | `resident_windows.go:759` | **Windows-only** |
+| `retentionBootLine180K` | `run.go:709` | 跨平台 |
+
+**只把 `attachMemoryL1IfEnabled180K` 这一枚函数（连同它体内引用、且只被它用的私有 helper，如果有）搬到一个新文件。**
+
+### 第 1 步：现读现状（⛔ 抄本派单行号）
+
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+git rev-parse HEAD
+Select-String -Path 'cmd/wisp/memory_retention_180k.go' -Pattern '^func |^\t"' | ForEach-Object { $_.LineNumber.ToString() + ': ' + $_.Line }
+Write-Output '--- 全文行数 ---'
+(Get-Content 'cmd/wisp/memory_retention_180k.go').Count
+```
+
+然后**完整读一遍** `cmd/wisp/memory_retention_180k.go`（用 read 工具），确认：
+- `attachMemoryL1IfEnabled180K` 从哪一行开始、到哪一行结束（函数体）；
+- 它体内是否调用了本文件里的**私有 helper**（如 `memoryL1Enabled180K`、`retentionWindowDays180K`）——那些 helper 是**跨平台**的，**留在原文件即可**（同 package，跨文件可见，无需搬）；
+- 它需要的 `import`（`fmt`/`log/slog`/`config` 等）在新文件里也要有。
+
+### 第 2 步：新建 `cmd/wisp/memory_retention_180k_windows.go`
+
+内容形如：
+```go
+//go:build windows
+
+package main
+
+// （原文件顶部若有该函数专属的注释，一并搬来）
+
+import (
+	// 只列这个函数真正用到的 import（现读确认）
+)
+
+// attachMemoryL1IfEnabled180K ...（原注释照搬）
+func attachMemoryL1IfEnabled180K(rv *residentVoice, run *agentRuntime, dataDir string) {
+	// 原函数体逐字照搬，一个字符不改
+}
+```
+
+### 第 3 步：从 `memory_retention_180k.go` 删掉这个函数
+
+- 只删 `attachMemoryL1IfEnabled180K` 那一个函数（及其专属注释）；
+- **保留**其余 3 个函数和它们用的 import；
+- ⛔ 改任何函数体、断言、注释语义。
+
+### 第 4 步：门禁
+
+```powershell
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx;D:\work\workspace\projects plans\Wisp\build;' + $env:PATH
+
+# ① Windows build
+& 'D:\work\base\go\bin\go.exe' build ./cmd/wisp 2>&1; Write-Output "win build rc=$LASTEXITCODE"
+
+# ② Windows vet ./cmd/wisp
+& 'D:\work\base\go\bin\go.exe' vet ./cmd/wisp 2>&1; Write-Output "win vet rc=$LASTEXITCODE"
+
+# ③ Linux 编过（判据核心）——先试完整交叉编译
+$env:GOOS='linux'; $env:CGO_ENABLED='1'
+& 'D:\work\base\go\bin\go.exe' build ./cmd/wisp 2>&1; Write-Output "linux build rc=$LASTEXITCODE"
+$env:GOOS=''; $env:CGO_ENABLED=''
+
+# ④ 若 ③ 因本机缺 linux onnx/cgo 工具链在 sherpa 处先挂（不是 residentVoice），
+#    改跑 type-check：编 cmd/wisp 的语法面
+$env:GOOS='linux'; $env:CGO_ENABLED='0'
+& 'D:\work\base\go\bin\go.exe' vet -tags '' ./cmd/wisp 2>&1 | Tee-Object 'D:\tmp\wisp\20261112\424fix\linuxvet.log'
+Write-Output "linux vet(after) rc=$LASTEXITCODE"
+$env:GOOS=''; $env:CGO_ENABLED=''
+# 判据：日志里**不再出现** 'undefined: residentVoice'。若还有别的 sherpa/cgo 报错，如实记录（那是本机工具链问题，非本票）。
+
+# ⑤ Windows 测试不回归
+& 'D:\work\base\go\bin\go.exe' test ./cmd/wisp -run 'Test180K|Test423|TestTicket255' -count=1 -v 2>&1 | Tee-Object 'D:\tmp\wisp\20261112\424fix\win-test.log'
+Write-Output "win test rc=$LASTEXITCODE"
+```
+
+**四数数法（剥子测试 + 去重）**：
+```powershell
+$c = @(Get-Content 'D:\tmp\wisp\20261112\424fix\win-test.log')
+function Top($l,$p){ @($l | Select-String $p | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' } | Sort-Object -Unique) }
+"RUN=$((Top $c '^=== RUN   (\S+)').Count) PASS=$((Top $c '^--- PASS: (\S+)').Count) FAIL=$((Top $c '^--- FAIL: (\S+)').Count) SKIP=$((Top $c '^--- SKIP: (\S+)').Count)"
+```
+
+### 第 5 步：越界自证
+
+```powershell
+git status --porcelain
+```
+要求：**只有** `cmd/wisp/memory_retention_180k.go`（改）＋ `cmd/wisp/memory_retention_180k_windows.go`（新）＋ 证据件（新）被改/建；其他一律不动（⚠ 工作树里已有别的腿留下的未跟踪件，别管它们，⛔ 提交它们）。
+
+### 第 6 步：交件
+
+`docs/evidence/s1/424-fix-linux-build.md`：
+
+```markdown
+# 票 424 — Linux 编译断裂修复
+- 锚/时刻/腿码
+## 改了什么（逐字）
+- 新文件 cmd/wisp/memory_retention_180k_windows.go（全文）
+- 原文件删掉 attachMemoryL1IfEnabled180K（贴 diff）
+## 判据
+| 项 | rc 或读数 |
+|---|---|
+| win build | |
+| win vet | |
+| **linux vet（不再 undefined: residentVoice？）**| |
+| win test Test180K/423/255 | RUN/PASS/FAIL/SKIP |
+## 越界自证
+## 一句话
+```
+
+## 铁律
+
+- ⛔ 动 `internal/**`／`frontend/**`／`design/**`；⛔ 改任何断言/阈值/契约
+- ⛔ `git add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；add/commit **显式 pathspec**
+- ⛔ push；⛔ 删文件；临时件只落 `D:\tmp\wisp\20261112\424fix\`
+
+## 回一行
+
+`DONE: 424-fix 新文件=有 linux是≡residentVoice消失=是/否 win build/vet/test=RUN/PASS/FAIL/SKIP 件=<路径>`
