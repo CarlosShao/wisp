@@ -46,6 +46,32 @@
 
 set -u
 
+# Refuse the WSL relay before anything else. On this host `bash` on PATH resolves
+# to C:\Windows\System32\bash.exe, which is the WSL forwarder and not a shell:
+# it dies with "execvpe(/bin/bash) failed: No such file or directory" and runs
+# ZERO tests. A leg that invoked it saw an empty log and concluded the carrier
+# was broken (measured 2026-11-12 by the resident-ac1-verdict leg, which then
+# spent time re-deriving the Git-bash path by hand). Detecting it here turns a
+# silent zero-test run into a named setup failure.
+#
+# The test is what the relay cannot do, not what it is called: ask the shell to
+# run a builtin and require the answer. Naming conventions differ across hosts
+# (Git Bash, MSYS2, cygwin) and a path check would refuse valid ones.
+if [ "$(printf 'ok')" != ok ]; then
+	echo "wisp-cli-staged-tests.sh: this shell cannot even run printf; nothing was run" >&2
+	exit 2
+fi
+case "${OSTYPE:-}" in
+msys* | cygwin*) : ;;
+*)
+	echo "wisp-cli-staged-tests.sh: OSTYPE=${OSTYPE:-unset} is not an msys/cygwin shell." >&2
+	echo "wisp-cli-staged-tests.sh: on this host 'bash' on PATH is the WSL relay" >&2
+	echo "wisp-cli-staged-tests.sh: (C:\\Windows\\System32\\bash.exe), which runs no tests at all." >&2
+	echo "wisp-cli-staged-tests.sh: run this through D:\\work\\soft\\Git\\bin\\bash.exe instead." >&2
+	exit 2
+	;;
+esac
+
 root=$(cd "$(dirname "$0")/.." && pwd)
 stage=${WISP_CLI_STAGE_DIR:-"$root/.scratch/wisp/stage-cli"}
 
