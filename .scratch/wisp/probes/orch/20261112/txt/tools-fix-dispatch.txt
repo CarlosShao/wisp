@@ -1,0 +1,53 @@
+# tools-fix 派单（internal/tools：joinForListing 跨平台 bug + launcher_other 两缺臂）
+
+- 腿码：**tools-fix**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`
+- 写面：**只** `internal/tools/` 内文件（fs.go、launcher_other.go、必要的测试件）。⛔ 别的包 / ⛔ scripts / ⛔ ci.yml / ⛔ portable-tests.sh
+- 目标：让 `internal/tools` 的这批测试**在 Linux（CI ubuntu）上真绿**，同时 **Windows 不回归**。这是真·跨平台生产 bug，不是测试卫生。
+
+## 背景（先读，⛔ 抄）
+读分诊证据：`docs/evidence/s1/70-ac2-testcore-triage.md`（序号 1-9 就是本腿的活）。CI 原始日志在 `D:\tmp\wisp\20261112\tc-log.zip`（纯文本，`Get-Content -Raw` 读）。
+
+## 要修的两处
+
+### 1. `internal/tools/fs.go:280-288` `joinForListing`（一处修七条：Test24R2A×4 + Test24R3×3）
+现码（**已核**）：
+```go
+func joinForListing(dir, name string) string {
+	if dir == "" { return name }
+	if strings.HasSuffix(dir, `\`) || strings.HasSuffix(dir, "/") { return dir + name }
+	return dir + `\` + name        // ← BUG：硬编码反斜杠
+}
+```
+- **修法**：最后一行改 `return dir + string(os.PathSeparator) + name`（并把 `os` import 补上，如缺）。
+- ⛔ 用 `filepath.Join`（D22 禁在 PathResolver 外用 filepath 做 FS 决策；且函数注释 :278 明令"must not grow into a general path joiner"）。
+- 为什么 Windows 不回归：Windows 上 `os.PathSeparator == '\\'`，与原行为逐字节同。
+- ⛔ 别改函数签名、别加 Clean、别动 C26 语义。
+
+### 2. `internal/tools/launcher_other.go`（非 Windows 分支；Test22AppLaunchJobFailureSurfaces + Test22AUMIDIsWindowsOnlyHere）
+- 先读这两个测试：`internal/tools/web_launch_test.go`（约 :122 与 :160）与 `launcher_other.go` 全文，弄清它们各自期望什么。
+- `startApp` 现有 "path"/"aumid" 两臂，但对上面两条有缺口（分诊说 :72-75 一带）。**按测试期望补齐非 Windows 臂**：例如 AUMID 那支在非 Windows 要返回"仅 Windows 平台能力"的确定性结果/错误，使 `Test22AUMIDIsWindowsOnlyHere` **通过**（它是"只在 Windows 才有 AUMID"的断言，非 Windows 下应如实成立）。
+- ⛔ 删/放宽断言来过关；⛔ 改生产语义只为迎合测试；改的是"实现缺口"。
+
+## 三把尺 / 自验（⛔ 只报本机，最终 Linux 绿靠 CI）
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+$env:PATH='D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx;D:\work\workspace\projects plans\Wisp\build;'+$env:PATH
+# a) Windows 上这批测试必须仍绿（os.PathSeparator=\ 所以不回归）
+& 'D:\work\base\go\bin\go.exe' test ./internal/tools -run 'Test22|Test24' -count=1 2>&1 | Select-Object -Last 6
+# b) Linux 编译面（类型检查，不跑）：跨平台改动不引入未定义
+$env:GOOS='linux'; $env:CGO_ENABLED='0'
+& 'D:\work\base\go\bin\go.exe' vet ./internal/tools 2>&1 | Select-Object -Last 8
+"linux vet rc=$LASTEXITCODE"
+$env:GOOS=''; $env:CGO_ENABLED=''
+```
+- 期望：a) Windows `Test22|Test24` 全绿 rc=0；b) linux vet rc=0、0 条 undefined。
+- ⚠ 说明：本机跑不了 Linux 二进制，所以"Linux 上这批测试真绿"由你自己**按构造论证**（joinForListing→os.PathSeparator 在 Linux 即 `/`；launcher 非 Windows 臂按测试期望），最终以推后 CI step7 为准。⛔ 把"本机 Windows 绿"谎报成"Linux 绿"。
+
+## 铁律
+- 只 commit 不 push；add/commit 两处显式 pathspec（逐枚写 `internal/tools/fs.go` 等字面路径）；⛔ add -A/amend/reset/rebase/stash/checkout ./clean
+- 临时件只落 `D:\tmp\wisp\20261112\toolsfix\`；中文写文件用 write 工具别走 PowerShell 内联
+- 改前先 `git status` 看清自己只碰 internal/tools；⛔ 碰任何他人未跟踪件
+
+## 回一行
+`DONE: tools-fix joinForListing=<改否> launcher=<改否> win-test-test22-24=<rc> linux-vet=<rc> undefined=<n> 建议=<能否推CI验>`
