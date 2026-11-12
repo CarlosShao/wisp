@@ -35931,3 +35931,14 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **我的失误已回退**（见 `A1800`）：票 174 AC#4 违反票面禁区，`7dcb145ff` 回退，回退后 `TestTaskOutputPointerNotice174r8` 族 PASS=2／FAIL=0。
 - **本轮提交 10 笔全部已推 origin/dev**，汇总件 `docs/evidence/s1/round88-summary.md`。
 - **★边界**：⛔ 不宣称整包全绿（还差 8 枚真红）；⛔ 未下载模型／未改 System32／未动 `PLAN.md`／`specs/**`／`thresholds.go`／golden／`allowlist.txt`／`frontend/**`。
+
+## A1802 — 票 425 收件（第 14 枚）：断言落后于产码那一枚修好了，三把尺全过
+
+- **腿**：`ticket-425-shutdown-assert`（`magpie/auto/deepseek-v4.1-flash`）交件 `e4c611d26`（3 files／318 insertions／6 deletions）。
+- **三把尺（我亲核）**：①`git cat-file -t e4c611d26` = commit；②证据件 `docs/evidence/s1/425-shutdown-record-assert.md` 15162B 在盘；③**我自己复跑** `^TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink$` ⇒ **PASS 9.59s，rc=0**，日志 `RESIDENT LEG ORDERING: 5 shutdown record(s) at records [26 27 32 33 34], first replay record 35 of 45`。
+- **越界**：`git show --name-only` 只有票／测试文件／证据件三枚；**改动的 `.go` 只有测试文件一枚（零产码）**。
+- **★选形＝乙（三合取）而非甲，理由很硬**：甲是**重言式**——`trail` 本身就是按 `shutdown step` 字面量过滤 `recs` 的产物，"trail 末位是最后一条 shutdown 记录"只是**读自己的过滤器**，产品怎么变都成立。乙钉住真正承诺：①非空（**保留未放宽**）②步序严格递增 ③最后一条 shutdown 记录下标早于第一条 `D38(e)` 记录下标。
+- **★突变控制两发真跑**（`-overlay` 拷贝在仓外，产码字节未碰）：删 `internal/proc/shutdown.go:130` 的 `slog.Info` ⇒ **FAIL 9.41s**（`the D38(e) trail is not in the file the same process closed: 38 record(s) after the install`，记录 45→40 正好少那五条）；恢复 ⇒ **PASS 8.39s**。**腿还加了第二发控制**：把一条 shutdown 记录排在回放**之后** ⇒ **只有判据③红**，①②同时绿 ⇒ **证明新判据单独有牙**。
+- **★这一票的立意值得记住**：原断言唯一判据"末位"在票 43 之后**恒假**——**一个恒假的判据不测任何东西，它的绿也买不到任何东西**。改后三条判据**每条都有对应实测红**，且②③覆盖原断言**从来测不到**的两种退化（序列重排／回放挪位）。
+- **票池**：done 342 / open 67 / total 409。票 425 已 `-done` 改名。
+- **腿报的一枚副产品（⛔ 我没动）**：`go build ./...` 在工作树里红，红在 `build/mut_rvw.go`——**未跟踪、被 `.gitignore:14` 吃掉、mtime 2026-11-04**，`git ls-files build/` = 0 文件。HEAD 导出树 `rc=0`。**这不是任何票的债，是残留件，需其主人清理**（⛔ 不在我写面，未删）。
