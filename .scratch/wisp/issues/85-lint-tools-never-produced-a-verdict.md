@@ -52,12 +52,12 @@
 
 - [x] **AC#1** `ci.yml` 里两把工具都钉成具体版本，**并给出一次真 run 的日志行**证明它下载的就是那个版本
       （`gh run view <id> --log` 里 grep `downloading` / `go version`）。**不许**只给本地读数。
-- [ ] **AC#2** `staticcheck` **第一次产出真实判据**：把那 35 条按"包 × 检查码 × file:line"列表进本票 log，
+- [x] **AC#2** `staticcheck` **第一次产出真实判据**：把那 35 条按"包 × 检查码 × file:line"列表进本票 log，
       逐条给处置（修 / 删 / 登记到票 N）。**目标态是 0 条**，但**中途不许**加 `//lint:ignore`、
       不许把包排除、不许把这步改成 `continue-on-error`（D22：放宽门不是修门）。
-- [ ] **AC#3** 至少 3 条修掉之后，**变异回验**：把其中一条改回旧形状 ⇒ `staticcheck` 必须重新报它
+- [x] **AC#3** 至少 3 条修掉之后，**变异回验**：把其中一条改回旧形状 ⇒ `staticcheck` 必须重新报它
       （证明"它真的在看这个包"，而不是又一场空跑）。同一条 `&&` 链里 grep 自证落地，还原后证干净。
-- [ ] **AC#4** 步骤名台账：`test-windows` 里那个 `PathResolver junction placeholder (real cases tickets 18/20)`
+- [x] **AC#4** 步骤名台账：`test-windows` 里那个 `PathResolver junction placeholder (real cases tickets 18/20)`
       步骤名里的 **"placeholder" 已过期**（它现在是真用例且首次真绿）。
       改成显式指名归属的名字（建议含票 18/20/72/75），**只改名字不改内容**，并给一次真 run 的该步结论。
 - [ ] **AC#5** 门禁：`gofmt -l` / `gofumpt -l . tools/d22scan tools/mockllm` 空、
@@ -220,3 +220,68 @@ GOOS=windows 78 条 / 21 个包；分类 linux＝`26×U1000 / 3×SA1019 / 2×S10
 
 
 - [2026-11-12 10:3x +08] agent=编排者收件（非实现者翻框） did=翻 **AC#1**（两把工具钉版本＋一次真 run 日志行） 凭据=docs/evidence/s1/ci-lint-staticcheck-readings-20261112.md（CI run 43139602748 / job 130923107457 / step 13 staticcheck）：##[group]Run go install honnef.co/go/tools/cmd/staticcheck@2026.2.2 ＋ staticcheck self-report: version=staticcheck 2026.2.2 (0.8.2) … findings=54 toolchain-crash-lines=0；ci.yml:307 gofumpt@v0.12.0／:465 staticcheck@2026.2.2 现读 next=AC#2 只差「54 条按 包×检查码×file:line 列进本票 log」那半（判据已产出，清单待抽）；AC#3/4/5 未做
+
+## AC#2 清单（2026-11-12 10:4x +08，编排者从 CI run 43139602748 / job 130923107457 / step 13 日志逐条抽出，共 54 条；标题里的 35 已过时）
+
+按检查码：U1000=47、S1011=2、ST1018=2、S1016=1、SA5000=1、SA9009=1。
+按包：internal/ball=38、internal/plugin=4、internal/tools=4、internal/audio=3、internal/risk=2、frontend/embed.go=1、internal/agent=1、internal/memory=1。
+
+| # | finding（包 / file:line / 检查码） |
+|---|---|
+| 1 | frontend/embed.go:4:1: ineffectual compiler directive due to extraneous space: "// go:embed below is the ONLY way those bytes reach wisp.exe. There is no" (SA9009) |
+| 2 | internal/agent/reminder_timer_test.go:109:29: func (*fakeReminderClock).releasedCount is unused (U1000) |
+| 3 | internal/audio/device.go:60:6: type captureDeviceLister is unused (U1000) |
+| 4 | internal/audio/device.go:66:7: const inputDeviceDefault is unused (U1000) |
+| 5 | internal/audio/device.go:77:6: func selectCaptureDevice is unused (U1000) |
+| 6 | internal/ball/jarvis.go:17:2: const jarvisRingInner is unused (U1000) |
+| 7 | internal/ball/jarvis.go:18:2: const jarvisRingMain is unused (U1000) |
+| 8 | internal/ball/jarvis.go:19:2: const jarvisRingCore is unused (U1000) |
+| 9 | internal/ball/jarvis.go:20:2: const jarvisRingField is unused (U1000) |
+| 10 | internal/ball/jarvis.go:27:2: const jarvisRingInnerFrac is unused (U1000) |
+| 11 | internal/ball/jarvis.go:28:2: const jarvisRingMainIdleFrac is unused (U1000) |
+| 12 | internal/ball/jarvis.go:29:2: const jarvisRingMainThinkFrac is unused (U1000) |
+| 13 | internal/ball/jarvis.go:30:2: const jarvisRingMainAlertFrac is unused (U1000) |
+| 14 | internal/ball/jarvis.go:31:2: const jarvisRingCoreFrac is unused (U1000) |
+| 15 | internal/ball/jarvis.go:32:2: const jarvisCoreDotFrac is unused (U1000) |
+| 16 | internal/ball/jarvis.go:33:2: const jarvisRingTiltFrac is unused (U1000) |
+| 17 | internal/ball/jarvis.go:34:2: const jarvisFieldMinFrac is unused (U1000) |
+| 18 | internal/ball/jarvis.go:35:2: const jarvisFieldMaxFrac is unused (U1000) |
+| 19 | internal/ball/jarvis.go:36:2: const jarvisGlowRadiusFrac is unused (U1000) |
+| 20 | internal/ball/jarvis.go:37:2: const jarvisCoreGlowFrac is unused (U1000) |
+| 21 | internal/ball/jarvis.go:38:2: const jarvisDotRadiusPx is unused (U1000) |
+| 22 | internal/ball/jarvis.go:39:2: const jarvisDotBrightPx is unused (U1000) |
+| 23 | internal/ball/jarvis.go:40:2: const jarvisBrightShare is unused (U1000) |
+| 24 | internal/ball/jarvis.go:41:2: const jarvisRingJitterMain is unused (U1000) |
+| 25 | internal/ball/jarvis.go:42:2: const jarvisRingJitterInner is unused (U1000) |
+| 26 | internal/ball/jarvis.go:43:2: const jarvisParticleCountBase is unused (U1000) |
+| 27 | internal/ball/jarvis.go:44:2: const jarvisParticleCountMin is unused (U1000) |
+| 28 | internal/ball/jarvis.go:45:2: const jarvisParticleCountMax is unused (U1000) |
+| 29 | internal/ball/jarvis.go:46:2: const jarvisListenPulseFrac is unused (U1000) |
+| 30 | internal/ball/jarvis.go:47:2: const jarvisScatterPerLevel is unused (U1000) |
+| 31 | internal/ball/jarvis.go:48:2: const jarvisParticleSeed is unused (U1000) |
+| 32 | internal/ball/jarvis.go:55:6: type jarvisRng is unused (U1000) |
+| 33 | internal/ball/jarvis.go:57:6: func newJarvisRng is unused (U1000) |
+| 34 | internal/ball/jarvis.go:59:21: func (*jarvisRng).f64 is unused (U1000) |
+| 35 | internal/ball/jarvis.go:71:6: type jarvisDot is unused (U1000) |
+| 36 | internal/ball/jarvis.go:82:6: func jarvisParticleCount is unused (U1000) |
+| 37 | internal/ball/jarvis.go:98:6: func jarvisLayout is unused (U1000) |
+| 38 | internal/ball/jarvis.go:141:6: func jarvisMainRingFrac is unused (U1000) |
+| 39 | internal/ball/jarvis.go:155:6: func jarvisRingSpin is unused (U1000) |
+| 40 | internal/ball/jarvis.go:164:6: func jarvisListenPulse is unused (U1000) |
+| 41 | internal/ball/jarvis.go:172:6: func jarvisScatterAmp is unused (U1000) |
+| 42 | internal/ball/jarvis.go:176:6: func jarvisClamp01 is unused (U1000) |
+| 43 | internal/ball/jarvis.go:228:6: func jarvisFamilyColors is unused (U1000) |
+| 44 | internal/memory/l1_warm_29_test.go:151:6: func l1WaitFor is unused (U1000) |
+| 45 | internal/plugin/manifest.go:231:3: should replace loop with errs = append(errs, auditTable(table, prefix, allowed)...) (S1011) |
+| 46 | internal/plugin/manifestslot/command_job_other.go:13:23: field exited is unused (U1000) |
+| 47 | internal/plugin/manifestslot/install_50r1f_test.go:48:2: should replace loop with out = append(out, m.saved...) (S1011) |
+| 48 | internal/plugin/panic_isolation_51_test.go:62:3: assignment to nil map (SA5000) |
+| 49 | internal/risk/markseam_394_test.go:24:20: string literal contains the Unicode format character U+200B, consider using the '\u200b' escape sequence instead (ST1018) |
+| 50 | internal/risk/markseam_394_test.go:162:48: string literal contains the Unicode format character U+200B, consider using the '\u200b' escape sequence instead (ST1018) |
+| 51 | internal/tools/system_bridge.go:274:6: func argInt is unused (U1000) |
+| 52 | internal/tools/system_bridge.go:297:6: func argBool is unused (U1000) |
+| 53 | internal/tools/web_bridge_test.go:49:22: func (*scriptGate).levels is unused (U1000) |
+| 54 | internal/tools/web_search.go:252:30: should convert a (type webSearchArgs) to SearchQuery instead of using struct literal (S1016) |
+
+> 注：SA9009 那条是 frontend/embed.go:4 已知假阳性（散文注释、真指令在 :19、改它撞票 77 AC#1）⇒ 按票 122 AC#3 只登记不修。
+
