@@ -1,0 +1,117 @@
+# 33-ac1 派单（票 33 唯一剩余格 AC#1 现量 · glm high）
+
+- 腿码：**33-ac1**
+- 路由：`provider:"magpie"`, `model:"auto/glm-5.3-flash"`, `reasoning_effort:"high"`
+- 写面：**只写 1 枚 md**：`docs/evidence/s1/33-ac1-census.md`
+- ⚠ **⛔ 改任何 `.go`／票面任何框／`Status:`**
+
+---
+
+## 背景（你只需知道这些）
+
+票 33 的 14 格里，**13 格已确认有落地或证据**，只剩 **AC#1** 没核。你的活就是把 AC#1 核清楚。
+
+## ★AC#1 票面逐字
+
+> `- [ ] Show/hide/destroy lifecycle: second show within session reuses window (process-tree ...`
+
+**完整读票面**：`D:\work\workspace\projects plans\Wisp\.scratch\wisp\issues\33-panel-host-c27.md` 的 `:72` 附近。
+
+## ★`33-v2` 终裁对 AC#1 的判语（逐字，这是你的起点）
+
+> `**不成立**（按票面原句：四段里一段尺会误归因、一段本腿未量）`
+
+**具体两处问题**：
+1. **"进程树枚数稳定"那一维的尺会把正常子进程回收判红并错归因成 reuse broken**（10 发里 2 发）
+2. **"≤2s 退净"已进 `winlive` 但本腿未量**
+
+## 你要做的（四步）
+
+### 第 1 步：现读票面 AC#1 全文 + 现有测试
+
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+# 票面 AC#1 全文（:70-75）
+Get-Content '.scratch/wisp/issues/33-panel-host-c27.md' | Select-Object -Skip 68 -First 12 | ForEach-Object { '  ' + $_ }
+```
+
+```powershell
+# 找 show/hide/destroy 相关测试
+Select-String -Path 'cmd/wisp/*_test.go' -Pattern 'second show|reuse|show.*hide|dispose|process-tree|ProcessTree' | Select-Object -First 20 | ForEach-Object { '  ' + (Split-Path $_.Path -Leaf) + ':' + $_.LineNumber + '  ' + $_.Line.Trim().Substring(0,[Math]::Min(100,$_.Line.Trim().Length)) }
+```
+
+### 第 2 步：核问题①"尺会误归因"
+
+**要回答**：那条"进程树枚数稳定"的尺**今天还在不在**？在的话它**会不会**把正常回收判红？
+
+```powershell
+Select-String -Path 'cmd/wisp/panel_host_windows_test.go','cmd/wisp/panel_resident_windows_test.go' -Pattern 'len\(.*[Pp]rocess|processCount|childCount|NumProc' | Select-Object -First 15 | ForEach-Object { '  ' + (Split-Path $_.Path -Leaf) + ':' + $_.LineNumber + '  ' + $_.Line.Trim().Substring(0,[Math]::Min(110,$_.Line.Trim().Length)) }
+```
+
+**判据**：
+- 若那条尺**已被删/改** ⇒ 问题①**已消**（`33-v2` 是 10-01 读数，之后 `33-r14` 等腿改过）
+- 若**还在** ⇒ 读它的断言逻辑，判它会不会误判
+
+### 第 3 步：核问题②"≤2s 退净未量"
+
+```powershell
+# 找 winlive 里的退净断言
+Select-String -Path 'cmd/wisp/*winlive*_test.go','cmd/wisp/*_windows_test.go' -Pattern '2\s*\*\s*time\.Second|2s|退净|exitClean|Dispose' | Select-Object -First 20 | ForEach-Object { '  ' + (Split-Path $_.Path -Leaf) + ':' + $_.LineNumber + '  ' + $_.Line.Trim().Substring(0,[Math]::Min(110,$_.Line.Trim().Length)) }
+```
+
+### 第 4 步（**只在第 2/3 步判"需要跑"时才跑**）：跑一发
+
+⚠ **`cmd/wisp` 整包同一时刻只许一个**（本波只有你一条腿）。**但 ⛔ 跑整包**，只跑 `-run` 指名的：
+
+```powershell
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx;D:\work\workspace\projects plans\Wisp\build;' + $env:PATH
+New-Item -ItemType Directory -Force -Path 'D:\tmp\wisp\20261112\33ac1' | Out-Null
+$p = Start-Process -FilePath 'D:\work\base\go\bin\go.exe' -ArgumentList 'test','./cmd/wisp','-run','<你找到的测试名正则>','-count=1','-v' -NoNewWindow -PassThru -RedirectStandardOutput 'D:\tmp\wisp\20261112\33ac1\run1.out' -RedirectStandardError 'D:\tmp\wisp\20261112\33ac1\run1.err'
+$p.WaitForExit(900000) | Out-Null
+"rc=$($p.ExitCode)  ($('0x{0:X8}' -f $p.ExitCode))"
+```
+
+⚠ **`Start-Process -PassThru` 后 `$LASTEXITCODE` 是空的**，必须读 `$p.ExitCode`。
+⚠ 缺 DLL ⇒ `0xC0000135`，那是环境问题。
+
+**如果判断"必须跑整包才能判"** ⇒ **⛔ 跑，如实写〔不可判：需整包〕并说明为什么**。
+
+## 交件
+
+`docs/evidence/s1/33-ac1-census.md`：
+
+```markdown
+# 票 33 AC#1 现量（唯一剩余格）
+
+- 锚 / 时刻 / 腿码
+- ⛔ 改任何 .go
+
+## AC#1 票面逐字
+（抄 :72 那格全文）
+
+## 33-v2 的两处问题，逐处现核
+
+### 问题①"尺会误归因"
+- 那条尺今天在哪？（file:line 或"已不存在"）
+- 它会不会误判？证据：
+
+### 问题②"≤2s 退净未量"
+- 有断言吗？（file:line 或"没有"）
+- 跑了吗？读数：
+
+## 结论
+AC#1＝<成立／不成立／部分／不可判>，理由：
+
+## 本腿 ⛔ 做到的事
+```
+
+## 铁律
+
+- ⛔ 改任何 `.go`；⛔ 跑 `./cmd/wisp` 整包；⛔ `go test ./...`
+- ⛔ 票面框／`Status:`／票名／`-done`
+- ⛔ `git add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；add/commit **显式 pathspec**
+- ⛔ push；⛔ 删文件
+
+## 回一行
+
+`DONE: 33-ac1 AC#1=<成立/不成立/部分/不可判> 问题①=<已消/还在> 问题②=<有断言/无> 件=<路径>`
