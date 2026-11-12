@@ -1,0 +1,159 @@
+# 346-a2 派单（AC#4 颜色与门禁 + AC#2 去牙反形 · 测量腿）
+
+- 腿码：**346-a2**
+- 路由：`provider:"magpie"`, `model:"group/group-review-and-audit"`, `reasoning_effort:"max"`
+- 写面：**只写** `.scratch/wisp/probes/346/a2/**` ＋ 票 346 末尾**一条**追加 bullet
+- ⚠ **⛔ 改任何 `.go`／`.github/**`／票面任何框／`Status:`**
+
+---
+
+## 你是谁
+
+**测量腿**。票 346 已经跑到 `5 勾 / 2 未勾`，你只交**两个未勾格**的读数：**AC#4** 与 **AC#2**。⛔ 修任何东西。
+
+## ★票面这两格逐字（照这个做，⛔ 加戏）
+
+### AC#4（逐字）
+
+> `- [ ] **AC#4 颜色与门禁**：`./internal/winsec/` 两平台成对（Linux 容器 ⇄ 本机 Windows 档；同一 `-run` 名册、`-count=1 -timeout 30m`、四数逐枚点名⛔ 混用⛔ 相减）＋★**两枚弃权仪器各自至少 3 发独立复跑**（同一台面、逐名点名红⇄绿⇄弃权，散布如实报）；红名册作差逐名归位。门禁四数只在共享工作树、★跑前 `unset GOTMPDIR TMPDIR`（票 311 AC#1 shape B GUARD，带 env 时 rc=2 射程拒绝⛔ 读成红）。⛔ `./cmd/wisp` 整包（车道按波次排）、⛔ `go test ./...`。`
+
+### AC#2（逐字）
+
+> `- [ ] **AC#2 ★⛔ 用"变绿"换"看不见"**：⛔ 放宽或删掉那三句弃权红句、⛔ `t.Skip`（无具名登记面的裸 Skip＝本仓禁手）、⛔ 把重试拉到"总能过"、⛔ 给 CI 加 `continue-on-error`／撤步骤。⇒ 判据＝**交件侧那三句红句逐字仍在**（只在"真到不了窗口"时响）。★自证＝去牙反形：把弃权守卫摘掉的那一发（**只打仓外导出树物理字节**、⛔ `-overlay`、每发前后各验 pristine 哈希）⇒ 仪器必须从"弃权红"变成"**假绿**"，且这一维**能被点名**（⛔ 一把两种形状都放行的尺）。`
+
+## ★第 0 步：环境（缺一读数全废）
+
+```powershell
+Set-Location 'D:\work\workspace\projects plans\Wisp'
+$env:PATH = 'D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx;D:\work\workspace\projects plans\Wisp\build;' + $env:PATH
+New-Item -ItemType Directory -Force -Path '.scratch/wisp/probes/346/a2' | Out-Null
+git rev-parse HEAD | Tee-Object '.scratch/wisp/probes/346/a2/head.txt'
+git status --porcelain -- internal/winsec | Tee-Object '.scratch/wisp/probes/346/a2/gitstatus.txt'
+```
+
+⚠ **DLL 不入 PATH ⇒ 退出码 `0xC0000135`**，那是环境问题，遇到报告并修 PATH 重跑，⛔ 当发现。
+
+## ★第 1 步：先找出"两枚弃权仪器"是哪两枚
+
+票面说射程是 `internal/winsec/openleaf_322_other_test.go` ⇄ `internal/winsec/posix_seal_window_120_other_test.go`（票面 `:5` 逐字）。现跑确认：
+
+```powershell
+Get-ChildItem 'internal/winsec' -Filter '*_test.go' | Select-Object Name, Length
+Select-String -Path 'internal/winsec/*_test.go' -Pattern 't\.Skip|弃权|abstain|到不了窗口|skip' | Select-Object -First 30
+```
+
+**把那三句"弃权红句"逐字抄下来**（AC#2 判据就是它们还在）。
+
+## ★第 2 步：AC#4 本机 Windows 档（一发）
+
+```powershell
+# 跑前 unset（票 311 AC#1 shape B GUARD）
+Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue
+Remove-Item Env:TMPDIR -ErrorAction SilentlyContinue
+
+go test ./internal/winsec/ -count=1 -timeout 30m -v 2>&1 | Tee-Object '.scratch/wisp/probes/346/a2/win-local.log'
+Write-Output "rc=$LASTEXITCODE"
+```
+
+**四数分开数（⛔ 相减）**：
+```powershell
+$c = @(Get-Content '.scratch/wisp/probes/346/a2/win-local.log')
+$runs = @($c | Select-String '^=== RUN   (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
+$pass = @($c | Select-String '^--- PASS: (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
+$fail = @($c | Select-String '^--- FAIL: (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
+$skip = @($c | Select-String '^--- SKIP: (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '/' })
+Write-Output "RUN=$($runs.Count) PASS=$($pass.Count) FAIL=$($fail.Count) SKIP=$($skip.Count)"
+Write-Output "FAIL names: $($fail -join ', ')"
+Write-Output "SKIP names: $($skip -join ', ')"
+```
+⚠ **必须剥掉含 `/` 的子测试**，否则数会翻倍。
+
+## ★第 3 步：AC#4 的"至少 3 发独立复跑"
+
+**同一台面，跑 3 发**（`-count=1` 每次都是新进程）：
+
+```powershell
+for($i=1; $i -le 3; $i++){
+  go test ./internal/winsec/ -count=1 -timeout 30m -v 2>&1 | Tee-Object ".scratch/wisp/probes/346/a2/rep$i.log"
+  Write-Output "rep$i rc=$LASTEXITCODE"
+}
+```
+**逐发记红/绿/弃权**，**散布如实报**（⛔ 只报最好那发）。
+
+## ★第 4 步：Linux 容器那半（如果 Docker 可用）
+
+```powershell
+docker --version
+```
+- **可用** ⇒ 在容器里跑同一个 `-run` 名册、`-count=1 -timeout 30m`；
+- **不可用** ⇒ **如实写〔不可判：本机无 Docker〕** ＋ 写清"需要什么环境才能判"。**⛔ 编、⛔ 拿 Windows 那半冒充成对**。
+
+## ★第 5 步：AC#2 去牙反形（**只打仓外导出树**）
+
+**⛔ 在共享工作树改码**。做法：
+
+```powershell
+$snap = 'D:\tmp\wisp\20261112\346a2\snap'
+New-Item -ItemType Directory -Force -Path $snap | Out-Null
+git archive HEAD | tar -x -C $snap
+Set-Location $snap
+# 验 pristine 哈希（每发前后各一次）
+```
+1. 在 **snap** 里把"弃权守卫"摘掉（改那几行，**只在 snap 里改**）；
+2. 跑 → 仪器应从「弃权红」变成「**假绿**」；
+3. **每发前后各验 pristine 哈希**（`git -C <repo> stash list` 不用；用 sha256 对比原文件）；
+4. **⛔ `-overlay`**（票面明令）。
+
+**判据**：摘掉守卫 ⇒ **假绿**；守卫在 ⇒ **弃权红**。**两形都要能点名**。
+
+## ★第 6 步：交件
+
+`.scratch/wisp/probes/346/a2/census.md`：
+
+```markdown
+# 346-a2 测量（AC#4 颜色与门禁 + AC#2 去牙反形）
+
+- HEAD / 普查时刻 / 环境（Docker 有无、PATH 是否带 DLL）
+- ★本腿 ⛔ 改任何 .go；⛔ 跑 ./cmd/wisp 整包；⛔ go test ./...
+
+## AC#4 两平台成对
+
+| 平台 | -run 名册 | RUN | PASS | FAIL | SKIP | 红名 |
+|---|---|---|---|---|---|---|
+| Windows 本机 | ... | | | | | |
+
+## AC#4 三发独立复跑（逐发）
+
+| 发 | RUN | PASS | FAIL | SKIP | 红/绿/弃权 | 红名 |
+|---|---|---|---|---|---|---|
+| rep1 | | | | | | |
+| rep2 | | | | | | |
+| rep3 | | | | | | |
+
+散布如实报：
+
+## AC#2 三句弃权红句逐字（判据＝它们还在）
+
+（逐字抄三句 + file:line）
+
+## AC#2 去牙反形（snap 里做）
+
+| 形 | 结果 | 判据 |
+|---|---|---|
+| 守卫在 | 弃权红 | ... |
+| 守卫摘掉 | 假绿 | ... |
+
+## 一句话总判
+AC#4＝<成对/半对/不可判>；AC#2＝<三句仍在/假绿可点名>
+```
+
+## 铁律
+
+- ⛔ 改任何 `.go`（除 snap 里）；⛔ `.github/**`；⛔ 票面框／`Status:`／票名／`-done`
+- ⛔ `./cmd/wisp` 整包；⛔ `go test ./...`；⛔ `-overlay`
+- ⛔ `git add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；add/commit 两处**显式 pathspec**
+- ⛔ push；⛔ 删任何文件；临时件只落 `D:\tmp\wisp\20261112\346a2\`
+
+## 回一行
+
+`DONE: 346-a2 AC#4=<成对/半对/不可判> AC#2=<三句在/假绿可点名> <红名> <件路径>`
