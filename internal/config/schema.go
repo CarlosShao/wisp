@@ -451,8 +451,25 @@ type LoopGuard struct {
 type AgentSection struct {
 	// MaxRounds caps agent loop iterations (50 fallback, D36).
 	MaxRounds int `toml:"max_rounds" default:"50"`
-	// TokenBudget caps tokens per task; 0 = uncapped (not recommended).
-	TokenBudget int `toml:"token_budget" default:"200000"`
+	// TokenBudget caps tokens per task. 0 = not written: the loop then applies
+	// its own scaled default (agent.BudgetsFor(context_window).TokenBudget,
+	// 200000 at the 128k reference window), which is what D15 makes a MUST -
+	// "所有阈值必须按所配模型的 context_window 等比缩小，不得硬编码".
+	//
+	// This key deliberately carries NO default tag. A `default:"200000"` here
+	// would make "the user never wrote this" indistinguishable from "the user
+	// asked for 200k": applyDefaults would fill the frozen 128k reference
+	// number, the composition root feeds it as an override
+	// (cmd/wisp/run.go:2021 -> agent.Config.TokenBudget), and guard.go's
+	// `if cfg.TokenBudget <= 0` fallback would then never run - so a model
+	// declaring a tiny context_window kept a 200k budget instead of its own
+	// scaled one. Ticket 430 measured exactly that: context_window = 1 scaled
+	// the budget to 2 tokens (agent/budgets.go:108) and the run still spent 17
+	// without ever braking.
+	//
+	// A value the user DOES write stays absolute and is never re-scaled; it
+	// only has to be positive to win (agent/guard.go:104-106).
+	TokenBudget int `toml:"token_budget"`
 	// PerToolTimeoutMS overrides per-tool timeouts; 0 = each tool's own
 	// default applies.
 	PerToolTimeoutMS int `toml:"per_tool_timeout_ms"`

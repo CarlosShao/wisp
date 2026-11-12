@@ -111,3 +111,41 @@ tasklogstate_365_test.go:184: this run did not end stuck (screen word "completed
 - ⛔ 翻任何 AC 框。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\430-<腿码>\`。
 - **仪器**：这枚是**运行时行为**检查 ⇒ `go test -overlay`（拷贝放**仓外**）有效。
+
+## Progress log（append-only，newest last）
+
+### 430-365 写腿 · 2026-11-12 20:5x +08
+
+**判定：产品缺陷**（⛔ 不是台面/夹具问题）。票面「造透支手法没生效」的假设**是反的**：夹具写 `context_window = 1` 完全生效，C22 预算**真的**缩到了 2 token。
+
+**三个探针读数**（仓外 overlay 探针，`D:\tmp\wisp\20261112\430-365\`）：
+
+1. **换算后预算 = 2 token**（`BudgetsFor(1).TokenBudget = 2`，`Scale = 7.8125e-06`，`HistoryCompressTokens = 1`）⇒ 换算链本身正确。
+2. **实际消耗 = 17 token**（`in=12 + out=5`，provider 自报 usage）。
+3. **`brakeStuck` 零调用** —— 探针打在 `internal/agent/loop.go:1058` 入口，全程无输出。
+
+第 4 个数（决定性）：同一次运行里 `BudgetsFor.TokenBudget = 2` 而 `guard.TokenBudget = 200000` —— 缩放值被**顶掉**了。
+
+**病因**：`internal/config/schema.go:472`（改前）`TokenBudget int \`toml:"token_budget" default:"200000"\``。`defaults.go:80-81` 的 `applyDefaults` 见标签即填 ⇒ 用户**没写**这键也变 200000 ⇒ `cmd/wisp/run.go:2021` 当显式覆盖喂进 `agent.Config.TokenBudget` ⇒ `internal/agent/guard.go:104` 的 `if cfg.TokenBudget <= 0` scaled 兜底**永不执行** ⇒ `loop.go:457` 的 `17 >= 200000` 为假 ⇒ 不刹车、`completed`、`done`、exit 0。
+
+**回归引入点**：`a7f309112`（423-followup）首次把 `TokenBudget: cfg.Agent.TokenBudget` 接进 `run.go`；`a7f309112^` 没有这行，scaled 兜底正常，故 365 测试曾绿。`default:"200000"` 标签本身更早（`fe126e278`）但此前是**死标签**（没人读）。
+
+**`StartMockllm` 响应**：**没有 tool_call**（`toolCalls=0`，`stop=end_turn`）。⛔ 不是病因——2 token 预算下任何非空回答都该透支。票面「0 次工具调用⇒没有大东西进上下文⇒不超支」把因果读反了；`0 次工具调用` 是果。修好后**依然是 0 次**，再次证明无关。
+
+**修法（只改产品侧一处）**：`internal/config/schema.go` 删掉 `token_budget` 的 `default:"200000"` 标签，改为无标签 + 长注释。与同 section 兄弟键 `per_tool_timeout_ms`（`:475`，本来无标签）对齐；用户显式写的值仍绝对生效（`guard.go:104` 只要 `> 0`）；128k 基准仍是 200000（`budgets.go:37`）。
+
+**突变控制（真跑两发）**：仓外拷贝把 `default:"200000"` 放回 + `-overlay` ⇒ **`--- FAIL: Test365RunRowsAStuckTaskAsStuck (1.97s)`**（屏幕 `completed`／库 `done`）；恢复 ⇒ **`--- PASS (2.00s)`**（屏幕 `stuck`／库 `stuck`）。
+
+**稳定性**：本腿单独复跑 2.69s FAIL，加探针 3.82s FAIL，修后 2.00s PASS。同句同数，稳定真红，⛔ 偶发。
+
+**附带读数**：`MarshalCanonical` 无 omitempty（D36 rule 4），删标签后新建 config.toml 会渲染 `token_budget = 0`（探针实测），语义正确（0 = 不覆盖）且与 `per_tool_timeout_ms = 0` 同形；`TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags` 通过。
+
+**门禁**：`go build ./cmd/wisp/` rc=0 · `go vet ./cmd/wisp/` rc=0 · `gofumpt -l` 零输出 · `scripts/d22scan.sh` clean（480 files，`no D22 ban violations`，自测 `PASS=45 FAIL=0`）。
+
+**越界**：本腿 diff 只 `internal/config/schema.go` + 本证据件 + 本 Progress 条。⛔ 未碰 `PLAN.md`／`specs`／`thresholds.go`／golden／`allowlist.txt`／`frontend`／`design`。
+
+**与 365／164**：票 164 的 `brakeStuck` **没坏**（`loop.go:1058` 与触发条件 `:457` 一字未动）；本票只让 365 的宿主测试重新说真话。⛔ 未翻 365／164 任何 AC 框。
+
+**旁证（非本腿引入）**：`TestTicket198FirstRunCallerIsTheRunEntryOnly` 在 `HEAD` 版 schema 上同样 FAIL（`firstrun_198_test.go:281` AC J1 RED，`ensureFirstRunConfig` 被 `[runConfigSet65 runTextTask]` 调用），与本改动无关，已用 `-overlay` 回退基线验证。
+
+**证据件**：`docs/evidence/s1/430-365-stuck-probe.md`。
