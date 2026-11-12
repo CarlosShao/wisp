@@ -345,15 +345,43 @@ func (f *failingSource) Err() error                                 { return f.e
 // TestAC247HandingTheLevelToTheSeamIsNotVisibility is AC#10's reading half.
 //
 // This leg may claim one thing: the scalar reaches Ball.SetAudioLevel. It may
-// not claim the orb breathes on screen, because while prototypeVisuals is off
-// - which is the shipped default, and this leg is forbidden to flip it for a
-// prettier AC#2 - applyLevel returns at internal/ball/liquid_windows.go:52
-// before any pixel can move. Flipping that default belongs to ticket 68 AC#2.
-// The reading is taken off the exported flag, not off a comment.
+// not claim the orb breathes on screen, and it may not decide that question
+// either.
+//
+// The original form of this test asserted that prototypeVisuals was OFF in the
+// shipped assembly and read the "no pixel can move" half off that flag
+// (internal/ball/liquid_windows.go:52 returns before the liquid is touched
+// while the mode is off). That premise is gone: ticket 68 AC#2 flipped the
+// shipped default to ON on 2026-11-01 (commit 4b9efc889, registry A1378 "R15
+// 全按推荐"), and internal/ball/tokens_test.go:158 pins the new default from
+// the library side. Re-asserting OFF here would fail on the product as
+// shipped, and the pixel question is closed by that criterion: this test is
+// evidence about the handoff, not about pixels, in either direction.
+//
+// So the promise is kept in the form that does not depend on which way the
+// default points - which is what AC#10 was really forbidding. Ticket 247's
+// AC#10 text bans this leg from calling ball.EnablePrototypeVisuals(true) "to
+// make AC#2 look good", and it bans the opposite edit just as much: nobody
+// hands a level to the seam and moves the visibility mode on the way. Two
+// readings below hold that line.
+//
+//  1. Handing a level to the seam must not MOVE the mode. A leg that flips it
+//     either way while handing a number has crossed AC#10, and this reading
+//     stays armed whatever the default becomes.
+//  2. The handoff must not DEPEND on the mode: the same scalar still reaches
+//     the destination with the mode forced off. A seam that only delivers when
+//     pixels are allowed to move has fused the two facts AC#10 keeps apart.
+//
+// Both readings are taken off the exported flag and the seam's own counter,
+// never off a comment.
 func TestAC247HandingTheLevelToTheSeamIsNotVisibility(t *testing.T) {
-	if ball.PrototypeVisualsEnabled() {
-		t.Fatal("prototypeVisuals is ON in this assembly: the shipped default is off, and a leg that says it turned it on has crossed AC#10")
-	}
+	restored := ball.PrototypeVisualsEnabled()
+	t.Cleanup(func() { ball.EnablePrototypeVisuals(restored) })
+	// Recorded, not demanded: the value belongs to ticket 68 AC#2 and its pin
+	// lives in internal/ball. Demanding it here would turn every future
+	// styling ruling into a red in cmd/wisp.
+	modeAtAssembly := restored
+
 	rt, _ := bootAudioRuntime(t)
 	dir := writeAudioConfig(t, nil)
 	tap := &levelTap{}
@@ -361,7 +389,7 @@ func TestAC247HandingTheLevelToTheSeamIsNotVisibility(t *testing.T) {
 	if ra.gate == nil {
 		t.Fatalf("no collector to hand anything to: %q", ra.verdict)
 	}
-	// The seam still takes the number even though nothing on screen can move.
+	// Reading 1: the handoff must not move the visibility mode.
 	ra.levelOut(tap.call)(0.3)
 	if got := ra.levels.Load(); got != 1 {
 		t.Fatalf("levels handed to the seam = %d, want 1", got)
@@ -369,6 +397,25 @@ func TestAC247HandingTheLevelToTheSeamIsNotVisibility(t *testing.T) {
 	if tap.count() != 1 {
 		t.Fatalf("the destination saw %d levels, want 1", tap.count())
 	}
-	t.Logf("AC#10 reading: PrototypeVisualsEnabled()=%v levels_reaching_the_ball_seam=%d (a number arriving is not a pixel moving)",
-		ball.PrototypeVisualsEnabled(), ra.levels.Load())
+	if now := ball.PrototypeVisualsEnabled(); now != modeAtAssembly {
+		t.Fatalf("handing a level moved prototypeVisuals %v -> %v: a leg that turns the visuals on or off while handing a number has crossed AC#10", modeAtAssembly, now)
+	}
+
+	// Reading 2: the handoff must not depend on the mode. Forced off is the
+	// shipped state AC#10 was written against, and it is still reachable as the
+	// escape hatch, so the same scalar has to land there too.
+	ball.EnablePrototypeVisuals(false)
+	ra.levelOut(tap.call)(0.4)
+	if got := ra.levels.Load(); got != 2 {
+		t.Fatalf("levels handed to the seam with prototypeVisuals off = %d, want 2: the handoff stopped depending on a number arriving, not on pixels being allowed to move", got)
+	}
+	if tap.count() != 2 {
+		t.Fatalf("the destination saw %d levels with prototypeVisuals off, want 2", tap.count())
+	}
+	if ball.PrototypeVisualsEnabled() {
+		t.Fatal("the second handoff moved prototypeVisuals off -> on")
+	}
+
+	t.Logf("AC#10 reading: prototypeVisuals_at_assembly=%v levels_reaching_the_ball_seam=%d levels_with_the_mode_forced_off=%d (a number arriving is not a pixel moving, whichever way the default points; the pixel half is closed by ticket 68 AC#2, commit 4b9efc889)",
+		modeAtAssembly, ra.levels.Load(), tap.count())
 }
