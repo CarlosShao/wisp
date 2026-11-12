@@ -759,33 +759,8 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// C26 canonicalizer over the [fs] allowlist; the same instance is shared
 	// by the bridge and the fs tools, so the path the risk verdict judged is
 	// the path that opens.
-	allowed := make([]string, 0, len(cfg.FS.AllowedDirs)+1)
+	allowed := make([]string, 0, len(cfg.FS.AllowedDirs))
 	allowed = append(allowed, cfg.FS.AllowedDirs...)
-	// Ticket 174 AC#4: the artifacts tree is the ONE directory the agent's own
-	// spill writes into, and until now it was authorized by nobody - so
-	// task.output could point at a file the model was structurally unable to
-	// read back (D14's "按需再读" was an empty promise). The owner approved
-	// adding it to the [fs] authorization roots (census-199 §4 row 14 asks
-	// exactly this; A1571's B bucket covers 174 and says the contract-wording
-	// step is approved too), and the wording itself needs no change: PLAN.md's
-	// "read on demand" becomes true by this line rather than by editing it.
-	//
-	// WHY mem.ArtifactsDir() AND NOT filepath.Join(rt.spec.dataDir, "artifacts"):
-	// memory.Open resolves its dir through filepath.Abs (open.go:263) and builds
-	// artifactsDir from THAT absolute form (open.go:277), while rt.spec.dataDir
-	// is whatever the caller passed. Asking the store for the directory it
-	// actually writes into is what makes this root and the spill target the same
-	// spelling - the failure this avoids is silent: a root that differs from the
-	// spill target by a relative/absolute prefix authorizes a tree that the
-	// writes never land in, and InAllowlist then answers "outside" for a file
-	// this very process just created.
-	//
-	// The directory exists by now: memory.Open already created and sealed it
-	// (open.go:283 winsec.PrivateDirAll, ticket 89's A51①), and that ordering is
-	// what keeps this root out of PathCanonicalizer's unusable list - a root the
-	// OS cannot resolve is dropped, which would leave the ticket silently unfixed
-	// while every test still passed.
-	allowed = append(allowed, mem.ArtifactsDir())
 	rt.paths = tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)
 
 	reg := tools.NewRegistry()
