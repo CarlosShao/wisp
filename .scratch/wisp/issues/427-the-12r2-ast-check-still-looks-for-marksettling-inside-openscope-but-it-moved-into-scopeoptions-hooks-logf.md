@@ -96,3 +96,24 @@
 - ⛔ 翻任何 AC 框（翻框由编排者做，非实现者）。
 - 临时件只建不删，落 `D:\tmp\wisp\<YYYYMMDD>\427-<腿码>\`。
 - 跑测试**只经 carrier**，⛔ 裸 `go test ./cmd/wisp`（DLL 遮蔽会给出假读数）。
+
+## Progress log
+
+### 2026-11-12 20:1x — 写腿 427-12r2（实现者；⛔ 未翻任何 AC 框，翻框归编排者）
+
+证据件：`docs/evidence/s1/427-12r2-ast-anchor.md`。写面只有 `cmd/wisp/settle_trace_12r2_windows_test.go` 一枚，产码零字节。
+
+- **AC#0 复现＋扫描范围（逐字读 `:167`–`:191`）**：红句逐字＝`:193: 12r2: openScope no longer stamps T1 on the scope's SCOPE-SETTLING announcement, so the settle entry leg of AC#9 item 1 is unmeasurable`，`--- FAIL (0.01s)`、rc=1。
+  **扫描范围结论：锚在 `openScope` 的 `FuncDecl`**——`:169` `fn.Name.Name != "openScope"` 一命中就 `return false`（`:190`）停外层遍历，判据 `:172`–`:189` 全跑在 `openScope` 的函数体里。不是整文件扫，**所以修法＝搬锚点，不是放宽成全文 grep**。
+- **AC#1 选形＝乙**（理由一句话：甲只能证"同函数里两样都在"，而 AC#9① 买的承诺是**打戳被前缀判断门控**；把 `markSettling` 提到 `if` 外面＝T1 会对每条审计行都打戳，甲对这一形照样绿）。落地：锚点 `openScope`→`scopeOptions`（T1/T2 一并搬）；T1 收紧为"`markSettling` 在 `HasPrefix(..., "session: SCOPE-SETTLING")` 这个 `IfStmt` 的 `Body` 内"（条件本身与 `else` 臂都不算）；分支消失与戳掉出分支**两种回归分开红**；字面量单点常量化。改后 `PASS 0.01s`。
+- **AC#2 两发真跑（仓外拷贝盘上改写，⛔ 未用 `-overlay`）**：
+  - ⚠ **仪器事实（本程实测）**：这枚检查**运行时从盘上读源码**，`-overlay` 只换编译期输入 ⇒ 拿"删戳"的 overlay 建出的二进制跑在未变异盘上**PASS rc=0**，是**假绿**。故按票面"拷贝放仓外"做盘上改写；三棵树**同一枚测试二进制**（`sha256 9173453721…A012F2`）配不同盘上文本给出不同判决，坐实读数不是编译期差异。
+  - **发①删 `:484` `r.settle.markSettling()`** ⇒ **红**：`:217: …branch no longer stamps T1 (markSettling is not inside that branch's body)…`，rc=1。
+  - **发②把 `markSettling()` 提出 `if` 外（同函数内）** ⇒ **红**（乙的承诺）：同一句 `:217`，rc=1。
+  - **甲乙差别现量**（仓外纯 `go/ast` 探针）：基线 `A绿/B绿`；删戳 `A红/B红`；**提出去 `A绿/B红`**——票面 :75 预言的差别坐实，甲在这一格放过"错读数"。
+  - 还原核：基线树产码原样重跑 `PASS rc=0`。
+- **AC#3 越界**：`git diff --name-only` 五行，本腿只占 `cmd/wisp/settle_trace_12r2_windows_test.go`；`cmd/wisp/resident_voice_wire_r1_windows_test.go` 是**他腿 426** 的脏改（mtime 20:09:04，本程 20:03 起手，内容＝owner-queue barrier 改写，本程零触碰零 commit）；另三行起手前既存。禁面全未动，`build/mut_rvw.go` 未删。
+- **AC#4 门禁四读数**：`go build ./cmd/wisp/` **rc=0**；`go vet ./cmd/wisp/` **rc=0**；`gofmt -l`／`gofumpt -l` **两尺零输出**；`tools/d22scan`（独立 module，`go build .`）**clean rc=0 零新增违规**。
+- **AC#5**：只修这一枚锚点，⛔ 不宣称 T0/T1/T2 三戳全绿（T2 半另计）；⛔ 未碰 `Test12r2SettleWalkFiveSamplesEndToEnd`、⛔ 未动产码 `markSettling` 位置、⛔ 未改 `docs/PLAN.md`／`docs/specs/**`。
+- **未做（具名）**：未跑整包 `cmd/wisp`（同包有他腿在飞，且票面只要求这一枚）；`-overlay` 假绿坑只在本检查上实测、未普查其他运行时读盘的检查；`run.go` 那半（T0）的锚点是否也过期未审计。
+- 临时件：`D:\tmp\wisp\20261112\427-12r2\**`（`mut1`／`mut1-del`／`mut2-hoist`／`ov`／`predicate`／`d22`，只建不删）。

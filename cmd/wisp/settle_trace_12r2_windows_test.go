@@ -160,41 +160,104 @@ func Test12r2SeamCallSitesAreTheMeasurement(t *testing.T) {
 			"so the AC#9 measurement has no T0 and the 3s settle record is unmeasurable")
 	}
 
-	// T1/T2: openScope must stamp on the scope's own settling announcement and
-	// on the dispose cascade's memory-return step, anchored on the scope's own
-	// audit prefix.
-	t1, t2, tag := false, false, false
+	// T1/T2: the scope must stamp on its own settling announcement and on the
+	// dispose cascade's memory-return step.
+	//
+	// WHERE THE ANCHOR IS, AND WHY (ticket 427): both stamps used to sit in
+	// openScope, and this check scanned that FuncDecl. Production refactored the
+	// scope's options into scopeOptions (ticket 423's addressable config seam),
+	// so the hooks - and with them both stamps - moved into that function's
+	// closures. The old anchor was therefore reporting a stamp that had moved as
+	// a stamp that was gone: a stale anchor, not a dead mechanism (the sibling
+	// end-to-end walk proves the mechanism still fires).
+	//
+	// The anchor is scopeOptions now, and for T1 the criterion is deliberately
+	// the BRANCH, not the function: the promise AC#9 item 1 buys is that the
+	// stamp is gated by the scope's own SCOPE-SETTLING prefix test. A
+	// markSettling hoisted out of that if would stamp T1 on every audit line the
+	// scope ever prints - a wrong reading rather than a moved one - so
+	// "somewhere in this function" would pass exactly the regression the check
+	// exists to catch.
+	settlingBranch, t1, t2 := false, false, false
 	ast.Inspect(enginesAst, func(n ast.Node) bool {
 		fn, ok := n.(*ast.FuncDecl)
-		if !ok || fn.Name.Name != "openScope" || fn.Body == nil {
+		if !ok || fn.Name.Name != "scopeOptions" || fn.Body == nil {
 			return true
 		}
 		ast.Inspect(fn.Body, func(m ast.Node) bool {
-			switch x := m.(type) {
-			case *ast.CallExpr:
-				if sel, ok := x.Fun.(*ast.SelectorExpr); ok {
-					if sel.Sel.Name == "markSettling" {
-						t1 = true
-					}
-					if sel.Sel.Name == "markFellBack" {
-						t2 = true
-					}
+			ifStmt, ok := m.(*ast.IfStmt)
+			if !ok || !testsSettlingPrefix(ifStmt.Cond) {
+				return true
+			}
+			settlingBranch = true
+			// Only the branch body counts: the condition itself and the else
+			// arm are the two places a stamp would look anchored and not be.
+			ast.Inspect(ifStmt.Body, func(b ast.Node) bool {
+				if call, ok := b.(*ast.CallExpr); ok && isSelectorCall(call, "markSettling") {
+					t1 = true
 				}
-			case *ast.BasicLit:
-				if x.Value == `"session: SCOPE-SETTLING"` {
-					tag = true
-				}
+				return true
+			})
+			return true
+		})
+		ast.Inspect(fn.Body, func(m ast.Node) bool {
+			if call, ok := m.(*ast.CallExpr); ok && isSelectorCall(call, "markFellBack") {
+				t2 = true
 			}
 			return true
 		})
 		return false
 	})
-	if !t1 || !tag {
-		t.Fatal("12r2: openScope no longer stamps T1 on the scope's SCOPE-SETTLING announcement, " +
-			"so the settle entry leg of AC#9 item 1 is unmeasurable")
+	if !settlingBranch {
+		t.Fatalf("12r2: scopeOptions no longer branches on the scope's own %s audit prefix, "+
+			"so the T1 stamp has no anchor and the settle entry leg of AC#9 item 1 is unmeasurable",
+			settle12r2SettlingPrefix)
+	}
+	if !t1 {
+		t.Fatalf("12r2: scopeOptions' %s branch no longer stamps T1 (markSettling is not inside that "+
+			"branch's body), so the settle entry leg of AC#9 item 1 is unmeasurable", settle12r2SettlingPrefix)
 	}
 	if !t2 {
-		t.Fatal("12r2: openScope no longer stamps T2 on the dispose cascade (FreeOSMemory step), " +
+		t.Fatal("12r2: scopeOptions no longer stamps T2 on the dispose cascade (FreeOSMemory step), " +
 			"so the fall-back leg (Settling->dispose) is unmeasurable")
 	}
+}
+
+// settle12r2SettlingPrefix is the scope's own audit line head for the settling
+// announcement: the literal the T1 stamp is anchored on, in one place so the
+// check and its failure messages cannot drift apart.
+const settle12r2SettlingPrefix = `"session: SCOPE-SETTLING"`
+
+// isSelectorCall reports whether call has the shape x.<name>(...).
+func isSelectorCall(call *ast.CallExpr, name string) bool {
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	return ok && sel.Sel.Name == name
+}
+
+// testsSettlingPrefix reports whether cond is the prefix test the T1 stamp is
+// anchored on: a HasPrefix call carrying the SCOPE-SETTLING literal as one of
+// its arguments. The receiver package is deliberately not named - aliasing
+// strings is not a drift in the promise - but the literal must be an argument
+// of THAT call, so a branch testing something else cannot stand in for it, and
+// the walk accepts a compound condition (a guard ANDed onto the prefix test
+// still tests the prefix).
+func testsSettlingPrefix(cond ast.Expr) bool {
+	if cond == nil {
+		return false
+	}
+	found := false
+	ast.Inspect(cond, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok || !isSelectorCall(call, "HasPrefix") {
+			return true
+		}
+		for _, arg := range call.Args {
+			if lit, ok := arg.(*ast.BasicLit); ok && lit.Value == settle12r2SettlingPrefix {
+				found = true
+				return false
+			}
+		}
+		return true
+	})
+	return found
 }
