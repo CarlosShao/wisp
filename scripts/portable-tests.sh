@@ -462,6 +462,19 @@ cli)
     # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
     # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
     # 98), and that script stages them and refuses to run if they are not there.
+    #
+    # TICKET 409's FINDING, EXTENDED HERE (round 87): PATH is the WRONG lever for
+    # the SECOND-level dependency. Windows resolves the whole import tree at
+    # process load time, searching the executable's directory first and System32
+    # before PATH - so on a host whose System32 carries an OS-provided
+    # onnxruntime.dll (measured here: 1.17.1), the loader binds THAT copy
+    # whatever PATH says, and every voice-backed test in cmd/wisp reports the
+    # shadowing verdict instead of measuring the product. The 2026-11-12
+    # whole-package run read 39 such reds out of 52 on this host, none of them a
+    # product defect. internal/speech solved the identical problem in ticket 409
+    # by staging the pinned DLLs next to the test binary and running that binary
+    # from the package directory; the run step below routes cli through the same
+    # shape (scripts/wisp-cli-staged-tests.sh).
     scope=(./cmd/wisp/)
     pinned=$cli_pin
     ;;
@@ -1002,6 +1015,29 @@ if [ "$mode" = speech ]; then
         "scripts/speech-tests.sh (ticket 409) - the strict runner cannot judge this package:"
     echo "portable-tests.sh: the loader resolves the sherpa DLL tree at process load time," \
         "so the carrier stages the pinned DLLs next to the test binary first."
+    bash "$carrier" 2>&1 | tee "$capture" || rc=$?
+elif [ "$mode" = cli ]; then
+    # Same reasoning as the speech branch above: cmd/wisp's test binary links the
+    # sherpa import library too, so its second-level onnxruntime dependency is
+    # resolved by the loader BEFORE any Go code runs. PATH cannot influence that
+    # ordering (System32 is searched before PATH), which is exactly what ticket
+    # 409 established for internal/speech. The carrier stages the pinned DLLs
+    # next to the binary and runs it from the package directory; its stdout is
+    # the same -v stream, so the four numbers below are read off it unchanged.
+    # This does NOT relax the ticket-98 GUARD, the SKIP rule or any assertion -
+    # only HOW the binary is launched changes.
+    carrier="$here/wisp-cli-staged-tests.sh"
+    if [ ! -f "$carrier" ]; then
+        echo "portable-tests.sh: $carrier is missing - the cli tier routes through it and" \
+            "refuses to invent a weaker run in its place." >&2
+        rm -f "$capture"
+        exit 2
+    fi
+    echo "portable-tests.sh: mode=cli routes [${scope[*]}] through the staging carrier" \
+        "scripts/wisp-cli-staged-tests.sh - the strict runner cannot judge this package:"
+    echo "portable-tests.sh: the loader resolves the sherpa DLL tree at process load time and" \
+        "System32 is searched before PATH, so the carrier stages the pinned DLLs next to the" \
+        "test binary first (ticket 409's shape, extended to cmd/wisp)."
     bash "$carrier" 2>&1 | tee "$capture" || rc=$?
 else
     sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?
