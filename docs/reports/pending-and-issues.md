@@ -36796,3 +36796,24 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★我的一次事故（如实记）**：第一次改时我用 `$C` 存第 3 个锚点串，**PowerShell 变量名不区分大小写 ⇒ `$C` 覆盖了 `$c`（整个文件内容）**，`ci.yml` 被写成 126 字节。**处置**：`git restore --source=HEAD -- .github/workflows/ci.yml`（单文件、非被禁的 `checkout .`）恢复，核实 103421B／1579 行／`git diff` 空／YAML OK；**改用不撞名的变量重做**。
   - 第二次又踩一个坑：插入新步用的锚点 `run: powershell ... build.ps1 -Env dev` **在 3 个 job 里都有**，`.Replace` 把新步插进了 `slo-smoke`／`slo-full`。**靠 YAML 解析后枚举步名当场发现**（打印出 4 个 staticcheck 步），再恢复、换成唯一锚点（票 111 fetch 步名）重做。
   - **教训入账**：①PowerShell 变量不区分大小写，别用只差大小写的两个名；②`.Replace` 前先数锚点出现次数，`count != 1` 就换锚点；③改完必须用**解析器**验证结构（不是只看文件大小）。
+
+## A1852 — 旧 matcha 字节**无处可得**（GitHub 换了、HF 11 个 revision 都不是）；裁定＝**重钉到当前上游**，已派两腿
+
+- **HF revision 逐个查（HEAD 读 LFS 头，未下载）**：
+  | revision | 日期 | size | sha256 |
+  |---|---|---|---|
+  | main / `6ccce73a41f1` | 2026-11-12 | 75624188 | `ab480153…` |
+  | `a447c1f6b205` | 2026-10-29 | 75624188 | `e0d654f5…` |
+  | `4ddc32d1724e` | 2026-10-24 | 75624188 | `ab480153…` |
+  | `f74e0b9e5bc0` | 2026-10-08 | 75624188 | `991a78d3…` |
+  | `75e64a57a80f` | 2026-07-10 | **75624611** | `a5e33b93…` |
+  | `c640c89b3017` | 2026-06-01 | 75624611 | `8d2a76e1…` |
+  - **没有任何 revision 的 sha 等于旧 pin `ef7ebdf5…`** ⇒ **旧字节只存在于本机 `third_party/`。** 注意 `75e64a57`/`c640c89b` 的**大小**与旧 pin 一致（75624611）但**内容不同** ⇒ 上游在 7 月前就已换过一次内容。
+- **★我的裁定（铁律⓪⓪⓪）**：**把 matcha 夹具的 pin 重新钉到当前上游真实字节**（归档 sha/size、`model-steps-3.onnx` sha/size、并补上包内多出的 3 个文件），**并验证新模型不破坏 TTS 测试**。
+  - **理由（不是「为了绿而降级」）**：①旧 pin **在物理上不可满足**（GitHub＋HF 全查过），留一个谁也拿不到的 pin ⇒ 那步**永久红** ⇒ 反而掩盖真问题；②这张 pin 的用途就是「让 CI 冷下载能校验」——钉一个可获得的真值才恢复它的功能；③该夹具 `status: blocked-p3`、许可 `NON-COMMERCIAL-ONLY`、**dev/measurement only**，不是出货面。
+  - **代价写明**：新模型与旧模型**字节不同**（75,624,188 vs 75,624,611）。若 TTS 用例因输出变化而红，**⛔ 不许改期望值**，回来我裁。
+  - **⛔ 我明确否决的两条路**：①把我们本地旧字节上传成自家 release 资产再钉（**那是分发 NON-COMMERCIAL 模型＝许可问题＋发布＝摆机主**）；②把 fetch 步 `continue-on-error`（那是把报警器摘掉）。
+- **已派两腿（写面不重叠）**：
+  - `workflow-5fb95f3751604741`（**8a**，`build/models/manifest.json` ＋ 证据件；派单存档 `111-wave8a-matcha-repin-dispatch.txt`）
+  - `workflow-8321624bfc6b4439`（**8b**，`scripts/wisp-cli-staged-tests.sh` 名册三路并集＋`FIXTURE-GAP` 防呆 ＋ `cmd/wisp/config_reload_perm_223_windows_test.go` 具名跳过＋ledger 行；派单存档 `111-wave8b-roster-223-dispatch.txt`）
+- **★记一条方法论**：一晚上三次「本地绿 / CI 红」都出自**平台或环境差异**（census 的 CRLF、cgo 的 scope、linux 交叉编 cgo）。**以后凡涉及平台条件的东西，先想「CI 那台和我这台哪儿不一样」，而不是先怀疑代码。**
