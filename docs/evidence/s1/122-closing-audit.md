@@ -211,10 +211,13 @@ FAIL
 
 - **5 格全判「满足」** ⇒ 勾框（`- [ ]` → `- [x]`，AC 文字未改）＋ `git mv` 加 `-done` 后缀。
 - 新文件名：`122-clear-the-staticcheck-backlog-after-85a-done.md`
-- commit：显式 pathspec，⛔ push。
+- commit（显式 pathspec，⛔ push）：
+  - `a9334851f90d571ffdc5d7570b64c6f16556263b` — 加 `-done` 新件＋证据件；
+  - `9600f5eedb745a75c931570cb0f9e62987ff9f3b` — 删旧名，完成改名。
+  - 净效果＝改名＋勾 5 格＋Progress log＋证据件；⛔ 未 push。
 
 ## 越界自证
 
-- 写面：`docs/evidence/s1/122-closing-audit.md`（本表，新）＋ `.scratch/wisp/issues/122-clear-the-staticcheck-backlog-after-85a.md`（勾框＋Progress log＋改名）。
-- ⛔ 零 `.go`／测试／`scripts/**`／`internal/**`／`cmd/**`．`.github/**`／`models/**` 改动；⛔ 未加任何 `//lint:ignore`；⛔ 未改任何 checker 开关/阈值/断言/golden。
+- 写面：`docs/evidence/s1/122-closing-audit.md`（本表，新）＋ `.scratch/wisp/issues/122-clear-the-staticcheck-backlog-after-85a-done.md`（勾框＋Progress log＋改名）。
+- ⛔ 零 `.go`／测试／`scripts/**`／`internal/**`／`cmd/**`／`.github/**`／`models/**` 改动；⛔ 未加任何 `//lint:ignore`；⛔ 未改任何 checker 开关/阈值/断言/golden。
 - 临时件全部落 `D:\tmp\wisp\20261113\122-close\`（只建不删）。
