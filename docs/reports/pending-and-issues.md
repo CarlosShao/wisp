@@ -36738,3 +36738,12 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **已派**：`workflow-74cac58bfaaa4a34`（波 7，`magpie-high`/`glm-5.3-flash`，全仓唯一可碰 `cmd/wisp/**` 的写腿），派单存档 `122-wave7-cgo-scope-dispatch.txt`，附 24 条逐条表＋四档判据＋三条要点名判语义（SA4004／SA1019／`SetHtml` 是否反射绑定）。
 - **校验**：`ci.yml` `py -3 yaml.safe_load` = **6 jobs OK**；抽出该段 `bash -n` **rc=0**。
 - **★自我更正**：我第一次改 ci.yml 时写 `$null=$c.Replace(...)`，**把结果丢进 $null**（PowerShell 字符串不可变），7 处替换全没生效。**是我写错，不是文件坏**——`git diff` 空、YAML 仍 OK，随后赋回 `$c` 重做成功。**记在这里防下次重犯。**
+
+## A1848 — 票 111 第三把尺（我自己跑完）：**有夹具全量 = RUN 796／PASS 606／FAIL 1／SKIP 10，1231 秒**；1 个 FAIL 是已知真窗偶发
+
+- **我这发是自己起 cgo 跑的整套**（`CGO_ENABLED=1` ＋ mingw gcc ＋ 本机有夹具 ⇒ 走「有夹具」路径，日志末 `CARRIER_RC=1`）。
+- **读数**：`顶层 RUN=796`、`--- PASS=606`、`--- FAIL=1`、`--- SKIP=10`、**耗时 1231 秒（20 分 31 秒）**。
+- **那 1 个 FAIL ＝ `TestAC4FocusReturnToPriorWindowGap33r5`**：`panel_host_windows_test.go:991/995`，报「面板 Show 时没抢到前台」（`foreground 0x94e0122, panel hwnd 0x8a21250`）——**真窗前台时序，机器耦合**；腿在证据件里**预先点名**过「AC4Focus（真窗族已知红，重试后绿）」，**与我这里吻合，不是我发现的意外**。
+- **10 个 SKIP 全是硬件 live 探针**（`TestAC247LiveMicrophoneLevels…`、`Test26P*` 五枚回声/AEC、`Test392*` 三枚、`Test16r1PremortemMicPermissionDenied…`）——**环境门控，合法**（票 71 AC#3 的「SKIP 不算 pass」讲的是**未被记账的** SKIP；这 10 枚在 `scripts/portable-tests.sh` 台账里有行）。
+- **★最关键的一条副产品：1231 秒＝20.5 分钟实测。** 这**量化坐实了我把 `test-windows` job 超时 30→60 的裁定**（A1846）：**光跑测试就 20.5 分，前面还要冷下载夹具 ⇒ 30 分必炸，60 分才对。** 这个数现在有真实来源，不再是我拍的估算。
+- **⇒ 票 111 三把尺齐**：提交 `84fc7aba9` 真在（5 件、零越界）／证据件 15379B 真在／**我自己复跑两种形态都验了**（无夹具＝具名跳过 41 枚＋包级结果行；有夹具＝796 枚全跑、voice 真执行）。
