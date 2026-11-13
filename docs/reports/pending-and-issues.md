@@ -36972,3 +36972,19 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **顺带记一条无害噪声**（如实，不慌）：carrier 日志里有 4 行 `sherpa-onnx … Unknown token: shei2`（lexicon 转换期的告警，来自 pinned 模型词典，**不影响用例判决**，本发 7/7 PASS）。
 - **票 122 审计腿**：证据件 `docs/evidence/s1/122-closing-audit.md` **16145B / 215 行**已写出，但**仍是未跟踪**（腿未提交）⇒ 待它落地或我收尸。
 
+
+## A1859 — 票 122 **结案并经我自验**（windows 半边我自己跑；linux 半边**在 Windows 上物理不可跑**，权威读数只能取 CI）；`scripts/` 那条腿真空手已重派
+
+### 票 122 结案事实（`a9334851f` / `9600f5eed` / `d778fb445`）
+- 改名 `122-clear-the-staticcheck-backlog-after-85a-done.md`；**7/7 AC 全勾**；证据件 `docs/evidence/s1/122-closing-audit.md` **220 行**入库。
+- **我的自验（不听它说）**：
+  - **windows 口径我自己跑**：`GOOS=windows CGO_ENABLED=1 -tags=winlive`，按名排除 `./build` ⇒ **`WINDOWS-RC=0`，41 包，零 findings**（与我今晚早些时候的独立读数一致）。
+  - **linux 口径我跑出来的读数无效，原因写清**：我设了 `CGO_ENABLED=0` ⇒ 得 `-: build constraints exclude all Go files in …sherpa-onnx-go-linux@v1.13.8 (compile)`、`LINUX-RC=1` ⇒ **那是一条 `(compile)` 行，不是 findings**，**错在我的口径**（正是 A1847 那条教训的镜像）。
+  - **★结论**：**linux 半边在 Windows 上物理不可跑**——本机 gcc 是 mingw，**不能把 cgo 交叉编到 linux**。⇒ 权威读数**只能**取 `lint` job 第 13 步（ubuntu runner，默认 cgo）＝**success**，而这正是票 122 **AC#6 自己指定的结案判据**。⇒ **结案成立。**
+- 三模块各跑一遍：`tools/d22scan` PASS1-RC=0、`tools/mockllm` PASS1-RC=0。
+
+### `scripts/` 腿（314c 第一发）**真空手**
+- `workflow-a7951a2e600a4f7e` 返回空，盘上**零改动**（`portable-tests.sh` 未改、无证据件、无 commit）⇒ **不是幽灵但有活，是彻底没干**。
+- **我观察到的高档幽灵模式（记下来）**：今晚 **`magpie-high` 写腿 4 条里 2 条幽灵化**（波 10 幽灵但有活／314c 真空手），而 **`magpie-max` 3 条（314 测量、314 诊断、122 审计）全部交付**。
+- **我的技术处置**（不违反机主路由令）：写腿**仍走 `magpie-high`**，但**派单改短**（短派单这两次都交了）⇒ 已用短派单重派 `workflow-7fbcbf85dcb840ff`。
+
