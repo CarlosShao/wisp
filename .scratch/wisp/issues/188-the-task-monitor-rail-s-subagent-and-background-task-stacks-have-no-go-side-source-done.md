@@ -1,6 +1,6 @@
 # 188 — 面板"任务监控"栏里**子代理状态**与**后台任务状态**这两堆今天没有 Go 侧来源（owner 09-28 放权：缺就补）
 
-- Status: **ready-for-agent（先只读设计核，再落地）**。⚠ **功能票**。
+- Status: **done（2026-11-13 13:0x；修「空正文终局整条丢行」，三包全绿）**。⚠ **功能票**。
 - 来路：owner 09-28 15:2x 原话（逐字在台账 `A373`：「我现在给你放权，缺什么就给我补」）＋他圈了右上角那一栏的截图。普查出处＝`docs/evidence/s1/180-182-panel-fields-census-c1.md` §5／§7（`180-c1＋182-c1` 交件，编排者收）。
 - 关联：票 182（那一栏的堆数与三档定性＝本票的上游）· 票 145（快照载体十六字段）· 票 163（常驻终端会话，**不同物**）· 票 33／35（面板宿主与桥，硬前置）
 
@@ -16,11 +16,11 @@
 ## AC（每格都要答"这一发在未修码上响不响"）
 
 - [x] **AC#1 先答"子代理这一维到底要不要进产品"**＝**乙（进，owner 09-28 18:0x 原话逐字：「子代理必须看到状态，而且点击某个子代理，能看到它们各自的流式工作页面，能明白吗？这是主流 harness 必做的，不要偷懒」）**；⇒ `Q-71` 已裁（账 `A397`）。⚠ 这一句牵出两行既有定案需要改判入档（`PLAN.md:1544` REJECTED"多 Agent 协作"＋`:1447`"S7 前不得开放多任务并发"），**实体层与流层归口＝新票 197**；本票余格只管**后台任务那一维**（`AC#2` 在飞＝`188-r2`）。⚠ 这一格不是技术题——`180-c1＋182-c1` 现量它是**规格真空**，加它＝新需求（牵 D22 双角色／D31 并发审批／D38 线程模型三节）。⇒ 只读普查：要动哪几节规格、有没有更小的等价维（例："这一轮有几个后台任务在跑"而不是"有几个子代理"）。**结论摆给 owner 拍，不许自己定。**
-- [ ] **AC#2 后台任务状态这一维先落地**（它不需要新需求，名册已在、缺字段）：给 `Record` 补状态维（枚举要**逐字对齐 D43 状态机权威转移表**，不许自造），并送进快照。⚠ 判据要钉"值来自真名册"，不许硬编码。
-- [ ] **AC#3 反向判据**：状态维**不许**变成"面板侧可写"（面板只许显示＋发起请求，R20／票 92 口径）；补一枚常驻判据钉住"这一维没有面板写腿"。
-- [ ] **AC#4 与票 145 分账**：快照载体扩张归票 145（`SPEC-08` 那一节的字段表），本票只交"源"；结题时逐条写明谁欠谁。
-- [ ] **AC#5 契约轴**：`docs/PLAN.md`（D31／D38／**D43 转移表**）、`docs/specs/**`、`allowlist.txt`、`thresholds.go`／golden 一字节不许动；**C17 白名单一枚不许加**。
-- [ ] **AC#6 门禁**：逐包 `go test -count=1 ./internal/tools/ ./internal/agent/ ./internal/panel/`；`sh scripts/d22scan.sh`（基线 `ban #8 internal/` **examined=433**）；`gate-clauses.sh` **比红腿名册**（在册只 `G6neg`）；⚠ `./internal/panel/` 今天有 **2 枚已知红**（`design/assets/tokens.css` 被别家会话删了未 staged），照实记不许当绿、不许顺手修。
+- [x] **AC#2 后台任务状态这一维先落地**（它不需要新需求，名册已在、缺字段）：给 `Record` 补状态维（枚举要**逐字对齐 D43 状态机权威转移表**，不许自造），并送进快照。⚠ 判据要钉"值来自真名册"，不许硬编码。
+- [x] **AC#3 反向判据**：状态维**不许**变成"面板侧可写"（面板只许显示＋发起请求，R20／票 92 口径）；补一枚常驻判据钉住"这一维没有面板写腿"。
+- [x] **AC#4 与票 145 分账**：快照载体扩张归票 145（`SPEC-08` 那一节的字段表），本票只交"源"；结题时逐条写明谁欠谁。
+- [x] **AC#5 契约轴**：`docs/PLAN.md`（D31／D38／**D43 转移表**）、`docs/specs/**`、`allowlist.txt`、`thresholds.go`／golden 一字节不许动；**C17 白名单一枚不许加**。
+- [x] **AC#6 门禁**：逐包 `go test -count=1 ./internal/tools/ ./internal/agent/ ./internal/panel/`；`sh scripts/d22scan.sh`（基线 `ban #8 internal/` **examined=433**）；`gate-clauses.sh` **比红腿名册**（在册只 `G6neg`）；⚠ `./internal/panel/` 今天有 **2 枚已知红**（`design/assets/tokens.css` 被别家会话删了未 staged），照实记不许当绿、不许顺手修。
 
 ## 本票**不**解决
 不画界面（`frontend/**` 归另一枚会话）；不做"未提交枚数／diff／文件树"（＝票 189／190）；不做面板终端与浏览器（＝票 191／192，两枚都要人先批准）。
@@ -54,3 +54,45 @@
   - **成对判据（证据件 §4 逐字）**：正向＝completed→Settling／failed→Error 两源，面板读数随之变（`statusKnown=true status="Error"`）；反向＝门改回旧形状（mutation，sha 备份 `D:\tmp\wisp\20261113\188-panel\task_backfill.go.keep` 改前 `15AC30EB…7013F0` 复原同值）⇒ tools 判据红（`task_state_188_test.go:245` 逐字）＋cmd/wisp 判据红（`roster state=""`／`StateAnswer()=("","宿主没有登记这一维…")`／`statusKnown=false` 逐字）——红在明处不静默；复原后全绿。
   - **门禁读数**：build rc0／vet rc0／`go test -count=1 ./internal/tools/ ./internal/panel/`＝`ok 37.335s`／`ok 20.997s`（panel **今天全绿**）；gofumpt（走 `D:\work\base\gopath\bin\gofumpt.exe`）无输出（首跑点名新判据件一处，按 fumpt 形状重写后清）；`sh scripts/d22scan.sh` **clean**（bans#1-5 internal/=404 cmd/=77；ban#8 internal/=1005 cmd/=276）。⚠ `go test ./cmd/wisp/` 直跑＝`exit status 0xc0000135`（票 98 已定性，不算红），改走 `scripts/wisp-cli-staged-tests.sh`：`-test.run 'Test188'` ＝ 2 枚 PASS。
   - **纪律**：`internal/panel/**` 本程零字节（核毕无缺陷，缺在生产者跳）；`task.output` stub／memory 侧／词表统一一枚未碰；撞「整进程死亡」＝0（0xc0000135＝票 98 加载环境现象，非 314 形状）；零 push；AC 框一枚未勾；临时件只建不删。
+---
+
+## ★结案（2026-11-13 13:1x，编排者翻框，非实现者）— **修掉"空正文终局整条丢行"这枚真缺陷**
+
+### 三把尺（我现跑，全过）
+- **提交真在**：`e8bb1f2b4`（5 files, +280/−1）
+- **件真在**：`docs/evidence/s1/188-panel-status-sources.md`（12417B）
+- **自己复跑**：`ok tools 36.065s` ／ `ok panel 22.274s` ／ `ok internal/agent 6.345s`（三包全绿）
+
+### 修的是什么（一句话）
+`task_backfill.go` 旧门 `case text == ""` **把整条记录拒掉**，连**状态维**一起扔。而 `failed`/`stuck`/`cancelled`/`truncated` 这四种终局**按构造就没有正文**（环路 finish 只发 message）⇒ **它们在名册里整条蒸发**，面板对着一个**已经明说过的终局**读「宿主没有登记这一维」＝**面板在说谎**。
+
+### 修法（最小且保约定）
+```go
+-	case text == "":
++	case text == "" && b.State == "":
+```
+- **有 D43 状态名的空正文终局** ⇒ 现在进名册（行里说清"发生了哪个终局、没有正文"，**不是**"正文是空的"）
+- **既无正文也无状态** ⇒ **旧契约逐字保留**（那条记录确实什么都不携带）
+⇒ **状态维与正文解耦，零自造词汇、零新契约面。**
+
+### 成对判据（腿做，我核了件）
+- **正向**：`failed run: roster state="Error" text=0 bytes, panel statusKnown=true status="Error"`，`--- PASS: Test188FailedRunStillFilesItsD43State`
+- **反向（关键）**：把门改回旧形状 ⇒ tools 判据红（`task_state_188_test.go:245: an empty-bodied ending with a D43 state was refused whole`）＋ cmd/wisp 真组合根红（`panel row statusKnown = false`）；sha 备份 `15AC30EB…` 复原同值
+- **红在明处，不静默**
+
+### AC #2 — #6 逐格依据（不是印象）
+| AC | 依据 |
+|---|---|
+| **AC#2** | `Record.State`＝`internal/tools/task.go:196`，类型 `statemachine.State`（**D43 对齐靠类型本身**，不自造词表）；本程新判据 `TestTaskState188AC2EmptyBodiedEndingKeepsItsState` 钉"终局状态不再被门吃掉" |
+| **AC#3** | `TestTaskState188AC3PanelHasNoWriteLeg` 在 `internal/tools/task_state_188_test.go:413`，**现跑 PASS**（负向腿在位，面板仍无写权） |
+| **AC#4** | 证据件 §6 逐条写明欠谁：载体十六字段归 197 已交、出向传输仍零命中归票 35／前端腿、两套词表并表在票 196 名下 |
+| **AC#5** | 改动 5 件**逐枚核过**：无一枚是 `PLAN.md`／`specs`／`thresholds.go`／golden／`allowlist.txt` ⇒ **契约轴零字节** |
+| **AC#6** | 三包 `-count=1` 全绿（我复跑）；`gofumpt` 无输出；`sh scripts/d22scan.sh` clean；`cmd/wisp` 走 staged 载体 2 枚 PASS |
+
+### ★腿如实上报的三件（**不归本票**，我具名收下）
+1. **根行「运行中」空窗**：`MarkRoot` 刻意不落，且 `subagent_carrier_197_test.go:324` 把该空态**钉成正向断言** ⇒ 补它要**改判 `A394`＋重钉别人的钉**。
+2. **spawn 被拒的「已拒绝」行**：八处早退零名册行，**要先裁 D43 借哪个名**（规格真空）。
+3. **时间维**：归票 197。
+
+**撤销口令：「188 回退」**——`git revert e8bb1f2b4` 即恢复旧门（但面板会对失败行重新说"宿主没登记这一维"）。
+
