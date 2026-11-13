@@ -45,3 +45,8 @@
 2. 证据件 `docs/evidence/s1/440-acl-parser-drift.md`
 3. 票面追加 Progress log。**⛔ 翻 AC 框**（编排者做）。
 4. commit，**显式 pathspec**，**⛔ push**。
+
+## Progress log
+
+- **2026-11-13 腿 440-v1**：AC#0 完成——射程差逐条（含 deny/继承两问的归属）＋真实 dump 逐行对照（`%TEMP%\wisp440-6ff42f5d`，`/deny` 实造，实测 deny 形状 `BUILTIN\Users:(DENY)(DC)`、继承形状 `NT AUTHORITY\SYSTEM:(I)(F)`，标记全在 `:(` 之后的载荷里）＋结构体验（`aceLine` 有 flag 字段＝`Rights` 载荷原文；`aclSIDs` 丢的正是它）。**比对额外发现**：`:(` 解析惯用法全仓 **5 份**不是 2 份（observe/config/agent 各一份内联，已登记进证据件 §0.4，不归本票收）。AC#1 判归＝**甲**，落点 `internal/winsec/aclparse.go`（winsec 本体内新增非测试文件，**非新包**——理由：models→winsec 无循环（grep 现跑，反向才有）＋ `portable-tests.sh` GUARD C/D 的静态名册机制＋scripts/ 不在本票写面，详见证据件 AC#1）。AC#2 完成：models 本地定义改 `var/type = winsec.X` 委托、`aclSIDs` 改薄包装（签名不变，33 处调用零改动），测试函数计数 models 3→4 / winsec 5→5（零断言删除）；成对判据 `TestAC440TheSharedParserKeepsTheRightsPayload` 钉进 portable 腿＋变异实证（`Rights` 填空 → AC440+AC47 红 → 还原复绿）。AC#3 契约件零触碰。AC#4 三条门禁合并后终态全绿（models 10.642s / winsec 26.788s；gofumpt 空；d22scan clean，本机经 `D:\work\soft\Git\bin\bash.exe` 调用——裸 `bash` 解析到 WSL 无 bash，环境注记在证据件）。AC#5 边界声明在证据件（收：双副本合并＋射程注释＋238 AC#4③ 归属落账；不收：三份内联副本、aclSIDs 调用面迁移、策略层、CI 名册）。票 238 AC#4③ 的悬账自此有归属＝本票。commit 显式 pathspec（四 Go 件＋证据件＋本票面），未 push。
+

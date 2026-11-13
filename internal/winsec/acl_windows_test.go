@@ -77,7 +77,21 @@ func sidOf(t *testing.T, account string) string {
 }
 
 // aclSIDs returns the SIDs (and the printed names) of the principals holding an
-// ACE on path. Names are resolved rather than string-matched because icacls
+// ACE on path.
+//
+// RANGE, AND THE BLIND SPOT THAT COMES WITH IT (ticket 440). This wrapper is
+// the identity half only: it answers "WHOSE grants does this object carry" and
+// "does any principal beyond this set hold one". It CANNOT answer "is this ACE
+// a deny", "is it inherited", or anything else that turns on the ACE's type or
+// inheritance, because it discards the "(...)" rights payload that carries
+// those markers - icacls prints a deny as `BUILTIN\Users:(DENY)(DC)` and an
+// inherited ACE as `NT AUTHORITY\SYSTEM:(I)(F)`, both after the ":(" this
+// helper splits on. A criterion that needs the payload calls
+// winsec.ParseACELines or winsec.ACELinesForSID (the one shared parser,
+// internal/winsec/aclparse.go) directly instead of growing another private
+// copy here.
+//
+// Names are resolved rather than string-matched because icacls
 // prints "swq\swq" while the account name is "swq", and it prints the *path*
 // glued to the first ACE: the first version of this parser skipped the header
 // line and thereby ignored exactly one grant - the foreign Modify ACE that
@@ -85,16 +99,9 @@ func sidOf(t *testing.T, account string) string {
 // why the path is stripped and every remaining ":(" line is counted.
 func aclSIDs(t *testing.T, path string) (sids, names []string) {
 	t.Helper()
-	raw := strings.ReplaceAll(icaclsRaw(t, path), path, "")
-	for _, line := range strings.Split(raw, "\n") {
-		line = strings.TrimSpace(line)
-		i := strings.LastIndex(line, ":(")
-		if i <= 0 {
-			continue // blank, or the "Successfully processed" trailer
-		}
-		principal := line[:i]
-		names = append(names, principal)
-		sids = append(sids, sidOf(t, principal))
+	for _, a := range winsec.ParseACELines(icaclsRaw(t, path), path) {
+		names = append(names, a.Trustee)
+		sids = append(sids, sidOf(t, a.Trustee))
 	}
 	return sids, names
 }

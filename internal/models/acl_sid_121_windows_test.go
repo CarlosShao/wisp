@@ -31,7 +31,7 @@ var sidTranslateCache = struct {
 }{m: map[string]string{}}
 
 // liveSIDResolver answers "which principal is this trustee text". A bare numeric
-// SID needs no answer and is handled by aceLine.sidIdentity before this is ever
+// SID needs no answer and is handled by aceLine.SIDIdentity before this is ever
 // consulted; anything else must translate or the case fails loudly, because a
 // skipped ACE is the false green this whole file exists to remove.
 func liveSIDResolver(t *testing.T) func(string) (string, error) {

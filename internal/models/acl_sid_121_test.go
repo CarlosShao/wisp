@@ -15,13 +15,20 @@ package models
 // correction landing there). This file moves internal/models' two ACL-reading
 // helpers onto that footing.
 //
-// WHY THE PARSER IS HERE AND UNTAGGED. The identity logic is a text function
-// over an icacls dump, so it can be judged on both CI legs instead of only on
-// the Windows one: the synthetic dumps below are the mutation denominator for
-// the shape name-matching cannot express at all (a trustee printed as a bare
-// numeric SID, and a short-spelled name that resolves to the wanted SID), while
-// the live-object seeding stays where it belongs, in the _windows_test.go files
-// that have icacls. Nothing in this file shells out.
+// THE PARSER LIVES IN WINSEC NOW (ticket 440). The tree used to carry this
+// parser twice - here and in internal/winsec's acl_windows_test.go - as two
+// test helpers that did not know about each other and answered different
+// questions: this one kept the whole ACE line (trustee plus the "(...)" rights
+// payload, which is what let the synthetic cases below assert on Rights), the
+// other returned only SIDs and names. A criterion written on the second could
+// not ask "is this ACE a deny / inherited", because the markers live in the
+// payload it dropped. Ticket 440 merged them into winsec.ParseACELines /
+// ACELine / SIDIdentity / ACELinesForSID (internal/winsec/aclparse.go) - the
+// package every ACL-reading test already reaches for, and one both CI tiers
+// that run these tests already pin. What stays here is the synthetic-dump
+// denominator: the identity logic is a text function over an icacls dump, so
+// judging it on both CI legs instead of only the Windows one needs a resolver
+// that is a table, not a subprocess.
 //
 // THE SHAPE BEING DEFENDED AGAINST, once, concretely: icacls prints the SID
 // instead of a name whenever it cannot resolve the trustee, and real profiles on
@@ -35,87 +42,31 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
-// aceLine is one trustee-right pair from an icacls descriptor dump.
-type aceLine struct {
-	// Trustee is what icacls printed as the holder: either an account name
-	// ("BUILTIN\\Users", "DESKTOP-X\\swq") or a bare numeric SID it could not
-	// resolve. It is never treated as an identity by itself.
-	Trustee string
-	// Rights is the "(...)" payload verbatim, e.g. "(I)(OI)(CI)(M)".
-	Rights string
-}
+// aceLine is the parser's record: one trustee-right pair from an icacls
+// descriptor dump. It is an alias, not a new shape - the fields (and the
+// rights payload the discarded copy used to drop) are defined once, next to
+// the parser.
+type aceLine = winsec.ACELine
 
-// parseACELines turns an icacls dump for one path into ACE lines.
-//
-// Two parsing traps this has to survive, both learned from this repository's
-// earlier ACL work (winsec acl_windows_test.go's comment records the first one
-// as the bug that let a foreign Modify ACE sit in the header line and go
-// uncounted): the dump glues the path to the FIRST ACE instead of putting it on
-// its own line, and the trailer ("Successfully processed ...") is not an ACE.
-func parseACELines(raw, path string) []aceLine {
-	var out []aceLine
-	body := strings.ReplaceAll(raw, "\r\n", "\n")
-	for _, line := range strings.Split(body, "\n") {
-		line = strings.TrimSpace(strings.ReplaceAll(line, path, ""))
-		i := strings.LastIndex(line, ":(")
-		if i <= 0 {
-			continue
-		}
-		out = append(out, aceLine{
-			Trustee: strings.TrimSpace(line[:i]),
-			Rights:  line[i+1:],
-		})
-	}
-	return out
-}
+// parseACELines is the shared icacls parser. Its two parsing traps (the path
+// glued to the FIRST ACE, and the "Successfully processed" trailer that is not
+// an ACE) are documented once, at the definition.
+var parseACELines = winsec.ParseACELines
 
 // isNumericSID reports whether icacls printed an unresolved trustee, in which
 // case the text already IS the identity and must not be sent for translation.
-func isNumericSID(s string) bool {
-	return strings.HasPrefix(strings.ToUpper(strings.TrimSpace(s)), "S-1-")
-}
-
-// sidIdentity is the answer "whose grant is this", as a SID. resolve translates
-// an account name the way a live test does (a subprocess); in the synthetic legs
-// below it is a table, which is what lets these cases run on any platform.
-func (a aceLine) sidIdentity(resolve func(string) (string, error)) (string, error) {
-	if isNumericSID(a.Trustee) {
-		return strings.ToUpper(strings.TrimSpace(a.Trustee)), nil
-	}
-	if resolve == nil {
-		return "", fmt.Errorf("no resolver for trustee %q", a.Trustee)
-	}
-	sid, err := resolve(a.Trustee)
-	if err != nil {
-		return "", err
-	}
-	if !isNumericSID(sid) {
-		return "", fmt.Errorf("resolver answered %q for %q, which is not a SID", sid, a.Trustee)
-	}
-	return strings.ToUpper(strings.TrimSpace(sid)), nil
-}
+var isNumericSID = winsec.IsNumericSID
 
 // aceLinesForSID returns the lines of an icacls dump that belong to wantSID.
-// An entry that cannot be resolved is reported through err rather than dropped:
-// "we could not tell whose grant that was" and "that grant is not the one asked
-// about" are different answers, and silently equating them is how this hole got
-// opened in the first place.
-func aceLinesForSID(raw, path, wantSID string, resolve func(string) (string, error)) ([]aceLine, error) {
-	want := strings.ToUpper(strings.TrimSpace(wantSID))
-	var out []aceLine
-	for _, a := range parseACELines(raw, path) {
-		got, err := a.sidIdentity(resolve)
-		if err != nil {
-			return nil, fmt.Errorf("%s %s: %w", a.Trustee, a.Rights, err)
-		}
-		if got == want {
-			out = append(out, a)
-		}
-	}
-	return out, nil
-}
+// It is the shared filter (internal/winsec/aclparse.go); its one rule this
+// ticket exists over - an unresolvable trustee is reported through err, never
+// silently dropped, because "cannot tell whose grant that was" is not the same
+// answer as "that grant is not the one asked about" - is documented there.
+var aceLinesForSID = winsec.ACELinesForSID
 
 // tableResolver is the synthetic dump's directory service.
 func tableResolver(m map[string]string) func(string) (string, error) {
@@ -252,5 +203,72 @@ func TestAC49UnresolvableTrusteeIsReportedNotSkipped(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "nobody-here") {
 		t.Errorf("the error must name the trustee it could not resolve: %v", err)
+	}
+}
+
+// TestAC440TheSharedParserKeepsTheRightsPayload is ticket 440's paired
+// criterion over the merge: it is RED against the discarded copy's shape and
+// GREEN against the merged one. The dump is a live-printed descriptor shape
+// (the same two ACE forms a real sealed dir shows): a deny ACE, and an
+// inherited one - the two markers a "this ACE is allowed, not denied, and not
+// inherited" seal judgement asks about, both printed AFTER the ":(" the
+// parsers split on.
+//
+// Why the red half is a shape assertion instead of a call to a dead symbol:
+// the identity-only shape (per-line SID+name strings, no payload) is what
+// internal/winsec's aclSIDs returned before the merge, and the merge deleted
+// that shape on purpose. A test may not resurrect a deleted symbol, so the
+// red half pins the shape itself and the two questions it cannot answer; the
+// mutation-shaped reading of the same pair (strip the Rights field from
+// ACELine and every assertion here fails) is in
+// docs/evidence/s1/440-acl-parser-drift.md.
+func TestAC440TheSharedParserKeepsTheRightsPayload(t *testing.T) {
+	const path = `C:\store`
+	dump := path + ` BUILTIN\Users:(DENY)(DC)` + "\n" +
+		`  NT AUTHORITY\SYSTEM:(I)(F)` + "\n" +
+		"\nSuccessfully processed 1 files; Failed processing 0 files\n"
+
+	// GREEN, the merged parser: the payload survives the parse, so a judgement
+	// on it can tell a deny from a grant and an inherited ACE from an explicit
+	// one.
+	lines := parseACELines(dump, path)
+	if len(lines) != 2 {
+		t.Fatalf("the parser must keep both ACEs and skip the trailer, got %d: %v", len(lines), lines)
+	}
+	if lines[0].Trustee != `BUILTIN\Users` || lines[0].Rights != "(DENY)(DC)" {
+		t.Errorf("the deny marker did not survive the parse: %+v", lines[0])
+	}
+	if lines[1].Rights != "(I)(F)" {
+		t.Errorf("the inherited marker did not survive the parse: %+v", lines[1])
+	}
+
+	// RED, the discarded copy's shape: identity-only rows - the (sids, names)
+	// return shape aclSIDs carried before ticket 440. It still answers WHOSE
+	// grant each line is; for both type questions the answer is simply absent,
+	// so the two "matched" checks below can never fire - that emptiness is the
+	// blind spot, pinned. The live wrapper additionally resolved each name
+	// through a subprocess; the resolution is not what was lost, the payload
+	// was.
+	type identityOnlyRow struct{ SID, Name string }
+	table := tableResolver(map[string]string{
+		`BUILTIN\Users`:       "S-1-5-32-545",
+		`NT AUTHORITY\SYSTEM`: "S-1-5-18",
+	})
+	var identityOnly []identityOnlyRow
+	for _, a := range lines {
+		sid, err := a.SIDIdentity(table)
+		if err != nil {
+			t.Fatalf("the identity half of the merged parser: %v", err)
+		}
+		identityOnly = append(identityOnly, identityOnlyRow{SID: sid, Name: a.Trustee})
+	}
+	if len(identityOnly) != 2 {
+		t.Fatalf("the identity half must still see both rows, got %d", len(identityOnly))
+	}
+	for _, r := range identityOnly {
+		if strings.Contains(r.SID, "DENY") || strings.Contains(r.Name, "DENY") ||
+			strings.Contains(r.SID, "(I)") || strings.Contains(r.Name, "(I)") {
+			t.Errorf("the identity-only shape unexpectedly carries payload markers: %+v", r)
+		}
 	}
 }
