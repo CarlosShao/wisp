@@ -36904,3 +36904,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - 目标＝`test-windows` 第 10 步**最后 5 枚**：①`Test16r1VoiceDemo…`（runner 无 waveOut 设备）②`TestPanelHostRealWindowHopAndLifecycle`（`hot re-show 220.7 ms` 超 D32 冻结 200ms）③`TestPanelHostLatencyPercentilesAC2` ④`Test41a2r1WarmGateFeedsKwsNotTheAsr`（`wav drain` 超时＋`slow consumer`，但 `kws_hits=1`／`asr_fed=13312` 说明**被测行为其实成了**）⑤`TestTicket223HandEditedFsLooseningCostsAnL2Card`（**唯一必须真诊断**：日志写 `approved via L2 re-confirmation` 而测试找不到渲染出来的卡）。
 - **判据写死在派单里**：环境族必须**前提探测＋具名跳过＋台账行**（前提在场照旧断言，⛔ 一刀切永久跳）；⑤ 必须定性 **(a) 测试采集时机错** 还是 **(b) 产品真缺陷**，若是 (b) **⛔ 不许自己改产品，交回我裁**。
 - 派单存档：`.scratch/wisp/probes/orch/20261113/txt/111-wave10-last-mile-dispatch.txt`。
+
+## A1856 — 票 314 测量腿（max 档）：**没复现票面的「死亡」，两发全量都是「卡死」**，且 dump 给出具名栈 ⇒ 已派只读诊断腿挖根因
+
+- **三把尺**：commit `66f8c0bce` 真在（9 文件 / 4562 插入，含 6 份原始日志）；证据件 `docs/evidence/s1/314-window-zone-death.md` **18016B / 226 行**；我核了两个关键主张——`cmd/wisp/panel_pump_test.go:177` **确是 `<-done`**，`cmd/wisp/panel_host_windows.go:585-586` **确写着**「half-initialised controller, which on this box can take the whole process down (rc=139 reading…)」。
+- **★本轮最重要的读数（全是腿现跑，⛔ 不是票面转抄）**：
+  | 发 | 退出码 | 耗时 | 四数 | 结局 |
+  |---|---|---|---|---|
+  | run1 全量 | **无**（我 kill） | 8m31s 后杀 | 11/10/0/0 | **卡死**在 `Test219AC2RevokeRoundTripByteForByte`；PID 33580 还在，**CPU 30 秒增量 0.0156s**、日志零增长、无 TCP ⇒ **活的死锁** |
+  | run2 全量＋`-test.timeout=10m` | **2** | 604s | 380/295/2/0 | `panic: test timed out after 10m0s`；卡在 `TestRunBooksWithASnapshotOfItsLiveQueue`；**终点锚 `TestZZ315A1` 0 命中** |
+  | 死点 5 枚单跑 ×3 | 0/0/0 | 9/18/13s | 5/5/0/0 | 全活 |
+  | `Test219AC2` 单跑 | 0 | 5s | 1/1/0/0 | 活 |
+  - ⇒ **「整进程死亡」没复现；两发全量都是「卡住」。而单跑全活 ⇒ 卡死是顺序/状态依赖**，且卡点**漂出真窗区**（run1 审批流、run2 `panel_pump`）。
+  - **★run2 的 goroutine dump 给了具名栈**：`panel_pump_test.go:177` ＝ `<-done`，**在等一张永不回答的 L2 卡片**；同一 dump 里还有一枚 **3 分钟前的 `lifecycle_43` owner goroutine 泄漏**。
+- **139 的真实出处**（腿如实报：本轮**没亲眼看到 139**）：产品码注释与 `docs/evidence/s1/33-panel-host-c27-r7.md:99` 都有具名出处；算术 `139 = 128 + 11 = 128 + SIGSEGV`，Windows 未处理 `0xC0000005` 经 MSYS2 译成 SIGSEGV ⇒ **同一类现象**。⚠ 边界：票面 2026-10-13 那 5 发**没留退出码**，故⛔ 不能证明那 5 发当时的码就是 139。
+- **候选 (a) 桌面/会话：本轮不可验**——每发实测 `input_desktop=Default`（**未锁屏**）、session 1 `LogonUI`=0、前台微信、CPU 67–100%；**锁屏这个机制根本没出现**，既不能坐实也不能证伪。⇒ **需机主按一次 `Win+L` 锁屏**，腿才好复跑同一发（判据＝`LogonUI` 变 1、`input_desktop` 变 `Winlogon`）。
+- **(b)** 部分判别但不足以坐实；**(c)** 纯随机⛔ 不能排除（本轮全量 n=2、死 0、卡 2，样本太小；要到定性线需同桌面连续 ≥10 发）。
+- **已派只读诊断腿**（`workflow-92daf25991ae4210`，max 档）：挖「整包卡死」根因，5 问——`done` 谁关/何时永不关；那张 L2 卡谁发谁答、整包跑时是否有**别的用例留下未答复的卡**占住单例/队列（这就是顺序依赖候选机制）；`lifecycle_43` 是原因还是后果；卡点为何漂；最小修法三候选各一句代价。**⛔ 只读，不许动手**（`scripts/portable-tests.sh` 与那 5 枚用例文件正被波 10 写腿占着）。派单存档 `314-hang-rootcause-dispatch.txt`。
+- **★记一条与本票无关但重要的关联**：这个「等一张没人回答的卡」的形状，与票 **123** 的「runner 上无人应答 ⇒ 300s 判拒绝」**是同一族**。⇒ 若诊断坐实「跨用例遗留未答复卡」，那它同时也解释了 123 的一部分现象。
