@@ -142,10 +142,9 @@ func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMes
 				}
 			}
 		}
-		if p.toolName == "" &&
-			(len(choice) == 0 || strings.Contains(string(choice), `"auto"`)) {
-			// auto: answer in text (the real protocol's default too).
-		}
+		// No tool_choice ("auto", or the field absent) answers in text - the
+		// real protocol's default too - which falls out of the branch below:
+		// only a forced tool name produces tool_use arguments.
 		if p.toolName != "" {
 			argText := text
 			if argText == "" {

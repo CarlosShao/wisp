@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -452,11 +451,17 @@ func Test24R3SearchAppsEnumeratesFixtureAndFeedsLaunch(t *testing.T) {
 }
 
 // Test24R3SearchAppsAUMIDCandidateFeedsTheAUMIDArm: a UWP activation id is
-// emitted as kind=aumid, which is exactly the shape launcher_windows.go accepts.
+// emitted as kind=aumid, which is exactly the shape the launcher accepts.
+// Runs on every GOOS on purpose: the shape gate windowsAUMIDPattern lives in
+// launcher_aumid.go, the platform-neutral file, and both launcher_windows.go
+// and launcher_other.go classify an AUMID-shaped candidate as Kind "aumid"
+// BEFORE the name resolvers - what the platform then DOES with an aumid
+// target (activate through explorer vs the honest D7 platform refusal in
+// startApp) is a separate arm with its own tests. This row was previously
+// gated to windows and skipped on ubuntu; the skip's reason ("the AUMID
+// shape gate is the Windows launcher") had gone stale and the runtests.sh
+// ledger books every SKIP as fatal (ticket 71 AC#3).
 func Test24R3SearchAppsAUMIDCandidateFeedsTheAUMIDArm(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		t.Skip("the AUMID shape gate is the Windows launcher")
-	}
 	aumid := "Microsoft.WindowsNotepad_8wekyb3d8bbwe!App"
 	res := r3ExecApps(t, SearchAppsDeps{
 		Sources:  []AppSource{r3AppSource{label: "fixture", aumids: []string{aumid}}},

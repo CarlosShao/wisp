@@ -36586,3 +36586,40 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   2. 改判据说"这 2 条可以静音" —— **改判据是最后一招，且这里不需要**：真正的修法是换对配置，不是让判据闭嘴。
 - **★这一改我已写进 `ci.yml` 注释**：点明"`-tags=winlive` 是更严的构建不是更松的"、给出三组实测数、指向本账。
 - **诚实交代**：`bash -n` rc=0；`p2_pkgs`/`p2_out`/自报三处文本已核；**真读数等 CI 下一跑**。
+
+## A1839 — 波 5（test-core 转绿）**六件改动已真落盘、全部经文件工具逐处核过**；★**但宿主命令通道 `spawn EPERM` 自 15:35 起全瘫 ⇒ commit/push 未落地**（不是我的判断错，是宿主的进程 spawn 层坏了）
+
+- **★这是宿主故障，不是票的问题**：`pwsh` 工具（前台/后台/重定向输出三种形状都试）一律 `Error: spawn EPERM`；`grep`/`glob` 也起不了（`ripgrep launch failed`）。**只有 `read`/`edit`/`write` 三个纯文件工具还能用**——本账就是用它写进去的。**工具说明明写这是文档化边界（confined 模式开不了命名管道 ⇒ 捕获输出的 spawn 必 EPERM），且本会话审批禁用 ⇒ 无法提权、不许换法重试。**
+- **★波 5 交的东西（我逐处 `read` 核过，不是听它说）**：
+  1. **`scripts/portable-tests.sh:819`** 新增 ledger 行 `TestAppendSessionTurnCrashChild|./internal/memory/|any|reexec|...`——**五字段齐全、与既有 `TestSubprocessCrashWriter|...|any|reexec` 先例同形**。
+  2. **`internal/tools/search_files_test.go:453-464`** AUMID 那枚的 `if runtime.GOOS != "windows" { t.Skip(...) }` 守卫**已删**，改成一段说明"**每 GOOS 都跑是故意的**（形状门 `windowsAUMIDPattern` 本就在平台中立的 `launcher_aumid.go`）"的 doc；断言一字未动。
+  3. **`tools/mockllm/messages.go:145-148`** SA9003 的**空分支真删了**、说明并入下方真实分支的注释；**不是 lint:ignore、`-checks` 未动**。
+  4. **`docs/evidence/s1/70-testcore-green.md`**（109 行）**在**，逐条引了原文行号与 Docker `golang:1.27` 实测 `--- PASS`。
+  5-6. 票 70／71 Progress log 各 +1（文件名 `70-ci-actually-green.md`、`71-gates-must-self-report.md`，**两枚我都 `read` 过确认真实存在**）。
+- **★腿纠了我一个事实错（我认）**：我派单写 `TestAppendSessionTurnCrashChild` 在 **`internal/session`**，**错**——实测在 **`internal/memory/dao_session_append_326_test.go:44`**（票 326 AC#3 的 reexec 子进程入口）。它按真位置登记，**没按我的错派单乱动 `internal/session`**。
+- **★它给的判断我认为对**：AUMID 那枚**守卫的理由已过期**（形状门是平台中立的，原注释逐字写着 "so EVERY GOOS classifies an AUMID-shaped app.launch target the same way"）⇒ **删守卫让它真跑**，而不是划走。它在同款 CI 镜像里实测 `--- PASS / SKIP=0`。**这正是"跳过不算通过"的正确解法：让它执行。**
+- **★commit 脚本已备好且我已核**：`D:\tmp\wisp\20261113\70-core-green\commit70.ps1`（显式 6 文件 pathspec、message 完整、无 push）。**等命令通道恢复我立刻跑它并推 origin/dev。**
+- **★通道恢复后的下一步（写死，免得丢）**：①跑 `commit70.ps1` ②推送 ③取 CI 新 run 的 `test-core` 读数（期望 `SKIP=0`）＋ `lint` 的 `compile-lines` 与两段 findings。
+- **★这不构成 goal 阻塞**（第 1 轮出现，且是宿主瞬时故障，不是任务本身卡死）。
+
+## A1840 — 命令通道故障期间我做的**非执行类**编排准备：把 pass2 剩余清单量出来了，两波派单已预写存档
+
+- **★我读出了 pass2 的精确剩余清单**（`D:\tmp\wisp\20261113\p2-winlive-now.txt`，53 行 = 1 条 compile ＋ **52 条 finding**，用 `read` 工具读的，不需要起进程）：
+  | 包 | 条数 | 主力形状 |
+  |---|---|---|
+  | `internal/tools` | **约 28** | `system_backend_windows.go` 一整族 `var procX = NewLazyDLL...` 懒加载函数指针 U1000 ＋ 3 条 ST1005/ST1000 |
+  | `internal/winsec` | 7 | 测试夹具 U1000 族 ＋ ST1000 包注释 |
+  | `internal/audio` | 6 | 5 条 ST1003 命名（`deviceId→deviceID`）＋ 1 条 `iidIUnknown`（COM GUID） |
+  | `internal/proc` | 3 | ST1021＋2 ST1003 |
+  | `internal/ball` | 2 | ST1012 错误变量命名 |
+  | `risk`/`memory`/`observe`/`secret`/`agent`/`cmd/balldebug` | 各 1–2 | 混杂（`secret` 那条 SA4010 **可能是真 bug**，要读码判） |
+- **两波派单已预写存档**（通道一恢复就能发，零等待）：
+  - `.scratch/wisp/probes/orch/20261113/txt/122-wave5-tools-pass2-dispatch.txt`（`internal/tools`＋`cmd/balldebug`，写面互斥已写明）
+  - `.scratch/wisp/probes/orch/20261113/txt/122-wave6-rest-pass2-dispatch.txt`（其余 9 包）
+- **★两波派单里我把新口径写死了**：
+  1. **`-tags=winlive` 已写进复跑命令**（`A1838` 的决定）⇒ ④类「只在 winlive 有主」的符号会**自然消失**；**带 tag 后仍报的必是①ABI／②保留句柄／③真死**。
+  2. **`procX` 懒加载函数指针不是 ABI 字段**，删单个是安全的，但**常与调用它的函数一起死**——⛔ 只删一半留悬空调用。
+  3. `secret/delete_test.go:131` 的 SA4010（`append` 结果被丢）**可能是真 bug**，⛔ 机械改，先读码判。
+- **★为什么现在只做准备不动手**：`pwsh`/`grep`/`glob` 全部 `spawn EPERM`，**我也起不了子代理去跑命令**（独立 `subagent` 实测同样 EPERM，已确认是宿主全局层，不是单条工具）。**在起不了进程时硬派腿＝派出幽灵，正是 goal 明令要防的。**
+- **⇒ 通道一恢复的立即动作（写死）**：①先跑 `finish70.ps1`（波 5 六件＋A1839）②推 `origin/dev` ③发 wave5／wave6 ④取 CI 新 run 三组读数。
+
