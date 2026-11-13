@@ -36287,3 +36287,19 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   3. **`A1822`**：坏掉的是 3 枚不是 2 枚；两笔 commit message 撒谎；**我核 HEAD 的命令本身有缺陷**（`5e5adab15` 修）。
   - **⇒ 三条腿三次救了我。这三条腿都是"零改动＋摆证据＋停手"，这是正确行为。**
 - **★票池：done 363 / open 61。HEAD 全仓无重复票号（`uniq -d` 空）。**
+
+## A1825 — 票 **440 结案**（第 35 枚，判甲合并）：两份 ACL 解析器合成一份；★腿量出**全仓 5 份 `:(` 解析器，没一份能答"允许还是拒绝"**
+
+- **三把尺（我现跑，全过）**：提交 `b7bc01482`（6 files, +414/-92）／件 `docs/evidence/s1/440-acl-parser-drift.md` 14541B ＋ `internal/winsec/aclparse.go` 6148B（新）／**自己复跑** `go test -count=1 ./internal/models/ ./internal/winsec/` ⇒ `ok models 11.752s` ＋ `ok winsec 28.913s`。
+- **★判甲（合并）的理由**：两份**是同一个东西的两个前缀**，不是两个该分工的东西——`aclSIDs` 每行输出＝`parseACELines` 对应行的 Trustee 列＋翻译；连 `:(`／trailer／路径粘连三个陷阱的判据都**逐字同源、注释互引同一个 bug**。
+  - **主流 harness 判据**：重复的测试解析逻辑**向上抽成被测包导出面、测试留薄包装**是 Go 仓常规做法（`iotest`/`httptest` 先例）。
+  - **价值只有合并买得到**：下一个写判据的人**只有一个解析器可挑**。**"注释互指"（乙形）买不到——本仓 5 份副本就是互指失败的证据。**
+  - **落点 `winsec` 本体不新包**：①依赖边只有 `models→winsec` 干净（反向成环）；②`portable-tests.sh` GUARD C/D 核对静态名册，新包当天顶红而 `scripts/**` 不在本票写面。
+- **★★腿顺手量出的事实（比票面严重得多）**：票面只点 2 份解析器，腿找到 **5 份** `:(` 解析器（observe/config/agent 各还有一份内联），**全都拿不到 deny/继承**。
+  - **⇒ 合并前全仓没有任何一份解析器把「允许还是拒绝」递到判据手里。**
+  - 我复核：`icacls` 出现在 **35 个文件**里 ⇒ 这个洞的射程比腿说的还宽。
+- **★成对判据（真做）**：`TestAC440TheSharedParserKeepsTheRightsPayload`——绿半边＝合并后 `(DENY)(DC)`/`(I)(F)` 都在判据手里；**变异实证**＝把 `Rights` 临时填空 ⇒ TestAC440＋TestAC47 四子句全红 ⇒ 精确还原复绿。
+- **零断言删除**：models 测试 3→4、winsec 5→5；**winsec 侧 33 处 `aclSIDs` 调用签名不变、零改动**。
+- **门禁**：`gofumpt` 空输出、`d22scan` clean（internal 404/1005，新文件已入扫）、两包全绿。
+- **★HEAD 重放与 index 对读一致**：`tracked=19510 over-budget=69 covered=69 not in roster=0` **GREEN** 两边同值。
+- **票池：done 364 / open 61。**
