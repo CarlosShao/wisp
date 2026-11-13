@@ -36988,3 +36988,40 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **我观察到的高档幽灵模式（记下来）**：今晚 **`magpie-high` 写腿 4 条里 2 条幽灵化**（波 10 幽灵但有活／314c 真空手），而 **`magpie-max` 3 条（314 测量、314 诊断、122 审计）全部交付**。
 - **我的技术处置**（不违反机主路由令）：写腿**仍走 `magpie-high`**，但**派单改短**（短派单这两次都交了）⇒ 已用短派单重派 `workflow-7fbcbf85dcb840ff`。
 
+
+## A1860 — ★我自己复跑 314b 得到与腿**不同**的四数：`PASS 2 / FAIL 1 / SKIP 1`——三者都是真的，而且**反向尺终于出现了**
+
+### 我的复跑（真 carrier，`-test.run` 4 枚，2026-11-13 23:2x）
+```
+PASS  Test219AC2RevokeRoundTripByteForByte (2.77s)
+FAIL  TestPanelHostRealWindowHopAndLifecycle (0.37s)
+PASS  TestRunBooksWithASnapshotOfItsLiveQueue (33.72s)
+SKIP  Test41a2r1WarmGateFeedsKwsNotTheAsr (45.58s)
+CARRIER-EXIT=1
+```
+腿报的是 `RUN=4 PASS=4 FAIL=0 SKIP=0`。**两边都不是假的**——差别来自**负载与顺序**，而这正是 314 诊断腿判定的「竞态＋整包负载」机制。
+
+### ★反向尺（我等了三轮的那把）终于有读数：WarmGate **具名 SKIP 并带数字**
+```
+resident_voice_41a2r1_windows_test.go:508: bounded-channel overflow on a loaded host:
+  injector sent=142 dropped=2, drained moved 274 -> 416, want drained0+144=418
+SKIP: Test41a2r1WarmGateFeedsKwsNotTheAsr (45.58s)
+```
+⇒ **前提缺失（本机被并行腿压着、注入器真丢了 2 帧）⇒ 具名跳过＋数字**，不是硬跑出假红。**票 111 环境族的「前提缺失即具名跳过」这一半成立。**（同时说明：**它在本机也会跳**，所以 CI 上跳不跳取决于负载，不只看有没有声卡。）
+
+### ✗ 真缺口：`TestPanelHostRealWindowHopAndLifecycle` 在 WebView2 不可用时**硬红**而不是跳过
+```
+panel_host_windows_test.go:631: bringUp on the test thread: panel host: WebView2 Embed failed
+  (runtime missing or blocked) (WebView2 window creation is ava…
+FAIL: TestPanelHostRealWindowHopAndLifecycle (0.37s)
+```
+- **同一枚用例在我上一发（波 10 那 7 枚）是 `PASS 1.20s`** ⇒ **不是固定前提缺失，是 WebView2 状态/顺序依赖**。
+- **处置不一致**：WarmGate 有前提探测器，PanelHost 没有 ⇒ **同族两套行为**。⇒ 已派腿补：**WebView2 不可用时具名跳过（带读数），可用时照旧断言**。
+
+### 314b 腿的交付（我核过的部分）
+- commit `05086888d`（7 文件 +319/−12）；证据件 `314-bounded-waits-and-16r1.md` 12216B/163 行。
+- **裸接收加界**：`panel_pump_test.go:177`→46s（45s Execute ctx + 31s L2 窗 + 1s 边距）；`approval_always_219ac2_test.go` 三处→46s（40s 夹具窗 + 6s 边距）。**上界都带出处行号，不是魔法数。**
+- **正控用 `-overlay`（仓内零触碰）**，红读数四要素点名（等什么/等多久/上界出处/当时读数）。
+- **★它证伪了我的假设**：`Test16r1Premortem…` 不是「绑旧 pin」，而是唯一断言 `took < 5s` 在**跟 CI 网速赛跑**（绿发 `5.01s` 过线 0.01 秒、红发 `4.094s` 反而更快 ⇒ 越快越红）。修法＝删 5 秒猜想、换 **mtime 前提**（`corruptAt` `:528`、`!st.ModTime().After(corruptAt)` `:589`）⇒ 命中缓存的回归在任何网速都红、慢速重取必绿。**我逐行核过属实**（旧猜想已不在断言里，只剩 `t.Logf`）。
+- 已推 `05086888d`。
+
