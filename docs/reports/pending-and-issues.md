@@ -36482,3 +36482,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - **我跑了 carrier 验**：`sh scripts/portable-tests.sh --scope=windows` **rc=0**，`internal/config` 与 `internal/plugin` 均 `ok (own line)`，ledger **没有报 stale**；`sh -n` 语法 rc=0。
 - **★登记这行的意义（腿点明、我认）**：不登记的话 test-windows 那一步会从「vacuous-pass 红」变成「honest-skip 红」——**跳过是要登记的，不登记等于偷偷跳过**。
 - **票 70 维持 open**：AC#2（分诊）已实质完成，但 **AC#6 要"每个 job 全绿"的证据**，须等 CI 真跑一次。
+
+## A1835 — ★★**U1000 清账的重大发现：40 条里大半是 Win32 ABI 结构体字段，删了会让球的渲染崩**。这改的是清账规则的**定性**，不是数字
+
+- **怎么发现的（如实）**：波 4 那条腿**返回空值（幽灵交件）**，零提交零改动零证据件；但它留下了两遍 staticcheck 输出在 `D:\tmp\wisp\20261113\122-wave4\`。**我读它的报废产物时看见 40 条 U1000 的位置全挤在 `internal/ball/win32_windows.go:175-271`，起了疑，去读代码，发现了这件事。**
+- **★实体**：`internal/ball/win32_windows.go:173` 的 `wndClassEx` 就是 **Win32 `WNDCLASSEX`**；被判"unused"的是 `style`／`clsExtra`／`winExtra`／`icon`／`bkgnd`／`menuName`／`iconSm` 等字段。同文件 `:220-230` 那批是 **`BITMAPINFOHEADER`**（`compression`／`sizeImage`／`xPelsPerMeter`／`clrUsed`／`bmiColors`），`:247-271` 那批是 **`NOTIFYICONDATA`**（`dwState`／`szInfo`／`hBalloonIcon`）。
+- **★★为什么不能删**：这些结构体是**按内存偏移**被 Win32 API 读写的（`RegisterClassEx`／`CreateDIBSection`／`Shell_NotifyIcon`）。**删掉任何一个字段，后面每个字段的偏移全部平移** ⇒ 窗口类注册错位、DIB 头错位、托盘图标数据错位 ⇒ **球的渲染与托盘在运行期坏，而且编译器不报错。**
+- **★★⇒ 我上一条的推理是错的，必须更正**：我在 `A1833` 里写过「在 GOOS=windows 下 U1000 是真 unused ⇒ 可以正当地逐条判删/判留」。**前半句对（确实没有 Go 代码读它），后半句错（"没有 Go 代码读它" ≠ "没有东西读它"）。** **ABI 结构体的读者是 Windows 内核/API，staticcheck 看不见。**
+- **★这等于 `A1773` 的教训以另一种形状重演**：那次是"linux 判死但 windows 有主"；**这次是"Go 判死但内核有主"**。**同一个根因：把"我的工具看不见读者"当成"没有读者"。**
+- **⇒ 我定 U1000 清账规则（技术选型，我拍，写理由）**：
+  | 形状 | 处置 | 理由 |
+  |---|---|---|
+  | **ABI 结构体字段**（`wndClassEx`／`BITMAPINFOHEADER`／`NOTIFYICONDATA` 这类**手写 Win32 结构**） | **逐字段 `//lint:ignore U1000 <ABI 理由>`**，理由点名"哪个 API 按偏移读它" | ⛔ 删＝运行期坏且编译不报。**主流 harness 对 ABI 结构就是"布局即契约"** |
+  | **真无主的 func／method／var／const** | **删**（删前 `git grep` 全仓核 + 看 build tag） | 这些没有"看不见的读者" |
+  | **只在非默认 build tag 下有主的** | **不删、不加 ignore**，在证据件点名调用者 `file:line` 与 tag | 加了 ignore 等于把真调用者藏起来 |
+- **⛔ 我否掉的替代方案**：把字段名导出（大写）让 staticcheck 不报 —— 那是**为了过门而改变 API 语义**，且这些结构本来就不该被包外看见。
+- **⛔ 我否掉的第二个**：整包 `-U1000` 关掉 —— 那会把真死代码一起藏了。
+- **★这一条要不要单独开票**：**要**。它是"手写 Win32 ABI 结构 + staticcheck"的**通用形状**，不是票 122 的一次性判断，而且它会反复出现（`internal/winsec`／`internal/audio` 的 `wasapi_windows.go` 里还有 COM GUID 与接口结构体）。
+- **波 4 那 40 条的真实构成（我按位置分类）**：`internal/ball/win32_windows.go` **约 27 条几乎全是 ABI 字段**；`internal/ball/renderer_windows.go`／`orb_windows.go`／`d2d_windows.go`／`ball_windows.go` **约 10 条是真无主的 func/field**；`internal/audio/wasapi_windows.go:49` 的 `iidIUnknown` 是 **COM GUID**，待判。
