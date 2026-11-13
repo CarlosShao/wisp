@@ -36922,3 +36922,27 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **(b)** 部分判别但不足以坐实；**(c)** 纯随机⛔ 不能排除（本轮全量 n=2、死 0、卡 2，样本太小；要到定性线需同桌面连续 ≥10 发）。
 - **已派只读诊断腿**（`workflow-92daf25991ae4210`，max 档）：挖「整包卡死」根因，5 问——`done` 谁关/何时永不关；那张 L2 卡谁发谁答、整包跑时是否有**别的用例留下未答复的卡**占住单例/队列（这就是顺序依赖候选机制）；`lifecycle_43` 是原因还是后果；卡点为何漂；最小修法三候选各一句代价。**⛔ 只读，不许动手**（`scripts/portable-tests.sh` 与那 5 枚用例文件正被波 10 写腿占着）。派单存档 `314-hang-rootcause-dispatch.txt`。
 - **★记一条与本票无关但重要的关联**：这个「等一张没人回答的卡」的形状，与票 **123** 的「runner 上无人应答 ⇒ 300s 判拒绝」**是同一族**。⇒ 若诊断坐实「跨用例遗留未答复卡」，那它同时也解释了 123 的一部分现象。
+
+## A1857 — ★夹具通了之后「该跑的真的跑了」：`cmd/wisp CLI` 从 7 红降到 **4 红（RUN=796 PASS=599 FAIL=4）**；新冒两处红要单独查
+
+### 分步读数（`run 43431925841` / `sha 10f98f52b`，我逐行从 job 日志里按步名过滤出来的）
+- **`lint` 仍绿**（16 步全绿，第 8 步 windows staticcheck 仍 success）；`test-core`／`slo-full`／`slo-smoke`／`lint-frontend` 全绿。
+- **第 10 步 `cmd/wisp CLI tests`：`=== RUN=796 PASS=599 FAIL=4 SKIP=…`** —— 上一发（`285a5c310`）是 **7 红**。**8b 的两枚真修掉了**：`TestTicket223PermissionDeniedSitsInItsOwnSentence`（具名跳过）与 wake 名册那枚；`TestPanelHostRealWindowHopAndLifecycle`／`TestPanelHostLatencyPercentilesAC2` 也不再红。
+- **★关键：`NAMED FALLBACK` 标记这次没出现** ⇒ **夹具全部拉到了（第 9 步 fetch = success）**，所以 8b 的回退名册**根本不会生效**——**该跑的用例这次真的跑了**。RUN 从 743 升到 **796** 就是这个原因。⇒ **这 4 枚是在「有夹具」前提下红的，与名册无关。**
+- **剩这 4 枚**：
+  | 用例 | 现象 | 谁在管 |
+  |---|---|---|
+  | `Test41a2r1WakeEndToEndArmedToListening` | `resident_voice_41a2r1_windows_test.go:251`（drain 超时族） | 波 10 |
+  | `Test41a2r1WarmGateFeedsKwsNotTheAsr` | 同上，`slow consumer` | 波 10 |
+  | `Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware` | runner 无 `waveOut` 输出设备 | 波 10 |
+  | **`Test16r1PremortemModelSha256CorruptRefusesTheHandOff`** | `voice_e2e_demo_16r1_windows_test.go:523/525`（`COR…` 断言行）、`wisp models ensure: asr-streaming-paraformer-zh-…` | **★新冒，波 10 单里没有** |
+- **第 13 步 `Portable windows tests`**：按步名过滤**没有任何 `--- FAIL:` 行**，但它被标记 failure ⇒ 失败形态不是测试红（疑脚本面 rc 或 `set -e` 早停），待查。
+- **第 4 步 `Windows ACL sealing gate`**：`winsec-tests.sh: four numbers: === RUN=0 --- PASS=0 --- FAIL=0 --- SKIP=0` 紧接 `gate is RED (rc=1) for scope=[./internal/winsec/]`。
+  - **★门在做正确的事**：跑了个空就**拒绝报绿**（正是票 71 要的「自报工作量」）。但 `RUN=0` 说明 **`-run` 过滤器一枚都没匹配上**，而同一段里 `winsec result line: ok github.com/CarlosShao/...` 说明包本身编过也过了 ⇒ **这不是产品缺陷，是这道门在 runner 上的前提没成立**（同 step 在 `285a5c310` 是 success ⇒ **跨发不稳定**）。
+  - ⚠ 疑点：同段有 `winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\runneradmin\...` ⇒ **临时目录那条前提**在这次 runner 上可能没建起来。待查，⛔ 不下结论。
+
+### 结论与下一步
+- **`test-windows` 的红已从「一片」收敛到「4 枚 + 2 处脚本/环境形态」**，且 `lint` 那边的 history-first 绿是稳的。
+- **波 10 覆盖了 4 枚里的 3 枚**；`Test16r1PremortemModelSha256CorruptRefusesTheHandOff` **新冒、未派**——但它同样在 `cmd/wisp/**`，**必须等波 10 落地后另起**（每波一枚 cmd/wisp 写腿）。
+- **第 4 步与第 13 步的红**要单独查：二者都**不是测试红**（一个是 `RUN=0` 的门拒绝、一个没有 `--- FAIL` 行），属「门/脚本在 runner 上的前提」族。
+
