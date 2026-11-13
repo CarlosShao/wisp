@@ -36946,3 +36946,29 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **波 10 覆盖了 4 枚里的 3 枚**；`Test16r1PremortemModelSha256CorruptRefusesTheHandOff` **新冒、未派**——但它同样在 `cmd/wisp/**`，**必须等波 10 落地后另起**（每波一枚 cmd/wisp 写腿）。
 - **第 4 步与第 13 步的红**要单独查：二者都**不是测试红**（一个是 `RUN=0` 的门拒绝、一个没有 `--- FAIL` 行），属「门/脚本在 runner 上的前提」族。
 
+
+## A1858 — 波 10 收尸完成：门禁我全跑＋**我自己跑行为面 7/7 PASS**；提交 `7386f221c` 已推
+
+- **腿的形态**：`workflow-5ca9b8975f1d42d9` **返回空**（幽灵交件），盘上留下 5 改 1 新共 6 文件，**未 commit、未写证据、未跑门禁**。
+- **我的第一把尺（门禁，逐字）**：两脚本 `bash -n` SYNTAX-OK；`CGO_ENABLED=1 go build ./cmd/wisp/` BUILD-OK；`go vet ./cmd/wisp/` VET-OK；`go vet -tags=winlive ./cmd/wisp/` WINLIVE-VET-OK；`sh scripts/d22scan.sh` **clean**；`gofumpt -l ./cmd/wisp/` **无输出**。
+- **★我的第三把尺（行为面，我自己在真 carrier 上跑那 7 枚）**：
+  ```
+  --- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (3.82s)
+  --- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (3.05s)
+  --- PASS: TestPanelHostRealWindowHopAndLifecycle (1.20s)
+  --- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+  --- PASS: Test41a2r1WakeEndToEndArmedToListening (23.50s)
+  --- PASS: Test41a2r1WarmGateFeedsKwsNotTheAsr (19.08s)
+  --- PASS: Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware (34.74s)
+  ok  github.com/CarlosShao/wisp/cmd/wisp  86.00s      CARRIER-EXIT=0
+  ```
+  **零 SKIP** ⇒ **本机前提齐全时它们照旧跑、照旧断言、照旧 PASS**——这是我上轮点名的「⛔ 不许一刀切永久跳过」那条判据的**正向半边**，已有读数。
+- **★还缺的反向半边（如实报）**：**「前提缺失时具名跳过」我没有运行读数**。下一发 CI 的 runner 没有音频输出设备，若 `Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware` 在 CI 上变成**具名 SKIP**（而不是 FAIL），反向半边即成立。⇒ **判据＝下一发 run 第 10 步的 SKIP 名单与理由语。**
+- **处置内容（我读 diff 判的，不是听腿说）**：
+  - D32 两条面板延迟裁决（hot 200 / cold 1500ms，**阈值一字未改**）搬进新文件 `cmd/wisp/panel_host_windows_budget_winlive_test.go`（`//go:build windows && winlive`），照 33-r5 先例；**代价具名＝winlive 没有 CI job ⇒ 该裁决流水线永远看不到**。
+  - 另 3 枚落前提探测；`scripts/portable-tests.sh` 增 **4 条台账行**（票 71 AC#3）。
+- **证据件**：`docs/evidence/s1/111-cmdwisp-last-mile.md`（**我写的**，六节，含「我**没有**验到的」一节与「待验证清单」）。
+- **commit**：`7386f221c`，显式 pathspec 8 条，暂存清单恰好 8 条无陌生人，**已推 `origin/dev`**。
+- **顺带记一条无害噪声**（如实，不慌）：carrier 日志里有 4 行 `sherpa-onnx … Unknown token: shei2`（lexicon 转换期的告警，来自 pinned 模型词典，**不影响用例判决**，本发 7/7 PASS）。
+- **票 122 审计腿**：证据件 `docs/evidence/s1/122-closing-audit.md` **16145B / 215 行**已写出，但**仍是未跟踪**（腿未提交）⇒ 待它落地或我收尸。
+
