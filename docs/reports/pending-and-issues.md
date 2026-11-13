@@ -36029,3 +36029,16 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   **纠正措施**：**派 436 前必须先读票面确认写面的真实包**，⛔ 凭"我觉得它在 internal/ball"判断。**从下一波起：凡写面可能落 `cmd/wisp/**` 的票，一律排在波次里独占，⛔ 与任何其它 cmd/wisp 写腿并行。**
 - **★腿踩坑（记，省下一个人的时间）**：PowerShell 直接 `& $exe -test.run …` 会**把旗标吞掉**、全 rc=2 输出 `-help`；经 `D:\work\soft\Git\bin\bash.exe -c` 才拿到真读数。
 - **票池**：done **353** / open **69** / total 422（本轮新建 434–437 四票，故 open 从 67 升到 69）。
+
+## A1810 — 票 435 收件（第 25 枚）：名册漏登一枚、名字说的是真话；★腿把 `-overlay` 无效这件事做了正反两向对照
+
+- **腿** `ticket-435-33r11-roster` 交件 `7cf184068`（证据件 12576B）。**三把尺我全核**：commit 在、件在、**我亲跑 PASS 0.06s**，且普查仍报 `4 Locked-suffixed func(s) across 72 production source file(s)` ⇒ **⛔ 靠缩小扫描面消红**。**产码零改动**（`--stat` 逐字证实）。
+- **★判甲（该登记）**。三个产码调用点**无一例外都在 `h.mu` 临界区内**（`:985` start／`:1044` toggle／`:1104` show），函数 doc `:1005-1007` 逐字 `Called with h.mu held (every spawn site holds it)` ⇒ **`Locked` 后缀说的是真话**，判乙改名会把"spawn 窗口必须持锁"这层语义从名字上抹掉。
+- **★登记条目连"另一把锁"都注明了**：`… body takes no lock on h.mu (rp.setSnapshotPublish takes the panel thread's own rp.mu)` —— 引 `panel_resident_windows.go:555-557`。**这是名册该有的写法**（⛔ 糊一句"takes no lock"）。
+- **★★仪器有效性正反两向对照（本会话做得最硬的一次，值得后人照抄）**：
+  - **对照 A**：故意不可解析的 overlay 源 ⇒ 编译**失败** `syntax error` ⇒ **证明 overlay 通路是活的**（⛔ "overlay 没生效"这种托词）。
+  - **对照 B**：合法 overlay 源编译**成功**，但**同一二进制**跑出来普查仍 `4 … across 72` 且 **PASS**（**编译器看见第 5 个函数、普查看不见**）⇒ **台账 `A1804` 那条"overlay 是读盘检查的假绿仪器"复核成立**。
+  - **同一二进制两种判定**：M1／M2 **都不重编译**（sha256 前后同为 `4B594E99…A349E`），读数分别变 `FAIL 5 … across 73`（点名 `zz_mut435_probe_windows.go line 7`）与 `FAIL 2 lock operation(s)` ⇒ **唯一变量是盘上源码**。
+  - **名册不是免死金牌**：M2 证明**已登记条目体内一加锁照样红**。
+- **★我票面的第 9 次错（已在本票内自纠）**：我把 `:245` 那 4 行 `t.Logf` 普查日志读成 4 条红句，实际只有 1 条（`:254`）。**腿复核了我的更正，成立。**
+- **票池**：done **354** / open **68** / total 422。
