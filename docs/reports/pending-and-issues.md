@@ -36391,3 +36391,22 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★边界（腿自述，我核过）**：`internal/panel/` **零字节**（核毕结论：该包今天没缺陷，缺的在生产者那一跳）；`internal/tools/task_backfill.go` 是唯一产码改动。
 - **HEAD 重放与 index 对读一致**：`tracked=19511 over-budget=69 covered=69 not in roster=0` **GREEN** 两边同值。
 - **票池：done 366 / open 59。**
+
+## A1830 — 票 122 **量尺口径已修**（`61ac182e8`，CI 那一步拆两遍）；★但 **CI 仍红、票 122 不整票收**——清账波现在有了**读得懂的工单面**
+
+- **三把尺（我现跑）**：提交 `61ac182e8`（3 件, 412+/15−，**`.go` 改动 0 枚**）／件 `docs/evidence/s1/122-staticcheck-goos-scope.md` **27422B**（附录 B 含 156 条逐条清单）／**我自己复跑两遍**：pass1（GOOS=linux, `-checks=all,-U1000`）**31 条**、pass2（GOOS=windows, `-checks=all`）**123 条**。
+  - **★我复跑的数与腿报的 32/124 差 1，已核清**：我 `staticcheck ./...` 只覆盖 root 模块；腿跑 3 个 module，多出的 1 条是 **`tools/mockllm` 的 SA9003**。**两边读数一致，不是分歧。**
+- **实装形状（我逐行核过 diff）**：`ci.yml` 的 staticcheck 那步拆成两遍——`GOOS=linux CGO_ENABLED=0 staticcheck -checks=all,-U1000`（管跨平台通用缺陷）＋ `GOOS=windows CGO_ENABLED=0 staticcheck -checks=all`（管死代码，在**真编译调用者的平台**上求值）。**两遍各自累加进 `rc`，⛔ 没有 continue-on-error，⛔ 没有全局关掉 U1000。** 自报行分开打印两段分母。
+- **★成对判据四发（腿做，种子 `jarvisProbe122Unused` 种在 `internal/ball/jarvis.go`，已拆净）**：
+  - **A 正向·搬家**：种子在场，**linux 遍 probe-lines=0（沉默）** ⇒ U1000 判庭搬家成功，不再误杀 Windows 代码
+  - **B 正向·咬合**：同一枚种子，**windows 遍 42→43**，逐字点名 `jarvis.go:239:6: func jarvisProbe122Unused is unused (U1000)`
+  - **C 反向·对照（关键）**：同一枚种子＋`//lint:ignore U1000` ⇒ windows 遍回 42、probe-lines=0 ⇒ **证明"真闭嘴"只有指令级抑制能做到；本修一条指令没加、门没关小**
+  - **D 拆除还原**：两遍回基线，文件逐字节还原
+- **★★腿如实报的结论：CI 不能绿**。新口径首跑预计 pass1 红 32、pass2 红 124。
+  - **但这是本票真正的价值**：**两份逐条清单就是清账波的工单面**，且 **windows 遍多看出 14 条旧口径从来看不到的 windows-only 文件缺陷**。
+- **★新口径下的构成（我按码分过）**：pass1＝ST1003×10／ST1021×10／ST1020×3／ST1000×2／ST1022×2／ST1023×2／SA5000×1／SA9009×1（**文风族为主 ＋ 两枚已登记夹具/假阳性**）。pass2＝U1000×79（A1773 的 GOOS 盲区主体）＋非 U1000×45。
+- **★口径的连带收益（重要，⛔ 漏记）**：**在 GOOS=windows 下，U1000 是"真 unused"**（windows 编译得到全部调用者）⇒ **A1773 说的"删了会坏 windows 功能"这个风险在新口径下消失了**。所以 79 条 U1000 **现在可以正当地逐条判删/判留**。
+  - ⚠ **但有一个我必须盯住的新陷阱**：`GOOS=windows` **不覆盖 `//go:build windows && winlive`** 那批文件。**只在 winlive 测试里被用的符号，在 pass2 下会假报 U1000** ⇒ 清账腿必须逐条查 build tag，⛔ 见 U1000 就删。**我已在派单里写死这一条。**
+- **票 122 维持 open**（AC#1/#2/#5/#6/#7 仍未勾；AC#6 要 lint 步真绿，而清账未做完）。
+- **票池：done 366 / open 59。**
+- **已推 origin/dev**（`b87b36995..61ac182e8`，含 188 结案与 122 口径两笔）。
