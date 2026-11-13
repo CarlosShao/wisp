@@ -435,7 +435,13 @@ run_selftest() {
     mkdir -p "$BENCH/scripts" || cannot_decide "cannot create $BENCH/scripts"
     self=$here/$(basename "$0")
     cp "$self" "$BENCH/scripts/slo-nail-census.sh" || cannot_decide "cannot copy this script into the bench"
-    cp "$target" "$BENCH/pristine.ps1" || cannot_decide "cannot copy $rel into the bench"
+    # ticket 266-r2: normalise the mutation source to LF, whatever the checkout
+    # holds. CI signs the target out with CRLF (eol=crlf), and the sed variants
+    # below anchor at end of line, which never matches a trailing \r, so every
+    # deliberate breakage would silently miss and the self-test would stay green
+    # where it must ring. $pristine feeds only the variants; the census reader
+    # strips \r itself, and control 27 (CRLF copy) builds its own CRLF from here.
+    tr -d '\015' < "$target" > "$BENCH/pristine.ps1" || cannot_decide "cannot copy $rel into the bench"
     bench_target=$BENCH/scripts/slo-check.ps1
     bench_census=$BENCH/scripts/slo-nail-census.sh
     pristine=$BENCH/pristine.ps1
