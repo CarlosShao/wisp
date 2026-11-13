@@ -76,6 +76,17 @@ func holdExclusive(t *testing.T, path string) (release func()) {
 // assertion: the failed call adopts the new stat, the next tick answers
 // (nil, nil), and the write stays hidden until the next successful write.
 func TestReadFailureDoesNotAdoptStatTheNextTickSeesTheWrite(t *testing.T) {
+	// PROBE-UNDO gate (manager_readfail_42r1_envprobe_windows_test.go): the
+	// case's first CheckAndReload must actually LOSE to the sharing violation,
+	// or everything below answers on a different code path than the one it
+	// exists to pin - a host where a share-0 handle does not conflict with a
+	// reader (the hosted windows-2025 runner shape, red with
+	// "must surface an error, got report &{Hot:[ball] ...}" on runs
+	// 43362781437 and 43243081268) would green-pass vacuously. The probe skips
+	// this case there with the undo condition named instead.
+	if got := probeShareZeroRead(t, shareZeroProbeFile(t)); got != "" {
+		t.Skipf("PROBE-UNDO (ticket 70 AC#2): %s - re-enable this case on a host where the probe passes (CreateFile share-0 conflicts with a plain reader)", got)
+	}
 	m, path, mutate := newTestManager(t, matrixBase)
 	beforeMtime, beforeSize, beforeValid := m.seenMtime, m.seenSize, m.seenValid
 

@@ -305,6 +305,18 @@ func validateExe(exe, path string) ValidationErrors {
 	case strings.TrimSpace(exe) == "":
 		return ValidationErrors{{Field: path, Reason: "required for a command tool (D46: the absolute path of the wrapped CLI)"}}
 	}
+	// The marker loop keeps its place BEFORE the TEMP/absoluteness checks so a
+	// `%VAR%` spelling names the movable-marker rule first (the ordering the
+	// Test52InstallRefusesUnstableExe table pins); the tilde half of the old
+	// marker list is the LEADING-~ check beside it, and it must yield to the
+	// TEMP rule: GitHub windows runners answer TEMP through an 8.3 alias
+	// (C:\Users\RUNNER~1\AppData\Local\Temp) whose mid-component tilde is a
+	// fixed alias, not a movable spelling - marking it movable refused the
+	// runner's own TEMP tree with the wrong reason (measured on run
+	// 43362781437's test-windows log). Both answers still refuse; only the
+	// named reason differs. On POSIX the marker loop runs unchanged: `$VAR`
+	// and a leading `~` expand there exactly as on Windows.
+	var errs ValidationErrors
 	for _, marker := range unstableExeMarkers {
 		if strings.Contains(exe, marker) {
 			return ValidationErrors{{
@@ -313,23 +325,21 @@ func validateExe(exe, path string) ValidationErrors {
 			}}
 		}
 	}
-	var errs ValidationErrors
-	if !isAbsSpelling(exe) {
-		errs = append(errs, ValidationError{
-			Field:  path,
-			Reason: fmt.Sprintf("%q is not absolute: a relative exe depends on the working directory, so its hash proves nothing about what runs", exe),
-		})
-	}
-	// The dangerous ABSOLUTE spelling is refused too, and the order is about a
-	// readable message rather than about severity: a path under
-	// `C:/.../Temp\cli.exe` is absolute, so a test asserting the TEMP marker
-	// would pass on the absoluteness refusal alone and never prove the
-	// stability rule. Being inside a TEMP root is the stronger statement, so it
-	// is named first.
 	if env, root, inTemp := underTempRoot(exe); inTemp {
 		errs = append(errs, ValidationError{
 			Field:  path,
 			Reason: fmt.Sprintf("%q is under %s (%q): a TEMP directory is recycled, so an executable there cannot be hash-pinned (PLAN.md §16.5.6 red-team case)", exe, env, root),
+		})
+	} else if isHomeRelativeSpelling(exe) {
+		errs = append(errs, ValidationError{
+			Field:  path,
+			Reason: fmt.Sprintf("%q is home-relative: a leading ~ resolves against whoever runs the manifest, and a movable executable cannot be hash-pinned (PLAN.md §16.5.6)", exe),
+		})
+	}
+	if !isAbsSpelling(exe) {
+		errs = append(errs, ValidationError{
+			Field:  path,
+			Reason: fmt.Sprintf("%q is not absolute: a relative exe depends on the working directory, so its hash proves nothing about what runs", exe),
 		})
 	}
 	if strings.HasPrefix(exe, `\\`) || strings.HasPrefix(exe, "//") {

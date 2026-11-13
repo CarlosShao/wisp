@@ -18,6 +18,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -30,8 +31,42 @@ import (
 // refuses to pin an exe under TEMP. The fake CLI is a file rather than a real
 // executable for the pin tests: nothing here spawns it, and the runtime tests
 // (manifestslot) do spawn a real process.
+//
+// On POSIX t.TempDir() answers the OS scratch root (TMPDIR, defaulting to
+// /tmp) - the very shape the windows guard below skips away from, and on a CI
+// container that root is recycled per run. Refusing to measure there would
+// leave the whole pin family unexecuted on ubuntu (that is exactly what run
+// 43362781437's SKIP rows were), so the POSIX branch plants the fixtures in a
+// STABLE tree instead: $GITHUB_WORKSPACE on CI (the checkout the job itself
+// owns, writable by the runner user), /var/tmp otherwise - neither is named by
+// TEMP/TMP/TMPDIR, so underTempRoot accepts it and the D46 rule under test is
+// exercised for real. The pin only has to outlive this one test, which it does
+// by construction.
 func fixtureExeDir(t *testing.T) string {
 	t.Helper()
+	if runtime.GOOS != "windows" {
+		base := strings.TrimSpace(os.Getenv("GITHUB_WORKSPACE"))
+		posixRoot := "GITHUB_WORKSPACE"
+		if base == "" {
+			base = "/var/tmp"
+			posixRoot = "/var/tmp"
+		}
+		dir, err := os.MkdirTemp(base, "wisp-d46-fixture-")
+		if err != nil {
+			// No stable POSIX tree on this host: say so rather than fail
+			// inside the code under test. Named so a ledger row can quote it.
+			t.Skipf("no stable POSIX fixture root available (%s: %v); the D46 stability fixtures need a tree outside the TEMP/TMPDIR roots", posixRoot, err)
+		}
+		if env, root, inTemp := underTempRoot(dir); inTemp {
+			// This host's TEMP/TMPDIR answer covers the stable tree too, so
+			// the pin rule under test would refuse the fixture by the very
+			// rule being measured - say so instead of red-herring.
+			os.RemoveAll(dir)
+			t.Skipf("every POSIX fixture root lives under %s (%q) on this host; the D46 stability fixtures need a tree outside the TEMP/TMPDIR roots", env, root)
+		}
+		t.Cleanup(func() { os.RemoveAll(dir) })
+		return dir
+	}
 	base := t.TempDir()
 	if _, _, inTemp := underTempRoot(base); inTemp {
 		// t.TempDir() honours TMPDIR/TMP/TEMP, so a developer shell that
@@ -259,48 +294,106 @@ func Test52InstallRefusesUnstableExe(t *testing.T) {
 // TEMP rule, not an accident of "not absolute". A path under the real TEMP root
 // IS absolute, so a test that only asserted "refused" would pass even if the
 // stability check were deleted.
+//
+// Why a probe and not "os.Getenv(TEMP) == \"\"": a hosted windows runner DOES
+// answer TEMP (as an 8.3 short spelling whose `~` used to bury this rule - see
+// validateExe's comment), so the old env check both skipped here on ubuntu and
+// mis-measured there. When the host answers a TEMP/TMP/TMPDIR root, every arm
+// runs against that real root; when it answers nothing, the installer arm is
+// still measured with a REAL file planted in the recycled tree this platform
+// does offer (t.TempDir()) - the same ErrExeUnstable, still naming TEMP - so
+// the stability rule is asserted here on every host, never skipped.
 func Test52AbsoluteTempPathIsRefusedForTheTempReason(t *testing.T) {
 	root := strings.TrimSpace(os.Getenv("TEMP"))
 	if root == "" {
-		t.Skip("no TEMP in this environment")
+		root = strings.TrimSpace(os.Getenv("TMP"))
 	}
-	exe := filepath.Join(root, "d46-fixture", "lark-cli.exe")
-	def := commandTool(exe)
+	if root == "" {
+		root = strings.TrimSpace(os.Getenv("TMPDIR"))
+	}
 
-	errs := Validate(&Manifest{
-		SchemaVersion: CurrentSchemaVersion,
-		ID:            "com.example.lark",
-		HostAPI:       "^1.0",
-		Name:          "Lark",
-		Version:       "0.1.0",
-		Tools:         []ToolDef{def},
-	})
-	var reasons []string
-	for _, e := range errs {
-		if strings.HasSuffix(e.Field, ".exe") {
-			reasons = append(reasons, e.Reason)
+	if root != "" {
+		exe := filepath.Join(root, "d46-fixture", "lark-cli.exe")
+		def := commandTool(exe)
+
+		errs := Validate(&Manifest{
+			SchemaVersion: CurrentSchemaVersion,
+			ID:            "com.example.lark",
+			HostAPI:       "^1.0",
+			Name:          "Lark",
+			Version:       "0.1.0",
+			Tools:         []ToolDef{def},
+		})
+		var reasons []string
+		for _, e := range errs {
+			if strings.HasSuffix(e.Field, ".exe") {
+				reasons = append(reasons, e.Reason)
+			}
 		}
+		if len(reasons) == 0 {
+			t.Fatalf("C14 accepted %q, which lives under TEMP (%s)", exe, root)
+		}
+		if !strings.Contains(reasons[0], "TEMP") {
+			t.Fatalf("first exe refusal = %q, want it to name TEMP (the stability rule), not just absoluteness", reasons[0])
+		}
+		_, perr := PinCommandExe(def, nil)
+		if !errors.Is(perr, ErrExeUnstable) || !strings.Contains(perr.Error(), "TEMP") {
+			t.Fatalf("install refusal = %v, want ErrExeUnstable naming TEMP", perr)
+		}
+		return
 	}
-	if len(reasons) == 0 {
-		t.Fatalf("C14 accepted %q, which lives under TEMP (%s)", exe, root)
+
+	// No TEMP/TMP/TMPDIR answer on this host. On POSIX the recycled tree this
+	// platform does offer is still a subject: os.TempDir()'s default (/tmp)
+	// is the recycled scratch root and underTempRoot refuses it by name. On
+	// WINDOWS the env-driven rule has no subject when no variable answers
+	// (os.TempDir would fall through to a user-profile tree the rule does not
+	// name), so the case says so instead of measuring nothing.
+	if runtime.GOOS == "windows" {
+		t.Skip("no TEMP/TMP/TMPDIR answer on this windows host: the env-driven TEMP rule has no subject to measure here (every CI windows runner answers TEMP; measured on run 43362781437)")
 	}
-	if !strings.Contains(reasons[0], "TEMP") {
-		t.Fatalf("first exe refusal = %q, want it to name TEMP (the stability rule), not just absoluteness", reasons[0])
+	// Plant a REAL file in the platform's recycled default tree - the
+	// installer hashes real bytes - and the refusal is the same ErrExeUnstable
+	// naming TEMP. A pinned result here would mean the TEMP rule never fired.
+	exe := writeFixtureExe(t, t.TempDir(), "lark-cli.exe", "v1:d46-temp-reason")
+	pin, err := PinCommandExe(commandTool(exe), nil)
+	if err == nil {
+		t.Fatalf("PinCommandExe pinned %q (%s): a TEMP-root exe must be refused with ErrExeUnstable naming TEMP", pin.Hash, exe)
 	}
-	_, perr := PinCommandExe(def, nil)
-	if !errors.Is(perr, ErrExeUnstable) || !strings.Contains(perr.Error(), "TEMP") {
-		t.Fatalf("install refusal = %v, want ErrExeUnstable naming TEMP", perr)
+	if !errors.Is(err, ErrExeUnstable) {
+		t.Fatalf("install refusal = %v, want ErrExeUnstable", err)
+	}
+	if !strings.Contains(err.Error(), "TEMP") {
+		t.Fatalf("install refusal = %v, want it to name TEMP (the stability rule)", err)
 	}
 }
 
 // Test52ForwardSlashWindowsPathIsPinnable is the SPEC-07 §4 example itself:
 // `exe = "C:/Users/me/bin/lark-cli.exe"`. A Windows path spelled with forward
 // slashes is absolute, and refusing it would refuse the contract's own sample.
+//
+// On POSIX the same criterion is measured inside its own platform: one file,
+// pinned twice, first through the native spelling, then through a
+// slash-rewritten spelling of the same file - the "spelling must not change
+// what is pinned" property, which is what the SPEC example pins on Windows.
+// The pre-triage shape skipped unexecuted on ubuntu; it now asserts there.
 func Test52ForwardSlashWindowsPathIsPinnable(t *testing.T) {
 	dir := fixtureExeDir(t)
 	exe := writeFixtureExe(t, dir, "lark-cli.exe", "v1:forward-slash")
-	if !strings.Contains(exe, `\`) {
-		t.Skipf("native spelling %q has no separator to convert", exe)
+	if runtime.GOOS != "windows" {
+		slashSpelling := filepath.ToSlash(exe)
+		native, err := PinCommandExe(commandTool(exe), nil)
+		if err != nil {
+			t.Fatalf("PinCommandExe(native spelling %q): %v", exe, err)
+		}
+		slash, err := PinCommandExe(commandTool(slashSpelling), nil)
+		if err != nil {
+			t.Fatalf("PinCommandExe(%q): %v (the rewritten spelling of the same file must pin the same bytes)", slashSpelling, err)
+		}
+		if native.Hash != slash.Hash || native.Path != slash.Path {
+			t.Errorf("the two spellings of one file pinned differently: %s@%s vs %s@%s", native.Hash, native.Path, slash.Hash, slash.Path)
+		}
+		return
 	}
 	forward := filepath.ToSlash(exe)
 	back, err := PinCommandExe(commandTool(exe), nil)

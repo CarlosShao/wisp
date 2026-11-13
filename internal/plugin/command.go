@@ -37,6 +37,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/CarlosShao/wisp/internal/risk"
@@ -115,7 +116,24 @@ func CommandExeAllowed(name string) bool {
 // %VAR% and ~ by contract (SPEC-06 §4 step 1), so a manifest that names
 // `%TEMP%\x.exe` would otherwise be pinned to today's temp directory and called
 // "stable". D46's red-team case is exactly this one (PLAN.md:2678).
-var unstableExeMarkers = []string{"%", "$", "~"}
+//
+// The tilde is deliberately NOT a substring marker: its home-relative meaning
+// lives only in the LEADING position (expandInput expands a leading ~, never
+// one inside a component), and GitHub's windows runners answer TEMP through an
+// 8.3 alias (C:\Users\RUNNER~1\AppData\Local\Temp) whose mid-component tilde is
+// a FIXED alias of the runner user's profile, not a movable spelling. Marking
+// that tilde movable refused the runner's own TEMP tree with the wrong reason
+// and buried the TEMP rule (run 43362781437's test-windows log); the
+// home-relative half of the old check lives on in isHomeRelativeSpelling.
+var unstableExeMarkers = []string{"%", "$"}
+
+// isHomeRelativeSpelling is the tilde half of the old marker check: a LEADING
+// ~ (bare, ~/ or ~\ - the spellings expandInput treats as home) resolves
+// against whoever runs the manifest and cannot be hash-pinned. A tilde inside
+// a component is an 8.3 alias artifact (RUNNER~1) and is not refused here.
+func isHomeRelativeSpelling(p string) bool {
+	return strings.HasPrefix(p, "~")
+}
 
 // tempDirEnvnames are the variables whose value would make an exe live in a
 // directory the OS recycles. Checked as a component of the canonical path, so
@@ -127,7 +145,8 @@ var tempDirEnvnames = []string{"TEMP", "TMP", "TMPDIR"}
 // call can never agree with a manifest that install would have refused.
 //
 // Stability rules, in order:
-//   - no %VAR% / $VAR / ~ in the spelling (that is what "movable" means here);
+//   - no %VAR% / $VAR in the spelling, and no LEADING ~ (that is what
+//     "movable" means here; a mid-component ~ is an 8.3 alias, not a variable);
 //   - the spelling is absolute as written (a relative exe depends on the cwd);
 //   - C26's expansion step must NOT have moved it (Result.Actable);
 //   - it is a local drive path, not a UNC share (a share name is not a pin);
@@ -139,9 +158,13 @@ func resolveExe(spelling string, exceptions []string) (string, error) {
 	}
 	for _, marker := range unstableExeMarkers {
 		if strings.Contains(spelling, marker) {
-			return "", fmt.Errorf("%w: %q contains %q (variable/home-relative paths are refused before C26 expands them)",
+			return "", fmt.Errorf("%w: %q contains %q (variable/home-relative paths are refused before C26 expands them; a movable executable cannot be hash-pinned)",
 				ErrExeUnstable, spelling, marker)
 		}
+	}
+	if isHomeRelativeSpelling(spelling) {
+		return "", fmt.Errorf("%w: %q is home-relative (a leading ~ resolves against whoever runs the manifest; a movable executable cannot be hash-pinned)",
+			ErrExeUnstable, spelling)
 	}
 	if !isAbsSpelling(spelling) {
 		return "", fmt.Errorf("%w: %q is not an absolute path", ErrExeUnstable, spelling)
@@ -157,8 +180,8 @@ func resolveExe(spelling string, exceptions []string) (string, error) {
 	if strings.HasPrefix(canonical, `\\`) {
 		return "", fmt.Errorf("%w: %q resolves to a UNC path %q (a share name is not a local pin)", ErrExeUnstable, spelling, canonical)
 	}
-	if vol := filepath.VolumeName(canonical); vol == "" {
-		return "", fmt.Errorf("%w: %q resolves to a drive-less path %q", ErrExeUnstable, spelling, canonical)
+	if vol := filepath.VolumeName(canonical); runtime.GOOS == "windows" && vol == "" {
+		return "", fmt.Errorf("%w: %q resolves to a drive-less path %q (a volume-relative spelling is resolved against an unpredictable current directory)", ErrExeUnstable, spelling, canonical)
 	}
 	if env, root, inTemp := underTempRoot(canonical); inTemp {
 		return "", fmt.Errorf("%w: %q resolves under %s (%q); a TEMP directory is recycled", ErrExeUnstable, spelling, env, root)
@@ -184,8 +207,14 @@ func isAbsSpelling(p string) bool {
 	if filepath.VolumeName(p) != "" {
 		return filepath.IsAbs(p)
 	}
-	// Posix absolute spelling (tests on other platforms, and a Windows path
-	// written with forward slashes still carries a volume name above).
+	// Posix absolute spelling (`/tmp/cli.exe`): absolute where POSIX paths are
+	// the native spelling, so D46 can pin the exact bytes of a real file there.
+	// On a WINDOWS build the same spelling is drive-root-relative (the volume
+	// letter would come from the current directory), so it stays refused - the
+	// pre-triage verdict on windows is byte-for-byte unchanged.
+	if runtime.GOOS == "windows" {
+		return false
+	}
 	return strings.HasPrefix(p, "/") && !strings.HasPrefix(p, "//")
 }
 
@@ -193,7 +222,21 @@ func isAbsSpelling(p string) bool {
 // variable named that root. Both the validator (C14, on the spelling as
 // written) and resolveExe (install, on the C26-canonical path) call it, so "a
 // TEMP path is refused" is one rule expressed once rather than two guesses that
-// can drift apart.
+// can drift apart. The root spelling is the env value AS ANSWERED - on GitHub's
+// windows runners TEMP is the 8.3 short form (...\RUNNER~1\...), and because
+// the check is a prefix comparison against a root this process got from the
+// same environment as the exe spelling, the short form matches a short
+// spelling; an 8.3-alias root would only evade this check on a host that
+// spells the exe long and TEMP short, which the C26-resolved canonical side
+// absorbs by construction (resolveExe compares one resolution against the
+// same host's own answer).
+//
+// On POSIX with NO TEMP/TMP/TMPDIR answer at all, the recycled-tree rule still
+// has a subject: os.TempDir()'s own default (/tmp) is the platform's recycled
+// scratch root, and an exe pinned there is exactly the red-team case the rule
+// exists for (t.TempDir() itself lands there when TMPDIR is unset). The /tmp
+// default is consulted only when all three variables are empty, so a host that
+// points TMPDIR elsewhere keeps answering through its own variable.
 func underTempRoot(p string) (envname, root string, ok bool) {
 	for _, env := range tempDirEnvnames {
 		r := strings.TrimSpace(os.Getenv(env))
@@ -204,6 +247,16 @@ func underTempRoot(p string) (envname, root string, ok bool) {
 			return env, r, true
 		}
 	}
+	if runtime.GOOS != "windows" {
+		for _, env := range tempDirEnvnames {
+			if strings.TrimSpace(os.Getenv(env)) != "" {
+				return "", "", false // a POSIX host answered; its answer is the rule's subject, /tmp is not
+			}
+		}
+		if isWithinDir(p, "/tmp") {
+			return "os.TempDir default", "/tmp", true
+		}
+	}
 	return "", "", false
 }
 
@@ -211,21 +264,43 @@ func underTempRoot(p string) (envname, root string, ok bool) {
 // sides are C26 output or an OS-provided root; the comparison is
 // case-insensitive because Windows filesystems are, and component-bounded so
 // "C:\Temp2" is not inside "C:\Temp".
+//
+// Each side is compared in BOTH of the spellings C26 distinguishes (the same
+// two forms risk's pathForms separates): the spelling AS ANSWERED (raw) and
+// the handle-resolved real path when the OS can answer one. A hosted windows
+// runner answers TEMP as the 8.3 short form (C:\Users\RUNNER~1\...) while a
+// resolved path comes back long (C:\Users\runneradmin\...), so a single-form
+// comparison misses exactly there (risk/pathresolver.go's anchor-spelling
+// note); a containment hit on EITHER paired form is enough, because both
+// forms of one side name the same tree on the same host. This predicate feeds
+// refusal rules only, so the extra hits are strictness, never a pass.
 func isWithinDir(canonical, dir string) bool {
-	res, err := risk.Resolve(dir, nil)
+	dirRes, err := risk.Resolve(dir, nil)
 	if err != nil {
 		return false
 	}
-	root := strings.TrimRight(res.Canonical, `\/`)
-	if root == "" {
+	cRes, err := risk.Resolve(canonical, nil)
+	if err != nil {
 		return false
 	}
-	c := strings.ToLower(canonical)
-	r := strings.ToLower(root)
-	if c == r {
-		return true
+	roots := []string{dirRes.Canonical, dir}
+	cands := []string{cRes.Canonical, canonical}
+	for _, c := range cands {
+		c = strings.ToLower(c)
+		if c == "" {
+			continue
+		}
+		for _, r := range roots {
+			r = strings.ToLower(strings.TrimRight(r, `\/`))
+			if r == "" {
+				continue
+			}
+			if c == r || strings.HasPrefix(c, r+`\`) || strings.HasPrefix(c, r+"/") {
+				return true
+			}
+		}
 	}
-	return strings.HasPrefix(c, r+`\`) || strings.HasPrefix(c, r+"/")
+	return false
 }
 
 // ResolveExeForRun re-runs the install-time C26 stability rules over a
