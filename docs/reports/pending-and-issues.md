@@ -36303,3 +36303,33 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **门禁**：`gofumpt` 空输出、`d22scan` clean（internal 404/1005，新文件已入扫）、两包全绿。
 - **★HEAD 重放与 index 对读一致**：`tracked=19510 over-budget=69 covered=69 not in roster=0` **GREEN** 两边同值。
 - **票池：done 364 / open 61。**
+
+## A1826 — 票 **439 结案**（第 36 枚）：7 枚零读者**零枚该接、零枚该删**（0 甲/0 乙/4 丙/2 丁）；★**3 件摆机主**
+
+- **三把尺**：提交 `3cdc57faa`（2 files, +176）／件 `docs/evidence/s1/439-seven-config-keys.md` 17306B／门禁五条腿跑全绿（`ok config 2.582s`＋`ok panel 19.098s`、`gofumpt` 空、`d22scan` clean）。
+- **AC#0：7 枚全部复现零读者，与票 180 的表无一处矛盾。**
+  - **一处精化（#6 `voice.tts.speed`）**：下游消费**在盘**——`cloudtts.go:140` 把 `ep.ttsSpeed()` 写进云端请求体；**死的是 `ResolveCloudChain` 全仓非测试调用者 0** ⇒ "接票 61 即活"钉得更死。
+- **AC#1：0 甲 · 0 乙 · 4 丙 · 2 丁**
+  | 字段 | 判 | 归口 |
+  |---|---|---|
+  | `app.language` | 丙 | 票 **39** |
+  | `app.theme` | 丙＋**丁（球侧）** | GUI 票 39；球侧摆机主 |
+  | `ball.hide_on_fullscreen` | 丙 | 票 **62/68**（功能半边**不在**，想接都没对象） |
+  | `voice.wake_word.veto_words` | **丁** | 消费半边**已接线在盘**，缺的是**数据**（keywords 转导表＝模型资产＋manifest sha256） |
+  | `voice.tts.provider` | 丙 | 票 **61** 收尾 |
+  | `voice.tts.speed` | 丙 | 随票 61 搭车（零额外工作量） |
+  | `observe.slo_sample_interval_sec` | **丁** | **任何接法都动冻结面**（SPEC-03 §4.3 冻结 1s tick），字段语义零契约文字 |
+- **★腿纠正我的一处**：`kws.go:291` 的 `Veto: kwsVetoWords[...]` **读的是 speech 包内 map，不是 config 字段** ⇒ **不是"完全没接"，是"消费半边已接、数据半边缺"**。
+- **★AC#2 零枚判甲 ⇒ 无落地、无成对判据可跑**（如实记，⛔ 漏跑）。反向自动满足：`git diff HEAD -- internal/config/schema.go` **空**（70 枚 default 标签零字节动）。
+- **★HEAD 重放与 index 对读一致**：`tracked=19510 over-budget=69 covered=69 not in roster=0` **GREEN** 两边同值；**HEAD 全仓无重复票号**。
+- **票池：done 365 / open 61。**
+
+## ★★★Q-439：3 件摆机主（都要**改契约文字**，按铁律必须他拍）
+
+| # | 裁定 | 选项 | 不答的代价 |
+|---|---|---|---|
+| **1** | **`app.theme` 的皮跟谁走**（球侧半边） | ①批"球吃 `app.theme`"→开小票接线（缝在盘）②批"theme 只归 GUI"→归票 39（备注消费对象＝改契约须批）③维持现状 | 键继续零读者；票 39 的 hot 徽章对 theme 撒谎 |
+| **2** | **`veto_words` 要不要激活**（要重生成 keywords 转导表＝模型资产＋manifest sha 变更） | ①批资产→开 B 腿 ②不批→维持挂账 | 打断词功能永远打不响（代码半边在盘等数据） |
+| **3** | **`slo_sample_interval_sec` 的语义** | ①给语义→须改 SPEC-03 §4.3/D32＝改契约须批 ②批删键→同是改契约须批 ③维持挂账（现状） | 键继续零读者，写任何值都白改 |
+
+**⇒ 机主回一句「1 选 X、2 选 X、3 选 X」即可。不答＝三件按"维持现状"继续挂账，功能不受影响，只是那几个配置键写了仍然白写。**
