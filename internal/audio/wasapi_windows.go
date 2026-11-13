@@ -45,11 +45,6 @@ func currentThreadID() uint32 {
 
 // COM identifiers (from mmdeviceapi.h / audioclient.h).
 var (
-	// IID_IUnknown {00000000-0000-0000-C000-000000000046}
-	iidIUnknown = windows.GUID{
-		Data1: 0x00000000, Data2: 0x0000, Data3: 0x0000,
-		Data4: [8]byte{0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46},
-	}
 	// CLSID_MMDeviceEnumerator {BCDE0395-E52F-467C-8E3D-C4579291692E}
 	clsidMMDeviceEnumerator = windows.GUID{
 		Data1: 0xBCDE0395, Data2: 0xE52F, Data3: 0x467C,

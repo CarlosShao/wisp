@@ -36,15 +36,11 @@ var (
 	pSendMessageW             = modUser32.NewProc("SendMessageW")
 	pWindowFromPoint          = modUser32.NewProc("WindowFromPoint")
 	pGetForegroundWindow      = modUser32.NewProc("GetForegroundWindow")
-	pSetWindowLongPtrW        = modUser32.NewProc("SetWindowLongPtrW")
-	pGetWindowLongPtrW        = modUser32.NewProc("GetWindowLongPtrW")
 	pCallWindowProcW          = modUser32.NewProc("CallWindowProcW")
 	pEnumThreadWindows        = modUser32.NewProc("EnumThreadWindows")
 	pKeybdEvent               = modUser32.NewProc("keybd_event")
 	pGetAsyncKeyState         = modUser32.NewProc("GetAsyncKeyState")
 	pGetGuiResources          = modUser32.NewProc("GetGuiResources")
-	pGetClientRect            = modUser32.NewProc("GetClientRect")
-	pClientToScreen           = modUser32.NewProc("ClientToScreen")
 )
 
 const (

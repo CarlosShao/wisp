@@ -135,14 +135,21 @@ type d2d1Ellipse struct {
 	radiusY float32
 }
 
+// d2d1RenderTargetProps is D2D1_RENDER_TARGET_PROPERTIES (x64 ABI). The zero
+// fields below are part of the ABI CreateDCRenderTarget reads by offset from
+// the pRenderTargetProperties pointer we pass it (D2D1_RENDER_TARGET_TYPE
+// default, USAGE_NONE, D2D1_FEATURE_LEVEL_DEFAULT).
 type d2d1RenderTargetProps struct {
+	//lint:ignore U1000 CreateDCRenderTarget reads D2D1_RENDER_TARGET_PROPERTIES fields by memory offset
 	typ       uint32
 	format    uint32
 	alphaMode uint32
 	dpiX      float32 // 96 -> 1 DIP == 1 physical pixel
 	dpiY      float32
-	usage     uint32
-	minLevel  uint32
+	//lint:ignore U1000 CreateDCRenderTarget reads D2D1_RENDER_TARGET_PROPERTIES fields by memory offset
+	usage uint32
+	//lint:ignore U1000 CreateDCRenderTarget reads D2D1_RENDER_TARGET_PROPERTIES fields by memory offset
+	minLevel uint32
 }
 
 type d2d1BrushProps struct {

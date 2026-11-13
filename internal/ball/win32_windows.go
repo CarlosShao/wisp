@@ -171,18 +171,32 @@ const (
 // ------------------------------------------------------------------- structs
 
 type wndClassEx struct {
-	size      uint32
-	style     uint32
-	wndProc   uintptr
-	clsExtra  int32
-	winExtra  int32
-	instance  windows.Handle
-	icon      windows.Handle
-	cursor    windows.Handle
-	bkgnd     windows.Handle
+	size uint32
+	// The fields below are the WNDCLASSEX ABI. RegisterClassExW reads them
+	// by FIELD OFFSET from the lpwcx pointer we pass it - there is no Go
+	// reader, and deleting any of them silently shifts every later field
+	// (go vet and go build both stay green), which corrupts the window class
+	// registration at runtime.
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	style uint32
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	wndProc uintptr
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	clsExtra int32
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	winExtra int32
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	instance windows.Handle
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	icon   windows.Handle
+	cursor windows.Handle
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	bkgnd windows.Handle
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
 	menuName  uintptr
 	className *uint16
-	iconSm    windows.Handle
+	//lint:ignore U1000 RegisterClassExW reads WNDCLASSEX fields by memory offset
+	iconSm windows.Handle
 }
 
 type msg struct {
@@ -212,21 +226,34 @@ type blendFunction struct {
 }
 
 type bitmapInfoHeader struct {
-	size          uint32
-	width         int32
-	height        int32 // negative = top-down
-	planes        uint16
-	bitCount      uint16
-	compression   uint32
-	sizeImage     uint32
+	size     uint32
+	width    int32
+	height   int32 // negative = top-down
+	planes   uint16
+	bitCount uint16
+	// The fields below complete the BITMAPINFOHEADER ABI: CreateDIBSection
+	// reads the whole 40-byte header by field offset from the pbmi pointer we
+	// pass it. Truncating them would move bmiColors' offset in bitmapInfo and
+	// silently corrupt the DIB descriptor (go build stays green).
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFOHEADER fields by memory offset
+	compression uint32
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFOHEADER fields by memory offset
+	sizeImage uint32
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFOHEADER fields by memory offset
 	xPelsPerMeter int32
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFOHEADER fields by memory offset
 	yPelsPerMeter int32
-	clrUsed       uint32
-	clrImportant  uint32
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFOHEADER fields by memory offset
+	clrUsed uint32
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFOHEADER fields by memory offset
+	clrImportant uint32
 }
 
 type bitmapInfo struct {
-	header    bitmapInfoHeader
+	header bitmapInfoHeader
+	// bmiColors sits right after the 40-byte header in the Win32 ABI
+	// (BITMAPINFO); CreateDIBSection reads it by offset.
+	//lint:ignore U1000 CreateDIBSection reads BITMAPINFO.bmiColors by memory offset
 	bmiColors [1]uint32
 }
 
@@ -244,6 +271,9 @@ type trackMouseInfo struct {
 	size      uint32
 	flags     uint32
 	hwndTrack windows.HWND
+	// hoverTime completes the TRACKMOUSEEVENT ABI: TrackMouseEvent reads the
+	// whole struct by field offset from the lpEventTrack pointer we pass it.
+	//lint:ignore U1000 TrackMouseEvent reads TRACKMOUSEEVENT fields by memory offset
 	hoverTime uint32
 }
 
@@ -259,16 +289,28 @@ type notifyIconData struct {
 	_                uint32
 	hIcon            windows.Handle
 	szTip            [128]uint16
-	dwState          uint32
-	dwStateMask      uint32
-	szInfo           [256]uint16
-	uVersion         uint32
-	_                uint32
-	szInfoTitle      [64]uint16
-	dwInfoFlags      uint32
-	_                uint32
-	guidItem         windows.GUID
-	hBalloonIcon     windows.Handle
+	// The fields below complete the NOTIFYICONDATAW ABI (x64): Shell-
+	// _NotifyIconW reads/writes them by field offset from the lpData pointer
+	// we pass it. Deleting any shifts szInfo/szInfoTitle/hBalloonIcon and
+	// silently corrupts tray state at runtime (go build stays green).
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	dwState uint32
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	dwStateMask uint32
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	szInfo [256]uint16
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	uVersion uint32
+	_        uint32
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	szInfoTitle [64]uint16
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	dwInfoFlags uint32
+	_           uint32
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	guidItem windows.GUID
+	//lint:ignore U1000 Shell_NotifyIconW reads NOTIFYICONDATA fields by memory offset
+	hBalloonIcon windows.Handle
 }
 
 const (
@@ -324,11 +366,4 @@ func htTransparentResult() uintptr { return ^uintptr(0) }
 // call; the double indirection keeps vet's provenance check quiet.
 func rectFromUintptr(p uintptr) *rect {
 	return (*rect)(unsafe.Pointer(&p))
-}
-
-// winHeapPtr reinterprets a Windows-heap uintptr as a pointer for a bounded
-// read. The target is NOT Go memory (DIB bits): it is invisible to the GC by
-// design and the caller must keep the lifetime bound (see renderer.dumpDIB).
-func winHeapPtr(p uintptr) unsafe.Pointer {
-	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }

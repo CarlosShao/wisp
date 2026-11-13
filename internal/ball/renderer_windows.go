@@ -22,13 +22,12 @@ import (
 )
 
 type renderer struct {
-	dcRT       unsafe.Pointer // ID2D1DCRenderTarget
-	hdcMem     uintptr
-	hbm        uintptr        // DIB section handle
-	bits       unsafe.Pointer // DIB memory (Windows heap - the allocation lives and dies with hbm; held typed so the overlay audit can read it vet-clean)
-	capW, capH uint32         // current DIB allocation
-	w, h       int32          // physical pixels
-	dpi        uint32
+	dcRT   unsafe.Pointer // ID2D1DCRenderTarget
+	hdcMem uintptr
+	hbm    uintptr        // DIB section handle
+	bits   unsafe.Pointer // DIB memory (Windows heap - the allocation lives and dies with hbm; held typed so the overlay audit can read it vet-clean)
+	w, h   int32          // physical pixels
+	dpi    uint32
 
 	solid    unsafe.Pointer // single solid brush, SetColor per use
 	badgeFmt unsafe.Pointer // DWrite text format: badge digits (weight 600)
@@ -210,21 +209,6 @@ func (r *renderer) createTextFormats() error {
 	if r.microFmt, err = mk(500, float32(FontSizeMicroPx)); err != nil {
 		return err
 	}
-	return nil
-}
-
-// resize rebinds the DC render target to a new physical size (DPI change /
-// state size change).
-func (r *renderer) resize(w, h int32) error {
-	if w == r.w && h == r.h {
-		return nil
-	}
-	bindRect := rect{l: 0, t: 0, r: w, b: h}
-	hr, _, _ := comCall(r.dcRT, slotDCRTBindDC, uintptr(r.hdcMem), unsafePtr(&bindRect))
-	if hr != 0 {
-		return fmt.Errorf("ball: BindDC(%dx%d) hr=0x%x", w, h, hr)
-	}
-	r.w, r.h = w, h
 	return nil
 }
 
@@ -931,48 +915,4 @@ func (r *renderer) drawIcon(v Visual, c d2d1Point2F, R, s float32) {
 		r.line(d2d1Point2F{tip.x - R*0.14, tip.y - R*0.02}, tip, g)
 		r.line(d2d1Point2F{tip.x - R*0.02, tip.y - R*0.14}, tip, g)
 	}
-}
-
-// maxWindowEdge is the largest window edge this renderer must back (max
-// configured orb + ring margins, DPI-scaled).
-func maxWindowEdge(dpi uint32) int32 {
-	return int32(WindowEdgePx(BallSizeMaxPx, dpi))
-}
-
-// ensureDCAndDIB creates the memory DC and the backing DIB at (at least)
-// w x h. Existing DC/DIB are reused when they are large enough; the DIB is
-// recreated only when the requested size outgrows the allocation (DPI rise).
-func (r *renderer) ensureDCAndDIB(hdcScreen uintptr, w, h int32) error {
-	if r.hdcMem == 0 {
-		r.hdcMem, _, _ = pCreateCompatibleDC.Call(hdcScreen)
-		if r.hdcMem == 0 {
-			return fmt.Errorf("ball: CreateCompatibleDC failed")
-		}
-	}
-	if r.hbm != 0 && int32(r.capW) >= w && int32(r.capH) >= h {
-		return nil // reuse
-	}
-	// (Re)allocate.
-	if r.hbm != 0 {
-		pDeleteObject.Call(r.hbm)
-		r.hbm = 0
-	}
-	bmi := bitmapInfo{}
-	bmi.header = bitmapInfoHeader{
-		size:     uint32(unsafe.Sizeof(bmi.header)),
-		width:    w,
-		height:   -h, // negative = top-down
-		planes:   1,
-		bitCount: 32,
-	}
-	var bits unsafe.Pointer
-	hbm, _, err := pCreateDIBSection.Call(r.hdcMem, unsafePtr(&bmi), dibRGBColors, unsafePtr(&bits), 0, 0)
-	if hbm == 0 {
-		return fmt.Errorf("ball: CreateDIBSection(%dx%d): %v", w, h, err)
-	}
-	r.hbm = hbm
-	r.bits = bits
-	r.capW, r.capH = uint32(w), uint32(h)
-	pSelectObject.Call(r.hdcMem, hbm)
-	return nil
 }

@@ -216,3 +216,39 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   本波 commit 只含 2 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树 3 个他腿改动零触碰零提交。
   next=编排者推送后取 CI lint 步两段自报读数：**期望 pass1＝0**（runner go patch 不同则 crash-lines 数可异，
   判读以 finding 行为准）；票 122 剩余＝pass2 的 U1000 清账与 windows-only 14 条（后续波）＋ AC#6。
+
+- [2026-11-13 15:1x +08] agent=122-wave4b（写腿·重派，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-wave4b-u1000-dispatch.txt`，开工 HEAD `0743e89f5`，
+  staticcheck 2026.2.2 (0.8.2)）
+  did=**pass2 U1000 清账波 4 落地：internal/audio＋internal/ball 40 条 → 2 条**（前腿返回空零交付，本腿全量重做）。
+  起手复跑两把尺：不带 tag ＝40 条（audio 1＋ball 39，与派单数一致）；`-tags=winlive` ＝43 条——**差集为空**
+  （40 条无一属于④"仅 winlive 有主"），多出的 3 条（`takeEscWith`/`cancelBorrowedLine`/`cancelFailedLine`）
+  是**假阳性**：winlive 下 ball 测试包编译本身是坏的（存量：`interaction_live_test.go` 本地重声明
+  GWL_EXSTYLE 索引撞 `win32_windows.go:87`＋溢出调用、`live_guard_windows_test.go:39-40` 本地重声明
+  `pGet/SetWindowLongPtrW`），测试包被编译错误丢弃 ⇒ 默认档测试（tag 仅 `windows`）里的真引用从分析中消失。
+  四档处置（逐条表＋理由＝证据件 `docs/evidence/s1/122-wave4-u1000-audio-ball.md` §2 全 40 行）：
+  **① ABI ignore 27**（WNDCLASSEX 7＋BITMAPINFOHEADER 6＋BITMAPINFO.bmiColors 1＋TRACKMOUSEEVENT 1＋
+  NOTIFYICONDATA 8＋DWM_BLURBEHIND 1＋D2D1_RENDER_TARGET_PROPERTIES 3，理由逐个点名按偏移读它的 API）；
+  **② ignore 1**（`orbDataLock`，写-only 即设计、句柄寄存是副作用，票 408r3 判例）；
+  **③ 删 12 条目**（`iidIUnknown`、`fadeStart`、`startedErr`、`recenterAt`、`resize`、`capW/capH`、
+  `maxWindowEdge`、`ensureDCAndDIB`、`winHeapPtr`——每枚删前全仓 grep＋副作用核；`ensureDCAndDIB` 删后
+  核过 bitmapInfo/dibRGBColors/slotDCRTBindDC 在 newRenderer 另有活读者，不级联出新死码）；
+  **④ 点名保留 2**（`orbHwndTopmost`＝winlive 测试 4 处 `SetWindowPos` 调用；`overlayGlyphPixels`＝
+  `orb_live_windows_test.go:972` 真调用——批 1 曾判"留-口"、本腿现核升级为④真主，⛔删⛔ignore，
+  源码处留 Ticket-122 注释点名调用者 file:line＋tag）。
+  **★ABI 反向判据现场实测**：真删 `bitmapInfoHeader.clrUsed` ⇒ `go build` exit 0 **零报错**，随后立即还原
+  复跑绿——"删了编译照样过"落档为机器依据，编译器不是护栏。
+  **附带修复（本腿写面内）**：上述 winlive 测试包坏编译两处重声明删除、调用点改用生产符号
+  （int32 变量转换，循 `win32_windows.go:83-87` 注释规矩）；修复后 winlive 测试包编译恢复，
+  新显形 2 条测试本地死 proc（`pGetClientRect`/`pClientToScreen`，零引用）按③删；
+  winlive 冒烟 `-run TestNothingMatchesThis -tags=winlive` exit 0。
+  过程如实记：本腿一度误删④档 `overlayGlyphPixels`（grep 命中未先核 tag），发现后立即原样恢复，终态＝保留。
+  收尾读数：**不带 tag U1000＝2、winlive U1000＝2（同两条，均为④预期残留）**；
+  两包另余 ST1003×7 存量命名红（非本票射程，未动）。
+  门禁：build rc0／vet rc0／test `-count=1` 两包 ok（audio 18.374s＋ball 0.854s）／gofumpt 0 行
+  （三处改动对齐曾点名，-w 收口后复验空）／d22scan clean rc0（PASS=45 FAIL=0）；
+  `audio/aecspike` sherpa cgo DLL 依赖按派单 SKIP 如实报；`go test ./cmd/wisp/` 按票 98 豁免未跑。
+  本波 commit 只含 8 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树他腿改动
+  （internal/tools/search_files_test.go 等）零触碰零提交。
+  next=编排者推送后取 CI lint 步 pass2 自报读数（这两个包应只剩 2 条④残留，若 CI 口径连④也要静音，
+  属改判据、须人工批准）；AC#6 仍待 CI 步级读数。

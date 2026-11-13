@@ -159,9 +159,13 @@ const (
 
 // dwmBlurBehind is DWM_BLURBEHIND.
 type dwmBlurBehind struct {
-	dwFlags                uint32
-	fEnable                uint32 // BOOL
-	hRgnBlur               windows.Handle
+	dwFlags  uint32
+	fEnable  uint32 // BOOL
+	hRgnBlur windows.Handle
+	// fTransitionOnMaximized completes the DWM_BLURBEHIND ABI (x64):
+	// DwmEnableBlurBehindWindow reads the whole struct by field offset from
+	// the pBlurBehind pointer we pass it.
+	//lint:ignore U1000 DwmEnableBlurBehindWindow reads DWM_BLURBEHIND fields by memory offset
 	fTransitionOnMaximized uint32 // BOOL
 }
 
@@ -190,6 +194,13 @@ func enableDWMAlpha(hwnd windows.HWND) {
 }
 
 // HWND_TOPMOST as a uintptr literal ((HWND)-1).
+//
+// Ticket-122 note: staticcheck (without build tags) reports this const as
+// U1000-unused, but it HAS a real caller under -tags=winlive:
+// orb_live_windows_test.go:559/:577 and
+// orb_glass62_live_windows_test.go:145/:160 pass it to SetWindowPos as the
+// hWndInsertAfter argument. Ticket-122 rule 4: no delete, no lint:ignore -
+// the caller stays visible; the residue in the tagless read is expected.
 const orbHwndTopmost = ^uintptr(0)
 
 // orbWndProcPtr / activeOrb: the class callback plus the package-level
@@ -462,7 +473,12 @@ var (
 	orbDataPathOnce sync.Once
 	orbDataDir      string
 	// orbDataLock is held OPEN from before the folder exists until process
-	// exit - that open handle IS the sweep's liveness signal.
+	// exit - that open handle IS the sweep's liveness signal. The write below
+	// (orbDataLock = h) is itself the side effect that pins the handle: it
+	// keeps the handle reachable for the process lifetime, so the sweep can
+	// key on its existence. No Go code ever reads the value back BY DESIGN.
+	//
+	//lint:ignore U1000 intentionally write-only: the open handle itself is the sweep's liveness signal
 	orbDataLock windows.Handle
 )
 

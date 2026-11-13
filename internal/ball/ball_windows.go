@@ -115,7 +115,6 @@ type Ball struct {
 	dragMoved       bool
 	dragStart       point
 	animTimerActive bool
-	fadeStart       time.Time
 	stateEntered    time.Time
 	animPhase       float64
 	constAlpha      uint8 // ULW SourceConstantAlpha (Warm breathing / Settling fade)
@@ -157,8 +156,7 @@ type Ball struct {
 	trayMuted     bool
 	trayPauseWake bool
 
-	startedErr error
-	closed     atomic.Bool
+	closed atomic.Bool
 }
 
 // wndproc routing: windows.NewCallback needs stable function pointers, so a
@@ -1106,14 +1104,6 @@ func (b *Ball) Close() {
 	if b.sta.handle != nil {
 		<-b.sta.handle.Done() // join the ui-sta thread
 	}
-}
-
-// recenterAt re-sizes/re-positions the window for the destination monitor's
-// DPI after the hidden move (keeps the restored top-left corner).
-func (b *Ball) recenterAt(dpi uint32, edge int32) {
-	var wr rect
-	pGetWindowRect.Call(uintptr(b.hwnd), unsafePtr(&wr))
-	moveWindow(uintptr(b.hwnd), wr.l, wr.t, edge, edge)
 }
 
 // registerBallClass registers the ball window class once per process

@@ -24,8 +24,7 @@ import (
 )
 
 const (
-	gwlExStyle     = ^uintptr(19) // GWL_EXSTYLE (-20)
-	htTransparent  = ^uintptr(0)  // LRESULT(-1)
+	htTransparent  = ^uintptr(0) // LRESULT(-1)
 	maNoActivate   = uintptr(3)
 	htClientResult = uintptr(HTClient)
 	mouseLeftDown  = 0x0002
@@ -287,8 +286,11 @@ func TestLiveNeverStealsFocus(t *testing.T) {
 		t.Fatal("the ball window is not alive")
 	}
 
-	// 1. The style bit the OS enforces.
-	ex, _, _ := pGetWindowLongPtrW.Call(uintptr(hwnd), gwlExStyle)
+	// 1. The style bit the OS enforces. GWL_EXSTYLE goes through an int32
+	// VARIABLE (the constant conversion of -20 to uintptr does not compile,
+	// see win32_windows.go's gwlExStyle note).
+	exIdx := int32(gwlExStyle)
+	ex, _, _ := pGetWindowLongPtrW.Call(uintptr(hwnd), uintptr(exIdx))
 	if ex&uintptr(wsExNoActivate) == 0 {
 		t.Fatalf("the live window does not carry WS_EX_NOACTIVATE: exStyle=0x%X", ex)
 	}
