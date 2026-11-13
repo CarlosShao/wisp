@@ -281,18 +281,18 @@ func nClientOnDefaultDeviceChanged(this, flow, role, device uintptr) uintptr {
 // handle path runs even without a default-change event.
 const deviceStateActive = 0x1 // DEVICE_STATE_ACTIVE
 
-func nClientOnDeviceStateChanged(this, deviceId, newState uintptr) uintptr {
+func nClientOnDeviceStateChanged(this, deviceID, newState uintptr) uintptr {
 	if w := notifWatcher(this); w != nil && newState != deviceStateActive {
 		w.notify()
 	}
 	return hrSOK
 }
 
-func nClientOnDeviceAdded(this, deviceId uintptr) uintptr { return hrSOK }
+func nClientOnDeviceAdded(this, deviceID uintptr) uintptr { return hrSOK }
 
-func nClientOnDeviceRemoved(this, deviceId uintptr) uintptr { return hrSOK }
+func nClientOnDeviceRemoved(this, deviceID uintptr) uintptr { return hrSOK }
 
-func nClientOnPropertyValueChanged(this, deviceId, key uintptr) uintptr { return hrSOK }
+func nClientOnPropertyValueChanged(this, deviceID, key uintptr) uintptr { return hrSOK }
 
 // notifWatcher recovers the watcher from the raw `this` value via the
 // registry (no uintptr->pointer conversion; vet-clean).

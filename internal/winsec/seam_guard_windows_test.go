@@ -41,19 +41,6 @@ func (rubberStampResolver) ResolveAccounted(in string) (string, bool, error) {
 	return in, false, nil
 }
 
-// narrowOnlyResolver and its twin both refuse everything, so they are conforming
-// by the conformance probe's own rule; they exist to give the single-use guard
-// two *different* legitimate resolvers to refuse to swap.
-type narrowOnlyResolver struct{}
-
-func (narrowOnlyResolver) Resolve(string) (string, error) {
-	return "", errors.New("narrowOnlyResolver: refuses to answer")
-}
-
-func (narrowOnlyResolver) ResolveAccounted(string) (string, bool, error) {
-	return "", false, errors.New("narrowOnlyResolver: refuses to answer")
-}
-
 type narrowOnlyResolverB struct{}
 
 func (narrowOnlyResolverB) Resolve(string) (string, error) {
@@ -67,7 +54,10 @@ func (narrowOnlyResolverB) ResolveAccounted(string) (string, bool, error) {
 // countingResolver is the witness for the identity-reinstall pin: it is the only
 // shape of candidate that lets a test tell "the first instance was kept" from
 // "a structurally identical value was installed", which an empty struct cannot.
-type countingResolver struct{ installs int }
+type countingResolver struct {
+	//lint:ignore U1000 identity witness: the pin asserts pointer identity, never the field's value (see TestAC1SeamIsOneWayUseIsTheOnlyDirection)
+	installs int
+}
 
 func (c *countingResolver) Resolve(string) (string, error) {
 	return "", errors.New("countingResolver: refuses to answer")

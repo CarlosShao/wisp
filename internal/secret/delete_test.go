@@ -126,9 +126,7 @@ func TestBlobsListsMetadataOnly(t *testing.T) {
 		t.Fatalf("Blobs returned %d entries, want the 3 valid blob ids (stray file skipped): %+v", len(blobs), blobs)
 	}
 	want := []string{"10-middle", "alpha", "zeta"}
-	var got []string
 	for i, b := range blobs {
-		got = append(got, b.ID)
 		if b.ID != want[i] {
 			t.Errorf("blobs[%d].ID = %q, want %q (sorted by id)", i, b.ID, want[i])
 		}

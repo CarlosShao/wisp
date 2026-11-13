@@ -104,20 +104,6 @@ func (c *fakeReminderClock) lastBudget() time.Duration {
 	return c.budgets[len(c.budgets)-1]
 }
 
-// releasedCount reports how many timers have been released (for tests that want
-// an explicit view into the fake). It is never read in this file's own cases.
-func (c *fakeReminderClock) releasedCount() int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	var n int
-	for _, t := range c.timers {
-		if t.released {
-			n++
-		}
-	}
-	return n
-}
-
 // fakeReminderRows is a ReminderRows face over an in-memory status map, with
 // the DAO's one-way rule enforced: MarkReminderFired answers applied=false for
 // a row that is no longer armed.

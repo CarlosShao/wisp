@@ -94,14 +94,6 @@ func widenDir132(t *testing.T, dir string) {
 	}
 }
 
-// dirIsSealed132 reports the current verdict without failing the test, for
-// fixtures that have to prove their own precondition.
-func dirIsSealed132(t *testing.T, dir string) bool {
-	t.Helper()
-	ok, _ := judge132(t, dir)
-	return ok
-}
-
 func parseACL132(acl, path string) []ace132 {
 	var out []ace132
 	acl = strings.ReplaceAll(acl, "\r\n", "\n")

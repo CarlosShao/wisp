@@ -33,13 +33,13 @@ var (
 	pCoUninitialize     = modOle32.NewProc("CoUninitialize")
 	pCoTaskMemFree      = modOle32.NewProc("CoTaskMemFree")
 	pPropVariantClear   = modOle32.NewProc("PropVariantClear")
-	pGetCurrentThreadId = modKernel32.NewProc("GetCurrentThreadId")
+	pGetCurrentThreadID = modKernel32.NewProc("GetCurrentThreadId")
 )
 
 // currentThreadID returns the Win32 thread id of the calling thread (the
 // pinned-loop identity probe for D38a diagnostics and tests).
 func currentThreadID() uint32 {
-	id, _, _ := pGetCurrentThreadId.Call()
+	id, _, _ := pGetCurrentThreadID.Call()
 	return uint32(id)
 }
 

@@ -28,8 +28,6 @@ const (
 	// prints them as ACE-looking lines and they are not principals that can
 	// read anything.
 	integrityPrefix = "S-1-16-"
-	// Well-known SIDs need no name resolution.
-	wellKnown = systemSID + "," + adminsSID + "," + everyoneSID
 )
 
 func run(t *testing.T, name string, args ...string) string {

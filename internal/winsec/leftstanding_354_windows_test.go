@@ -63,10 +63,6 @@ const (
 	// leftStandingPayload354r1 is the refused write's payload; landing anywhere in the tree is red.
 	leftStandingPayload354r1 = "deterministic payload 354r1 - must never land outside the object the caller named"
 
-	// leftStandingInjected354r1 is the injected refusal this leg names as its own, through the same
-	// declared seam the 342r2 window uses.
-	leftStandingInjected354r1 = "354r1 injected through this package's declared AC#5 seam: the descriptor could not be applied"
-
 	// leftStandingControl354r1 is the positive control's own name: the world where nothing tops up, so
 	// the name still carries the object the route opened and the removal MUST still run. It is the leg
 	// that sees the OTHER tooth: with the removal pulled the name stays, and this control - not the

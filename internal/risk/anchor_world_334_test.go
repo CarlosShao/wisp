@@ -48,6 +48,19 @@ const (
 // sentence above promises.
 var _ = hostile334
 
+// hostilePOSIX347 and danglingTarget347 are the same story on the other
+// platform: declared here untagged (ticket 347 collapsed the per-platform
+// copies of the world into this one file), but every reader that names them -
+// the 336/339 teeth and the 347 POSIX partial-maker - lives behind
+// //go:build !windows, so the windows build sees no reference. Pinned for the
+// same reason as hostile334 above, and for the same reason they must not move
+// into the _other_test.go files: there they would be per-platform copies
+// again, which is exactly the drift ticket 347 eliminated.
+var (
+	_ = hostilePOSIX347
+	_ = danglingTarget347
+)
+
 const (
 	// hostilePOSIX347 is the POSIX candidate name: an ordinary B-tier name
 	// (id_*), because on POSIX nothing about the NAME can be refused. The

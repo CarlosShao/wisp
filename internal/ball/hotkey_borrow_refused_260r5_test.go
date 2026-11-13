@@ -95,10 +95,10 @@ const (
 // next to this file under -tags winlive.
 var t260r5IsWindow = modUser32.NewProc("IsWindow")
 
-// t260r5ErrNoWindowDoor is what the rig's create step returns so that
+// errT260r5NoWindowDoor is what the rig's create step returns so that
 // staThread.start never reaches the message pump: no pump, no window, and the
 // thread goes back through the create-error door.
-var t260r5ErrNoWindowDoor = errors.New("260-r5 rig: this door creates no window and runs no pump")
+var errT260r5NoWindowDoor = errors.New("260-r5 rig: this door creates no window and runs no pump")
 
 // t260r5Errno is Win32 1400 as an error value, in one place, so the two
 // comparisons below read as the same number this file claims to expect.
@@ -213,7 +213,7 @@ func t260r5RunBorrow(t *testing.T, cfg HotkeyConfig, preBorrowed bool) t260r5Rea
 			r, _, _ := pUnregisterHotKey.Call(0, uintptr(hkCancel))
 			o.unregNullRc = r
 		}
-		return t260r5ErrNoWindowDoor
+		return errT260r5NoWindowDoor
 	})
 
 	slog.SetDefault(previous)
@@ -265,7 +265,7 @@ func TestWindowlessSTAReachesTheBorrowWiring260r5(t *testing.T) {
 	if o.staHWND != 0 {
 		t.Errorf("the rig's staThread recorded a window handle 0x%X - this case promised to create no window at all", o.staHWND)
 	}
-	if !errors.Is(o.doorErr, t260r5ErrNoWindowDoor) {
+	if !errors.Is(o.doorErr, errT260r5NoWindowDoor) {
 		t.Errorf("the create-error door was not taken (err=%v): if the pump ran instead, this rig is holding a real "+
 			"message loop on a test goroutine and nothing below is readable", o.doorErr)
 	}

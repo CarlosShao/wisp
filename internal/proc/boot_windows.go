@@ -19,7 +19,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
-// Boot assembles the resident runtime (ticket 03): env resolution -> env
+// Runtime assembles the resident runtime (ticket 03): env resolution -> env
 // layout -> Job Object (C30) -> per-session single instance (D42#7) ->
 // goroutine registry (D38b). Each stage doubles as the init-time self-check
 // for the parts of the runtime that already exist.

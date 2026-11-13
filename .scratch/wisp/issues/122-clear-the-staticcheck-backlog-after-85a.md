@@ -280,3 +280,27 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   （291 probe／346-a2 txt／frontend fixture）零触碰零提交。
   next=编排者推送后取 CI lint 步 pass2 自报读数（tools/balldebug 两包应读 0）；票 122 剩余＝
   audio/ball 两包 2 条④残留＋AC#6。
+
+- [2026-11-13 16:3x +08] agent=122-wave6-rest-pass2（写腿，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-wave6-rest-pass2-dispatch.txt`，开工 HEAD `283a24dfa`，
+  staticcheck 2026.2.2 (0.8.2)）
+  did=**pass2 清账波 6 落地：tools 之外 9 包 24 → 0**（起手复跑 23 条与派单清单逐条一致，0 新增；
+  派单列 24 条，`aecspike/rig_windows.go:49 iidIUnknown` 不在 `./internal/audio/` 目录口径射程内——
+  目录模式不递归子包，以显式子包口径单列处置，见证据件 §4）。
+  四档落点＝**③删 7（winsec 3＋audio aecspike 1＋memory/observe/agent 3 中的真死 helper＋secret SA4010 debris）
+  ＋真改 10（ST1003×6 全部声明+引用点齐改、grep 旧名归 0；ST1012×2 含 errors.Is 引用点齐改；ST1021/ST1000 注释头各 1）
+  ＋①钉 1（winsec countingResolver.installs——身份见证字段，注释点名"指针同一从不读值"）
+  ＋④钉 1（risk anchor_world_334_test 两枚 POSIX 常量——按同文件 hostile334 既有型制 var _ 钉＋扩注；
+  linux 口径佐证 EXIT=0，钉法双向成立）**，零 prod 码 lint:ignore。
+  ★两专项（派单提醒 #2/#1）：secret/delete_test.go:131 SA4010 读码判**夹具疏忽非真 bug**（意图断言全部
+  逐元素落在 blobs 本体，got 收集后从未被读），删 debris 不补建；aecspike iidIUnknown 判③删——
+  **加回该行做双口径回归实验，winlive 与默认档均报 U1000**（⇒非④），全仓零引用且 COM 调用传的是
+  别的 GUID 地址（与 wave4 wasapi 同名孪生同判）。
+  门禁：build rc0／vet rc0／`test -count=1` 八包全 ok（winsec 73.4s proc 12.3s risk 29.3s memory 65.9s
+  observe 16.0s secret 8.2s agent 28.5s ball 3.1s）／gofumpt 0 行／d22scan **clean rc0**（PASS=45 FAIL=0 SKIP=0）；
+  **staticcheck 口径后跑 0 条 EXIT=0**；`internal/audio/aecspike` 测试按 sherpa cgo DLL 依赖 SKIP 如实报；
+  `go test ./cmd/wisp/` 按票 98 豁免未跑。
+  证据件 `docs/evidence/s1/122-wave6-rest-pass2.md`（23 条逐条表＋两专项论证＋门禁＋写面 build-tag 审计）。
+  本波 commit 只含 17 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树他腿脏件零触碰零提交。
+  next=编排者推送后取 CI lint 步读数（九包+aecspike 应读 0）；波 5/6 合并后票 122 静态检查清账面余
+  AC#6（CI 步级读数）。

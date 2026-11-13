@@ -44,7 +44,7 @@ var (
 	modkernel32                  = windows.NewLazySystemDLL("kernel32.dll")
 	procGetProcessIoCounters     = modkernel32.NewProc("GetProcessIoCounters")
 	modiphlpapi                  = windows.NewLazySystemDLL("iphlpapi.dll")
-	procGetExtendedTcpTable      = modiphlpapi.NewProc("GetExtendedTcpTable")
+	procGetExtendedTCPTable      = modiphlpapi.NewProc("GetExtendedTcpTable")
 	modntdll                     = windows.NewLazySystemDLL("ntdll.dll")
 	procNtQuerySystemInformation = modntdll.NewProc("NtQuerySystemInformation")
 )
@@ -336,7 +336,7 @@ func treeTCPConnections(inTree map[uint32]bool) int {
 	size := uint32(32 << 10)
 	for attempt := 0; attempt < 4; attempt++ {
 		buf := make([]byte, size)
-		r1, _, _ := procGetExtendedTcpTable.Call(
+		r1, _, _ := procGetExtendedTCPTable.Call(
 			uintptr(unsafe.Pointer(&buf[0])),
 			uintptr(unsafe.Pointer(&size)),
 			0, // bOrder = FALSE (counting only, no sort needed)

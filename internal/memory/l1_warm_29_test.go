@@ -145,21 +145,6 @@ func l1Median(d []time.Duration) time.Duration {
 	return cp[len(cp)/2]
 }
 
-// l1WaitFor polls a predicate. It is a test-only wait (the product code never
-// subtracts wall clocks, D42#9); the roster goroutine is what actually runs the
-// extraction, so the test has to observe it rather than own its lifetime.
-func l1WaitFor(t *testing.T, what string, cond func() bool) {
-	t.Helper()
-	deadline := time.Now().Add(5 * time.Second)
-	for time.Now().Before(deadline) {
-		if cond() {
-			return
-		}
-		time.Sleep(time.Millisecond)
-	}
-	t.Fatalf("timed out waiting for %s", what)
-}
-
 // TestTicket29_AC1_WarmWindowLatencyIsolation is the AC's latency-isolation
 // instrument. It asserts the MECHANISM that makes extraction post-response:
 //

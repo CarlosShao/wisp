@@ -26,9 +26,9 @@ import (
 // PrivateUsage) over the job's process id list, which is the documented
 // "process tree private bytes" accounting the D32 tables are written against.
 
-// jobObjectBasicProcessIdList is JOB_OBJECT class 3 (winbase.h); x/sys/windows
+// jobObjectBasicProcessIDList is JOB_OBJECT class 3 (winbase.h); x/sys/windows
 // does not export it.
-const jobObjectBasicProcessIdList = 3
+const jobObjectBasicProcessIDList = 3
 
 // jobPidListCapacity bounds the pid-list buffer. Wisp trees are small
 // (WebView2 <=5 children + speech subprocess + updater); 256 is generous and
@@ -197,7 +197,7 @@ func (j *JobScope) pids() ([]uint32, error) {
 	buf := make([]byte, 8+uintptr(jobPidListCapacity)*entrySize)
 	var retLen uint32
 	if err := windows.QueryInformationJobObject(
-		j.handle, jobObjectBasicProcessIdList,
+		j.handle, jobObjectBasicProcessIDList,
 		uintptr(unsafe.Pointer(&buf[0])), uint32(len(buf)), &retLen,
 	); err != nil {
 		return nil, fmt.Errorf("proc: QueryInformationJobObject(pid list): %w", err)

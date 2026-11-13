@@ -52,10 +52,10 @@ const (
 	t245WerrInvalidWindowHandle = 1400
 )
 
-// t245ErrNoWindowDoor stops staThread.start before the pump: the create step
+// errT245NoWindowDoor stops staThread.start before the pump: the create step
 // returns an error, the thread records the error and leaves (sta_windows.go), so
 // no window and no message loop exist for the length of this rig.
-var t245ErrNoWindowDoor = errors.New("245 rig: this door creates no window and runs no pump")
+var errT245NoWindowDoor = errors.New("245 rig: this door creates no window and runs no pump")
 
 // t245IsWindow is this file's own handle to user32's IsWindow (pIsWindow belongs
 // to the winlive package layer and is not compiled in the default suite).
@@ -169,7 +169,7 @@ func t245Run(t *testing.T, mode t245Mode) t245Reading {
 			b.ReleaseEscAfterSession()
 			o.secondRelease = b.hotkeyReport
 		}
-		return t245ErrNoWindowDoor
+		return errT245NoWindowDoor
 	})
 	o.doorErr = s.waitStarted()
 	s.mu.Lock()
@@ -194,7 +194,7 @@ func t245RequireRefusal(t *testing.T, o t245Reading) {
 	if o.staHWND != 0 {
 		t.Errorf("the rig's staThread recorded a window handle 0x%X - this case promised to create no window", o.staHWND)
 	}
-	if !errors.Is(o.doorErr, t245ErrNoWindowDoor) {
+	if !errors.Is(o.doorErr, errT245NoWindowDoor) {
 		t.Errorf("the create-error door was not taken (err=%v): a pump running here would make the readings unreadable", o.doorErr)
 	}
 	if o.attemptTaken {

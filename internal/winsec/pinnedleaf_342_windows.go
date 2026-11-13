@@ -1,7 +1,8 @@
 //go:build windows
 
-// Tickets 342 + 348, leg 342-r1, form 乙 on Windows: the pinned chain the private write route now
-// stands on. This is the first Windows-side handle pinning in this package - before it, the route's
+// Package winsec - file-level note: tickets 342 + 348, leg 342-r1, form 乙 on
+// Windows: the pinned chain the private write route now stands on. This is the
+// first Windows-side handle pinning in this package - before it, the route's
 // act was by name in both directions (the open resolved the spelling, and the refusal-path unlink
 // resolved it again), which is what the two tickets booked.
 //

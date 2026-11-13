@@ -46,7 +46,6 @@ var (
 )
 
 var (
-	iidIUnknown             = windows.GUID{Data4: [8]byte{0xC0, 0, 0, 0, 0, 0, 0, 0x46}}
 	clsidMMDeviceEnumerator = windows.GUID{
 		Data1: 0xBCDE0395, Data2: 0xE52F, Data3: 0x467C,
 		Data4: [8]byte{0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E},
