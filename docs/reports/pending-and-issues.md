@@ -36776,3 +36776,23 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   1. **`Test41a2r1WakeEndToEndArmedToListening`** ＝ `cannot find third_party\spike-models\matcha-icefall-zh-baker` ⇒ **回退名册有漏**：它**直接按路径摸夹具**（`resident_voice_41a2r1_windows_test.go:225`），不是经 helper 函数，而名册是按 **helper 函数名 grep** 建的 ⇒ 漏。**腿自己在证据件里点过这个风险（「under-skipping turns the fallback into a red」），现在真发生了。**
   2. **`TestTicket223PermissionDeniedSitsInItsOwnSentence`** ＝ `icacls denied nothing, so this case cannot show the permission sentence` ⇒ CI runner 是管理员，**造不出「拒绝访问」前提**。环境依赖，须改成**具名跳过并记账**，⛔ 不许当绿。
 - **已起实验四（后台）**：试 HF 同仓 `csukuangfj/matcha-icefall-zh-baker` 是否还供旧字节（HF 可按 revision 钉死，比 mutable release 资产稳）。**若命中 ⇒ 加一条 URL、所有 pin 一字节不动，是最优修法。**
+
+## A1851 — ★staticcheck 真因（我 A1847 的错）：**linux 上交叉编译 cgo 到 windows**；裁定＝**windows pass 移到 windows runner**。另记一次我写坏 `ci.yml` 的事故
+
+- **CI 逐字（`run 43416983302`，含波 7；我加了 compile-lines 计数器后第一次读数）**：
+  ```
+  -: # runtime/cgo
+  gcc_libinit_windows.c:10:10: fatal error: windows.h: No such file or directory
+  compilation terminated. (compile)
+  --- module . [pass 2 GOOS=windows]: exit=1 packages=41 findings=0 compile-lines=1
+  ```
+  **⇒ 是我 A1847 把 pass2 改成 `CGO_ENABLED=1` 造成的**：`lint` job 跑在 **ubuntu**，于是 go 让 **linux gcc 去编 windows 的 cgo 运行时**，必然找不到 `windows.h`。**findings=0 但 exit=1，且 compile-lines=1——两个数字并排就把病因点名了。这就是我坚持加计数器要加在两个 pass 上的价值。**
+  - **★本地为什么看不出来**：我本机是 Windows + 有 mingw ⇒ 0 条。**又是「本地绿 ≠ CI 绿」，本会话第 N 次。**
+- **★我的技术裁定（铁律⓪⓪⓪，不降级）**：**windows 的 staticcheck 跑在 windows runner 上**，这是主流形状（跨平台 cgo lint 本就反常）。
+  - `lint`（ubuntu）保留 **pass1 GOOS=linux only**；pass2 加**平台闸** `[ "${RUNNER_OS}" = "Windows" ]`，非 Windows 时**打一行具名说明**（「windows pass 在 test-windows 里跑」）而不是静默跳过；自报行同步如实改写。
+  - `test-windows`（windows）**新增一步**：自带 `go install staticcheck@2026.2.2` ＋ `cygpath` 转 PATH，跑 pass2 同一套 checks／`-tags=winlive`／`./build` 按名排除／`exit 1 if any module nonzero`，并打印自己的 self-report。**零放宽。**
+  - **为什么不选「ubuntu 装 mingw 交叉编」**：那条路可行但要 apt 装交叉工具链＋sherpa 的 cgo 头文件风险未知；而 **windows 那台已经用 build smoke 和 CLI 测试证明 cgo 能编这棵树**，零风险。**代价写明**：多一台机器上的 `go install`（约 30 秒）。
+- **门禁（我现跑）**：`py -3 yaml.safe_load` = **6 jobs OK**；用 YAML 解析器抽出两段 `run` 落文件后 `bash -n` **both OK**；步枚举确认**全仓只有 2 个 staticcheck 步**（`lint`、`test-windows`）。
+- **★我的一次事故（如实记）**：第一次改时我用 `$C` 存第 3 个锚点串，**PowerShell 变量名不区分大小写 ⇒ `$C` 覆盖了 `$c`（整个文件内容）**，`ci.yml` 被写成 126 字节。**处置**：`git restore --source=HEAD -- .github/workflows/ci.yml`（单文件、非被禁的 `checkout .`）恢复，核实 103421B／1579 行／`git diff` 空／YAML OK；**改用不撞名的变量重做**。
+  - 第二次又踩一个坑：插入新步用的锚点 `run: powershell ... build.ps1 -Env dev` **在 3 个 job 里都有**，`.Replace` 把新步插进了 `slo-smoke`／`slo-full`。**靠 YAML 解析后枚举步名当场发现**（打印出 4 个 staticcheck 步），再恢复、换成唯一锚点（票 111 fetch 步名）重做。
+  - **教训入账**：①PowerShell 变量不区分大小写，别用只差大小写的两个名；②`.Replace` 前先数锚点出现次数，`count != 1` 就换锚点；③改完必须用**解析器**验证结构（不是只看文件大小）。
