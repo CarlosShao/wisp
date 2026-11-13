@@ -36351,3 +36351,23 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - `workflow-3b93865b857f43c2` **审计腿**（magpie-max / max 档）复核我本会话 4 枚结案（180/238/439/440）——**补「裁决者≠实现者」那个缺失的第二人**。派单存档 `audit-round91-4closures-dispatch.txt`（5608B）。
 - **票池 61 open 的真实结构（我本程分类）**：**12 枚四条全过**（169/188/191/192/197/201/245/262/264/291/293/314）／**31 枚有前置票**／**26 枚有机主裁定或按住**。
   - ⚠ 那 12 枚里仍有多枚**不由本编队做主**：169 是前端面、191/192 票面写"要 owner 逐枚批准"、201/291 要真机硬件、264 票面写"取舍归机主本格不派写腿"、262 的 AC#5 要 CI 绿。
+
+## A1828 — 承接 A1827：**CI 红的归属票找到了＝票 70「让 CI 真的成为护栏」**；已补派第四条腿做 `test-core` 分诊
+
+- **★归属澄清（A1827 只说了红，没说谁管）**：
+  - **票 70**（`.scratch/wisp/issues/70-ci-actually-green.md`，**仍是 open，无机主否决**）＝**CI 全绿的总票**。题面逐字「5 个 job 全红，逐因分诊（本仓的"门禁"从未生效过）」。**剩余未勾＝AC#2 `test-core` 分诊 ＋ AC#6 逐 job 全绿证据**。
+  - **票 122** ＝ staticcheck 那一路的口径与清账（本轮已派）。
+  - **⇒ 这两张票合起来才是"CI 绿"。A1827 记的 6 枚测试红，归属票 70 的 AC#2。**
+- **6 枚红的确切位置（我本程核定）**：
+  - `internal/plugin/command_52_test.go`：`Test52PinComputesAndVerifiesHash`／`Test52OneByteTamperRefusesAndAlerts`／`Test52ManifestPinMismatchIsRefusedAsASwap`／`Test52ManifestPinsEveryCommandTool`／`Test52AbsoluteTempPathIsRefusedForTheTempReason`（**5 枚可能同根**）
+  - `internal/config/manager_readfail_42r1_windows_test.go`：`TestReadFailureDoesNotAdoptStatTheNextTickSeesTheWrite`（**这枚全仓零票认领**，`git grep` 空）
+- **本轮四条腿在飞（全 `run_in_background`，无一条阻塞主会话）**：
+  | job | 票 | 写面 | 档位 |
+  |---|---|---|---|
+  | `workflow-aea8a63c97a9464f` | 122 GOOS 口径 | 只有 `.github/**`＋证据件 | high |
+  | `workflow-fcb22a85bc3c45e6` | 188 面板状态来源 | `internal/tools`＋`internal/panel`＋`cmd/wisp` | high |
+  | `workflow-fdedaeb4cf424083` | 70 test-core 分诊 | `internal/plugin`＋`internal/config` | high |
+  | `workflow-3b93865b857f43c2` | **审计** 4 枚结案 | 只读（只建一枚证据件） | **max（magpie-max）** |
+- **★写面互斥已写进每张派单**：188 独占 `cmd/wisp/**`＋`internal/panel/**`；70 被明令⛔碰这两处；122 被明令⛔碰任何 `.go`；审计腿只读。
+- **CPU 现量 62%（≤70% 补位规矩，故补第 4 条）。**
+- **★待机中未派（不是漏派）**：`191`/`192` 票面写"要 owner 逐枚批准"；`264` 票面写"取舍归机主本格不派写腿"；`169` 前端面归机主外部 agent；`201`/`291` 要真机硬件；`262` 的 AC#5 要 CI 先绿、故被 70/122 阻塞；其余 31 枚有前置票。
