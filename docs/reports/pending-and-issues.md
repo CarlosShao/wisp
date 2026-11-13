@@ -36175,3 +36175,20 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **修法三步**：①删 17 条幽灵路径（显式 pathspec）②12 条登记 roster，**其中 269／435 理由里写明"是我今天造成的"**（⛔ 混进历史债措辞洗白）③删 3 条陈旧条目（174/194/246 旧名，guard B 正确报 74 vs 71）。
 - **★这次收口用了 `git mv`**（⛔ 又用 `Move-Item`）——上一笔 bug 的直接教训。
 - **票池**：done **361** / open **62**。
+
+## A1819 — 269／435 两枚**真还债**（改名＋销账）：门禁 GREEN 且超预算数 71→69，⛔ 靠登记糊过去
+
+- **上轮我声明「不说就按丙做」，机主未答 ⇒ 按丙执行**：改短名 ＋ 保留 `-done` 键 ＋ 销掉 roster 条目。
+- **改名（用 `git mv`，⛔ `Move-Item`）**：
+  - `269-gofmt-step-is-held-red-by-its-own-committed-mutation-sample-and-eats-three-unprotected-steps-done.md`（**104**）→ `269-gofmt-gate-red-by-own-sample-done.md`（**40**，相对 61 ≤ 121）
+  - `435-the-33r11-locked-suffix-roster-missed-four-new-names-and-the-question-is-whether-they-earned-the-suffix-done.md`（**115**）→ `435-locked-suffix-roster-missed-four-names-done.md`（**50**，相对 71 ≤ 121）
+- **★关键判据：销账 vs 糊账**。两枚改名后**不再超预算**，所以它们的 roster 条目**必须删**（否则 guard B 会报漂移）。删后读数：
+  ```
+  over-budget=69  covered by roster=69  not in roster=0
+  VERDICT GREEN
+  positive control PASSED
+  ```
+  **超预算总数 71 → 69** ⇒ **是真还债，⛔ 把债从"超预算"挪到"已登记"的糊账**。
+- **引用代价（已知并接受）**：`269` 按名引用 **19 处**、`435` **3 处**。这些全在**台账与证据件**里，是**历史读数**（`issues/README` 规则：⛔ 改写读数）。⇒ **旧名留在那些文件里是正当的**，roster 注释区本来也留了"旧名可追溯"的惯例。
+- **commit**：`b3b3db813`（2 rename ＋ 1 script）。**push 首次因网络失败，重试成功**（`2175e1908..b3b3db813`）。
+- **票池**：done **361** / open **62**。
