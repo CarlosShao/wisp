@@ -36164,3 +36164,14 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★根因（第 13 次）**：我**看着一批票觉得"都是我改的名"**，就报了 14。**实际要逐枚量"原名长度"才知道谁是被推过帽的**。**同根：凭印象报数，不逐枚量。**
 - **★修法（已派写腿 `magpie-high`）**：把这 17 个 `D` 用**显式 pathspec 逐条** `git add` ＋ `git commit`。⛔ `git add -A`。提交后 `git status --short -- '.scratch/wisp/issues/'` 必须空，且每张票 `git ls-files` 只剩 1 条。
 - **★真正的修法方向（等 bug 修完再动）**：17 枚历史债（c）**该登记进 roster**（它们是历史，⛔ 我的责任）；**269 改名**（99 ≤100，去掉 `-done` 即合规，但 `-done` 是防重领唯一键 ⇒ **需裁：改名 vs 登记**）；**435 改名**。
+
+## A1818 — 票 438 收口（第 32 枚）：路径长度门禁 **GREEN**（71/71/0）；★本票标题的"14"是错的，**实际 1**
+
+- **三笔 commit**：删 17 条幽灵路径 ／ `555ef7ec2`（A1817）／ `c44d8b23f`（roster 12 条＋删 3 条陈旧）。
+- **最终读数（我现跑）**：`positive control PASSED` ＋ `denominator: tracked paths=19499  over-budget=71  covered by roster=71  not in roster=0` ＋ `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`。
+- **★标题里的数错了（第 13 次同根）**：我写「14 枚是我造成的」。普查腿逐枚量字符数 ⇒ **(a) 1 枚（269：99→104）／(b) 1 枚（435：建时 110）／(c) 17 枚历史债**。**把 1 说成 14。**
+- **★"有些路径出现两次"的真因（腿逐字引用脚本 `:395-404` 证伪我的猜）**：`VD[viol]` **以路径字符串为下标** ⇒ 同一路径只入列一次，两条判据不是两次输出。**真因是我的 `Move-Item` 造出 17 条幽灵路径**（原名＋`-done` 名并存，两条都超预算）。
+- **★腿识破我给的命令**：`git log --diff-filter=R` 19 条全返空，腿**没把"空"当"没问题"**，换 `--follow --name-status -M` 查出是 **`C`（copy）非 `R`（rename）**，因源还在 index。**我的命令有缺陷。**
+- **修法三步**：①删 17 条幽灵路径（显式 pathspec）②12 条登记 roster，**其中 269／435 理由里写明"是我今天造成的"**（⛔ 混进历史债措辞洗白）③删 3 条陈旧条目（174/194/246 旧名，guard B 正确报 74 vs 71）。
+- **★这次收口用了 `git mv`**（⛔ 又用 `Move-Item`）——上一笔 bug 的直接教训。
+- **票池**：done **361** / open **62**。
