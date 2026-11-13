@@ -518,6 +518,7 @@ jobs:
           pkgs_windows=0
           findings_windows=0
           crashes_windows=0
+          compiles_windows=0
           for mod in . tools/d22scan tools/mockllm; do
             modcount=$((modcount+1))
             echo "=== staticcheck module: $mod ==="
@@ -556,19 +557,44 @@ jobs:
             # U1000), and NOT ONE finding appears that is absent from the
             # default set - so compiling the winlive files adds coverage and
             # removes two false positives, and costs nothing. Ledger: A1838.
-            p2_pkgs=$(cd "$mod" && GOOS=windows CGO_ENABLED=0 go list -tags=winlive ./... 2>/dev/null | wc -l)
+            # ---- SCOPE, both halves measured (A1847). Neither is a loosening.
+            # (1) CGO IS ON, NOT OFF. With CGO_ENABLED=0 the sherpa dependency has
+            #     no files on windows either, so ./cmd/wisp - the main binary - was
+            #     excluded from analysis and the pass reported findings=0 while never
+            #     looking at the program. With cgo on it loads (this runner already
+            #     builds cmd/wisp for the test job) and reports 24 real findings. A
+            #     gate that reads zero because it skipped its subject is the failure
+            #     this repo keeps paying for.
+            # (2) ./build IS EXCLUDED BY NAME, and said out loud. build/mut_rvw.go is
+            #     a "//go:build windows" "package main" DRAFT that references cmd/wisp
+            #     own symbols and has never compiled standalone: at HEAD,
+            #     "go build ./build" reports 8 undefined identifiers. It is not a
+            #     shippable package, and leaving it in scope pins this step to a
+            #     permanent compile-class exit 1 no matter how clean the code gets.
+            #     If a compilable package ever lands in ./build, DELETE this
+            #     exclusion - it is a named hole, not a silent one.
+            p2_list=$(cd "$mod" && GOOS=windows CGO_ENABLED=1 go list -tags=winlive ./... 2>/dev/null | grep -vE '(^|/)build$') || true
+            p2_pkgs=$(printf '%s\n' "$p2_list" | grep -c .) || true
             p2_rc=0
-            p2_out=$(cd "${mod}" && GOOS=windows CGO_ENABLED=0 staticcheck -tags=winlive -checks=all,-SA9009 ./... 2>&1) || p2_rc=$?
+            p2_rc=0
+            if [ -z "$p2_list" ]; then
+              p2_out='CANNOT DECIDE: the windows package list came back empty, so nothing was analysed'
+              p2_rc=2
+            else
+              p2_out=$(cd "${mod}" && GOOS=windows CGO_ENABLED=1 staticcheck -tags=winlive -checks=all,-SA9009 $p2_list 2>&1) || p2_rc=$?
+            fi
             p2_find=$(printf '%s\n' "$p2_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
             p2_crash=$(printf '%s\n' "$p2_out" | grep -c 'export data version') || true
+            p2_compile=$(printf '%s\n' "$p2_out" | grep -cE '\((compile)\)$') || true
             printf '%s\n' "$p2_out"
-            echo "--- module $mod [pass 2 GOOS=windows tags=winlive checks=all,-SA9009]: exit=$p2_rc packages=$p2_pkgs findings=$p2_find toolchain-crash-lines=$p2_crash"
+            echo "--- module $mod [pass 2 GOOS=windows tags=winlive checks=all,-SA9009]: exit=$p2_rc packages=$p2_pkgs findings=$p2_find toolchain-crash-lines=$p2_crash compile-lines=$p2_compile"
             pkgs_windows=$((pkgs_windows+p2_pkgs))
             findings_windows=$((findings_windows+p2_find))
             crashes_windows=$((crashes_windows+p2_crash))
+            compiles_windows=$((compiles_windows+p2_compile))
             if [ "$p2_rc" -ne 0 ]; then rc=1; fi
           done
-          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000,-SA9009] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux compile-lines=$compiles_linux [pass2 GOOS=windows tags=winlive checks=all,-SA9009] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows (step exit is $rc; both passes must exit 0)"
+          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000,-SA9009] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux compile-lines=$compiles_linux [pass2 GOOS=windows tags=winlive checks=all,-SA9009] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows compile-lines=$compiles_windows (step exit is $rc; both passes must exit 0)"
           exit $rc
 
       - name: mockllm module vet

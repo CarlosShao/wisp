@@ -36724,3 +36724,17 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - **`:904` 原注释自己就写着「A ceiling that kills a genuinely slow run would be a new red, which is the opposite of what this line is for」——30 正是那个会掐死真慢 run 的界。** 抬到 60 与步级一致，**仍是 hang 界（不是排程）**，性质未变。
   - **已落 `ci.yml` 并写了注释点名本账**。
 - **待办（腿点名、我认领）**：`portable-tests.sh` 的 **cli 档 GUARD B 正解（speech 形臂）** 归 GUARD 维护腿，已具名进票面——**这是下一票的事，不在 111 内偷做**。
+
+## A1847 — ★★两 pass 都 0 findings 了，但步骤仍退 1；我挖出**两个更深的事实**：`cmd/wisp` 从来没被 lint 过 ＋ `./build` 永远编译不过
+
+- **`run 43399634067`（`832badbe6`）实测**：`lint` 只挂**第 13 步 staticcheck**（**第 8 步 SLO nail census 已绿——A1845 的 CRLF 修复生效**）；`test-core`／`slo-full`／`slo-smoke`／`lint-frontend` **全绿**。
+- **自报逐字**：`[pass1 GOOS=linux] packages=42 findings=0 crash=0 compile-lines=0 [pass2 GOOS=windows tags=winlive] packages=43 findings=0 crash=0 (step exit is 1)`。**两个 pass 都是 0 findings，步骤却仍 exit 1。**
+- **★事实一（严重）**：pass2 用 `CGO_ENABLED=0`，sherpa 无文件 ⇒ **`./cmd/wisp`（主程序）被整体排除在分析之外**。pass2 的 `findings=0` 是**因为它没看被检对象**，不是因为它干净。**我本机开 cgo 复跑，同一棵树立刻冒出 24 条真 finding。**——这跟 A1843 的「0 findings 但 exit 1」是同一类病，**假绿比红更危险**。
+- **★事实二**：`build/mut_rvw.go` 是 `//go:build windows` 的 `package main` **草稿**，引用 `cmd/wisp` 自己的符号（`voiceTtsFiles`/`residentBall`/`voiceOwnerQueue`/`voiceResidency`/`voiceSpeaker`…），**从来没编译过**：HEAD 上 `go build ./build` 直接报 **8 个 undefined**。而它 `//go:build windows` ⇒ **pass1（linux）天然跳过它所以干净，pass2（windows）必撞它 ⇒ 永久 compile 诊断 ⇒ 步骤恒 exit 1**。（AGENTS.md 明令 ⛔ 删它。）
+- **★我的裁定（铁律⓪⓪⓪，两项都不降级）**，已落 `ci.yml`：
+  1. **pass2 改 `CGO_ENABLED=1`**：让 lint 真正分析会构建的东西。**代价写明**：pass2 从「0 条（没看主程序）」变成「24 条（看了）」，CI 仍红——**但这是真红，可清**；此前的绿是假的。
+  2. **`./build` 按名排除**，并**在注释里说透**：它不是可交付包，留着就把步骤钉在永久 compile red 上；**「若将来 ./build 里有可编译包，删掉这条排除」**。**这是具名缺口，不是静默缺口。**
+  3. 补 **pass2 的 `compile-lines` 计数器**（pass1 早有，pass2 没有 ⇒ 事实二才隐形这么久）。**同一课的第二次：计数器只加一半＝仪器自己留盲区。**
+- **已派**：`workflow-74cac58bfaaa4a34`（波 7，`magpie-high`/`glm-5.3-flash`，全仓唯一可碰 `cmd/wisp/**` 的写腿），派单存档 `122-wave7-cgo-scope-dispatch.txt`，附 24 条逐条表＋四档判据＋三条要点名判语义（SA4004／SA1019／`SetHtml` 是否反射绑定）。
+- **校验**：`ci.yml` `py -3 yaml.safe_load` = **6 jobs OK**；抽出该段 `bash -n` **rc=0**。
+- **★自我更正**：我第一次改 ci.yml 时写 `$null=$c.Replace(...)`，**把结果丢进 $null**（PowerShell 字符串不可变），7 处替换全没生效。**是我写错，不是文件坏**——`git diff` 空、YAML 仍 OK，随后赋回 `$c` 重做成功。**记在这里防下次重犯。**
