@@ -46,16 +46,6 @@ func (g *scriptGate) PendingApproval(_ context.Context, d Decision) (Answer, str
 	return AnswerReject, "L2 审批未通过（测试脚本）"
 }
 
-func (g *scriptGate) levels() []risk.Level {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-	out := make([]risk.Level, 0, len(g.seen))
-	for _, d := range g.seen {
-		out = append(out, d.Level)
-	}
-	return out
-}
-
 func (g *scriptGate) find(tool string) []Decision {
 	g.mu.Lock()
 	defer g.mu.Unlock()

@@ -252,3 +252,31 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   （internal/tools/search_files_test.go 等）零触碰零提交。
   next=编排者推送后取 CI lint 步 pass2 自报读数（这两个包应只剩 2 条④残留，若 CI 口径连④也要静音，
   属改判据、须人工批准）；AC#6 仍待 CI 步级读数。
+
+- [2026-11-13 16:1x +08] agent=122-wave5-tools-pass2（写腿，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-wave5-tools-pass2-dispatch.txt`，开工 HEAD `b39126832`，
+  staticcheck 2026.2.2 (0.8.2)）
+  did=**pass2 清账波 5 落地：internal/tools＋cmd/balldebug 28 → 0**（起手复跑与派单清单逐条一致，0 新增；
+  `-tags=winlive` 与默认档同空——本波 0 条④类，四档落点＝**③删 24 项＋ST1005 真改 2，零 lint:ignore**）。
+  ③删明细：system_backend_windows.go 整族 23 声明同进退（ole32/shlwapi 两 DLL 句柄＋15 死 proc＋
+  `gaRoot`/`dwmExtendedFrameBounds` 两常量（唯一消费者就是这批 proc：GetAncestor/DWM 属性读）＋
+  `procGetWindowIconSafe`/`dwmGetWindowAttrSafe` 两恒 nil 变量＋`procGetWindowIcon`/`procDwmGetWindowAttr`
+  两纯别名）＋ screen_capture_windows.go `procGetDeviceCaps`/`procSetCaptureDpiAwareness` ＋
+  cmd/balldebug `pGetModuleHandle`（批 2 判例本波落删）＋ web_bridge_test.go `(*scriptGate).levels`
+  （AC#4 真死码候选现核坐实：全包 `.levels(` 零调用）＋ **整文件删 `system_dpi_windows.go`**。
+  ★死链拆解（派单风险 1 现核）：`procSetCaptureDpiAwareness = setDPIAwarenessSafe` →
+  `procSetProcessDpiAwareness`/`shcore` 三节链删前两节，第三节**留**——活函数 `ensureDPIAwareness`
+  （system_ops_windows.go:100，`platformSystemBackend:85` 每次后端构建调用）在用；死副本与活函数
+  重复干同一件事（无 Once/错误映射差异均无消费者），截屏 DPI 行为不变（Test23ScreenCapture* 全 PASS）。
+  每枚删前全仓 git grep（含注释/历史档/他包同名不同物甄别），零处活引用被打断；剩余 proc 逐一确认有活调用。
+  ST1005×2 真改文字（`Shell 操作被中止`→小写；`App Paths 注册表不可读`→`读不到 App Paths 注册表`），
+  改前 grep 核实无测试断言这两条文本。
+  门禁：build rc0／vet rc0／`test -count=1` internal/tools **ok 50.955s**（-v 复跑 ok，**SKIP 1 条**
+  `Test23LiveClipboardRoundTripThroughRealOS`＝真 OS 剪贴板占用环境夹具，改动前同形态）／
+  gofumpt 0 行（初跑 2 件＝本波删行后 var 块对齐，`-w` 收口，diff 复核纯对齐）／
+  d22scan **clean rc0**（PASS=45 FAIL=0 SKIP=0）／`go test ./cmd/wisp/` 按票 98 豁免未跑。
+  证据件 `docs/evidence/s1/122-wave5-tools-pass2.md`（28 条逐条表＋门禁＋死链论证）。
+  本波 commit 只含 7 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树他腿脏件
+  （291 probe／346-a2 txt／frontend fixture）零触碰零提交。
+  next=编排者推送后取 CI lint 步 pass2 自报读数（tools/balldebug 两包应读 0）；票 122 剩余＝
+  audio/ball 两包 2 条④残留＋AC#6。

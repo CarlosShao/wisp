@@ -32,8 +32,6 @@ var (
 	user32   = windows.NewLazySystemDLL("user32.dll")
 	kernel32 = windows.NewLazySystemDLL("kernel32.dll")
 	shcore   = windows.NewLazySystemDLL("shcore.dll")
-	ole32    = windows.NewLazySystemDLL("ole32.dll")
-	shlwapi  = windows.NewLazySystemDLL("shlwapi.dll")
 
 	procEnumWindows              = user32.NewProc("EnumWindows")
 	procGetWindowTextW           = user32.NewProc("GetWindowTextW")
@@ -57,10 +55,8 @@ var (
 	procEmptyClipboard           = user32.NewProc("EmptyClipboard")
 	procGetClipboardData         = user32.NewProc("GetClipboardData")
 	procSetClipboardData         = user32.NewProc("SetClipboardData")
-	procOpenInputDesktop         = user32.NewProc("OpenInputDesktop")
 	procGetKeyboardLayout        = user32.NewProc("GetKeyboardLayout")
 	procActivateKeyboardLayout   = user32.NewProc("ActivateKeyboardLayout")
-	procMonitorFromWindow        = user32.NewProc("MonitorFromWindow")
 
 	procGlobalAlloc  = kernel32.NewProc("GlobalAlloc")
 	procGlobalFree   = kernel32.NewProc("GlobalFree")
@@ -69,22 +65,7 @@ var (
 	procGlobalSize   = kernel32.NewProc("GlobalSize")
 	procRtlMoveMem   = kernel32.NewProc("RtlMoveMemory")
 
-	procGetDpiForWindow = user32.NewProc("GetDpiForWindow")
-
 	procSetProcessDpiAwareness = shcore.NewProc("SetProcessDpiAwareness")
-
-	procGetWindowIcon      = procGetWindowIconSafe
-	procOleInitialize      = ole32.NewProc("OleInitialize")
-	procOleUninitialize    = ole32.NewProc("OleUninitialize")
-	procDwmGetWindowAttr   = dwmGetWindowAttrSafe
-	procMapVirtualKeyExW   = user32.NewProc("MapVirtualKeyExW")
-	procGetAsyncKeyState   = user32.NewProc("GetAsyncKeyState")
-	procIsWindowEnabled    = user32.NewProc("IsWindowEnabled")
-	procGetWindowLongPtrW  = user32.NewProc("GetWindowLongPtrW")
-	procGetAncestor        = user32.NewProc("GetAncestor")
-	procRegisterClipFmt    = user32.NewProc("RegisterClipboardFormatW")
-	procGetClipboardSeqNum = user32.NewProc("GetClipboardSequenceNumber")
-	procGetKeyState        = user32.NewProc("GetKeyState")
 )
 
 // Win32 constants the bindings need, named so the call sites read like the
@@ -101,8 +82,6 @@ const (
 	swpNoMove     = 0x0002
 	swpNoZOrder   = 0x0004
 	swpShow       = 0x0040
-
-	gaRoot = 2
 
 	cfUnicodeText = 13
 	gmemMoveable  = 0x0002
@@ -141,8 +120,6 @@ const (
 
 	monitorDefaultToNearest = 2
 	processQueryLimitedInfo = 0x1000
-
-	dwmExtendedFrameBounds = 9
 )
 
 // rect mirrors RECT.
@@ -797,17 +774,6 @@ func integrityOf(tok windows.Token) uint32 {
 	}
 	return label.Label.Sid.SubAuthority(uint32(count - 1))
 }
-
-// procGetWindowIconSafe / dwmGetWindowAttrSafe keep the two "declared but not
-// bound here" procs out of the var block's initializer order; they are nil and
-// nothing calls them, so the family does not depend on them existing. They are
-// named here rather than deleted because D22 ban #9 forbids citing a file that
-// does not exist and the reverse - deleting a proc a later ticket needs - is
-// just as costly.
-var (
-	procGetWindowIconSafe *windows.LazyProc
-	dwmGetWindowAttrSafe  *windows.LazyProc
-)
 
 // ---------------------------------------------------------------------------
 // the verb implementations

@@ -148,7 +148,7 @@ func shellTrash(canonical string) (trashDetail, error) {
 		return d, fmt.Errorf("SHFileOperationW 返回 %d（%v）：项目未进入回收站，也未被删除", int32(r), sc)
 	}
 	if op.fAnyOperationsAborted != 0 {
-		return d, errors.New("Shell 操作被中止：项目未进入回收站，也未被删除")
+		return d, errors.New("shell 操作被中止：项目未进入回收站，也未被删除")
 	}
 
 	// THE PROOF. The shell writes one `$I` restore record per recycled item,

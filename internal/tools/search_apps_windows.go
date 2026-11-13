@@ -91,4 +91,4 @@ func (appPathsRegistrySource) Apps(ctx context.Context) ([]InstalledAppCandidate
 
 // errNoAppPathsHive says the enumeration had nothing to read at all, so the
 // caller reports a failed search instead of an empty app list.
-var errNoAppPathsHive = errors.New("App Paths 注册表不可读")
+var errNoAppPathsHive = errors.New("读不到 App Paths 注册表")

@@ -32,15 +32,13 @@ import (
 // one trade-off this ticket cannot afford, because AC#2 asserts them apart.
 
 var (
-	procCreateCompatibleDC     = gdi32.NewProc("CreateCompatibleDC")
-	procCreateDIBSection       = gdi32.NewProc("CreateDIBSection")
-	procSelectObject           = gdi32.NewProc("SelectObject")
-	procDeleteObject           = gdi32.NewProc("DeleteObject")
-	procDeleteDC               = gdi32.NewProc("DeleteDC")
-	procBitBlt                 = gdi32.NewProc("BitBlt")
-	procGetSystemMetrics       = user32.NewProc("GetSystemMetrics")
-	procGetDeviceCaps          = gdi32.NewProc("GetDeviceCaps")
-	procSetCaptureDpiAwareness = setDPIAwarenessSafe
+	procCreateCompatibleDC = gdi32.NewProc("CreateCompatibleDC")
+	procCreateDIBSection   = gdi32.NewProc("CreateDIBSection")
+	procSelectObject       = gdi32.NewProc("SelectObject")
+	procDeleteObject       = gdi32.NewProc("DeleteObject")
+	procDeleteDC           = gdi32.NewProc("DeleteDC")
+	procBitBlt             = gdi32.NewProc("BitBlt")
+	procGetSystemMetrics   = user32.NewProc("GetSystemMetrics")
 )
 
 var gdi32 = windows.NewLazySystemDLL("gdi32.dll")
