@@ -247,6 +247,9 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 	}
 	reported := strings.Split(rest, "/")
 	want := append(append([]string{}, panel.WritableFields()...), panel.AdditionalWritableFields()...)
+	want = append(want, panel.WritableFields187()...)
+	want = append(want, panel.WritableFields65()...)
+	want = append(want, panel.WritableFieldsWave()...)
 	sort.Strings(want)
 	if !reflect.DeepEqual(reported, want) {
 		t.Errorf("the door reports the union %v; the two rosters say %v (A881: union == table1 + table2)", reported, want)

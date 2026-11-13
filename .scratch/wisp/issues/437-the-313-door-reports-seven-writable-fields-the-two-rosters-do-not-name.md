@@ -142,3 +142,16 @@ voice_realtime_model voice_realtime_provider
 
 断言侧单独立票并独占 `cmd/wisp/**` 一波。
 
+## ★断言侧写腿（2026-11-13 09:4x，腿 `437b-313assert`，commit 见下）
+
+**判定沿用上一腿，不重做。** 本腿只做单点：把断言的 `want` 改成与门同一口径——**五册**，⛔ 两册。
+
+- **五个名册的真实函数名（逐字，读的是定义处而非调用点）**：`WritableFields()`（`config_handlers.go:100`，7 枚）· `AdditionalWritableFields()`（`config_write_313.go:154`，13 枚）· `WritableFields187()`（`config_write_187.go:66`，1 枚）· `WritableFields65()`（`config_write_65.go:69`，2 枚）· `WritableFieldsWave()`（`config_write_wave.go:62`，4 枚）。`7+13+1+2+4=27`，与门报数闭合。
+- **改动（唯一一处，`cmd/wisp/panel_config_313_test.go:249-252`）**：`want` 在三行里并上 187／65／wave。改前＝`want := append(append([]string{}, panel.WritableFields()...), panel.AdditionalWritableFields()...)`；改后＝该行原样保留，再追加 `want = append(want, panel.WritableFields187()...)`／`…65()`／`…Wave()`。**`sort.Strings(want)` 与 `!reflect.DeepEqual(reported, want)` 一字未动**——仍是**等集**比较，⛔ 未放宽成 Contains／子集。
+- **`^Test313` 全族复跑（carrier `D:\work\soft\Git\bin\bash.exe`）**：改前 **PASS=2 / FAIL=1**（红的是 `Test313WritableUnionEqualsTheTwoRosters` 0.00s）；改后 **PASS=3 / FAIL=0**。全族恰三枚，另两枚一直绿。
+- **half-2 现在验 27 个**：`want` 即 half-2 的循环源，故由 20 涨到 27。**实测读数**（仓外 overlay 加一行 `t.Logf`）：`PROBE437B half2 covers 27 union members` ＋ `--- PASS`，零条 "refused"/"reached the leg N time(s)" ⇒ **27 个全被门接受且各到达腿一次**。
+- **突变控制（真跑，两份拷贝都在仓外 `D:\tmp\wisp\20261113\437b-313assert\`）**：**M1**＝`want` 退回两册 ⇒ **FAIL**（`panel_config_313_test.go:253`，逐名点名那 7 枚）；**恢复**（无 overlay）⇒ **PASS 3/3**；**M5**（额外加牙）＝五册 `want` 但把门的报告截掉 wave 册 ⇒ **FAIL**，恰好点名四个 wave 字段（`ball_click_through`/`ball_opacity_idle`/`panel_font_size`/`panel_width`）。⇒ 改动是绿的原因（M1 红），且等集比较两个方向都有牙（M5 红）。
+- **门禁四读数**：`go build ./cmd/wisp/` rc0 空 · `go vet ./cmd/wisp/` rc0 空 · `gofumpt -l`（真身 `D:\work\base\gopath\bin\gofumpt.exe`）**空** · `scripts/d22scan.sh` **clean，rc0**。`build/mut_rvw.go` 未删。
+- **边界**：`internal/panel/**` **零改动**（`git diff --name-only -- internal/panel/` 空）。本腿自己的代码改动只有 `cmd/wisp/panel_config_313_test.go` 一处三行；`git diff --name-only` 里另有 11 份 `.scratch/wisp/issues/43x` 删除、`probes/291`、`probes/orch/.../346-a2-dispatch.txt`、`frontend/fixtures/composer-states.html`——**都是别的腿的存量脏**，按 mtime 排除（本会话 09:43 起，那几件最后写入是 11-09／11-11／11-12）。证据件 `docs/evidence/s1/437b-313-assertion-five-rosters.md`。⛔ 未 push／⛔ 未翻任何 AC 框／⛔ 未改 half-2／⛔ 未改别的测试。
+- **留一条小账**：失败句里 "the two rosters say …" 的字样现已过时（两侧都是五册）。本腿被派单限定"只改期望集的构造"，故**未动文案**——若要改，另开一格，属措辞不属判据。
+
