@@ -1,0 +1,59 @@
+# 派单：修 `lint` 步 8 —— SLO nail census 自测 32 个对照里 14 个挂（仪器该吐的 token 没吐）
+
+> ⚠ 先把本文件从头读到尾，它是权威。
+
+## 现象（CI run `43389487057` / job `lint` / 步 8 `SLO nail census (ticket 266)` 逐字摘）
+```
+slo-nail-census: CONTROL FAILED - the red names the missing definition token
+                 expected the output to carry [slo-nail-census-nail-definition-missing]; output at .../out-18.txt
+slo-nail-census: CONTROL FAILED - the red names the ordering token
+                 expected the output to carry [slo-nail-census-ordering]; output at .../out-30.txt
+slo-nail-census: CONTROL FAILED - the red says why the position matters
+                 expected the output to carry [not before the first sampling call]; output at .../out-30.txt
+slo-nail-census: positive control RED - the census is not run, because a ruler that cannot go red does not get to print a reading
+slo-nail-census: positive control FAILED - 32 control(s) ran, 14 failed
+##[error]Process completed with exit code 1.
+```
+**⇒ 根因**：这是 **SLO nail census 仪器（脚本）的自测**。32 个「故意破坏」对照里 14 个没按预期变红／红时没带约定的 token。**这是仪器的报错措辞问题，不是 SLO 阈值问题**——⛔ 绝不许动任何 SLO 阈值/`thresholds.go`/golden（**那是铁律禁区**）。
+
+## 你要做的
+1. **先找到仪器与自测**：全仓找 `slo-nail-census`（大概在 `scripts/` 或 `tools/`；自测可能是同一脚本的 `-self-test` 或独立 `*-selftest*`）。**逐字读那 32 个对照的期望 token vs 脚本实际输出。**
+2. **逐条把失败对照对齐**：让脚本在被破坏时**真的变红**且**红里带约定 token**（`[slo-nail-census-nail-definition-missing]`、`[slo-nail-census-ordering]`、`[not before the first sampling call]` 等）。**修的是仪器的判据/措辞，不是被测数据。**
+3. **14 个逐一列表**：把 14 个失败的 control 号 + 期望 token + 实际输出，做成表放证据件。**凡是「期望的 token 在脚本里根本没实现」或「实现了但拼写不一致」，都要点明是哪种。**
+4. **拉出 `out-18.txt`/`out-30.txt` 那类实跑输出**：本机能复跑就复跑（仪器应是本地可跑的纯脚本），把「改前红/改后红且带 token」的逐字读数贴进证据件。**⛔ 编读数。**
+
+## ★红线（铁律，违者判失败）
+- **⛔ 动任何 SLO 阈值、`thresholds.go`、golden、`allowlist.txt` 一字节**。本票只许改**仪器脚本**及其自测期望。
+- **⛔ 让自测「全绿」的办法是把期望 token 删掉/放宽**——那是拆报警器。要改就改**仪器**去真吐 token。
+- ⛔ 改契约文字（`C1–C32`/`D1–D47`）——碰到就停手问我。
+
+## 关键文件（先读）
+- `slo-nail-census` 仪器脚本（自己找路径，`git grep -l 'slo-nail-census'`）
+- 它的自测（32 个 control 那段）
+- `.github/workflows/ci.yml` 的 `lint` job 步 8（`SLO nail census (ticket 266 ...)`）
+- 票 `.scratch/wisp/issues/266-*.md`（原文 AC）与 `.scratch/wisp/issues/171-*.md`（同样是「仪器自测须能变红」的先例判据，可参照它的修法）
+
+## 写面（严格）
+**只许**：census 仪器脚本本身 + 它的自测 + `.github/workflows/ci.yml`（**只动 lint 步 8 相关**）+ 票 266 面 Progress log + 证据件 `docs/evidence/s1/266-slo-nail-census-selftest.md`（新）。
+⛔ `thresholds.go`、golden、`allowlist.txt`、`docs/SLO.md` 的**数值**、`internal/**`、`cmd/**`、`frontend/**`。
+
+## 门禁（如实报）
+1. 本机复跑 census 自测：**32 control 全过 / 0 failed**（贴逐字末行）
+2. 本机复跑 census 正常路径：对真 SLO 目标**仍绿**（rc=0）——**证明你没把仪器改哑**
+3. `bash -n`（或 `pwsh -File` 语法）仪器脚本 rc=0
+4. `d22scan.sh` clean
+5. ⛔ 跑 `go test ./cmd/wisp/`
+
+## 交付
+改动真落盘 ＋ 证据件（含 14 条对照表）＋ 票 266 Progress log（⛔ 翻 AC 框）＋ **commit 显式 pathspec ⛔push**，回话抄 hash。
+
+## 禁止
+`git add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。临时件落 `D:\tmp\wisp\20261113\266-nailcensus\`（只建不删）。
+
+## 回话
+- 仪器与自测的**真实路径**
+- 14 条失败对照表（control 号/期望 token/实际/根因类别）
+- 改前/改后自测读数（32 全过）＋ 正常路径仍绿读数
+- 门禁逐项
+- diff+hash
+- **一句话**：现在这仪器「被破坏时能不能变红、红里带不带 token」

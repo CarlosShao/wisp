@@ -36666,3 +36666,18 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★它删了整个文件 `internal/tools/system_dpi_windows.go`**：判据＝它是 `ensureDPIAwareness`（活，`platformSystemBackend:85` 每次后端构建调用）的**死副本**；build/vet/test 全 rc0（`internal/tools` `ok 50.955s`，SKIP 恰 1 条 `Test23LiveClipboardRoundTripThroughRealOS` 真 OS 剪贴板夹具）＋ d22scan clean。**整文件删除属"删"类，但按铁律⓪⓪⓪ 是最有价值的正确动作（删死副本），且它先验了 build 不断、行为不变（Test23ScreenCapture* 全 PASS）。**
 - **★`test-windows` 现在只剩第 7 步 `cmd/wisp CLI tests`**：这是**票 98 豁免**的那枚（本机 `go test ./cmd/wisp/` 会 `0xc0000135` STATUS_DLL_NOT_FOUND，需要 sherpa DLL 先 stage）。**下一个要拆的门就是它。**
 - **★git push 暂时连不上 github**（`Failed to connect to github.com port 443`）：`681c831ba`＋本账 **1 枚待推**，本地安全。**网络恢复再推，票不动。**
+
+## A1843 — `test-core` 绿后，**CI 只剩两道门**，我已量清根因并各派一条写腿
+
+- **★CI run `43389487057`（`dc49dd1f3`）六 job**：`test-core` **success（史上首次）**／`slo-full`/`slo-smoke`/`lint-frontend` success／**`lint` failure**／**`test-windows` failure**。
+- **★`lint` 只差第 8 步 `SLO nail census (ticket 266)`**（第 13 步 staticcheck 已被波 3＋波 5 打干净：pass1=0、pass2=52 待波5-tools/波6 降）。
+  - **根因（逐字）**：`positive control FAILED - 32 control(s) ran, 14 failed`；具体如 `CONTROL FAILED - the red names the missing definition token - expected [slo-nail-census-nail-definition-missing]`、`...ordering token... [slo-nail-census-ordering]`、`... [not before the first sampling call]`。
+  - **⇒ 是 census 仪器（脚本）自测的红，不是 SLO 阈值问题**。⛔ 阈值/golden/`thresholds.go` 一字节不许碰。
+- **★`test-windows` 只差第 7 步 `cmd/wisp CLI tests (ticket 111 AC#4)`**。
+  - **根因（逐字）**：`WISP_SPIKE_MODELS defaults to .../third_party/spike-models, which is not on disk` ⇒ carrier 判 setup failure ⇒ `RUN=0 PASS=0 FAIL=0 SKIP=0`＋`<NO TOP-LEVEL RESULT LINE> missing .../cmd/wisp` ⇒ `GUARD B` 判「包消失＝红」。
+  - **⇒ runner 上 VOICE 夹具没下载，cmd/wisp 一个测试没跑**。⛔ 不许把 GUARD B 改哑。
+- **两条写腿已派（写面互斥，均 `magpie-high`/`glm-5.3-flash`）**：
+  - `workflow-7bd5f47df65a4138` → 票 111 cmd/wisp CLI 夹具（派单存档 `111-cmdwisp-cli-fixtures-dispatch.txt`）。**两路线：A=CI fetch 夹具（voice 真跑，我倾向）；B=carrier 仍编译跑非夹具测试、voice 具名记账。由腿判并写理由。**
+  - `workflow-6fa80fd560cf4134` → 票 266 SLO nail census 自测（派单存档 `266-slo-nail-census-dispatch.txt`）。**只许改仪器，⛔ 拆报警器/动阈值。**
+  - 波 6（`workflow-6eb16c78270d47a7`，其余 9 包 pass2）仍在飞 ⇒ **共 3 条写腿**。
+- **★三腿写面两两不相交**：波6=`internal/{winsec,audio,proc,ball,risk,memory,observe,secret,agent}`；111=`scripts/`+`ci.yml`+票111；266=census 仪器脚本+`ci.yml`（步 8）＋票266。**⚠ `ci.yml` 两个腿都会碰，但一个动 test-windows 步、一个动 lint 步 8——仍是我复核 diff 时要盯的合并点。**

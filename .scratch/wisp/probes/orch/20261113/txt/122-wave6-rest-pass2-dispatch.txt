@@ -1,0 +1,51 @@
+# 派单：票 122 — pass2 清账波 6（tools 之外的全部余包）
+
+> ⚠ 宿主命令通道故障（spawn EPERM）期间预写。启动前确认 `pwsh` 已恢复。
+
+## 口径（自跑，⛔ 照抄）
+```
+GOOS=windows CGO_ENABLED=0 D:\work\base\gopath\bin\staticcheck.exe -tags=winlive -checks=all,-SA9009 ./internal/winsec/ ./internal/audio/ ./internal/proc/ ./internal/ball/ ./internal/risk/ ./internal/memory/ ./internal/observe/ ./internal/secret/ ./internal/agent/
+```
+我最后量到的（**自己复核，行号会动**）：
+- `internal/winsec`：`acl_windows_test.go:32` U1000（`wellKnown`）· `leftstanding_354_windows_test.go:68` U1000 · `pinnedleaf_342_windows.go:3` ST1000（包注释）· `seam_guard_windows_test.go:47/49/53/70` U1000（`narrowOnlyResolver` 族 + `installs` 字段）
+- `internal/audio`：`mmdevice_windows.go:284/291/293/295` ST1003（`deviceId→deviceID`）· `wasapi_windows.go:36` ST1003（`pGetCurrentThreadId→pGetCurrentThreadID`）· `aecspike/rig_windows.go:49` U1000（`iidIUnknown`，COM GUID）
+- `internal/proc`：`boot_windows.go:22` ST1021 · `jobscope_windows.go:31` ST1003（`jobObjectBasicProcessIdList→...ProcessIDList`）· `treemetrics_windows.go:47` ST1003
+- `internal/ball`：`hotkey_borrow_refused_260r5_test.go:101` ST1012 · `hotkey_refused_borrow_release_245_test.go:58` ST1012（错误变量要 `errFoo` 形）
+- `internal/risk`：`anchor_world_334_test.go:55/60` U1000
+- `internal/memory`：`l1_warm_29_test.go:151` U1000
+- `internal/observe`：`logprivate_132_windows_test.go:99` U1000
+- `internal/secret`：`delete_test.go:131` SA4010（append 结果没人用 ← 这条可能是**真 bug**，仔细看）
+- `internal/agent`：`reminder_timer_test.go:109` U1000
+
+## 四档判据（同波 5，⛔ 见 unused 就删）
+①ABI 结构体字段 → `//lint:ignore U1000 <点名哪个 API 按偏移读>`；②故意保留的句柄/资源 → `//lint:ignore U1000 <为什么>`；③真无主 → **删**（先 `git grep -n` 全仓核 + 看 tag）；④只在非默认 tag 有主 → **⛔删⛔ignore**，证据件点名。
+**本波带 `-tags=winlive`** ⇒④类自然消失；带 tag 后仍报的必是①②③。
+
+## ★三条特别提醒
+1. **`iidIUnknown`（aecspike/rig_windows.go:49）是 COM GUID**：若真无 Go 引用则③删（wave4b 已删过 `wasapi_windows.go` 的同名那个，这是 aecspike 的另一份）；但**先核 `rig_windows.go` 里有没有按 `unsafe.Pointer`/`IID` 传给 COM API**——若有，判①ignore。
+2. **`internal/secret/delete_test.go:131` SA4010 可能是真 bug**（`x = append(x, ...)` 结果丢弃），**读代码判它是测试夹具疏忽还是被测行为**，别机械改。
+3. **ST1003 改名**：改声明+全部引用点，`git grep -c` 旧名归 0，改前核名册面。**ST1012 错误变量改名要同步改所有 `errors.Is/As` 引用点**。
+
+## 写面（严格）
+**只许**上面那 9 个包（含测试文件）＋ 证据件 `docs/evidence/s1/122-wave6-rest-pass2.md`（新）＋ 票 122 面 Progress log。
+⛔ `internal/tools/**`（波 5 的地界）、`cmd/**`、`internal/panel/**`、`internal/plugin/**`、`internal/config/**`、`frontend/**`、`.github/**`、`scripts/**`、`docs/PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、`allowlist.txt`。
+
+## 门禁
+```
+D:\work\base\go\bin\go.exe build ./internal/winsec/ ./internal/audio/ ./internal/proc/ ./internal/ball/ ./internal/risk/ ./internal/memory/ ./internal/observe/ ./internal/secret/ ./internal/agent/
+D:\work\base\go\bin\go.exe vet （同上九包）
+D:\work\base\go\bin\go.exe test -count=1 ./internal/winsec/ ./internal/proc/ ./internal/risk/ ./internal/memory/ ./internal/observe/ ./internal/secret/ ./internal/agent/ ./internal/ball/
+D:\work\base\gopath\bin\gofumpt.exe -l （同上）
+D:\work\soft\Git\bin\bash.exe -c "cd '/d/work/workspace/projects plans/Wisp' && sh scripts/d22scan.sh"
+```
+⚠ `internal/audio/aecspike` sherpa cgo 依赖跑不了 ⇒ **如实报 SKIP**，⛔ 当绿。⛔ 跑 `go test ./cmd/wisp/`。
+
+## 交付
+改动真落盘 ＋ 证据件 ＋ 票 122 Progress log（⛔ 翻 AC 框）＋ **commit 显式 pathspec ⛔push**，回话抄 hash。
+
+## 禁止
+`git add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。⛔ 删 `build/mut_rvw.go`。
+临时件落 `D:\tmp\wisp\20261113\122-wave6\`（只建不删）。
+
+## 回话
+前/后按码表 · 逐条表（符号/位置/档/理由）· 门禁逐项（含 SKIP 名）· diff+hash · 一句话剩几条。

@@ -1,0 +1,61 @@
+# 派单：修 `test-windows` 步 7 —— `cmd/wisp` CLI 测试在 runner 上一个没跑（voice 夹具缺）
+
+> ⚠ 先把本文件从头读到尾，它是权威。
+
+## 现象（CI run `43389487057` / job `test-windows` / 步 7 逐字）
+```
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> .scratch/wisp/stage-cli/...
+wisp-cli-staged-tests.sh: WISP_SPIKE_MODELS defaults to .../third_party/spike-models, which is not on disk.
+wisp-cli-staged-tests.sh: the voice fixtures were never fetched on this host, so the
+wisp-cli-staged-tests.sh: voice tests cannot be judged here. Treat this as a setup
+wisp-cli-staged-tests.sh: failure, not as red tests.
+portable-tests.sh: four numbers: === RUN=0  --- PASS=0  --- FAIL=0  --- SKIP=0
+portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing github.com/CarlosShao/wisp/cmd/wisp
+portable-tests.sh: GUARD B - 1 of 1 packages in scope mode=cli printed
+portable-tests.sh:   NO top-level result line, so this step tested them ZERO times
+portable-tests.sh: strict runner exited 1 for scope=[./cmd/wisp/]
+```
+**⇒ 根因**：runner 上没有 `third_party/spike-models`（等 voice 夹具）⇒ carrier `wisp-cli-staged-tests.sh` 判 setup failure 直接不跑 ⇒ `cmd/wisp` 包 0 个顶层结果 ⇒ GUARD B（票 111 AC#2/AC#8）判「包消失＝红」。
+
+## 你要做的：让这步在**没有 voice 夹具**的 runner 上也能真跑出顶层结果
+**两条路，你自己判哪条最符合主流 harness（⛔ 别为了省事选小的）：**
+
+**路线 A（我倾向——最有价值）**：**CI 里把 voice 夹具 fetch 下来**。查仓里有没有现成的 fetch 脚本（`scripts/`／`third_party/model-fetch/` 下），在 `ci.yml` 的 test-windows 步**在 stage-sherpa-dlls 旁边**加一个 fetch 步（**离线可缓存**：先查 GitHub Actions cache 是否更合适）。
+- 好处：voice 测试**真的跑**（不是跳过），`cmd/wisp` 有顶层结果。
+- 代价：CI 时间/带宽↑，需处理 cache 与失败重试。
+
+**路线 B**：**让 carrier 在夹具缺失时不是 setup-failure 退出，而是仍编译并跑「不依赖夹具」的那批 cmd/wisp 测试**，voice 相关子集按现有 ledger/`-skip` 机制**具名记账**（不是静默跳过），从而产出顶层结果行。
+- 好处：不增加 CI 带宽。
+- 代价：voice 测试在 CI 仍不跑（但至少被**具名**记账，符合票 71 AC#3「跳过须具名」）。
+
+**⛔ 禁止**：把 GUARD B 改哑、把「包消失」判成绿。**报警器不许拆。**
+
+## 关键文件（先读）
+- `scripts/wisp-cli-staged-tests.sh`（carrier，**逐字读它的 setup-failure 分支和 GUARD B**）
+- `.github/workflows/ci.yml` 的 `test-windows` job 步 7（`cmd/wisp CLI tests ... ticket 111 AC#4`）
+- `scripts/portable-tests.sh`（GUARD B 的定义，票 111 AC#2/AC#8）
+- `third_party/model-fetch/`（看现成 fetch 机制）
+- 票 `.scratch/wisp/issues/111-*.md`（AC#4 原文）与 `.scratch/wisp/issues/98-*.md`（本机豁免的原因）
+
+## 写面（严格）
+**只许**：`scripts/wisp-cli-staged-tests.sh`、`.github/workflows/ci.yml`（**只动 test-windows 相关步**）、**新增** fetch 脚本（若走 A）、票 111 面 Progress log、证据件 `docs/evidence/s1/111-cmdwisp-cli-fixtures.md`（新）。
+⛔ `cmd/wisp/**` 生产码（本波若必须改测试做基建依赖以外的改动，先回来问我）、`internal/**`、`frontend/**`、`thresholds.go`、golden、`allowlist.txt`。
+
+## 门禁（如实报）
+1. `bash -n scripts/wisp-cli-staged-tests.sh` rc=0
+2. **本机模拟「夹具缺失」路径**：临时改名/用环境变量让它看不到 `third_party/spike-models`，跑 `sh scripts/wisp-cli-staged-tests.sh`，**要求：产出顶层结果行、退出码符合你的设计、且 GUARD B 不再「包消失」**（把读数贴进证据件）。
+3. 若走 A：`bash -n` fetch 脚本 ＋ 在 `ci.yml` 里 yaml 结构自检（能 `python -c 'import yaml,sys;yaml.safe_load(open(".github/workflows/ci.yml"))'` 最好；不行就人工读 diff）。
+4. `d22scan.sh` clean。
+
+## 交付
+改动真落盘 ＋ 证据件 ＋ 票 111 Progress log（⛔ 翻 AC 框）＋ **commit 显式 pathspec ⛔push**，回话抄 hash。
+
+## 禁止
+`git add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。临时件落 `D:\tmp\wisp\20261113\111-cmdwisp\`（只建不删）。
+
+## 回话
+- 你选 A 还是 B、**为什么它最有价值**
+- 改前/改后本机模拟读数（顶层结果行、rc、GUARD B 状态）
+- 门禁逐项
+- diff+hash
+- **一句话**：这步现在在「有夹具」和「无夹具」两种 runner 上分别会怎样

@@ -1,0 +1,59 @@
+# 派单：票 122 — pass2 清账波 5（`internal/tools` ＋ `cmd/balldebug`）
+
+> ⚠ 本派单是在**宿主命令通道故障（spawn EPERM）期间**预先写好的。启动前先确认通道已恢复（`pwsh` 能跑 `go version`）。
+
+## 口径（必须自跑，⛔ 照抄我贴的数）
+```
+GOOS=windows CGO_ENABLED=0 D:\work\base\gopath\bin\staticcheck.exe -tags=winlive -checks=all,-SA9009 ./internal/tools/ ./cmd/balldebug/
+```
+我最后一次量到的这堆（**你要自己复核，行号会动**）：
+- `internal/tools/recycle_windows.go:151` ST1005（错误信息首字母大写）
+- `internal/tools/screen_capture_windows.go:42,43` U1000（`procGetDeviceCaps`、`procSetCaptureDpiAwareness`）
+- `internal/tools/search_apps_windows.go:94` ST1005
+- `internal/tools/system_backend_windows.go` **约 22 条 U1000**（全是 `var procX = ...` 懒加载函数指针：`procGetWindowIcon`、`procOleInitialize`、`procDwmGetWindowAttr`、`procGetAsyncKeyState`、`procGetWindowLongPtrW`、`procGetAncestor`、`procRegisterClipFmt`、`procGetClipboardSeqNum`、`procGetKeyState`、`procOpenInputDesktop`、`procMonitorFromWindow`、`procGetDpiForWindow`、`procOleUninitialize`、`procMapVirtualKeyExW`、`procIsWindowEnabled`、`ole32`、`shlwapi`、`procGetWindowIconSafe`、`dwmGetWindowAttrSafe` ＋ 常量 `gaRoot`、`dwmExtendedFrameBounds`）
+- `internal/tools/system_dpi_windows.go:16` U1000（`setDPIAwarenessSafe`）
+- `internal/tools/web_bridge_test.go:49` U1000（`(*scriptGate).levels`）
+- `cmd/balldebug/shot_windows.go:36` U1000（`pGetModuleHandle`）
+
+## ★★这批的特殊风险（⛔ 漏读就坏事）
+1. **`procX` 是 `syscall.NewLazyDLL(...).NewProc("X")` 拿到的函数指针。删掉一个未使用的 `procX` 是安全的（它不按内存偏移被读），但它常常和「调用它的那个函数一起死」——先看调用者是不是也死了，别只删一半留下悬空调用。**
+2. **⛔ 见 unused 就删**——判据仍是派单四档：
+   - ①**ABI 结构体字段** → `//lint:ignore U1000 <点名哪个 API 按偏移读>`
+   - ②**故意保留的句柄/资源** → `//lint:ignore U1000 <为什么留>`
+   - ③**真无主的 func/var/const** → **删**（删前 `git grep -n '<名>'` 全仓核 + 看调用者 build tag）
+   - ④**只在 winlive/其它非默认 tag 下有主的** → **⛔删 ⛔ignore**，证据件点名调用者 `file:line` + tag
+   - **本波已带 `-tags=winlive`**，所以④类会**自然消失**（真被 winlive 测试用了就不报了）。若你看到某条在**带 tag 后仍报**，那它不是④类，是①/②/③之一。
+3. **ST1003 改名**（若本波出现 `deviceId→deviceID` 之类）：改**声明＋全部引用点（含注释里的引用）**；改名前后 `git grep -c '<旧名>'` 必须归 0；改前先核名册面（`scripts/portable-tests.sh` GUARD、票 171 名册、`tokens_table_test`）。
+4. **ST1005/ST1012/ST1021/ST1000 是文风**：真改文字/命名，**⛔ 用 lint:ignore 蒙**（④类除外，但④要求点名调用者）。
+
+## 写面（严格）
+**只许** `internal/tools/**` 与 `cmd/balldebug/**`（含非测试与测试文件）＋ 证据件 `docs/evidence/s1/122-wave5-tools-pass2.md`（新）＋ 票 122 面 Progress log。
+⛔ `cmd/wisp/**`（每波只许一枚写腿，本波不是它）、`internal/panel/**`、`internal/plugin/**`、`internal/config/**`、`internal/audio/**`、`internal/ball/**`、`internal/winsec/**`、`internal/proc/**`、`internal/risk/**`、`internal/memory/**`、`internal/observe/**`、`internal/secret/**`、`internal/agent/**`、`frontend/**`、`.github/**`、`scripts/**`、`docs/PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、`allowlist.txt`。
+
+## 门禁（逐条，如实报）
+```
+D:\work\base\go\bin\go.exe build ./internal/tools/ ./cmd/balldebug/
+D:\work\base\go\bin\go.exe vet ./internal/tools/ ./cmd/balldebug/
+D:\work\base\go\bin\go.exe test -count=1 ./internal/tools/
+D:\work\base\gopath\bin\gofumpt.exe -l internal/tools cmd/balldebug
+D:\work\soft\Git\bin\bash.exe -c "cd '/d/work/workspace/projects plans/Wisp' && sh scripts/d22scan.sh"
+```
+⚠ `go test ./cmd/wisp/` 本机测不到东西（票 98 豁免），⛔ 跑。
+⚠ `internal/tools` 有平台守卫/多卷夹具，`go test` 可能 SKIP 一片——**如实报 SKIP 名字**，⛔ 当绿。
+
+## 交付（⚠ 上一个腿因宿主故障未能 commit，但改动全在盘上；你要真落 commit）
+1. 改动真落盘
+2. 证据件 `docs/evidence/s1/122-wave5-tools-pass2.md`
+3. 票 122 面 Progress log（⛔ 翻 AC 框）
+4. **commit，显式 pathspec，⛔ push**，回话抄 `git log --oneline -1` 的 hash
+
+## 禁止
+`git add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。⛔ 删 `build/mut_rvw.go`。
+临时件落 `D:\tmp\wisp\20261113\122-wave5\`（只建不删）。
+
+## 回话给我
+- 复跑前/后两张读数（按码）
+- **逐条表**：符号/位置/四档哪一档/理由（①点名 API；②点名为什么留；④点名调用者+tag）
+- 门禁逐项读数（含 SKIP 名字）
+- `git diff --name-status` ＋ commit hash
+- **一句话**：这个包 pass2 还剩几条、是什么
