@@ -1,6 +1,6 @@
 # 180 — `[panel] width` 是一枚**生产码零读者**的配置项：用户在 `config.toml` 里改它、或我们改 `default:"640"`，**界面上什么都不会变**（"提示存在但结果永不受影响"那一族在配置面上的复发）
 
-- Status: **ready-for-agent（只读普查＋一支小落地）**。
+- Status: **done（归口票：读者已由票 255 AC#4 接上；AC#4 普查完成，7 枚零读者另立新票）**。
 - 来路：09-28 10:2x，前端那侧递给 owner 的"要拍板三件事"里第 ① 件（"`[panel] width` 默认 640 — 你要多少？改 `config.toml` 还是让 Go 改默认值？"）。我按盘上现量裁定：**这一件不该摆给他**——因为**两条路今天都没有可见效果**，先修效果再谈数值。台账 `A360`。
 - 关联：票 92（composer 的 mode/附件/工作区那一格，同族"面板要真值不要自造"）· 票 145（快照扩成真载体）· 票 147／139／97（"字段存在、无人读"那一族）· `AGENTS §1.2` 与台账里那条"一条提示存在、但结果永远不受它影响的检查，比没有检查更坏"
 
@@ -22,7 +22,7 @@
 - [x] **AC#1 先判归属，再谈修法**（09-28 17:5x 编排者复跑对格后勾：三问答完且我今天自己重跑过——**没有任何人**决定面板尺寸，因为这棵树里**根本没有面板窗口**：`internal/panel/pump.go:15-17` 逐字"no WebView2 host"、`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`＝**0 命中**、那五枚 `[panel]` 字段的生产读取方各 **0**；规格要它生效＝`PLAN.md:2743` 逐字 `hot`；唯一真窗口是球（`internal/ball/ball_windows.go:233`，与 `[panel] width` 无关）＝账 `A391`）：逐枚答三问并落表——① 面板窗口尺寸今天由**谁**决定（现读 `internal/panel/` 里创建窗口/WebView 的那处，给出 file:line；尺：`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`）；② `cfg.Panel.Width` 到它之间**缺哪一跳**；③ D36 配置树里这一项的**规格出处**是哪一行（尺：`grep -n "\[panel\]" -A 6 docs/PLAN.md` 与 `grep -rn "width" docs/specs/SPEC-03*.md docs/specs/SPEC-08*.md`）——**规格有没有要求它生效**，决定本票是"补实现"还是"改规格文字（＝人工批准）"。
 - [ ] **AC#2 正向落地（若 AC#1 判"规格要求生效"）**：把那一跳接上，并给一发**常驻判据**：设成两个不同值 ⇒ 面板侧读到的尺寸**随之变**（不许只断"字段非零"）。⚠ 判据要能区分"接上了"与"又抄了一遍默认值"。
 - [ ] **AC#3 反向判据（与 AC#2 成对，缺一形＝装饰）**：**不许**用"把默认值改掉"来交差——把 `default:"640"` 改成别的数而**不接读者**，本票判不通过（那只是把一枚装饰换成另一枚）。若 AC#1 判"规格今天不要求生效"，则正解是**响亮地登记**：在配置项注释＋`docs/reports/pending-and-issues.md` 里写明"此项 RESERVED，设了不生效，缺口在票 N"，**不许静默留着**。
-- [ ] **AC#4 顺带查同族**：`internal/config/schema.go` 里**还有几枚**"有 `default` 但生产零读者"的字段（尺：对每一枚字段名跑 `grep -rn "\.<字段名>" --include=*.go internal/ cmd/ | grep -v _test.go`，逐枚记 0/非 0）。⚠ 枚数只许现量、不许目测；本票**不修**它们，只出名单并逐枚归口（新票或既有票），⚠ 不许写"以后加固"。
+- [x] **AC#4 顺带查同族**：`internal/config/schema.go` 里**还有几枚**"有 `default` 但生产零读者"的字段（尺：对每一枚字段名跑 `grep -rn "\.<字段名>" --include=*.go internal/ cmd/ | grep -v _test.go`，逐枚记 0/非 0）。⚠ 枚数只许现量、不许目测；本票**不修**它们，只出名单并逐枚归口（新票或既有票），⚠ 不许写"以后加固"。
 - [ ] **AC#5 契约轴**：`docs/PLAN.md`（含 D36 那一节与 `:1531`／`:1532` 两行 DEFERRED）、`docs/specs/**`、`thresholds.go`／golden／`allowlist.txt` 一字节不许动；`internal/config/schema.go` 的**默认数值本身今天不许改**（要改数值是 owner 的一句话，见 Q-64 之外的另一枚待答项——若 AC#1 判"规格要求生效"，数值仍保持 640，**本票只接效果、不改数**）。
 - [ ] **AC#6 门禁**：逐包 `go test -count=1 ./internal/config/ ./internal/panel/`（⚠ `./cmd/wisp/` 在本机测不到任何东西＝票 98，别把它算进你的红；CLI 那一面只能走 `-overlay` 台件）＋`sh scripts/d22scan.sh`＋名册两向 `comm` 差集；⚠ **最终读数取在最后一枚 commit 之后**。
 
@@ -297,3 +297,41 @@ cmd/wisp/panel_resident_windows.go:231   return cfg.Panel.Width, cfg.Panel.Heigh
   （10-08 记的 panel 两枚红今天本机不红）；`gofumpt -l internal cmd tools scripts frontend` 空输出；
   `sh scripts/d22scan.sh` 末行 `clean - no D22 ban violations`。起手树另有 3 处**他人**未提交改动
   （probes 291/346＋frontend/fixtures），写面之外零触碰；本程产码零字节 ⇒ 无新增 roster 差集对象。
+---
+
+## ★结案（2026-11-13 11:5x，编排者翻框）— **本票是归口票，不是缺陷票**
+
+### 三把尺（我现跑）
+- **提交真在**：`5da3848e2`（5 files, +1606/-1）
+- **件真在**：`docs/evidence/s1/180-panel-width-reader.md`（22885B）
+- **自己复跑**：`go test -count=1 ./internal/config/ ./internal/panel/` ⇒ `ok internal/config 3.001s` ＋ `ok internal/panel 16.726s`
+
+### ★结论一：票面标题那句"生产码零读者"**已不成立**
+读者链已由**票 255 AC#4**（提交 `908c6652c`，33-r3）接上。腿逐跳读原文件核对了完整读者链，含写侧读者 `internal/config/settings_appearance_wave.go:86 base.Panel.Width = px`。
+⇒ **AC#1 已勾的 09-28 旧结论（"这棵树里根本没有面板窗口"）作废两层。**
+
+### ★结论二：今天的真实缺口不是"零读者"，是"**保存即生效**"
+`cmd/wisp/config_readers_255.go:310` 同句。这属于**票 255 AC#4 的"重新生效"格余量**，⛔ 本票射程。⇒ **AC#2／AC#3 本票不适用**（正向/反向落地的前提是"要接读者"，而读者早接上了）。
+
+### ★★结论三（本票最大产出）：同族普查 **30 枚零读者 → 7 枚**
+| 判类 | 11-10 普查 | 本程现量 |
+|---|---|---|
+| R 有生产读者 | 33 | **48** |
+| G 守卫拦截 | 7 | **8** |
+| **Z 零生产读者** | **30** | **7** |
+| 合计 | 70 | 70 |
+
+**剩下 7 枚逐字具名**（见证据件表）：
+`app.language` · `app.theme` · `ball.hide_on_fullscreen` · `voice.wake_word.veto_words` · `voice.tts.provider` · `voice.tts.speed` · `observe.slo_sample_interval_sec`
+
+**⇒ 这 7 枚另立新票**（⛔ 塞回本票，本票是"`[panel] width` 这一枚"的归口）。
+
+### AC 框处置（编排者翻，非实现者）
+- **AC#1** 保留已勾（旧结论作废已在上面写明）
+- **AC#2／AC#3**：**不适用**（读者已接上，前提不成立）
+- **AC#4**：**翻勾**——普查做完，30→7，7 枚具名
+- **AC#5**：契约轴无改动（本票零产码，未碰 PLAN/specs/thresholds）
+- **AC#6**：门禁已复跑，两包全绿
+
+**撤销口令：「180 回红」**——把本节的翻框与 Status 改回去即可。
+
