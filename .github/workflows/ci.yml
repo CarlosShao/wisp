@@ -898,12 +898,20 @@ jobs:
     runs-on: windows-latest
     # Hang bound (see the block above `jobs:`). Measured max 14.78 min, p90
     # 11.90; 0 of 40 runs finished, so the ceiling is set from the observed
-    # shape rather than from a completed run. 30 = 2.0x that max, and the margin
-    # is deliberate: this job runs cmd/wisp (the MARK299 panel-window path),
-    # where the failure mode is a stuck window or control thread - a hang, not a
-    # slow test. A ceiling that kills a genuinely slow run would be a new red,
-    # which is the opposite of what this line is for.
-    timeout-minutes: 30
+    # shape rather than from a completed run. The margin is deliberate: this job
+    # runs cmd/wisp (the MARK299 panel-window path), where the failure mode is a
+    # stuck window or control thread - a hang, not a slow test. A ceiling that
+    # kills a genuinely slow run would be a new red, which is the opposite of
+    # what this line is for.
+    #
+    # RAISED 30 -> 60 (ticket 111 fixtures leg, orchestrator ruling A1846). The
+    # CLI step now FETCHES the voice fixtures before running (cold first download
+    # up to ~25 min) and then actually runs the voice family (CI's own prior full
+    # runs read 328.9s..392.9s = up to ~6.5 min), so ~31 min on the cold run. A
+    # job ceiling of 30 would kill exactly the run the fetch enables - the step's
+    # own timeout-minutes: 60 cannot help while the JOB is the tighter bound.
+    # 60 matches the step, stays a hang bound, and lets the cold first run finish.
+    timeout-minutes: 60
     env:
       WISP_ENV: test
     steps:

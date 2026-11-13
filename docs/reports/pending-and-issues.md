@@ -36706,3 +36706,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **⇒ 结论**：`lint` 第 8 步 `SLO nail census` 的 **CI 红因已消除**（下一次 CI 该步应绿）。这是我第二次靠「本地 docker 复现 CI 平台差异」定位并修好——**第一例是 test-core 的 AUMID/reexec，这一例是 census 的 CRLF。二者同源：本地 Win 工作树与 CI 签出的换行/平台差异，本地绿掩盖了 CI 红。**
 - **★腿自报一只无害的坑**：中途 `d22scan` 报 `missing go.mod`，是它**自己的验证脚本泄漏 `MSYS2_ARG_CONV_EXCL`** 污染路径所致，清环境重跑即 clean。**它主动说了，没有藏。**
 - **已推**：连同波 6 三提交＋`A1844` 一起，6 枚全上 `origin/dev`（网络早前断过，恢复后 1 次推成功）。
+
+## A1846 — 票 111 cmd/wisp CLI 夹具腿验收（`84fc7aba9`）＋ ★我抬了 test-windows **job 级超时 30→60**
+
+- **三把尺**：
+  1. **提交 `84fc7aba9`**：5 件（`scripts/wisp-cli-staged-tests.sh` 227+/24−、新 `scripts/fetch-voice-fixtures.ps1` 320 行、`.github/workflows/ci.yml` +82、证据件、票 111 面）。**越界：零**（没碰 `cmd/wisp` 生产码、`portable-tests.sh`、任何 GUARD/阈值/golden/allowlist）。
+  2. **件**：`docs/evidence/s1/111-cmdwisp-cli-fixtures.md` **15379B**。
+  3. **我自己复跑**：`bash -n` rc=0；`py -3 yaml.safe_load(ci.yml)` = **6 jobs OK**；`d22scan` **clean**；**带 cgo 真跑 carrier ＝ `voice fixture environment resolved`，`Test382WR2…` PASS、`TestWireR1…` 在跑**（⇒ A 路线前提成立：**有夹具时 voice 真跑**）。我第一次跑失败是我自己没设 `CGO_ENABLED=1`（`cmd/wisp` 要 cgo 编 sherpa），**不是 carrier 的问题**。
+- **★腿的路线裁决（我认）**：**A 为主干 ＋ B 作 carrier 内具名回退，两半都落地。**
+  - **A 为什么最有价值**：主流 harness 形状＝「数据依赖在测试前 fetch＋哈希验证＋`actions/cache`」，且 fetch 脚本 URL+SHA256 **现读 `build/models/manifest.json`**（零第二真相源）；**让 41 枚夹具依赖用例在 CI 真跑**而不是记账缺席。
+  - **为什么要 B**：A 修常态，B 修**失效日**（URL 全死/断网）——旧 carrier 那天答案是「整包 0 跑」（GUARD B 咬中的正是它），B 让答案变成「41 枚具名跳过＋其余照跑＋真实包级结果行」。**⛔ 这不是判绿：GUARD B 职权未动**，仍能咬「包消失」。
+  - **为什么不只 B**：voice 41 枚在 CI 永久缺席＝把被检对象从门禁里删掉的缓释版（票 111 AC#2 禁）。
+- **★它自己披露并重做了一次机制错**：首发用 `-test.skip 'file::...'` 形，**静默匹配零个**（探针复证：加 `file::` skip 后照跑照红）⇒ 当场重做为 **41 枚全名锚定形 ＋ `-test.skip` 名单经 `go test -list` 对编译二进制防呆（匹配 0 枚即拒跑）**。**这种自报错的诚实要记。**
+- **★它的 `FAIL=1`／rc=139 我核过不是真红**：`=== RUN=412 PASS=323 FAIL=1 SKIP=0` 里 **rc=139 是测试二进制在 331s 处段错误**（真窗族机器耦合偶发）；**同树 r1 跑完 796 枚互证非本腿改动面**；且 **41 枚夹具用例 0 执行**（具名跳过确实生效）。**权威读数＝r3 的 skip 有效性 ＋ r1 的全包可跑性，两半合起来才算数**——它这么写是对的。
+- **★★我拍的技术裁定（铁律⓪⓪⓪）：`test-windows` job 级 `timeout-minutes` 30 → 60。**
+  - **理由（是硬事实不是偏好）**：腿只加了**步级** 60，但 **job 级 30 是更紧的界 ⇒ 步级 60 形同虚设，job 到 30 分钟就杀**。而 CLI 步现在**先冷下载夹具（约 25 分）＋再跑 voice 族（CI 自己历次读数 328.9s~392.9s≈6.5 分）≈ 31 分 > 30** ⇒ **恰好会掐死这次 fetch 想让它跑起来的那一发**。
+  - **`:904` 原注释自己就写着「A ceiling that kills a genuinely slow run would be a new red, which is the opposite of what this line is for」——30 正是那个会掐死真慢 run 的界。** 抬到 60 与步级一致，**仍是 hang 界（不是排程）**，性质未变。
+  - **已落 `ci.yml` 并写了注释点名本账**。
+- **待办（腿点名、我认领）**：`portable-tests.sh` 的 **cli 档 GUARD B 正解（speech 形臂）** 归 GUARD 维护腿，已具名进票面——**这是下一票的事，不在 111 内偷做**。
