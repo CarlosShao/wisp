@@ -36760,3 +36760,19 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - **C SA1019 `runtime.GOROOT()`＝保留＋ignore，我认。** 该分支只在 `LookPath("go")` **已失败后**才走到 ⇒ 换 `go env GOROOT` 是**循环依赖**（正是它要兜的场景）。腿还做了探针验证两实现等价（PATH 移除后 `go env GOROOT` 仍返同根）但兜底职责与 `runtime.GOROOT()` 匹配。**代码零改动，只补说理＋ignore。**
 - **门禁（腿报，我核了最关键的第三把尺）**：`go build ./cmd/wisp/` rc0；`go vet` 两包 rc0；staticcheck **24→0**；`gofumpt -l` 0 行；`d22scan` clean rc0（480 产码文件在册）；**`go test ./cmd/wisp/` 全量如实报「未跑」**（票 98 豁免）→ 走 carrier 定向跑 **32 枚顶层用例全 PASS exit 0**；`aecspike` **SKIP 如实报**。**没有把「未跑」写成绿，这是对的。**
 - **旧名归零**：`git grep -w` 16 个旧名在 `cmd/`＋`internal/` **归 0**；名册面（`portable-tests` GUARD／票 171／`tokens_table_test`）零引用。
+
+## A1850 — 票 111 首上 CI：**设计成功（GUARD B 一次没触发）**，但 fetch 步红得**完全正确**——★上游 release 资产被换过，换掉的是**模型权重本身**
+
+- **`run 43413718734` / `test-windows` 逐字读数**：
+  - **`NAMED FALLBACK - fixtures absent, so 41 fixture-dependent cases ... skipped BY NAME`** —— 回退机制**真生效**。
+  - **`=== RUN=743 --- PASS=566 --- FAIL=2 --- SKIP=8`** ＋ **`strict runner exited 1`** ＋ **`GUARD B` 字样一次没出现**，`four numbers` 行存在 ⇒ **包不再「消失」，GUARD B 没被冤枉咬**。**票 111 的核心目标达成：它现在为真原因红，不再为「包没结果行」红。**
+  - 另：`Windows ACL sealing gate` `RUN=129 PASS=78 FAIL=0 SKIP=0`、`Portable windows tests` `RUN=1274 PASS=832 FAIL=0 SKIP=0` 均绿。
+- **★fetch 步红的真因（我三组实验坐实）**：`FATAL: tts-matcha-zh-baker: archive bytes do not match the manifest pin`。其它四个目标（vad／asr 三件／vocos／punc／kws）**全部 sha256 verified 通过**。
+  - **实验一**：我本地直接下那个 GitHub release 资产 ⇒ **实际 75455267 B／SHA `ae70096b19…`**，manifest 说 `75463442 B／20de2ec034…`（**差 8175 字节**）。
+  - **实验二**：我解包后逐成员比对 ⇒ **14/15 与 pin 一致，唯一不符的是 `model-steps-3.onnx`**（实际 `47e82b11…` vs pin `ef7ebdf5…`）；**归档内实际 18 个文件，pin 只列 15 个**。
+  - **实验三**：本机存量那份 `model-steps-3.onnx` 的 SHA **正好等于 pin 的旧值**。
+  - **⇒ 结论：这不是脚本缺陷，是上游把那个 release 资产换掉了，而且换的是模型权重本体，不是重新打包。CI 无法从当前 URL 复现本机夹具——真的可复现性断裂。** fetch 步报警是对的，⛔ 不许为了让 CI 绿而放宽它。
+- **另两个 FAIL 也已定位（都不是 fetch 引起）**：
+  1. **`Test41a2r1WakeEndToEndArmedToListening`** ＝ `cannot find third_party\spike-models\matcha-icefall-zh-baker` ⇒ **回退名册有漏**：它**直接按路径摸夹具**（`resident_voice_41a2r1_windows_test.go:225`），不是经 helper 函数，而名册是按 **helper 函数名 grep** 建的 ⇒ 漏。**腿自己在证据件里点过这个风险（「under-skipping turns the fallback into a red」），现在真发生了。**
+  2. **`TestTicket223PermissionDeniedSitsInItsOwnSentence`** ＝ `icacls denied nothing, so this case cannot show the permission sentence` ⇒ CI runner 是管理员，**造不出「拒绝访问」前提**。环境依赖，须改成**具名跳过并记账**，⛔ 不许当绿。
+- **已起实验四（后台）**：试 HF 同仓 `csukuangfj/matcha-icefall-zh-baker` 是否还供旧字节（HF 可按 revision 钉死，比 mutable release 资产稳）。**若命中 ⇒ 加一条 URL、所有 pin 一字节不动，是最优修法。**
