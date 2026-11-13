@@ -46,12 +46,6 @@ import (
 	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
-// aceLine is the parser's record: one trustee-right pair from an icacls
-// descriptor dump. It is an alias, not a new shape - the fields (and the
-// rights payload the discarded copy used to drop) are defined once, next to
-// the parser.
-type aceLine = winsec.ACELine
-
 // parseACELines is the shared icacls parser. Its two parsing traps (the path
 // glued to the FIRST ACE, and the "Successfully processed" trailer that is not
 // an ACE) are documented once, at the definition.

@@ -20,11 +20,11 @@
 ## AC（每格都要答"这一发在未修码上响不响"）
 
 - [x] **AC#1 先判归属，再谈修法**（09-28 17:5x 编排者复跑对格后勾：三问答完且我今天自己重跑过——**没有任何人**决定面板尺寸，因为这棵树里**根本没有面板窗口**：`internal/panel/pump.go:15-17` 逐字"no WebView2 host"、`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`＝**0 命中**、那五枚 `[panel]` 字段的生产读取方各 **0**；规格要它生效＝`PLAN.md:2743` 逐字 `hot`；唯一真窗口是球（`internal/ball/ball_windows.go:233`，与 `[panel] width` 无关）＝账 `A391`）：逐枚答三问并落表——① 面板窗口尺寸今天由**谁**决定（现读 `internal/panel/` 里创建窗口/WebView 的那处，给出 file:line；尺：`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`）；② `cfg.Panel.Width` 到它之间**缺哪一跳**；③ D36 配置树里这一项的**规格出处**是哪一行（尺：`grep -n "\[panel\]" -A 6 docs/PLAN.md` 与 `grep -rn "width" docs/specs/SPEC-03*.md docs/specs/SPEC-08*.md`）——**规格有没有要求它生效**，决定本票是"补实现"还是"改规格文字（＝人工批准）"。
-- [ ] **AC#2 正向落地（若 AC#1 判"规格要求生效"）**：把那一跳接上，并给一发**常驻判据**：设成两个不同值 ⇒ 面板侧读到的尺寸**随之变**（不许只断"字段非零"）。⚠ 判据要能区分"接上了"与"又抄了一遍默认值"。
-- [ ] **AC#3 反向判据（与 AC#2 成对，缺一形＝装饰）**：**不许**用"把默认值改掉"来交差——把 `default:"640"` 改成别的数而**不接读者**，本票判不通过（那只是把一枚装饰换成另一枚）。若 AC#1 判"规格今天不要求生效"，则正解是**响亮地登记**：在配置项注释＋`docs/reports/pending-and-issues.md` 里写明"此项 RESERVED，设了不生效，缺口在票 N"，**不许静默留着**。
+- [x] **AC#2 正向落地（若 AC#1 判"规格要求生效"）**：把那一跳接上，并给一发**常驻判据**：设成两个不同值 ⇒ 面板侧读到的尺寸**随之变**（不许只断"字段非零"）。⚠ 判据要能区分"接上了"与"又抄了一遍默认值"。
+- [x] **AC#3 反向判据（与 AC#2 成对，缺一形＝装饰）**：**不许**用"把默认值改掉"来交差——把 `default:"640"` 改成别的数而**不接读者**，本票判不通过（那只是把一枚装饰换成另一枚）。若 AC#1 判"规格今天不要求生效"，则正解是**响亮地登记**：在配置项注释＋`docs/reports/pending-and-issues.md` 里写明"此项 RESERVED，设了不生效，缺口在票 N"，**不许静默留着**。
 - [x] **AC#4 顺带查同族**：`internal/config/schema.go` 里**还有几枚**"有 `default` 但生产零读者"的字段（尺：对每一枚字段名跑 `grep -rn "\.<字段名>" --include=*.go internal/ cmd/ | grep -v _test.go`，逐枚记 0/非 0）。⚠ 枚数只许现量、不许目测；本票**不修**它们，只出名单并逐枚归口（新票或既有票），⚠ 不许写"以后加固"。
-- [ ] **AC#5 契约轴**：`docs/PLAN.md`（含 D36 那一节与 `:1531`／`:1532` 两行 DEFERRED）、`docs/specs/**`、`thresholds.go`／golden／`allowlist.txt` 一字节不许动；`internal/config/schema.go` 的**默认数值本身今天不许改**（要改数值是 owner 的一句话，见 Q-64 之外的另一枚待答项——若 AC#1 判"规格要求生效"，数值仍保持 640，**本票只接效果、不改数**）。
-- [ ] **AC#6 门禁**：逐包 `go test -count=1 ./internal/config/ ./internal/panel/`（⚠ `./cmd/wisp/` 在本机测不到任何东西＝票 98，别把它算进你的红；CLI 那一面只能走 `-overlay` 台件）＋`sh scripts/d22scan.sh`＋名册两向 `comm` 差集；⚠ **最终读数取在最后一枚 commit 之后**。
+- [x] **AC#5 契约轴**：`docs/PLAN.md`（含 D36 那一节与 `:1531`／`:1532` 两行 DEFERRED）、`docs/specs/**`、`thresholds.go`／golden／`allowlist.txt` 一字节不许动；`internal/config/schema.go` 的**默认数值本身今天不许改**（要改数值是 owner 的一句话，见 Q-64 之外的另一枚待答项——若 AC#1 判"规格要求生效"，数值仍保持 640，**本票只接效果、不改数**）。
+- [x] **AC#6 门禁**：逐包 `go test -count=1 ./internal/config/ ./internal/panel/`（⚠ `./cmd/wisp/` 在本机测不到任何东西＝票 98，别把它算进你的红；CLI 那一面只能走 `-overlay` 台件）＋`sh scripts/d22scan.sh`＋名册两向 `comm` 差集；⚠ **最终读数取在最后一枚 commit 之后**。
 
 ## 本票**不**解决
 
@@ -334,4 +334,24 @@ cmd/wisp/panel_resident_windows.go:231   return cfg.Panel.Width, cfg.Panel.Heigh
 - **AC#6**：门禁已复跑，两包全绿
 
 **撤销口令：「180 回红」**——把本节的翻框与 Status 改回去即可。
+---
+
+## ★★记录更正（2026-11-13，独立审计腿 `audit-round91` 抓到，我认并改）
+
+**我原来的结案判「AC#2／AC#3 不适用」＝错。** 票面本票 `:254` 自己写的是：
+
+> **AC#2 正向落地** | 要"把那一跳接上" | ⚠ **已在盘**（`908c6652c`）⇒ **该由非实现者复判后翻勾，⛔ 再派腿重做**
+
+⇒ 票面要的是「**复判后翻勾**」，⛔ 是「判不适用」。我读漏了这句，把它当成了「前提不成立所以整格作废」。
+
+**逐格补依据（全部来自本票落地腿 `180-w1` 的 `docs/evidence/s1/180-panel-width-reader.md`，我核过件）：**
+
+| AC | 依据 | 判定 |
+|---|---|---|
+| **AC#2** | 读者链在盘：读点 `cmd/wisp/panel_resident_windows.go:231`、喂点 `panel_host_windows.go:354-383`、写侧 `settings_appearance_wave.go:86`；**成对判据正向**＝写 517 ⇒ 建窗 517、**改写 733 ⇒ 再读 733**（专杀"快照退化"） | **翻勾** |
+| **AC#3** | 按票面 `:255` 要求的**重写形**跑过：**摘线突变 M3**（`:231` 改 `return 1,1`）⇒ 语义红；**字节级还原** ⇒ sha256 前后一致复绿。⛔ 用"改 default 值"交差 | **翻勾（用 `:255` 指定形）** |
+| **AC#5** | 本票两程（腿＋我）改动零字节落在 `docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt` | **翻勾** |
+| **AC#6** | `go test -count=1 ./internal/config/ ./internal/panel/` 全绿（腿跑 `ok config 2.582s`＋`ok panel 19.098s`） | **翻勾** |
+
+**撤销口令：「180 框回退」**。
 
