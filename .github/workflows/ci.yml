@@ -514,6 +514,7 @@ jobs:
           pkgs_linux=0
           findings_linux=0
           crashes_linux=0
+          compiles_linux=0
           pkgs_windows=0
           findings_windows=0
           crashes_windows=0
@@ -523,16 +524,18 @@ jobs:
             # PASS 1 of 2: GOOS=linux, every check EXCEPT U1000. This pass is
             # the judge for the GOOS-independent defects (SA/ST/S/QF...): they
             # hold under both platforms, so the linux runner keeps them.
-            p1_pkgs=$(cd "$mod" && GOOS=linux CGO_ENABLED=0 go list ./... 2>/dev/null | wc -l)
+            p1_pkgs=$(cd "$mod" && GOOS=linux go list ./... 2>/dev/null | wc -l)
             p1_rc=0
-            p1_out=$(cd "${mod}" && GOOS=linux CGO_ENABLED=0 staticcheck -checks=all,-U1000,-SA9009 ./... 2>&1) || p1_rc=$?
+            p1_out=$(cd "${mod}" && GOOS=linux staticcheck -checks=all,-U1000,-SA9009 ./... 2>&1) || p1_rc=$?
             p1_find=$(printf '%s\n' "$p1_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
             p1_crash=$(printf '%s\n' "$p1_out" | grep -c 'export data version') || true
+            p1_compile=$(printf '%s\n' "$p1_out" | grep -cE '\((compile)\)$') || true
             printf '%s\n' "$p1_out"
-            echo "--- module $mod [pass 1 GOOS=linux checks=all,-U1000,-SA9009]: exit=$p1_rc packages=$p1_pkgs findings=$p1_find toolchain-crash-lines=$p1_crash"
+            echo "--- module $mod [pass 1 GOOS=linux checks=all,-U1000,-SA9009]: exit=$p1_rc packages=$p1_pkgs findings=$p1_find toolchain-crash-lines=$p1_crash compile-lines=$p1_compile"
             pkgs_linux=$((pkgs_linux+p1_pkgs))
             findings_linux=$((findings_linux+p1_find))
             crashes_linux=$((crashes_linux+p1_crash))
+            compiles_linux=$((compiles_linux+p1_compile))
             if [ "$p1_rc" -ne 0 ]; then rc=1; fi
             # PASS 2 of 2: GOOS=windows, the FULL check set INCLUDING U1000.
             # "Unused" is a GOOS-relative verdict - it depends on which GOOS
@@ -553,7 +556,7 @@ jobs:
             crashes_windows=$((crashes_windows+p2_crash))
             if [ "$p2_rc" -ne 0 ]; then rc=1; fi
           done
-          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000,-SA9009] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux [pass2 GOOS=windows checks=all,-SA9009] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows (step exit is $rc; both passes must exit 0)"
+          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000,-SA9009] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux compile-lines=$compiles_linux [pass2 GOOS=windows checks=all,-SA9009] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows (step exit is $rc; both passes must exit 0)"
           exit $rc
 
       - name: mockllm module vet

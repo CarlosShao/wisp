@@ -36535,3 +36535,28 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   | `test-windows` | 7 `cmd/wisp CLI tests` | 票 111 AC#4 的 sherpa DLL staging |
   | `test-windows` | 8 `winlive compile gate (go vet -tags winlive, ticket 111 AC#11)` | **正好是 `A1835` 那条标签陷阱的实体** |
 - **★口径纠正（第二处，我认）**：我一直说"CI 红"，但**从没区分 job**。真相是**三个 job 红、三个 job 绿**，且每个红的原因各不相同、各有主人。**"CI 红"这个说法本身太粗，等于没量。**
+
+## A1837 — ★★`pass1` 的 finding 已 **0 条**，但这一步**永远退 1**：一条 `compile` 类诊断把退出码钉死。我修了它，并补上自报里被漏掉的第三类计数
+
+- **三把尺（我现跑）**：提交 `5bcdb7d2d`（4 件, +158/−2）／件 `docs/evidence/s1/122-wave3-plugin-pass1.md` **9409B**／**我自己复跑 pass1 ＝ `finding 行 = 0`**。
+- **★腿推翻了我派单里的一处落法，而且给了机制证据（我认）**：我派单说 `//lint:ignore SA5000` 放 `:61`（`var m` 声明行上）。**它照落两发，两发都报 `this linter directive didn't match anything` ＋ SA5000 照报。** 它读 staticcheck 0.8.2 源码得出机制：`lineIgnore.match` 要求**诊断报告行 == 指令关联节点行**，而 `ast.NewCommentMap` 把 `:61` 的指令关联到 `var m` 声明、诊断报在 `:62` 的赋值语句 ⇒ **差一行，永不生效，机制性的**。正确形状＝**独立行贴在被报赋值语句正上方**（它引 staticcheck 自家 `cache.go:202` 同形），第三发实测生效。**我现读盘确认指令在 `:67`、`var m` 在 `:66`，即紧贴赋值行。**
+- **★它还纠了我一处台账引错**：我派单骨架写 "See A1834"，**SA5000 的原始登记是 `A1773`**，它按真号写。
+- **★★但它同时报了一件更要紧的事（我复跑证实，且这是本轮最关键的发现）**：
+  ```
+  finding 行 = 0
+  exit code  = 1
+  ```
+  唯一非空输出行：
+  ```
+  -: build constraints exclude all Go files in ...\k2-fsa\sherpa-onnx-go-linux@v1.13.8 (compile)
+  ```
+  **⇒ 原因**：`CGO_ENABLED=0` 让 sherpa 的 **linux 变体全部被 build constraints 排除**，staticcheck 对那个依赖包报 **`compile` 类**诊断，**`compile` 类无条件计入退出码** ⇒ **这一步即使 0 条 finding 也永远退 1。**
+  - **★我试过 `CGO_ENABLED` 用默认值——本机仍退 1**：因为**在 Windows 上 `GOOS=linux` 无法启用 cgo 交叉编译**，本机这条路测不出来。
+  - **★但在 CI 的 ubuntu runner 上这条路成立**：`test-core` 里 `internal/audio/aecspike` 本机跑出 `ok`（`A1836` 的 job log 逐字有），**说明测试步骤用的是 cgo（默认 1）——是我们的 staticcheck 步骤强行设了 `CGO_ENABLED=0`**，与测试环境的假设不一致。
+- **⇒ 我改了两处（`ci.yml`，技术选型我拍）**：
+  1. **linux pass 去掉 `CGO_ENABLED=0`**（`p1_out` 与 `p1_pkgs` 两行）⇒ 让 runner 用**原生 cgo** 解析 sherpa 的 linux 变体。**⛔ 不是放宽 check**——check 集合一字未动，改的是"用什么环境去判"。
+  2. **★自报行补第三类计数 `compile-lines`**：`p1_compile=$(... grep -cE '\((compile)\)$')`，累加进 `compiles_linux`，打进自报与分模块行。
+     **为什么必须补——这是我自己的仪器的洞**：自报原来只数 `findings` 和 `toolchain-crash-lines`，**`compile` 类两样都不算**。**所以"0 条 finding 但永久红"在自报里完全看不见**——我上一轮读 `findings=3 / crash=0` 时会以为"差的只是 3 条"。
+     ⇒ **一条门禁的仪器必须能报出"我为什么红"，否则它只是红。**
+- **★诚实交代**：**这一改我本机验不了**（Windows 上 `GOOS=linux` 无 cgo 交叉编译器）。我只能验到 ①`bash -n` 语法 rc=0 ②改的两行文本正确。**真读数必须等 CI 下一次跑**——若 linux pass 仍报 compile 行，`compile-lines` 会在自报里**明明白白写出来**，不会再隐形。
+- **票 122 现状**：**pass1 findings=0（真）**，但"这一步绿"要等 CI 证实；**pass2 仍 95 条**（U1000 清账中＋windows-only 14 条）；AC#6 未勾。
