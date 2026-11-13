@@ -287,10 +287,11 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   did=**pass2 清账波 6 落地：tools 之外 9 包 24 → 0**（起手复跑 23 条与派单清单逐条一致，0 新增；
   派单列 24 条，`aecspike/rig_windows.go:49 iidIUnknown` 不在 `./internal/audio/` 目录口径射程内——
   目录模式不递归子包，以显式子包口径单列处置，见证据件 §4）。
-  四档落点＝**③删 7（winsec 3＋audio aecspike 1＋memory/observe/agent 3 中的真死 helper＋secret SA4010 debris）
-  ＋真改 10（ST1003×6 全部声明+引用点齐改、grep 旧名归 0；ST1012×2 含 errors.Is 引用点齐改；ST1021/ST1000 注释头各 1）
+  四档落点＝**③删 10（winsec 5：wellKnown/leftStandingInjected354r1/narrowOnlyResolver 族×3；
+  aecspike iidIUnknown 1；memory l1WaitFor、observe dirIsSealed132、agent releasedCount 各 1；secret SA4010 debris 1）
+  ＋真改 11（ST1003×7 全部声明+引用点齐改、grep 旧名归 0；ST1012×2 含 errors.Is 引用点齐改；ST1021/ST1000 注释头各 1）
   ＋①钉 1（winsec countingResolver.installs——身份见证字段，注释点名"指针同一从不读值"）
-  ＋④钉 1（risk anchor_world_334_test 两枚 POSIX 常量——按同文件 hostile334 既有型制 var _ 钉＋扩注；
+  ＋④钉 2（risk anchor_world_334_test 两枚 POSIX 常量——按同文件 hostile334 既有型制 var _ 钉＋扩注；
   linux 口径佐证 EXIT=0，钉法双向成立）**，零 prod 码 lint:ignore。
   ★两专项（派单提醒 #2/#1）：secret/delete_test.go:131 SA4010 读码判**夹具疏忽非真 bug**（意图断言全部
   逐元素落在 blobs 本体，got 收集后从未被读），删 debris 不补建；aecspike iidIUnknown 判③删——

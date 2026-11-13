@@ -84,15 +84,17 @@ for i, b := range blobs {
 - 零 `lint:ignore` 新增于 prod 码（仅 winsec 测试夹具 1 处①钉，含点名注释）；
 - 临时件落 `D:\tmp\wisp\20261113\122-wave6\`（run-sc.ps1/run-gates.ps1/run-corroborate.ps1＋regression 脚本 `D:\tmp\winreg.ps1`），只建不删。
 
-## 6. 波 6 四档统计
+## 6. 波 6 四档统计（按 finding 粒度，合计必须＝24）
 
-| 档 | 数 |
-|----|----|
-| ① ABI/身份见证 → lint:ignore 钉 | 1（winsec countingResolver.installs） |
-| ④ tag 恒死 → var _ 钉（照同文件既有型制） | 1 条 finding（risk 2 枚常量） |
-| ③ 真死 → 删 | 6 条 finding（winsec 3 + audio 1 + memory 1 + observe 1 + agent 1 + secret SA4010 debris 1） |
-| 真改（ST1003×6 / ST1012×2 / ST1021×1 / ST1000×1） | 10 条 finding |
-| 合计 | 23 条（= 派单口径全部）＋ aecspike 1 条（§4，双口径恒死③删）＝**24 条全清** |
+| 档 | 条数 | 明细 |
+|----|------|------|
+| 真改 | 11 | ST1003×7（deviceId×4、pGetCurrentThreadID、jobObjectBasicProcessIDList、procGetExtendedTCPTable）＋ ST1012×2 ＋ ST1021×1 ＋ ST1000×1 |
+| ③删 | 10 | winsec 5（wellKnown、leftStandingInjected354r1、narrowOnlyResolver type+两法×3）＋ audio aecspike 1（iidIUnknown）＋ memory 1 ＋ observe 1 ＋ agent 1 ＋ secret SA4010 debris 1 |
+| ①钉 | 1 | winsec countingResolver.installs（lint:ignore＋点名） |
+| ④钉 | 2 | risk 两枚常量（一处 var _ 块＋扩注；linux 口径佐证 EXIT=0） |
+| 合计 | **24** | = 派单口径 23 ＋ aecspike 1（§4） |
+
+（更正记录：本表初稿按"处置动作"粒度误记 ③6/真改10，commit `45c3b6511` 后自检按 finding 粒度改正；§1 表的 14/14b、16/16b 合并行系记账拆行，此处已拆回。）
 
 ## 7. Commit
 
