@@ -124,3 +124,21 @@ voice_realtime_model voice_realtime_provider
 ## Progress log（append-only，newest last）
 
 - [2026-11-13T01:35Z] agent=437-313 read-only-first leg did=AC#0 只读取证完成，**判定为「断言侧陈旧」，零产品改动**。① 复现（carrier，`D:\work\soft\Git\bin\bash.exe`）逐字红句已存；② **自己重数：门报 27、两表 20、差 7**（票面写的 26／6 有误，逐名清单本身是对的；门列表无重名，roster-only=0）；③ 差集七名逐一查分发器：`ball_click_through`(panel_config_store.go:354)／`ball_opacity_idle`(:340)／`ball_size`(:326)／`ball_style`(:321)／`panel_font_size`(:377)／`panel_width`(:365)／`role_chat_thinking`(:262)——**七枚全有真实 case 且各调真 setter**，无一枚落 default 拒支；全量核对 27 报名 ↔ 27 个 `case panel.Field…` ↔ 0 缺支；④ 机制：门报的是**五册并集** `acceptedWritableFields`（config_write_313.go:176-183），断言只读前两册（7+13=20 vs 7+13+1+2+4=27），差集恰＝313 之后落地的三册（187=1＋65=2＋wave=4）；⑤ `role_chat_thinking` 单独查：生于 `007de34f0`(2026-11-07，票187)，写腿支在 `7817ad09a`(同日至次)，**比 ball/panel 六枚早三天、另一票带入**，非游离件（有 fieldTier187 与三枚钉）；⑥ 判：**七枚逐枚皆「断言陈旧」，无一是乙（门撒谎）**，甲也不是——补表会重名。AC#1 结论＝**本波写面内无正确改法**：M2（票面诱惑的甲：七名塞 fields313）⇒ 门报涨到 34 且七名**各重名两次**、红；M6（把三册并进 AdditionalWritableFields）⇒ 同样重名、红；M3（把报告缩回两册）⇒ 断言绿但 internal/panel 四枚钉红（appearance_wave_test.go:67／ball_size_422_test.go:54／ball_style_65_test.go:55／config_write_187_test.go:134）⇒ 正是票面禁止的"报告撒谎"。**正确修法在断言侧**（`cmd/wisp/panel_config_313_test.go:249` 三行并上 187/65/wave），实测 M1/M4 绿、M5 仍有牙（截一册即红并逐名点名），**但该包本波另一腿独占 ⇒ 按派单停下报告，未改**。门禁四读数：build rc0／vet rc0／gofumpt 空（⚠ 本机 gofumpt 不在 PATH，真身 D:\work\base\gopath\bin\gofumpt.exe）／d22scan clean（480 件，PASS=45 FAIL=0 SKIP=0）。证据件 `docs/evidence/s1/437-313-door-union.md`。`git diff --name-only` 无任何产品文件。⛔ 未 push／未翻 AC 框／未删 build/mut_rvw.go。next=断言侧三行修复请编排者另派一波（该包写面互斥）；本腿无残留待办。
+---
+
+## ★取证腿结论（2026-11-13 09:3x，腿 `ticket-437-313-door-union`，commit `018b3112d`）
+
+**判定：门是对的，过时的是断言侧。** 那 7 个名字**全部有真实写分支**，一个都不是"门在撒谎"。
+
+- **★我票面的数错了**：实际 **门 27 / 两册 20 / 差 7**（我写 26／6）。腿**机械解析红句**得出、非目测；并核对门列表无重复。**我的名字清单是对的，数错了。**（第 10 次同根错）
+- **★差异的来源（算术闭合）**：门的报告**⛔ 两册并集，是五个名册的并集**（`acceptedWritableFields`，`internal/panel/config_write_313.go:176-183`），而断言的 `want` 只拼了**两个**。`7 + 13 = 20` vs `7 + 13 + 1 + 2 + 4 = 27` ⇒ 那 7 个正是**票 313 之后落地**的名册：票 187（1 个）＋票 65（2 个）＋某波（4 个）。
+- **★逐字段真实分支（全有，`panel_config_store.go`）**：`ball_click_through` `:354`→`SetBallClickThrough:364`／`ball_opacity_idle` `:340`→`:353`／`ball_size` `:326`→`:339`／`ball_style` `:321`→`:325`／`panel_font_size` `:377`→`:386`／`panel_width` `:365`→`:376`／`role_chat_thinking` `:262`→`:267`。**全扫：27 个报告名 ↔ 27 个 case ↔ 0 个无分支。**
+- **★不止"列出来"，是真的能写进去**：把测试自己 half-2 的验收循环扩到全部 27 个 ⇒ **PASS**（27 个都被接受且各自到达腿一次）。
+- **★`role_chat_thinking` 单独查清了**：**不同族、不同票、早三天**。生于 `007de34f0`（2026-11-07，票 187），其腿分支在 `7817ad09a` 加——**那笔提交记录该字段此前是 fail-closed**。ball/panel 那 6 个是 2026-11-10/11 来的。**⛔ 野的**：自己的名册、自己的实测档（`fieldTier187`→`EffectiveNextTask`）、三个钉子。
+- **★为什么 `internal/panel` 侧无正确修法（三条实测）**：**M2**（我票面诱人的甲：把 7 个加进 `fields313`）⇒ 门报 **34 且 7 个重复**，**红掉三个不相交钉子**；**M6**（把后落名册并进 `AdditionalWritableFields`）⇒ 同样重复、同样三钉红；**M3**（把报告缩到两册）⇒ **断言绿了，但四个 `internal/panel` 钉子红**，每个都在说**拒绝文案现在漏掉了一个已接受的名字**——**那正是我票面禁止的"报告撒谎"**。
+- **⇒ 修法必须在断言侧：`cmd/wisp/panel_config_313_test.go`**。本波写面不含它 ⇒ **腿零改动、只交证据件，测试仍红**（我亲跑复核：`FAIL 0.00s`）。**这是诚实交付。**
+
+## 下一步（编排者已派）
+
+断言侧单独立票并独占 `cmd/wisp/**` 一波。
+
