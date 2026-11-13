@@ -119,3 +119,21 @@ waveOutSpeaker.unprepareLocked in voice_out_windows.go line 376: 0 lock operatio
 
 ⇒ **本票的范围缩为一枚：`panelHolder.stampPublishLocked`。** 判定逻辑不变（该登记还是该改名）。
 
+
+---
+
+## Progress log（只追加，⛔ 翻 AC 框）
+
+- **2026-11-13 09:2x 写腿 `435-33r11`：判甲，名册加一枚（AC 框一枚未翻、未 push）**
+  - **AC#0 只读**：carrier（`D:\work\soft\Git\bin\bash.exe`）复现，`--- FAIL … (0.07s)`、`rc=1`、端到端 11.29s。**红句只有 1 条**（`:254`）：`panelHolder.stampPublishLocked (resident_windows.go line 1008) carries the "Locked" suffix but no roster entry`；`:245` 那 4 行确认为 `t.Logf` 普查日志。**票面末尾"更正记录"复核成立**。
+  - **名册修前 3 条**，格式＝`"<类型>.<方法名>": "requires the caller to hold <锁>; body takes no lock"`（`PanelManager.setPriorFocusLocked`／`waveOutSpeaker.releaseLocked`／`waveOutSpeaker.unprepareLocked`）。
+  - **调用点逐个读前后 10 行（3 处产码调用，全部持锁）**：`resident_windows.go:985`（`start`，锁在 `:979-980`）、`:1044`（`toggle`，锁在 `:1033-1034`）、`:1104`（`show`，锁在 `:1093-1094`）——三个调用点都在 `h.mu.Lock()` / `defer h.mu.Unlock()` 临界区内，且都紧跟 `h.rp = h.spawn(...)`。函数 doc `:1005-1007` 逐字：`Called with h.mu held (every spawn site holds it)`。函数体 0 次加锁；它唯一碰的 `rp.mu`（`panel_resident_windows.go:555-557`）是**面板线程自己的另一把锁**，非 `h.mu`。另 1 处命中 `panel_resident_pump_windows_test.go:240` 是票 65 的源钉，⛔ 调用点。
+  - **判甲（该登记）**：三个调用点全持 `h.mu`、函数体不碰 `h.mu` ⇒ `Locked` 后缀说的是真话，名册漏登，⛔ 名字骗人。判乙会把这个"spawn 窗口必须持锁"的语义从名字上抹掉。
+  - **修法（只修一处）**：`cmd/wisp/panel_locked_naming_33r11_windows_test.go` 名册加 1 行（`:101`）＋ 文档块加 1 段（`:83-93`）写明"为什么它自己不持锁"。**产码零改动**（`resident_windows.go` 一字节未动）⇒ 影响面 0 个调用点。
+  - **修后复跑**：`--- PASS … (0.04s)`、`rc=0`、端到端 18.49s；普查仍 `4 Locked-suffixed func(s) across 72 production source file(s)`。
+  - **突变控制（★仓外磁盘改写，⛔ overlay）**：仓外模块树 `D:\tmp\wisp\20261113\435-33r11\module-tree\`（24.8 MB／1484 文件，`go test -c ./cmd/wisp/` rc=0，cwd＝`module-tree\cmd\wisp`）。**M0** 基线 PASS／4 命中 72 文件。**M1**（不重编译，二进制 sha256 前后同为 `4B594E99…A349E`）仓外 `cmd/wisp/` 新增一个 `mut435ProbeLocked` ⇒ **FAIL**，普查 `5 Locked-suffixed func(s) across 73 production source file(s)` 并点名 `zz_mut435_probe_windows.go line 7`；删掉该文件同一二进制回 **PASS**。**M2**（不重编译）给 `stampPublishLocked` 体首插 `h.mu.Lock()/defer Unlock` ⇒ **FAIL**，普查该行变 `2 lock operation(s) [h.mu.Lock h.mu.Unlock]`，红句 `:270 …is named as if the caller holds the lock while its own body takes it…`；还原回 PASS。**M3**（名册编译进二进制，故须重编译）仓外删掉本票新增那行 ⇒ **FAIL**，红句回到 `:265 … carries the "Locked" suffix but no roster entry`；还原重编译回 PASS。
+  - **仪器有效性怎么确认（三问）**：①**同一二进制两种判定**（M1／M2 二进制 sha256 未变，唯一变量是盘上源码；若读烘焙快照则数字不可能跟着磁盘走）；②**`-overlay` 真的无效**——对照 A 故意写成不可解析的 overlay 源 ⇒ 编译**失败** `syntax error: unexpected {, expected )`（证明 overlay 通路是通的）；对照 B 换成合法 overlay 源 ⇒ 编译**成功**，但同一二进制跑出来普查仍 `4 … across 72` 且 **PASS**（编译器看见第 5 个函数、普查看不见）⇒ 台账 `A1804` 复核成立；③**名册⛔免死金牌**——M2 证明已登记的条目体内一加锁照样红。
+  - **越界**：本腿写面＝`cmd/wisp/panel_locked_naming_33r11_windows_test.go` 一枚（＋本票 log ＋证据件）。`internal/panel/**` **零触碰**（437 腿地界）。禁止面（`PLAN.md`／`specs`／`thresholds.go`／golden／`allowlist.txt`／`frontend`／`design`）零命中。`git diff --name-only` 全量输出里另 13 枚是起手即脏的**别人在飞腿**改动（票 426–436 票面、291 探针、346 派单件、前端 fixture），本腿未碰、commit 用显式 pathspec 只提三枚。
+  - **门禁四读数**：`go build ./cmd/wisp/` `rc=0`／`go vet ./cmd/wisp/` `rc=0`／`gofumpt -l` **零输出**／`scripts/d22scan.sh` **clean**（`examined 480 production Go files`，正控 `PASS=45 FAIL=0 SKIP=0`，`ok … 53.608s`）。`build/mut_rvw.go` 未删未碰；门禁用 `go build ./cmd/wisp/`，⛔ `go build ./...`。
+  - **AC#4 关系**：只处理这一枚名字，**⛔ 不翻**票 33／11 任何框，**⛔ 宣称** `…Locked` 全族已审。
+  - **证据件**：`docs/evidence/s1/435-33r11-roster-stamppublish.md`。**撤销口令：「435 回乙」**（把名册那 1 行与文档那段删掉即复原，产码从未改动）。

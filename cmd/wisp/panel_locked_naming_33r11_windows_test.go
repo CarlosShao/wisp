@@ -80,6 +80,17 @@ const lockedSuffix33r11 = "Locked"
 //	waveOutSpeaker.unprepareLocked: the tail releaseLocked and the natural end
 //	share; its only caller runs with s.mu held, and its body takes no lock.
 //
+//	panelHolder.stampPublishLocked: ticket 435's census found this name rostered
+//	nowhere. All three call sites (start, toggle and show) sit inside that same
+//	holder's h.mu.Lock() / defer h.mu.Unlock() section - each one immediately
+//	after h.rp is replaced by h.spawn, which is exactly the window the stamp
+//	must cover. Its body takes no lock: the one lock it reaches is the panel
+//	thread's OWN rp.mu, taken inside residentPanel.setSnapshotPublish
+//	(panel_resident_windows.go), which is a different mutex from h.mu and is
+//	what serialises the field write against publishOnShow's read. So the suffix
+//	is honest: the caller holds h.mu, and the method's own contract is "do not
+//	lock h.mu again here".
+//
 // The two methods this leg renamed are deliberately ABSENT: they take m.mu inside
 // their own bodies, so they must not carry the Locked suffix and no roster entry
 // could make that honest.
@@ -87,6 +98,7 @@ var lockedNamingRoster33r11 = map[string]string{
 	"PanelManager.setPriorFocusLocked": "requires the caller to hold m.mu; body takes no lock",
 	"waveOutSpeaker.releaseLocked":     "requires the caller to hold s.mu; body takes no lock",
 	"waveOutSpeaker.unprepareLocked":   "requires the caller to hold s.mu; body takes no lock",
+	"panelHolder.stampPublishLocked":   "requires the caller to hold h.mu; body takes no lock on h.mu (rp.setSnapshotPublish takes the panel thread's own rp.mu)",
 }
 
 // lockMethodNames33r11 are the mutex and rwmutex operations whose presence in a
