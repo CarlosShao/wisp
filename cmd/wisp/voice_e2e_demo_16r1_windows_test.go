@@ -522,6 +522,10 @@ func Test16r1PremortemModelSha256CorruptRefusesTheHandOff(t *testing.T) {
 	if err := os.WriteFile(target, blob, 0o644); err != nil {
 		t.Fatal(err)
 	}
+	// corruptAt is the instant the flip landed. The not-a-cache-hit premise
+	// below reads the tampered file's mtime against it, so the premise is
+	// measured on the file itself rather than on a clock.
+	corruptAt := time.Now()
 
 	// Half 1, DETECTION: the store's own verification on the tampered tree.
 	ms, err := openModelStore(dataDir, nil)
@@ -563,8 +567,30 @@ func Test16r1PremortemModelSha256CorruptRefusesTheHandOff(t *testing.T) {
 	if verr2 := ms2.mgr.VerifyInstalled(voiceAsrModelID); verr2 != nil {
 		t.Fatalf("after the walk the store still does not verify: %v (the user would be left with tampered bytes)", verr2)
 	}
-	if took < 5*time.Second {
-		t.Fatalf("the walk returned exit 0 in %v: a cache-hit shape would mean the tampered bytes were trusted", took.Round(time.Millisecond))
+	// NOT A CACHE HIT, MEASURED ON THE FILE, NOT ON A CLOCK. The premise this
+	// case needs is that the walk actually REWROTE the tampered file (the only
+	// healing path it has is a re-fetch + verify; a cache hit would leave the
+	// flipped byte in place and the VerifyInstalled just above would have
+	// failed). The old premise for the same doubt was `took < 5*time.Second` -
+	// a wall-clock guess about how long a re-download of ~80 MB takes. It
+	// worked on the dev box and then raced the CI network for real: the green
+	// run (43425302222 @ 285a5c310) measured took=5.01s with ticks=9847, the
+	// red run (43431925841 @ 10f98f52b) measured took=4.094s with ticks=11514
+	// - SAME code, SAME manifest pin (encoder pins 81a70226a893... on both),
+	// a 0.9s carrier-speed difference turning a true premise into a false
+	// verdict. The mtime reading below keeps every bit of the doubt and none
+	// of the race: the tampered file's own mtime must sit after the flip,
+	// because only the walk's healing write moves it - a cache hit is now red
+	// at ANY download speed, and a slow re-fetch is green at any speed.
+	st, err := os.Stat(target)
+	if err != nil {
+		t.Fatal(err)
 	}
-	t.Logf("CORRUPT healed store verifies clean (the hand-off never delivered unverified bytes)")
+	if !st.ModTime().After(corruptAt) {
+		t.Fatalf("the healed store's encoder was never rewritten (mtime %v is not after the flip %v): "+
+			"the walk left the tampered bytes in place, which the clean verify above should have refused",
+			st.ModTime().Round(time.Millisecond), corruptAt.Round(time.Millisecond))
+	}
+	t.Logf("CORRUPT healed store verifies clean; the tampered encoder was rewritten by the walk (mtime +%.0fms after the flip)",
+		float64(st.ModTime().Sub(corruptAt).Microseconds())/1000)
 }

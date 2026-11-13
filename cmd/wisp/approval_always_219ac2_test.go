@@ -181,8 +181,7 @@ func Test219AC2WidenAppliedAuditLineCarriesTheFourFields(t *testing.T) {
 	if code := w.h.run("总结一下 这份笔记"); code != 0 {
 		t.Fatalf("exit %d\nstdout:\n%s\nstderr:\n%s", code, w.h.out.String(), w.h.err.String())
 	}
-	<-w.done
-	<-w.reply
+	waitRoundTripBounded314(t, w)
 	if err := w.failure(); err != nil {
 		t.Fatal(err)
 	}
@@ -234,13 +233,13 @@ func Test219AC2RevokeRoundTripByteForByte(t *testing.T) {
 
 	rule := `[fs] allowed_dirs += "` + filepath.ToSlash(w.h.outside) + `"`
 	var stored []byte
+	w.storedBytes219 = &stored
 	go driveStoreHoldRevoke(t, w, pw, "revoke "+rule, "已撤销长期规则", "", "", "yes", &stored)
 
 	if code := w.h.run("总结一下 这份笔记"); code != 0 {
 		t.Fatalf("exit %d\nstdout:\n%s\nstderr:\n%s", code, w.h.out.String(), w.h.err.String())
 	}
-	<-w.done
-	<-w.reply
+	waitRoundTripBounded314(t, w)
 	if err := w.failure(); err != nil {
 		t.Fatal(err)
 	}
@@ -268,6 +267,7 @@ func Test219AC2SecondRevokeOfTheSameRuleIsRefused(t *testing.T) {
 
 	rule := `[fs] allowed_dirs += "` + filepath.ToSlash(w.h.outside) + `"`
 	var stored []byte
+	w.storedBytes219 = &stored
 	go driveStoreHoldRevoke(t, w, pw,
 		"revoke "+rule, "已撤销长期规则",
 		"revoke "+rule, "本进程账上没有",
@@ -276,8 +276,7 @@ func Test219AC2SecondRevokeOfTheSameRuleIsRefused(t *testing.T) {
 	if code := w.h.run("总结一下 这份笔记"); code != 0 {
 		t.Fatalf("exit %d\nstdout:\n%s\nstderr:\n%s", code, w.h.out.String(), w.h.err.String())
 	}
-	<-w.done
-	<-w.reply
+	waitRoundTripBounded314(t, w)
 	if err := w.failure(); err != nil {
 		t.Fatal(err)
 	}
@@ -404,4 +403,68 @@ func bytesEqual219(a, b []byte) bool {
 		}
 	}
 	return true
+}
+
+// waitRoundTripBounded314 is ticket 314's bounded replacement for the bare
+// <-w.done / <-w.reply pair the three AC#2 cases used to do. w.done closes when
+// the fs.write bridge.Execute returns; w.reply closes when the reply driver
+// returns. The work behind w.done is bounded by the chain this fixture itself
+// lays down: the run's config carries confirm_timeout_sec = 40
+// (newReplyHost's l2Wait, approval_reply_201_test.go:154 - the value every
+// replyRoute case has passed since ticket 201), and the store is held until
+// waitWidenCard187 answers the second card within its own 15s limit
+// (driveStoreHoldRevoke, approval_always_219ac2_test.go:135) after the first
+// card the driver answers by line. So a hang here cannot be one of those
+// clocks quietly failing: it can only mean a step between them never happened,
+// which is the silent shape the diagnosis leg measured (8m31s of zero output,
+// external kill, no stack, no name). The bound below is therefore NOT a number
+// tuned to let this machine pass: it is this fixture's own 40s L2 window - the
+// LONGEST clock the awaited work carries - plus a 6s margin for the remaining
+// write/audit steps, and it exists only so the failure is named HERE, with the
+// readings that decide the case at expiry: whether each of the two awaited
+// closes did land inside the bound, and how far the store-hold phase got
+// (stored bytes collected = WIDEN-APPLIED booked).
+//
+// ONE BOUND FOR BOTH CLOSES, NOT A CHAIN: the total wait across done and reply
+// can never exceed the bound twice over - done gets whatever the deadline has
+// left, and an expired done leaves reply zero, so the case exits by the same
+// absolute deadline no matter which close is the wedged one. (A bare <-w.done
+// after a satisfied reply was itself an unbounded receive - the exact shape
+// this helper exists to end.)
+func waitRoundTripBounded314(t *testing.T, w *widenRun) {
+	t.Helper()
+	const bound = 46 * time.Second
+	deadline := time.Now().Add(bound)
+	stored := func() bool {
+		return w.storedBytes219 != nil && len(*w.storedBytes219) > 0
+	}
+	clockLine := "the run's own clocks bound the work it awaits at the 40s L2 " +
+		"window (confirm_timeout_sec, approval_reply_201_test.go:154) + the 15s " +
+		"second-card wait (approval_always_219ac2_test.go:135), so an expiry " +
+		"here means a step between them never happened"
+
+	select {
+	case <-w.reply:
+	case <-time.After(time.Until(deadline)):
+		doneClosed := false
+		select {
+		case <-w.done:
+			doneClosed = true
+		default:
+		}
+		t.Fatalf("the reply driver never returned: waited on w.reply %v (the round's whole bound); "+
+			"%s. At expiry: the fs.write side %s, the widening reached the store=%v "+
+			"- the driver's last typed lines are in the run's stdout/stderr above",
+			bound, clockLine,
+			map[bool]string{true: "DID return (done closed)", false: "also never returned (done still open)"}[doneClosed],
+			stored())
+	}
+	select {
+	case <-w.done:
+	case <-time.After(time.Until(deadline)):
+		t.Fatalf("the reply driver returned but the fs.write never did: waited on w.done "+
+			"until the round's 46s bound expired; %s. At expiry: the widening reached "+
+			"the store=%v - the fs.write is parked behind its unanswered or un-expired "+
+			"approval card", clockLine, stored())
+	}
 }

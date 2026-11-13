@@ -54,6 +54,11 @@ type widenRun struct {
 	exec   error
 	fail   error
 	rtRef  *agentRuntime
+	// storedBytes219 is the between-store-and-revoke config snapshot the 219
+	// round-trip cases capture; ticket 314's bounded wait reads it at expiry to
+	// report how far the store-hold phase got. Cases that do not capture it
+	// leave it nil.
+	storedBytes219 *[]byte
 }
 
 func (w *widenRun) setFail(err error) {

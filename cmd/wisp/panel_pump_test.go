@@ -104,6 +104,50 @@ func assertPacketMatchesLedger145(t *testing.T, rec map[string]string, data []by
 
 var modeRead145 = regexp.MustCompile(`perm: MODE-READ origin=startup mode=(\S+) source=`)
 
+// waitDoneBounded314 is ticket 314's bounded replacement for the bare <-done
+// this file used to do. done closes when the queued fs.read returns, and that
+// wait is ALREADY bounded inside the product the goroutine calls: the Execute
+// context expires at 45s (executeOn145, panel_pump_test.go:155) and the L2
+// confirmation window expires at 31s (nonDefaultConfig145's
+// confirm_timeout_sec = 31, panel_pump_test.go:181 - the fixture's own
+// tightening of C18's 300s contract default, long-standing in this file). So a
+// hang here cannot be the receive waiting forever; it can only mean those two
+// inner bounds failed to fire, which is exactly the silent shape the diagnosis
+// leg measured (8m31s of zero output, kill from outside, no stack, no name).
+// The bound below is therefore NOT tuned to let this machine pass: it is the
+// 45s Execute bound - the LONGEST bound the awaited work already carries - plus
+// a 1s read-out margin for the Fatalf's own logging, and it exists only so the
+// failure is named on THIS line instead of being observed from outside as a
+// wedged process. The log names what was awaited, both inner bounds, and the
+// readings that decide the case at expiry time: the sampled packet's pending
+// depth, the gate's displayed-card count, and the pump's publish count.
+func waitDoneBounded314(t *testing.T, done <-chan struct{}, snap panel.Snapshot, rt *agentRuntime) {
+	t.Helper()
+	const bound = 46 * time.Second
+	select {
+	case <-done:
+		return
+	case <-time.After(bound):
+		sampledPending := len(snap.Pending)
+		shown, publishes, nowPending := 0, 0, 0
+		if rt != nil {
+			shown, publishes = rt.windowCount(), rt.snapshotCount()
+			if s, _, ok := rt.lastPanelSnapshot(); ok {
+				nowPending = len(s.Pending)
+			}
+		}
+		t.Fatalf("the fs.read goroutine never closed done: waited on channel done "+
+			"for %v; the work it awaits is bounded by the Execute ctx at 45s "+
+			"(panel_pump_test.go:155) and the L2 card window at 31s "+
+			"(confirm_timeout_sec=31, panel_pump_test.go:181), so an expiry here "+
+			"means an inner bound failed to fire. At expiry: the packet sampled "+
+			"while the card was up held %d pending card(s), the latest packet the "+
+			"pump knows holds %d, the gate displayed %d card(s), and the pump "+
+			"published %d packet(s)",
+			bound, sampledPending, nowPending, shown, publishes)
+	}
+}
+
 // executeOn145 runs one host-side tool call on the bridge this root assembled,
 // on its own goroutine, and waits until the gate has displayed a card. The card
 // is what makes the queue non-empty, which is the whole subject of these cases.
@@ -121,8 +165,10 @@ func executeOn145(t *testing.T, rt *agentRuntime, taskID, corr, callID, tool, ar
 // carry, and both are there to make an assertion falsifiable rather than
 // accidentally true:
 //
-//   - confirm_timeout_sec = 2, so the case can watch an L2 card open and close
-//     (tightening the C18 window is not a loosening);
+//   - confirm_timeout_sec = 31, so the case can watch an L2 card open and the
+//     queue expire it well inside the 45s Execute bound (tightening the C18
+//     window is not a loosening; 31 is the value this file has measured with
+//     since ticket 35's wave, not a fresh tuning);
 //   - permission_mode = ask_high_risk, because the default档 is exactly what a
 //     pump that hardcoded "ask_every_step" would print. With a non-default档 in
 //     the file, the packet's mode is only right if something read it.
@@ -174,7 +220,7 @@ func TestRunBooksWithASnapshotOfItsLiveQueue(t *testing.T) {
 		// run's own triggers booked, so the sampling cannot be the only evidence.
 		rt.publishPanelSnapshot()
 		live, liveBytes, _ = rt.lastPanelSnapshot()
-		<-done
+		waitDoneBounded314(t, done, live, rt)
 		if err != nil {
 			t.Errorf("the L1 route failed: %v", err)
 		}
