@@ -36817,3 +36817,34 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - `workflow-5fb95f3751604741`（**8a**，`build/models/manifest.json` ＋ 证据件；派单存档 `111-wave8a-matcha-repin-dispatch.txt`）
   - `workflow-8321624bfc6b4439`（**8b**，`scripts/wisp-cli-staged-tests.sh` 名册三路并集＋`FIXTURE-GAP` 防呆 ＋ `cmd/wisp/config_reload_perm_223_windows_test.go` 具名跳过＋ledger 行；派单存档 `111-wave8b-roster-223-dispatch.txt`）
 - **★记一条方法论**：一晚上三次「本地绿 / CI 红」都出自**平台或环境差异**（census 的 CRLF、cgo 的 scope、linux 交叉编 cgo）。**以后凡涉及平台条件的东西，先想「CI 那台和我这台哪儿不一样」，而不是先怀疑代码。**
+
+## A1853 — 票 111 两腿全部落地并**我亲自复核**；name册补到 46 枚且**揪回一枚过跳**；票 262/314 已发
+
+### 111 波 8a（`285a5c310`，已推）—— 我重跑了三把尺＋自己重算组合摘要
+- 尺①②：commit 真在（4 文件 +276/−9）；证据件 `docs/evidence/s1/111-matcha-repin.md` **20817B/262 行**。
+- 尺③（★最硬的一条）：我自己把 `matcha.tar.bz2`(75455267B, `ae70096b19…`) ⊕ `vocos-22khz-univ.onnx`(53884024B) **按 Files 顺序拼接后算 sha256**，得 **`a0bc1fbb7da681ab7a87707bcfa3dafd1665c635cdfaccc4c9d90207eb5d84fc`／129339291B**，与 manifest 逐字命中。
+- **上一轮我挂的悬念（target 级 sha256 是什么）已有代码坐标答案**：`internal/models/manifest.go:19-31` 注释 ＋ `:236-242` `CombinedDigest` ⇒ **多工件条目的条目级 sha256 ＝ 按 Files 顺序拼接全部工件字节再算 sha256**；运行时下载/校验**完全不读它**（`downloader.go:336-360` 走 `entry.Artifact(i)`），只由 `manifest_real_test.go:83-98` 断言 `Σ files[].size_bytes == entry.size_bytes`。**⇒ 它是有定义、被机器断言的真字段，改它是对的。**
+- 归档内成员 pin 由 15 补到 **18**（包内实际 18）；签名 `sign-models.ps1 -Verify` = OK（keyid 未变，**没换钥**，故无需改 buildinfo）。
+- 冷跑：五目标六行判定全 `ok`，**exit 0**（三行 `308` 是 hf-mirror 候选被 PS5.1 拒跳转后转 huggingface 成功，**如实记录非失败**）。
+- TTS 用例（新模型）：**RUN=19 PASS=14 FAIL=0 SKIP=5**；5 枚 SKIP 全是 `Test26P*`（AEC3 binding 不在该 build，tag 门控自跳）⇒ **我上轮担心的「新模型破坏 TTS」＝没有发生，期望值零改动。**
+
+### 111 波 8b（`02939b8a2`，已推）—— 我自己的回退态实测
+- 尺①②：commit 真在（5 文件 +460/−38，**零越界**）；证据件 13964B/190 行；两脚本 `bash -n` 均 OK。
+- 尺③（★我自己跑，不是听它说）：`WISP_SPIKE_MODELS=<不存在目录>` 走真 carrier，逐字得：
+  ```
+  WISP_SPIKE_MODELS=... is SET but not on disk (streaming ASR + VAD tree).
+  NAMED FALLBACK - fixtures absent, so 46 fixture-dependent cases
+  (computed roster 44 from routes (a)+(b), plus the compiled binary's own roster by go test -list = 46)
+  testing: warning: no tests to run        ← 那枚 wake 用例真没执行
+  ok  github.com/CarlosShao/wisp/cmd/wisp 1.00s   ← GUARD B 要的结果行在
+  RC=0                                     ← FIXTURE-GAP 防呆正确沉默（没冤枉人）
+  ```
+- **★这腿揪出一枚我没想到的反向错误：旧名册「过跳」了一枚**——`Test41a2r1GuardRowsWalkWithTheProductionFact` 用 stub KWS 走 D43 表，**无夹具也能 PASS**，却被旧名册按名跳过 ⇒ **过跳＝静默删覆盖**。已从名册移除，并在脚本 `:123` 写注释说明理由（我核过：那名字现在**只在注释里**，不在名册）。
+- 名册 41 → **46**（三路并集现算：`(a)` helper/wrapper 名 7 leaf＋8 封装入口；`(b)` 9 枚夹具路径字面量；`(c)` 人工残余 4 枚），并保留 `go test -list` 自验。
+- `FIXTURE-GAP` 防呆的正控已被腿跑过（删一枚名册后单跑 wake ⇒ 打印 `依赖夹具但不在名册上：<名>` 且 rc=1）；**我的负控（当前树）rc=0，不误报。**
+- 223 从 `t.Fatalf` 改为 `t.Skip` 具名理由（**只在 icacls 造不出拒绝时到达**，deny 落上时断言照旧），`portable-tests.sh` ledger 增 1 行（票 71 AC#3）。
+
+### 本轮新派（写面互斥）
+- `workflow-e5f1c8648b314651` 票 **262** 写腿：建 `scripts/check-path-length-budget.sh`，**阈值钉帽（相对 >121）不钉墙（217）**，豁免名册＋分母自报＋正控；中间带 57 枚优先进名册（零改名风险）。派单存档 `262-dispatch.txt`。
+- `workflow-87819437f809430a` 票 **314** **max 档测量腿**：真窗区整进程死亡定性（三候选），并要求它判「沙盒里偶发 `rc=139`」与票面「死亡」是否同一现象。派单存档 `314-dispatch.txt`。
+- **票 291 挂机主**：AC#2 要求「机主对着真麦采四形各 ≥3 秒（安静/正常说话/外放已知音调/…）」⇒ **本编队不可派**，等机主在场。
