@@ -36464,3 +36464,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **撤销口令：「SA9009 回开」**——删 `ci.yml` 两处 `,-SA9009` 即恢复（会立刻重现那 1 条假阳性）。
 - **我的复跑读数（新口径）**：`pass1 = 2 条`，剩下两条**全在 `internal/plugin`**（`manifest.go:11` ST1022、`panic_isolation_51_test.go:62` SA5000），而那一处**归票 70 的分诊腿**（仍在飞）。
 - **票 122 维持 open**：pass1 还差 2 条（等 70 腿让出 `internal/plugin`）＋ pass2 的 79 U1000 清账未做 ＋ AC#6 要 lint 步真绿。
+
+## A1834 — 票 70 分诊交付验收通过（`ea651adce`，7 件）＋ 我登记了那行 ledger（`scripts/portable-tests.sh` 在腿写面外）
+
+- **三把尺（我现跑全过）**：提交 `ea651adce`（7 件：`internal/plugin/{command.go,validator.go,command_52_test.go}`、`internal/config/manager_readfail_42r1_windows_test.go`、新件 `manager_readfail_42r1_envprobe_windows_test.go`、证据件、票面）／件 `docs/evidence/s1/70-testcore-triage-6.md` **13164B**／**我自己复跑 `go test -count=1 ./internal/plugin/ ./internal/config/` ＝ `ok 8.304s` ＋ `ok 3.507s`**。
+- **越界核查**：7 件里**零枚**碰 `cmd/wisp`／`internal/panel`／`internal/tools`／`.github`／`frontend`（逐枚过 `--name-only`）。
+- **★★腿找到的是真根因，不是改断言**（这点我自己逐行读了 diff 才接受）：
+  - **`command.go` 的 `unstableExeMarkers` 把 `~` 当子串标记** ⇒ CI runner 的 `TEMP` 是 **8.3 短名** `C:\Users\RUNNER~1\AppData\Local\Temp`，中缀 `~` 被当"home 相对"抢跑，**用错的理由拒掉了 runner 自己的 TEMP 树**。
+  - **修法**：`~` 收窄为**只判行首**（`isHomeRelativeSpelling`，`strings.HasPrefix(p, "~")`）—— `~` 的"home 相对"语义**只存在于行首**（`expandInput` 也只展开行首），`RUNNER~1` 是**固定别名**、不是可移动拼写。
+  - **`filepath.VolumeName(canonical) == ""` 那条**：无条件套用了 **Windows 的"无盘符＝不确定"** 语义到 **POSIX 绝对路径** —— `/tmp/cli.exe` 在 POSIX 上**完全确定**。**修法**：`runtime.GOOS == "windows" && vol == ""`，即**这条判据只在 Windows 生效**。
+  - **★我核过的最重要一点：Windows 侧防护一字未松** —— 无盘符在 Windows 上**照样拒**、行首 `~` **照样拒**、`%VAR%`/`$VAR` **照样拒**。改的只是"把 Windows 语义套到 POSIX 上"这个**跨平台错位**。
+- **★腿第二次纠正我的 CI 基线**（与 `A1831` 同一件事被另一个独立读法证实）：「最后一次绿 `255224a56`」是 **`slo-fresh`** 的绿；`255224a56` 上的 `ci` run 的 test-core **已 FAIL=4**（恰是那四枚 pin）。⇒ **两个独立腿从两个角度证了同一个事实：这个仓的 `ci` 从未绿过。**
+- **★"6 枚"横跨两个 job**（我派单时当成一个 job）：test-core 4 枚（`Test52Pin*` 族）＋ test-windows 2 枚。
+- **第 6 枚 `TestReadFailureDoesNotAdoptStatTheNextTickSeesTheWrite` 归 C**（hosted windows 会话不兑现 share-0 冲突）：工具链无关（`GOTOOLCHAIN=go1.27.4` 复跑仍绿、本机 21 次绿），处置＝**具名 skip ＋ PROBE-UNDO 探针闸**，撤销条件写死在新件头（CI 探针哪天打出"冲突兑现"就删闸）。
+- **★我替它落了那行 ledger**（`scripts/portable-tests.sh` 在腿的写面外，它如实上报而不是偷偷改）：
+  - 插入 `:829`，格式与该数组既有行一致（`"Test|<pkg>|windows|fixture|<理由>"`）；
+  - **我跑了 carrier 验**：`sh scripts/portable-tests.sh --scope=windows` **rc=0**，`internal/config` 与 `internal/plugin` 均 `ok (own line)`，ledger **没有报 stale**；`sh -n` 语法 rc=0。
+- **★登记这行的意义（腿点明、我认）**：不登记的话 test-windows 那一步会从「vacuous-pass 红」变成「honest-skip 红」——**跳过是要登记的，不登记等于偷偷跳过**。
+- **票 70 维持 open**：AC#2（分诊）已实质完成，但 **AC#6 要"每个 job 全绿"的证据**，须等 CI 真跑一次。
