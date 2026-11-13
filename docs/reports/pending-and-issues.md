@@ -36500,3 +36500,38 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **⛔ 我否掉的第二个**：整包 `-U1000` 关掉 —— 那会把真死代码一起藏了。
 - **★这一条要不要单独开票**：**要**。它是"手写 Win32 ABI 结构 + staticcheck"的**通用形状**，不是票 122 的一次性判断，而且它会反复出现（`internal/winsec`／`internal/audio` 的 `wasapi_windows.go` 里还有 COM GUID 与接口结构体）。
 - **波 4 那 40 条的真实构成（我按位置分类）**：`internal/ball/win32_windows.go` **约 27 条几乎全是 ABI 字段**；`internal/ball/renderer_windows.go`／`orb_windows.go`／`d2d_windows.go`／`ball_windows.go` **约 10 条是真无主的 func/field**；`internal/audio/wasapi_windows.go:49` 的 `iidIUnknown` 是 **COM GUID**，待判。
+
+## A1836 — ★★首次拿到**真 CI 读数**：`test-core` 已 **FAIL=0**（3039 跑 / 2056 通过 / 0 失败 / 2 跳过）。**失败原因不再是测试红，是「跳过不算通过」这条规矩**
+
+- **run 现取**：`79890d2b3` → CI run `43377972621`。**六个 job：`lint-frontend` success、`slo-full` success、`slo-smoke` success、`test-core` failure、`test-windows` failure、`lint` failure。**
+- **★★test-core 的真读数（从 job log 抽出，逐字）**：
+  ```
+  portable-tests.sh: four numbers (all from -v output): === RUN=3039  --- PASS=2056  --- FAIL=0  --- SKIP=2
+  ```
+  **⇒ 票 70 那条腿的修复真生效了**：4 枚 `Test52Pin*` 在 CI 里逐枚 `--- PASS`（我在 log 里逐枚看过），**`--- FAIL:` 全文零命中**。
+- **★test-core 为什么还红（这条最值得记）**：
+  ```
+  runtests.sh: 2 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3)
+  runtests.sh: either make the step's scope exclude it or run it where it can execute;
+               do not relax this script.
+  ```
+  **⇒ 不是测试坏，是这个仓自己的一条规矩：跳过不等于通过。** 两枚被跳的是 `TestAppendSessionTurnCrashChild`（`internal/session`，reexec）与 `Test24R3SearchAppsAUMIDCandidateFeedsTheAUMIDArm`（`internal/tools`，**AUMID 是 Windows 专属**）。
+  **⇒ 这正是 `A1834` 那条"跳过要登记"的另一面**：登记了才叫"解释过的跳过"，不登记就是"偷偷跳过"。
+- **★★staticcheck 自报行（CI 里逐字，第一次看到两段真分母）**：
+  ```
+  staticcheck self-report: staticcheck 2026.2.2 (0.8.2) modules=3
+    [pass1 GOOS=linux checks=all,-U1000,-SA9009]  packages=42 findings=3  crash=0
+    [pass2 GOOS=windows checks=all,-SA9009]        packages=43 findings=95 crash=0
+    (step exit is 1; both passes must exit 0)
+  ```
+  - **改动前 32 / 124 ⇒ 现在 3 / 95。** `A1830` 的口径修正＋`A1833` 的清账真进了 CI。
+  - **★我本机读 pass1=2、CI 读 3，差 1 条——已核清不是分歧**：CI 跑 3 个 module，我只跑根 module；**差的正是 `tools/mockllm` 那 1 条 `SA9003`**（早期腿也报过"mockllm 两遍同报 1 条 SA9003"）。**两边读数一致。**
+  - **⇒ `tools/mockllm` 那 1 条我之前从没派过任何人**，它是 pass1 归零的漏项。**已记，下一波必须带上。**
+- **★另外三个红（本轮首次定位，之前只知道"CI 红"）**：
+  | job | 失败步 | 说明 |
+  |---|---|---|
+  | `lint` | 8 `SLO nail census (ticket 266)` | 与 staticcheck 无关的独立红 |
+  | `lint` | 13 `staticcheck` | 就是上面那条 3/95 |
+  | `test-windows` | 7 `cmd/wisp CLI tests` | 票 111 AC#4 的 sherpa DLL staging |
+  | `test-windows` | 8 `winlive compile gate (go vet -tags winlive, ticket 111 AC#11)` | **正好是 `A1835` 那条标签陷阱的实体** |
+- **★口径纠正（第二处，我认）**：我一直说"CI 红"，但**从没区分 job**。真相是**三个 job 红、三个 job 绿**，且每个红的原因各不相同、各有主人。**"CI 红"这个说法本身太粗，等于没量。**
