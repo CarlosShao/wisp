@@ -36623,3 +36623,20 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★为什么现在只做准备不动手**：`pwsh`/`grep`/`glob` 全部 `spawn EPERM`，**我也起不了子代理去跑命令**（独立 `subagent` 实测同样 EPERM，已确认是宿主全局层，不是单条工具）。**在起不了进程时硬派腿＝派出幽灵，正是 goal 明令要防的。**
 - **⇒ 通道一恢复的立即动作（写死）**：①先跑 `finish70.ps1`（波 5 六件＋A1839）②推 `origin/dev` ③发 wave5／wave6 ④取 CI 新 run 三组读数。
 
+
+## A1841 — ★★CI 实测：**`compile-lines=0`（我的 CGO 修法生效）**，pass1 **3→1**、pass2 **53**。波 5 已落地（`dc49dd1f3`）
+
+- **run 现取**：`87f12728d` → CI run `43384807367`。六个 job：`test-core` failure、`lint` failure、`test-windows` failure、`slo-full`/`slo-smoke`/`lint-frontend` success。
+- **★★staticcheck 自报行（CI 里逐字）**：
+  ```
+  [pass1 GOOS=linux checks=all,-U1000,-SA9009]   packages=42 findings=1  toolchain-crash-lines=0 compile-lines=0
+  [pass2 GOOS=windows tags=winlive checks=all,-SA9009] packages=43 findings=53 toolchain-crash-lines=0
+  (step exit is 1; both passes must exit 0)
+  ```
+- **★★`compile-lines=0` —— 我 `A1837` 那个 CGO 修法验证成立。** 那行 `sherpa-onnx-go-linux (compile)` **不见了**，即：**去掉 `CGO_ENABLED=0` 让 ubuntu runner 用原生 cgo 解析 sherpa，是对的。** 「一条永远不可能变绿的门」拆掉了。
+  - **★同时验证了我补的仪器**：`compile-lines` 这个格**第一次出现在自报里就是 0**——**它是可见的**。以后若它非 0，一眼就能看见，不会再隐形。
+- **★pass1 从 3 → 1**：波 3（`5bcdb7d2d`）的 plugin 两枚修复生效。**剩的那 1 条正是 `tools/mockllm` 的 SA9003**——`A1836` 记的"从没派过人的漏项"，**刚被波 5（`dc49dd1f3`）修掉**。⇒ **下一跑 pass1 应为 0。**
+- **★pass2 = 53（带 winlive）**：与我本机 root-only 量的 52 差 1，**同因**＝CI 跑 3 个 module（`tools/mockllm` 再贡献 1 条）。**又是"射程差"，不是分歧**（本会话第 4 次，已形成肌肉记忆：**引用数先声明射程**）。
+- **★波 5 已落地（三把尺全过）**：`dc49dd1f3`（7 件, +164/−9：`scripts/portable-tests.sh` ledger＋`internal/tools/search_files_test.go` 删守卫＋`tools/mockllm/messages.go` 删空分支＋证据件 109 行＋票 70/71＋本台账）／**0 枚未推**（已推 `origin/dev`）／件 `70-testcore-green.md` 在。
+- **★宿主命令通道故障已恢复**：`spawn EPERM` 持续约 40 分钟（15:35–16:15），期间只有 `read`/`edit`/`write` 可用。**恢复后立即补完 commit+push，并发出波 5（tools）／波 6（其余 9 包）两条写腿**（`workflow-ba25e9b038674b44`、`workflow-6eb16c78270d47a7`）。
+- **★`test-core` 在 `87f12728d` 仍是 failure**：那一跑**不含**波 5 的 skip 修复（波 5 在 `dc49dd1f3`）。**新 run `43389487057`（`dc49dd1f3`）在飞**，它才带 skip→0 的修复。
