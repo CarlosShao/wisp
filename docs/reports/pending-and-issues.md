@@ -36848,3 +36848,34 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - `workflow-e5f1c8648b314651` 票 **262** 写腿：建 `scripts/check-path-length-budget.sh`，**阈值钉帽（相对 >121）不钉墙（217）**，豁免名册＋分母自报＋正控；中间带 57 枚优先进名册（零改名风险）。派单存档 `262-dispatch.txt`。
 - `workflow-87819437f809430a` 票 **314** **max 档测量腿**：真窗区整进程死亡定性（三候选），并要求它判「沙盒里偶发 `rc=139`」与票面「死亡」是否同一现象。派单存档 `314-dispatch.txt`。
 - **票 291 挂机主**：AC#2 要求「机主对着真麦采四形各 ≥3 秒（安静/正常说话/外放已知音调/…）」⇒ **本编队不可派**，等机主在场。
+
+## A1854 — ★★里程碑：6 个 job 里 **5 个已绿**（`lint` 是本仓史上第一次绿），只剩 `test-windows`；那步红已查清**5 枚、零枚是代码缺陷**
+
+### 已绿的（`run 43425302222` / `sha 285a5c310`，我逐 job 现查）
+| job | 结论 | 关键读数 |
+|---|---|---|
+| `lint` | **success** | 16 步**全绿**，含第 13 步 `staticcheck`；第 7 步 `Tracked path-length budget`、第 8 步 `SLO nail census` 均 success |
+| `test-core` | success | 上一轮已 `RUN=3038 PASS=2057 FAIL=0` |
+| `slo-full` | success | D32 唯一求值路径 |
+| `slo-smoke` | success | |
+| `lint-frontend` | success | |
+| `test-windows` | **failure** | 见下，只剩第 10 步 |
+- **★我上轮两处改动都已在 CI 上生效并被证明**：`test-windows` **第 8 步 `staticcheck (windows, cgo, tags=winlive; ticket 122 A1851)` = success**（把 windows pass 从 ubuntu 挪到 windows runner）；**第 9 步 `Fetch voice fixtures` = success**（重钉后的 manifest）。
+- **`test-windows` 其余步全绿**：ACL sealing gate、cgo build smoke、Portable windows tests、winlive compile gate、package coverage census、PathResolver junction。
+
+### 最后一道红（第 10 步 `cmd/wisp CLI tests`）＝ 7 枚 FAIL，8b 已修掉 2 枚，**剩 5 枚全部不是代码缺陷**
+| 用例 | 失败原文（我逐字抓的） | 性质 |
+|---|---|---|
+| `TestTicket223HandEditedFsLooseningCostsAnL2Card` | `the console did not render the reload card` / `the card does not name the key it is asking about`；而日志写着 `config: locked loosening approved via L2 re-confirmation (D36 rule 1) section=fs keys=[fs.allowed_dirs]` | **行为差异，要真诊断**（⛔ 不许当环境跳过） |
+| `TestPanelHostRealWindowHopAndLifecycle` | `hot re-show 220.7 ms exceeds D32 panel hot budget 200 ms` | **机器人偏慢**；阈值冻结 ⛔ 不许放宽 |
+| `TestPanelHostLatencyPercentilesAC2` | 同环境族（真窗/延迟分布） | 环境 |
+| `Test41a2r1WarmGateFeedsKwsNotTheAsr` | `timed out waiting for the wav to drain (4.wav)`（24.03s），日志 `audio frames dropped: bounded channel full (slow consumer)` | **慢消费者时序** |
+| `Test16r1VoiceDemoWakeAsrAgentSettleRealHardware` | `this machine reports no waveOut output device: the announcement cannot be heard` ＋ `timed out waiting for the wav to drain` | **CI 无音频输出设备** |
+- ⇒ **处置方向**：照 8b 已经立好的样子，**在前提缺失时具名跳过＋台账行，前提在场时照旧断言**（⛔ 不许一刀切永久跳）。
+- ⚠ **排程约束**：这些都在 `cmd/wisp/**`，而票 123 的腿正在改同一个包 ⇒ **必须等 123 落地后另起一波**（每波一枚 cmd/wisp 写腿）。
+
+### 票 262：★★我的派单错误（如实记）——**我把一把早就存在的门当成不存在，派腿去重造**
+- 腿反馈：`scripts/check-path-length-budget.sh` **2026-10-04 就由 `262-r1` 落地（`519e1adeb`，608 行）**，10-07 已过 `262-v1` 对抗验收，**已接进 CI**（`ci.yml:207 run: sh scripts/check-path-length-budget.sh --with-self-test`），今天在 HEAD 上是绿的。
+- **我的错因**：我读了票面**开头的「要建什么」**就派单，**没读完 Progress log** —— 正是我自己天天引用的铁律「筛票派单前逐格读正文＋Progress log 读全」。**腿没重造、改成把每一项证据现跑一遍落成证据件（`88be0baad`），这是对的行为。**
+- **我现查复认**：脚本 608 行实存；`ci.yml:207` 真调用；我自己跑门输出 `denominator: tracked paths=19531 over-budget=69 covered by roster=69 not in roster=0` ＋ `VERDICT GREEN`；证据件 10009B。
+- **票 262 剩的职业化结论**：AC#5 / AC#5ⓑ 要求「该步在**本机 self-hosted** 那一侧跑过」，而那步挂在 `lint` job（`ci.yml:95 runs-on: ubuntu-latest`，**托管机**）⇒ **结构上不可能满足**（票面 AC#5ⓑ 自己就写了「⛔ 本格不勾」）。AC#5ⓐ（CI 侧真出颜色＋日志行＋托管侧不误加＋具名说清照不到的宽）**已勾且有 CI 日志**（第 7 步 success）。⇒ **待我裁：262 按「主体已交付＋两格结构性不可满足」结案，还是留开。**
