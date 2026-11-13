@@ -460,30 +460,81 @@ jobs:
         # Go itself was NOT downgraded, for item 1's reason: the stale side is
         # the consumer. No finding is suppressed by this pin either - no
         # //nolint, no lint:ignore, no excluded package, no new `if:`.
+        #
+        # TICKET 122 (2026-11-13): the check set is now SPLIT BY GOOS, two
+        # passes over the same three modules (ledger A1773's scope ruling:
+        # the linux-side U1000 wall was "unused under GOOS=linux, alive under
+        # windows" GOOS blindness - 44 of 47 - not dead code to delete).
+        # U1000 ("unused") is a GOOS-RELATIVE verdict: it depends on which
+        # GOOS compiles the callers, and this repo's callers live mostly in
+        # //go:build windows files (internal/ball's jarvis family is consumed
+        # by jarvis_windows.go), so judging U1000 on this ubuntu runner read
+        # working Windows code as dead. Pass 1 GOOS=linux
+        # -checks=all,-U1000 judges the GOOS-independent defects (SA/ST/S/QF);
+        # pass 2 GOOS=windows -checks=all judges the full set including U1000
+        # on the platform that sees every caller. BOTH passes must exit 0 for
+        # the step to be green. The self-report now prints each pass's own
+        # denominator separately (packages/findings/crash-lines per pass,
+        # never one summed number). What this split does NOT see, named
+        # rather than hidden: U1000 on files loaded only under GOOS=linux
+        # (the wasapi_other.go shape) - dead code there is not gated by this
+        # step, and the count is part of the evidence reading
+        # (docs/evidence/s1/122-staticcheck-goos-scope.md). What did NOT
+        # change: pin 2026.2.2, the three-module loop, the finding regex, the
+        # exit rule, no //nolint, no //lint:ignore, no excluded package, no
+        # new `if:`, no continue-on-error, and NO global -checks=-U1000
+        # off-switch (that would be a relaxed gate, not a scope fix). Also
+        # NOT done here: deleting any U1000-reported symbol (A1773 forbids
+        # it - they are windows-alive) and fixing any finding - the backlog
+        # stays with ticket 122's follow-up waves under the new denominators.
         if: ${{ !cancelled() }}
         run: |
           go install honnef.co/go/tools/cmd/staticcheck@2026.2.2
           rc=0
           modcount=0
-          pkgs=0
-          findings=0
-          crashes=0
+          pkgs_linux=0
+          findings_linux=0
+          crashes_linux=0
+          pkgs_windows=0
+          findings_windows=0
+          crashes_windows=0
           for mod in . tools/d22scan tools/mockllm; do
             modcount=$((modcount+1))
             echo "=== staticcheck module: $mod ==="
-            m_pkgs=$(cd "$mod" && go list ./... 2>/dev/null | wc -l)
-            step_rc=0
-            m_out=$(cd "${mod}" && staticcheck ./... 2>&1) || step_rc=$?
-            m_find=$(printf '%s\n' "$m_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
-            m_crash=$(printf '%s\n' "$m_out" | grep -c 'export data version') || true
-            printf '%s\n' "$m_out"
-            echo "--- module $mod: exit=$step_rc packages=$m_pkgs findings=$m_find toolchain-crash-lines=$m_crash"
-            pkgs=$((pkgs+m_pkgs))
-            findings=$((findings+m_find))
-            crashes=$((crashes+m_crash))
-            if [ "$step_rc" -ne 0 ]; then rc=1; fi
+            # PASS 1 of 2: GOOS=linux, every check EXCEPT U1000. This pass is
+            # the judge for the GOOS-independent defects (SA/ST/S/QF...): they
+            # hold under both platforms, so the linux runner keeps them.
+            p1_pkgs=$(cd "$mod" && GOOS=linux CGO_ENABLED=0 go list ./... 2>/dev/null | wc -l)
+            p1_rc=0
+            p1_out=$(cd "${mod}" && GOOS=linux CGO_ENABLED=0 staticcheck -checks=all,-U1000 ./... 2>&1) || p1_rc=$?
+            p1_find=$(printf '%s\n' "$p1_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
+            p1_crash=$(printf '%s\n' "$p1_out" | grep -c 'export data version') || true
+            printf '%s\n' "$p1_out"
+            echo "--- module $mod [pass 1 GOOS=linux checks=all,-U1000]: exit=$p1_rc packages=$p1_pkgs findings=$p1_find toolchain-crash-lines=$p1_crash"
+            pkgs_linux=$((pkgs_linux+p1_pkgs))
+            findings_linux=$((findings_linux+p1_find))
+            crashes_linux=$((crashes_linux+p1_crash))
+            if [ "$p1_rc" -ne 0 ]; then rc=1; fi
+            # PASS 2 of 2: GOOS=windows, the FULL check set INCLUDING U1000.
+            # "Unused" is a GOOS-relative verdict - it depends on which GOOS
+            # compiles the callers - and this repo's callers are mostly in
+            # //go:build windows files, so U1000 is evaluated here, on the
+            # platform that sees every caller. The step is green only when
+            # BOTH passes exit 0; the windows pass is not continue-on-error
+            # and not skippable (D22 run-away mode 6).
+            p2_pkgs=$(cd "$mod" && GOOS=windows CGO_ENABLED=0 go list ./... 2>/dev/null | wc -l)
+            p2_rc=0
+            p2_out=$(cd "${mod}" && GOOS=windows CGO_ENABLED=0 staticcheck -checks=all ./... 2>&1) || p2_rc=$?
+            p2_find=$(printf '%s\n' "$p2_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
+            p2_crash=$(printf '%s\n' "$p2_out" | grep -c 'export data version') || true
+            printf '%s\n' "$p2_out"
+            echo "--- module $mod [pass 2 GOOS=windows checks=all]: exit=$p2_rc packages=$p2_pkgs findings=$p2_find toolchain-crash-lines=$p2_crash"
+            pkgs_windows=$((pkgs_windows+p2_pkgs))
+            findings_windows=$((findings_windows+p2_find))
+            crashes_windows=$((crashes_windows+p2_crash))
+            if [ "$p2_rc" -ne 0 ]; then rc=1; fi
           done
-          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"
+          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux [pass2 GOOS=windows checks=all] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows (step exit is $rc; both passes must exit 0)"
           exit $rc
 
       - name: mockllm module vet

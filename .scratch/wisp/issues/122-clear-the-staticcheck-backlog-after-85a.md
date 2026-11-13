@@ -137,3 +137,29 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   - **AC#3**：`docs/evidence/s1/122-staticcheck-inventory.md:37` 已登记 SA9009（`frontend/embed.go:4` 散文注释恰以 `// go:embed` 开头、真指令在 `:19`、不修只登记，票面 AC#3 明令）⇒ 勾。
   - **AC#4**：`docs/evidence/s1/122-u1000-judgment.md` 100 行，**47 条 U1000 逐条判**（真死码候选删 3：`releasedCount`/`l1WaitFor`/`(*scriptGate).levels`；留 44 全具名 GOOS 盲区原因；本波零删、删留交回）⇒ 勾。
   - **未勾（具名）**：AC#1 缺"预做 34/78"并列对比（部分）；AC#2 需 SA4000 行为证据（本轮未复核那格、不盲翻）；AC#5 需 `-count=2 -v` 四数（本波跑的是 `-count=1`）；AC#6 步级 CI 读数——**lint 步仍红（staticcheck 49=47 U1000, GOOS 盲区需 `ci.yml` 按 GOOS 分分母的口径裁定，属票 71/85a 地界）**⇒ 票 122 **不整票收**。
+
+- [2026-11-13 13:1x +08] agent=122-goos-scope（写腿，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-goos-scope-dispatch.txt`，开工 HEAD `8a8673fe8`）
+  did=**staticcheck 量尺口径修正落地**（A1773 裁定的 ci.yml 动作，即上格"属票 71/85a 地界"的那一刀，
+  编排者本日已裁定并由本腿执行）：`ci.yml` staticcheck 步单遍改**两遍**——
+  pass 1 `GOOS=linux -checks=all,-U1000`（跨平台缺陷）/ pass 2 `GOOS=windows -checks=all`（含 U1000，
+  在看得到全部调用者的平台上判死码），两遍都 exit 0 步才绿；自报行按遍分打 packages/findings/crash-lines；
+  三模块循环/钉版 2026.2.2/正则/exit 规则原样；**无 `-checks=-U1000` 全局关门、无 //lint:ignore、无 continue-on-error、无新 `if:`**。
+  读数（本机复刻 CI 同形，windows 遍 CGO_ENABLED=0，与 CGO=1 复跑 finding 集逐字节一致；包集 44/42 完整）：
+  **pass 1 = 42 包 32 条**（ST1003×10/ST1021×10/ST1020×3/ST1000×2/ST1022×2/ST1023×2/SA5000×1/SA9003×1/SA9009×1，
+  逐条在证据件附录 A）· **pass 2 = 44 包 124 条**（U1000×79＋非 U1000×45，逐条附录 B）。
+  对账：编排者 95（windows 默认）→本腿 89＝期间真修 −6；CI 64（linux 默认）→54＝U1000 真删 −10；
+  默认 89→全集 124＝stylecheck 全族 +43−3（U1000 集合移动：`unlandedProvider` 族 4 条仅默认口径报、
+  `(*scriptGate).levels` 仅全集口径报——本口径把这条 AC#4 真死码候选捞回门内）。
+  成对判据四发（`internal/ball/jarvis.go` 种 `jarvisProbe122Unused`，已拆净、`git diff` 空）：
+  A 种子+linux 遍＝沉默（判庭搬家）；B 同种子+windows 遍＝**被咬点名**（42→43，`jarvis.go:239 U1000`）；
+  C 同种子+`//lint:ignore`+windows 遍＝被压哑（42＝基线）⇒ 证明指令级抑制才是真闭嘴、本修门没关小；
+  D 拆除后两遍回基线。具名边界：**linux-only 文件（`//go:build !windows`）的 U1000 两遍都不设门**
+  （今日读数 0 条，登记在证据件 §6.1，不另开票）。
+  **AC#6 仍不能关：新口径下 CI 首跑预计 pass 1 红 32 条 / pass 2 红 124 条**——是读得懂的红，逐条清单
+  ＝后续清账波的工单面（证据件 `docs/evidence/s1/122-staticcheck-goos-scope.md`，附录 A/B 共 156 条）。
+  零 .go 改动进 commit；写面仅 ci.yml＋证据件＋本 Progress log。
+  next=编排者推送后取 CI `lint` job staticcheck 步读数：自报行应为两段分母（pass1/pass2 各自
+  packages/findings/crash-lines），期望接近 32/124（runner go patch 版与并行腿新 .go 会动分母，判读以两遍分开数字为准）；
+  清账波按新分母领单：pass 1 的 32 条 GOOS 无关缺陷＋pass 2 的 windows-only 14 条＋U1000 79 条按
+  `122-u1000-judgment.md` 归属表清。
