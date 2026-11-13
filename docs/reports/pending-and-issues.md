@@ -36640,3 +36640,29 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★波 5 已落地（三把尺全过）**：`dc49dd1f3`（7 件, +164/−9：`scripts/portable-tests.sh` ledger＋`internal/tools/search_files_test.go` 删守卫＋`tools/mockllm/messages.go` 删空分支＋证据件 109 行＋票 70/71＋本台账）／**0 枚未推**（已推 `origin/dev`）／件 `70-testcore-green.md` 在。
 - **★宿主命令通道故障已恢复**：`spawn EPERM` 持续约 40 分钟（15:35–16:15），期间只有 `read`/`edit`/`write` 可用。**恢复后立即补完 commit+push，并发出波 5（tools）／波 6（其余 9 包）两条写腿**（`workflow-ba25e9b038674b44`、`workflow-6eb16c78270d47a7`）。
 - **★`test-core` 在 `87f12728d` 仍是 failure**：那一跑**不含**波 5 的 skip 修复（波 5 在 `dc49dd1f3`）。**新 run `43389487057`（`dc49dd1f3`）在飞**，它才带 skip→0 的修复。
+
+## A1842 — ★★★ **`test-core` 第一次全绿（FAIL=0、SKIP=0）**；staticcheck **pass1 归零（findings=0、compile-lines=0）**；pass2 剩 52
+
+- **★CI run `43389487057`（sha `dc49dd1f3`，带波 5 的 skip＋mockllm 修复）job 结论**：
+  | job | 结论 |
+  |---|---|
+  | **`test-core`** | **★success（史上第一次）** |
+  | `slo-full`／`slo-smoke`／`lint-frontend` | success |
+  | `lint` | failure（剩：第 8 步 `SLO nail census (ticket 266)` ＋第 13 步 staticcheck pass2） |
+  | `test-windows` | failure（剩：第 7 步 `cmd/wisp CLI tests (needs sherpa DLLs staged above, ticket 111 AC#4)`） |
+- **★★test-core 逐字读数**：`=== RUN=3038  --- PASS=2057  --- FAIL=0  --- SKIP=0`。
+  - **这枚 job 自本仓建立以来从未绿过**（`A1831` 记过：`ci` 1125 runs 0 success）。**今天是第一次。**
+  - **§ 波 5 的两手都验证成立**：AUMID 守卫删掉后 ubuntu 真跑 PASS（SKIP 消失）；reexec 子进程入口登 ledger 后 `-skip` 排除（不产生 `--- SKIP` 行）。**两条合起来把 "2 skip" 清零。**
+- **★★staticcheck 自报（逐字）**：
+  ```
+  [pass1 GOOS=linux checks=all,-U1000,-SA9009]        packages=42 findings=0 toolchain-crash-lines=0 compile-lines=0
+  [pass2 GOOS=windows tags=winlive checks=all,-SA9009] packages=43 findings=52 toolchain-crash-lines=0
+  (step exit is 1; both passes must exit 0)
+  ```
+  - **pass1 = 0**：波 3（plugin）＋波 5（mockllm SA9003）两手合起来**把 3 条打干净**。
+  - **compile-lines = 0**：`A1837` 的 CGO 修法坐实。
+  - **pass2 = 52**：这是 **`dc49dd1f3` 时点**的数，**尚未含波 5-tools（`681c831ba`，28→0）与波 6**。⇒ 推上去后**应降到 24 左右**。
+- **★波 5-tools（`681c831ba`）我已三把尺验过**：9 件全在写面内／证据件 `122-wave5-tools-pass2.md` **11948B**／**我自己复跑两包 `-tags=winlive -checks=all,-SA9009` ＝ 0 条**。**28→0（24 删＋2 条 ST1005 真改文案，全波零 lint:ignore）**。
+- **★它删了整个文件 `internal/tools/system_dpi_windows.go`**：判据＝它是 `ensureDPIAwareness`（活，`platformSystemBackend:85` 每次后端构建调用）的**死副本**；build/vet/test 全 rc0（`internal/tools` `ok 50.955s`，SKIP 恰 1 条 `Test23LiveClipboardRoundTripThroughRealOS` 真 OS 剪贴板夹具）＋ d22scan clean。**整文件删除属"删"类，但按铁律⓪⓪⓪ 是最有价值的正确动作（删死副本），且它先验了 build 不断、行为不变（Test23ScreenCapture* 全 PASS）。**
+- **★`test-windows` 现在只剩第 7 步 `cmd/wisp CLI tests`**：这是**票 98 豁免**的那枚（本机 `go test ./cmd/wisp/` 会 `0xc0000135` STATUS_DLL_NOT_FOUND，需要 sherpa DLL 先 stage）。**下一个要拆的门就是它。**
+- **★git push 暂时连不上 github**（`Failed to connect to github.com port 443`）：`681c831ba`＋本账 **1 枚待推**，本地安全。**网络恢复再推，票不动。**
