@@ -36747,3 +36747,16 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **10 个 SKIP 全是硬件 live 探针**（`TestAC247LiveMicrophoneLevels…`、`Test26P*` 五枚回声/AEC、`Test392*` 三枚、`Test16r1PremortemMicPermissionDenied…`）——**环境门控，合法**（票 71 AC#3 的「SKIP 不算 pass」讲的是**未被记账的** SKIP；这 10 枚在 `scripts/portable-tests.sh` 台账里有行）。
 - **★最关键的一条副产品：1231 秒＝20.5 分钟实测。** 这**量化坐实了我把 `test-windows` job 超时 30→60 的裁定**（A1846）：**光跑测试就 20.5 分，前面还要冷下载夹具 ⇒ 30 分必炸，60 分才对。** 这个数现在有真实来源，不再是我拍的估算。
 - **⇒ 票 111 三把尺齐**：提交 `84fc7aba9` 真在（5 件、零越界）／证据件 15379B 真在／**我自己复跑两种形态都验了**（无夹具＝具名跳过 41 枚＋包级结果行；有夹具＝796 枚全跑、voice 真执行）。
+
+## A1849 — 波 7 验收（`e505420b2`）：**24 → 0，我自己复跑 EXIT=0／非空行=0**；三条专判我全认，两件不需摆机主
+
+- **三把尺**：
+  1. **提交 `e505420b2`**：18 件（16 `cmd/wisp/**` ＋ 2 `internal/audio/aecspike/**` ＋ 证据件 ＋ 票 122 面）。**越界：零**（写面外零文件）。
+  2. **件**：`docs/evidence/s1/122-wave7-cgo-scope.md` **17563B**。
+  3. **★★我自己复跑**：`GOOS=windows CGO_ENABLED=1 staticcheck -tags=winlive -checks=all,-SA9009 ./cmd/wisp/ ./internal/audio/aecspike/` ＝ **EXIT=0、非空行=0**。
+- **★三条专判，我的裁定**：
+  - **A `SetHtml`×3＝`//lint:ignore ST1003`，我认（不摆机主）。** 腿查得比红线要求更细：**不是反射/COM 绑定名**（`reflect` 只摸 handler 形参、全仓无字符串调用），**但它是 `webview2.WebView` 接口的满足方法**（三处类型都有 `var _ webview2.WebView = …` 显式断言）⇒ **改名即编译失败**。**这正是 `//lint:ignore` 存在的场景**（主流静态分析对「名字必须如此」的处置就是具名放行＋说理），不是拆报警器。**要改成适配器/改接口才是契约面改动——那不值当，收益为零。**
+  - **B SA4004＝真 bug，我认它修得对。** 腿判出是**残留笔误**：`equality()` 外层 `for{}` 首循环即 `return`（死壳），来源＝照抄相邻 `or()`/`additive()` 骨架时循环体放错层；且内层一遍扫描在跨算符序（`==` 后跟 `===`）会**意外链式**。修＝剥死壳＋保留一遍扫描＋注释钉「不建模 JS 链式比较」；台件 137 处比较逐一看过无链式输入，35r2 九枚用例实跑全 PASS。**这就是我要的「先判语义再动」**，不是机械消除。
+  - **C SA1019 `runtime.GOROOT()`＝保留＋ignore，我认。** 该分支只在 `LookPath("go")` **已失败后**才走到 ⇒ 换 `go env GOROOT` 是**循环依赖**（正是它要兜的场景）。腿还做了探针验证两实现等价（PATH 移除后 `go env GOROOT` 仍返同根）但兜底职责与 `runtime.GOROOT()` 匹配。**代码零改动，只补说理＋ignore。**
+- **门禁（腿报，我核了最关键的第三把尺）**：`go build ./cmd/wisp/` rc0；`go vet` 两包 rc0；staticcheck **24→0**；`gofumpt -l` 0 行；`d22scan` clean rc0（480 产码文件在册）；**`go test ./cmd/wisp/` 全量如实报「未跑」**（票 98 豁免）→ 走 carrier 定向跑 **32 枚顶层用例全 PASS exit 0**；`aecspike` **SKIP 如实报**。**没有把「未跑」写成绿，这是对的。**
+- **旧名归零**：`git grep -w` 16 个旧名在 `cmd/`＋`internal/` **归 0**；名册面（`portable-tests` GUARD／票 171／`tokens_table_test`）零引用。
