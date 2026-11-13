@@ -963,12 +963,67 @@ jobs:
           path: third_party
           key: wisp-third_party-${{ hashFiles('deps.toml') }}
 
+      - name: Cache voice fixtures (manifest key)
+        # ADDED STEP ONLY (ticket 111 fixtures leg, 2026-11-13): no existing step
+        # was moved, edited, deleted, given an `if:` it did not have, or made
+        # continue-on-error (D22 run-away mode 6). It caches the same third_party
+        # tree under a SECOND key so the voice models survive a deps.toml change:
+        # the sherpa DLLs above are pinned by deps.toml, but the voice fixtures
+        # are pinned by build/models/manifest.json - a deps.toml edit invalidates
+        # the key above and would otherwise throw the 650 MB of model bytes away
+        # with it, and the step below would re-download them on every such push.
+        # Both caches fill the same paths: GitHub keeps the most recently
+        # written entry per key, and a non-matching primary key still restores
+        # from this entry's key (or the next run's), so cache misses degrade to
+        # a slower fetch, never to a missing fixture.
+        #
+        # The manifest pins the voice fixtures' SHA256s (the same single source
+        # `wisp models ensure` walks), and the fetch step below verifies every
+        # byte against it even on a cache hit, so a poisoned or stale cache
+        # entry cannot reach the tests as a silently wrong fixture.
+        if: ${{ !cancelled() }}
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-voice-fixtures-${{ hashFiles('build/models/manifest.json') }}
+          restore-keys: |
+            wisp-voice-fixtures-
+
       - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
         # AC#6: red on run 35551819606 before, and skipped behind the winsec gate
         # since ticket 110 - a build gate that only gets to answer when the ACL
         # tests pass. Now it always answers.
         if: ${{ !cancelled() }}
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: "Fetch voice fixtures (manifest-pinned, sha256-verified; ticket 111 fixtures leg)"
+        # ADDED STEP ONLY (ticket 111 fixtures leg, 2026-11-13): the run that
+        # dispatched it (43389487057 / step 7) died on a runner whose
+        # third_party/ carried the sherpa DLLs but never the voice MODELS - the
+        # whole third_party/ tree is git-ignored, and until this step nothing in
+        # this job fetched the models. It sits AFTER the build step (same
+        # position discipline as stage-sherpa-dlls inside the carrier: the
+        # fixtures belong to the same staging family the build's DLL fetch is
+        # in) and BEFORE the CLI tests step, which is the only consumer.
+        #
+        # WHAT IT DOES: reads build/models/manifest.json - the same pin ledger
+        # `wisp models ensure` walks - and downloads/verifies exactly the five
+        # fixture targets the staged carrier's WISP_* env points at (VAD, the
+        # streaming-ASR triple, the matcha checkpoint + vocos vocoder, the KWS
+        # archive tree, the punctuation model file). Every file is SHA256
+        # verified against the manifest before it lands, even on a cache hit,
+        # so the CI shape cannot drift from the manifest (AGENTS.md 1.1's
+        # "pinned list" discipline, extended to the models). Idempotent: a warm
+        # cache costs only the hash reads.
+        #
+        # WHAT A RED HERE MEANS: a setup failure, named with the target and the
+        # reason (every URL dead, or an archive/member hash mismatch). The CLI
+        # step below will then run in the carrier's NAMED-FALLBACK mode - the
+        # non-fixture part of cmd/wisp still runs and the voice files are
+        # skipped by full name with their count booked on ticket 111 - so this
+        # step's failure degrades the DENOMINATOR loudly, never silently.
+        if: ${{ !cancelled() }}
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/fetch-voice-fixtures.ps1
 
       - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
         # AC#4 asked whether this package can be tested on CI at all, and forbade
@@ -990,6 +1045,33 @@ jobs:
         # inconclusive skip.
         shell: bash
         if: ${{ !cancelled() }}
+        # TICKET 111 FIXTURES LEG (2026-11-13): the fixtures are now staged one
+        # step above (Fetch voice fixtures), so the voice tests RUN here on the
+        # hosted runner instead of the step dying on a missing
+        # third_party/spike-models (run 43389487057's shape). The carrier
+        # (scripts/wisp-cli-staged-tests.sh, routed through portable-tests.sh's
+        # cli tier) keeps two further behaviours for the shape this step cannot
+        # rule out - a dead manifest URL, a no-network runner: it then runs the
+        # package WITHOUT the fixture-dependent voice cases, skipping them
+        # BY FULL NAME (-test.skip, 41 cases measured 2026-11-13 - 29 whose own
+        # body calls a fixture helper + 4 indirect dependents the no-fixture
+        # reading exposed; the roster is verified against the compiled binary
+        # via go test -list on every fallback run and a zero-match pattern is
+        # refused) and printing the package's own `ok/FAIL <import path>
+        # <duration>` result line either way, which is what portable-tests.sh's
+        # GUARD B table anchors on. A package that produced zero result lines
+        # therefore cannot come back from this step by a missing fixture again
+        # - if it ever does, GUARD B is right to ring.
+        #
+        # TIMEOUT: 60 is a hang bound, not a schedule (same shape as every
+        # timeout-minutes in this file). The old bound was this job's 30 - fine
+        # while the step died in seconds, too tight once the voice family
+        # actually runs here: CI's own prior full runs of this package read
+        # 328.9s..392.9s (ticket 111 AC#4's readings, run 42554322437), and the
+        # step now additionally waits up to ~25 min for a cold first fixture
+        # download above it. 60 covers both; the job-level 30 remains as the
+        # owner's overall ceiling for this job and is NOT changed here.
+        timeout-minutes: 60
         run: bash scripts/wisp-cli-tests.sh
 
       - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
