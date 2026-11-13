@@ -25,9 +25,11 @@ import (
 // "Deferred" is a per-field fact, not a per-ticket one: the D46 fields are
 // accepted on a kind = "command" tool only. On a declarative tool the auditor
 // names the ticket that owns them instead of reading them and doing nothing.
-//
+
 // CurrentSchemaVersion is the only schema_version this loader understands
-// (SPEC-07 §4 example: schema_version = 1).
+// (SPEC-07 §4 example: schema_version = 1). It is the value validator.go
+// requires, so a future schema bump must change this constant and the
+// validator's refusal message together, not one of them alone.
 const CurrentSchemaVersion = 1
 
 // ToolKindDeclarative is the default tool kind: a Tier-1 tool whose behaviour

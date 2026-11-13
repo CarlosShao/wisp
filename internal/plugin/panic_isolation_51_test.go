@@ -49,6 +49,11 @@ type crashHost struct {
 	reply    C24Reply
 }
 
+// CallC24 serves the request and, when the fixture is set to crash, raises the
+// host-bug panic shape selected by panicVal: an explicit panic when panicVal is
+// set, otherwise the runtime.Error of a write to a nil map, which staticcheck
+// flags as SA5000 (suppressed where it fires; the write is the subject, see
+// there).
 func (h *crashHost) CallC24(_ context.Context, req C24Request) (C24Reply, error) {
 	h.mu.Lock()
 	h.calls = append(h.calls, req)
@@ -59,6 +64,7 @@ func (h *crashHost) CallC24(_ context.Context, req C24Request) (C24Reply, error)
 			panic(val)
 		}
 		var m map[string]string
+		//lint:ignore SA5000 the nil-map write on this line IS the subject: ticket 51 AC#4 requires the host to survive the runtime.Error shape of a Go host bug, not only the explicit panic shape crashHost raises when panicVal is set, and a write to a nil map is the cheapest deterministic way to raise one - removing it removes that half of the assertion. Intentional, registered in pending-and-issues A1773, re-verified independently by wave 2 (A1833).
 		m["boom"] = "nil map write" // runtime.Error, no explicit panic
 	}
 	return reply, nil

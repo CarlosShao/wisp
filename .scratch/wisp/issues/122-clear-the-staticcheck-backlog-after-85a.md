@@ -191,3 +191,28 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   本波 commit 只含 19 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树里 3 个他腿改动
   （291 probe／346-a2 dispatch／frontend fixture）零触碰零提交。
   next=编排者推送后取 CI lint 步两段自报读数（期望 pass1≈3／pass2≈95）；特殊项①②③的落法待裁。
+
+- [2026-11-13 14:5x +08] agent=122-wave3-plugin（写腿，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-wave3-plugin-dispatch.txt`，开工 HEAD `79890d2b3`，staticcheck 2026.2.2 (0.8.2)）
+  did=**pass1 清账波 3 落地：2 → 0**（两条都在 internal/plugin，本波收口）。起手复跑与派单逐字一致；
+  ① `manifest.go:11` ST1022＝**真改注释（拆组）**：把埋在 `:11-30` 大块注释尾部的 CurrentSchemaVersion 两句
+  用空行拆成常量自己的 doc 块（首句即合格），原文一字未丢，并补一句可核真话（validator.go:56-59 现跑——
+  schema 比较与拒绝消息都写死引用该常量，故升级时两者必须同改）；② `panic_isolation_51_test.go:62` SA5000＝
+  **独立复核采纳上腿判断**（夹具有意、断言有效、不该修；依据现读：crashHost doc 与第二用例 doc 明写
+  nil-map 写就是被测的 runtime.Error 宿主崩溃形状，`:162` 刻意缺省 panicVal，删除或防御性初始化＝拆掉
+  runtime.Error 半个 AC#4 断言），落**具名 `//lint:ignore SA5000` 1 行**在赋值语句正上方，理由内联
+  （写明"这个写就是被测对象＋删它拆断言"）并登记 A1773（SA5000 原始登记；派单骨架写的 A1834 是票 70 的账，
+  引用按真号）。**★落点更正（已证，非口味）**：派单/wave2 证据件 §5②给的"在 :61 行（var m 声明行）加"
+  从机制上不可能生效——读 staticcheck 0.8.2 本机源码：`lineIgnore.match` 要求诊断行==指令 NodePosition 行，
+  而 NodePosition 由 `ast.NewCommentMap` 关联（:61 指令关联 var m 声明、SA5000 报 :62 赋值语句，差一行永不匹配；
+  实跑两发证伪：语句级放 :61 与挂函数 doc 均报 "this linter directive didn't match anything"＋SA5000 照报）；
+  正确形状＝独立行贴在**被报赋值语句正上方**（staticcheck 自家 cache.go:202 同形），第三发实测咬住。
+  本波零 `-checks` 放宽、零 CI 改动、零 staticcheck.conf；ST1022 是真改、SA5000 是具名抑制（派单明令的形状）。
+  门禁：build rc0／vet rc0／`test -count=2` 两包 ok（13.296s＋31.290s）／gofumpt 0 行／d22scan clean rc0；
+  pass1 全仓复跑 finding **0 条**（本机全仓 rc 恒 1＝开工即有的 sherpa compile crash-line 所致，
+  staticcheck 源码 `printDiagnostics` 证实 compile 类无条件计入 exit，与 finding 无关；scoped
+  `./internal/plugin/...`＝零输出 rc0，为干净判据）。证据件 `docs/evidence/s1/122-wave3-plugin-pass1.md`
+  （§4.2 含落点机制证据与撤销口令：删那行 lint:ignore 即复原）。
+  本波 commit 只含 2 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树 3 个他腿改动零触碰零提交。
+  next=编排者推送后取 CI lint 步两段自报读数：**期望 pass1＝0**（runner go patch 不同则 crash-lines 数可异，
+  判读以 finding 行为准）；票 122 剩余＝pass2 的 U1000 清账与 windows-only 14 条（后续波）＋ AC#6。
