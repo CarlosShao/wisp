@@ -102,13 +102,30 @@ type TaskBackfill struct {
 // and get "", and task.output then answers with the whole text; a spill that
 // failed also gets "", and task.output announces 「截断且无副本文件」 instead of
 // pointing at a file that is not there.
+//
+// TICKET 188 (panel status sources, 2026-11-13): the empty-text gate used to
+// refuse the WHOLE record, and with it the status dimension this ticket owns -
+// a failed / stuck / cancelled / truncated run (which ends without a body by
+// construction, loop.go's finish) vanished from the roster entirely, so the
+// panel read 「宿主没有登记这一维」 for an ending the run DID spell. The status
+// dimension and the body are now decoupled: a filed D43 name lands the record
+// even with empty text (the row says which ending happened and that no body
+// exists - never that the body was empty), while an EMPTY state keeps the old
+// contract byte for byte, because there the record would carry nothing at all.
+// A D43-named row a reader calls "done" is the same lie, so the text stays
+// absent and ticket 176's original sentences below still hold for it.
 func (b TaskBackfill) Backfill(ctx context.Context, taskID, text string) (TaskOutput, string) {
 	switch {
 	case b.Roster == nil:
 		return TaskOutput{}, "任务名册未接线（fail-closed：不替没人建的名册编一条记录）"
 	case taskID == "":
 		return TaskOutput{}, "这个任务没有宿主铸的 id（id 只由环路生成，组合根不许自造一枚）"
-	case text == "":
+	case text == "" && b.State == "":
+		// Ticket 188: this gate no longer eats the status dimension of an
+		// empty-bodied ending (see the file comment above). It keeps refusing the
+		// ONE shape it always refused the truth about: a record with neither a
+		// body nor a filed state carries nothing the reader could check, which is
+		// the same 「查不到」和「没打印」 conflation the original sentence named.
 		return TaskOutput{}, "这个任务没有留下正文（空正文不进名册，免得「查不到」和「没打印」被读成同一件事）"
 	case b.State != "" && !statemachine.Valid(b.State):
 		// Refused before the table is touched, and the reason travels with the

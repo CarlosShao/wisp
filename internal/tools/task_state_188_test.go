@@ -222,6 +222,68 @@ func TestTaskState188AC2BackfillIsTheGoSideProducer(t *testing.T) {
 	}
 }
 
+// TestTaskState188AC2EmptyBodiedEndingKeepsItsState is the panel-status-sources
+// step (2026-11-13): the empty-text gate used to refuse the WHOLE record, so an
+// ending the run DID spell (failed / stuck / cancelled / truncated - the loop's
+// finish publishes a message, not a body) vanished from the roster and every
+// surface read 「宿主没有登记这一维」 for a task that had just ended loudly.
+// The state dimension and the body are decoupled: a D43-named record with an
+// empty body lands (State, empty Text, no artifact), and the row answers
+// fail-closed about the body - never "done".
+//
+// Mutation (recorded with readings in
+// docs/evidence/s1/188-panel-status-sources.md §4): restoring the old gate to
+// `case text == "":` turns this leg red - the record is refused whole and the
+// reader is back on the 未登记 notice.
+func TestTaskState188AC2EmptyBodiedEndingKeepsItsState(t *testing.T) {
+	roster := NewTaskRoster()
+	ctx := context.Background()
+
+	rec, why := TaskBackfill{Roster: roster, State: statemachine.StateError}.
+		Backfill(ctx, "bg-failed-188", "")
+	if why != "" {
+		t.Fatalf("an empty-bodied ending with a D43 state was refused whole: %q", why)
+	}
+	if rec.State != statemachine.StateError {
+		t.Errorf("returned record carries state %q, want Error", string(rec.State))
+	}
+	if rec.Text != "" {
+		t.Errorf("returned record carries a body the task never printed: %q", rec.Text)
+	}
+	if rec.ArtifactPath != "" {
+		t.Errorf("empty body must not promise an artifact, got %q", rec.ArtifactPath)
+	}
+	stored := mustLook(t, roster, "bg-failed-188")
+	if stored.State != statemachine.StateError {
+		t.Errorf("roster state = %q, want Error: the ending the run spelled was dropped", string(stored.State))
+	}
+	if got, notice := stored.StateAnswer(); got != statemachine.StateError || notice != "" {
+		t.Errorf("roster answer = (%q, %q), want (Error, \"\")", string(got), notice)
+	}
+
+	// The other half of the decoupling: no state filed and no body printed is
+	// still refused, with the original sentence - that is the one shape the old
+	// gate was telling the truth about.
+	before := roster.Count()
+	_, emptyWhy := (TaskBackfill{Roster: roster}).Backfill(ctx, "bg-empty-188", "")
+	if emptyWhy == "" {
+		t.Fatal("a record with neither body nor state was filed: the gate is gone")
+	}
+	if after := roster.Count(); after != before {
+		t.Errorf("the refused empty shape changed the table: %d before, %d after", before, after)
+	}
+
+	// And a non-empty body keeps landing exactly as before (the control that
+	// keeps this leg from being bought by "never file anything").
+	if _, why := (TaskBackfill{Roster: roster, State: statemachine.StateSettling}).
+		Backfill(ctx, "bg-body-188", "正文还在"); why != "" {
+		t.Fatalf("the ordinary path was disturbed: %q", why)
+	}
+	if got := mustLook(t, roster, "bg-body-188"); got.State != statemachine.StateSettling || got.Text != "正文还在" {
+		t.Errorf("ordinary path record = (%q, %q), want (Settling, 正文还在)", string(got.State), got.Text)
+	}
+}
+
 // ---------------------------------------------------------------------------
 // AC#3: no panel-side write leg for this dimension.
 // ---------------------------------------------------------------------------

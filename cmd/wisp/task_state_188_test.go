@@ -28,6 +28,7 @@ package main
 import (
 	"testing"
 
+	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
@@ -110,4 +111,71 @@ func Test188RootRowFilesTheD43NameTheLoopSpelled(t *testing.T) {
 	if !seen {
 		t.Fatalf("the panel reader lost the root row %s it had listed before Look", rootID)
 	}
+}
+
+// Test188FailedRunStillFilesItsD43State is the panel-status-sources step
+// (2026-11-13): a run that ends WITHOUT a body (a classified provider failure -
+// the loop's finish publishes a message, not a body) used to be refused whole
+// by the backfill's empty-text gate, so the roster carried no row at all and
+// every surface answered 「宿主没有登记这一维」 for an ending the run DID spell.
+// The status dimension and the body are now decoupled (task_backfill.go), so
+// the ending the host already knew reaches the panel.
+//
+// Three readings, same shape as the completed-run criterion above: the roster
+// record, the host's own judge, the panel's reader. Mutation (recorded with
+// readings in docs/evidence/s1/188-panel-status-sources.md §4): restoring the
+// gate to `case text == "":` turns this leg red - the failed run's row
+// disappears and the reader is back on the 未登记 answer.
+func Test188FailedRunStillFilesItsD43State(t *testing.T) {
+	f := newRunFixture(t, "openai-chat")
+	var driven *agentRuntime
+	f.rtHook = func(rt *agentRuntime) { driven = rt }
+	// fail_next(3): every attempt fails, the retry ladder gives up, the task
+	// ends classified (the same shape TestRunTextTaskFailNextIsClassified and
+	// Test365RunKeepsItsWordForTheControls/failed use).
+	f.srv.QueueFault(t, adaptertest.Fault{Status: 500, Times: 3})
+	code := f.run("总结一下 这份笔记")
+	out, errb := f.out.String(), f.err.String()
+	if code != 1 {
+		t.Fatalf("exit = %d, want 1 for a classified provider failure\nstdout:\n%s\nstderr:\n%s", code, out, errb)
+	}
+	if driven == nil {
+		t.Fatal("the run never assembled a runtime")
+	}
+	rootID := f.taskID()
+	rec, ok := driven.tasks.Look(rootID)
+	if !ok {
+		t.Fatalf("the failed run left NO roster row: the empty-text gate ate the record whole\nstdout:\n%s", out)
+	}
+	if rec.State != statemachine.StateError {
+		t.Errorf("roster state = %q, want Error (failed -> error -> Error): the ending the run "+
+			"spelled must survive its missing body", string(rec.State))
+	}
+	if rec.Text != "" {
+		t.Errorf("roster text = %q, want empty (this ending has no body to file)", rec.Text)
+	}
+	if state, reason := rec.StateAnswer(); state != statemachine.StateError || reason != "" {
+		t.Errorf("StateAnswer() = (%q, %q), want (Error, empty)", string(state), reason)
+	}
+	seen := false
+	for _, row := range driven.taskRosterState().Rows {
+		if row.TaskID != rootID {
+			continue
+		}
+		seen = true
+		if !row.StatusKnown {
+			t.Errorf("panel row statusKnown = false (reason %q): the roster has the ending and the reader dropped it", row.StatusReason)
+		}
+		if row.Status != string(statemachine.StateError) {
+			t.Errorf("panel row status = %q, want %q", row.Status, statemachine.StateError)
+		}
+		if row.StatusReason != "" {
+			t.Errorf("panel row statusReason = %q for a row the roster filed a name for", row.StatusReason)
+		}
+	}
+	if !seen {
+		t.Fatalf("the panel reader lost the root row %s the roster filed", rootID)
+	}
+	t.Logf("failed run: roster state=%q text=%d bytes, panel statusKnown=%v status=%q",
+		string(rec.State), len(rec.Text), seen, statemachine.StateError)
 }
