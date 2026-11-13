@@ -36695,3 +36695,14 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - **★为什么一直没人发现**：本机工作树恰好是 LF，本地全绿；只有 CI 的 CRLF 签出才炸。**这正是「本地绿 ≠ CI 绿」的第 N 个实例。**
 - **修法（我已定，1 行）**：`:438 cp "$target" "$pristine"` → `tr -d '\015' < "$target" > "$pristine"`（建 `$pristine` 时就规范成 LF；census 自身解析本就 `tr -d '\015'`）。**control 11 单独保留**，专门验「census 吃 CRLF」。
 - **已重派**：`workflow-c985547c19c4442d`（`magpie-high`/`glm-5.3-flash`，派单存档 `266-slo-nail-census-r2-dispatch.txt`，含**我给的 docker CRLF 复现配方**，要求改前 14 failed／改后 0 failed 两个读数进证据件）。
+
+## A1845 — 票 266 修复验收（`9aec7ba37`＋`1971a828d`）：★**CRLF 下 14 failed → 0 failed，我自己 docker 复跑坐实**
+
+- **三把尺（我现跑全过）**：
+  1. **提交**：`9aec7ba37`（`scripts/slo-nail-census.sh` 1 行修＋6 行注释 ＋ 证据件）＋ `1971a828d`（票面 Progress log，AC 框没碰）。**越界检查：零**。
+  2. **件**：`docs/evidence/s1/266-slo-nail-census-crlf.md` **6000B**。
+  3. **★★我自己用 docker 复跑**：把 `slo-check.ps1` 转 CRLF 后跑自测 ⇒ **`positive control PASSED - 32 control(s) ran, 0 failed`**（改前是 14 failed）。普通 census ⇒ **`PASS - 2/2 nails`** 仍绿。
+- **修法逐字**（就是我定的那行）：`cp "$target" "$BENCH/pristine.ps1"` → `tr -d '\015' < "$target" > "$BENCH/pristine.ps1"`；**control 27（CRLF 副本保持绿）原样未动**，census 自身仍能吃 CRLF。
+- **⇒ 结论**：`lint` 第 8 步 `SLO nail census` 的 **CI 红因已消除**（下一次 CI 该步应绿）。这是我第二次靠「本地 docker 复现 CI 平台差异」定位并修好——**第一例是 test-core 的 AUMID/reexec，这一例是 census 的 CRLF。二者同源：本地 Win 工作树与 CI 签出的换行/平台差异，本地绿掩盖了 CI 红。**
+- **★腿自报一只无害的坑**：中途 `d22scan` 报 `missing go.mod`，是它**自己的验证脚本泄漏 `MSYS2_ARG_CONV_EXCL`** 污染路径所致，清环境重跑即 clean。**它主动说了，没有藏。**
+- **已推**：连同波 6 三提交＋`A1844` 一起，6 枚全上 `origin/dev`（网络早前断过，恢复后 1 次推成功）。
