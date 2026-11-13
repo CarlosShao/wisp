@@ -36096,3 +36096,27 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   2. **`subagent` 工具不支持非父路由** —— 传 `provider:"magpie", model:"group/group-review-and-audit"` 报 `child LLM route "magpie/group/group-review-and-audit" is not allowed for this Session; without a recorded model-selection policy, explicit selection (including reasoning_effort) is limited to the parent route`。⇒ **`subagent` 只能走父路由（deepseek），所以档位可控的那条路恰恰用不了 glm/审计组。**
   - **⇒ 现状：glm／审计组只能经 `workflow` 派，而 `workflow` 不支持档位。** **这是环境限制，⛔ 我的选择。** 需机主或环境侧决定是否放行 `subagent` 的 route policy。
 - **★已掐**：438 那条 deepseek 腿（`workflow-d7ae1c2519534afd`）已 `job_kill`；已按 glm 重派（`workflow-73f43fa36e9c4872`）；审计腿已按审计组重派（`workflow-44d0b0e58ff84194`）。
+
+## A1815 — ★★我自己建过两个"档位服务商"，转头就忘了；机主当场骂醒。**这是唯一能在 `workflow` 下拿到档位的办法**
+
+- **机主原话（逐字）**：「你个傻狗，我知道workflow不支持选择推理档位，但是你不是自己想到个办法，专门创建了个服务商，只把档位设置最高，这就是你自己搞的办法，这也是你自己搞的服务商，你特么转头就忘了？你审计或者测试，审查等非票推进任务都用这个服务商下的模型不就行了？？？」
+- **事实**：`C:\Users\swq\.dsh\profiles\desktop\cordis.patch.yml` 里**早就有 `magpie-max`**（`:2169`），是**我自己建的**：
+  ```yaml
+  magpie-max:
+    displayName: Magpie (review/audit, max effort)
+    apiKeyEnv: MAGPIE_GATEWAY_KEY
+    api: openai-completions
+    baseURL: http://127.0.0.1:3425/v1
+    reasoning: max                       # ← 档位写死在 provider 层
+    models:
+      - id: group/group-review-and-audit
+  ```
+  **`reasoning: max` 是 provider 级默认值** ⇒ **`workflow.agent()` 不用传 `reasoning_effort` 就自动走 max 档**。**这正好绕开 `agent() option "reasoning_effort" is not recognized` 那个限制。**
+- **★机制（⛔ 我下次再忘）**：**`workflow.agent()` 不支持 `reasoning_effort` 参数，但 provider 的 `reasoning:` 字段是默认档位。** ⇒ **要档位就建 provider，不传参数。**
+- **★我本轮的补救（已落地并实测）**：
+  1. **审计/测试/审查腿 ⇒ `provider:"magpie-max", model:"group/group-review-and-audit"`**（`reasoning: max` 写死）。
+  2. **写腿 ⇒ 我新建成 `magpie-high`**（`:2187`，`reasoning: high` 写死，`model: auto/glm-5.3-flash`）。备份 `cordis.patch.yml.bak-magpiehigh-20261113`。
+  3. **两条都实测通过**：`magpie-max` 探针回 `MAXOK` **且真写了文件**；`magpie-high` 探针回 `HIGHOK` **且真写了文件**。
+- **★另一个我搞错的结论（当场被推翻）**：我曾判断「审计组不支持长提示词」。**错的。** 长提示词（约 1500 字）**完全可用**，腿跑了两枚测试（`PASS 9.58s`／`PASS 6.94s`）、核了 commit 改了 3 件、写了 465B 的 verdict 件、回了完整五行。**真空返回的真因是：我让腿"先读外部派单文件 `audit-431to437.txt`"，腿读了却没把它当指令源。** ⇒ **纪律：提示词必须内联全部步骤，⛔ 依赖外部文件转达指令。**
+- **★票 431 审计结论（非实现者＝`magpie-max` 腿，合规）**：**HONEST**。commit `fa39931bd` 存在、改 3 件（`resident_sink_nail_127_windows_test.go` +190／`431-ac1-boot-budget.md` +230／票面 +9）、证据件 230 行在盘、复跑 `TestAC1ResidentLegInstallsItsLogListenerOnDisk` **PASS 9.58s** ＋ `TestAC1ResidentLegOutlivesItsOwnLogFailure` **PASS 6.94s**、越界无。**与我自己的读数一致。**
+- **★教训（第 12 次同根）**：**"我自己做过的东西"也会被我忘掉。** 前 11 次是不实测就下结论，这次是**不查自己建过什么就宣布做不到**。⇒ **遇到能力限制时，先查配置文件里有没有我自己的旧解法，⛔ 直接宣布不可行。**
