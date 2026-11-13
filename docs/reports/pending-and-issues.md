@@ -36560,3 +36560,29 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
      ⇒ **一条门禁的仪器必须能报出"我为什么红"，否则它只是红。**
 - **★诚实交代**：**这一改我本机验不了**（Windows 上 `GOOS=linux` 无 cgo 交叉编译器）。我只能验到 ①`bash -n` 语法 rc=0 ②改的两行文本正确。**真读数必须等 CI 下一次跑**——若 linux pass 仍报 compile 行，`compile-lines` 会在自报里**明明白白写出来**，不会再隐形。
 - **票 122 现状**：**pass1 findings=0（真）**，但"这一步绿"要等 CI 证实；**pass2 仍 95 条**（U1000 清账中＋windows-only 14 条）；AC#6 未勾。
+
+## A1838 — 波 4b 验收（`429387f46`，audio/ball U1000 **40 → 2**）＋ 我拍 **pass2 加 `-tags=winlive`**（实测是严格更优，不是放宽）
+
+- **三把尺（我现跑全过）**：提交 `429387f46`（10 件：8 个 `.go`＋证据件＋票面）／件 `122-wave4-u1000-audio-ball.md` **11211B**／**我自己复跑**：不带 tag 两包 **U1000=2**（`orbHwndTopmost`＋`overlayGlyphPixels`），带 `-tags=winlive` **=0**。
+- **越界核查**：10 件里**零枚**碰 `plugin/`／`config/`／`tools/`／`cmd/wisp`／`panel/`／`frontend/`／`.github/`／`scripts/`。
+- **★腿做对的三件事（值得记）**：
+  1. **四档分类逐条执行**：①ABI 字段 23 条 `//lint:ignore` 且**点名哪个 API 按偏移读**（`RegisterClassExW`／`CreateDIBsection`／`Shell_NotifyIconW`／`DwmEnableBlurBehindWindow`／`TrackMouseEvent`／`CreateDCRenderTarget`）；②`orbDataLock` 判"写-only 即设计，sweep 拿句柄存在当活性信号"；③真死函数 6 条删；④**2 条点名调用者保留**（`orb_live_windows_test.go:559/:577`、`orb_glass62_live_windows_test.go:145/:160`、`orb_live_windows_test.go:972`，全带 `windows && winlive`）。
+  2. **★ABI 反向判据现场实测**：真删 `clrUsed` ⇒ **`go build` exit 0、零报错**，随即原样还原复绿。**这条把"编译器不是护栏"从我的断言变成了可复跑的实测。**
+  3. **★如实自报一次自己的错**：它**一度误删④档 `overlayGlyphPixels`**（grep 命中未先核 tag），发现后**原样恢复**，终态＝保留。**这正是我要的诚实：报自己的错，不藏。**
+- **★它还顺手修了一件存量坏**：`-tags=winlive` 下 `internal/ball` 测试包**编译本就是坏的**（存量重声明 ⇒ 测试包被丢弃 ⇒ 分析退化），它修好后那 3 条假阳性消失。
+
+### ★★我拍的设计决定：**pass2 加 `-tags=winlive`**（我量过，是严格更优）
+- **问题**：那 2 条④类符号**只在 winlive 测试里被用**。**不带 winlive 标签，它们永远是"unused"** ⇒ 这两个包**永远清不到 0** ⇒ 门禁永远红。
+- **我量的三组数（现跑）**：
+  | 全仓口径 | findings | 其中 U1000 |
+  |---|---|---|
+  | 不带 tag | **54** | 40 |
+  | `-tags=winlive` | **52** | 38 |
+  | **只在 winlive 口径下新出现的** | **0 条** | — |
+- **⇒ 结论**：`-tags=winlive` **编译的文件更多（覆盖 winlive 测试）⇒ 覆盖更严**，**反而 findings 更少（54→52）**，**零新增要修的**，**并把 2 条假阳性正确消解**。
+- **⇒ 这符合铁律⓪⓪⓪「主流 harness 怎么做」**：一符号算不算 unused，**是"每个构建配置各判一次"**，和"每个 GOOS 各判一次"同理。**默认 tag 集报它 unused 才是假阳性，winlive 才是真相。** 门禁该量**项目实际会构建的全部配置**。
+- **⛔ 我明确否掉的两条**：
+  1. 给那 2 条加 `//lint:ignore` —— **跨配置会反噬**：在 winlive 配置下符号被真用，指令就变成 `directive didn't match anything`（`A1837` 那条机制）。**`//lint:ignore` 解决不了跨配置问题。**
+  2. 改判据说"这 2 条可以静音" —— **改判据是最后一招，且这里不需要**：真正的修法是换对配置，不是让判据闭嘴。
+- **★这一改我已写进 `ci.yml` 注释**：点明"`-tags=winlive` 是更严的构建不是更松的"、给出三组实测数、指向本账。
+- **诚实交代**：`bash -n` rc=0；`p2_pkgs`/`p2_out`/自报三处文本已核；**真读数等 CI 下一跑**。

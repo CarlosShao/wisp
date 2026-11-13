@@ -544,19 +544,31 @@ jobs:
             # platform that sees every caller. The step is green only when
             # BOTH passes exit 0; the windows pass is not continue-on-error
             # and not skippable (D22 run-away mode 6).
-            p2_pkgs=$(cd "$mod" && GOOS=windows CGO_ENABLED=0 go list ./... 2>/dev/null | wc -l)
+            #
+            # -tags=winlive IS PASSED, and it is a STRICTER build, not a looser
+            # one. Why: "unused" is a per-build-configuration verdict just as it
+            # is per-GOOS. A symbol whose only callers live in winlive-tagged
+            # test files (orb_live_windows_test.go, orb_glass62_live_windows_test.go)
+            # is reported unused under the default tag set and used under
+            # winlive - i.e. the default-config report is the FALSE POSITIVE and
+            # winlive is the truth. Measured on this tree: the default tag set
+            # gives 54 findings (40 U1000), with -tags=winlive gives 52 (38
+            # U1000), and NOT ONE finding appears that is absent from the
+            # default set - so compiling the winlive files adds coverage and
+            # removes two false positives, and costs nothing. Ledger: A1838.
+            p2_pkgs=$(cd "$mod" && GOOS=windows CGO_ENABLED=0 go list -tags=winlive ./... 2>/dev/null | wc -l)
             p2_rc=0
-            p2_out=$(cd "${mod}" && GOOS=windows CGO_ENABLED=0 staticcheck -checks=all,-SA9009 ./... 2>&1) || p2_rc=$?
+            p2_out=$(cd "${mod}" && GOOS=windows CGO_ENABLED=0 staticcheck -tags=winlive -checks=all,-SA9009 ./... 2>&1) || p2_rc=$?
             p2_find=$(printf '%s\n' "$p2_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
             p2_crash=$(printf '%s\n' "$p2_out" | grep -c 'export data version') || true
             printf '%s\n' "$p2_out"
-            echo "--- module $mod [pass 2 GOOS=windows checks=all,-SA9009]: exit=$p2_rc packages=$p2_pkgs findings=$p2_find toolchain-crash-lines=$p2_crash"
+            echo "--- module $mod [pass 2 GOOS=windows tags=winlive checks=all,-SA9009]: exit=$p2_rc packages=$p2_pkgs findings=$p2_find toolchain-crash-lines=$p2_crash"
             pkgs_windows=$((pkgs_windows+p2_pkgs))
             findings_windows=$((findings_windows+p2_find))
             crashes_windows=$((crashes_windows+p2_crash))
             if [ "$p2_rc" -ne 0 ]; then rc=1; fi
           done
-          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000,-SA9009] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux compile-lines=$compiles_linux [pass2 GOOS=windows checks=all,-SA9009] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows (step exit is $rc; both passes must exit 0)"
+          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount [pass1 GOOS=linux checks=all,-U1000,-SA9009] packages=$pkgs_linux findings=$findings_linux toolchain-crash-lines=$crashes_linux compile-lines=$compiles_linux [pass2 GOOS=windows tags=winlive checks=all,-SA9009] packages=$pkgs_windows findings=$findings_windows toolchain-crash-lines=$crashes_windows (step exit is $rc; both passes must exit 0)"
           exit $rc
 
       - name: mockllm module vet
