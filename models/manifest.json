@@ -170,8 +170,8 @@
         "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/matcha-icefall-zh-baker.tar.bz2",
         "https://github.com/k2-fsa/sherpa-onnx/releases/download/vocoder-models/vocos-22khz-univ.onnx"
       ],
-      "sha256": "f2b9e766f5ec3917aac86d7e2f59aca0cb3c4d7487c1775e348fd0f68136a6a0",
-      "size_bytes": 129347466,
+      "sha256": "a0bc1fbb7da681ab7a87707bcfa3dafd1665c635cdfaccc4c9d90207eb5d84fc",
+      "size_bytes": 129339291,
       "license": "NON-COMMERCIAL-ONLY (data-baker free dataset terms) - P3 BLOCKED, must not ship; dev/measurement use only, replacement model decision pending (see PRECHECK P3)",
       "quant": "fp32",
       "files": [
@@ -180,17 +180,18 @@
           "urls": [
             "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/matcha-icefall-zh-baker.tar.bz2"
           ],
-          "sha256": "20de2ec034b55562609d6362771c934905dfe11d0f41ec103d593427ad9a7efb",
-          "size_bytes": 75463442,
+          "sha256": "ae70096b19c6e283ea351a26b8a718ce6427c8bde8c1da22eb46a5478d39a69b",
+          "size_bytes": 75455267,
           "archive": {
             "format": "tar.bz2",
             "files": [
-              { "path": "model-steps-3.onnx", "sha256": "ef7ebdf5987e16a5836136a51d6f3560ca997ffd33d06a40daab5af92b4b86e5", "size_bytes": 75624611 },
+              { "path": "model-steps-3.onnx", "sha256": "47e82b11454edeeb65adc4e44a24fd54c6715cd4d875cc2a20f75545ecc32d4d", "size_bytes": 75624188 },
               { "path": "tokens.txt", "sha256": "56209b2bf609d5ac1d66ede6dae7bf5254bd3f8aa24c4a6823713d5b884d87ba", "size_bytes": 19591 },
               { "path": "lexicon.txt", "sha256": "38b886d46aefa50da6322a64d72fd595d5f4fae1051adb160d647541b1e0a4a2", "size_bytes": 1363705 },
               { "path": "date.fst", "sha256": "eb8aa079ae3cb81d8f4404992f39d61a0cb990947512b5b8d1e54d1f6980e718", "size_bytes": 59154 },
               { "path": "number.fst", "sha256": "743f402181fcfebf76cc2f0546b71fa26476e626fbe4e460fb7b4c3a7a8bd5bd", "size_bytes": 64482 },
               { "path": "phone.fst", "sha256": "1ac2b6fa56b1442320c4de7db08353bab8963a2b57f365eebcdd3a2d3562f8d7", "size_bytes": 88630 },
+              { "path": "README.md", "sha256": "d47ef70781df15845b6f28c6c071dee9e51b52c36797a8130a620c5c8895929c", "size_bytes": 370 },
               { "path": "dict/jieba.dict.utf8", "sha256": "3043b77068e09c9904f27cad82f12b6ebe9dbdb5aeff3b25e45ab7f9c1122b55", "size_bytes": 5071204 },
               { "path": "dict/hmm_model.utf8", "sha256": "f17790586ac86dd048c8adffed052c4bd2b28ed0682972c1275e59040c0589a7", "size_bytes": 519739 },
               { "path": "dict/idf.utf8", "sha256": "dbd1e03d72b2263cc8d84a4304ed77677eed9e7deaf43a1a5133bbba9733b535", "size_bytes": 5998717 },
@@ -199,7 +200,9 @@
               { "path": "dict/pos_dict/char_state_tab.utf8", "sha256": "28b7be1dd7369766a51445af4d42e9a2ba4bf374c13be5bc1ca7721e27271dbb", "size_bytes": 327139 },
               { "path": "dict/pos_dict/prob_emit.utf8", "sha256": "c33c4cb7edf3b3a5947df7209b6e9f267eae1f21335d9e2bd2521ea07105457a", "size_bytes": 1687686 },
               { "path": "dict/pos_dict/prob_start.utf8", "sha256": "13623ea0e9300bdb597cb2da28770b7b385d6c0098d66e516083fb01b6bd5d96", "size_bytes": 4347 },
-              { "path": "dict/pos_dict/prob_trans.utf8", "sha256": "f22363e2307408293d180c6f9f6b5cb75879d52f722f7764fa2d3d0ae2400236", "size_bytes": 124159 }
+              { "path": "dict/pos_dict/prob_trans.utf8", "sha256": "f22363e2307408293d180c6f9f6b5cb75879d52f722f7764fa2d3d0ae2400236", "size_bytes": 124159 },
+              { "path": "dict/README.md", "sha256": "8bcc7c2ed7dff082d9a99c09de0bfd72249bf3b5c4298a3af328da40cbd8cfd1", "size_bytes": 683 },
+              { "path": "dict/generate_user_dict.py", "sha256": "24541017b4b60d8e1ad94a5165f7097d2fd107d4ceecbf13583dd37682fdd2a7", "size_bytes": 545 }
             ]
           }
         },
