@@ -61,8 +61,8 @@ const BargeinWindowSamples = 16000
 // 6dB below a rolling median catches mid-run losses above the floor, three
 // consecutive 1s windows ride out word-gap flicker.
 const (
-	BargeinCollapseDropDb     = 6
-	BargeinCollapseLowAbsDb   = 15
+	BargeinCollapseDropDB     = 6
+	BargeinCollapseLowAbsDB   = 15
 	BargeinCollapseSustain    = 3
 	bargeinCollapseBaseWindow = 8
 	bargeinCollapseMinArm     = 3
@@ -187,15 +187,15 @@ type CollapseAlarm struct {
 // consumes one closed window at a time (causal: only the past) and fires two
 // alarm shapes, each once per sustained streak:
 //
-//   - "drop": the window fell dropDb below the median of the recent good
+//   - "drop": the window fell dropDB below the median of the recent good
 //     windows (a converged engine losing convergence mid-run);
-//   - "low-absolute": the window sits below lowAbsDb outright.
+//   - "low-absolute": the window sits below lowAbsDB outright.
 //
 // Windows without far-active frames are skipped without resetting a streak
 // (the echo is absent there; absence is not recovery).
 type CollapseDetector struct {
-	dropDb   float64
-	lowAbsDb float64
+	dropDB   float64
+	lowAbsDB float64
 	sustain  int
 
 	base []float64 // the last baseWindow active-window ERLEs
@@ -205,8 +205,8 @@ type CollapseDetector struct {
 // NewCollapseDetector arms the detector with the pinned tuning.
 func NewCollapseDetector() *CollapseDetector {
 	return &CollapseDetector{
-		dropDb:   BargeinCollapseDropDb,
-		lowAbsDb: BargeinCollapseLowAbsDb,
+		dropDB:   BargeinCollapseDropDB,
+		lowAbsDB: BargeinCollapseLowAbsDB,
 		sustain:  BargeinCollapseSustain,
 	}
 }
@@ -223,8 +223,8 @@ func (d *CollapseDetector) Observe(w BargeinWindowStat) []CollapseAlarm {
 		d.base = d.base[len(d.base)-bargeinCollapseBaseWindow:]
 	}
 	var alarms []CollapseAlarm
-	drop := len(d.base) >= bargeinCollapseMinArm && db <= medianBargein(d.base)-d.dropDb
-	low := db < d.lowAbsDb
+	drop := len(d.base) >= bargeinCollapseMinArm && db <= medianBargein(d.base)-d.dropDB
+	low := db < d.lowAbsDB
 	if drop || low {
 		d.run++
 		if d.run == d.sustain {
@@ -531,8 +531,8 @@ func (g *BargeinGate) ObserveWindow(w BargeinWindowStat, farCorr float64) {
 	g.wins = append(g.wins, g.det.Sustained() || (!math.IsNaN(farCorr) && farCorr < g.fcorr.floor))
 }
 
-// Windows reports the per-window untrusted flags (the readings surface for
-// the offline re-cut and the integration panel).
+// UntrustedWindows reports the per-window untrusted flags (the readings
+// surface for the offline re-cut and the integration panel).
 func (g *BargeinGate) UntrustedWindows() []bool {
 	out := make([]bool, len(g.wins))
 	copy(out, g.wins)

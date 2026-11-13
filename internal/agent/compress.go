@@ -39,25 +39,6 @@ type Summarizer interface {
 	SummarizeHistory(ctx context.Context, msgs []llm.Message) (string, error)
 }
 
-// CompressionReport describes one compression pass (assertion + log surface).
-//
-// Trace placement (ticket 139 AC#2): a pass that actually folded history is
-// booked as ONE slog.Info record ("agent: history compressed") emitted right
-// here, on the success edge, so it carries the counts and never the text.
-// Field set (ticket 153 AC#2 appends the last key): tokens_before,
-// tokens_after, threshold, msgs_before, msgs_after, compressed_msgs,
-// kept_raw_rounds, history_changed, and "task" - the owning task id, present
-// only when the caller handed this pass one (see withTraceTask below).
-// Three things follow from putting it in the compressor rather than at a call
-// site: the record exists even for a caller that forgets to log (the
-// Warm-window hook DEFERRED(D28-1) installs will get it for free); it pairs
-// with the caller's failure Warn ("agent: history compression failed") so both
-// outcomes of one call answer to the search prefix "agent: history compress";
-// and it cannot be emitted for a pass that folded nothing, because the fold is
-// decided inside this function (rep.Ran), not inferred afterwards.
-//
-// Privacy: [privacy] keep_transcript forbids putting history text on this
-// line, so every attribute is a count or a flag.
 // CompressionState is the outcome of one compression pass (ticket 358 AC#1,
 // the shape the orchestrator ruled: a tri-state enum, NOT a companion bool).
 //
@@ -157,6 +138,25 @@ const (
 	skipReasonUnderFoldBudget = "under_fold_budget"
 )
 
+// CompressionReport describes one compression pass (assertion + log surface).
+//
+// Trace placement (ticket 139 AC#2): a pass that actually folded history is
+// booked as ONE slog.Info record ("agent: history compressed") emitted by
+// Compress, on the success edge, so it carries the counts and never the text.
+// Field set (ticket 153 AC#2 appends the last key): tokens_before,
+// tokens_after, threshold, msgs_before, msgs_after, compressed_msgs,
+// kept_raw_rounds, history_changed, and "task" - the owning task id, present
+// only when the caller handed this pass one (see withTraceTask below).
+// Three things follow from putting it in the compressor rather than at a call
+// site: the record exists even for a caller that forgets to log (the
+// Warm-window hook DEFERRED(D28-1) installs will get it for free); it pairs
+// with the caller's failure Warn ("agent: history compression failed") so both
+// outcomes of one call answer to the search prefix "agent: history compress";
+// and it cannot be emitted for a pass that folded nothing, because the fold is
+// decided inside this function (rep.Ran), not inferred afterwards.
+//
+// Privacy: [privacy] keep_transcript forbids putting history text on this
+// line, so every attribute is a count or a flag.
 type CompressionReport struct {
 	// Ran is the compatibility mirror of State == CompressionCompacted. State
 	// is authoritative: every report Compress returns satisfies

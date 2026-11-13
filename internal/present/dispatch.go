@@ -10,11 +10,15 @@ import (
 	"strings"
 )
 
+// Speaker hands the line to the voice leg's announce queue (D38b owner
+// goroutine). The ChTTS exfil gate lives on that announce path in the
+// host (ticket 26 wiring) and is NOT duplicated here.
+//
 // The channel ports. Each one is the narrowest face the router needs, so the
 // host adapters stay thin and the real implementations keep their own
 // semantics:
 //
-//   - Speaker hands the line to the voice leg's announce queue (D38b owner
+//   - Speaker: hands the line to the voice leg's announce queue (D38b owner
 //     goroutine). The ChTTS exfil gate lives on that announce path in the
 //     host (ticket 26 wiring) and is NOT duplicated here.
 //   - Notifier is the system toast. Its failure must never silence the rest

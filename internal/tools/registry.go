@@ -10,8 +10,9 @@ import (
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
-// C4 ToolProvider (SPEC-07 §2): four slots - Builtin, Manifest (Tier-1),
-// Goja (Tier-2), MCP. Only Builtin has an implementation here.
+// Kind is one C4 ToolProvider slot (SPEC-07 §2): four slots - Builtin,
+// Manifest (Tier-1), Goja (Tier-2), MCP. Only Builtin has an implementation
+// here.
 type Kind string
 
 // The C4 slots (SPEC-07 §2).

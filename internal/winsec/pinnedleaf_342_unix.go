@@ -1,5 +1,11 @@
 //go:build unix
 
+// Package winsec - file-level note: this is the unix family's placement-pin
+// file (tickets 342 + 348, form 乙): the ancestor pin and the two act-time
+// primitives (openat, unlinkat) the private write route stands on. The
+// package-wide promise - "the current user is the only principal that can read
+// this" - is documented in winsec.go.
+//
 // Tickets 342 + 348, leg 342-r1, form 乙 on the unix family: the ancestor pin and the two
 // act-time primitives the private write route stands on.
 //

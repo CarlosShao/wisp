@@ -392,9 +392,10 @@ func systemDecl(level risk.Level, cap Capability, facts func(context.Context, ma
 	}
 }
 
-// Decls for the family. Each is a function rather than a package variable for
-// the same reason PlanPresentDecl is: the roster a test reads must be the roster
-// the registry froze, never a second copy that can drift.
+// SystemGetDecl is the system.get row of the system family. The rows are
+// functions rather than package variables for the same reason PlanPresentDecl
+// is: the roster a test reads must be the roster the registry froze, never a
+// second copy that can drift.
 func SystemGetDecl() Decl      { return systemDecl(risk.L0, CapSysinfo, nil) }
 func SystemSetDecl() Decl      { return systemDecl(risk.L1, CapSysinfo, nil) }
 func SystemPowerDecl() Decl    { return systemDecl(risk.L2, CapSysinfo, powerFacts) }

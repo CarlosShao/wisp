@@ -57,10 +57,11 @@ import (
 	"time"
 )
 
-// The five engine families whose lifetime the scope owns (SPEC-05 section 5,
-// C31: "ASR/TTS/VAD/punct/KWS acquire-release through SessionScope only"). They
-// are strings rather than an iota because they reach logs and audit lines, and
-// a renumbered constant is a silent change in what an old line means.
+// EngineKind names one of the five engine families whose lifetime the scope
+// owns (SPEC-05 section 5, C31: "ASR/TTS/VAD/punct/KWS acquire-release through
+// SessionScope only"). They are strings rather than an iota because they reach
+// logs and audit lines, and a renumbered constant is a silent change in what
+// an old line means.
 type EngineKind string
 
 const (

@@ -8,9 +8,9 @@ import (
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
-// C1 Tool contract (SPEC-07 §2, Pi AgentTool semantics per D21#1). The four
-// methods below are the frozen contract: Name / Description / Parameters
-// (JSON Schema) / Execute(ctx, params, onUpdate).
+// Tool is the C1 tool contract (SPEC-07 §2, Pi AgentTool semantics per
+// D21#1). The four methods below are the frozen contract: Name / Description /
+// Parameters (JSON Schema) / Execute(ctx, params, onUpdate).
 //
 // Everything the HOST needs but the contract does not give a tool (its
 // capability declarations, its R1 declared risk floor, its C22 per-tool

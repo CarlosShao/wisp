@@ -38,7 +38,7 @@ func wensityBandDeform(spectrumMid float32) float32 {
 }
 
 // wensityBandSegmentColor picks the stop colour of span position t: the
-// nearest stop along wensityStopTs. No interpolation - the band is a chain
+// nearest stop along wensityStopTS. No interpolation - the band is a chain
 // of soft overlapping spots of PURE token colours, which is also how the
 // reference's hue clusters measured (65-style-direction §1.1).
 func wensityBandSegmentColor(t float32) Color {
@@ -51,7 +51,7 @@ func wensityBandSegmentColor(t float32) Color {
 		wensityBandTokens.StopOrange,
 	}
 	best, bestDist := 0, float32(2)
-	for i, ts := range wensityStopTs {
+	for i, ts := range wensityStopTS {
 		if d := absf32(t - ts); d < bestDist {
 			best, bestDist = i, d
 		}

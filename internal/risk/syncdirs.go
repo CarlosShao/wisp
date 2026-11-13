@@ -451,7 +451,7 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 	return SyncStatus{Sync: false, Why: "write target is not under any sync root"}
 }
 
-// Roots returns the detected roots (panel/debug view). The suspect fallback
+// SyncRoots returns the detected roots (panel/debug view). The suspect fallback
 // is reported via SyncDetectionComplete()==false, not as a root.
 func (p *Provenance) SyncRoots() []SyncRoot {
 	if p.sync == nil {

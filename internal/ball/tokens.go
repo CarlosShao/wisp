@@ -440,11 +440,11 @@ var wensityBandTokens = WensityBand{
 // WensityBandTokens returns the band token set (renderer/test seam).
 func WensityBandTokens() WensityBand { return wensityBandTokens }
 
-// wensityStopTs places the six stops along the band span (fractions 0..1;
+// wensityStopTS places the six stops along the band span (fractions 0..1;
 // hue-cluster centroids of 65-style-direction §1.1, spread so the
 // red->magenta->white->blue->cyan->orange order reads left to right).
 // Unexported on purpose: a within-treatment stop layout, not a knob.
-var wensityStopTs = [6]float32{0.06, 0.22, 0.46, 0.66, 0.84, 0.98}
+var wensityStopTS = [6]float32{0.06, 0.22, 0.46, 0.66, 0.84, 0.98}
 
 // Wensity band geometry (ticket 65; fractions of the orb radius R, measured
 // in 65-style-direction §1.1/§2.1 and C21-tabled - the renderer bakes from

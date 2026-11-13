@@ -46,9 +46,9 @@ func (s *Store) RestoreProfile(ctx context.Context, snapshots ...Profile) error 
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	var lastTs int64
+	var lastTS int64
 	for _, p := range snapshots {
-		lastTs = max(lastTs, p.UpdatedAt)
+		lastTS = max(lastTS, p.UpdatedAt)
 	}
 
 	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {

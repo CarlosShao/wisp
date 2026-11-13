@@ -5,9 +5,10 @@ import (
 	"strings"
 )
 
-// C3 capability face (SPEC-07 §2). The eleven tokens below are the frozen set:
-// a token outside it is invalid input, not a capability, and no caller may
-// extend the list at runtime (extending C3 is a contract change).
+// Capability is one token of the C3 capability face (SPEC-07 §2). The eleven
+// tokens below are the frozen set: a token outside it is invalid input, not a
+// capability, and no caller may extend the list at runtime (extending C3 is a
+// contract change).
 //
 // The enforcement rule is asymmetric on purpose: a tool that needs a capability
 // it never declared is REJECTED (see hardReject in bridge.go), it is not an

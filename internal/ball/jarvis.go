@@ -22,7 +22,7 @@ const (
 
 // Jarvis geometry/motion tokens (fractions of the orb radius R unless stated;
 // measured on jarvis-orb.png, 65-style-direction §1.2). Unexported on purpose:
-// a within-style layout, not a knob - the same law as wensityStopTs.
+// a within-style layout, not a knob - the same law as wensityStopTS.
 const (
 	jarvisRingInnerFrac     = 0.16               // inner orbit radius
 	jarvisRingMainIdleFrac  = 0.50               // main orbit, idle/rest/success

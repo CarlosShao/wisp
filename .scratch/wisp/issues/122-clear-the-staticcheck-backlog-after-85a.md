@@ -163,3 +163,31 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   packages/findings/crash-lines），期望接近 32/124（runner go patch 版与并行腿新 .go 会动分母，判读以两遍分开数字为准）；
   清账波按新分母领单：pass 1 的 32 条 GOOS 无关缺陷＋pass 2 的 windows-only 14 条＋U1000 79 条按
   `122-u1000-judgment.md` 归属表清。
+
+- [2026-11-13 13:5x +08] agent=122-wave2-pass1（写腿，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-wave2-pass1-dispatch.txt`，开工 HEAD `da2702a2a`，staticcheck 2026.2.2）
+  did=**pass1 清账波 2 落地**：复跑 GOOS=linux `-checks=all,-U1000`＝**31 条**（与派单逐条一致；派单 ST1021×10
+  实为 ×9，总数不变）→ 清后 **3 条**＝第二类三特殊项原样（frontend SA9009／plugin SA5000／plugin manifest.go
+  ST1022），第一类 28 条**全数真改清除，零 lint:ignore、零 staticcheck.conf、零开关**。按码后表：ST1000 2→0、
+  ST1003 10→0、ST1020 3→0、ST1021 9→0、ST1023 2→0、ST1022 2→1（特殊项③）、SA5000/SA9009 各留 1（特殊项①②）。
+  28 条逐条＋改名 grep 前/后计数表＝证据件 `docs/evidence/s1/122-wave2-pass1-clearance.md` §3
+  （ST1003 十条改全引用点，8 个旧名除 evidence 历史档外归零；ST1021 compress.go 那条是**拆块**：
+  CompressionReport 说明段原文搬到它自己的类型声明处，"emitted right here" 随位置改真话）。
+  门禁：build 唯一红＝`build/mut_rvw.go`（.gitignore 本机残件，check-ignore 实证，派单禁删）；vet rc0；
+  10 门禁包 test 全 ok＋internal/agent ok；`audio/aecspike` 首跑 0xc0000135＝sherpa cgo DLL 要仓库根在 PATH
+  （`:35`/`:13` 注释自带该运行约定），PATH 补齐复跑 ok（PASS 19/SKIP 13 点名全是 `WISP_AEC_SPIKE=1` 硬件夹具）；
+  gofumpt 唯一命中＝`internal/models/acl_sid_121_test.go` 非本波改动（HEAD blob 过 gofumpt 干净，工作副本被别的
+  进程动成 CRLF）；d22scan clean；portable-tests **无 `--self-test` 模式**（旗透传给 go list 报错），按 Usage
+  实跑 `--scope=windows` **rc0**（runtests OK：PASS=833 FAIL=0 SKIP=0，账本 12 条 8 条记账，GUARD A–D 过），
+  ubuntu 核心 scope 本机 rc1＝同上述 13 个硬件 SKIP 不在 ubuntu 账本（本机形状，非改动引起）。
+  对账：pass2 非 U1000 45→17（45−28 跨平台清除，精确吻合）；剩余 17＝windows-only 14（audio 5／ball ST1012 2／
+  proc 3／secret SA4010／tools ST1005 2／winsec ST1000）＋特殊项 3，**本波零越界**＝下一波工单面。
+  特殊项三案（**未落**，全文在证据件 §5）：① SA9009 建议甲=ci.yml 两遍 -checks 各具名加 `-SA9009`
+  （frontend 字节零触碰、仪器不再重报；乙=根目录 staticcheck.conf 纯登记注释、丙=维持现状，留给编排者裁）；
+  ② SA5000 读后判断＝**夹具有意、断言有效、不该修**（crashHost doc :40-43 与第二个用例 :145-148 明写 nil-map
+  写就是被测的 runtime.Error 宿主崩溃形状，修＝拆半个 AC#4 断言）；若裁定落，一行
+  `//lint:ignore SA5000 ticket 51 AC#4 fixture...` 于 :61，由 plugin 腿/编排者定；
+  ③ plugin ST1022 留票 70 腿顺手落（1 行 doc 移动，方案已写）。
+  本波 commit 只含 19 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树里 3 个他腿改动
+  （291 probe／346-a2 dispatch／frontend fixture）零触碰零提交。
+  next=编排者推送后取 CI lint 步两段自报读数（期望 pass1≈3／pass2≈95）；特殊项①②③的落法待裁。

@@ -25,7 +25,7 @@ func TestContentSealed(t *testing.T) {
 		t.Fatalf("content part registry out of sync: %d names, %d parts", len(contentPartNames), len(parts))
 	}
 	for _, p := range parts {
-		var c Content = p // compile-time: every part satisfies the interface
+		c := p // p is already a Content: the literal above is the compile-time seal
 		_ = c
 	}
 }

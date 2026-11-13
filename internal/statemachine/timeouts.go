@@ -15,7 +15,8 @@ const (
 	PhaseConversation              // conversation mode (#28/#30): 30s
 )
 
-// Per-state timeout table (SPEC-08 §3 timeout column):
+// TimeoutSpec is one entry of the per-state timeout table (SPEC-08 §3 timeout
+// column):
 //
 //	Listening        first-round 15s | in-session 90s | conversation 30s (#12)
 //	Confirming       L1 countdown 3s (#21; SPEC-06 L1 window is 2-3s, the

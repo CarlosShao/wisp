@@ -38,8 +38,8 @@ type Stater interface {
 	Stats() Stats
 }
 
-// Target sample rate of the C8 seam: everything downstream (VAD/ASR/KWS)
-// consumes 16kHz mono (SPEC-04 sec 3).
+// TargetRate is the target sample rate of the C8 seam: everything downstream
+// (VAD/ASR/KWS) consumes 16kHz mono (SPEC-04 sec 3).
 const TargetRate = 16000
 
 // FrameSamples is the frame length the seam guarantees, aligned to the VAD

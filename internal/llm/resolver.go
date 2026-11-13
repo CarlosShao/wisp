@@ -33,7 +33,7 @@ type KeyResolver interface {
 	Resolve(ref string) (string, error)
 }
 
-// Role carries the call-time sampling settings resolved with a role.
+// RoleSettings carries the call-time sampling settings resolved with a role.
 type RoleSettings struct {
 	Temperature       float64
 	ThinkingIntensity string

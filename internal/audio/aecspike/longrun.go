@@ -168,17 +168,17 @@ func (a *ERLEAccum) SpanERLE(from, to int) float64 {
 // it is running". It consumes one ERLE window at a time (causal: only the
 // past) and fires two alarm shapes, each once per sustained streak:
 //
-//   - "drop": the window fell dropDb below the median of the recent good
+//   - "drop": the window fell dropDB below the median of the recent good
 //     windows (a converged engine losing convergence mid-run);
-//   - "low-absolute": the window sits below lowAbsDb outright (the cold
+//   - "low-absolute": the window sits below lowAbsDB outright (the cold
 //     collapse shape - the 8.9dB peak against the 29-30.7dB one, which this
 //     cut separates by construction).
 //
 // Windows without far-active frames are skipped without resetting a streak
 // (the echo is absent there; absence is not recovery).
 type CollapseDetector struct {
-	dropDb   float64
-	lowAbsDb float64
+	dropDB   float64
+	lowAbsDB float64
 	sustain  int
 
 	base []float64 // the last baseWindow active-window ERLEs
@@ -200,8 +200,8 @@ type CollapseAlarm struct {
 // below a rolling median catches mid-run losses well above the absolute
 // floor, and three consecutive 1s windows ride out word-gap flicker.
 const (
-	collapseDropDb        = 6
-	collapseLowAbsDb      = 15
+	collapseDropDB        = 6
+	collapseLowAbsDB      = 15
 	collapseSustain       = 3
 	collapseBaseWindow    = 8
 	collapseMinArmWindows = 3
@@ -210,8 +210,8 @@ const (
 // NewCollapseDetector arms the detector with the leg's tuning.
 func NewCollapseDetector() *CollapseDetector {
 	return &CollapseDetector{
-		dropDb:   collapseDropDb,
-		lowAbsDb: collapseLowAbsDb,
+		dropDB:   collapseDropDB,
+		lowAbsDB: collapseLowAbsDB,
 		sustain:  collapseSustain,
 	}
 }
@@ -228,8 +228,8 @@ func (d *CollapseDetector) Observe(w ERLEWindowStat) []CollapseAlarm {
 		d.base = d.base[len(d.base)-collapseBaseWindow:]
 	}
 	var alarms []CollapseAlarm
-	drop := len(d.base) >= collapseMinArmWindows && db <= median(d.base)-d.dropDb
-	low := db < d.lowAbsDb
+	drop := len(d.base) >= collapseMinArmWindows && db <= median(d.base)-d.dropDB
+	low := db < d.lowAbsDB
 	if drop || low {
 		d.run++
 		if d.run == d.sustain {

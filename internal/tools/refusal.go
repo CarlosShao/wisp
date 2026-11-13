@@ -4,7 +4,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
-// The machine-readable refusal classes (ticket 20 frame 7 (a)).
+// RefusalKind is the machine-readable refusal class (ticket 20 frame 7 (a)).
 //
 // WHY A TYPED VALUE AND NOT A WORDING. Until this file, the two refusal
 // families below were told apart only by their human Reason text, and

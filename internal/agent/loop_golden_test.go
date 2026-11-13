@@ -219,7 +219,7 @@ func TestToolExecutionRunsFourAcross(t *testing.T) {
 // Budget exhaustion is the C22 token brake: Stuck state plus an explicit,
 // user-visible message that names the consumption. No silent stop.
 func TestGoldenBudgetExhaustionStuck(t *testing.T) {
-	var cfgTokenBudget int = 300 // two rounds of 170 tokens
+	cfgTokenBudget := 300 // two rounds of 170 tokens
 	h := newHarness(t, "budget-loop", withConfig(func(c *Config) {
 		c.TokenBudget = cfgTokenBudget
 	}))

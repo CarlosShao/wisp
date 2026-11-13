@@ -16,7 +16,7 @@ import (
 // of that rule; adapters must resolve the ref into bytes only at wire-encode
 // time (Request.ResolveBytes) and must not log the encoded payload.
 
-// Role of a normalized Message.
+// MessageRole is the role of a normalized Message.
 type MessageRole string
 
 const (

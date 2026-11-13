@@ -1,3 +1,8 @@
+// Package agent - file-level note: images.go is the memory half of the C7
+// image seam (ticket 23 AC#2). The package's own charter - the ReAct loop,
+// budgeting, cancellation - is documented in doc.go; this file adds the
+// process-local image store the loop hands screenshot bytes to.
+//
 // Ticket 23 AC#2 - the memory half of the C7 image seam.
 //
 // screen.capture hands the loop the raw pixels of a window it just captured.
