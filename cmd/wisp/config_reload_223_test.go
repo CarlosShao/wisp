@@ -431,7 +431,27 @@ func TestTicket223HandEditedFsLooseningCostsAnL2Card(t *testing.T) {
 		}
 		// The card text is what the operator reads; the ledger's ReplyCard has no
 		// reason field, so the naming is asserted off the console.
-		shown := r.h.out.String()
+		//
+		// TICKET 111 WAVE 10 (⑤): read the face this assertion is about,
+		// waited-for. consoleApprovalUI.Prompt books the card into the ledger
+		// FIRST and only then writes its lines (run.go:2743-2770: the order is
+		// the point - "from the moment a card is on screen someone may answer
+		// it"), so awaitCard above can return while the card's own text is still
+		// in flight on stdout. A single r.h.out.String() read at that instant is
+		// a real window: on a loaded host the reply listener can spend the card
+		// between the ledger write and the Fprintf, so the console can carry
+		// "已允许" without ever carrying "[确认 L2 ...]" - which is exactly the
+		// CI reading (run 43425302222: the two reds here while the same log
+		// carried "locked loosening approved via L2 re-confirmation", i.e. the
+		// card WAS displayed, recorded, and allowed before the read). The
+		// package precedent for this shape is ticket 351's G2/G3 arm
+		// (TestTicket223ModeLooseningChangesTheRunningModeAfterAllow below,
+		// :618-:626: awaitStdout("[确认 L2 ...]"), then assert the naming on the
+		// awaited return value); this case applies the same shape to its own
+		// two arms. The needles are unchanged verbatim; only WHERE they are
+		// read moved - a sentence that never arrives still fails at
+		// reloadCaseBudget with the full stream dumped (awaitStdout's own rule).
+		shown := r.awaitStdout(t, "[确认 L2 "+configReloadTool+"]")
 		if !strings.Contains(shown, "[确认 L2 "+configReloadTool+"]") {
 			t.Errorf("the console did not render the reload card: %s", shown)
 		}

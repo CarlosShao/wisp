@@ -157,6 +157,34 @@ func (b *demo16Bridge) snapshot() (transcripts []string, exits []int, notices []
 		append([]string(nil), b.notices...), b.stdout.String(), b.stderr.String()
 }
 
+// demo16AnnounceNeedsAnOutputDevice is ①'s precondition probe (ticket 111 wave
+// 10). The demo's tail speaks the reply through the PRODUCTION announce path -
+// real matcha checkpoint, real waveOut render (voice_out_windows.go:217 opens
+// the default output device). On a hosted runner that reports zero waveOut
+// devices the announce line itself degrades to the D10 notification
+// (resident_voice_engines_windows.go:1171 notes 播报没有输出设备 and the
+// announcement cannot be heard), so the SPEAK half of the D43 walk below
+// (#15/#26, and the counters at :379) has no subject. Skip ONLY that named
+// precondition; on any machine with an output device the probe opens nothing
+// durably (probe speaker is closed immediately) and every assertion below runs
+// unchanged. Probe shape = the 26p echo rig's own precedent
+// (resident_voice_bargein_26p_echo_windows_test.go:102-106).
+func demo16AnnounceNeedsAnOutputDevice(t *testing.T) {
+	t.Helper()
+	// Tripwire proof lever (ticket 111 wave 10): forces the probe's ANSWER to
+	// no-device so the skip branch can be demonstrated on a machine that HAS
+	// an output device - the dispatcher's own injection shape ("把输出设备探
+	// 测结果打到无设备"). No product code runs below this branch either way.
+	if os.Getenv("WISP_TEST_FORCE_NO_WAVEOUT") == "1" {
+		t.Skipf("the demo's announce needs a waveOut output device; this machine reports none: [INJECTED premise WISP_TEST_FORCE_NO_WAVEOUT=1 - the probe's answer is forced to no-device for the tripwire reading, the real openWaveOutSpeaker probe did not run] - the D43#15/#26 Speaking walk has no subject here (degrades to the D10 notification), so the demo cannot be measured on this host")
+	}
+	if probe, err := openWaveOutSpeaker(22050); err != nil {
+		t.Skipf("the demo's announce needs a waveOut output device; this machine reports none: %v - the D43#15/#26 Speaking walk has no subject here (degrades to the D10 notification), so the demo cannot be measured on this host", err)
+	} else {
+		_ = probe.Close()
+	}
+}
+
 // Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware is AC#1's chain demo:
 // say command (wav) -> Armed->Listening->Thinking->(agent turn)->Speaking->
 // Warm->Settling with the transcript, the tool_call rows and the settle trace
@@ -164,6 +192,7 @@ func (b *demo16Bridge) snapshot() (transcripts []string, exits []int, notices []
 // (KWS arm #5, wake #7, vad-stop #11, announce #15/#26); the case dispatches
 // nothing by hand.
 func Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware(t *testing.T) {
+	demo16AnnounceNeedsAnOutputDevice(t)
 	dataDir := voice15eDataDir(t)
 
 	// The note fs.read will read, and the config that points the agent at the
