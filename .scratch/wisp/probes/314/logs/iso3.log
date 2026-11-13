@@ -1,0 +1,263 @@
+===== TICKET314 PRE-RUN DESK =====
+DESK314 ts=2026-11-13 21:08:12 input_desktop=Default logonui_session1=0 foreground=44296:Weixin cpu_load=97 cores=12
+===== git HEAD =====
+2efedd78b3b815c773c84b4d93d7606c0d8eb6d9
+===== carrier argv =====
+-test.run
+^(TestAC13BringUpSurvivesAReusedThreadQuit|TestAC13BringUpRefusesAThreadWithAQueuedClose|TestAC14AwaitedBindingReplyReachesThePage|TestAC14GoSideEvalPushReachesThePage|TestPanelThreadIsSTAAndExitsCleanly)$
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-13T21:08:17.842+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+time=2026-11-13T21:08:17.863+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-13T21:08:17.872+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x8b60c30"
+time=2026-11-13T21:08:17.872+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x18 known=true"
+time=2026-11-13T21:08:17.873+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x46 known=true"
+time=2026-11-13T21:08:17.876+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x46 known=true"
+time=2026-11-13T21:08:17.877+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x1c known=true"
+time=2026-11-13T21:08:17.878+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x86 known=true"
+time=2026-11-13T21:08:17.879+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:17.879+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:17.879+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:17.879+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x6 known=true"
+time=2026-11-13T21:08:17.892+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x281 known=true"
+time=2026-11-13T21:08:17.895+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x282 known=true"
+time=2026-11-13T21:08:17.898+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x3d known=true"
+time=2026-11-13T21:08:17.898+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x3d known=true"
+time=2026-11-13T21:08:17.898+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7 known=true"
+time=2026-11-13T21:08:17.899+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x85 known=true"
+time=2026-11-13T21:08:17.899+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x14 known=true"
+time=2026-11-13T21:08:17.900+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x47 known=true"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x5 known=true"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x3 known=true"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0xf known=true"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-13T21:08:17.901+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-13T21:08:17.926+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x210 known=true"
+time=2026-11-13T21:08:17.927+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:17.927+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x31f known=true"
+time=2026-11-13T21:08:17.927+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0xc0fa known=true"
+time=2026-11-13T21:08:17.928+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:17.930+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:18.481+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:18.481+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x7f known=true"
+time=2026-11-13T21:08:18.533+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-13T21:08:18.787+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x14 known=true"
+time=2026-11-13T21:08:18.806+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0xf known=true"
+time=2026-11-13T21:08:18.816+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x10 known=true"
+time=2026-11-13T21:08:18.816+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x90 known=true"
+time=2026-11-13T21:08:18.816+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x46 known=true"
+time=2026-11-13T21:08:18.818+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x47 known=true"
+time=2026-11-13T21:08:18.818+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x281 known=true"
+time=2026-11-13T21:08:18.818+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x282 known=true"
+time=2026-11-13T21:08:18.818+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8b60c30 msg=0x2 known=true"
+    panel_resident_windows_test.go:629: AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=<nil> err=<nil> created=true
+    panel_resident_windows_test.go:631: AC#13 reused-thread release: tid=11644 dispatched 3 message(s) before unlocking; windows left on that thread=0 queue head=empty
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (1.05s)
+=== RUN   TestAC13BringUpRefusesAThreadWithAQueuedClose
+time=2026-11-13T21:08:18.906+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-13T21:08:18.910+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x4550c68"
+time=2026-11-13T21:08:18.910+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x18 known=true"
+time=2026-11-13T21:08:18.910+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x46 known=true"
+time=2026-11-13T21:08:18.914+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x46 known=true"
+time=2026-11-13T21:08:18.914+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x1c known=true"
+time=2026-11-13T21:08:18.915+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x86 known=true"
+time=2026-11-13T21:08:18.916+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:18.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:18.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:18.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x6 known=true"
+time=2026-11-13T21:08:18.925+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x281 known=true"
+time=2026-11-13T21:08:18.929+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x282 known=true"
+time=2026-11-13T21:08:18.929+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x3d known=true"
+time=2026-11-13T21:08:18.929+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x3d known=true"
+time=2026-11-13T21:08:18.929+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7 known=true"
+time=2026-11-13T21:08:18.930+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x85 known=true"
+time=2026-11-13T21:08:18.930+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x14 known=true"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x47 known=true"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x5 known=true"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x3 known=true"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0xf known=true"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-13T21:08:18.931+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-13T21:08:18.936+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x210 known=true"
+time=2026-11-13T21:08:18.936+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:18.936+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x31f known=true"
+time=2026-11-13T21:08:18.936+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0xc0fa known=true"
+time=2026-11-13T21:08:18.965+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:18.965+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:19.486+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:19.486+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x7f known=true"
+time=2026-11-13T21:08:19.573+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-13T21:08:19.822+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x14 known=true"
+time=2026-11-13T21:08:19.840+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0xf known=true"
+time=2026-11-13T21:08:19.858+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x10 known=true"
+time=2026-11-13T21:08:19.858+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x90 known=true"
+time=2026-11-13T21:08:19.858+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x46 known=true"
+time=2026-11-13T21:08:19.860+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x47 known=true"
+time=2026-11-13T21:08:19.860+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x281 known=true"
+time=2026-11-13T21:08:19.861+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x282 known=true"
+time=2026-11-13T21:08:19.862+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4550c68 msg=0x2 known=true"
+    panel_resident_windows_test.go:716: AC#13 queued-close: tid=11644 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0x4550C68, plantQueued=true), then bringUp#2 err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x4550C68. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false; the close was still queued after the refusal=true; released with windows=0 queue head=empty
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.02s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-11-13T21:08:19.921+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-13T21:08:19.925+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-13T21:08:19.932+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x12030ffc"
+time=2026-11-13T21:08:19.932+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x18 known=true"
+time=2026-11-13T21:08:19.932+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x46 known=true"
+time=2026-11-13T21:08:19.936+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x46 known=true"
+time=2026-11-13T21:08:19.938+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x1c known=true"
+time=2026-11-13T21:08:19.938+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x86 known=true"
+time=2026-11-13T21:08:19.938+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:19.939+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:19.939+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:19.940+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x6 known=true"
+time=2026-11-13T21:08:19.948+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x281 known=true"
+time=2026-11-13T21:08:19.954+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x282 known=true"
+time=2026-11-13T21:08:19.955+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x3d known=true"
+time=2026-11-13T21:08:19.956+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x3d known=true"
+time=2026-11-13T21:08:19.957+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7 known=true"
+time=2026-11-13T21:08:19.957+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x85 known=true"
+time=2026-11-13T21:08:19.957+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x14 known=true"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x47 known=true"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x5 known=true"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x3 known=true"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0xf known=true"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-13T21:08:19.958+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-13T21:08:19.965+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x210 known=true"
+time=2026-11-13T21:08:19.965+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:19.965+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x31f known=true"
+time=2026-11-13T21:08:19.965+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0xc0fa known=true"
+time=2026-11-13T21:08:19.992+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:19.993+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:20.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:20.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:20.656+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-13T21:08:20.902+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x14 known=true"
+time=2026-11-13T21:08:20.916+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 1024.1 ms, hot path 0.0 ms)
+time=2026-11-13T21:08:21.054+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:21.055+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+time=2026-11-13T21:08:21.055+08:00 level=INFO msg="MARK299 wndproc hwnd=0x12030ffc msg=0x7f known=true"
+    panel_resident_windows_test.go:972: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+time=2026-11-13T21:08:21.266+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-11-13T21:08:21.266+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.39s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+time=2026-11-13T21:08:21.320+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-13T21:08:21.325+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-13T21:08:21.332+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0xce80afa"
+time=2026-11-13T21:08:21.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x18 known=true"
+time=2026-11-13T21:08:21.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x46 known=true"
+time=2026-11-13T21:08:21.336+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x46 known=true"
+time=2026-11-13T21:08:21.337+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x1c known=true"
+time=2026-11-13T21:08:21.337+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x86 known=true"
+time=2026-11-13T21:08:21.338+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.338+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.338+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.339+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x6 known=true"
+time=2026-11-13T21:08:21.346+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x281 known=true"
+time=2026-11-13T21:08:21.350+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x282 known=true"
+time=2026-11-13T21:08:21.350+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x3d known=true"
+time=2026-11-13T21:08:21.350+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x3d known=true"
+time=2026-11-13T21:08:21.351+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7 known=true"
+time=2026-11-13T21:08:21.351+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x85 known=true"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x14 known=true"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x47 known=true"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x5 known=true"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x3 known=true"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0xf known=true"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-13T21:08:21.352+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-13T21:08:21.359+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x210 known=true"
+time=2026-11-13T21:08:21.368+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x31f known=true"
+time=2026-11-13T21:08:21.368+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.368+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0xc0fa known=true"
+time=2026-11-13T21:08:21.391+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.393+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.472+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:21.472+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:22.040+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-13T21:08:22.242+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x14 known=true"
+time=2026-11-13T21:08:22.263+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 963.9 ms, hot path 0.0 ms)
+time=2026-11-13T21:08:22.416+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:22.416+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:22.417+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:22.497+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+time=2026-11-13T21:08:22.498+08:00 level=INFO msg="MARK299 wndproc hwnd=0xce80afa msg=0x7f known=true"
+    panel_resident_windows_test.go:1011: AC#14 push nail: the handover document settled on probe attempt 5: "https://wisp.panel/index.html|complete|Wisp"
+    panel_resident_windows_test.go:1020: AC#14 nail 2 (Eval push hop), page's own words: title="PUSHED-33R5-OK"
+time=2026-11-13T21:08:22.948+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-11-13T21:08:22.948+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14GoSideEvalPushReachesThePage (1.71s)
+=== RUN   TestPanelThreadIsSTAAndExitsCleanly
+time=2026-11-13T21:08:23.033+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-13T21:08:23.040+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-13T21:08:23.047+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x87212d8"
+time=2026-11-13T21:08:23.048+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x18 known=true"
+time=2026-11-13T21:08:23.048+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x46 known=true"
+time=2026-11-13T21:08:23.052+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x46 known=true"
+time=2026-11-13T21:08:23.052+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x1c known=true"
+time=2026-11-13T21:08:23.053+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x86 known=true"
+time=2026-11-13T21:08:23.053+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.054+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.054+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.054+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x6 known=true"
+time=2026-11-13T21:08:23.060+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x281 known=true"
+time=2026-11-13T21:08:23.064+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x282 known=true"
+time=2026-11-13T21:08:23.064+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x3d known=true"
+time=2026-11-13T21:08:23.065+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x3d known=true"
+time=2026-11-13T21:08:23.065+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7 known=true"
+time=2026-11-13T21:08:23.065+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x85 known=true"
+time=2026-11-13T21:08:23.066+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x14 known=true"
+time=2026-11-13T21:08:23.067+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x47 known=true"
+time=2026-11-13T21:08:23.067+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x5 known=true"
+time=2026-11-13T21:08:23.067+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x3 known=true"
+time=2026-11-13T21:08:23.067+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-13T21:08:23.067+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0xf known=true"
+time=2026-11-13T21:08:23.067+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-13T21:08:23.068+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-13T21:08:23.068+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-13T21:08:23.075+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x210 known=true"
+time=2026-11-13T21:08:23.075+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.075+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x31f known=true"
+time=2026-11-13T21:08:23.075+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0xc0fa known=true"
+time=2026-11-13T21:08:23.103+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.104+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.466+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.466+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x7f known=true"
+time=2026-11-13T21:08:23.744+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-13T21:08:23.958+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0x14 known=true"
+time=2026-11-13T21:08:23.972+08:00 level=INFO msg="MARK299 wndproc hwnd=0x87212d8 msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 976.8 ms, hot path 0.0 ms)
+time=2026-11-13T21:08:24.043+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-11-13T21:08:24.059+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+    panel_resident_windows_test.go:1063: panel thread up and down: hwnd 0x87212d8, exits observed, shows=1
+time=2026-11-13T21:08:24.059+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (1.25s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	8.00s
+
+===== TICKET314 RUN SUMMARY =====
+tag=iso3
+rc=0
+start_epoch=1794575292 end_epoch=1794575305 dur_seconds=13
+start_local=2026-11-13 21:08:12 +0800
+end_local=2026-11-13 21:08:25 +0800
+===== TICKET314 POST-RUN DESK =====
+DESK314 ts=2026-11-13 21:08:28 input_desktop=Default logonui_session1=0 foreground=44296:Weixin cpu_load=99 cores=12

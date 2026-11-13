@@ -1,0 +1,55 @@
+===== TICKET314 PRE-RUN DESK =====
+DESK314 ts=2026-11-13 21:10:02 input_desktop=Default logonui_session1=0 foreground=44296:Weixin cpu_load=65 cores=12
+===== git HEAD =====
+2efedd78b3b815c773c84b4d93d7606c0d8eb6d9
+===== carrier argv =====
+-test.run
+^Test219AC2RevokeRoundTripByteForByte$
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-13T21:10:05.152+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test219AC2RevokeRoundTripByteForByte
+time=2026-11-13T21:10:07.379+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/13 21:10:07 mockllm: serving on http://127.0.0.1:49890 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-13T21:10:07.408+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-11-13T21:10:07.418+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\logs kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-11-13T21:10:07.424+08:00 level=INFO msg="wisp: persistent log sink installed" dir=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\logs min_level=info config_source=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=4 early_dropped=0
+time=2026-11-13T21:10:07.430+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-11-13T21:10:07.452+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-13T21:10:07.467+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-13T13:10:07Z duration_ms=14
+time=2026-11-13T21:10:07.473+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-13T21:10:07.479+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-13T13:10:07Z duration_ms=6
+time=2026-11-13T21:10:07.488+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-13T21:10:07.496+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-13T13:10:07Z duration_ms=8
+time=2026-11-13T21:10:07.508+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-13T21:10:07.517+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-13T13:10:07Z duration_ms=8
+time=2026-11-13T21:10:07.517+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-13T21:10:07.527+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-13T21:10:07.533+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-13T13:10:07Z duration_ms=5
+time=2026-11-13T21:10:07.544+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp\20261113\314\Test219AC2RevokeRoundTripByteForByte654996750\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-13T21:10:07.552+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-13T13:10:07Z duration_ms=7
+time=2026-11-13T21:10:07.556+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-13T21:10:07.560+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-13T21:10:07.560+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-13T21:10:07.596+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-11-13T21:10:07.605+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-11-13T21:10:07.710+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=09074a7b-039b-4a63-bbf1-4ca0df777e17
+time=2026-11-13T21:10:07.712+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-13T21:10:07.716+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test219AC2RevokeRoundTripByteForByte (2.58s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	2.00s
+
+===== TICKET314 RUN SUMMARY =====
+tag=iso219
+rc=0
+start_epoch=1794575402 end_epoch=1794575407 dur_seconds=5
+start_local=2026-11-13 21:10:02 +0800
+end_local=2026-11-13 21:10:07 +0800
+===== TICKET314 POST-RUN DESK =====
+DESK314 ts=2026-11-13 21:10:10 input_desktop=Default logonui_session1=0 foreground=44296:Weixin cpu_load=80 cores=12
