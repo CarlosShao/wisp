@@ -258,3 +258,42 @@ cmd/wisp/panel_resident_windows.go:231   return cfg.Panel.Width, cfg.Panel.Heigh
 | AC#6 门禁 | 逐包 `go test` | ⚠ 需跑测试 ⇒ **降载令下不派** |
 
 **5. ★给下一个接手的警告**：本票标题是**立票时刻（09-27 前后）**的事实，**不是今天的**。派腿前必须重跑上面第 1 条那条 grep。**这是"票面断言零读者"这类票的通用陷阱** —— 台账 `A1667` 记了。
+
+## 11-13 落地腿 `180-w1`（写腿·产码零字节；表 `docs/evidence/s1/180-panel-width-reader.md`；起手 HEAD `b5193c097`）
+
+- **AC#1 三问本程独立复核（不采信 11-09 复验节，只对格）**：① 读者**在场**——读
+  `cmd/wisp/panel_resident_windows.go:231 [return cfg.Panel.Width, cfg.Panel.Height]`（每次建窗现读盘）
+  → `panel_host_windows.go:354-383 windowOptions()` → 建窗 `Width: uint(width)`，全包唯一建窗点
+  `newPanelControl`（255 判据件尺 3 逐字 "the one create site is newPanelControl at 625, fed by m.windowOptions()"）；
+  另有外观波写侧 `internal/config/settings_appearance_wave.go:86 SetPanelWidth`／`:168 PanelWidthOptions`。
+  ② 规格要求生效：`PLAN.md:2736` 三档定义＋`:2753` `[panel] … hot`（现量行号，**比票面引的 :2743 已漂**，
+  现含 `font_size`(12)）＋SPEC-03:39 同行；**派单点名的 :1531/:1532 是剪贴板历史／xlsx-OCR 两条 DEFERRED，
+  与面板宽度无关**（全文 `width` 仅 ：2753 与 ：3461 SVG 两处命中）。③ 归属＝**接读者支，且已由票 255 AC#4
+  （33-r3 `908c6652c`）接上**——票面 AC#1 勾的 09-28 结论（"没有面板窗口"）两层作废照 11-09 复验节成立：
+  `internal/panel/pump.go:16` 注释过期、宿主在 cmd/wisp、`go.mod:9` go-webview2 在场。
+- **AC#2 正向**：判据复跑 GREEN——`TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions`
+  （517⇒建窗 517；改写 733⇒再读 733，**专杀快照退化**）＋四形表驱动＋建窗点钉，五枚全 PASS
+  （sherpa staging 垫 PATH，`ok cmd/wisp 0.230s`）。真窗 winlive 本程未跑（别腿在飞的共享树，
+  该尺在盘、读数由 255 交付时留档）。
+- **AC#3 反向**：`schema.go` diff 空（`default:"640"` 原样 :587）；摘线突变 M3 有效——
+  `:231` 改 `return 1,1` ⇒ 语义红（`panel_geometry_255_test.go:152 the create block got 1x1 …`），
+  字节级还原 sha256 `C4E79861…F4EF19` 前后一致；打歪两发（M1 落盘失败／M2 编译红）原样记录未洗。
+- **AC#4 同族再普查（主产出，台件 `probes/180/w1/`）**：母体 70 枚带 `default:` 字段（71 行 − :8 注释行），
+  判类 R/**G/Z** ⇒ **R 48／G 8／Z 7**（11-10 普查 33/7/30）。**Z 30→7 的 23 枚差全部有票可指**：
+  17 枚票 423＋423-K 接走（session 三、punctuation、agent 三、observe 三、privacy 三、memory 三、
+  conversation_mode、aec.enabled、input_device）、2 枚改判 G（echo_ref/sample_rate 守卫）、
+  2 枚本程新发现（`app.single_instance` 真读 `single_instance_boot_180p.go:69`；
+  `privacy.diagnostics_opt_in` 真读 `wisp diagnostics` 总闸 `diagnostics_cmd.go:137`——
+  423 的 DEFERRED 理由只对 GUI 半边成立）、2 枚 11-10 漏算喂线（ball.opacity_idle/click_through 外观波）。
+  **剩余 Z 7 枚**＝`app.language`/`app.theme`（→票 39 open）· `ball.hide_on_fullscreen`（→票 62/68 open，
+  **本程新量：功能半边不在**，internal/ball 无 fullscreen 判定）· `voice.wake_word.veto_words`（KWS 空表悬空）·
+  `voice.tts.provider`/`voice.tts.speed`（云 TTS 半边缺悬空，speed 是死读点
+  `cloudcatalog.go:119` 住无人调用的 `ResolveCloudChain`）· `observe.slo_sample_interval_sec`（DEFERRED 待裁）。
+  处置（开票/挂台账）归编排者，本腿不裁。
+- **AC#5 契约轴**：PLAN.md/specs/thresholds.go/golden/allowlist.txt/frontend/design 零字节；
+  `git diff HEAD -- internal/config/schema.go`＝空。
+- **AC#6 门禁（commit 前工作树现跑）**：`go build ./cmd/wisp/` rc0；`go vet ./cmd/wisp/` rc0；
+  `go test -count=1 ./internal/config/ ./internal/panel/` ⇒ `ok config 2.187s`＋`ok panel 15.533s` 全绿
+  （10-08 记的 panel 两枚红今天本机不红）；`gofumpt -l internal cmd tools scripts frontend` 空输出；
+  `sh scripts/d22scan.sh` 末行 `clean - no D22 ban violations`。起手树另有 3 处**他人**未提交改动
+  （probes 291/346＋frontend/fixtures），写面之外零触碰；本程产码零字节 ⇒ 无新增 roster 差集对象。

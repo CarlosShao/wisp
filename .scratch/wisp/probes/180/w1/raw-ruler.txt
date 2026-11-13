@@ -1,0 +1,1181 @@
+=== Language count=12
+internal\config\manager.go:379: restartChanged := cur.App.Language != fresh.App.Language ||
+internal\config\manager.go:387: // keep cur.App.Language/Autostart/SingleInstance at old values: this is
+internal\config\tiers.go:60: "app.language":        TierRestart,
+internal\memory\golden_extract.go:41: //   - pref.language:    "zh" | "en"  (the language the ASSISTANT replies in,
+internal\memory\l1_extract.go:66: pref.language     "zh" | "en"  (the language the ASSISTANT replies in, not the language the user typed)
+internal\memory\models.go:16: // ('pref.language', 'habit.work_hours', ...); at most L1MaxProfiles rows
+internal\memory\schema.go:44: slot       TEXT NOT NULL UNIQUE,      -- 'pref.language'|'pref.tone'|'habit.work_hours'|'fact.family'|…
+internal\speech\cloudasr.go:515: if a.ep.Language != "" {
+internal\speech\cloudasr.go:516: q += "&language=" + a.ep.Language
+internal\tools\web_search.go:130: if q.Language != "" {
+internal\tools\web_search.go:131: body["language"] = q.Language
+cmd\wisp\config_reload.go:374: "app.language", "app.autostart", "app.single_instance",
+=== Theme count=6
+internal\config\manager.go:378: themeChanged := cur.App.Theme != fresh.App.Theme
+internal\config\manager.go:383: plan.set = append(plan.set, func() { cur.App.Theme = fresh.App.Theme })
+internal\config\tiers.go:59: "app.theme":           TierHot,
+internal\config\validate.go:51: if !slices.Contains(themes, c.App.Theme) {
+internal\config\validate.go:53: "config.toml: app.theme %q must be one of %s", c.App.Theme, vocabList(themes)))
+cmd\wisp\config_readers_255.go:323: "app.theme": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App.THEME - manager.go's planApp compares and copies it, and no component re-skins from it. The SECTION does have one production reader since 票 43: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it - a reader of a different key, so this row stays no-reader",
+=== Autostart count=13
+internal\config\manager.go:380: cur.App.Autostart != fresh.App.Autostart ||
+internal\config\tiers.go:61: "app.autostart":       TierRestart,
+cmd\wisp\autostart_windows.go:5: // Ticket 43, autostart: the [app].autostart opt-in as a registry Run key.
+cmd\wisp\autostart_windows.go:9: //   - the KEY is [app].autostart (internal/config/schema.go, default false -
+cmd\wisp\autostart_windows.go:13: //     "app.autostart" -> TierRestart, ticket 233): the OS registration is a
+cmd\wisp\autostart_windows.go:48: // [app].autostart. The four answers are distinct on purpose - "wrote it",
+cmd\wisp\autostart_windows.go:55: // every other boot leg takes (the compiled defaults, whose [app].autostart is
+cmd\wisp\autostart_windows.go:62: return applyAutostartValue(valueName, c.App.Autostart) +
+cmd\wisp\autostart_windows.go:65: return applyAutostartValue(valueName, c.App.Autostart)
+cmd\wisp\config_readers_255.go:323: "app.theme": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App.THEME - manager.go's planApp compares and copies it, and no component re-skins from it. The SECTION does have one production reader since 票 43: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it - a reader of a different key, so this row stays no-reader",
+cmd\wisp\config_readers_255.go:405: // reader outside internal/config - it reads App.Autostart (restart tier,
+cmd\wisp\config_reload.go:374: "app.language", "app.autostart", "app.single_instance",
+cmd\wisp\resident_windows.go:192: //   - autostart: [app].autostart is restart-tier (ticket 233), so the Run
+=== SingleInstance count=3
+internal\config\manager.go:381: cur.App.SingleInstance != fresh.App.SingleInstance
+cmd\wisp\config_readers_255.go:410: // _180p.go reads App.SingleInstance (the same restart tier) once per boot
+cmd\wisp\single_instance_boot_180p.go:69: if lerr != nil || c == nil || c.App.SingleInstance {
+=== Size count=68
+internal\ball\dock_windows.go:201: tmi.size = uint32(unsafe.Sizeof(tmi))
+internal\ball\monitors_windows.go:44: mi.size = uint32(unsafe.Sizeof(mi))
+internal\ball\monitors_windows.go:67: mi.size = uint32(unsafe.Sizeof(mi))
+internal\ball\monitors_windows.go:83: mi.size = uint32(unsafe.Sizeof(mi))
+internal\config\allowdirs.go:162: m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
+internal\config\manager.go:120: m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
+internal\config\manager.go:168: if m.seenValid && st.ModTime().Equal(m.seenMtime) && st.Size() == m.seenSize {
+internal\config\manager.go:189: m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
+internal\config\manager.go:220: m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
+internal\config\settings_413.go:3: // Ticket 413's settings additions for [ball].size: the guarded setter and the
+internal\config\settings_413.go:14: // write store has no ball.size case (cmd/wisp/panel_config_store.go's
+internal\config\settings_413.go:38: const keyPathBallSize = "ball.size"
+internal\config\settings_413.go:40: // SetBallSize writes ball.size through the same guarded key-by-key path every
+internal\config\settings_413.go:50: base.Ball.Size = size
+internal\config\settings_413.go:61: // Size is the current ball.size value in px. 0 only when no Manager backs
+internal\config\settings_413.go:84: v.Size = c.Ball.Size
+internal\config\validate.go:58: // The [ball].size band, single-sourced for both gates that judge it: the load
+internal\config\validate.go:67: // ballSizeRangeError is the ONE out-of-range refusal for ball.size: both gates
+internal\config\validate.go:73: "config.toml: ball.size %d out of range [%d, %d]", v, ballSizeMinPx, ballSizeMaxPx))
+internal\config\validate.go:78: // for ball.size: the load gate (validateBall, a hand-edited file) and the
+internal\config\validate.go:93: if c.Ball.Size < ballSizeMinPx || c.Ball.Size > ballSizeMaxPx {
+internal\config\validate.go:94: return ballSizeRangeError(c.Ball.Size)
+internal\memory\artifacts.go:133: SizeBytes: info.Size(),
+internal\memory\artifacts.go:157: st.bytes += fi.Size()
+internal\models\downloader.go:406: offset = st.Size()
+internal\models\downloader.go:755: if st.Size() != wantSize {
+internal\models\downloader.go:756: return fmt.Errorf("size %d, manifest pins %d", st.Size(), wantSize)
+internal\observe\diagnostics.go:619: return "", info.Size(), rerr
+internal\observe\diagnostics.go:628: return red.String(line), info.Size(), nil
+internal\observe\guards_45.go:493: c.SizeBytes = info.Size()
+internal\observe\guards_45.go:577: files = append(files, item{name: name, size: info.Size(), mod: info.ModTime().UTC()})
+internal\observe\guards_45.go:578: total += info.Size()
+internal\observe\guards_45.go:599: total -= f.size
+internal\observe\guards_45.go:601: rep.BytesFreed += f.size
+internal\observe\guards_45.go:603: "file", f.name, "bytes", f.size, "quota_bytes", quotaBytes,
+internal\observe\logging.go:603: b.recs, b.size, b.dropped, b.first, b.closed = nil, 0, 0, "", true
+internal\observe\logging.go:646: if len(b.recs) >= earlyLogMaxRecords || b.size+n > earlyLogMaxBytes {
+internal\observe\logging.go:654: b.size += n
+internal\panel\ball_size_413.go:23: // Size is ball.size in px as the live config holds it RIGHT NOW - the
+internal\panel\config_write_65.go:44: // FieldBallSize is ball.size, the orb's diameter in px. Value = the integer
+internal\plugin\tamper.go:75: if len(digits) != sha256.Size*2 {
+internal\plugin\tamper.go:76: return "", fmt.Errorf("%w: digest is %d hex chars, want %d", ErrMalformedHash, len(digits), sha256.Size*2)
+internal\plugin\manifestslot\command_job_windows.go:115: te.Size = uint32(unsafe.Sizeof(te))
+internal\secret\dpapi_windows.go:65: if out.Size == 0 || out.Data == nil {
+internal\secret\dpapi_windows.go:68: copied := make([]byte, out.Size)
+internal\secret\dpapi_windows.go:69: copy(copied, unsafe.Slice(out.Data, out.Size))
+internal\secret\list.go:60: Size:     fi.Size(),
+internal\speech\punctuate.go:154: if info.Size() == 0 {
+internal\tools\document_text.go:349: size := fi.Size()
+internal\tools\fs.go:266: line = fmt.Sprintf("%s %s %d %s", kind, n, st.Size(),
+internal\tools\search_content.go:323: if info.Size() > s.d.fileCap() {
+cmd\balldebug\diff_windows.go:189: bmi.header.size = 40
+cmd\balldebug\diff_windows.go:412: if o.size > 0 {
+cmd\balldebug\diff_windows.go:413: childArgs = append(childArgs, "-size", fmt.Sprint(o.size))
+cmd\balldebug\shot_windows.go:81: bmi.header.size = 40
+cmd\wisp\ball_idle_appearance_windows.go:14: // config.toml the same per-use way ballSizeSeed413 reads [ball].size:
+cmd\wisp\ball_idle_appearance_windows.go:43: // the way ballSizeSeed413 reads [ball].size. ok=true says the file loaded -
+cmd\wisp\ball_size_413_windows.go:5: // Ticket 413's boot-side half of the [ball].size feed line: the seed that reads
+cmd\wisp\ball_size_413_windows.go:20: // already own it: config.Validate rejects ball.size outside 44..160
+cmd\wisp\ball_size_413_windows.go:35: // ballSizeSeed413 reads [ball].size the way ballStyleSeed65 reads [ball].style
+cmd\wisp\ball_size_413_windows.go:44: slog.Warn("ball: [ball].size source unreadable at boot; the ball package default (56) stays",
+cmd\wisp\ball_size_413_windows.go:48: return c.Ball.Size, true
+cmd\wisp\config_readers_255.go:179: // cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] is a production read
+cmd\wisp\config_readers_255.go:207: "ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx int // configured orb size 44..160 (0 = default 56)] - the option the configured size rides; ticket 413 landed the feed: cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] (the resident ball host's boot seed) hands the file's number to ball.New through cmd/wisp/resident_ball_windows.go, so the size reaches the window at construction; the verdict stays no-reader because the read is one boot-time LoadFile that never re-reads the live Manager and the ball has no live re-size, and the style field keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither; the appearance wave closed the feed side for the section's two remaining keys the same way and the verdict stays no-reader for the same three reasons: cmd/wisp/ball_idle_appearance_windows.go:56 [c.Ball.OpacityIdle] is the boot seed for opacity_idle AND click_through (one LoadFile, both keys; a nil opacity is the seed's unreadable-file carrier (0 is a real configured value the pointer carries)), the assembly root hands both over pre-New through cmd/wisp/resident_ball_windows.go:449 [OpacityIdle:  hs.idleOpacity] (the ClickThrough feed rides the same Options literal), and the settings store's two new write cases (SetBallOpacityIdle at :322 and SetBallClickThrough at :333 of the same store file the style route lives in) answer the measured tier - now when the resident process hosts the ball (its applier seams), restart when it does not",
+cmd\wisp\config_readers_255.go:360: // 413 added the third: the [ball].size boot seed is a production read site
+cmd\wisp\panel_resident_pump.go:186: return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
+cmd\wisp\resident_windows.go:446: // Ticket 413: the [ball].size seed reads the same per-use shape the style
+cmd\wisp\run.go:1233: return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
+=== Style count=53
+internal\agent\prompt.go:157: {Kind: SecStyle, Budget: a.budgets.SectionStyle, Text: a.style, CachePrefix: true},
+internal\ball\orb_windows.go:376: // o.style at window creation, above.)
+internal\ball\orb_windows.go:387: _, _, entryURL := orbPageForStyle(o.style)
+internal\ball\orb_windows.go:397: doc, _, _ := orbPageForStyle(o.style)
+internal\ball\orb_windows.go:595: if o.style == StyleJarvis {
+internal\ball\orb_windows.go:608: if o.browser == nil || o.style == StyleJarvis || !orbAudioFor(o.state) {
+internal\ball\orb_windows.go:625: if o.browser == nil || o.style == style {
+internal\ball\orb_windows.go:628: o.style = style
+internal\ball\orbasset.go:174: if (b) { b.style.background = "transparent"; }
+internal\ball\orbasset.go:176: document.documentElement.style.background = "transparent";
+internal\config\settings_413.go:15: // ApplySetting), and the CLI's closed roster names ball.style only
+internal\config\settings_65.go:3: // Ticket 65's settings-write additions: [ball].style, the orb style family
+internal\config\settings_65.go:22: // THE TIER IS NOT DECIDED HERE. Unlike every [llm] field, ball.style can be
+internal\config\settings_65.go:40: const keyPathBallStyle = "ball.style"
+internal\config\settings_65.go:42: // SetBallStyle writes ball.style through the same guarded key-by-key path every
+internal\config\settings_65.go:50: "config: ball.style: %q 不在枚举内（%s）；这一枚只接受这几种写法",
+internal\config\settings_65.go:54: base.Ball.Style = v
+internal\config\settings_65.go:75: // Style is the current ball.style value. Empty only when no Manager backs
+internal\config\settings_65.go:95: v.Style = c.Ball.Style
+internal\config\validate.go:89: // ball.style enum (ticket 65: glass|jarvis - an unknown style is an error
+internal\config\validate.go:99: if !slices.Contains(ballStyles, c.Ball.Style) {
+internal\config\validate.go:101: "config.toml: ball.style %q must be one of %s", c.Ball.Style, vocabList(ballStyles)))
+internal\panel\ball_style_65.go:22: // Style is ball.style as the live config holds it RIGHT NOW - the family
+internal\panel\config_write_65.go:29: // honest answer is restart (the boot seed reads [ball].style at startup). No
+internal\panel\config_write_65.go:39: // FieldBallStyle is ball.style, the orb appearance family. Value = the family
+cmd\balldebug\diff_windows.go:418: if o.style != "" {
+cmd\balldebug\diff_windows.go:419: childArgs = append(childArgs, "-style", o.style)
+cmd\wisp\ball_size_413_windows.go:16: // same per-use way ballStyleSeed65 reads [ball].style and hotCfg258 reads
+cmd\wisp\ball_size_413_windows.go:35: // ballSizeSeed413 reads [ball].size the way ballStyleSeed65 reads [ball].style
+cmd\wisp\ball_style_65_windows.go:5: // Ticket 65's boot-side half of the appearance style switch: the [ball].style
+cmd\wisp\ball_style_65_windows.go:37: // ballStyleSeed65 reads [ball].style the way hotCfg258 reads [hotkey]. Returns
+cmd\wisp\ball_style_65_windows.go:46: slog.Warn("ball: [ball].style source unreadable at boot; the package default (glass) stays",
+cmd\wisp\ball_style_65_windows.go:50: return c.Ball.Style, true
+cmd\wisp\config_cmd_65.go:15: // `ball.style` the guarded setter already owns, and the values are the
+cmd\wisp\config_cmd_65.go:24: // command surface owns ball.style today, and an unknown key is refused by
+cmd\wisp\config_cmd_65.go:38: // with config.NewDefaults().Ball.Style - the schema's own default:"glass" tag
+cmd\wisp\config_cmd_65.go:61: const configCliKey65 = "ball.style"
+cmd\wisp\config_cmd_65.go:77: Keys owned today: ball.style (取值 glass|jarvis，默认 glass).
+cmd\wisp\config_cmd_65.go:150: fmt.Fprintln(cio.stdout, config.NewDefaults().Ball.Style)
+cmd\wisp\config_cmd_65.go:208: view.Style = config.NewDefaults().Ball.Style
+cmd\wisp\config_cmd_65.go:215: configCliKey65, view.Style, strings.Join(view.Vocabulary, "|"))
+cmd\wisp\config_cmd_65.go:220: // loadBallStyle65 reads the effective ball.style off the disk the way
+cmd\wisp\config_cmd_65.go:235: return c.Ball.Style, true, nil
+cmd\wisp\config_readers_255.go:168: // ticket 65's leg gave cfg.Ball.Style two production read sites outside
+cmd\wisp\config_readers_255.go:190: // [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235
+cmd\wisp\config_readers_255.go:191: // [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are
+cmd\wisp\config_readers_255.go:207: "ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx int // configured orb size 44..160 (0 = default 56)] - the option the configured size rides; ticket 413 landed the feed: cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] (the resident ball host's boot seed) hands the file's number to ball.New through cmd/wisp/resident_ball_windows.go, so the size reaches the window at construction; the verdict stays no-reader because the read is one boot-time LoadFile that never re-reads the live Manager and the ball has no live re-size, and the style field keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither; the appearance wave closed the feed side for the section's two remaining keys the same way and the verdict stays no-reader for the same three reasons: cmd/wisp/ball_idle_appearance_windows.go:56 [c.Ball.OpacityIdle] is the boot seed for opacity_idle AND click_through (one LoadFile, both keys; a nil opacity is the seed's unreadable-file carrier (0 is a real configured value the pointer carries)), the assembly root hands both over pre-New through cmd/wisp/resident_ball_windows.go:449 [OpacityIdle:  hs.idleOpacity] (the ClickThrough feed rides the same Options literal), and the settings store's two new write cases (SetBallOpacityIdle at :322 and SetBallClickThrough at :333 of the same store file the style route lives in) answer the measured tier - now when the resident process hosts the ball (its applier seams), restart when it does not",
+cmd\wisp\main.go:60: over the keys this CLI owns - today ball.style (glass|
+cmd\wisp\main.go:151: // get/set/list over the closed key roster (today ball.style). A console
+cmd\wisp\panel_config_store.go:323: // setter 在落盘前把关（320 裁定的同一条形状）；盘上的 [ball].style 键、
+cmd\wisp\panel_resident_pump.go:178: return panel.BallStyleSection{Style: v.Style, Vocabulary: v.Vocabulary}
+cmd\wisp\resident_windows.go:433: // Ticket 65: the [ball].style seed reads the same per-use shape hotCfg258
+cmd\wisp\run.go:1220: return panel.BallStyleSection{Style: v.Style, Vocabulary: v.Vocabulary}
+=== OpacityIdle count=10
+internal\ball\idle_appearance_windows.go:48: if opts.OpacityIdle == nil {
+internal\ball\idle_appearance_windows.go:51: v := float32(*opts.OpacityIdle)
+internal\ball\idle_appearance_windows.go:113: b.opts.OpacityIdle = &v
+internal\config\settings_appearance_wave.go:61: base.Ball.OpacityIdle = v
+internal\config\settings_appearance_wave.go:128: v.Opacity = c.Ball.OpacityIdle
+internal\config\validate.go:96: if c.Ball.OpacityIdle < 0 || c.Ball.OpacityIdle > 1 {
+internal\config\validate.go:97: return ballOpacityIdleRangeError(c.Ball.OpacityIdle)
+cmd\wisp\ball_idle_appearance_windows.go:56: return &c.Ball.OpacityIdle, c.Ball.ClickThrough, true
+cmd\wisp\config_readers_255.go:195: // reasons: cmd/wisp/ball_idle_appearance_windows.go:56 [c.Ball.OpacityIdle]
+cmd\wisp\config_readers_255.go:207: "ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx int // configured orb size 44..160 (0 = default 56)] - the option the configured size rides; ticket 413 landed the feed: cmd/wisp/ball_size_413_windows.go:48 [c.Ball.Size] (the resident ball host's boot seed) hands the file's number to ball.New through cmd/wisp/resident_ball_windows.go, so the size reaches the window at construction; the verdict stays no-reader because the read is one boot-time LoadFile that never re-reads the live Manager and the ball has no live re-size, and the style field keeps its own sentence: cmd/wisp/ball_style_65_windows.go:50 [c.Ball.Style] (the boot style seed) and cmd/wisp/config_cmd_65.go:235 [c.Ball.Style, true, nil] (`wisp config get`, a process of its own) are boot/invocation-time LoadFile passes that never re-read the live Manager, and this `wisp run` host reads neither; the appearance wave closed the feed side for the section's two remaining keys the same way and the verdict stays no-reader for the same three reasons: cmd/wisp/ball_idle_appearance_windows.go:56 [c.Ball.OpacityIdle] is the boot seed for opacity_idle AND click_through (one LoadFile, both keys; a nil opacity is the seed's unreadable-file carrier (0 is a real configured value the pointer carries)), the assembly root hands both over pre-New through cmd/wisp/resident_ball_windows.go:449 [OpacityIdle:  hs.idleOpacity] (the ClickThrough feed rides the same Options literal), and the settings store's two new write cases (SetBallOpacityIdle at :322 and SetBallClickThrough at :333 of the same store file the style route lives in) answer the measured tier - now when the resident process hosts the ball (its applier seams), restart when it does not",
+=== ClickThrough count=7
+internal\ball\idle_appearance_windows.go:64: want := s == statemachine.StateSleeping && opts.ClickThrough
+internal\ball\idle_appearance_windows.go:130: b.opts.ClickThrough = on
+internal\config\settings_appearance_wave.go:71: base.Ball.ClickThrough = on
+internal\config\settings_appearance_wave.go:149: return BallClickThroughView{Enabled: c.Ball.ClickThrough}
+cmd\wisp\ball_idle_appearance_windows.go:56: return &c.Ball.OpacityIdle, c.Ball.ClickThrough, true
+cmd\wisp\resident_ball_windows.go:174: return func(h *panelHostHooks) { h.idleOpacity = opacity; h.clickThrough = clickThrough }
+cmd\wisp\resident_ball_windows.go:450: ClickThrough: hs.clickThrough,
+=== HideOnFullscreen count=0
+=== Cancel count=124
+internal\agent\loop.go:342: func (t *RunningTask) Cancel() { t.root.Cancel() }
+internal\agent\loop.go:388: defer root.Cancel()
+internal\agent\loop.go:634: root.Cancel()
+internal\agent\reminder_timer.go:427: // Disarm stops waiting for one reminder. reminder.cancel calls it BEFORE it
+internal\agent\reminder_timer.go:508: if t.ownRoot && t.root.Cancel != nil {
+internal\agent\reminder_timer.go:511: t.root.Cancel()
+internal\agent\approval\approval.go:117: // internal/ball's DefaultHotkeys().Cancel is the authority, and two cmd/wisp
+internal\agent\approval\approval.go:120: // check `ball.DefaultHotkeys().Cancel == "Esc"` (move that ball default and the
+internal\agent\approval\doc.go:31: // resident card path); the D31 ledger seam is wired (tools.Options.Cancel
+internal\agent\approval\report.go:175: // .Cancel). The adapter lives here because internal/tools may not import this
+internal\agent\scheduler\bridge.go:12: // loop run INSIDE the scheduler, so task.list / task.cancel can reach the
+internal\agent\scheduler\bridge.go:52: // authority join travels here: ParentTaskID is the task id whose task.cancel
+internal\agent\scheduler\bridge.go:75: func (c schedulerControl) Cancel(id string) error { return c.s.Cancel(id) }
+internal\agent\scheduler\bridge.go:87: // whose task.cancel may stop this row. Empty = root row (nobody stops
+internal\agent\scheduler\doc.go:13: //   - the task.list / task.cancel scheduler surface through the tools'
+internal\agent\scheduler\doc.go:24: // same-landing rule ruling A434 set for task.cancel.
+internal\agent\scheduler\scheduler.go:140: // -> the parent task id whose task.cancel may stop that row (the host
+internal\agent\scheduler\scheduler.go:417: if t.root != nil && t.root.Cancel != nil {
+internal\agent\scheduler\scheduler.go:418: t.root.Cancel()
+internal\agent\scheduler\scheduler.go:494: // whose task.cancel may stop id through the tools. An empty parentID clears
+internal\agent\scheduler\scheduler.go:558: if t.root != nil && t.root.Cancel != nil {
+internal\agent\scheduler\scheduler.go:559: t.root.Cancel()
+internal\audio\wasapimic_windows.go:81: m.cancel = cancel
+internal\audio\wasapimic_windows.go:106: cancel := m.cancel
+internal\audio\wasapimic_windows.go:109: m.cancel = nil
+internal\audio\wavinjector.go:87: if w.cancel != nil {
+internal\audio\wavinjector.go:91: w.cancel = cancel
+internal\audio\wavinjector.go:104: cancel := w.cancel
+internal\audio\wavinjector.go:106: w.cancel = nil
+internal\ball\ball_windows.go:288: b.cancelBinding = b.opts.Hotkeys.Cancel
+internal\ball\ball_windows.go:900: b.cancelBinding = cfg.Cancel
+internal\ball\hotkey_reload.go:19: //			Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel})
+internal\ball\hotkey_reload.go:102: "summon", cfg.Summon, "mute", cfg.Mute, "cancel", cfg.Cancel, "panel", cfg.Panel,
+internal\ball\hotkey_windows.go:101: if cfg.Cancel == "" {
+internal\ball\hotkey_windows.go:102: cfg.Cancel = d.Cancel
+internal\ball\hotkey_windows.go:482: bindings := []string{cfg.Summon, cfg.Mute, cfg.Cancel, cfg.Panel}
+internal\ball\hotkey_windows.go:541: // product default says (DefaultHotkeys().Cancel, and the [hotkey] schema's only
+internal\observe\goroutine.go:323: if root != nil && root.Cancel != nil {
+internal\observe\goroutine.go:324: root.Cancel()
+internal\observe\logging.go:160: p.root.Cancel()
+internal\plugin\disposal.go:270: s.cancel()
+internal\speech\cloudasr.go:404: a.cancel()
+internal\statemachine\table.go:155: SideEffects: []string{"agent.cancel-tool-call", "ui.voice-cancel-availability"},
+internal\statemachine\table.go:169: SideEffects: []string{"approval.cancel-call", "approval.replay-offer"},
+internal\statemachine\table.go:173: SideEffects: []string{"approval.cancel-call", "approval.replay-offer"},
+internal\statemachine\table.go:243: SideEffects: []string{"settling.cancel-fallback"},
+internal\tools\bridge.go:229: cancel:      o.Cancel,
+internal\tools\bridge.go:622: corr: orDefault(req.CorrelationID, req.TaskID), taskID: req.TaskID, bus: b.cancel,
+internal\tools\bridge.go:629: if b.cancel != nil {
+internal\tools\bridge.go:630: defer b.cancel.Complete(orDefault(req.CorrelationID, req.TaskID))
+internal\tools\bridge.go:695: if kind == OutcomeKindError && b.cancel.Vetoed(orDefault(dec.CorrelationID, dec.TaskID)) {
+internal\tools\bridge.go:899: if b.cancel == nil {
+internal\tools\bridge.go:903: if len(res.AppliedSteps) == 0 && !b.cancel.Vetoed(corr) {
+internal\tools\bridge.go:906: rep := b.cancel.Report(dec, res)
+internal\tools\reminder.go:70: // timer at construction. Disarm is what reminder.cancel calls so the row and
+internal\tools\reminder.go:409: // reminder.cancel (L1)
+internal\tools\reminder.go:422: func (reminderCancel) Name() string { return "reminder.cancel" }
+internal\tools\reminder.go:482: onUpdate(fmt.Sprintf("reminder.cancel 已取消 %s", id))
+internal\tools\shell_session.go:429: // task.cancel's caller identity. A call with no host task id has no scope
+internal\tools\subagent_197.go:39: //     back by TaskRoster.Cancel.
+internal\tools\subagent_197.go:196: // that used to read 「可以用 task.cancel 单独停它」 promised an unqualified power
+internal\tools\subagent_197.go:197: // while nothing registered that tool and TaskRoster.Cancel had zero production
+internal\tools\subagent_197.go:199: // task.cancel exists, and it only lets the row's OWN parent stop it. ⚠ Two
+internal\tools\subagent_197.go:205: "注意：停掉父任务不会级联停掉子代理；task.cancel 只有派生它的那枚父任务能用它单独停孩子——"+
+internal\tools\subagent_197.go:436: "它的父任务 %s 还能用 task.cancel 单独停它（只有派生它的那一枚能停）；"+
+internal\tools\task.go:23: //	task.cancel  L1  stop one subagent the CALLER itself derived (this file, 221)
+internal\tools\task.go:26: // task.output is AC#3's leg, task.cancel is ticket 221's. task.list lands
+internal\tools\task.go:28: // "注册表里 task.list／task.cancel 各有一枚真实现并过契约测试", ticket 163's
+internal\tools\task.go:31: // so this is the "标记与接线同一次核销" shape ruling A434 set for task.cancel,
+internal\tools\task.go:37: // task.cancel's authority shape (only the row's own parent may stop it) is
+internal\tools\task.go:38: // UNCHANGED: task.cancel stops what the caller derived. The scheduler's rows
+internal\tools\task.go:41: // task.cancel's scheduler branch below. task.cancel also carries the scheduler
+internal\tools\task.go:54: // task.cancel's scheduler branch stops a scheduler row through Control.
+internal\tools\task.go:98: // TaskCanceler is the write face task.cancel's scheduler branch consumes:
+internal\tools\task.go:99: // one verb, the same narrow shape TaskRoster.Cancel has.
+internal\tools\task.go:111: // ParentTaskID is the authority join task.cancel's scheduler branch sits on:
+internal\tools\task.go:494: if r.cancel == nil {
+internal\tools\task.go:495: r.cancel = map[string]func(){}
+internal\tools\task.go:497: r.cancel[taskID] = cancel
+internal\tools\task.go:508: delete(r.cancel, taskID)
+internal\tools\task.go:520: cancel := r.cancel[taskID]
+internal\tools\task.go:649: // task.list/task.cancel on :2563): reading an in-process table touches no C3
+internal\tools\task.go:666: // task.output, task.cancel (ticket 221 甲形, ruling A434) and - since ticket
+internal\tools\task.go:678: // task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+internal\tools\task.go:695: func (taskCancel) Name() string { return "task.cancel" }
+internal\tools\task.go:716: // PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+internal\tools\task.go:717: // pair splitting into task.list L0 and task.cancel L1, and SPEC-07 §3's mirror
+internal\tools\task.go:719: // L1 window (tools.NoGate, i.e. 票 21 未接入), a task.cancel call is REFUSED
+internal\tools\task.go:754: // The stop itself is TaskRoster.Cancel - the function this repository already
+internal\tools\task.go:786: // model could see the row through task.list and have task.cancel answer
+internal\tools\task.go:808: if err := t.d.Scheduler.Control.Cancel(target); err != nil {
+internal\tools\task.go:813: onUpdate(fmt.Sprintf("task.cancel 已对调度器任务 %s 发出停止", target))
+internal\tools\task.go:854: stopped, why := t.d.Roster.Cancel(target)
+internal\tools\task.go:862: onUpdate(fmt.Sprintf("task.cancel 已对子代理 %s 发出停止", target))
+internal\tools\task.go:872: onUpdate(fmt.Sprintf("task.cancel 收尾：子代理 %s 落到 %s", target, string(st)))
+internal\tools\task.go:1048: "停你自己派生的子代理用 task.cancel。"
+internal\tools\task.go:1054: // "task.list / task.cancel | 查看/取消任务 | L0 / L1": reading an in-process
+cmd\balldebug\main.go:272: Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel,
+cmd\balldebug\main.go:286: stopBridge, joinBridge = bridgeRoot.Cancel, bridgeHandle.Done()
+cmd\balldebug\main.go:371: feedRoot.Cancel()
+cmd\balldebug\main.go:507: root.Cancel()
+cmd\wisp\approval_always.go:100: defer root.Cancel()
+cmd\wisp\lifecycle_windows.go:472: ra.cancel = cancel
+cmd\wisp\resident_approval_windows.go:194: return ball.DefaultHotkeys().Cancel
+cmd\wisp\resident_approval_windows.go:794: ra.cancel()
+cmd\wisp\resident_audio_windows.go:318: ra.mic, ra.gate, ra.cancel, ra.frames = mic, gate, cancel, buf
+cmd\wisp\resident_audio_windows.go:421: if ra.cancel != nil {
+cmd\wisp\resident_audio_windows.go:422: ra.cancel()
+cmd\wisp\resident_ball_windows.go:500: bridgeRoot.Cancel()
+cmd\wisp\resident_task_source_windows.go:346: src.consoleStop = func() { src.root.Cancel() }
+cmd\wisp\resident_task_source_windows.go:485: // root.Cancel on the way out: this task's own ctx is what execute
+cmd\wisp\resident_task_source_windows.go:489: defer root.Cancel()
+cmd\wisp\resident_voice_bargein_windows.go:456: m.cancel = cancel
+cmd\wisp\resident_voice_bargein_windows.go:554: if m.cancel != nil {
+cmd\wisp\resident_voice_bargein_windows.go:555: m.cancel()
+cmd\wisp\resident_windows.go:73: return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel})
+cmd\wisp\resident_windows.go:410: "summon", h.Summon, "mute", h.Mute, "cancel", h.Cancel, "panel", h.Panel,
+cmd\wisp\resident_windows.go:413: return ball.HotkeyConfig{Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel}
+cmd\wisp\resident_windows.go:807: defer wdRoot.Cancel()
+cmd\wisp\run.go:318: // run.go): task.list walks its rows and task.cancel's scheduler branch
+cmd\wisp\run.go:791: //	task.cancel  stops ONE subagent the CALLING task itself derived
+cmd\wisp\run.go:794: // task.cancel's production landing point (ticket 221 AC#2: TaskRoster's Cancel
+cmd\wisp\run.go:1629: rt.replyRoot.Cancel()
+cmd\wisp\run.go:1635: rt.reloadRoot.Cancel()
+=== WarmTimeoutSec count=3
+cmd\wisp\config_readers_255.go:210: // [c.Session.WarmTimeoutSec], handed to the voice plan's warm timeout), so
+cmd\wisp\config_readers_255.go:221: "session": hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1862 [c.Session.WarmTimeoutSec] - the resident voice leg reads the warm timeout once at its boot LoadFile, so a hand edit reaches the next process, never this run; ticket 423 feeds the other two keys the same way (cmd/wisp/resident_voice_windows.go:1866 [c.Session.ConversationIdleSec] and cmd/wisp/resident_voice_windows.go:1867 [c.Session.SettlingSec], both handed to session.ScopeOptions at the scope's construction)",
+cmd\wisp\resident_voice_windows.go:1874: plan.WarmTimeout = time.Duration(c.Session.WarmTimeoutSec) * time.Second
+=== SettlingSec count=2
+cmd\wisp\config_readers_255.go:221: "session": hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1862 [c.Session.WarmTimeoutSec] - the resident voice leg reads the warm timeout once at its boot LoadFile, so a hand edit reaches the next process, never this run; ticket 423 feeds the other two keys the same way (cmd/wisp/resident_voice_windows.go:1866 [c.Session.ConversationIdleSec] and cmd/wisp/resident_voice_windows.go:1867 [c.Session.SettlingSec], both handed to session.ScopeOptions at the scope's construction)",
+cmd\wisp\resident_voice_windows.go:1879: plan.SettleStatic = time.Duration(c.Session.SettlingSec) * time.Second
+=== ConversationIdleSec count=2
+cmd\wisp\config_readers_255.go:221: "session": hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1862 [c.Session.WarmTimeoutSec] - the resident voice leg reads the warm timeout once at its boot LoadFile, so a hand edit reaches the next process, never this run; ticket 423 feeds the other two keys the same way (cmd/wisp/resident_voice_windows.go:1866 [c.Session.ConversationIdleSec] and cmd/wisp/resident_voice_windows.go:1867 [c.Session.SettlingSec], both handed to session.ScopeOptions at the scope's construction)",
+cmd\wisp\resident_voice_windows.go:1878: plan.ConversationIdle = time.Duration(c.Session.ConversationIdleSec) * time.Second
+=== Enabled count=84
+internal\config\catalog.go:126: if !rt.Enabled {
+internal\config\catalog.go:131: "config.toml: voice.realtime.enabled=true requires voice.realtime.provider and voice.realtime.model")
+internal\config\manager.go:405: if cv.Enabled != fv.Enabled || cv.WakeWord.Enabled != fv.WakeWord.Enabled ||
+internal\config\manager.go:419: cur.Voice.Enabled = fv.Enabled
+internal\config\manager.go:420: cur.Voice.WakeWord.Enabled = fv.WakeWord.Enabled
+internal\config\manager.go:537: if !o.Enabled && n.Enabled {
+internal\config\manager.go:538: loosen = append(loosen, "plugins."+id+".enabled")
+internal\config\manager.go:539: } else if o.Enabled && !n.Enabled {
+internal\config\manager.go:540: tighten = append(tighten, "plugins."+id+".enabled")
+internal\config\schema.go:262: // VoiceSection is [voice]. Reload-tier: enabled, wake_word.enabled/keywords,
+internal\config\settings_187.go:217: // Models lists ONLY enabled catalog entries (ModelSpec.Enabled's promise is
+internal\config\settings_187.go:299: if !spec.Enabled {
+internal\config\settings_local_audio.go:6: // WHY THEY EXIST. The backend grew real readers/guards for voice.aec.enabled
+internal\config\settings_local_audio.go:18: // on top. voice.aec.enabled is a bool with no band; audio.input_device is a
+internal\config\settings_local_audio.go:36: // SetVoiceAecEnabled writes voice.aec.enabled (the barge-in monitor's switch).
+internal\config\settings_local_audio.go:39: return m.writeOneKey("voice.aec.enabled", func(base *Config) bool {
+internal\config\settings_local_audio.go:40: base.Voice.AEC.Enabled = on
+internal\config\tiers.go:65: "voice.enabled":              TierReload,
+internal\config\tiers.go:66: "voice.wake_word.enabled":    TierReload,
+internal\config\tiers.go:75: "voice.aec.enabled":          TierReload,
+internal\config\tiers.go:78: "voice.realtime.enabled":     TierReload,
+internal\config\unwired.go:63: // now reads both keys - ShellDeps.Enabled gates whether
+internal\config\unwired.go:122: "risk.shell_enabled":       "consumed: cmd/wisp/run.go feeds it to ShellDeps.Enabled (ticket 163): tools.BuiltinShellEntries registers the shell family only while it is true and registers NOTHING while it is false (D14 默认禁用, the FSDeps.DeleteEnabled shape)",
+internal\config\unwired.go:142: "plugins.<id>.enabled":       "not built: plugin engine is ticket 50/51",
+internal\llm\resolver.go:128: if !spec.Enabled {
+internal\llm\resolver.go:290: // discovery per the ModelSpec.Enabled promise (their catalog entry stays).
+internal\llm\resolver.go:298: if !spec.Enabled {
+internal\memory\dao_misc.go:199: if p.Enabled {
+internal\memory\dao_misc.go:207: version=excluded.version, enabled=excluded.enabled,
+internal\memory\dao_misc.go:236: p.Enabled = enabled != 0
+internal\memory\dao_misc.go:260: p.Enabled = enabled != 0
+internal\observe\logging.go:173: return h.next.Enabled(ctx, l)
+internal\observe\logging.go:612: if !next.Enabled(ctx, r.Level) {
+internal\observe\logging.go:631: if next.Enabled(ctx, rec.Level) {
+internal\observe\logging.go:683: return t.mirror.Enabled(ctx, level)
+internal\observe\logging.go:688: if t.mirror.Enabled(ctx, r.Level) {
+internal\panel\config_handlers.go:202: // 2026-11-11 S-leg alignment): voice.aec.enabled, audio.input_device and
+internal\panel\config_write_313.go:95: // write face (the 2026-11-11 S-leg alignment): voice.aec.enabled is the
+internal\panel\plugins_inventory_215.go:88: // Enabled is plugins.<id>.enabled as the live config holds it - the
+internal\plugin\tier2_gate.go:28: //  3. PER-PLUGIN KEYS. [plugins.<id>].enabled is the second switch. Tier 2 on
+internal\plugin\tier2_gate.go:186: return nil, gateRefusal("plugin %q: no [plugins.%s].enabled key - tier 2 being on does not turn a "+
+internal\plugin\tier2_gate.go:189: if !entry.Enabled {
+internal\plugin\tier2_gate.go:190: return nil, gateRefusal("plugin %q: [plugins.%s].enabled = false - the per-plugin switch is off, so it "+
+internal\plugin\tier2_gate.go:231: if !g.policy.Tier2Enabled || !ok || !entry.Enabled {
+internal\projctx\projctx.go:209: func (l *Loader) Enabled() bool { return l.o.Enabled }
+internal\projctx\projctx.go:255: if !l.o.Enabled {
+internal\speech\cloudcatalog.go:87: if !spec.Enabled {
+internal\statemachine\events.go:18: EvKwsEnabled      Event = "kws.enabled"      // #5
+internal\tools\shell.go:37: //     registers ONLY when ShellDeps.Enabled mirrors [risk] shell_enabled
+internal\tools\shell.go:231: // ShellDeps.Enabled mirrors [risk] shell_enabled = true (D14 默认禁用,
+internal\tools\shell.go:236: if !d.Enabled {
+cmd\wisp\config_readers_255.go:333: "voice.tts.speed": hotClaimNoReader + "没有一条运行路径按这个值做事：唯一的生产读点是 internal/speech/cloudcatalog.go:119 [ep.Speed = cfg.Voice.TTS.Speed]，而它住在票 61 的 ResolveCloudChain 里——那枚函数全仓非测试调用者 0 枚（cmd/internal 里只有定义与注释）⇒ 读点存在、没人调用，TTS 的 speed 仍未接进运行的语音链 (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins)",
+cmd\wisp\config_readers_255.go:347: "voice.punctuation":          hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1868 [c.Voice.Punctuation] - the resident voice leg carries the switch in its boot plan (voicePlan.PunctEnabled) and the punctuation stage opens and attaches under it (cmd/wisp/resident_voice_engines_windows.go:445's OpenPunctuation enabled argument, gated by the ASR-epoch acquire); the section's other production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins",
+cmd\wisp\config_readers_255.go:348: "voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
+cmd\wisp\config_readers_255.go:349: "voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
+cmd\wisp\logsink.go:253: return t.primary.Enabled(ctx, level) || t.mirror.Enabled(ctx, level)
+cmd\wisp\logsink.go:258: if t.mirror.Enabled(ctx, r.Level) {
+cmd\wisp\panel_config_store.go:102: aecOn := cfg.Voice.AEC.Enabled
+cmd\wisp\panel_config_store.go:117: RealtimeEnabled:  cfg.Voice.Realtime.Enabled,
+cmd\wisp\panel_host_windows.go:303: return func(m *PanelManager) { m.enabled = src }
+cmd\wisp\panel_host_windows.go:428: src := m.enabled
+cmd\wisp\panel_resident_pump.go:198: return panel.BallClickThroughSection{Enabled: m.BallClickThroughOptions().Enabled}
+cmd\wisp\panel_resident_pump.go:258: Enabled:      e.Enabled,
+cmd\wisp\panel_resident_windows.go:258: return cfg.Panel.Enabled
+cmd\wisp\resident_audio_windows.go:34: //     is what decides whether the device opens at boot. voice.enabled=false
+cmd\wisp\resident_audio_windows.go:69: // chain cannot be built (voice.enabled=false, no capture leg, no VAD model,
+cmd\wisp\resident_audio_windows.go:288: "mic_muted_default", c.Audio.MicMutedDefault, "voice_enabled", c.Voice.Enabled)
+cmd\wisp\resident_audio_windows.go:292: ra.voiceEnabled = c.Voice.Enabled
+cmd\wisp\resident_audio_windows.go:297: if !c.Voice.Enabled {
+cmd\wisp\resident_audio_windows.go:299: slog.Info("audio: capture leg not built", "reason", "voice.enabled=false", "config_source", cfgSource)
+cmd\wisp\resident_voice_bargein_windows.go:265: // aecEnabled is [voice] aec.enabled (the 180K feed, setAECEnabled): false
+cmd\wisp\resident_voice_bargein_windows.go:316: // say otherwise; the assembly root flips it from [voice] aec.enabled right
+cmd\wisp\resident_voice_bargein_windows.go:330: // setAECEnabled carries [voice] aec.enabled (the 180-census follow-up's feed)
+cmd\wisp\resident_voice_bargein_windows.go:393: m.reason = "[voice] aec.enabled=false：AEC 插话检测不装配（无 AEC 的插话必自触发，P15/A1307；D47 Path C 由配置关闭）"
+cmd\wisp\resident_voice_windows.go:257: // same store layout when [voice] wake_word.enabled asks for it. Incomplete
+cmd\wisp\resident_voice_windows.go:298: // AECEnabled is [voice] aec.enabled, the barge-in monitor's config switch
+cmd\wisp\resident_voice_windows.go:1860: case !c.Voice.Enabled:
+cmd\wisp\resident_voice_windows.go:1884: plan.AECEnabled = c.Voice.AEC.Enabled
+cmd\wisp\resident_voice_windows.go:1925: // [voice] wake_word.enabled=true resolves the model set.
+cmd\wisp\resident_voice_windows.go:1927: if !c.Voice.WakeWord.Enabled {
+cmd\wisp\resident_voice_windows.go:1928: kwsNote = "[voice] wake_word.enabled=false（opt-in 没问，本进程停在 Sleeping）"
+cmd\wisp\run.go:837: //   - ShellDeps.Enabled mirrors [risk] shell_enabled (D14 默认禁用, the
+cmd\wisp\run.go:1249: return panel.BallClickThroughSection{Enabled: mgr.BallClickThroughOptions().Enabled}
+cmd\wisp\run.go:1307: Enabled:      e.Enabled,
+=== VetoWords count=2
+internal\config\manager.go:434: cur.Voice.WakeWord.VetoWords = slices.Clone(fv.WakeWord.VetoWords)
+internal\config\manager.go:441: !slices.Equal(cv.WakeWord.VetoWords, fv.WakeWord.VetoWords) ||
+=== Provider count=117
+internal\agent\loop.go:221: if opt.Provider == nil {
+internal\agent\loop.go:236: info := opt.Provider.Info()
+internal\agent\loop.go:270: provider: opt.Provider,
+internal\agent\loop.go:644: err := l.provider.Stream(ctx, req, func(ev llm.StreamEvent) error {
+internal\agent\quota_44r4.go:152: if q, ok := g.providers[m.Provider]; ok {
+internal\config\catalog.go:99: case role.Provider == "" && role.Model == "":
+internal\config\catalog.go:101: case role.Provider == "":
+internal\config\catalog.go:103: "config.toml: %s.model set without %s.provider (set both or neither)", path, path))
+internal\config\catalog.go:106: "config.toml: %s.provider set without %s.model (set both or neither)", path, path))
+internal\config\catalog.go:108: if _, ok := c.LLM.Providers[role.Provider]; !ok {
+internal\config\catalog.go:110: "config.toml: %s references unknown provider %q", path, role.Provider))
+internal\config\catalog.go:112: if !modelExists(c.LLM.Providers, role.Provider, role.Model) {
+internal\config\catalog.go:114: "config.toml: %s references unknown model pair %q", path, role.Provider+"/"+role.Model))
+internal\config\catalog.go:129: if rt.Provider == "" || rt.Model == "" {
+internal\config\catalog.go:131: "config.toml: voice.realtime.enabled=true requires voice.realtime.provider and voice.realtime.model")
+internal\config\catalog.go:133: if _, ok := c.LLM.Providers[rt.Provider]; !ok {
+internal\config\catalog.go:135: "config.toml: voice.realtime references unknown provider %q", rt.Provider))
+internal\config\catalog.go:137: if !modelExists(c.LLM.Providers, rt.Provider, rt.Model) {
+internal\config\catalog.go:139: "config.toml: voice.realtime references unknown model pair %q", rt.Provider+"/"+rt.Model))
+internal\config\manager.go:408: cv.TTS.Provider != fv.TTS.Provider || cv.TTS.Voice != fv.TTS.Voice ||
+internal\config\manager.go:423: cur.Voice.TTS.Provider = fv.TTS.Provider
+internal\config\schema.go:263: // asr.*, tts.provider/voice, conversation_mode, aec.*, realtime.* and both
+internal\config\sectionwrite.go:222: // llm.roles.chat.model and .provider under the one key llm.roles.chat). A
+internal\config\settings_187.go:131: if role.Provider == "" || role.Model == "" {
+internal\config\settings_187.go:136: p, ok := base.LLM.Providers[role.Provider]
+internal\config\settings_187.go:152: keyPathChatThinking, role.Provider, role.Model, vocabList(spec.ThinkingLevels), level))
+internal\config\settings_187.go:261: out.CurrentProvider = cfg.LLM.Roles.Chat.Provider
+internal\config\settings_313.go:119: // SetVoiceRealtimeProvider writes voice.realtime.provider (A877 ruling 1's β
+internal\config\settings_313.go:126: return m.writeOneKey("voice.realtime.provider", func(base *Config) bool {
+internal\config\settings_313.go:127: base.Voice.Realtime.Provider = v
+internal\config\settings_313.go:216: base.LLM.Roles.Chat.Provider = p
+internal\config\settings_320.go:265: if cfg.LLM.Roles.Chat.Provider == provider {
+internal\config\settings_320.go:268: if cfg.Voice.Realtime.Provider == provider {
+internal\config\settings.go:236: if base == nil || model == "" || base.LLM.Roles.Chat.Provider != "" {
+internal\config\tiers.go:69: "voice.asr.provider":         TierReload,
+internal\config\tiers.go:71: "voice.tts.provider":         TierReload,
+internal\config\tiers.go:79: "voice.realtime.provider":    TierReload,
+internal\llm\discover.go:102: func ImportDiscovered(providers map[string]config.Provider, provider string, models []DiscoveredModel) int {
+internal\llm\discover.go:105: p = config.Provider{Billing: config.BillingPayPerToken}
+internal\llm\probe_health.go:142: return fmt.Sprintf("能力实测不符：%s/%s 声明支持 %s，实测不可用", m.Provider, m.Model, m.Capability)
+internal\llm\probe_health.go:221: if o.Provider == "" || o.Model == "" {
+internal\llm\probe_health.go:239: rep := ProbeReport{Provider: o.Provider, Model: o.Model, AllOK: true}
+internal\llm\probe_health.go:266: Provider: o.Provider, Model: o.Model, Capability: c,
+internal\llm\probe_health.go:275: if err := o.Sink.RecordProbe(ctx, o.Provider, o.Model, rep.Flags, rep.AllOK,
+internal\llm\probe_health.go:277: return rep, fmt.Errorf("llm: record probe for %s/%s: %w", o.Provider, o.Model, err)
+internal\llm\provider.go:229: ep.Protocol, ep.Provider, out))
+internal\llm\resolver.go:63: o.Provider = e.Provider
+internal\llm\resolver.go:77: return fmt.Sprintf("%s/%s (%s %s)", e.Provider, e.Model, e.Protocol, e.BaseURL)
+internal\llm\resolver.go:83: Providers map[string]config.Provider
+internal\llm\resolver.go:208: if role.Provider != "" && role.Model != "" {
+internal\llm\resolver.go:209: ep, err := r.resolveEndpoint(role.Provider, role.Model)
+internal\llm\resolver.go:246: names = append(names, ep.Provider+"/"+ep.Model)
+internal\llm\anthropic\adapter.go:130: Provider: a.opts.Provider,
+internal\llm\openaichat\adapter.go:69: Provider:         a.opts.Provider,
+internal\llm\openairesponses\adapter.go:104: Provider:         a.opts.Provider,
+internal\memory\costmodeldao_44b.go:89: if err := rows.Scan(&d.Day, &d.Provider, &d.Model, &d.TokensIn, &d.TokensOut, &d.Micros, &d.Tasks); err != nil {
+internal\memory\dao_providerhealth.go:202: if err := sc.Scan(&h.Provider, &h.Model, &probeJSON, &lastProbeAt,
+internal\memory\dao_providerhealth.go:209: h.Provider, h.Model, err)
+internal\memory\l1_extract.go:150: if e == nil || e.provider == nil {
+internal\memory\l1_extract.go:158: streamErr := e.provider.Stream(ctx, req, func(ev llm.StreamEvent) error {
+internal\observe\costmodel_44b.go:44: func (t CostModelDayTotal) Key() string { return t.Provider + "/" + t.Model }
+internal\observe\costmodel_44b.go:198: l.planMon[r.Provider] += r.Micros
+internal\observe\quota_44.go:66: func (m QuotaModel) Key() string { return m.Provider + "/" + m.Model }
+internal\observe\quota_44.go:159: consider("plan-credit", s.ProviderPlan[prov.Provider], prov.PlanCreditTotalMicro, true)
+internal\observe\quota_44.go:200: if q, ok := providers[m.Provider]; ok {
+internal\observe\quota_44.go:277: l.planMon[m.Provider] += micros
+internal\panel\config_handlers.go:508: if r.Credential.Provider != "" {
+internal\panel\config_handlers.go:510: b.WriteString(r.Credential.Provider)
+internal\plugin\manifestslot\manifestslot.go:1: // Package manifestslot is the C4 Manifest slot (internal/tools.Provider) over
+internal\plugin\manifestslot\manifestslot.go:16: // Nothing here invents a seam. tools.Provider (Kind/List/Lookup), tools.Entry
+internal\plugin\manifestslot\manifestslot.go:56: var _ tools.Provider = (*Provider)(nil)
+internal\plugin\manifestslot\manifestslot.go:89: // List implements tools.Provider in the manifest's declaration order, which is
+internal\plugin\manifestslot\manifestslot.go:97: // Lookup implements tools.Provider.
+internal\risk\syncdirs.go:555: out = append(out, SyncRoot{Provider: c.provider, Path: c.dir, Source: "env"})
+internal\risk\syncdirs.go:573: out = append(out, SyncRoot{Provider: d.provider, Path: p, Source: "default"})
+internal\speech\cloudasr.go:645: Key:            ChainKey(a.ep.Provider, a.ep.Model),
+internal\speech\cloudchain.go:129: names = append(names, ChainKey(ep.Provider, ep.Model))
+internal\speech\cloudchain.go:160: names = append(names, ChainKey(ep.Provider, ep.Model))
+internal\speech\cloudchain.go:353: return c.cb.Quota.Allow(ep.Provider, ep.Model)
+internal\speech\cloudchain.go:594: return c.cb.Quota.Allow(ep.Provider, ep.Model)
+internal\speech\cloudendpoint.go:129: return ChainKey(e.Provider, e.Model) + " " + e.BaseURL
+internal\speech\cloudtts.go:233: Key:             ChainKey(t.ep.Provider, t.ep.Model),
+internal\tools\bridge.go:455: Tool: req.Name, Provider: entry.Decl.Provider, Args: req.Args,
+internal\tools\bridge.go:596: entry.Decl.PluginID, entry.Decl.Provider)
+internal\tools\registry.go:108: if e.Decl.Provider == "" {
+internal\tools\registry.go:109: e.Decl.Provider = KindBuiltin
+internal\tools\registry.go:199: if e.Decl.Provider == "" {
+internal\tools\registry.go:200: e.Decl.Provider = p.Kind()
+internal\tools\web_search.go:241: p := t.w.provider
+internal\tools\web.go:160: w.provider = d.SearchProvider
+internal\tools\web.go:165: w.provider = NewAnySearchProvider(d.SearchBaseURL, d.SearchKey, nil)
+cmd\wisp\config_readers_255.go:319: // enabled (:1315) and asr.provider (:1321) to decide whether the voice
+cmd\wisp\config_readers_255.go:419: // wire-r1's voice leg added the fourth: it reads [voice] enabled/asr.provider
+cmd\wisp\panel_config_store.go:111: ChatProvider:    cfg.LLM.Roles.Chat.Provider,
+cmd\wisp\panel_config_store.go:112: Configured:      len(cfg.LLM.Providers) > 0 || strings.TrimSpace(cfg.LLM.Roles.Chat.Provider) != "",
+cmd\wisp\panel_config_store.go:118: RealtimeProvider: cfg.Voice.Realtime.Provider,
+cmd\wisp\panel_config_store.go:228: written, err = s.mgr.SetProviderBaseURL(w.Provider, w.Value)
+cmd\wisp\panel_config_store.go:238: written, err = s.mgr.SetProviderAPIKeyRef(w.Provider, ref)
+cmd\wisp\panel_config_store.go:245: written, err = s.mgr.SetModelContextWindow(w.Provider, w.Model, n)
+cmd\wisp\panel_config_store.go:252: written, err = s.mgr.SetModelPriceIn(w.Provider, w.Model, f)
+cmd\wisp\panel_config_store.go:259: written, err = s.mgr.SetModelPriceOut(w.Provider, w.Model, f)
+cmd\wisp\panel_config_store.go:296: written, err = s.mgr.CreateProviderRow(w.Provider, w.Model)
+cmd\wisp\panel_config_store.go:300: written, err = s.mgr.SetProviderBilling(w.Provider, w.Value)
+cmd\wisp\panel_config_store.go:305: written, err = s.mgr.CreateCustomProviderRow(w.Provider, protocol, baseURL, w.Model)
+cmd\wisp\panel_config_store.go:309: written, err = s.mgr.CreateModelRow(w.Provider, w.Model)
+cmd\wisp\panel_config_store.go:314: written, err = s.mgr.RemoveModelRow(w.Provider, w.Model)
+cmd\wisp\panel_config_store.go:318: written, err = s.mgr.RemoveProviderRow(w.Provider)
+cmd\wisp\panel_config_store.go:320: written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
+cmd\wisp\panel_resident_pump.go:232: models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model, Display: opt.Display})
+cmd\wisp\providers.go:207: rep.Provider, rep.Model, rep.LatencyMS, rep.Written)
+cmd\wisp\resident_audio_windows.go:70: // [voice].asr.provider not local-sherpa). In that shape the boot report still says
+cmd\wisp\resident_voice_windows.go:1866: case c.Voice.ASR.Provider != "" && c.Voice.ASR.Provider != "local-sherpa":
+cmd\wisp\resident_voice_windows.go:1867: rv.verdict = fmt.Sprintf("语音链未构造：[voice].asr.provider=%q，本片的链路只有本地 sherpa 一条（云 ASR 是 RESERVED，票 61）",
+cmd\wisp\resident_voice_windows.go:1868: c.Voice.ASR.Provider)
+cmd\wisp\run.go:594: models = append(models, panel.ModelOption{Provider: opt.Provider, Model: opt.Model, Display: opt.Display})
+cmd\wisp\run.go:1965: quotaKeys[0] = ep.Provider + "/" + ep.Model
+cmd\wisp\run.go:1980: card, budget := agent.CostWiring(cfg, ep.Provider, ep.Model)
+=== Speed count=13
+internal\config\manager.go:435: cur.Voice.TTS.Speed = fv.TTS.Speed
+internal\config\manager.go:442: cv.TTS.Speed != fv.TTS.Speed || cv.Punctuation != fv.Punctuation {
+internal\config\schema.go:265: // wake_word.thresholds, wake_word.veto_words, tts.speed, punctuation.
+internal\config\tiers.go:87: "voice.tts.speed":            TierHot,
+internal\speech\cloudcatalog.go:119: ep.Speed = cfg.Voice.TTS.Speed
+internal\speech\cloudendpoint.go:102: // Speed is the TTS rate multiplier (voice.tts.speed, hot-tier); 0 reads
+internal\speech\cloudendpoint.go:149: // config default for voice.tts.speed.
+internal\speech\cloudendpoint.go:151: if e.Speed > 0 {
+internal\speech\cloudendpoint.go:152: return e.Speed
+cmd\wisp\config_readers_255.go:325: // added a production READ SITE for voice.tts.speed, so the old 扫描零命中
+cmd\wisp\config_readers_255.go:333: "voice.tts.speed": hotClaimNoReader + "没有一条运行路径按这个值做事：唯一的生产读点是 internal/speech/cloudcatalog.go:119 [ep.Speed = cfg.Voice.TTS.Speed]，而它住在票 61 的 ResolveCloudChain 里——那枚函数全仓非测试调用者 0 枚（cmd/internal 里只有定义与注释）⇒ 读点存在、没人调用，TTS 的 speed 仍未接进运行的语音链 (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins)",
+cmd\wisp\config_readers_255.go:425: // plus tts.voice / tts.speed off its snapshot argument. It is a READ SITE
+cmd\wisp\config_readers_255.go:427: // voice.tts.speed's row was re-worded (the read exists, the caller does
+=== EchoRef count=1
+internal\config\validate.go:148: if ref := c.Voice.AEC.EchoRef; ref != "" && ref != voiceAECEchoRefSelfRender {
+=== Punctuation count=6
+internal\config\manager.go:436: cur.Voice.Punctuation = fv.Punctuation
+internal\config\manager.go:442: cv.TTS.Speed != fv.TTS.Speed || cv.Punctuation != fv.Punctuation {
+internal\config\tiers.go:88: "voice.punctuation":          TierHot,
+cmd\wisp\config_readers_255.go:347: "voice.punctuation":          hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1868 [c.Voice.Punctuation] - the resident voice leg carries the switch in its boot plan (voicePlan.PunctEnabled) and the punctuation stage opens and attaches under it (cmd/wisp/resident_voice_engines_windows.go:445's OpenPunctuation enabled argument, gated by the ASR-epoch acquire); the section's other production readers answer other keys: cmd/wisp/resident_audio_windows.go:292 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1848 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins",
+cmd\wisp\resident_voice_windows.go:277: // PunctEnabled is [voice].punctuation. Until ticket 423 the stage was opened
+cmd\wisp\resident_voice_windows.go:1880: plan.PunctEnabled = c.Voice.Punctuation
+=== ConversationMode count=12
+internal\config\manager.go:409: cv.ConversationMode != fv.ConversationMode || cv.AEC != fv.AEC ||
+internal\config\manager.go:425: cur.Voice.ConversationMode = fv.ConversationMode
+internal\statemachine\table.go:187: Guard: "not-conversation", GuardFn: func(f *Facts) bool { return !f.ConversationMode },
+internal\statemachine\table.go:200: GuardFn:     func(f *Facts) bool { return !f.ConversationMode },
+internal\statemachine\table.go:206: GuardFn:     func(f *Facts) bool { return f.ConversationMode },
+internal\statemachine\table.go:211: Guard: "conversation", GuardFn: func(f *Facts) bool { return f.ConversationMode },
+cmd\wisp\conversation_privacy_180p_windows.go:71: // plan.ConversationMode true.
+cmd\wisp\conversation_privacy_180p_windows.go:73: if rv == nil || rv.residency == nil || !rv.plan.ConversationMode {
+cmd\wisp\conversation_privacy_180p_windows.go:86: rv.plan.ConversationMode = false
+cmd\wisp\resident_voice_engines_windows.go:1288: if facts.ConversationMode {
+cmd\wisp\resident_voice_engines_windows.go:1310: return speakDoneFacts180K(rv.plan.ConversationMode)
+cmd\wisp\resident_voice_windows.go:1883: plan.ConversationMode = c.Voice.ConversationMode
+=== InputDevice count=7
+internal\config\settings_local_audio.go:53: base.Audio.InputDevice = v
+internal\panel\config_handlers.go:647: InputDevice:      v.Voice.InputDevice,
+cmd\wisp\config_readers_255.go:231: // [inputDevice := cfg.Audio.InputDevice] and :104
+cmd\wisp\config_readers_255.go:240: // [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to
+cmd\wisp\config_readers_255.go:246: "audio": hotClaimConsumed + "cmd/wisp/panel_config_store.go:103 [inputDevice := cfg.Audio.InputDevice] - the settings leg reads [audio]'s device half off the LIVE Manager per config.get (and :104 [sampleRate := cfg.Audio.SampleRate]), so a hot-applied [audio] edit changes what the next settings read answers without a restart - the same per-call reader class the [llm] row's consumed claim rests on; the caveat is [llm]'s: 已立即生效 means the live reader answers differently, not that anything re-opens - the resident capture leg still reads the file once at boot (cmd/wisp/resident_audio_windows.go:291 [ra.mutedAtBoot = c.Audio.MicMutedDefault] feeding audio.WithStartMuted, and cmd/wisp/resident_audio_windows.go:312 [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to internal/audio's capture config, whose open path resolves the boot-fed name per open and per hotplug reopen), so the device the mic actually opens with waits for the next resident process; sample_rate stays a load-time guard: the chain honours no other rate, so validate.go refuses a non-16000 value instead of accepting a key nothing would act on",
+cmd\wisp\panel_config_store.go:103: inputDevice := cfg.Audio.InputDevice
+cmd\wisp\resident_audio_windows.go:307: audio.WithInputDevice(c.Audio.InputDevice),
+=== SampleRate count=19
+internal\config\validate.go:120: if c.Audio.SampleRate != audioSampleRateChain {
+internal\config\validate.go:123: c.Audio.SampleRate, audioSampleRateChain))
+internal\panel\config_handlers.go:648: SampleRate:       v.Voice.SampleRate,
+internal\speech\cloudchain.go:553: return c.fallback.SampleRate()
+internal\speech\cloudchain.go:556: return c.engines[c.active].SampleRate()
+internal\speech\cloudendpoint.go:107: // resamples from whatever TtsEngine.SampleRate reports.
+internal\speech\cloudendpoint.go:142: if e.SampleRate > 0 {
+internal\speech\cloudendpoint.go:143: return e.SampleRate
+internal\speech\engines.go:140: // RealtimeAudio is model speech to play, at RealtimeEngine.SampleRate.
+internal\speech\tts.go:172: rate := tts.SampleRate()
+internal\speech\tts.go:228: return m.sampleRate
+cmd\wisp\config_readers_255.go:232: // [sampleRate := cfg.Audio.SampleRate]), the same per-call class the [llm]
+cmd\wisp\config_readers_255.go:246: "audio": hotClaimConsumed + "cmd/wisp/panel_config_store.go:103 [inputDevice := cfg.Audio.InputDevice] - the settings leg reads [audio]'s device half off the LIVE Manager per config.get (and :104 [sampleRate := cfg.Audio.SampleRate]), so a hot-applied [audio] edit changes what the next settings read answers without a restart - the same per-call reader class the [llm] row's consumed claim rests on; the caveat is [llm]'s: 已立即生效 means the live reader answers differently, not that anything re-opens - the resident capture leg still reads the file once at boot (cmd/wisp/resident_audio_windows.go:291 [ra.mutedAtBoot = c.Audio.MicMutedDefault] feeding audio.WithStartMuted, and cmd/wisp/resident_audio_windows.go:312 [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to internal/audio's capture config, whose open path resolves the boot-fed name per open and per hotplug reopen), so the device the mic actually opens with waits for the next resident process; sample_rate stays a load-time guard: the chain honours no other rate, so validate.go refuses a non-16000 value instead of accepting a key nothing would act on",
+cmd\wisp\panel_config_store.go:104: sampleRate := cfg.Audio.SampleRate
+cmd\wisp\resident_voice_engines_windows.go:1175: speaker, serr := rv.newSpeaker(eng.SampleRate())
+cmd\wisp\resident_voice_engines_windows.go:1207: rv.bargein.speakFar(samples, eng.SampleRate())
+cmd\wisp\resident_voice_engines_windows.go:1224: return speaker.Play(samples, eng.SampleRate())
+cmd\wisp\resident_voice_engines_windows.go:1238: "chunks", chunks, "samples", spoke, "rate", eng.SampleRate())
+cmd\wisp\resident_voice_engines_windows.go:1275: "rate", eng.SampleRate(), "acquire", d.String(), "scope", req.scope)
+=== HalfDuplex count=1
+internal\config\validate.go:116: if !c.Audio.HalfDuplex {
+=== MicMutedDefault count=8
+internal\audio\gate.go:56: // (config AudioSection.MicMutedDefault) here at boot wiring.
+cmd\wisp\config_readers_255.go:238: // [ra.mutedAtBoot = c.Audio.MicMutedDefault], feeding audio.WithStartMuted,
+cmd\wisp\config_readers_255.go:246: "audio": hotClaimConsumed + "cmd/wisp/panel_config_store.go:103 [inputDevice := cfg.Audio.InputDevice] - the settings leg reads [audio]'s device half off the LIVE Manager per config.get (and :104 [sampleRate := cfg.Audio.SampleRate]), so a hot-applied [audio] edit changes what the next settings read answers without a restart - the same per-call reader class the [llm] row's consumed claim rests on; the caveat is [llm]'s: 已立即生效 means the live reader answers differently, not that anything re-opens - the resident capture leg still reads the file once at boot (cmd/wisp/resident_audio_windows.go:291 [ra.mutedAtBoot = c.Audio.MicMutedDefault] feeding audio.WithStartMuted, and cmd/wisp/resident_audio_windows.go:312 [audio.WithInputDevice(c.Audio.InputDevice)] hands input_device to internal/audio's capture config, whose open path resolves the boot-fed name per open and per hotplug reopen), so the device the mic actually opens with waits for the next resident process; sample_rate stays a load-time guard: the chain honours no other rate, so validate.go refuses a non-16000 value instead of accepting a key nothing would act on",
+cmd\wisp\resident_audio_windows.go:32: //     audio.WithStartMuted(c.Audio.MicMutedDefault), so [audio]
+cmd\wisp\resident_audio_windows.go:171: // WithStartMuted(c.Audio.MicMutedDefault). It asks for the opposite of what the
+cmd\wisp\resident_audio_windows.go:288: "mic_muted_default", c.Audio.MicMutedDefault, "voice_enabled", c.Voice.Enabled)
+cmd\wisp\resident_audio_windows.go:291: ra.mutedAtBoot = c.Audio.MicMutedDefault
+cmd\wisp\resident_audio_windows.go:314: gate := audio.NewHalfDuplexGate(mic, audio.PathT, audio.WithStartMuted(c.Audio.MicMutedDefault))
+=== Temperature count=9
+internal\agent\prompt.go:252: Temperature:       a.Temperature,
+internal\config\migrate.go:155: //	llm.temperature                -> llm.roles.chat.temperature
+internal\llm\resolver.go:203: Temperature:       role.Temperature,
+internal\llm\anthropic\request.go:181: if req.Temperature != nil && w.Thinking == nil {
+internal\llm\anthropic\request.go:182: v := *req.Temperature
+internal\llm\anthropic\request.go:183: w.Temperature = &v
+internal\llm\anthropic\request.go:197: cp.Temperature = nil
+internal\llm\openaichat\request.go:74: Temperature: req.Temperature,
+internal\llm\openairesponses\request.go:89: Temperature:     req.Temperature,
+=== ThinkingIntensity count=16
+internal\agent\prompt.go:254: ThinkingIntensity: a.ThinkingIntensity,
+internal\config\settings_187.go:117: base.LLM.Roles.Chat.ThinkingIntensity = v
+internal\config\settings_187.go:263: out.CurrentThinking = cfg.LLM.Roles.Chat.ThinkingIntensity
+internal\config\validate.go:336: if err := validateRoleIntensity("llm.roles."+name, role.ThinkingIntensity); err != nil {
+internal\llm\probe.go:145: // Request.ThinkingIntensity deliberately does NOT
+internal\llm\resolver.go:204: ThinkingIntensity: role.ThinkingIntensity,
+internal\llm\thinking_levels.go:10: // Request.ThinkingIntensity - the fact census
+internal\llm\thinking_levels.go:37: // accepts in Request.ThinkingIntensity. Call it from an adapter's package
+internal\llm\anthropic\adapter.go:18: //   - Request.ThinkingIntensity maps to the `thinking` parameter:
+internal\llm\anthropic\request.go:124: if intensity := strings.ToLower(strings.TrimSpace(req.ThinkingIntensity)); intensity != "" && intensity != "off" {
+internal\llm\anthropic\request.go:128: fmt.Sprintf("anthropic: unknown thinking_intensity %q (want off|low|medium|high)", req.ThinkingIntensity))
+internal\llm\openaichat\adapter.go:14: //   - Request.ThinkingIntensity is intentionally NOT mapped: the chat
+internal\llm\openairesponses\adapter.go:16: //   - Request.ThinkingIntensity maps to reasoning.effort (low|medium|high)
+internal\llm\openairesponses\request.go:139: if intensity := strings.ToLower(strings.TrimSpace(req.ThinkingIntensity)); intensity != "" && intensity != "off" {
+internal\llm\openairesponses\request.go:143: fmt.Sprintf("openai-responses: unknown thinking_intensity %q (want off|low|medium|high)", req.ThinkingIntensity))
+internal\panel\model_switch_187.go:93: // in Request.ThinkingIntensity, from llm.ThinkingLevels of that
+=== Max count=27
+internal\ball\orbasset.go:213: // Math.max/Math.min chain, so the Go side clamps FIRST and hands the page
+internal\llm\retry.go:60: Attempt int                // the attempt now starting (2..Max+1)
+internal\llm\retry.go:70: return "重试中 (" + strconv.Itoa(n.Attempt-1) + "/" + strconv.Itoa(n.Max) + ")"
+internal\llm\retry.go:79: if o.Max == 0 {
+internal\llm\retry.go:80: o.Max = observe.MaxBackoffAttempts
+internal\llm\retry.go:82: if o.Max < 0 {
+internal\llm\retry.go:83: o.Max = 0
+internal\llm\retry.go:150: Attempt: attempt + 1, Max: r.opts.Max, Class: class,
+internal\llm\retry.go:192: if attempt > r.opts.Max {
+internal\panel\attachments.go:193: func (b *AttachmentBroker) MaxBytes() int64 { return b.max }
+internal\panel\attachments.go:214: if src.SizeBytes > b.max {
+internal\panel\attachments.go:216: src.DisplayName, src.SizeBytes, b.max))
+internal\panel\attachments.go:228: data, err := io.ReadAll(io.LimitReader(rc, b.max+1))
+internal\panel\attachments.go:232: if int64(len(data)) > b.max {
+internal\panel\attachments.go:234: src.DisplayName, b.max, b.max+1))
+cmd\balldebug\diff_windows.go:658: if x > st.box.Max.X {
+cmd\balldebug\diff_windows.go:659: st.box.Max.X = x
+cmd\balldebug\diff_windows.go:661: if y > st.box.Max.Y {
+cmd\balldebug\diff_windows.go:662: st.box.Max.Y = y
+cmd\balldebug\diff_windows.go:675: if st.box.Max.X < st.box.Min.X {
+cmd\balldebug\diff_windows.go:678: st.box.Max.X++
+cmd\balldebug\diff_windows.go:679: st.box.Max.Y++
+cmd\wisp\panel_resident_pump.go:186: return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
+cmd\wisp\panel_resident_pump.go:194: return panel.BallOpacityIdleSection{Opacity: v.Opacity, Min: v.Min, Max: v.Max}
+cmd\wisp\run.go:1233: return panel.BallSizeSection{Size: v.Size, Min: v.Min, Max: v.Max}
+cmd\wisp\run.go:1246: return panel.BallOpacityIdleSection{Opacity: v.Opacity, Min: v.Min, Max: v.Max}
+cmd\wisp\run.go:2520: RetryMax:  cfg.LLM.Retry.Max,
+=== BackoffMS count=1
+cmd\wisp\run.go:2519: RetryBase: time.Duration(cfg.LLM.Retry.BackoffMS) * time.Millisecond,
+=== Loose count=39
+internal\llm\resolver.go:69: o.Compat.Loose = e.Compat.Loose
+internal\llm\anthropic\adapter.go:14: //     error in strict mode (our bug) and the first 4 in compat.loose.
+internal\llm\anthropic\adapter.go:249: // a mid-stream disconnect (the [DONE] analogue), unless compat.loose and
+internal\llm\anthropic\adapter.go:252: if st.stopReason != "" && a.loose() {
+internal\llm\anthropic\adapter.go:266: if !a.loose() && !a.opts.Compat.AllowMissingUsage {
+internal\llm\anthropic\adapter.go:268: "anthropic: stream carried no usage block (set compat.allow_missing_usage or compat.loose)"))
+internal\llm\anthropic\adapter.go:301: if a.loose() || a.opts.Compat.AllowMissingUsage {
+internal\llm\anthropic\adapter.go:305: "anthropic: stream finished without a stop_reason (set compat.loose to tolerate)")
+internal\llm\anthropic\adapter.go:307: if a.loose() {
+internal\llm\anthropic\adapter.go:315: func (a *Adapter) loose() bool { return a.opts.Compat.Loose }
+internal\llm\anthropic\request.go:239: if !a.loose() {
+internal\llm\openaichat\adapter.go:8: //     "index" field (gaps/out-of-order tolerated only in compat.loose);
+internal\llm\openaichat\adapter.go:19: //     compat.loose (several OpenAI-compatible servers reject it).
+internal\llm\openaichat\adapter.go:129: asm := newToolAssembler(a.loose())
+internal\llm\openaichat\adapter.go:216: if sawFinish != "" && a.loose() {
+internal\llm\openaichat\adapter.go:231: if !a.loose() && !a.opts.Compat.AllowMissingUsage {
+internal\llm\openaichat\adapter.go:233: "openai-chat: stream finished without a usage block (set llm.providers.<p>.compat.allow_missing_usage or compat.loose)"))
+internal\llm\openaichat\adapter.go:260: if a.loose() || a.opts.Compat.AllowMissingUsage {
+internal\llm\openaichat\adapter.go:264: "openai-chat: stream finished without finish_reason (set compat.loose to tolerate)")
+internal\llm\openaichat\adapter.go:266: if a.loose() {
+internal\llm\openaichat\adapter.go:274: func (a *Adapter) loose() bool { return a.opts.Compat.Loose }
+internal\llm\openaichat\request.go:79: if !a.loose() {
+internal\llm\openaichat\toolasm.go:45: } else if !a.loose {
+internal\llm\openaichat\toolasm.go:47: "openai-chat: tool_calls fragment without index (set compat.loose to tolerate)")
+internal\llm\openaichat\toolasm.go:110: if !a.loose {
+internal\llm\openaichat\toolasm.go:112: fmt.Sprintf("openai-chat: tool_calls[%d] closed without an id (set compat.loose to tolerate)", idx))
+internal\llm\openaichat\toolasm.go:117: if !a.loose {
+internal\llm\openaichat\toolasm.go:119: fmt.Sprintf("openai-chat: tool_calls[%d] closed without a function name (set compat.loose to tolerate)", idx))
+internal\llm\openairesponses\adapter.go:21: //     ClassInternal error unless compat.loose (which drops them).
+internal\llm\openairesponses\adapter.go:201: if a.loose() && st.status != "" {
+internal\llm\openairesponses\adapter.go:215: if !a.loose() && !a.opts.Compat.AllowMissingUsage {
+internal\llm\openairesponses\adapter.go:217: "openai-responses: stream carried no usage block (set compat.allow_missing_usage or compat.loose)"))
+internal\llm\openairesponses\adapter.go:255: if a.loose() || a.opts.Compat.AllowMissingUsage {
+internal\llm\openairesponses\adapter.go:262: "openai-responses: stream finished without a terminal status (set compat.loose to tolerate)")
+internal\llm\openairesponses\adapter.go:264: if a.loose() {
+internal\llm\openairesponses\adapter.go:275: func (a *Adapter) loose() bool { return a.opts.Compat.Loose }
+internal\llm\openairesponses\request.go:80: if !a.loose() {
+internal\llm\openairesponses\request.go:82: "openai-responses: the protocol has no stop-sequence field; drop StopSequences or set compat.loose")
+internal\llm\openairesponses\request.go:84: // compat.loose: tolerate a provider that cannot honor them.
+=== AllowMissingUsage count=7
+internal\llm\resolver.go:70: o.Compat.AllowMissingUsage = e.Compat.AllowMissingUsage
+internal\llm\anthropic\adapter.go:266: if !a.loose() && !a.opts.Compat.AllowMissingUsage {
+internal\llm\anthropic\adapter.go:301: if a.loose() || a.opts.Compat.AllowMissingUsage {
+internal\llm\openaichat\adapter.go:231: if !a.loose() && !a.opts.Compat.AllowMissingUsage {
+internal\llm\openaichat\adapter.go:260: if a.loose() || a.opts.Compat.AllowMissingUsage {
+internal\llm\openairesponses\adapter.go:215: if !a.loose() && !a.opts.Compat.AllowMissingUsage {
+internal\llm\openairesponses\adapter.go:255: if a.loose() || a.opts.Compat.AllowMissingUsage {
+=== Billing count=25
+internal\agent\quota_44r4.go:115: pBilling := p.Billing
+internal\agent\quota_44r4.go:121: billing := m.Billing
+internal\config\settings_320.go:32: // SetProviderBilling writes llm.providers.<name>.billing (ticket 320 AC#1). The
+internal\config\settings_320.go:40: "config: llm.providers.%s.billing: %q 不在枚举内（%s）；这一枚只接受这几种写法",
+internal\config\settings_320.go:48: p.Billing = v
+internal\config\validate.go:274: if p.Billing != "" && !slices.Contains(billingModes, p.Billing) {
+internal\config\validate.go:276: "config.toml: llm.providers.%s.billing %q must be one of %s",
+internal\config\validate.go:277: name, p.Billing, vocabList(billingModes)))
+internal\config\validate.go:311: if m.Billing != "" && !slices.Contains(billingModes, m.Billing) {
+internal\config\validate.go:313: "config.toml: %s.billing %q must be one of %s", path, m.Billing, vocabList(billingModes)))
+internal\observe\costmodel_44b.go:197: if c, ok := cards[key]; ok && c.Billing == BillingPlan {
+internal\observe\pricing.go:197: switch e.Billing {
+internal\observe\pricing.go:209: return PriceTable{}, fmt.Errorf("observe: cost price table row %q: billing=%q but no rate to price with", key, orDefault(e.Billing, "pay-per-token"))
+internal\observe\pricing.go:215: return PriceTable{}, fmt.Errorf("observe: cost price table row %q: billing %q must be pay-per-token or free", key, e.Billing)
+internal\observe\pricing.go:229: if e.Billing == "free" {
+internal\observe\pricing.go:281: billing := o.Billing
+internal\observe\quota_44.go:158: if m.Billing == BillingPlan && prov != nil {
+internal\observe\quota_44.go:276: if m.Billing == BillingPlan {
+internal\panel\config_handlers.go:658: Billing:         p.Billing,
+internal\panel\config_write_313.go:46: //	provider_billing  llm.providers.<name>.billing, the pay-per-token|plan
+internal\panel\config_write_313.go:74: // FieldProviderBilling is llm.providers.<name>.billing (ticket 320 AC#1).
+internal\speech\cloudasr.go:646: Billing:        a.ep.Billing,
+internal\speech\cloudcatalog.go:109: Billing:          spec.Billing,
+internal\speech\cloudtts.go:234: Billing:         t.ep.Billing,
+cmd\wisp\panel_config_store.go:144: Billing:  p.Billing,
+=== TimeoutMS count=10
+internal\plugin\command_argv.go:605: case t.TimeoutMs == 0:
+internal\plugin\command_argv.go:607: case t.TimeoutMs < MinCommandTimeoutMS:
+internal\plugin\command_argv.go:609: case t.TimeoutMs > MaxCommandTimeoutMS:
+internal\plugin\command_argv.go:612: return t.TimeoutMs
+internal\plugin\validator.go:235: case t.TimeoutMs == 0:
+internal\plugin\validator.go:236: case t.TimeoutMs < MinCommandTimeoutMS:
+internal\plugin\validator.go:239: Reason: fmt.Sprintf("must be 0 (default %d) or at least %d ms; got %d", DefaultCommandTimeoutMS, MinCommandTimeoutMS, t.TimeoutMs),
+internal\plugin\validator.go:241: case t.TimeoutMs > MaxCommandTimeoutMS:
+internal\plugin\validator.go:244: Reason: fmt.Sprintf("must be at most %d ms; got %d", MaxCommandTimeoutMS, t.TimeoutMs),
+cmd\wisp\run.go:2137: time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
+=== RepeatThresholds count=8
+internal\agent\guard.go:90: th := make([]int, 0, len(cfg.RepeatThresholds))
+internal\agent\guard.go:91: for _, v := range cfg.RepeatThresholds {
+internal\agent\guard.go:100: cfg.RepeatThresholds = th
+internal\agent\loop.go:245: if len(opt.Config.RepeatThresholds) == 0 {
+internal\agent\loop.go:246: opt.Config.RepeatThresholds = []int{3, 5, 8}
+internal\agent\loop.go:276: RepeatThresholds: opt.Config.RepeatThresholds,
+cmd\wisp\config_readers_255.go:140: "agent": hotClaimConsumed + "cmd/wisp/run.go:1875 [cfg = rt.mgr.Config()] - execute() reads the live Manager per task since ticket 233, so the next task after a hot-applied [agent] edit acts on the new values (PerToolTimeoutMS / SteeringEnabled / ProjectInstructionsEnabled, and since ticket 423 also MaxRounds / TokenBudget / LoopGuard.RepeatThresholds, which execute() hands to agent.Config at the loop's construction - the ticket-10 tail the census caught feeding from nowhere)",
+cmd\wisp\run.go:2022: RepeatThresholds: cfg.Agent.LoopGuard.RepeatThresholds,
+=== MaxRounds count=8
+internal\agent\guard.go:101: if cfg.MaxRounds <= 0 {
+internal\agent\guard.go:102: cfg.MaxRounds = 50 // D15(4) last-resort round floor
+internal\agent\guard.go:143: return g.round, g.round > g.cfg.MaxRounds
+internal\agent\loop.go:242: if opt.Config.MaxRounds <= 0 {
+internal\agent\loop.go:243: opt.Config.MaxRounds = 50
+internal\agent\loop.go:277: MaxRounds:        opt.Config.MaxRounds,
+internal\agent\loop.go:464: fmt.Sprintf("本次任务已达 %d 轮上限并停止：%s。", l.guard.MaxRounds, guard.Consumption()))
+cmd\wisp\run.go:2020: MaxRounds:        cfg.Agent.MaxRounds,
+=== SteeringEnabled count=2
+internal\agent\loop.go:318: if !l.opt.Config.SteeringEnabled || strings.TrimSpace(text) == "" {
+cmd\wisp\run.go:2011: SteeringEnabled: cfg.Agent.SteeringEnabled,
+=== ProjectInstructionsEnabled count=2
+cmd\wisp\run.go:2106: instrReq.WorkspaceDir, instrReq.GlobalDir, cfg.Agent.ProjectInstructionsEnabled,
+cmd\wisp\run.go:2111: Enabled:      cfg.Agent.ProjectInstructionsEnabled,
+=== ConfirmTimeoutSec count=3
+internal\config\validate.go:222: if sec := c.Risk.ConfirmTimeoutSec; sec < confirmTimeoutSecMin || sec > confirmTimeoutSecMax {
+cmd\wisp\resident_approval_windows.go:557: time.Duration(c.Risk.ConfirmTimeoutSec) * time.Second,
+cmd\wisp\run.go:1058: ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
+=== L1WindowSec count=4
+internal\config\manager.go:467: if new.L1WindowSec > old.L1WindowSec {
+internal\config\manager.go:469: } else if new.L1WindowSec < old.L1WindowSec {
+cmd\wisp\resident_approval_windows.go:556: return time.Duration(c.Risk.L1WindowSec) * time.Second,
+cmd\wisp\run.go:1057: Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
+=== ShellEnabled count=3
+internal\config\manager.go:457: if !old.ShellEnabled && new.ShellEnabled {
+internal\config\manager.go:459: } else if old.ShellEnabled && !new.ShellEnabled {
+cmd\wisp\run.go:864: Enabled:   cfg.Risk.ShellEnabled,
+=== AllowShellString count=3
+internal\config\manager.go:462: if !old.AllowShellString && new.AllowShellString {
+internal\config\manager.go:464: } else if old.AllowShellString && !new.AllowShellString {
+internal\config\unwired.go:77: fires:   func(c *Config) bool { return c.Risk.AllowShellString },
+=== PermissionMode count=31
+internal\agent\approval\reach.go:130: configured := u.src.PermissionMode()
+internal\command\roster.go:185: // panel gate compares the same pair. The EFFECTIVE档 (perm.PermissionMode, what the
+internal\config\manager.go:478: oldMode, _ := risk.ParseMode(old.PermissionMode)
+internal\config\manager.go:479: newMode, _ := risk.ParseMode(new.PermissionMode)
+internal\config\permmode.go:40: m, err := risk.ParseMode(c.Risk.PermissionMode)
+internal\config\permmode.go:77: old := m.cur.Risk.PermissionMode
+internal\config\permmode.go:78: m.cur.Risk.PermissionMode = mode.String()
+internal\config\permmode.go:80: base.Risk.PermissionMode = mode.String()
+internal\config\permmode.go:82: m.cur.Risk.PermissionMode = old
+internal\config\unwired.go:126: "risk.permission_mode":     "consumed: Config.PermissionMode is read per tool call by the bridge (internal/tools), persisted by Manager.SetPermissionMode; ticket 90",
+internal\config\validate.go:219: if _, err := risk.ParseMode(c.Risk.PermissionMode); err != nil {
+internal\panel\composer_handlers.go:29: // The missing leg is ALSO made safe on the READ side: perm.Store.PermissionMode
+internal\panel\pump.go:149: // Mode reads the permission mode in force (perm.Store.PermissionMode).
+internal\perm\store.go:245: if effective := s.PermissionMode(); effective != configured {
+internal\perm\store.go:315: return c.PermissionMode()
+internal\perm\store.go:470: return Snapshot{Mode: s.PermissionMode(), History: out}
+internal\tools\bridge.go:327: // It is the EFFECTIVE档 (perm.Store.PermissionMode, ticket 372's read-side
+internal\tools\bridge.go:330: mode := b.permissionMode()
+internal\tools\mode.go:46: return b.modes.PermissionMode()
+cmd\wisp\approval_always.go:122: Mode:  s.rt.permissionMode(),
+cmd\wisp\approval_always.go:154: // Ticket 377: it asks the STORE, not the config. perm.Store.PermissionMode is
+cmd\wisp\approval_always.go:157: // config.Config.PermissionMode answers config.toml's value. On the `wisp run`
+cmd\wisp\approval_always.go:167: // ask_every_step when it cannot answer (perm.Store.PermissionMode).
+cmd\wisp\approval_always.go:173: return rt.modes.PermissionMode()
+cmd\wisp\config_reload.go:66: // call rt.permissionMode(), which reads Manager.Config(), and park on a human.
+cmd\wisp\config_reload.go:313: mode := rt.permissionMode()
+cmd\wisp\panel_resident_pump.go:33: //     perm.Store is the process's档 truth (disp.Mode.Modes.PermissionMode);
+cmd\wisp\panel_resident_pump.go:152: src.Mode = mw.Modes.PermissionMode
+cmd\wisp\run.go:1150: modeStore.PermissionMode(), cfgPath)
+cmd\wisp\run.go:1169: Mode:      rt.modes.PermissionMode,
+cmd\wisp\run.go:1360: // into a refusal. The store itself is untouched: perm.Store.PermissionMode
+=== DeleteEnabled count=9
+internal\config\manager.go:495: if !old.DeleteEnabled && new.DeleteEnabled {
+internal\config\manager.go:497: } else if old.DeleteEnabled && !new.DeleteEnabled {
+internal\config\unwired.go:122: "risk.shell_enabled":       "consumed: cmd/wisp/run.go feeds it to ShellDeps.Enabled (ticket 163): tools.BuiltinShellEntries registers the shell family only while it is true and registers NOTHING while it is false (D14 默认禁用, the FSDeps.DeleteEnabled shape)",
+internal\tools\fs_write.go:596: if !t.d.DeleteEnabled {
+internal\tools\fs_write.go:779: if d.DeleteEnabled {
+internal\tools\shell.go:38: //     = true - the same shape FSDeps.DeleteEnabled gives fs.delete. The
+internal\tools\shell.go:232: // FSDeps.DeleteEnabled shape): a disabled family is not a roster of tools
+cmd\wisp\run.go:780: DeleteEnabled: cfg.FS.DeleteEnabled,
+cmd\wisp\run.go:838: //     FSDeps.DeleteEnabled shape): while it is false the family registers
+=== Mode count=118
+internal\agent\prompt.go:261: if a.Cache.Mode == llm.CacheExplicit && a.Cache.Breakpoints {
+internal\agent\approval\reach.go:121: announced    risk.Mode
+internal\agent\approval\reach.go:126: func (u *unsilencedMode) PermissionMode() risk.Mode {
+internal\agent\approval\reach.go:142: func (u *unsilencedMode) announce(configured risk.Mode) {
+internal\command\roster.go:18: //   - ChannelPanelMode: C17's panel.mode.request, whose production handler is
+internal\command\roster.go:55: // carries a panel.mode.request envelope); and the visible half is now a production
+internal\command\roster.go:91: // ChannelPanelMode is C17's panel.mode.request (panel.MethodModeRequest),
+internal\command\roster.go:193: Mode        risk.Mode
+internal\command\roster.go:287: // judgeMode judges one panel.mode.request against the same predicate the two
+internal\command\roster.go:289: // the door about which switch needs a card. The `from` it passes is Env.Mode, the
+internal\command\roster.go:304: if to == env.Mode {
+internal\command\roster.go:308: switch perm.JudgeCard(env.Mode, to, env.CardChannel) {
+internal\command\roster.go:312: env.Mode, to, env.Mode, to, env.CardChannel)}
+internal\command\roster.go:315: "从 %q 切到 %q 是调松，而本机没有接 L2 确认腿：perm.JudgeCard 报 GateNoChannel，面板腿在写之前就拒（panel.ErrNoL2Confirm），perm.Store.Set 也拒（失败闭合）", env.Mode, to)}
+internal\command\roster.go:318: "从 %q 切到 %q 是调松：perm.JudgeCard 报 GateAsk，perm.Store.Set 要一张已应答的 L2 强确认卡；只连了腿不算，卡没被答就是拒（perm.ResultCardNotAnswered）", env.Mode, to)}
+internal\command\roster.go:320: return Availability{Verdict: Refused, Reason: fmt.Sprintf("perm.JudgeCard 对 %q -> %q 给出未知判决，按 fail-closed 拒绝", env.Mode, to)}
+internal\config\manager.go:512: oldOpen := old.Proxy.Mode != ProxyNone
+internal\config\manager.go:513: newOpen := new.Proxy.Mode != ProxyNone
+internal\config\manager.go:516: loosen = append(loosen, "net.proxy.mode")
+internal\config\manager.go:518: tighten = append(tighten, "net.proxy.mode")
+internal\config\permmode.go:36: func (c *Config) PermissionMode() risk.Mode {
+internal\config\permmode.go:70: func (m *Manager) SetPermissionMode(mode risk.Mode) error {
+internal\config\settings.go:49: // panel.mode.request), and allowed-directory widening carries the same debt - see
+internal\config\unwired.go:134: "net.proxy":                "table header: the leaves are net.proxy.mode / net.proxy.url",
+internal\config\unwired.go:135: "net.proxy.mode":           "consumed: chainOptions -> llm transport",
+internal\config\validate.go:254: if !slices.Contains(proxyModes, c.Net.Proxy.Mode) {
+internal\config\validate.go:256: "config.toml: net.proxy.mode %q must be one of %s", c.Net.Proxy.Mode, vocabList(proxyModes)))
+internal\llm\errors.go:324: // proxy settings. mode is the config net.proxy.mode enum: "system" consults
+internal\llm\adaptertest\harness.go:466: switch c.Mode {
+internal\llm\adaptertest\harness.go:476: t.Fatalf("adaptertest: case %s has unknown mode %d", c.ID, c.Mode)
+internal\llm\anthropic\request.go:464: switch tc.Mode {
+internal\llm\anthropic\request.go:481: fmt.Sprintf("anthropic: unknown tool_choice mode %q", tc.Mode))
+internal\llm\openaichat\request.go:123: switch req.ToolChoice.Mode {
+internal\llm\openaichat\request.go:138: fmt.Sprintf("openai-chat: unknown tool_choice mode %q", req.ToolChoice.Mode))
+internal\llm\openairesponses\request.go:307: switch tc.Mode {
+internal\llm\openairesponses\request.go:322: fmt.Sprintf("openai-responses: unknown tool_choice mode %q", tc.Mode))
+internal\models\archive.go:77: out, err := os.OpenFile(target, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, normalMode(hdr.FileInfo().Mode()))
+internal\models\downloader.go:405: if st, err := os.Stat(dst); err == nil && st.Mode().IsRegular() {
+internal\models\downloader.go:752: if !st.Mode().IsRegular() {
+internal\models\manifest.go:346: return err == nil && st.Mode().IsRegular()
+internal\panel\bridge.go:42: MethodModeRequest      = "panel.mode.request"
+internal\panel\composer_dispatch.go:222: if d == nil || d.Mode == nil {
+internal\panel\composer_dispatch.go:225: return "", d.Mode.HandleModeRequest(ctx, req)
+internal\panel\composer_handlers.go:109: PermissionMode() risk.Mode
+internal\panel\composer_handlers.go:117: ConfiguredMode() risk.Mode
+internal\panel\composer_handlers.go:119: Set(ctx context.Context, to risk.Mode, origin, actor string) error
+internal\panel\composer_handlers.go:128: type ModeConfirm func(ctx context.Context, from, to risk.Mode, origin, actor string) (perm.Card, error)
+internal\panel\composer_handlers.go:130: // ModeWriteHandler is the native handler for one panel.mode.request.
+internal\panel\composer_handlers.go:149: // HandleModeRequest answers one parsed panel.mode.request (bridge.go's
+internal\panel\composer.go:257: if composer.Mode.Current == "" {
+internal\panel\composer.go:259: composer.Mode = ModeView{Current: "unknown", Names: risk.ModeNames()}
+internal\panel\composer.go:310: // Current is risk.Mode.String(): "ask_every_step" | "ask_high_risk" |
+internal\panel\composer.go:326: func NewModeView(m risk.Mode) ModeView {
+internal\panel\composer.go:355: func (r ModeRequest) Parse() (risk.Mode, error) {
+internal\panel\composer.go:460: func NewComposerState(mode risk.Mode, ws WorkspaceView, atts []AttachmentRef, maxBytes int64) ComposerState {
+internal\panel\config_handlers.go:34: // through panel.mode.request, which costs the L2 card), and it invents no answer
+internal\panel\config_handlers.go:122: return f, "档位与放宽类键只由带原生二次确认的那条路写：权限档位走 panel.mode.request（变宽要那张 L2 卡）"
+internal\panel\config_handlers.go:132: return "risk.", "权限档位的变更只由 panel.mode.request 发起（变宽要那张 L2 卡），设置页不写它"
+internal\panel\pump.go:150: Mode func() risk.Mode
+internal\panel\pump.go:371: mode, modeReadable := risk.Mode(0), false
+internal\panel\pump.go:372: if p.src.Mode != nil {
+internal\panel\pump.go:373: mode = p.src.Mode()
+internal\panel\pump.go:392: composer.Mode = ModeUnknownView()
+internal\panel\tree_reader_190.go:45: if info.Mode()&os.ModeSymlink != 0 {
+internal\perm\direction.go:27: func RequiresCard(from, to risk.Mode) bool { return IsWidening(from, to) }
+internal\perm\direction.go:67: func JudgeCard(from, to risk.Mode, channel bool) CardGate {
+internal\perm\direction.go:78: // adding them: a raw `to > from` over risk.Mode's constants, which is only sound
+internal\perm\direction.go:88: func IsWidening(from, to risk.Mode) bool { return to > from }
+internal\perm\store.go:68: SetPermissionMode(mode risk.Mode) error
+internal\perm\store.go:109: From   risk.Mode // the档 in effect before
+internal\perm\store.go:110: To     risk.Mode // the档 asked for
+internal\perm\store.go:264: // silences every L1 call (risk.Mode.Screen). An assembly with no way to ask must
+internal\perm\store.go:274: func (s *Store) PermissionMode() risk.Mode {
+internal\perm\store.go:297: func (s *Store) ConfiguredMode() risk.Mode { return s.configuredMode() }
+internal\perm\store.go:307: func (s *Store) configuredMode() risk.Mode {
+internal\perm\store.go:350: func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) error {
+internal\perm\store.go:460: Mode    risk.Mode
+internal\risk\pathresolver_other.go:86: if fi.Mode()&os.ModeSymlink != 0 {
+internal\risk\syncdirs.go:291: if !st.IsDir() && st.Mode()&os.ModeSymlink == 0 {
+internal\speech\punctuate.go:151: if !info.Mode().IsRegular() {
+internal\tools\bridge.go:341: dec.Mode = mode
+internal\tools\bridge.go:370: // record - and since ticket 377 the audit line carries dec.Mode itself.
+internal\tools\bridge.go:372: dec.Mode = mode
+internal\tools\bridge.go:1284: // call was screened under (Execute reads it once into dec.Mode), never
+internal\tools\bridge.go:1301: dec.Mode)
+internal\tools\fs_staging.go:256: if err != nil || !st.Mode().IsRegular() {
+internal\tools\fs.go:263: case st.Mode()&os.ModeSymlink != 0:
+internal\tools\gate.go:47: Mode risk.Mode
+internal\tools\mode.go:30: PermissionMode() risk.Mode
+internal\tools\mode.go:35: func (b *Bridge) permissionMode() (m risk.Mode) {
+internal\tools\search_apps.go:181: return info.Mode().Perm()&0o111 != 0
+internal\tools\search_content.go:313: case info.Mode()&fs.ModeSymlink != 0:
+internal\tools\task.go:978: } else if !st.Mode().IsRegular() {
+internal\winsec\winsec_other.go:219: if now.Mode()&os.ModeSymlink != 0 {
+internal\winsec\winsec_other.go:263: if got := info.Mode().Perm(); got != mode {
+internal\winsec\winsec_other.go:300: if now.Mode()&os.ModeSymlink != 0 {
+internal\winsec\winsec_other.go:455: return info.Mode()&os.ModeSymlink != 0
+internal\winsec\winsec.go:11: // evidence that counts is what `icacls` prints - not FileInfo.Mode(), which
+cmd\wisp\approval_always.go:147: // carries the mode the audit trail expects. tools.Decision.Mode's own comment
+cmd\wisp\approval_always.go:168: func (rt *agentRuntime) permissionMode() risk.Mode {
+cmd\wisp\conversation_privacy_180p.go:85: return err == nil && st.Mode().IsRegular()
+cmd\wisp\panel_inbound.go:218: // panel.ModeWriteHandler is the single handler for panel.mode.request, and
+cmd\wisp\panel_models_320.go:110: HTTPClient: llm.NewDefaultHTTPClient(cfg.Net.Proxy.Mode, cfg.Net.Proxy.URL),
+cmd\wisp\panel_pump.go:29: // verdict internal/risk already reached; composer.mode is perm.Store's own read;
+cmd\wisp\panel_pump.go:458: snap.Composer.Mode.Current, workspace,
+cmd\wisp\panel_pump.go:464: snap.GeneratedAt, len(snap.Pending), snap.Composer.Mode.Current, workspace,
+cmd\wisp\panel_resident_pump.go:33: //     perm.Store is the process's档 truth (disp.Mode.Modes.PermissionMode);
+cmd\wisp\panel_resident_pump.go:151: if mw, ok := disp.Mode.(*panel.ModeWriteHandler); ok && mw.Modes != nil {
+cmd\wisp\panel_resident_pump.go:152: src.Mode = mw.Modes.PermissionMode
+cmd\wisp\providers.go:138: HTTPClient: llm.NewDefaultHTTPClient(cfg.Net.Proxy.Mode, cfg.Net.Proxy.URL),
+cmd\wisp\resident_voice_windows.go:2075: return err == nil && st.Mode().IsRegular()
+cmd\wisp\run.go:1478: const modeSwitchToolName = "permission.mode"
+cmd\wisp\run.go:1581: return func(ctx context.Context, from, to risk.Mode, origin, actor string) (perm.Card, error) {
+cmd\wisp\run.go:2517: ProxyMode: cfg.Net.Proxy.Mode,
+cmd\wisp\slo_windows.go:294: run.Mode = "settle"
+cmd\wisp\slo_windows.go:364: run.Mode = "state"
+cmd\wisp\slo_windows.go:413: run.Mode = "subject"
+cmd\wisp\slo_windows.go:441: run.Mode = "subject-in-tree"
+=== BlockPrivateRanges count=3
+internal\config\manager.go:507: if old.BlockPrivateRanges && !new.BlockPrivateRanges {
+internal\config\manager.go:509: } else if !old.BlockPrivateRanges && new.BlockPrivateRanges {
+internal\config\unwired.go:94: fires:   func(c *Config) bool { return !c.Net.BlockPrivateRanges },
+=== RedactPaths count=11
+internal\observe\diagnostics.go:148: red := Redactor{RedactPaths: o.RedactPaths}
+internal\observe\diagnostics.go:166: red := Redactor{RedactPaths: o.RedactPaths}
+internal\observe\diagnostics.go:250: red := Redactor{RedactPaths: o.RedactPaths}
+internal\observe\diagnostics.go:385: red := Redactor{RedactPaths: o.RedactPaths}
+internal\observe\logging.go:115: red: Redactor{RedactPaths: cfg.RedactPaths},
+internal\observe\redact.go:138: if r.RedactPaths {
+cmd\wisp\config_readers_255.go:256: "privacy": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:233 [RedactPaths: c.Privacy.RedactPaths] - installLogSink's boot LoadFile feeds privacy.redact_paths into the pipeline's redactor (the mask runs in internal/observe/redact.go:138), and privacy.retention_days rides the same feed through the retention window: cmd/wisp/memory_retention_180k.go:46 [days = c.Privacy.RetentionDays] feeds memory.StartRetentionJob (the job's first production owner), so both keys act at the boot that installs the sink",
+cmd\wisp\diagnostics_cmd.go:157: RedactPaths: c.Privacy.RedactPaths,
+cmd\wisp\diagnostics_cmd.go:166: "redact_paths": fmt.Sprintf("%t", c.Privacy.RedactPaths),
+cmd\wisp\logsink.go:202: "redact_paths", obs.RedactPaths,
+cmd\wisp\logsink.go:233: RedactPaths: c.Privacy.RedactPaths,
+=== DiagnosticsOptIn count=1
+cmd\wisp\diagnostics_cmd.go:137: if !c.Privacy.DiagnosticsOptIn {
+=== RetentionDays count=3
+cmd\wisp\config_readers_255.go:256: "privacy": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:233 [RedactPaths: c.Privacy.RedactPaths] - installLogSink's boot LoadFile feeds privacy.redact_paths into the pipeline's redactor (the mask runs in internal/observe/redact.go:138), and privacy.retention_days rides the same feed through the retention window: cmd/wisp/memory_retention_180k.go:46 [days = c.Privacy.RetentionDays] feeds memory.StartRetentionJob (the job's first production owner), so both keys act at the boot that installs the sink",
+cmd\wisp\memory_retention_180k.go:45: if c.Privacy.RetentionDays > 0 && c.Privacy.RetentionDays < days {
+cmd\wisp\memory_retention_180k.go:46: days = c.Privacy.RetentionDays
+=== KeepTranscript count=1
+internal\config\validate.go:159: if c.Privacy.KeepTranscript {
+=== KeepAudio count=1
+internal\config\validate.go:163: if c.Privacy.KeepAudio {
+=== L1Enabled count=3
+cmd\wisp\memory_retention_180k.go:62: "path", cfgPath, "err", configErrText(err, c), "l1_enabled", c.Memory.L1Enabled)
+cmd\wisp\memory_retention_180k.go:63: return c.Memory.L1Enabled, "compiled defaults (config.NewDefaults)"
+cmd\wisp\memory_retention_180k.go:65: return c.Memory.L1Enabled, cfgPath
+=== L1Max count=2
+cmd\wisp\config_readers_255.go:257: "memory":  hotClaimSnapshotOnly + "cmd/wisp/run.go:691 [mem, err := memory.Open(s.dataDir, memory.WithProfileCap(cfg.Memory.L1Max))] - the assembly root feeds l1_max into the store's profile-row cap (dao_profile.go's LRU eviction enforces it), and the L3 window rides the retention start: cmd/wisp/memory_retention_180k.go:43 [days = c.Memory.L3RetentionDays] joins [privacy] retention_days on the same knob (the smaller window wins). l1_enabled is the resident boot's gate: cmd/wisp/resident_windows.go reads it once per boot (memoryL1Enabled180K) and false means the L1 extraction pipeline is not attached at all. All reads are boot-time, none re-read the live Manager - snapshot-only",
+cmd\wisp\run.go:691: mem, err := memory.Open(s.dataDir, memory.WithProfileCap(cfg.Memory.L1Max))
+=== L3RetentionDays count=3
+cmd\wisp\config_readers_255.go:257: "memory":  hotClaimSnapshotOnly + "cmd/wisp/run.go:691 [mem, err := memory.Open(s.dataDir, memory.WithProfileCap(cfg.Memory.L1Max))] - the assembly root feeds l1_max into the store's profile-row cap (dao_profile.go's LRU eviction enforces it), and the L3 window rides the retention start: cmd/wisp/memory_retention_180k.go:43 [days = c.Memory.L3RetentionDays] joins [privacy] retention_days on the same knob (the smaller window wins). l1_enabled is the resident boot's gate: cmd/wisp/resident_windows.go reads it once per boot (memoryL1Enabled180K) and false means the L1 extraction pipeline is not attached at all. All reads are boot-time, none re-read the live Manager - snapshot-only",
+cmd\wisp\memory_retention_180k.go:42: if c.Memory.L3RetentionDays > 0 && c.Memory.L3RetentionDays < days {
+cmd\wisp\memory_retention_180k.go:43: days = c.Memory.L3RetentionDays
+=== Width count=25
+internal\ball\ball_windows.go:632: code := HitTest(pt.x, pt.y, wr.width(), int(b.curVisual.SizePx), getDpiForWindow(windows.HWND(hwnd)))
+internal\ball\ball_windows.go:872: m, pos := ResolvePosition(monitors, dev, PosEntry{int(wr.l), int(wr.t)}, true, int(wr.width()))
+internal\ball\ball_windows.go:874: moveWindow(uintptr(b.hwnd), int32(pos.X), int32(pos.Y), wr.width(), wr.height())
+internal\ball\dock_windows.go:60: edgePx = wr.width()
+internal\ball\dock_windows.go:154: moveWindow(uintptr(b.hwnd), int32(pos.X), int32(pos.Y), wr.width(), wr.height())
+internal\ball\orb_windows.go:670: x, y := orbOverlayXY(wr, or.width(), work.Work, workOk)
+internal\config\settings_appearance_wave.go:4: // screen left locked (ball.opacity_idle, ball.click_through, panel.width and
+internal\config\settings_appearance_wave.go:10: // BallSection, opacity validated 0..1 by validate.go), and panel.width is a
+internal\config\settings_appearance_wave.go:47: keyPathPanelWidth       = "panel.width"
+internal\config\settings_appearance_wave.go:76: // SetPanelWidth writes panel.width. A non-positive width is refused by name:
+internal\config\settings_appearance_wave.go:83: "config: panel.width: %d 不是有效的正整数 px 宽度；这一枚只收正整数", px))
+internal\config\settings_appearance_wave.go:86: base.Panel.Width = px
+internal\config\settings_appearance_wave.go:168: v.Width = c.Panel.Width
+internal\panel\panel_tuning_wave.go:8: // (cfg.Panel.Width); the font-size half reads the NEW schema key the same
+internal\panel\panel_tuning_wave.go:21: // panel.width (and this carrier invents none): the page's control offers
+internal\panel\panel_tuning_wave.go:27: // Width is panel.width in px as the live config holds it RIGHT NOW - the
+internal\panel\pump.go:265: // wave): panel.width as the live config holds it, internal/config's
+cmd\balldebug\diff_windows.go:190: bmi.header.width = uint32(w)
+cmd\balldebug\shot_windows.go:82: bmi.header.width = uint32(w)
+cmd\wisp\config_readers_255.go:310: "panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:231 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:380 [Width:  uint(width)], reached from the create); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all; the appearance wave added the write half this row's reader always lacked - cmd/wisp/panel_config_store.go:345 [s.mgr.SetPanelWidth(v)] (and :355 [s.mgr.SetPanelFontSize(v)] for the NEW panel.font_size schema key, a font_size the reader above never carried because the key did not exist until that wave's config leg added it) writes both keys through the guarded path, and the receipt's Note says the honest tense: the per-create reader above picks a written value up on the next show request, no process restart required",
+cmd\wisp\panel_control_windows.go:391: windowWidth := options.Width
+cmd\wisp\panel_host_windows.go:914: width, height := int(options.Width), int(options.Height)
+cmd\wisp\panel_resident_pump.go:202: return panel.PanelWidthSection{Width: m.PanelWidthOptions().Width}
+cmd\wisp\panel_resident_windows.go:231: return cfg.Panel.Width, cfg.Panel.Height
+cmd\wisp\run.go:1252: return panel.PanelWidthSection{Width: mgr.PanelWidthOptions().Width}
+=== KeepAliveInSession count=1
+cmd\wisp\panel_resident_windows.go:276: return cfg.Panel.KeepAliveInSession
+=== FontSize count=4
+internal\config\settings_appearance_wave.go:101: base.Panel.FontSize = px
+internal\config\settings_appearance_wave.go:188: v.FontSize = c.Panel.FontSize
+cmd\wisp\panel_resident_pump.go:206: return panel.PanelFontSizeSection{FontSize: m.PanelFontSizeOptions().FontSize}
+cmd\wisp\run.go:1255: return panel.PanelFontSizeSection{FontSize: mgr.PanelFontSizeOptions().FontSize}
+=== AlertThreshold count=4
+internal\agent\costbook_44.go:184: cfg.Cost.AlertThreshold, cfg.Cost.OverBudget)
+internal\agent\quota_44r4.go:136: cfg.Cost.AlertThreshold, cfg.Cost.OverBudget); err == nil {
+internal\config\validate.go:236: if c.Cost.AlertThreshold < 0 || c.Cost.AlertThreshold > 1 {
+internal\config\validate.go:238: "config.toml: cost.alert_threshold %v out of range [0, 1]", c.Cost.AlertThreshold))
+=== OverBudget count=4
+internal\agent\costbook_44.go:184: cfg.Cost.AlertThreshold, cfg.Cost.OverBudget)
+internal\agent\quota_44r4.go:136: cfg.Cost.AlertThreshold, cfg.Cost.OverBudget); err == nil {
+internal\config\validate.go:232: if !slices.Contains(overBudgetModes, c.Cost.OverBudget) {
+internal\config\validate.go:234: "config.toml: cost.over_budget %q must be one of %s", c.Cost.OverBudget, vocabList(overBudgetModes)))
+=== Tier2Enabled count=14
+internal\config\manager.go:526: if !old.Tier2Enabled && new.Tier2Enabled {
+internal\config\manager.go:528: } else if old.Tier2Enabled && !new.Tier2Enabled {
+internal\config\parse.go:102: ps.Tier2Enabled = b
+internal\config\parse.go:182: inner := map[string]any{"tier2_enabled": ps.Tier2Enabled}
+internal\plugin\tier2_gate.go:121: // when policy.Tier2Enabled is true: the value came from a file, and only a
+internal\plugin\tier2_gate.go:154: if !g.policy.Tier2Enabled {
+internal\plugin\tier2_gate.go:175: case !g.policy.Tier2Enabled:
+internal\plugin\tier2_gate.go:226: if !g.policy.Tier2Enabled {
+internal\plugin\tier2_gate.go:231: if !g.policy.Tier2Enabled || !ok || !entry.Enabled {
+internal\plugin\tier2_gate.go:243: PolicyEnabled: g.policy.Tier2Enabled,
+internal\plugin\tier2_gate.go:245: Enabled:       g.policy.Tier2Enabled && g.confirmed,
+internal\plugin\tier2_gate.go:264: out := Tier2Policy{Tier2Enabled: policy.Tier2Enabled}
+cmd\wisp\panel_resident_pump.go:251: Tier2Enabled: c.Plugins.Tier2Enabled,
+cmd\wisp\run.go:1300: Tier2Enabled: c.Plugins.Tier2Enabled,
+=== VerifySignature count=2
+internal\config\validate.go:173: if !c.Models.VerifySignature {
+internal\models\downloader.go:106: if !opts.VerifySignature {
+=== SizeMB count=2
+cmd\wisp\config_readers_255.go:258: "observe": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:226 [level = c.Observe.Level] - the log sink's boot LoadFile feeds observe.level into the JSON handler's slog filter, and the roll window rides the same feed (cmd/wisp/logsink.go:231 [RollSizeMB:  c.Observe.Roll.SizeMB] and :232 [RollDays:    c.Observe.Roll.Days] into newRollingWriter's size roll and retention sweep). Before the 180-census follow-up this row was no-reader with the hardcoded logSinkLevel cite; the install record now carries the fed posture (min_level / roll_size_mb / roll_days / redact_paths) so which table decided is checkable",
+cmd\wisp\logsink.go:231: RollSizeMB:  c.Observe.Roll.SizeMB,
+=== Days count=8
+internal\observe\costmeter.go:231: rows, err := m.days.CostDaysBetween(ctx, day, day)
+internal\observe\costmeter.go:254: rows, err := m.days.CostDaysBetween(ctx, first, day)
+internal\observe\costmeter.go:272: return m.days.CostDaysBetween(ctx, fromDay, toDay)
+internal\observe\costmeter.go:343: rows, err := m.days.CostDaysBetween(ctx, day, day)
+internal\observe\logging.go:239: days = 7 // schema default ([observe] roll.days)
+internal\observe\logging.go:394: cutoff := w.now().UTC().Add(-time.Duration(w.days) * 24 * time.Hour)
+cmd\wisp\config_readers_255.go:258: "observe": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:226 [level = c.Observe.Level] - the log sink's boot LoadFile feeds observe.level into the JSON handler's slog filter, and the roll window rides the same feed (cmd/wisp/logsink.go:231 [RollSizeMB:  c.Observe.Roll.SizeMB] and :232 [RollDays:    c.Observe.Roll.Days] into newRollingWriter's size roll and retention sweep). Before the 180-census follow-up this row was no-reader with the hardcoded logSinkLevel cite; the install record now carries the fed posture (min_level / roll_size_mb / roll_days / redact_paths) so which table decided is checkable",
+cmd\wisp\logsink.go:232: RollDays:    c.Observe.Roll.Days,
+=== Level count=128
+internal\agent\costbook_44.go:146: if rep.Metered && rep.Verdict.AllowNewTask && rep.Verdict.Level != observe.LevelOK {
+internal\agent\loop.go:575: res.ReminderLevels = append(res.ReminderLevels, rem.Level)
+internal\agent\loop.go:578: ToolName: rem.Tool, RepeatLevel: rem.Level,
+internal\agent\loop.go:583: Text: rem.Text, RepeatLevel: rem.Level,
+internal\agent\quota_44r4.go:178: if v.Level == observe.LevelWarn && e.gate.notify != nil {
+internal\agent\approval\batch.go:36: if d.Level != risk.L1 || len(d.Paths) < BatchMinOps || len(d.Paths) >= R7BatchFloor {
+internal\agent\approval\cardrender.go:50: lines := []string{fmt.Sprintf("[确认 %s %s] %s", p.Level, p.Tool, p.Reason)}
+internal\agent\approval\cardrender.go:57: if p.Level == "L2" && p.Depth > 0 {
+internal\agent\approval\cardrender.go:72: if p.Level == "L2" { // an L2 card's Window is 0 by construction; its wait is the Deadline
+internal\agent\approval\gate.go:322: if d.Level != risk.L2 {
+internal\agent\approval\gate.go:323: d.Level = risk.L2
+internal\agent\approval\pending_read.go:140: Level:                  d.Level,
+internal\agent\approval\replies.go:178: Level:         p.Level,
+internal\agent\approval\replies.go:258: if c.Level == "L2" {
+internal\agent\approval\replies.go:265: if c.Level != "" && c.Level != "L1" {
+internal\agent\approval\replies.go:270: if c.Level == "L1" {
+internal\agent\approval\replies.go:291: if awaiting && card.Level != "L1" {
+internal\agent\approval\replies.go:297: if c.Level == "L1" {
+internal\ball\liquid.go:125: m.level = 0
+internal\ball\liquid.go:243: if raw >= m.level {
+internal\ball\liquid.go:247: m.level += float32(float64(raw-m.level) * k)
+internal\ball\liquid.go:248: if math.Abs(float64(m.level)) < MotionEpsilon {
+internal\ball\liquid.go:249: m.level = 0
+internal\ball\liquid.go:256: m.specLow = specFollow(m.specLow, m.level, dt, SpecLowTauMs)
+internal\ball\liquid.go:281: omega := SpinBaseRadPerS + SpinLevelRadPerS*float64(m.level) +
+internal\ball\liquid.go:335: level: m.level, summon: m.summon, border: m.border,
+internal\ball\liquid.go:341: if quantChanged(before.level, m.level) || quantChanged(before.summon, m.summon) ||
+internal\ball\liquid.go:397: v.LiquidLevel = m.level
+internal\ball\liquid.go:407: v.SpectrumMid = m.level
+internal\config\validate.go:245: if !slices.Contains(observeLevels, c.Observe.Level) {
+internal\config\validate.go:247: "config.toml: observe.level %q must be one of %s", c.Observe.Level, vocabList(observeLevels)))
+internal\observe\costbudget.go:113: switch v.Level {
+internal\observe\costbudget.go:134: if levelRank(c.Level) > levelRank(v.Level) {
+internal\observe\costbudget.go:135: v.Level = c.Level
+internal\observe\costbudget.go:159: c.Level = LevelOver
+internal\observe\costbudget.go:161: c.Level = LevelWarn
+internal\observe\costbudget.go:163: c.Level = LevelOK
+internal\observe\logging.go:107: if cfg.Level != "" {
+internal\observe\logging.go:108: if err := level.UnmarshalText([]byte(strings.ToLower(cfg.Level))); err != nil {
+internal\observe\logging.go:172: func (h *redactHandler) Enabled(ctx context.Context, l slog.Level) bool {
+internal\observe\logging.go:177: out := slog.NewRecord(rec.Time, rec.Level, h.red.Message(rec.Message), rec.PC)
+internal\observe\logging.go:612: if !next.Enabled(ctx, r.Level) {
+internal\observe\logging.go:631: if next.Enabled(ctx, rec.Level) {
+internal\observe\logging.go:682: func (t earlyTee) Enabled(ctx context.Context, level slog.Level) bool {
+internal\observe\logging.go:688: if t.mirror.Enabled(ctx, r.Level) {
+internal\observe\logging.go:731: out := slog.NewRecord(r.Time, r.Level, r.Message, r.PC)
+internal\observe\quota_44.go:148: v.Level = LevelOver
+internal\observe\quota_44.go:150: if v.Level != LevelOver {
+internal\observe\quota_44.go:151: v.Level = LevelWarn
+internal\observe\quota_44.go:165: if v.Level == LevelOver {
+internal\observe\quota_44.go:168: } else if v.Level == LevelWarn {
+internal\panel\approval.go:43: // Level is risk.Level.String(): "L0" | "L1" | "L2" | "Deny".
+internal\panel\approval.go:81: Level:                  decision.Level.String(),
+internal\panel\pump.go:95: Level                  risk.Level
+internal\panel\pump.go:115: Level:                  v.Level,
+internal\plugin\c24.go:109: Level      risk.Level
+internal\plugin\c24.go:277: Level      risk.Level
+internal\plugin\c24.go:319: Level      risk.Level
+internal\plugin\c24.go:334: p.Entry, capabilityOrNone(p.Capability), p.Level, p.PluginID, p.Tool, p.Recovered)
+internal\plugin\c24.go:665: Level:      e.Level,
+internal\plugin\c24.go:671: s.pluginID, s.tool, e.Path, capabilityOrNone(e.Capability), e.Level, p)
+internal\plugin\c24.go:683: Level:      e.Level,
+internal\plugin\c24.go:706: s.pluginID, s.tool, e.Path, capabilityOrNone(e.Capability), e.Level, reply.Truncated)
+internal\plugin\netallow.go:88: // LevelForRisk maps a manifest risk spelling to the host's risk.Level.
+internal\plugin\netallow.go:91: func LevelForRisk(s string) (risk.Level, error) {
+internal\plugin\manifestslot\manifestslot.go:140: // declaredLevel maps the C2 spelling to the host's risk.Level. An unknown
+internal\plugin\manifestslot\manifestslot.go:143: func declaredLevel(s string) (risk.Level, error) {
+internal\risk\assessor.go:305: level:            d.Level,
+internal\risk\assessor.go:322: if c.level > level {
+internal\risk\assessor.go:323: level = c.level
+internal\risk\mode.go:160: if d.Level == Deny {
+internal\risk\mode.go:184: if d.Level == L0 {
+internal\risk\mode.go:187: if d.Level != L1 && d.Level != L2 {
+internal\risk\mode.go:188: return Silenced{Level: d.Level, Kept: "无法识别的风险级，fail-closed 保留询问", Mode: m}
+internal\risk\mode.go:193: return Silenced{Level: d.Level, Mode: ModeAskEveryStep}
+internal\risk\mode.go:198: if d.Level == L1 {
+internal\risk\rules_gateway.go:85: if worst == nil || worst.level < L2 {
+internal\risk\rules_network.go:85: if c.level > worst.level {
+internal\risk\rules_network.go:89: return &contribution{rules: []RuleID{R5}, level: worst.level, reason: worst.reason}
+internal\tools\bridge.go:359: dec.Level = verdict.Level
+internal\tools\bridge.go:366: // never a package global), then handed to route as a PARAMETER. dec.Level
+internal\tools\bridge.go:375: if len(rawPaths) > 0 && verdict.Level >= risk.L1 {
+internal\tools\bridge.go:382: mode, verdict.Level, sil.Level, req.Name, verdict.RulesHit)
+internal\tools\bridge.go:383: case sil.Kept != "" && sil.Level == risk.Deny:
+internal\tools\bridge.go:413: if !sil.Silenced && sil.Level == risk.L1 {
+internal\tools\bridge.go:419: req.Name, len(rawPaths), grantID, verdict.Level, mode)
+internal\tools\bridge.go:434: dec.Refusal = b.refusalKindOf(rawPaths, sil.Level)
+internal\tools\bridge.go:436: if dec.Level == risk.Deny {
+internal\tools\bridge.go:506: switch sil.Level {
+internal\tools\bridge.go:564: if dec.Level == risk.Deny {
+internal\tools\bridge.go:1515: func levelString(l risk.Level) string {
+internal\tools\gate.go:25: Level        risk.Level
+internal\tools\gate.go:76: switch d.Level {
+internal\tools\refusal.go:72: func (b *Bridge) refusalKindOf(rawPaths []string, level risk.Level) RefusalKind {
+internal\tools\system.go:383: func systemDecl(level risk.Level, cap Capability, facts func(context.Context, map[string]any, []string) risk.Facts) Decl {
+internal\tools\system.go:422: func SystemRowLevels() map[string]risk.Level {
+internal\tools\system.go:423: return map[string]risk.Level{
+internal\tools\tool.go:106: Declared risk.Level
+cmd\balldebug\diff_windows.go:424: if o.level > 0 {
+cmd\balldebug\diff_windows.go:425: childArgs = append(childArgs, "-level", fmt.Sprint(o.level))
+cmd\wisp\approval_always.go:76: if card.Level != "L2" {
+cmd\wisp\approval_always.go:78: return "", fmt.Errorf("%s 是执行前阻止窗口，只有否决；「一直」是长期允许，得先有允许这一动作（SPEC-06 §2 B1）", card.Level)
+cmd\wisp\approval_always.go:203: st, card.CorrelationID, card.Tool, card.Level, len(card.Paths), via)
+cmd\wisp\approval_reply.go:226: "要停下它就答 veto %s", card.Level, corr)
+cmd\wisp\approval_reply.go:271: "要停下它就答 veto %s", card.Level, corr)
+cmd\wisp\approval_reply.go:405: item.CorrelationID, item.Level, item.Tool, item.Depth, reason, len(item.Paths))
+cmd\wisp\config_readers_255.go:258: "observe": hotClaimSnapshotOnly + "cmd/wisp/logsink.go:226 [level = c.Observe.Level] - the log sink's boot LoadFile feeds observe.level into the JSON handler's slog filter, and the roll window rides the same feed (cmd/wisp/logsink.go:231 [RollSizeMB:  c.Observe.Roll.SizeMB] and :232 [RollDays:    c.Observe.Roll.Days] into newRollingWriter's size roll and retention sweep). Before the 180-census follow-up this row was no-reader with the hardcoded logSinkLevel cite; the install record now carries the fed posture (min_level / roll_size_mb / roll_days / redact_paths) so which table decided is checkable",
+cmd\wisp\lifecycle_windows.go:548: switch card.Level {
+cmd\wisp\logsink.go:81: // ObserveSection.Level), which is also the value `wisp slo` passes today. The
+cmd\wisp\logsink.go:200: slog.Info("wisp: persistent log sink installed", "dir", dir, "min_level", obs.Level,
+cmd\wisp\logsink.go:226: level = c.Observe.Level
+cmd\wisp\logsink.go:252: func (t teeHandler) Enabled(ctx context.Context, level slog.Level) bool {
+cmd\wisp\logsink.go:258: if t.mirror.Enabled(ctx, r.Level) {
+cmd\wisp\panel_pump.go:89: Level:                  it.Decision.Level,
+cmd\wisp\resident_approval_windows.go:634: key, card.CorrelationID, card.Level, card.Tool)
+cmd\wisp\resident_approval_windows.go:674: Level  risk.Level
+cmd\wisp\resident_approval_windows.go:719: Level:  c.Level,
+cmd\wisp\resident_approval_windows.go:723: switch c.Level {
+cmd\wisp\resident_approval_windows.go:773: switch card.Level {
+cmd\wisp\resident_approval_windows.go:915: "corr", p.CorrelationID, "tool", p.Tool, "level", p.Level)
+cmd\wisp\resident_approval_windows.go:923: if p.Level == "L1" {
+cmd\wisp\resident_approval_windows.go:926: b.SetState(stateForCardLevel(p.Level))
+cmd\wisp\resident_approval_windows.go:938: "corr", p.CorrelationID, "level", p.Level, "tool", p.Tool,
+cmd\wisp\resident_approval_windows.go:939: "orb_state", string(stateForCardLevel(p.Level)),
+cmd\wisp\resident_approval_windows.go:940: "esc_borrowed", p.Level == "L1",
+cmd\wisp\resident_approval_windows.go:943: fmt.Printf("wisp: 卡片挂起：%s %s（编号 %s）\n", p.Level, p.Tool, p.CorrelationID)
+cmd\wisp\resident_approval_windows.go:956: if p.Level == "L1" && !b.EscTakenOver() {
+cmd\wisp\resident_approval_windows.go:1043: if p.Level != "L2" || p.Depth <= 0 {
+=== SLOSampleIntervalSec count=0
