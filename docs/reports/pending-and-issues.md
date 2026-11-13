@@ -36879,3 +36879,28 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **我的错因**：我读了票面**开头的「要建什么」**就派单，**没读完 Progress log** —— 正是我自己天天引用的铁律「筛票派单前逐格读正文＋Progress log 读全」。**腿没重造、改成把每一项证据现跑一遍落成证据件（`88be0baad`），这是对的行为。**
 - **我现查复认**：脚本 608 行实存；`ci.yml:207` 真调用；我自己跑门输出 `denominator: tracked paths=19531 over-budget=69 covered by roster=69 not in roster=0` ＋ `VERDICT GREEN`；证据件 10009B。
 - **票 262 剩的职业化结论**：AC#5 / AC#5ⓑ 要求「该步在**本机 self-hosted** 那一侧跑过」，而那步挂在 `lint` job（`ci.yml:95 runs-on: ubuntu-latest`，**托管机**）⇒ **结构上不可能满足**（票面 AC#5ⓑ 自己就写了「⛔ 本格不勾」）。AC#5ⓐ（CI 侧真出颜色＋日志行＋托管侧不误加＋具名说清照不到的宽）**已勾且有 CI 日志**（第 7 步 success）。⇒ **待我裁：262 按「主体已交付＋两格结构性不可满足」结案，还是留开。**
+
+## A1855 — ★我连续两票（262、123）派了「早已落地」的活 ⇒ **立硬规矩：派单前必须先做落地检查**；票 123 已可结、波 10 已发
+
+### 我的流程缺陷（第二次，同型）
+- **262**：我读票面「要建什么」就派腿去建门，而门 **10-04 就落地并已接进 CI**（`519e1adeb`，608 行，`ci.yml:207`）。
+- **123**：我派腿去把「可编程确认腿」做出来，而它 **11-06 就已落库**（`abf2a35a6` ＋ `446831ea9` 补 helper），我现查 `git log 446831ea9..HEAD -- <那4枚测试文件>` = **0 条改动**，且当前 CI 日志里那 4 枚 **FAIL 次数全为 0**。
+- **根因（同一个）**：**我读了票面开头的"要建什么"，没读完 Progress log、也没先查 `git log --grep=<票号>`。**
+- **★立硬规矩（写进我自己的派单前检查单，从这轮起执行）**：派任何写腿前必须跑三条，缺一条不许派：
+  1. `grep -n '\[x\]' <票>` 看 AC 勾选现状；
+  2. 读 **Progress log 全文**（不是前 N 行）；
+  3. `git log --oneline --grep='<票号>'` **看这票的历史提交**——若主体已落库，派单内容改成「复认＋收尾＋结案」，⛔ 不是「去实现」。
+- ⚠ **两次都是腿把我拦住的**（262 腿拒绝重造并改做复认；123 腿核实在库后改做定因与拒绝分支反转验证）。⇒ **腿的这种"拒绝照做并说明原因"是正确行为，我该给它记功，而不是当成没干活。**
+
+### 票 123：三条尺我全核过 ⇒ **主体已交付，可结**
+- 尺①：commit `a5501b954` 真在（2 文件 +99）。
+- 尺②：证据件 `docs/evidence/s1/123-programmable-confirm.md` **14478B / 94 行**。
+- 尺③：那 4 枚在 `285a5c310` 的 CI 日志里 **FAIL 次数 = 0**（`TestTicket101ManualSwitchSurvivesRestart`／`…UntouchedConfigRestartsAtDefault`／`…SessionGrantDoesNotCrossRestart`／`TestComposedGateBlocksAWriteForTwoSeconds`）。
+- **腿的两条产出值得记**：①AC#1 把「本机为什么不红」**定因到行**，并**修正了票面标题的假设**——本机绿**不是**因为有确认腿（9-21 那棵树里根本没有应答腿），而是 `%TEMP%` 长拼写让目标不出白名单、走 L1 路线、**根本无卡可答**；②AC#2 的判据用 **`go build -overlay` 把 5 处批准行全部反转为 `no`**（原始文件零改动），四枚仍全 PASS ⇒ **证明卡是被答了，不是等没了**。这个手法值得当范例。
+- **腿登记两条未做（我已阅）**：①证据件第一稿生成损坏（尾部含指令形残文），已整件重写并在 §6-1 登记；②`ticket123_replyleg_windows_test.go:13-14` 的注释前提实测不成立（本机 8.3 别名**是开着的**，`T123SP~1`），**2 行注释修正不在本波写面枚举内** ⇒ **留给验收方裁定**（我记在这里，别丢）。
+- **⇒ 票 123 待结案（改名 `-done`）**：AC#1/#2 已由腿交付、AC#4 的 CI 读数已到手（4 枚 FAIL=0）。
+
+### 波 10 已发（`workflow-5ca9b8975f1d42d9`）
+- 目标＝`test-windows` 第 10 步**最后 5 枚**：①`Test16r1VoiceDemo…`（runner 无 waveOut 设备）②`TestPanelHostRealWindowHopAndLifecycle`（`hot re-show 220.7 ms` 超 D32 冻结 200ms）③`TestPanelHostLatencyPercentilesAC2` ④`Test41a2r1WarmGateFeedsKwsNotTheAsr`（`wav drain` 超时＋`slow consumer`，但 `kws_hits=1`／`asr_fed=13312` 说明**被测行为其实成了**）⑤`TestTicket223HandEditedFsLooseningCostsAnL2Card`（**唯一必须真诊断**：日志写 `approved via L2 re-confirmation` 而测试找不到渲染出来的卡）。
+- **判据写死在派单里**：环境族必须**前提探测＋具名跳过＋台账行**（前提在场照旧断言，⛔ 一刀切永久跳）；⑤ 必须定性 **(a) 测试采集时机错** 还是 **(b) 产品真缺陷**，若是 (b) **⛔ 不许自己改产品，交回我裁**。
+- 派单存档：`.scratch/wisp/probes/orch/20261113/txt/111-wave10-last-mile-dispatch.txt`。
