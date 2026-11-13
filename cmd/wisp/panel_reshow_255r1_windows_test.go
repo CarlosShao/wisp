@@ -127,6 +127,7 @@ func (c *geoSink255r1) Init(string)            {}
 func (c *geoSink255r1) Eval(string)            {}
 func (c *geoSink255r1) Navigate(string)        {}
 
+//lint:ignore ST1003 the name is fixed by the webview2.WebView interface (forks/go-webview2/common.go:62); the var _ assertion at the top of this file pins it
 func (c *geoSink255r1) SetHtml(html string) {
 	c.mu.Lock()
 	c.docs = append(c.docs, html)

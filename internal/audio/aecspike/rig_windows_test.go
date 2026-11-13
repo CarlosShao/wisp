@@ -294,16 +294,16 @@ func TestSpikeSelfEchoPathRig(t *testing.T) {
 	// reference-subtraction stand-in plus the product's VAD, on this host.
 	// The OS AEC engine itself is not in this process (the DMO probe answers
 	// that), so this is the in-process floor, not the whole Path C row.
-	subCpu0, subWall0 := spikeCPUTimes(t), time.Now()
+	subCPU0, subWall0 := spikeCPUTimes(t), time.Now()
 	residual, gain, _ := SubtractEcho(far, near, lag)
 	corr := WindowedCorrelation(far, near, lag, 1024, 512)
-	subCpu, subWall := spikeCPUTimes(t).sub(subCpu0), time.Since(subWall0)
+	subCPU, subWall := spikeCPUTimes(t).sub(subCPU0), time.Since(subWall0)
 	pathERLE := ERLEdB(far, near, residual, lag)
 	vad := spikeNewVad(t)
-	vadCpu0, vadWall0 := spikeCPUTimes(t), time.Now()
+	vadCPU0, vadWall0 := spikeCPUTimes(t), time.Now()
 	vadRaw := spikeVadStarts(t, vad, near)
 	vadRes := spikeVadStarts(t, vad, residual)
-	vadCpu, vadWall := spikeCPUTimes(t).sub(vadCpu0), time.Since(vadWall0)
+	vadCPU, vadWall := spikeCPUTimes(t).sub(vadCPU0), time.Since(vadWall0)
 	audioSec := float64(len(near)) / audio.TargetRate
 
 	report := struct {
@@ -320,14 +320,14 @@ func TestSpikeSelfEchoPathRig(t *testing.T) {
 		AsrResidual        string         `json:"asr_residual"`
 		DriftCurveERLE     map[string]any `json:"drift_curve_erle_db"`
 		AudioSeconds       float64        `json:"audio_seconds"`
-		SubtractCpuPercent float64        `json:"subtract_cpu_percent_of_core"`
-		VadCpuPercent      float64        `json:"vad_both_passes_cpu_percent_of_core"`
+		SubtractCPUPercent float64        `json:"subtract_cpu_percent_of_core"`
+		VadCPUPercent      float64        `json:"vad_both_passes_cpu_percent_of_core"`
 	}{
 		reading, lag, strength, erleJSON(pathERLE), gain, meanCorr(corr),
 		vadRaw, vadRes,
 		spikeTranscribe(t, asr, far), spikeTranscribe(t, asr, near),
 		spikeTranscribe(t, asr, residual), drift,
-		audioSec, cpuPercent(subCpu, subWall), cpuPercent(vadCpu, vadWall),
+		audioSec, cpuPercent(subCPU, subWall), cpuPercent(vadCPU, vadWall),
 	}
 	writeJSON(t, filepath.Join(out, "selfecho.json"), report)
 	_ = WriteWav16(filepath.Join(out, "selfecho-far-16k.wav"), audio.TargetRate, far16)
@@ -336,7 +336,7 @@ func TestSpikeSelfEchoPathRig(t *testing.T) {
 	t.Logf("reading=%+v lag=%d strength=%.3f pathERLE=%.1fdB corr=%.3f vadRaw=%d vadRes=%d",
 		reading, lag, strength, pathERLE, report.CorrMean, report.VadRaw, report.VadResidual)
 	t.Logf("cpu: subtract=%.2f%% vad(2 passes)=%.2f%% of one core over %.1fs audio",
-		report.SubtractCpuPercent, report.VadCpuPercent, audioSec)
+		report.SubtractCPUPercent, report.VadCPUPercent, audioSec)
 	t.Logf("asr far=%q raw=%q residual=%q", report.AsrFar, report.AsrRaw, report.AsrResidual)
 }
 

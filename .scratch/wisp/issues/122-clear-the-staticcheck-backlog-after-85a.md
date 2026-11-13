@@ -305,3 +305,33 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
   本波 commit 只含 17 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树他腿脏件零触碰零提交。
   next=编排者推送后取 CI lint 步读数（九包+aecspike 应读 0）；波 5/6 合并后票 122 静态检查清账面余
   AC#6（CI 步级读数）。
+
+- [2026-11-13 19:2x +08] agent=122-wave7-cgo-scope（写腿，派单
+  `.scratch/wisp/probes/orch/20261113/txt/122-wave7-cgo-scope-dispatch.txt`，开工 HEAD `69cac0f18`，
+  staticcheck 2026.2.2 (0.8.2)）
+  did=**pass2 清账波 7 落地：CGO_ENABLED=1 winlive 口径下 cmd/wisp 16 ＋ aecspike 8 ＝ 24 → 0**（起手
+  复跑与派单清单逐条一致、0 新增）。四档落点＝**不可改钉 3（SetHtml×3——反射/COM 核查为否，但三处全是
+  依赖接口 webview2.WebView 的满足方法：panelControl :329 显式断言、geoSink255r1 :72 显式断言、
+  docSink33r10 经 attachSink33r10 赋给 PanelManager.w 接口字段；改名即编译失败，`//lint:ignore ST1003`
+  ＋说理注释，撤销口令＝删指令行）＋ST1003 改名 12（ctlRpcMessage/initDoorId/mibTcpStateListen/SwingDb/
+  targetDb/subCpu×4/SubtractCpuPercent/VadCpuPercent——全部引用点齐改，改后 `git grep -w` 旧名在 cmd+internal
+  归 0；json tag 一律不动）＋③删 7（floatPtrWave/pidSetIntersect/wroteIt/currentWakePauseRead/
+  voice41a2r1FileExists/waitAcquire/warmDiscards——每枚删前全仓 word 尺＋锁上下文核；currentWakePauseRead
+  特判：字段 wakePauseRead 有主（mirrorTrayMute 持锁直读），无主的是 accessor 本身）＋S1016 采纳 1
+  （GateEpisode(e) 同型转换，两结构四字段逐项一致）＋**SA4004 判真 bug 修 1**（jsParser.equality 的死循环壳
+  ＝照抄 or()/additive() 骨架的残留笔误，剥壳＋注释钉「不建模 JS 链式比较」；旧码内层跨算符序会意外链式，
+  台件无链式输入，35r2 全部 9 枚用例期望输出不变）＋**SA1019 判语义保留 1**（runtime.GOROOT 兜底活在
+  LookPath("go") 已失败之后，`go env GOROOT` 是循环依赖 ⇒ 代码零改动＋说理注释＋`//lint:ignore SA1019`；
+  本机探针：PATH 真移除后 go env GOROOT 仍返 D:\work\base\go，两实现等价但兜底职责与 runtime 版匹配）**。
+  门禁：build rc0／vet rc0／**staticcheck 口径后跑两包 0 条 EXIT=0**／gofumpt 0 行（本波删行后一处文件尾
+  空行 -w 收口）／d22scan clean rc0（PASS=45 FAIL=0 SKIP=0）；**`go test ./cmd/wisp/` 全量未跑**（票 98 豁免），
+  按 `scripts/wisp-cli-staged-tests.sh` 载体定向跑 32 枚顶层用例（wave 6／253r1 2／AC3 1／AC13 1／255r1 6／
+  35r2 9／44R5 6／392 1，覆盖本波 10 个 cmd/wisp 测试文件中可离线跑的全部）＝**全 PASS exit 0**（staged
+  binary 带 pinned sherpa DLL 从 cmd/wisp 运行）；`internal/audio/aecspike` go test 未跑（sherpa cgo 台件
+  依赖，改动面 6 纯改名＋1 同型转换，由 build/vet/staticcheck/gofumpt 四把尺覆盖）。
+  证据件 `docs/evidence/s1/122-wave7-cgo-scope.md`（24 条逐条表＋三条专判 SetHtml/SA4004/SA1019＋
+  名字核查尺＋门禁＋staged 读数）。
+  本波 commit 只含 16 个 .go＋证据件＋本 log（显式 pathspec，不 push）；共享树他腿脏件
+  （291 probe／346-a2 dispatch／frontend fixture 等）零触碰零提交。
+  next=编排者推送后取 CI lint 步 pass2 读数（**cmd/wisp 与 aecspike 应读 0**，本波后 pass2 应全绿）；
+  票 122 余 AC#6（CI 步级读数）。

@@ -516,7 +516,6 @@ type residentVoice struct {
 	ttsSamples    atomic.Uint64
 	warmTurnEnd   atomic.Uint64
 	warmWake      atomic.Uint64
-	warmDiscards  atomic.Uint64
 	punctAttached atomic.Bool
 	punctFinals   atomic.Uint64
 	// asrGone is set by the announce path when a family swap released the ASR the

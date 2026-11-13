@@ -100,7 +100,7 @@ type transportSite253r1 struct {
 	line       int
 	bindCalls  int
 	doors      []bindingDoor253r1
-	initDoorId string // constant name the w.Init script was fmt.Sprintf'd from ("" if none)
+	initDoorID string // constant name the w.Init script was fmt.Sprintf'd from ("" if none)
 	initSites  []string
 }
 
@@ -223,7 +223,7 @@ func censusTransport253r1(fset *token.FileSet, file *ast.File, name string, syms
 				if id, ok := call.Args[0].(*ast.Ident); ok {
 					for _, fed := range syms.varSprintf[id.Name] {
 						if fed == doorBindingConst253r1 {
-							site.initDoorId = id.Name
+							site.initDoorID = id.Name
 						}
 					}
 				}
@@ -394,12 +394,12 @@ func TestTransportDoorBindingMatchesRoster253r1(t *testing.T) {
 
 	// (4) the page script handed to w.Init must be built from the SAME door constant, so the
 	//     JS door and the Go door cannot be renamed independently.
-	if site.initDoorId == "" {
+	if site.initDoorID == "" {
 		t.Errorf("AC#1 RED: %s calls w.Init(%v) with no script built (via fmt.Sprintf) from %q - the page-side door the forwarding hook addresses is not the constant the transport binds, so the two can drift apart and leave the page posting at an unbound door",
 			doorTransportFunc253r1, site.initSites, doorBindingConst253r1)
 	} else {
 		t.Logf("253-r1 lockstep: w.Init(%s) at %s derives its window.<door> reference from %q, the same constant the Bind uses",
-			site.initDoorId, strings.Join(site.initSites, ", "), doorBindingConst253r1)
+			site.initDoorID, strings.Join(site.initSites, ", "), doorBindingConst253r1)
 	}
 }
 
@@ -533,7 +533,7 @@ func rosterRedsFor253r1(constValue string, site transportSite253r1) []string {
 	if _, ok := doorRoster253r1[constValue]; !ok {
 		reds = append(reds, "constant value "+constValue+" not reviewed")
 	}
-	if site.initDoorId == "" {
+	if site.initDoorID == "" {
 		reds = append(reds, "w.Init script not tied to the door constant")
 	}
 	sort.Strings(reds)
@@ -565,7 +565,7 @@ func TestBindingRosterBitesItsOwnFixtures253r1(t *testing.T) {
 			if len(reds) != tc.wantRed {
 				t.Fatalf("fixture %q reported %d red(s) %v, want %d", tc.name, len(reds), reds, tc.wantRed)
 			}
-			t.Logf("fixture %q: const=%q bound=%v initTied=%q reds=%v", tc.name, constValue, keysOf253r1(doorNamesOf253r1(site.doors)), site.initDoorId, reds)
+			t.Logf("fixture %q: const=%q bound=%v initTied=%q reds=%v", tc.name, constValue, keysOf253r1(doorNamesOf253r1(site.doors)), site.initDoorID, reds)
 		})
 	}
 }

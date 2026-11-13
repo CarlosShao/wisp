@@ -480,13 +480,6 @@ func Test41a2r1ProductionTableRejectsTheDemoWavs(t *testing.T) {
 	}
 }
 
-// voice41a2r1FileExists is the test helper's existence check (the production
-// one lives on voiceFileExists and is not exported to the test's intent).
-func voice41a2r1FileExists(p string) bool {
-	st, err := os.Stat(p)
-	return err == nil && st.Mode().IsRegular()
-}
-
 // Test41a2r1OptInGateResolvesTheManifestSpelling is the opt-in half of the
 
 // voice41a2r1WavPCM returns the wav's data chunk as 16k mono int16, parsed with

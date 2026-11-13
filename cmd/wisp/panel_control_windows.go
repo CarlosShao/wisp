@@ -688,6 +688,8 @@ func (c *panelControl) SetSize(width int, height int, hints webview2.Hint) {
 }
 
 func (c *panelControl) Navigate(url string) { c.browser.Navigate(url) }
+
+//lint:ignore ST1003 the name is not a free name: it is fixed by the webview2.WebView interface this type satisfies (forks/go-webview2/common.go:62), so a rename would no longer compile as that interface
 func (c *panelControl) SetHtml(html string) { c.browser.NavigateToString(html) }
 func (c *panelControl) Init(js string)      { c.browser.Init(js) }
 func (c *panelControl) Eval(js string)      { c.browser.Eval(js) }
@@ -716,7 +718,7 @@ func (c *panelControl) Eval(js string)      { c.browser.Eval(js) }
 // byte; callbinding keeps its faithful (nil, nil) branch for the same reason, it is
 // simply preceded by the named refusal here.
 
-type ctlRpcMessage struct {
+type ctlRPCMessage struct {
 	ID     int               `json:"id"`
 	Method string            `json:"method"`
 	Params []json.RawMessage `json:"params"`
@@ -735,7 +737,7 @@ func (c *panelControl) boundDoor(name string) bool {
 }
 
 func (c *panelControl) msgcb(msg string) {
-	d := ctlRpcMessage{}
+	d := ctlRPCMessage{}
 	if err := json.Unmarshal([]byte(msg), &d); err != nil {
 		// Ticket 253 AC#3, first of the pipe's two silent deaths: a message that is
 		// not an RPC frame at all. It has no id to address a reply to, so the record
@@ -780,7 +782,7 @@ func (c *panelControl) msgcb(msg string) {
 	}
 }
 
-func (c *panelControl) callbinding(d ctlRpcMessage) (interface{}, error) {
+func (c *panelControl) callbinding(d ctlRPCMessage) (interface{}, error) {
 	c.m.Lock()
 	f, ok := c.bindings[d.Method]
 	c.m.Unlock()

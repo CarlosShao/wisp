@@ -25,11 +25,10 @@ import (
 // left the machine for that model, which is the thing AC#5 forbids at zero
 // remaining.
 type stub44r5 struct {
-	name    string
-	calls   int
-	serr    error
-	info    llm.ProviderInfo
-	wroteIt bool
+	name  string
+	calls int
+	serr  error
+	info  llm.ProviderInfo
 }
 
 func (s *stub44r5) Info() llm.ProviderInfo { return s.info }

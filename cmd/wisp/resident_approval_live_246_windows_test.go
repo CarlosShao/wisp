@@ -408,8 +408,16 @@ func buildEscListener246(t *testing.T) string {
 		t.Fatalf("GOARCH = %s, want amd64", runtime.GOARCH)
 	}
 	goExe := "go"
+	// The fallback below is deliberately runtime.GOROOT(), not `go env GOROOT`:
+	// this whole else-branch only runs when exec.LookPath("go") has ALREADY
+	// failed, so shelling out to "go" there would be a circular dependency.
+	// runtime.GOROOT() is deprecated as a machine-independent root, but this
+	// host-local test rig runs on the same machine the binary was built on, so
+	// the build root IS the right root here; measured on this box, the value
+	// matches `go env GOROOT` (D:\tmp\wisp\20261113\122-wave7\goroot-probe).
 	if p, err := exec.LookPath("go"); err == nil {
 		goExe = p
+		//lint:ignore SA1019 this branch only runs after LookPath("go") failed, so `go env GOROOT` is a circular dependency here; the rig is host-local, so the build root is the right root (probe: D:\tmp\wisp\20261113\122-wave7\goroot-probe)
 	} else if rooted := filepath.Join(runtime.GOROOT(), "bin", "go.exe"); fileExists(rooted) {
 		goExe = rooted
 	}

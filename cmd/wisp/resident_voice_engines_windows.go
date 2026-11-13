@@ -754,13 +754,6 @@ func (r *voiceResidency) micCloseStages() []string {
 	return append([]string(nil), r.stageAtClose...)
 }
 
-// waitAcquire returns the duration of the most recent acquire, for the boot line.
-func (r *voiceResidency) waitAcquire() time.Duration {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.lastAcquire
-}
-
 // releaseTurn returns one borrow. It never unloads: releasing the last reference
 // while the session is alive is the NORMAL path into Warm (session Release's own
 // contract), which is the whole point of the epoch.

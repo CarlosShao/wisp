@@ -282,5 +282,3 @@ func TestWaveStoreRefusesAnUnlistedField(t *testing.T) {
 		t.Fatalf("a misspelled wave field must be refused by the leg's default branch (the door's roster check is one hop above), got: %v", err)
 	}
 }
-
-func floatPtrWave(v float64) *float64 { return &v }

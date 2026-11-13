@@ -581,7 +581,7 @@ func Test392AecTuningDoubleTalkSwing(t *testing.T) {
 		Rounds  []voice392RoundOut `json:"rounds"`
 		MinRms  float64            `json:"min_rms"`
 		MaxRms  float64            `json:"max_rms"`
-		SwingDb float64            `json:"swing_db"`
+		SwingDB float64            `json:"swing_db"`
 	}
 	out := make([]settingReadings, 0, len(settings)+1)
 	for _, s := range settings {
@@ -606,8 +606,8 @@ func Test392AecTuningDoubleTalkSwing(t *testing.T) {
 				sr.MaxRms = max(sr.MaxRms, round.rms)
 			}
 		}
-		sr.SwingDb = sr.MaxRms - sr.MinRms
-		t.Logf("TUNING-%s swing=%.2fdB (min=%.2f max=%.2f)", s.name, sr.SwingDb, sr.MinRms, sr.MaxRms)
+		sr.SwingDB = sr.MaxRms - sr.MinRms
+		t.Logf("TUNING-%s swing=%.2fdB (min=%.2f max=%.2f)", s.name, sr.SwingDB, sr.MinRms, sr.MaxRms)
 		out = append(out, sr)
 	}
 

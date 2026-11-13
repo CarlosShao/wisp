@@ -89,6 +89,7 @@ func newDocSink33r10() *docSink33r10 {
 	return &docSink33r10{bindings: map[string]interface{}{}}
 }
 
+//lint:ignore ST1003 the name is fixed by the webview2.WebView interface this sink stands in for (forks/go-webview2/common.go:62); attachSink33r10 assigns it to the PanelManager's w field
 func (c *docSink33r10) SetHtml(html string) {
 	c.mu.Lock()
 	c.docs = append(c.docs, html)

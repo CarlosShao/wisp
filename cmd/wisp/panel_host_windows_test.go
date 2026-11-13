@@ -439,17 +439,6 @@ func pidSetSubtract(a, b map[uint32]bool) map[uint32]bool {
 	return out
 }
 
-// pidSetIntersect returns the pids present in both sets.
-func pidSetIntersect(a, b map[uint32]bool) map[uint32]bool {
-	out := make(map[uint32]bool, len(a))
-	for pid := range a {
-		if b[pid] {
-			out[pid] = true
-		}
-	}
-	return out
-}
-
 // pidSetOfTree returns root plus every pid under it - the scope AC#3 has to be
 // read over, because a listening socket opened by a browser child is still "our
 // panel host listening" (33-v1 §A#25 asked for the tree, not just os.Getpid()).
@@ -470,9 +459,9 @@ const (
 	// treemetrics_windows.go:57 = 5), which is the in-repo cross-check 33-v1
 	// §A#24 used.
 	tcpTableOwnerPIDAll = 5
-	// mibTcpStateListen is MIB_TCP_STATE_LISTEN (2). The pre-33-r4 file carried
+	// mibTCPStateListen is MIB_TCP_STATE_LISTEN (2). The pre-33-r4 file carried
 	// 10 = MIB_TCP_STATE_ESTAB, so no listening socket could ever have matched.
-	mibTcpStateListen = 2
+	mibTCPStateListen = 2
 	// errInsufficientBuffer is Win32 ERROR_INSUFFICIENT_BUFFER, what
 	// GetExtendedTcpTable returns while rewriting the needed size.
 	errInsufficientBuffer = 122
@@ -549,7 +538,7 @@ func listenRowsForPIDs(family uint32, pids map[uint32]bool) (int, int, error) {
 			base := unsafe.Add(unsafe.Pointer(&buf[0]), 4+uintptr(i)*rowSize)
 			state := *(*uint32)(unsafe.Add(base, stateOff))
 			own := *(*uint32)(unsafe.Add(base, pidOff))
-			if state == mibTcpStateListen && pids[own] {
+			if state == mibTCPStateListen && pids[own] {
 				n++
 			}
 		}

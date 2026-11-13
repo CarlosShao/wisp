@@ -660,8 +660,11 @@ func (rb *residentBall) attachWakePause(toggle func() (string, bool), read func(
 	rb.wakePauseRead = read
 }
 
-// currentWakePauseToggle and currentWakePauseRead read the pair back under the
-// same lock the attach took, so the ui-sta thread can never see half a handoff.
+// currentWakePauseToggle reads its half back under the same lock the attach
+// took, so the ui-sta thread can never see half a handoff. (There is no paired
+// read accessor for wakePauseRead: mirrorTrayMute consumes it while already
+// holding muteMux, where re-entering an accessor would deadlock - its one
+// reader reads the field under the attach lock directly.)
 func (rb *residentBall) currentWakePauseToggle() func() (string, bool) {
 	if rb == nil {
 		return nil
@@ -669,15 +672,6 @@ func (rb *residentBall) currentWakePauseToggle() func() (string, bool) {
 	rb.muteMux.Lock()
 	defer rb.muteMux.Unlock()
 	return rb.wakePauseToggle
-}
-
-func (rb *residentBall) currentWakePauseRead() func() (bool, bool) {
-	if rb == nil {
-		return nil
-	}
-	rb.muteMux.Lock()
-	defer rb.muteMux.Unlock()
-	return rb.wakePauseRead
 }
 
 // attachVoiceInterrupt hands this host ticket 390's click-interrupt executor.

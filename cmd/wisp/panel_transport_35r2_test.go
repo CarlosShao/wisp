@@ -954,16 +954,22 @@ func (p *jsParser) and() jsNode {
 }
 
 func (p *jsParser) equality() jsNode {
+	// The library's equality level is left-associative over the four operators.
+	// NOTE deliberately kept to a single pass: JS `a == b === c` chains are not
+	// modelled here, and a previous draft wrapped the four-operator loop in an
+	// outer `for {}` to mimic or()/additive() - a shell that returned
+	// unconditionally on its first iteration (SA4004) and, worse, let the inner
+	// loop silently CHAIN across operator changes (`==` then `===`), which a
+	// real chain test would have caught. A chained form in the fixture JS must
+	// be a parser fix, not this loop's accidental tolerance.
 	left := p.additive()
-	for {
-		for _, op := range []string{"===", "!==", "==", "!="} {
-			if p.atPunct(op) {
-				p.next()
-				left = &jsBinary{op: op, x: left, y: p.additive()}
-			}
+	for _, op := range []string{"===", "!==", "==", "!="} {
+		if p.atPunct(op) {
+			p.next()
+			left = &jsBinary{op: op, x: left, y: p.additive()}
 		}
-		return left
 	}
+	return left
 }
 
 func (p *jsParser) additive() jsNode {

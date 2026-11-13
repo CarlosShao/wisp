@@ -672,9 +672,9 @@ func gateStage(t *testing.T, out string, longReps, coldReps map[string]*runRepor
 		speech16 := ttsSpeak(t, "今天天气怎么样，帮我看一下日历。")
 		for _, lvl := range []struct {
 			name     string
-			targetDb float64
+			targetDB float64
 		}{{"control-26", -26}, {"control-36", -36}} {
-			gain := math.Pow(10, lvl.targetDb/20) / math.Max(1e-9, speechRMS(speech16))
+			gain := math.Pow(10, lvl.targetDB/20) / math.Max(1e-9, speechRMS(speech16))
 			mixed := make([]float32, len(base))
 			copy(mixed, base)
 			for i, v := range speech16 {
@@ -685,7 +685,7 @@ func gateStage(t *testing.T, out string, longReps, coldReps map[string]*runRepor
 			}
 			mats = append(mats, gateMaterial{
 				Name: lvl.name, State: "control",
-				Source:  fmt.Sprintf("%s + TTS speech at %.0f dBFS RMS", controlBase, lvl.targetDb),
+				Source:  fmt.Sprintf("%s + TTS speech at %.0f dBFS RMS", controlBase, lvl.targetDB),
 				Samples: mixed,
 			})
 		}
@@ -770,7 +770,10 @@ func runGate(t *testing.T, m gateMaterial, asr *speech.StreamingAsr) gateReport 
 	rep.StartsPer10 = Rate10Min(rep.Starts, rep.DurationSec)
 	gateEps := make([]GateEpisode, len(episodes))
 	for i, e := range episodes {
-		gateEps[i] = GateEpisode{StartSample: e.StartSample, Samples: e.Samples, RmsDbfs: e.RmsDbfs, AsrText: e.AsrText}
+		// S1016: gateEpisodeReport and GateEpisode carry the identical four-field
+		// set (names, types, order), so this is a genuine same-shape conversion,
+		// not a mixed-type accident.
+		gateEps[i] = GateEpisode(e)
 	}
 	rep.Episodes = episodes
 	for _, thr := range gateEnergyThresholds {
