@@ -36120,3 +36120,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 - **★另一个我搞错的结论（当场被推翻）**：我曾判断「审计组不支持长提示词」。**错的。** 长提示词（约 1500 字）**完全可用**，腿跑了两枚测试（`PASS 9.58s`／`PASS 6.94s`）、核了 commit 改了 3 件、写了 465B 的 verdict 件、回了完整五行。**真空返回的真因是：我让腿"先读外部派单文件 `audit-431to437.txt`"，腿读了却没把它当指令源。** ⇒ **纪律：提示词必须内联全部步骤，⛔ 依赖外部文件转达指令。**
 - **★票 431 审计结论（非实现者＝`magpie-max` 腿，合规）**：**HONEST**。commit `fa39931bd` 存在、改 3 件（`resident_sink_nail_127_windows_test.go` +190／`431-ac1-boot-budget.md` +230／票面 +9）、证据件 230 行在盘、复跑 `TestAC1ResidentLegInstallsItsLogListenerOnDisk` **PASS 9.58s** ＋ `TestAC1ResidentLegOutlivesItsOwnLogFailure` **PASS 6.94s**、越界无。**与我自己的读数一致。**
 - **★教训（第 12 次同根）**：**"我自己做过的东西"也会被我忘掉。** 前 11 次是不实测就下结论，这次是**不查自己建过什么就宣布做不到**。⇒ **遇到能力限制时，先查配置文件里有没有我自己的旧解法，⛔ 直接宣布不可行。**
+
+## A1816 — ★七票全部由**非实现者**（`magpie-max` 审计组）独立复核，**7/7 HONEST**；这是本会话第一次真正做到"翻框须非实现者"的完整闭环
+
+- **背景**：`A1815` 修好路由后，我按机主令派了**七条审计腿**（`provider:"magpie-max", model:"group/group-review-and-audit"`，`reasoning: max` 写死在 provider 层）。**七条全部交件、全部真复跑、全部回话。**
+- **七份裁决件（逐份现读，非转述）**：
+  | 票 | verdict | commit | 复跑逐字 | 件 |
+  |---|---|---|---|---|
+  | 431 | **HONEST** | `fa39931bd` 3 件 | `PASS TestAC1ResidentLegInstallsItsLogListenerOnDisk (9.58s)` ＋ `PASS TestAC1ResidentLegOutlivesItsOwnLogFailure (6.94s)` | 465B |
+  | 432 | **HONEST** | `780fa6ea4` 4 件 +400/−2 | `PASS Test258BridgeMutationNoSrcKeepsOldBinding (2.47s)` 等三枚 | 967B |
+  | 433 | **HONEST** | `0bac5d9a3` 3 件 | `PASS TestAC246DevLegIgnoresTheTestTaskInjection (15.00s)` | 603B |
+  | 434 | **HONEST** | `9661bc6f4` 3 件 +299/−5 | `PASS`（且核了 `ef00174ac` 是那跳的来源） | 5289B |
+  | 435 | **HONEST** | `7cf184068` 3 件 +218/−0 | `PASS TestLockedSuffixNeverTakesTheLockItself33r11 (0.08s)` | 857B |
+  | 436 | **HONEST** | `d1f12dd55` 3 件 +222/−11 | `PASS` | 1140B |
+  | 437 | **HONEST** | `3fe4f7365` + `018b3112d` 两笔 | `PASS Test313WritableUnionEqualsTheTwoRosters (0.00s)`；全族 **PASS=3／FAIL=0** | 1885B |
+- **★越界七票全清**：`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／`frontend/**`／`design/**` **零命中**；437 额外确认 `internal/panel/**` 零改动。
+- **★腿抓到我的一处遗留笔误（我认）**：票 437 标题与正文仍写「门报 **26** 个／多出 **6** 个」，实测 **27／7**。审计腿逐字记下：`属票面已知笔误、非收口不诚实`。⇒ **这是我的第 10 次同根错的残留痕迹，已在票面自曝并改正，但标题没改**——标题是文件名，改名代价大于收益，**留档**。
+- **★433 审计腿自己抓到一个假读数（值得记）**：它第一次跑时把 `$` 转义成 `\$`，go test 收到字面 `$` ⇒ `testing: warning: no tests to run` ＋ `PASS`。**它自己识别出那是空跑、改回未转义的 `$` 重跑**，得 `PASS 15.00s`。**⇒ 审计腿有自检能力，这是好信号。**
+- **★意义**：这是本会话**第一次**做到 `SPEC-12 §4.3`／`issues/README` 要求的「**裁决者≠实现者**」完整闭环——之前 `A1785`／`A1786` 因为路由被禁，审计全靠我自己顶，那是不合规的（我自己收的票我自己判）。**现在七票有独立第二双眼睛。**
