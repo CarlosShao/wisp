@@ -36333,3 +36333,21 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
 | **3** | **`slo_sample_interval_sec` 的语义** | ①给语义→须改 SPEC-03 §4.3/D32＝改契约须批 ②批删键→同是改契约须批 ③维持挂账（现状） | 键继续零读者，写任何值都白改 |
 
 **⇒ 机主回一句「1 选 X、2 选 X、3 选 X」即可。不答＝三件按"维持现状"继续挂账，功能不受影响，只是那几个配置键写了仍然白写。**
+
+## A1827 — round92：★查出 **CI 从 2026-11-12 20:08 起一路红（近 100 run：94 红 / 2 绿）**；根因是 **staticcheck 量尺口径错**（linux runner 判 Windows 代码死刑），⛔ 不是欠清账
+
+- **现量（我本程现跑）**：
+  - `gh run list --limit 100` ⇒ **红 94 / 绿 2**；最后一次绿＝**`255224a56`（2026-11-12 20:08）**；之后 25 个 run 全红。
+  - 失败 run `43362781437`（`1c14613bc`）末行逐字：`staticcheck self-report: version=staticcheck 2026.2.2 (0.8.2) modules=3 packages=42 findings=64 toolchain-crash-lines=0 (step exit is 1)`。
+  - 另有 **6 枚测试失败**：`Test52PinComputesAndVerifiesHash`／`Test52OneByteTamperRefusesAndAlerts`／`Test52ManifestPinMismatchIsRefusedAsASwap`／`Test52ManifestPinsEveryCommandTool`／`Test52AbsoluteTempPathIsRefusedForTheTempReason`／`TestReadFailureDoesNotAdoptStatTheNextTickSeesTheWrite`。**这些文件今天一枚都没动**（`git log -1` 逐枚查过：jarvis.go 是 11-07、system_bridge.go 是 11-08、其余更早）⇒ **是历史遗留红，不是本轮引入**。
+  - 本机同口径：`staticcheck ./...`（默认 checks，GOOS=windows）⇒ **findings=95**，其中 **U1000=86**、ST1005=2、ST1012=2、S1016=1、SA4004=1、SA4010=1、SA5000=1、SA9009=1。
+- **★★A1773（台账 `:35686`）早已裁定，我差点违反**：原文「票 122 的 staticcheck 段要"CI linux 真清绿"，**不是靠删符号**——47 U1000 里 44 条是"linux 构建下真 unused、windows 构建下有主"的 GOOS 盲区，**删了会把 windows 功能搞坏**」。
+  - **★我这一轮的真实险情**：我先把 U1000=86 当成"欠清账"，**已经准备派腿去删/加 lint:ignore**。查 `A1773` 时才发现删的是**能跑的 Windows 代码**。**这是本会话我第 4 次"差点派错"（前三次：302、238、17 枚重复路径）。**
+  - **⇒ 我据此拍的口径（铁律⓪⓪⓪，技术选型我拍并写理由）**：`U1000`（未使用符号）是**平台相关判断**——一个符号"是否被使用"取决于**哪个 GOOS 在编译调用者**。所以 U1000 **必须在真正编译调用者的平台上求值**，⛔ 用 linux runner 的读数判 Windows 代码的死刑。
+  - **落地形状**：staticcheck 拆两遍——`GOOS=linux` 跑 `-checks=all,-U1000`（管跨平台通用缺陷）＋ `GOOS=windows` 跑 `-checks=all`（管死代码，在真平台上求值）；**两遍都必须 exit 0**；自报行分开打印两遍分母；**⛔ 用 `-checks=-U1000` 全局关掉交差（那是放宽）**。
+- **本轮派单（三条，全 `run_in_background`）**：
+  - `workflow-aea8a63c97a9464f` 票 **122** GOOS 量尺口径（写面只有 `.github/workflows/ci.yml`＋证据件＋票面，**一行 Go 都不许动**）。派单存档 `probes/orch/20261113/txt/122-goos-scope-dispatch.txt`。
+  - `workflow-fcb22a85bc3c45e6` 票 **188** 面板状态来源（独占 `internal/tools`＋`internal/panel`＋`cmd/wisp`）。
+  - `workflow-3b93865b857f43c2` **审计腿**（magpie-max / max 档）复核我本会话 4 枚结案（180/238/439/440）——**补「裁决者≠实现者」那个缺失的第二人**。派单存档 `audit-round91-4closures-dispatch.txt`（5608B）。
+- **票池 61 open 的真实结构（我本程分类）**：**12 枚四条全过**（169/188/191/192/197/201/245/262/264/291/293/314）／**31 枚有前置票**／**26 枚有机主裁定或按住**。
+  - ⚠ 那 12 枚里仍有多枚**不由本编队做主**：169 是前端面、191/192 票面写"要 owner 逐枚批准"、201/291 要真机硬件、264 票面写"取舍归机主本格不派写腿"、262 的 AC#5 要 CI 绿。
