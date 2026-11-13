@@ -36681,3 +36681,17 @@ HEAD `8e5b51890`；未推 **0**；工单总 **410**／done **326**／未结 **84
   - `workflow-6fa80fd560cf4134` → 票 266 SLO nail census 自测（派单存档 `266-slo-nail-census-dispatch.txt`）。**只许改仪器，⛔ 拆报警器/动阈值。**
   - 波 6（`workflow-6eb16c78270d47a7`，其余 9 包 pass2）仍在飞 ⇒ **共 3 条写腿**。
 - **★三腿写面两两不相交**：波6=`internal/{winsec,audio,proc,ball,risk,memory,observe,secret,agent}`；111=`scripts/`+`ci.yml`+票111；266=census 仪器脚本+`ci.yml`（步 8）＋票266。**⚠ `ci.yml` 两个腿都会碰，但一个动 test-windows 步、一个动 lint 步 8——仍是我复核 diff 时要盯的合并点。**
+
+## A1844 — 波 6 验收（3 提交，九包 pass2 **24→0**，我自己复跑=0）；★票 266 根因我用实验坐实＝**CRLF**，已重派
+
+- **波 6（`45c3b6511`＋`116f1ef65`＋`9fa19088d`）三把尺**：19 件全在 `internal/{winsec,audio,proc,ball,risk,memory,observe,secret,agent}`＋证据件＋票面／证据件 `122-wave6-rest-pass2.md` **11372B**／**我自己复跑这九包 `-tags=winlive -checks=all,-SA9009` ＝ 0 条**。**24→0 坐实。**
+  - 它自己两次更正证据件（`116f1ef65` 改「aecspike 检查因 sherpa cgo 环境噪音退 1 但 finding 行=0」；`9fa19088d` 按 finding 粒度重算四档 11 修/10 删/1 ABI pin/2 tag pin=24）——**主动自我更正是好信号。**
+  - ⚠ 顺带发现它删/改了 `internal/secret/delete_test.go:131` 的 SA4010——**这是我在派单里点名的「可能是真 bug」那条**，复核证据件确认它怎么判的（下一步核）。
+- **★★票 266 第一次腿返回空（幽灵），但它留的日志暴露了真相，我据此自己做了可复跑实验**：
+  1. **本机 Windows 工作树跑 `sh scripts/slo-nail-census.sh --self-test` ＝ 32/32 全过**（我刚跑的）。
+  2. **docker ubuntu:22.04（mawk 1.3.4）跑 ＝ 也 32/32 全过**（排除「awk 实现差异」）。
+  3. **docker 里把 `scripts/slo-check.ps1` 转成 CRLF 再跑 ＝ 正好 `14 failed`，与 CI 一字不差。**
+  - **⇒ 根因**：`.gitattributes` 给 `scripts/slo-check.ps1` 设 `eol=crlf` ⇒ **CI 签出成 CRLF**；自测的 `sed '/^X$/d' "$pristine"` 在 CRLF 下**匹配不到**（行尾 `\r`）⇒ 变体没生效 ⇒ 14 对照挂。**作者 `:517-519` 注释假设「work tree holds LF」在 CI 上不成立**——这就是虫。
+  - **★为什么一直没人发现**：本机工作树恰好是 LF，本地全绿；只有 CI 的 CRLF 签出才炸。**这正是「本地绿 ≠ CI 绿」的第 N 个实例。**
+- **修法（我已定，1 行）**：`:438 cp "$target" "$pristine"` → `tr -d '\015' < "$target" > "$pristine"`（建 `$pristine` 时就规范成 LF；census 自身解析本就 `tr -d '\015'`）。**control 11 单独保留**，专门验「census 吃 CRLF」。
+- **已重派**：`workflow-c985547c19c4442d`（`magpie-high`/`glm-5.3-flash`，派单存档 `266-slo-nail-census-r2-dispatch.txt`，含**我给的 docker CRLF 复现配方**，要求改前 14 failed／改后 0 failed 两个读数进证据件）。
