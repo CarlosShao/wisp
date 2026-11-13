@@ -489,6 +489,18 @@ char_view_offenders() {
 
 # ---- positive control --------------------------------------------------------
 run_selftest() {
+    # The bench must never touch the caller's repository or index. When this
+    # script is used to replay a commit the caller exports GIT_INDEX_FILE before
+    # invoking it (`GIT_INDEX_FILE=/tmp/x git read-tree HEAD; sh gate.sh
+    # --with-self-test`); without this unset the bench's `git add` writes the
+    # seeded file into the CALLER's index, so the caller's denominator grows by
+    # one, and the bench copy of the gate - whose roster the sed below strips -
+    # reads the caller's roster and reports red. Control 1/3 then fails and the
+    # real scan never runs, which is a false red produced by the instrument.
+    # Clearing the three variables here makes the bench self-contained, which is
+    # what a positive control has to be. It also covers the bare `git init`,
+    # `git add` and `git rm --cached` calls further down.
+    unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE
     BENCH=$(mktemp -d 2>/dev/null)
     if [ -z "$BENCH" ] || [ ! -d "$BENCH" ]; then
         printf '%s: REFUSE - the positive control cannot build a throwaway repository (mktemp returned "%s")\n' "$PROG" "$BENCH" >&2
