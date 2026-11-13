@@ -107,6 +107,69 @@
 # check, runtests.sh's rules, portable-tests.sh's GUARD A/B/C/D, ticket 98's
 # load-failure guard - all byte-identical. What changed is only what happens
 # AFTER the DLLs are staged, when the voice MODELS are missing.
+#
+# ===================================================================
+# TICKET 111 WAVE 8B (2026-11-13) - THE ROSTER BECOMES COMPUTED, AND A MISSED
+# NAME BECOMES ITS OWN VERDICT INSTEAD OF A RED TEST.
+#
+# The 2026-11-13 evening CI run (43413718734, test-windows step 7) reded one
+# case the 41-name roster never listed: Test41a2r1WakeEndToEndArmedToListening
+# reached the fixtures through a SECOND-LEVEL wrapper (voice41a2r1Start, whose
+# own body calls voice15eRepoFile / voice41a2r1KwsDir / voice15eInstallAsr),
+# and the roster was built by grepping helper names against TEST FUNCTION
+# BODIES - a case whose body only names the wrapper is invisible to that
+# grep, so the fallback skipped everything except exactly the case that then
+# failed on the missing tree. The roster also over-skipped one case:
+# Test41a2r1GuardRowsWalkWithTheProductionFact never touches the fixtures at
+# all (it drives the D43 walk over a stub KWS engine; measured in the
+# no-fixture reading: PASS without any fixture on disk), and sat in the
+# roster only because its file belongs to the voice family.
+#
+# THREE ROUTES, ONE NAMED PLACE EACH (the roster is no longer a hand-typed
+# 41-name regex; it is computed from the three lists below):
+#   (a) fixture HELPER and WRAPPER names - the leaf helpers the bodies call
+#       (voice15eVadModel / voice15eSpikeModels / voice41a2r1KwsDir /
+#       voiceWirePuncModel / voiceWireTtsFiles / voice15eRepoFile /
+#       voice15eInstallAsr) PLUS the second-level constructors that reach the
+#       fixtures on the caller's behalf (voice41a2r1Start / voice15eStartLeg /
+#       voice15eArm / voiceWireStart / ttsInheritLeg / newVoice26pRig /
+#       voice26pRenderTtsWav / voice26pSpikeAsr). The wrapper half is what the
+#       CI red exposed; the leaf half is the original route.
+#   (b) fixture PATH LITERALS - the tokens only the third_party voice trees
+#       contain (spike-models, model-fetch, matcha-icefall, silero_vad,
+#       sherpa-onnx-punct, sherpa-onnx-kws, vocos, asr-encoder, test_wavs),
+#       so a case (or a wrapper written tomorrow) that reaches the fixtures
+#       by spelling a path is caught even with no helper in sight.
+#   (c) the four INDIRECT dependents the no-fixture reading exposed and no
+#       source grep can see (markseam_394 x2, SLO159, AC4Focus) - kept as the
+#       hand-maintained list, reason still in the evidence file.
+# The union is evaluated per test function over cmd/wisp/*_test.go on every
+# run, so a NEW case that references any listed name lands in the roster the
+# first time it compiles - the CI miss above cannot recur through this route.
+#
+# AND THE GUARD FOR THE ROUTE THIS CANNOT SEE: a case the three routes all
+# miss still runs in fallback mode and fails on the missing fixtures - but it
+# now fails AS A ROSTER GAP, not as a broken package. After the run, in
+# fallback mode only, the carrier re-reads its own log and singles out every
+# --- FAIL whose message carries a fixture-absence signature ("cannot find
+# third_party" from voice15eRepoFile's walk-up, or "WISP_SPIKE_MODELS is not
+# set" from voice15eInstallAsrFiles), prints
+# "依赖夹具但不在名册上：<name>" for each, and exits non-zero as FIXTURE-GAP -
+# deliberately NOT folded into the plain FAIL count of a verdict, because a
+# case that failed on absent fixtures is a roster problem (fix the lists
+# above) and not an assertion that broke. GUARD B's职权 is untouched: the
+# package result line is still printed first, every run, exactly as before.
+#
+# ONE MORE SEMANTIC CHANGE, MEASURED AGAINST THE SAME EVENING: voice_env used
+# to treat ANY caller-set value as present ("caller values win"). A caller
+# that points WISP_SPIKE_MODELS at a directory that does not exist got a full
+# run of 30 voice reds and no roster. A caller value is now honoured only if
+# the target exists on disk; a caller-set-but-absent target is collected into
+# voice_missing exactly like an unset one, so the named fallback (not a wall
+# of missing-model reds) is the answer. An existing-but-wrong target still
+# wins as before - judging CONTENT was never this script's job, and the
+# incomplete-checkpoint reds (voiceTtsFiles.complete / kws.complete) remain
+# the tests' own honest failures.
 # ===================================================================
 
 set -u
@@ -224,6 +287,16 @@ voice_env() {
 	what=$3
 	cur=$(eval "printf '%s' \"\${$name:-}\"")
 	if [ -n "$cur" ]; then
+		# Wave 8b: a caller value is honoured only when the target exists.
+		# WISP_SPIKE_MODELS=/nonexistent used to win silently and produce a
+		# full run of 30 missing-model reds instead of the named fallback.
+		if [ -e "$cur" ]; then
+			return 0
+		fi
+		voice_missing="$voice_missing $name=$cur(caller-set but not on disk: $what)"
+		echo "wisp-cli-staged-tests.sh: $name=$cur is SET but not on disk ($what)." >&2
+		echo "wisp-cli-staged-tests.sh: -> named-fallback mode: the fixture-dependent cases will be" >&2
+		echo "wisp-cli-staged-tests.sh:    skipped by name below, the rest of the package still runs." >&2
 		return 0
 	fi
 	if [ -e "$want" ]; then
@@ -257,38 +330,99 @@ voice_env WISP_KWS_DIR "$root/third_party/spike-models/sherpa-onnx-kws-zipformer
 # and TestWireR1PunctuationReachesTheAgent failed, measured 2026-11-12.
 voice_env WISP_PUNC_MODEL "$root/third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx" "punctuation model file"
 
-# THE FIXTURE-DEPENDENT CASE ROSTER (ticket 111 fixtures leg, measured on the
-# 2026-11-13 tree; the compiled windows binary lists 617 top-level cases).
-# Sources of the union, both pinned in the evidence file:
-#   (a) 29 cases whose own function body references a fixture helper
-#       (voice15eVadModel / voice15eSpikeModels / voice41a2r1KwsDir /
-#       voiceWirePuncModel / voiceWireTtsFiles / voice15eRepoFile /
-#       voice15eInstallAsr), extracted per-function from the 15 files that
-#       define or call those helpers;
-#   (b) 4 more the no-fixture reading exposed as INDIRECT dependents:
-#       Test394R1SeamRecordsProductionMark +
-#       Test394R1SeamFedRefusalRefusesClosedTaskPoison
-#         (resident_voice_markseam_394_windows_test.go - they drive the
-#         production voice plan resolver, which needs the fixture set),
-#       TestSLO159Case14CommentKeepsItsTenseAndItsNumbers
-#         (slo_comment_tense_159_windows_test.go - it asserts against the
-#         395r1 file's logged readings, which are fixture products), and
-#       TestAC4FocusReturnToPriorWindowGap33r5
-#         (panel_host_windows_test.go - its hidden-window foreground sample
-#         was only produced inside the voice run in the no-fixture reading).
-# WHY NAMES AND NOT FILES: -test.skip's file:: form matched NOTHING and
-# skipped nothing (measured 2026-11-13, probe on the staged binary), so a
-# file-level shape here would be the green no-op ticket 71 AC#3 forbids.
-# WHY OVER-SKIP LEANS SAFE: a stale name removes coverage and reads as a
-# shorter RUN count; a missing name turns a setup gap into a red test. The
-# 180k/423 partials (8 + 1 independent cases) stay runnable in fallback mode
-# because only their dependent siblings are listed.
-# HOW IT CANNOT ROT SILENTLY: every fallback run verifies the pattern against
-# the compiled binary (go test -list, the same expression) and REFUSES to skip
-# with a pattern that matches zero names - a renamed/deleted test fails loudly
-# instead of shrinking the skip invisibly.
-voice_case_pattern='^(Test15eSpeechEndToEndHandsTheTranscriptToTheAgent|Test15eSilenceNeverCallsTheHandOff|Test15eARefusedHandOffLeavesTheAsrUnopened|Test15ePauseStopsTheListenerAndTheTrayFollows|Test15eTheProductionHandOffIsTheModelStoreWalk|Test41a2r1WarmGateFeedsKwsNotTheAsr|Test41a2r1GuardRowsWalkWithTheProductionFact|Test41a2r1ProductionTableRejectsTheDemoWavs|Test41a2r1OptInGateResolvesTheManifestSpelling|Test395r1VoiceToolTurnWalksActing|Test26PEchoNeverTriggersAndNeverTranscribes|Test26PWithoutAECTheEchoTranscribesVerbatim|Test26PMarginRetestAndGateReverse|Test381r2StaleTokenDoesNotKillTheNextAnnouncement|Test381r2PlayingPhaseInterruptAbortsAndWalks27|Test381r2RealDevicePlayingPhaseAbortWithin400ms|Test390r1BallClickPlayingInterruptAbortsAndWalks27|Test390r1BallClickRealDeviceWithin400ms|Test390r1UnattachedClickDoesNotInterrupt|Test26R3AnnounceClosesTheCaptureGate|Test26R3SilenceNeverTouchesTheGateNeedle|Test382WR2TTSInheritanceRefusesClosedTaskTaint|Test382WR2TTSCleanSentencePlaysThroughTheGate|Test382WR2TTSOpenScopeDirectCheckStillRefuses|TestWireR1AnnounceEndToEnd|TestWireR1WarmSecondTurnAcquiresNothing|TestWireR1PunctuationReachesTheAgent|TestWireR1AnnounceGateRefusesTaintedText|TestWireR1SilenceAndEmptyTextNeverSpeak|TestWireR1WarmIdleDisposesOnTheOwner|Test12r2SettleWalkFiveSamplesEndToEnd|Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware|Test16r1PremortemModelSha256CorruptRefusesTheHandOff|Test180KConversationModeReachesTheSpeakDoneRow|Test180KAECSwitchGatesTheMonitor|Test423PunctuationSwitchGatesTheStage|Test423SessionKeysReachTheScopeOptions|Test394R1SeamRecordsProductionMark|Test394R1SeamFedRefusalRefusesClosedTaskPoison|TestSLO159Case14CommentKeepsItsTenseAndItsNumbers|TestAC4FocusReturnToPriorWindowGap33r5)$'
-voice_case_count=41
+# ---------------------------------------------------------------------------
+# THE FIXTURE-DEPENDENT CASE ROSTER (ticket 111 wave 8b, computed on every run).
+# The old hand-typed 41-name regex is gone; the roster is now the UNION of
+# three routes, each with its list in exactly one named place. A stale entry
+# can no longer hide here either: every name in (a)/(b) is greped against the
+# tree while computing, so a rename turns up as a shorter count instead of a
+# silently matching regex.
+#
+# ROUTE (a) - fixture helper and wrapper NAMES a test body can reference.
+#   The seven leaf helpers are the functions whose own bodies open the
+#   fixture trees (they honour the WISP_* env vars above and fall back to
+#   walking up to third_party/). The eight wrappers are the second-level
+#   constructors and renderers that reach the fixtures ON THE CALLER'S
+#   BEHALF - the route the 2026-11-13 evening CI red exposed
+#   (Test41a2r1WakeEndToEndArmedToListening names only voice41a2r1Start,
+#   which is why the helper-name-only roster missed it).
+#   Members are exactly:
+#     voice15eVadModel      - silero VAD file (leaf)
+#     voice15eSpikeModels   - the ASR model tree (leaf)
+#     voice15eRepoFile      - the walk-up locator every fallback spells (leaf)
+#     voice15eInstallAsr    - hardlinks the ASR bytes into the store (leaf)
+#     voice41a2r1KwsDir     - the KWS checkpoint directory (leaf)
+#     voiceWirePuncModel    - the punctuation model file (leaf)
+#     voiceWireTtsFiles     - the matcha TTS checkpoint (leaf)
+#     voice41a2r1Start      - builds the full 41a2r1 wake leg (wrapper)
+#     voice15eStartLeg      - runs a caller-built voicePlan (wrapper)
+#     voice15eArm           - pushes the wake wav through the seam (wrapper)
+#     voiceWireStart        - the wire-r1 leg constructor (wrapper)
+#     ttsInheritLeg         - the 382wr2 leg constructor (wrapper)
+#     newVoice26pRig        - the 26p/392 bargein rig constructor (wrapper)
+#     voice26pRenderTtsWav  - renders wav via the real matcha checkpoint (wrapper)
+#     voice26pSpikeAsr      - builds the real spike ASR transcriber (wrapper)
+#   Deliberately NOT listed: voice15eWaitFor / voice15eWriteWav /
+#   voice15eDataDir / voice15eWriteConfig (pure test utilities with no
+#   fixture dependency - measured: the cases that use only those PASS with
+#   no fixtures on disk) and voice41a2r1Walked / voice41a2r1Feed /
+#   voice41a2r1PushSilence / voice41a2r1Wav* (operate on data the case
+#   already has; the feed/wav helpers are reached only through the Start
+#   constructor above). Over-skipping is the failure mode that silently
+#   removes coverage, so the wrapper set is exact names, not a prefix.
+#
+# ROUTE (b) - fixture PATH LITERALS. These tokens exist only in (or are
+#   spelled only for) the git-ignored voice fixture trees, so any body - a
+#   test's or a helper's - that contains one reaches the fixtures by path:
+#     spike-models, model-fetch, matcha-icefall, silero_vad,
+#     sherpa-onnx-punct, sherpa-onnx-kws, vocos, asr-encoder, test_wavs
+#   When a fixture tree moves or a new one is added, THIS list is the one
+#   place to update (the dispatch that commissioned it names this property).
+#
+# ROUTE (c) - the four INDIRECT dependents no source grep can see, kept as
+#   the hand-maintained list the original leg measured (reasons live in
+#   docs/evidence/s1/111-cmdwisp-cli-fixtures.md 4):
+#     Test394R1SeamRecordsProductionMark            - drives the production
+#        voice plan resolver, which needs the fixture set
+#     Test394R1SeamFedRefusalRefusesClosedTaskPoison - same resolver
+#     TestSLO159Case14CommentKeepsItsTenseAndItsNumbers - asserts against the
+#        395r1 file's logged readings, which are fixture products
+#     TestAC4FocusReturnToPriorWindowGap33r5 - its hidden-window foreground
+#        sample was only produced inside the voice run
+# ---------------------------------------------------------------------------
+fixture_helper_pattern='voice15eVadModel|voice15eSpikeModels|voice15eRepoFile|voice15eInstallAsr|voice41a2r1KwsDir|voiceWirePuncModel|voiceWireTtsFiles|voice41a2r1Start|voice15eStartLeg|voice15eArm|voiceWireStart|ttsInheritLeg|newVoice26pRig|voice26pRenderTtsWav|voice26pSpikeAsr'
+fixture_literal_pattern='spike-models|model-fetch|matcha-icefall|silero_vad|sherpa-onnx-punct|sherpa-onnx-kws|vocos|asr-encoder|test_wavs'
+fixture_roster_indirect="Test394R1SeamRecordsProductionMark Test394R1SeamFedRefusalRefusesClosedTaskPoison TestSLO159Case14CommentKeepsItsTenseAndItsNumbers TestAC4FocusReturnToPriorWindowGap33r5"
+
+# The union itself: per test function over the package's test files, a body
+# matching ANY route-(a) name or route-(b) literal joins the roster. One awk
+# invocation per file (POSIX awk only - index(), no dynamic regex), flushed
+# across file boundaries, deduplicated with sort -u.
+fixture_roster() {
+	fixture_pattern=$1
+	fixture_roster_out=""
+	for fixture_file in "$root"/cmd/wisp/*_test.go; do
+		[ -f "$fixture_file" ] || continue
+		fixture_names=$(awk -v pat="$fixture_pattern" '
+			BEGIN { n = split(pat, toks, "|") }
+			FNR == 1 { if (name != "" && hit) print name; name = ""; hit = 0 }
+			/^func Test[A-Za-z0-9_]+\(/ {
+				if (name != "" && hit) print name
+				name = $2; sub(/\(.*/, "", name); hit = 0
+			}
+			name != "" {
+				for (i = 1; i <= n; i++) {
+					if (toks[i] == "") continue
+					if (index($0, toks[i])) { hit = 1; break }
+				}
+			}
+			END { if (name != "" && hit) print name }
+		' "$fixture_file")
+		fixture_roster_out="$fixture_roster_out$fixture_names
+"
+	done
+	printf '%s' "$fixture_roster_out" | sed '/^$/d' | sort -u
+}
 
 skip_args=()
 if [ -n "$voice_missing" ]; then
@@ -298,6 +432,29 @@ if [ -n "$voice_missing" ]; then
 		echo "wisp-cli-staged-tests.sh: setup-failure exit, requested by the caller. Nothing was run." >&2
 		exit 1
 	fi
+	# Compute the roster from the three named routes above. The computed count
+	# is a READING (it moves as tests move); a computed roster of ZERO means
+	# the scan broke (no test files found, awk missing) - refusing here is the
+	# green-no-op guard, same shape as the -list check below.
+	computed_roster=$(fixture_roster "$fixture_helper_pattern
+$fixture_literal_pattern")
+	computed_count=$(printf '%s\n' "$computed_roster" | grep -c . || true)
+	if [ "$computed_count" -eq 0 ]; then
+		echo "wisp-cli-staged-tests.sh: GUARD - the computed fixture roster is EMPTY (routes (a)+(b) found" >&2
+		echo "wisp-cli-staged-tests.sh:   no test body in cmd/wisp). The scan broke; skipping nothing is the" >&2
+		echo "wisp-cli-staged-tests.sh:   green no-op ticket 71 AC#3 forbids. Refusing to run." >&2
+		exit 1
+	fi
+	indirect_count=$(printf '%s\n' $fixture_roster_indirect | grep -c . || true)
+	# The skip expression = computed roster + the route-(c) names. The four (c)
+	# cases are appended but NOT counted in computed_count: they carry their own
+	# hand-maintained accounting (see the route-(c) list above and the printout).
+	# NOTE: computed_count + indirect_count is deliberately NOT printed as a
+	# sum - markseam_394 x2 sit in BOTH routes, so the honest number is the
+	# -test.list verification below, not an arithmetic union of two lists.
+	voice_case_pattern="^($(printf '%s\n' "$computed_roster" | paste -sd'|' -)|$(printf '%s' "$fixture_roster_indirect" | tr ' ' '|'))$"
+	voice_case_count=$computed_count
+
 	# The pattern MUST match the compiled binary's own roster before it is
 	# allowed to skip anything: a -skip that matches zero tests is the
 	# green-no-op shape ticket 71 AC#3 was written against. go test -list
@@ -307,14 +464,19 @@ if [ -n "$voice_missing" ]; then
 		echo "wisp-cli-staged-tests.sh: GUARD - the fixture-skip pattern matched ZERO names in the" >&2
 		echo "wisp-cli-staged-tests.sh:   compiled test binary (go test -list). The voice cases were renamed" >&2
 		echo "wisp-cli-staged-tests.sh:   or deleted, and this pattern is now a green no-op. Refusing to run:" >&2
-		echo "wisp-cli-staged-tests.sh:   update voice_case_pattern alongside the rename, in the same commit." >&2
+		echo "wisp-cli-staged-tests.sh:   update the three fixture roster lists alongside the rename, in the" >&2
+		echo "wisp-cli-staged-tests.sh:   same commit." >&2
 		exit 1
 	fi
 	skip_args+=("-test.skip=$voice_case_pattern")
 	echo "wisp-cli-staged-tests.sh: NAMED FALLBACK - fixtures absent, so $listed fixture-dependent cases" >&2
-	echo "wisp-cli-staged-tests.sh:   (roster counts $voice_case_count; sources (a)+(b) named in" >&2
-	echo "wisp-cli-staged-tests.sh:   docs/evidence/s1/111-cmdwisp-cli-fixtures.md and ticket 111) are" >&2
+	echo "wisp-cli-staged-tests.sh:   (computed roster $voice_case_count from routes (a)+(b), plus the" >&2
+	echo "wisp-cli-staged-tests.sh:   $indirect_count route-(c) indirect dependents, deduplicated against the" >&2
+	echo "wisp-cli-staged-tests.sh:   compiled binary's own roster by go test -list = $listed) are" >&2
 	echo "wisp-cli-staged-tests.sh:   skipped BY NAME this run; every other case in ./cmd/wisp/ still runs." >&2
+	echo "wisp-cli-staged-tests.sh:   Roster routes: (a) fixture helper/wrapper names, (b) fixture path" >&2
+	echo "wisp-cli-staged-tests.sh:   literals, (c) indirect dependents - all three lists live above, in" >&2
+	echo "wisp-cli-staged-tests.sh:   THIS script, each in one named place with its rationale." >&2
 	echo "wisp-cli-staged-tests.sh:   This is a NAMED skip, not a silent one (ticket 71 AC#3's discipline)." >&2
 	echo "wisp-cli-staged-tests.sh:   Fetch the fixtures with" >&2
 	echo "wisp-cli-staged-tests.sh:   powershell -File scripts/fetch-voice-fixtures.ps1 to restore the full run." >&2
@@ -352,7 +514,56 @@ else
 fi
 
 if [ -n "$voice_missing" ]; then
+	# FIXTURE-GAP GUARD (ticket 111 wave 8b): in fallback mode, a --- FAIL whose
+	# message carries a fixture-absence signature is a ROSTER GAP - a case the
+	# three routes above all missed, red only because the fixtures are absent -
+	# and it must be reported as its own verdict instead of being read as a
+	# broken package. The count below is deliberately NOT folded into the plain
+	# FAIL accounting anywhere: the four numbers stay honest (the case really
+	# ran and really failed), and this block names the GAP on top of them.
+	# Skipped cases print nothing, so every --- FAIL in this log is a case that
+	# actually ran. Signatures (both measured 2026-11-13, no-fixture reading):
+	#   "cannot find third_party"      - voice15eRepoFile's walk-up failure
+	#   "WISP_SPIKE_MODELS is not set" - voice15eInstallAsrFiles' guard
+	fixture_gap_names=""
+	fixture_gap_count=0
+	# Attribution shape: in go -v output a test's message lines sit between its
+	# own "=== RUN <name>" and its "---- FAIL: <name>", so a signature line is
+	# credited to the currently-running case and the verdict is taken from that
+	# case's own FAIL line. A FAIL the awk cannot attribute (a subtest-shaped
+	# red) simply stays a plain FAIL - the run is still red, only the GAP label
+	# is withheld, so the guard's failure mode is under-labeling, never a green.
+	while IFS= read -r fixture_gap_name; do
+		[ -n "$fixture_gap_name" ] || continue
+		fixture_gap_count=$((fixture_gap_count + 1))
+		fixture_gap_names="$fixture_gap_names
+	依赖夹具但不在名册上：$fixture_gap_name"
+	done < <(awk '
+		/^=== RUN/ { cur = $3; next }
+		/^--- FAIL: / {
+			if (cur == $3 && seen[cur]) gap[cur] = 1
+			cur = ""
+			next
+		}
+		/^--- PASS: / || /^--- SKIP: / { cur = ""; next }
+		cur != "" && (index($0, "cannot find third_party") || index($0, "WISP_SPIKE_MODELS is not set")) {
+			seen[cur] = 1
+		}
+		END { for (n in gap) print n }
+	' "$log" | sort)
+	if [ "$fixture_gap_count" -gt 0 ]; then
+		{
+			echo "wisp-cli-staged-tests.sh: FIXTURE-GAP - $fixture_gap_count failed case(s) failed on the fixture-absence" >&2
+			echo "wisp-cli-staged-tests.sh:   signature, not on an assertion: this is a ROSTER GAP, not a package defect." >&2
+			echo "wisp-cli-staged-tests.sh:   Add these to the route-(a)/(b)/(c) lists above in this same script:$fixture_gap_names" >&2
+			echo "wisp-cli-staged-tests.sh:   FIXTURE-GAP carrier verdict: non-zero exit (1); do not read this run as a plain FAIL count." >&2
+		} >&2
+	fi
 	echo "wisp-cli-staged-tests.sh: run completed in NAMED-FALLBACK mode (fixture-dependent cases skipped" >&2
 	echo "wisp-cli-staged-tests.sh:   by name; missing:$voice_missing ). Binary exit code: $bin_rc" >&2
+	if [ "$fixture_gap_count" -gt 0 ]; then
+		# A missed roster name must stay red even if the binary somehow exits 0.
+		exit 1
+	fi
 fi
 exit "$bin_rc"
