@@ -6,7 +6,7 @@
 - 口径（自跑，与派单逐字同）：
   `GOOS=windows CGO_ENABLED=0 staticcheck -tags=winlive -checks=all,-SA9009 ./internal/winsec/ ./internal/audio/ ./internal/proc/ ./internal/ball/ ./internal/risk/ ./internal/memory/ ./internal/observe/ ./internal/secret/ ./internal/agent/`
 - 起手复跑＝**23 条**，与派单清单逐条一致（派单列 24 条；1 条差异见 §4——`aecspike/rig_windows.go:49 iidIUnknown` 不在此目录口径射程内，见 §4 判定）。
-- 终态：**同口径复跑 0 条（EXIT=0）**；无新增。
+- 终态：**同口径复跑 0 条（EXIT=0）**；无新增。（commit `45c3b6511` 后终验复跑一次，同读数。）
 
 ## 1. 逐条表（23 条，派单口径）
 
@@ -74,8 +74,7 @@ for i, b := range blobs {
    - 默认档（无 tag）：同报 U1000。
    ⇒ **不是④类**（④＝只在非默认 tag 有主，带 tag 后自然消失），两种口径都死 ⇒ 判据链指向③；
 3. **先例判例**：wave 4 对 `wasapi_windows.go:49` 的同名孪生判③删，判据逐字同：「它是纯 Go 值变量（GUID 常量），从不作为内存块被 API 按偏移读——COM 调用传的是**别的** GUID 的地址」；
-4. 派单口径为什么没列进 23 条：起手口径用 `./internal/audio/` **目录模式不递归子包**，aecspike 是 audio 的子包；本波处置后以显式子包口径（`./internal/audio/aecspike/`）验证归零。
-   终态：已删；winlive 口径 aecspike 单包 EXIT=0（仅 sherpa cgo DLL 环境噪声行，无 finding）。
+4. 派单口径为什么没列进 23 条：起手口径用 `./internal/audio/` **目录模式不递归子包**，aecspike 是 audio 的子包；本波处置后以显式子包口径（`./internal/audio/aecspike/`）验证：**finding 行＝0**（commit 后终验）；staticcheck 进程退出码＝1，**源自 sherpa-onnx cgo 依赖本机不可编译**（`build constraints exclude all Go files in .../sherpa-onnx-go-windows@v1.13.8 (compile)`），是环境噪声不是 finding——与门禁 SKIP 项同因。（更正：本件初稿在此误写"EXIT=0"，commit `45c3b6511` 后终验抓出，按追加更正。）
 
 ## 5. 写面审计
 
