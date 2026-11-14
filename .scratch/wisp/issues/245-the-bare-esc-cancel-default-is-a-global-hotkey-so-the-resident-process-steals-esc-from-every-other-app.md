@@ -61,7 +61,7 @@
 - [x] **AC#3 成立**：三枚钉逐枚字面对撞判"收紧非放宽"（`!=4`→`!=3` 且新增双向 `requireIdleRoster`；`0/4` 那一支一字未动、**另加一条让 `4/4` 判红**；注释改准而用例仍躲开裸键＝票面禁令守住）。**"收紧后仍能红"它实跑了**：V-M1 之下红在 `TestBallLiveLifecycle`，红句逐字「the live ball did not register its three idle hotkeys (summon/mute/panel, cancel is borrowed only during Confirming)」。**外加一枚它新抓的缺陷＝下面 AC#8。**
 - [ ] **AC#4 仍不翻**（它判"阻塞于票 228 如实、合格、不许翻勾"：`resident_ball_windows.go:86` 逐字 `Hotkeys: ball.DefaultHotkeys(),`）。
 - [x] **AC#5 成立**，且比我落笔时更全：`SPEC-12 §5` 那一行已在（`docs/specs/SPEC-12-roadmap-governance.md:80`，就是我 17:50 那枚「dc694430」搬进去的），代码里 `DEFERRED(D-` 标记**仍 0 枚** ⇒ 双向核对未被我这一步打破（它替我复认了这件事）。
-- [ ] **AC#6 两半都不翻**：①`main.go:25` 那句「its four global hot keys」**不成立**——它跑了这一版二进制 `-h`，打出的就是这句，而同一枚二进制稳态实测 3/4；②它**独立裁了我那句自裁**：判"编排者把锚改到'裸键'方向成立"，但**四枚钉全还锚在枚数**（`hotkey_live_test.go:435`／`live_windows_test.go:74`／`hotkey_status_test.go:181`/`:245`）⇒ **顺序必须"先改钉、再改行为"**，且它实测到"用户配成组合键也不绑"这一形**已经在读配置那条腿上真发生**（E5 逐字「cancel hotkey left unbound while idle … binding=Ctrl+Alt+V」＋`live=3`）⇒ 我那句"今天零行为差别"**说轻了，就地更正**：差别在另一条腿上今天就能量到。
+- [x] **AC#6② 已兑现（原「两半都不翻」的审计行，② 这一半于 2026-11-14 兑现）**：①`main.go:25` 那句「its four global hot keys」**不成立**——它跑了这一版二进制 `-h`，打出的就是这句，而同一枚二进制稳态实测 3/4；②它**独立裁了我那句自裁**：判"编排者把锚改到'裸键'方向成立"，但**四枚钉全还锚在枚数**（`hotkey_live_test.go:435`／`live_windows_test.go:74`／`hotkey_status_test.go:181`/`:245`）⇒ **顺序必须"先改钉、再改行为"**，且它实测到"用户配成组合键也不绑"这一形**已经在读配置那条腿上真发生**（E5 逐字「cancel hotkey left unbound while idle … binding=Ctrl+Alt+V」＋`live=3`）⇒ 我那句"今天零行为差别"**说轻了，就地更正**：差别在另一条腿上今天就能量到。
 
 - [x] **AC#7（新补，它的 V-F1）借被拒那一支的记账陈旧**：`takeEsc` 失败时不设 `escTakenOver`，于是 `ReleaseEscAfterSession` 首行早退 ⇒ 报告永久停在 `HotkeyError`、`AllLive()` 恒 false、`Problems()` 一直说"没注册"，**而桌面其实什么都没绑**（`ball_windows.go:878-899`）。完成判据＝失败那一支也要把状态归位＋一枚正控（借被拒之后报告必须说"稳态三枚、cancel 未绑"，不是"注册失败"）。
 - [x] **AC#8（新补，它的 V-F2）别的程序已经占了裸 Esc 时，正确的实现也过不了**：它起真外来进程占住 Esc（E6）⇒ 四枚真机用例**全硬红**（逐字「ticket 245 RED: bare Esc is claimed on this desktop while the ball is idle」），`SKIP-LOUD` 0 枚 ⇒ 在这种机器上**测不绿**，而写腿表里"被拒＝具名绿"那一支结构性走不到。完成判据＝把"桌面已有占位者"与"我们自己没绑上"这两种红分开判（分开两条红句），⛔ 不许改成跳过。
@@ -198,3 +198,15 @@
 - 票面 ② 自己写着「本格字面『注册集只能是三枚』写窄了 —— 真缺陷是『**没有任何修饰键的裸键**被全局抢走』，不是『稳态必须恰好三枚』」，并指出**用户把 `[hotkey] cancel` 配成带修饰键的组合时应当常绑**（那不会吞别的程序，且与 `ApplyHotkeyDefaults` 逐字写着的方向一致）。
 - **我裁决：采纳②的判据重切（裸键 vs 带修饰键），并按它派腿兑现「带修饰键的 cancel 常绑」。** 理由：①这不是改契约文字（`SPEC-11/12` 一字不动）；②不花钱；③不可逆？否 —— 配错一句话就退回来。铁律⓪⓪⓪ 明令这三类之外**我自己拍**。④它比「永远待命」更符合用户意图：用户显式配了 `Ctrl+Alt+X` 就是要它常驻，而今天这个配置**被静默忽略**。
 - ⚠ 与票 260 的「永远待命」判定的冲突**由我承担**：260 那枚判定针对的是**裸键**（防吞键），②只对**带修饰键**放开，两者不矛盾。撤销口令：「**245 AC6② 回永远待命**」。
+## AC#6② 兑现 + 翻框（编排者＝非实现者，2026-11-14 14:3x）
+
+写腿 `d44e89216` 落盘，**我自己复跑了那条判据**（不是信它自述）。
+
+- **判定点**：`internal/ball/hotkey_windows.go:577` —— `if p.id == hkCancel && !cancelHeldWhileIdle(bindings[i])`；`cancelHeldWhileIdle`（`:474`）**只对没有 Ctrl/Alt/Shift/Win 的裸键**返回 true。归还路径同步改 `ball_windows.go:1032`（`cancelIdleLine → cancelIdleLineWith`）—— 不改的话组合会在第一张卡之后被**永久删除**。
+- **我的复跑**：`go test -count=1 -v -run 'TestConfiguredCancelIdleBindingFollowsModifierRuling245' ./internal/ball` ⇒ **`--- PASS (0.00s)`、`ok internal/ball 0.132s`、RC=0**。
+- **两条判据（写腿读数，我核了 SHA）**：配 `Ctrl+Alt+K` ⇒ 稳态注册 **1** 次、cancel 行 `live / Ctrl+Alt+K`、`len(Live())=4`、`IsLive(hkCancel)=true`、`EscTakenOver()=false`；配 `Esc` ⇒ 稳态注册 **0** 次、`bindsEsc()=false`、`len(Live())=3`、借 1 次、归还后注册次数仍 **1**（只 drop 不重绑）。
+- **两侧正控（都能编译）**：A 改回「永远待命」⇒ `:318` 逐字红 `AC#6② RED: the idle pass made 0 RegisterHotKey attempts for a modifier-combination cancel (want exactly 1: a combination is held, not borrowed): [1 2 4]`；B 让裸键也可常绑 ⇒ `:357` 逐字红 `ticket 245 RED: the idle pass attempted a BARE cancel key (1 attempts): [1 2 3 4]`。还原后 `hotkey_windows.go` SHA256 **`C66CE2E3…` 同串**、`ball_windows.go` **`C9F20037…` 全程未变**（**我现核同串**）。
+- **门禁**：`go vet ./internal/ball` rc=0、`gofumpt -l internal/ball` 空、`d22scan` clean、`go test ./internal/ball` `ok 1.718s`。
+
+### ⚠ 我自己的连带错，当场记：**AC#6① 那句话现在是半句假话**
+`cmd/wisp/main.go:28-34` 现写「the cancel slot is the fourth key, **bound only while a confirmation card is waiting**…」—— 这在**裸键**配置下仍成立，但配了 `Ctrl+Alt+X` 后**不成立**（组合是常驻的）。这是我 14:2x 裁定 AC#6② 的直接后果：**我先把它改对，又被自己的下一个裁定改旧了**。⇒ 已派一条 **`cmd/wisp` 文案腿**把该句改成「裸键才借、组合常驻」，改完我会**重新核这句话与前文一致**，AC#6① 的勾保留但以文案落盘为准。
