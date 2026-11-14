@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：**只读**选票腿（不占写额）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读腿。⛔ 改任何产码/票面/证据件；只读＋写一个报告件。
+
+任务：从 `.scratch/wisp/issues/` 的**未结**票（约 59 枚）里，找出**可以立刻并行派单**的票，判据是**写面互斥**——现在 `cmd/wisp/**` 与 `internal/panel/**` 各有一条写腿在飞，所以我要的是**写面完全在这些之外**的票。
+
+逐枚读正文（读 PER 票的 AC 框与边界段，⛔ 只看标题），产出：
+1. **可立刻派**（写面 ⊆ `internal/llm`／`internal/tools`／`internal/risk`／`internal/state*`／`internal/storage`／`tools/d22scan`／`scripts` 等，⛔ 不含 `cmd/wisp/**`、`internal/panel/**`、`frontend/**`、`design/**`）：按「价值」排序，取**前 5 枚**，每枚给：票号＋标题＋**未勾的 AC 条数／总条数**＋写面（具体到包）＋一句话说它交付什么＋**是否有前置依赖**（等别的票/等机主/缺硬件/缺凭据）。
+2. **不可派及原因**（只点名，不展开）：分成 `归口`（属于前端外部 agent）／`不适用`／`等票`／`等机主裁定`／`缺硬件或凭据`／`写面冲突`，每类给票号清单。
+3. **判据自查**：你给的每一条「可立刻派」，都要能回答「这条凭什么说它的写面不在 cmd/wisp 或 internal/panel」——给出你在票面里读到的原话或 AC 里的路径。
+
+⛔ 不要建议改动任何票面；⛔ 不要自己派单；⛔ 不要评估"风险大小"来排序（按**交付价值**排）。
+产出件：`docs/evidence/s1/parallel-dispatchable-20261114.md`（一张表 ＋ 三类清单）。
+写面：只许这一个件 ＋ `.scratch/wisp/probes/survey3/**`。⛔ 动产码/票面/台账/阈值/golden/契约；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+回话第一行＝commit hash ＋「可立刻派 N 枚（前三是 票号）／不可派 M 枚」。没干完写「未完成，卡在哪」。
