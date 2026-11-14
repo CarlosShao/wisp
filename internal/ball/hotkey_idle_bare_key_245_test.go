@@ -80,6 +80,54 @@ func idleRosterReds245(rep HotkeyReport) []string {
 	return reds
 }
 
+// escIdleProbe245 is AC#8's evidence shape: the same bare-Esc question
+// escBorrowProbe asks, plus the numbers a reader needs when the answer is
+// "somebody else owns it" - how many attempts were made and what Win32 said.
+//
+// WHERE THE ERRNO COMES FROM. escBorrowProbe maps exactly one Win32 answer to
+// (free=false, err=nil): ERROR_HOTKEY_ALREADY_REGISTERED (1409). Every other
+// refusal is returned as an error and is fatal at the call site, so a not-free
+// reading is 1409 by construction; recording that constant is not a guess. Any
+// future widening of the probe's error mapping must widen this struct too, which
+// is why the attribution lives here and not at three call sites.
+type escIdleProbe245 struct {
+	attempts int
+	free     bool
+	errs     []error
+}
+
+// escIdleOwner245 is ticket 245 AC#8's three-way answer to "the bare-Esc probe
+// says the key is claimed": free (the idle ball leaves the desktop its key),
+// ours (the ball's own registration set holds a bare key - a PRODUCT defect), or
+// foreign (our set is clean, so another program owns the key - an environment
+// limit, never a product verdict).
+//
+// It lives in this default-tier file, not in hotkey_live_test.go, because the
+// split itself is pure: hotkey_esc_idle_owner_245_test.go pins all three
+// verdicts without a desktop, and the winlive ruler (requireIdleRoster) reads
+// the same function.
+type escIdleOwner245 int
+
+const (
+	escIdleFree245 escIdleOwner245 = iota
+	escIdleBall245
+	escIdleForeign245
+)
+
+// classifyEscIdleOwner245 is the split ticket 245 AC#8 asks for. Order matters:
+// a report that names a bare key is OURS even if a foreign program is also
+// squatting, because the product is already wrong and must not hide behind the
+// environment.
+func classifyEscIdleOwner245(rep HotkeyReport, p escIdleProbe245) escIdleOwner245 {
+	if p.free {
+		return escIdleFree245
+	}
+	if _, held := idleBareKeyHeld245(rep); held {
+		return escIdleBall245
+	}
+	return escIdleForeign245
+}
+
 // liveLine245 builds one LIVE line for the synthetic controls below. It parses
 // the binding with the production parser so the controls exercise the same
 // accelerator shapes RegisterHotKey would see.

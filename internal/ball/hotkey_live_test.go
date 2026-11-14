@@ -504,14 +504,53 @@ func requireIdleRoster(t *testing.T, b *Ball) {
 	if reds := idleRosterReds245(rep); len(reds) != 0 {
 		t.Fatalf("the live ball's idle roster is not the standby one: %v\n%+v", reds, rep.Bindings())
 	}
-	free, err := escBorrowProbe(t, b)
-	if err != nil {
-		t.Fatalf("the bare-Esc probe could not run: %v", err)
-	}
-	if !free {
-		t.Fatal("ticket 245 RED: bare Esc is claimed on this desktop while the ball is idle")
+	p := probeBareEsc245(t, b, 3)
+	switch classifyEscIdleOwner245(rep, p) {
+	case escIdleFree245:
+		return
+	case escIdleBall245:
+		line, _ := idleBareKeyHeld245(rep)
+		t.Fatalf("ticket 245 RED (AC#8, OUR OWN SET): bare Esc is claimed on this desktop while the ball is "+
+			"idle, and the ball's own registration set names it: %s = %q (%+v). This is the product's defect, "+
+			"not the desktop's - the foreign-owner reading below is reserved for a set that holds no bare key.",
+			line.Name, line.Binding, line.Acc)
+	default:
+		t.Skipf("SKIP-LOUD (ticket 245 AC#8, FOREIGN OWNER): bare Esc is claimed on this desktop while the "+
+			"ball is idle, but the ball's own registration set is clean (%d live entries, no bare key), so the "+
+			"claim belongs to another program. Probe attempts=%d, each answered errno 1409 %q. The idle-roster "+
+			"half of this case PASSED before the probe; this run cannot judge the delivery half on this desktop.",
+			len(rep.Live()), p.attempts, windows.ERROR_HOTKEY_ALREADY_REGISTERED.Error())
 	}
 }
+
+// probeBareEsc245 asks the desktop whether the bare Esc is unclaimed, up to
+// `attempts` times. A free answer stops early; a claimed answer is retried a few
+// times so the report can say "3/3" rather than "once" (ticket 245 AC#8's
+// dispatch: a named skip must carry the numbers).
+func probeBareEsc245(t *testing.T, b *Ball, attempts int) escIdleProbe245 {
+	t.Helper()
+	out := escIdleProbe245{}
+	for i := 0; i < attempts; i++ {
+		out.attempts++
+		free, err := escBorrowProbe(t, b)
+		if err != nil {
+			t.Fatalf("the bare-Esc probe could not run on attempt %d/%d: %v", out.attempts, attempts, err)
+		}
+		if free {
+			out.free = true
+			return out
+		}
+		out.errs = append(out.errs, windows.ERROR_HOTKEY_ALREADY_REGISTERED)
+		if i != attempts-1 {
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
+	return out
+}
+
+// escIdleOwner245 and classifyEscIdleOwner245 live in the default-tier file
+// hotkey_idle_bare_key_245_test.go: the split is pure, and pinning it there is
+// what lets AC#8's control run without a desktop.
 
 // requireEscReturned is AC#2's "还" half on a real window: the roster is idle
 // again AND Win32 itself reports the key that was borrowed unclaimed.

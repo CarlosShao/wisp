@@ -219,8 +219,18 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 		t.Fatal("Esc still taken over outside Confirming: B1 return violated")
 	}
 	requireEscReturned(t, b)
-	// Esc itself must be ours to give back: while Confirming, an injected bare
-	// Esc is the user's cancel.
+	// The key the borrow registered must be ours to give back: while Confirming,
+	// a physical press of THAT key is the user's cancel.
+	//
+	// Ticket 260 形ⓐ fixed the key's identity: the borrow registers whatever
+	// [hotkey] cancel names, and this fixture deliberately names "Ctrl+Alt+V" so a
+	// live run never parks the desktop's bare Esc (see liveHotkeys). Until
+	// 2026-11-14 this line injected "Esc" anyway - it was written against the
+	// pre-260 hard-coded borrow - so it went red the moment 260 landed (239-verdict
+	// §2 recorded it as the one deterministic winlive red, "归 245 地界") while the
+	// borrow itself was correct. The press now follows the same seed the borrow
+	// used, through the same parser, so "the configured cancel key is the cancel
+	// key" is the fact being tested rather than a key this file hard-codes.
 	if _, err := m.Dispatch(statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}); err != nil {
 		t.Fatalf("back into Confirming: %v", err)
 	}
@@ -228,11 +238,12 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if !b.EscTakenOver() {
 		t.Fatal("re-entering Confirming did not take Esc over")
 	}
-	if !injectBinding(t, "Esc") {
-		t.Skipf("SKIP-LOUD: injected Esc never reached the input stream, so this run did NOT prove the " +
-			"physical bare-Esc cancel during Confirming. The takeover itself, the WM_HOTKEY routing of the " +
-			"cancel id and the D43 #22 veto were asserted above; the B1 return is asserted below by the " +
-			"desktop probe that registers the bare Esc on a foreign id.")
+	borrowed := b.ConfiguredHotkeys().Cancel
+	if !injectBinding(t, borrowed) {
+		t.Skipf("SKIP-LOUD: injected %q never reached the input stream, so this run did NOT prove the "+
+			"physical cancel during Confirming. The takeover itself, the WM_HOTKEY routing of the "+
+			"cancel id and the D43 #22 veto were asserted above; the B1 return is asserted below by the "+
+			"desktop probe that registers the bare Esc on a foreign id.", borrowed)
 	}
 	if !waitFor(2*time.Second, func() bool { return m.State() == statemachine.StateActing }) {
 		t.Fatalf("the taken-over Esc did not cancel Confirming (machine %s)", m.State())
