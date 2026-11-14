@@ -63,7 +63,7 @@ func integrityOfProcess(pid uint32) uint32 {
 **fail-closed 语义（按原注释与调用方语义办，理由写在代码里）**：`target == 0` ⇒ `return true`（判「提权」= 拒绝）。依据有三条，都写在 `realProcessElevated` 的注释里：
 1. 打不开更高完整性目标的**进程或令牌**本身就是访问拒绝，这是 fail-closed 的原始场景（原代码 `OpenProcess` 失败即 `return true`，此处保持一致）；
 2. 猜「没提权」的代价是**静默丢弃输入**——正是票 23 存在的理由；猜「提权」的代价只是一句诚实的拒绝；
-3. 唯一调用方 `inputTarget`（`:1394-1396`）在 `elevated==true` 时返回冻结句 `ErrElevatedTarget`，所以 fail-closed 精确映射到「宁可拒，不试注入」。
+3. 唯一调用方 `inputTarget`（修后 `:1423-1424`）在 `elevated==true` 时返回冻结句 `ErrElevatedTarget`，所以 fail-closed 精确映射到「宁可拒，不试注入」。
 
 顺带订正两处**同函数族的注释**（都在同一文件、只改注释）：`integrityRID` → `currentIntegrity`（函数名早就叫这个）；`integrityOf` 的 RID 表原写「0x1000 medium / 0x2000 high / 0x3000 system」是**错一档**的，按真值改成 low/medium/high/system，并写明「读不到的 TARGET 按提权处理」。
 
@@ -75,7 +75,7 @@ func integrityOfProcess(pid uint32) uint32 {
 - `:72` 把 `processElevated` 打桩成 `func(uint32) bool { return true }` ⇒ 与真谓词无关；
 - `:129` 用真谓词，但目标是**本进程自己的窗口**（同 IL）⇒ 正确答案是 `false`，而恒假的错答案**也是 false**。⇒ 旧 bug 存在时两枚都是绿的。这正是要补的洞。
 
-### 3.2 新断言（本件新增，`:169` 起）
+### 3.2 新断言（本件新增，注释 `:162`、函数 `:177` 起）
 
 ```go
 func Test23IntegrityOfProcessAnchorsOnThisProcess(t *testing.T) {
