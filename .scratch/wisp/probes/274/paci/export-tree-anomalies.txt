@@ -1,0 +1,26 @@
+=== git archive HEAD | tar -x -C D:\tmp\wisp274paci\tree  (stderr only; re-run for the record) ===
+.scratch/wisp/probes/171/r1/logs/roster-G5-负一负-post.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G5-负一负-pre.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G5_负一负-post.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G5_负一负-pre.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G6-负一负-post.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G6-负一负-pre.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G6_负一负-post.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G6_负一负-pre.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G7-负一负-post.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G7-负一负-pre.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G7_负一负-post.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/171/r1/logs/roster-G7_负一负-pre.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/277/r1/01-a-道-readings.md: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.�\242TEMP.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.�\242TMP.txt: Invalid empty pathname: Unknown error
+.scratch/wisp/probes/orch/20261025/txt/README-�\254\346��无派单.txt: Invalid empty pathname: Unknown error
+tar.exe: Error exit delayed from previous errors.
+archive_rc=1
+=== anomaly line count ===
+16
+=== tree dist after re-extract (must still be the POS bundle) ===
+frontend\dist\.gitkeep
+frontend\dist\index.html
+frontend\dist\assets\index-CZoXrb9N.css
+frontend\dist\assets\index-QUtCIbHm.js

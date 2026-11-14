@@ -1,0 +1,11 @@
+=== POS (final): dist restored, exe rebuilt, committed bytes extracted from ci.yml, cwd=tree ===
+STEP| time=2026-11-14T14:18:44.071+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+STEP| panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/index-QUtCIbHm.js ./assets/index-CZoXrb9N.css]
+STEP| wisp.exe panel-assets -check -> exit code 0
+STEP_EXITCODE=0
+=== same exe: panel-assets -manifest (what the artifact carries) ===
+MANIFEST| time=2026-11-14T14:18:44.319+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+MANIFEST| .gitkeep 0 e3b0c44298fc1c14
+MANIFEST| assets/index-CZoXrb9N.css 65264 6d443e15fb042128
+MANIFEST| assets/index-QUtCIbHm.js 640318 b990516742de811d
+MANIFEST| index.html 1044 664520b87528f607

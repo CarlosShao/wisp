@@ -1,0 +1,11 @@
+exe=D:\work\workspace\projects plans\Wisp\build\wisp.exe bytes=32966840 sha256=ff941871b577f740c8fc30d750d5ce397fe390eadff526a4aef86d88675ef7b5
+--- A: '&' with pipeline (waits: 316 ms in the first measurement) ---
+PIPE| time=2026-11-14T14:19:57.090+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+PIPE| panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/index-DpRdJ-7r.js ./assets/index-Dxt2y5oW.css]
+rc_read_back=0 elapsed_ms=111
+--- B: '&' with *> file redirect (does NOT wait) ---
+rc_read_back=99 elapsed_ms=17
+redirect_file_bytes=0
+redirect_file_bytes_800ms_later=0
+--- C: the committed shape (Process.Start + WaitForExit) ---
+rc=0 elapsed_ms=83

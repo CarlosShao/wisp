@@ -1407,6 +1407,87 @@ jobs:
         if: ${{ !cancelled() }}
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
 
+      - name: Shipped wisp.exe carries the page bundle (panel-assets -check on the artifact)
+        # Ticket 274: "the exe that ships carries the page" had no direct
+        # measurement in CI. The AC#12 line is an indirect witness - built=true
+        # read off a TEST binary built in the same run from the same
+        # frontend/dist - and the only other sighting of `panel-assets` in this
+        # file was a comment (lint-frontend's L2 render step quotes its output
+        # as fixture input). A comment is not a step and cannot go red. This
+        # step measures the artifact itself: the build\wisp.exe the step above
+        # just produced, asked to serve its own embedded bundle.
+        #
+        # What `-check` proves (cmd/wisp/panel_assets.go:114-124 ->
+        # internal/panel/assets.go:137-160): the entry file resolves AND every
+        # asset reference inside it resolves from that same embedded tree. So
+        # the shape "the embed shipped less than npm run build produced" -
+        # built=true, blank panel, every hashed asset 404 - exits non-zero
+        # here, and the offending reference is named on the line above.
+        #
+        # Its reach, stated so nobody reads more into it: this says the exe
+        # carries a COMPLETE bundle, not that the bundle is THIS checkout's
+        # bytes (that is build.ps1's roster/provenance gate, ticket 274 AC#10,
+        # in the step above). Both sides were measured on 2026-11-14 in an
+        # exported tree outside the repo, readings in
+        # docs/evidence/s1/274-pa-ci-nail.md: frontend/dist reduced to the
+        # anchor-only shape -> exit 1, "embedded assets are not built (run npm
+        # run build in frontend/)"; entry present with its hashed refs absent
+        # -> exit 1, `index.html references "./assets/index-QUtCIbHm.js" but
+        # the embedded bundle cannot serve it`; dist restored to the full
+        # bundle -> exit 0, "entry=index.html built=true 2 asset refs
+        # resolve". Three bare runs of the check on the same bench the same
+        # hour: 319 / 283 / 101 ms, the first two carrying the cold DLL load.
+        #
+        # Ordering: directly below the build, so a pageless exe is red before
+        # the SLO gate below spends its whole sampling run on it.
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $exe = Join-Path $PWD 'build/wisp.exe'
+          if (-not (Test-Path -LiteralPath $exe)) {
+            Write-Host "the build step above reported success but $exe does not exist - nothing was measured, so this step does not pass"
+            exit 1
+          }
+          # `& $exe panel-assets -check` is NOT the shape used here. build\wisp.exe
+          # links with -H=windowsgui (scripts/build.ps1:244-257), and PowerShell does
+          # not wait for a GUI-subsystem child: measured on this bench 2026-11-14,
+          # `& $exe panel-assets -check *> file` returned after 20 ms with an EMPTY
+          # file and $LASTEXITCODE still reading 99 from the statement before it.
+          # The measured shape is the one build.ps1's own smoke test uses
+          # (scripts/build.ps1:307-361, ticket 244-r2): Process.Start with
+          # UseShellExecute=$false, so the child's stdout still reaches this log,
+          # then WaitForExit and the real ExitCode.
+          $psi = New-Object System.Diagnostics.ProcessStartInfo
+          $psi.FileName = $exe
+          $psi.Arguments = 'panel-assets -check'
+          $psi.UseShellExecute = $false
+          $proc = $null
+          try {
+            $proc = [System.Diagnostics.Process]::Start($psi)
+          } catch {
+            Write-Host "could not start ${exe}: $($_.Exception.Message) - no verdict was produced, so this step does not pass"
+            exit 1
+          }
+          if ($null -eq $proc) {
+            Write-Host "no process object came back for ${exe} - no verdict was produced, so this step does not pass"
+            exit 1
+          }
+          $code = $null
+          try {
+            $proc.WaitForExit()
+            $code = [int]$proc.ExitCode
+          } catch {
+            Write-Host "${exe} started but its exit code could not be read: $($_.Exception.Message) - no verdict was produced, so this step does not pass"
+            exit 1
+          } finally {
+            $proc.Dispose()
+          }
+          Write-Host "wisp.exe panel-assets -check -> exit code $code"
+          if ($code -ne 0) {
+            Write-Host "the shipping executable cannot serve its own embedded page bundle (panel-assets -check exit code $code); the lines above name the missing piece"
+            exit 1
+          }
+
       - name: SLO smoke gate
         if: ${{ !cancelled() }}
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4

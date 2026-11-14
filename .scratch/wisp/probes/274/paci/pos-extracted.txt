@@ -1,0 +1,9 @@
+=== POS: bytes extracted from the committed ci.yml, cwd=tree, dist = full bundle ===
+STEP| time=2026-11-14T14:17:10.060+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+STEP| panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/index-QUtCIbHm.js ./assets/index-CZoXrb9N.css]
+STEP| wisp.exe panel-assets -check -> exit code 0
+STEP_EXITCODE=0 wall_ms=2034
+=== bare cost of the check itself (Process.Start -> WaitForExit, same shape, 3 runs) ===
+run1: rc=0 ms=319
+run2: rc=0 ms=283
+run3: rc=0 ms=101

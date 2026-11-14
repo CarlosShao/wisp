@@ -1,0 +1,10 @@
+=== NEG-1: bytes extracted from the committed ci.yml, cwd=tree, dist = anchor-only ===
+STEP| time=2026-11-14T14:17:36.138+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+STEP| wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+STEP| wisp.exe panel-assets -check -> exit code 1
+STEP| the shipping executable cannot serve its own embedded page bundle (panel-assets -check exit code 1); the lines above name the missing piece
+STEP_EXITCODE=1
+=== same exe, direct CLI (for the 'what does the tool say' column) ===
+DIRECT| time=2026-11-14T14:17:36.423+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+DIRECT| wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+direct_rc=1

@@ -254,3 +254,17 @@ $ tr -cd '\r' < ... | wc -c      导出份＝24 ／ 工作树＝0
 ### AC#8（`SPEC-11 §2.2` 归属裁决）—— **维持不勾，等机主批**
 提案已在证据件 §3：**P1（推荐）承认取代**，一批 **6 处**逐句给「现文→改文→为什么」：`SPEC-11:44`（改成真跑 `npm ci`＋`npm run build` → `frontend/dist`，无 node/npm 即失败）、`:45`（`embed assets/web` → `embed frontend/dist`）、删 `:69-84` 整节 §3…（全文见 §3）。**规格一字未动。**
 撤销口令：「274 AC0/AC2 翻框复议」。
+
+## 收 `274-paci`（写腿：把「出货 exe 带页面」这道闸钉进 CI；件 `docs/evidence/s1/274-pa-ci-nail.md`；读数 `.scratch/wisp/probes/274/paci/**`；起手锚 `86e5655ba`；2026-11-14 14:1x +08；⛔ 未翻任何框、⛔ 未 push）
+
+- **落点与命令**：`slo-smoke` 第 **5** 步（0-based 4／共 7），**紧接 `Build wisp.exe` 之后**、`SLO smoke gate` 之前；跑 `build\wisp.exe panel-assets -check`。改动＝`.github/workflows/ci.yml` **+81/−0**，既有七步一步未挪、未加 `if:`/`continue-on-error`、`timeout-minutes`/`env:` 未动。
+- **为什么能放进去（派单那条"放不进就停手"的分叉不触发）**：三条前提逐条现量——①dist 在同一 job 由 `build.ps1:86-215` 真产（`ci.yml:1408` 就是跑它）；②exe 固定 `build\wisp.exe`（`build.ps1:270`，该 job 无 `defaults`，cwd＝仓根）；③`-check` 分支真存在（`cmd/wisp/panel_assets.go:114-124`）且是"入口＋入口里每个引用都能解析"那一支。⛔ 命令不是猜的：先 `git grep -n "panel-assets" -- .github/ scripts/ cmd/`（`.github/` 唯一命中＝`:1587` 注释、`scripts/` 零命中、`cmd/wisp/main.go:181` 是分派）。
+- **正控（仓外导出树 `D:\tmp\wisp274paci\tree`，三发；cwd＝树根，跑的是从改后 ci.yml 抽出的 `run:` 字节 sha256 `52109f41…`）**：①dist 只剩 `.gitkeep`（`go list -f '{{.EmbedFiles}}' ./frontend` ＝ `[dist/.gitkeep]`）⇒ **rc=1**，逐字 `panel: embedded assets are not built (run npm run build in frontend/)`；②入口在、`assets/` 不在（本腿加发，为把"点名"钉到具体那一枚引用）⇒ **rc=1**，逐字 `index.html references "./assets/index-QUtCIbHm.js" but the embedded bundle cannot serve it`；③还原完整包 ⇒ **rc=0**，逐字 `panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/index-QUtCIbHm.js ./assets/index-CZoXrb9N.css]`。仓里那份 `frontend/dist` 与 `build/wisp.exe` **一字节未动**。
+- **一发失手先记**：树里第一发得 `rc=-1073741515`（`0xC0000135`，DLL 未同置）＝**错的红**；照 `build.ps1:277-290` 同置 DLL 后才是真读数。⇒ 复跑者别把"环境缺件"记成"页面缺件"。
+- **为什么不用 `&`**（这一笔里最容易被下一个人"化简"掉的地方）：`build\wisp.exe` 是 `-H=windowsgui`（PE subsystem 现量 **2**），本机同一枚 exe 只换写法——`& … 2>&1 | …` 等到了（111 ms，rc=0），`& … *> file` **17 ms 就返回、rc 读到陈旧 99、重定向文件 0 字节（800 ms 后仍 0）**。⇒ 用 `build.ps1:307-361` 量过的 `Process.Start`+`WaitForExit`+真 `ExitCode`（ticket 244-r2 就是被 `&` 的陈旧 0 坑出过一个恒绿闸门）。
+- **YAML 自证**：仓里无 YAML 解析器（`powershell-yaml` 空、`yq` 空），按派单许可用 PyYAML 6.0.3 `yaml.safe_load`——两次 **rc=0**，抽出 `SLO_SMOKE_STEPS` 名册：`Build wisp.exe` → **新步** → `SLO smoke gate`（`PREVIOUS_STEP`/`NEXT_STEP` 逐字对）。⚠ 诚实边界：合法 ≠ GitHub 会收，真裁决只能靠一次真跑（推由编排者做）。
+- **代价**：检查本身四次裸跑 **83／101／283／319 ms**；无新 job／artifact／`needs:`。放在 SLO 采样之前，让"exe 都不带页面"先红。
+- **射程（⛔ 不许读成"带的是这份源码"）**：`-check` 只证内嵌树**内部完整**。盘上现成反例：仓里那枚 `build\wisp.exe`（sha `ff941871…`）`-check` 回 **rc=0**，但它带的引用是 `./assets/index-DpRdJ-7r.js`／`index-Dxt2y5oW.css`，**与工作树 dist 的 `index-QUtCIbHm.js` 不是同一套名字** ⇒ 它带的不是当前源码产物，仍绿。那格归 `build.ps1:196-213` 出处闸门（AC#10，已在同一 job 跑）。
+- **备选落点（都没选，代价留给编排者复议）**：B＝`slo-full` 对应 build 步之后（+0.1–0.3 s，多一台机的独立性；没选：派单只点名 slo-smoke，且 slo-full 已承载"contended＝无结论"这层语义）；C＝`lint-frontend`（要新 job／跨 job 传 dist／新 artifact＝AC#2 乙形，且与出处闸门正冲；那个 job 是 ubuntu node-only，**根本没有 exe**）。
+- **纪律**：写面只有 ci.yml＋本件＋`probes/274/paci/**`（15 枚，含两枚 0 字节文件＝"重定向 0 字节"的物证）＋本节；⛔ `scripts/**`/产码/测试/规格/阈值/golden 零写入；⛔ `add -A`/amend/reset/rebase/stash/checkout .；⛔ **零 push**。本笔 commit 的 `--name-only` 逐枚可核。
+- **撤销口令**：**「274-paci 撤那一步」**＝删 ci.yml 里 `Shipped wisp.exe carries the page bundle` 整步（那 +81 行），其余文件不动即可回到 `631e9bd92` 的形状。

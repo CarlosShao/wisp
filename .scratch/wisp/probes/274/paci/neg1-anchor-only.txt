@@ -1,0 +1,15 @@
+=== after DLL colocation ===
+=== embedded bundle of the tree exe: panel-assets -manifest ===
+MANIFEST| time=2026-11-14T14:15:03.867+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+MANIFEST| wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+manifest_rc=1
+=== embedded bundle: panel-assets -check (direct, default CLI shape) ===
+DIRECT| time=2026-11-14T14:15:03.998+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+DIRECT| wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+direct_rc=1
+=== NEG-1: the committed step body, cwd=tree (anchor-only dist) ===
+STEP| time=2026-11-14T14:15:05.808+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+STEP| wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+STEP| wisp.exe panel-assets -check -> exit code 1
+STEP| the shipping executable cannot serve its own embedded page bundle (panel-assets -check exit code 1); the lines above name the missing piece
+STEP_EXITCODE=1 elapsed_ms=1948

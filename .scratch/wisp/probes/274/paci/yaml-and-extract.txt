@@ -1,0 +1,60 @@
+YAML_PARSE_OK: yaml.safe_load returned dict
+JOBS: lint, test-core, test-windows, slo-smoke, slo-full, lint-frontend
+SLO_SMOKE_STEPS:
+  0: actions/checkout@v4
+  1: actions/setup-go@v5
+  2: Cache third_party (deps.toml key)
+  3: Build wisp.exe
+  4: Shipped wisp.exe carries the page bundle (panel-assets -check on the artifact)
+  5: SLO smoke gate
+  6: Upload SLO report
+STEP_INDEX=4 (0-based) of 7 step(s)
+PREVIOUS_STEP='Build wisp.exe'
+NEXT_STEP='SLO smoke gate'
+STEP_KEYS: ['if', 'name', 'run', 'shell']
+STEP_IF: ${{ !cancelled() }}
+STEP_SHELL: pwsh
+RUN_BLOCK_LINES: 44 chars: 1846
+WROTE: D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\274\paci\extracted-run.ps1
+YAML_CHECK_RC=0
+=== rerun after comment edit ===
+YAML_PARSE_OK: yaml.safe_load returned dict
+JOBS: lint, test-core, test-windows, slo-smoke, slo-full, lint-frontend
+SLO_SMOKE_STEPS:
+  0: actions/checkout@v4
+  1: actions/setup-go@v5
+  2: Cache third_party (deps.toml key)
+  3: Build wisp.exe
+  4: Shipped wisp.exe carries the page bundle (panel-assets -check on the artifact)
+  5: SLO smoke gate
+  6: Upload SLO report
+STEP_INDEX=4 (0-based) of 7 step(s)
+PREVIOUS_STEP='Build wisp.exe'
+NEXT_STEP='SLO smoke gate'
+STEP_KEYS: ['if', 'name', 'run', 'shell']
+STEP_IF: ${{ !cancelled() }}
+STEP_SHELL: pwsh
+RUN_BLOCK_LINES: 44 chars: 1846
+WROTE: D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\274\paci\extracted-run.ps1
+YAML_CHECK_RC=0
+extracted sha256=52109f410e83fffa22afe085f566bd53166e73cbae40591736a692841991f25f
+=== final re-validation (after all edits; ticket/evidence edits do not touch ci.yml) ===
+YAML_PARSE_OK: yaml.safe_load returned dict
+JOBS: lint, test-core, test-windows, slo-smoke, slo-full, lint-frontend
+SLO_SMOKE_STEPS:
+  0: actions/checkout@v4
+  1: actions/setup-go@v5
+  2: Cache third_party (deps.toml key)
+  3: Build wisp.exe
+  4: Shipped wisp.exe carries the page bundle (panel-assets -check on the artifact)
+  5: SLO smoke gate
+  6: Upload SLO report
+STEP_INDEX=4 (0-based) of 7 step(s)
+PREVIOUS_STEP='Build wisp.exe'
+NEXT_STEP='SLO smoke gate'
+STEP_KEYS: ['if', 'name', 'run', 'shell']
+STEP_IF: ${{ !cancelled() }}
+STEP_SHELL: pwsh
+RUN_BLOCK_LINES: 44 chars: 1846
+WROTE: D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\274\paci\extracted-run.ps1
+YAML_CHECK_RC=0
