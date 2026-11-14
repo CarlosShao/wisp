@@ -149,7 +149,7 @@ exec_verdicts=$((passed + failed + skipped))                      # ^--- (PASS|F
 four_numbers=$(count '^portable-tests.sh: four numbers (all from -v output):')
 ```
 判据变成：**包级结果行必须存在**（原判据，不动），**且** `exec_verdicts > 0` **或** `four_numbers > 0`。
-两者都没有 ⇒ 红，并逐字说明"你抓到的是 `go test -list` 的名册尾巴"。EXISTING 的"零结果行"分支一字未改；
+两者都没有 ⇒ 红，并逐字说明"你抓到的是 `go test -list` 的名册尾巴"。原有的"零结果行"分支一字未改；
 GUARD 3、四数行、`winsec result line` 的打印都保留。**没有放宽**：这是对同一个断言（这个包真跑过）
 **收紧输入**。
 
@@ -250,6 +250,10 @@ rc=0
 |---|---|---|---|
 | 1 | `997..1067` | `1111..1181` | `89aff5ba7cf4ecd177c8e79dc2871989943e98bbee8773d3edfe3dc6db700ebf` **两侧相同** |
 | 2 | `1218..1277` | `1332..1391` | `c60726a0eddc95ddf376accfe673472db331280366e0063d8db9efeb5181549d` **两侧相同** |
+
+> CRLF 这两行取自把工作副本规范化为 LF **之前**的 worktree（为什么规范化见 §5.1），
+> 两侧现在都能逐字复算：改前 `fix/pre70-portable-worktree-crlf.sh`、改后 `fix/after70-portable-worktree-crlf.sh`
+> （各自按其行号取块，保留 `\r\n` 逐字节 SHA256）。当前**提交的 blob** 与上面 LF 行的 hash 相同。
 
 **为什么行号变了字节没变**：本腿在 `:838-910`（块 1 之前）加行，块 1 下移 114 行、块 2 下移 114 行；
 `git diff -U0` 的 hunk 旧行号是 `849/851/860/878/900/1279` 与 `213/242`，**没有一条落在这两段里**。
