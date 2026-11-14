@@ -1,6 +1,7 @@
 #!/bin/sh
 # scripts/slo-nail-census.sh - the OUTER tooth over the two self-locking nails of
-# the D32 gate (ticket 266, shape 1-A).
+# the D32 gate (ticket 266, shape 1-A) and, since ticket 274, over the frontend
+# provenance gate of the build line (scripts/build.ps1).
 #
 # WHY THIS FILE EXISTS AT ALL
 #   scripts/slo-check.ps1 carries two nails that inspect THAT SAME FILE:
@@ -21,6 +22,21 @@
 #       the D32 gate has exactly 2 self-locking nails
 #       Test-ScriptShapeNail      carrying "shape nail ok"
 #       Test-ExitCodeInstrument   carrying "instrument self-check ok"
+#
+#   and, since ticket 274, that the BUILD gate (scripts/build.ps1) carries its
+#   frontend provenance gate - the nail 274-r2 (commit 91c90aa1) built into step
+#   2 to stop a stubbed npm from shipping last month's page bytes (ticket 274
+#   AC#10) with array-to-array rosters (ticket 274 AC#11):
+#
+#       the build gate has exactly 1 provenance gate shape
+#       $preRoster  (the pre-npm snapshot array)   = line 158 of build.ps1
+#       $freshNames (the array-to-array diff)      = line 209 of build.ps1
+#       the unprovenanced Fail                  = line 212 of build.ps1
+#       the npm run build call                     = line 165 of build.ps1
+#
+#   Deleting any of those lines (or commenting them out) now leaves the
+#   declaration behind saying the build gate should carry them - the same
+#   shape the D32 declaration gives the ticket-263 delete-nails mutant.
 #
 #   The two assignments below ARE that declaration. They live in this file; the
 #   inspected file never mentions them. Deleting a call from slo-check.ps1 now
@@ -116,6 +132,35 @@ nail_ok='shape nail ok|instrument self-check ok'
 sampling_anchor='-FilePath $WispExe'
 
 # ---------------------------------------------------------------------------
+# THE BUILD GATE DECLARATION (ticket 274) - lives here, not in build.ps1
+# ---------------------------------------------------------------------------
+# build.ps1's frontend provenance gate (ticket 274 AC#10/AC#11, commits
+# 35633445/91c90aa1/674c1920) is four load-bearing shapes, each pinned by an
+# exact token that must occur EXACTLY once, uncommented:
+#   bld_snapshot   the pre-npm dist roster array (AC#10's snapshot)
+#   bld_diff       the array-to-array roster diff (AC#11's array-in-array-out)
+#   bld_redline    the named-cause Fail for unprovenanced page bytes
+#   bld_npmcall    the npm invocation the snapshot must precede (the ordering
+#                  anchor for the three above, standing in for the gate's
+#                  "first sample")
+# Ordering: the three gate shapes must sit BEFORE the npm call (snapshot) or
+# between snapshot and the roster print that claims success - pinned simply as
+# "snapshot and diff and redline all precede the npm call" is wrong for the
+# redline (it does not), so the declaration is: snapshot before npm call; diff
+# and redline after the npm call and before the 'go build' that embeds dist.
+# That last anchor is exact and unique in build.ps1:
+bld_build_anchor='& $go.Source build -trimpath -ldflags $ldflags -o (Join-Path $outDir '"'"'wisp.exe'"'"') ./cmd/wisp'
+# Tokens are matched as substrings of comment-stripped code lines, each
+# expected exactly once in the whole file:
+bld_snapshot='$preRoster = @($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })'
+bld_diff='$freshNames = @($postRoster | Where-Object { $preRoster -notcontains $_ })'
+bld_redline_token='unprovenanced page bytes - nothing in frontend/dist was produced by this build'
+bld_npmcall='& $npm.Source run build'
+# The success line's provenance half (its ok sentence); double-quoted shell
+# string, so the apostrophe is literal and the sigil is escaped:
+bld_ok="provenance: this run's npm added new artifact name(s)"
+
+# ---------------------------------------------------------------------------
 # where the inspected file is - derived from this script's own location
 # ---------------------------------------------------------------------------
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -132,10 +177,15 @@ esac
 usage() {
     cat <<'EOF'
 scripts/slo-nail-census.sh - the outer tooth over the D32 gate's self-locking nails
-(ticket 266). It reads scripts/slo-check.ps1 and checks that the two nails this
-file declares are still defined, still carry their own ok sentence, still have
-exactly one uncommented column-0 call line, and are still called before the first
-SLO sample.
+(ticket 266) and over the build gate's frontend provenance gate (ticket 274). It
+reads scripts/slo-check.ps1 and checks that the two nails this file declares are
+still defined, still carry their own ok sentence, still have exactly one
+uncommented column-0 call line, and are still called before the first SLO sample.
+It also reads scripts/build.ps1 and checks that the frontend provenance gate
+(ticket 274 AC#10/AC#11: pre-npm snapshot, array-to-array roster diff, the
+unprovenanced Fail, the npm call, and the success line's provenance sentence)
+still exists exactly once and in the declared order around the npm call and the
+go build that embeds dist.
 
   sh scripts/slo-nail-census.sh                   read the real target
   sh scripts/slo-nail-census.sh --with-self-test  positive control first, then read
@@ -183,11 +233,19 @@ fail_finding() {  # $1 = the full finding, token first
 # Emits one row per declared nail plus the anchor line actually found:
 #   NAIL <name> <defcount> <defline> <okcount> <okline> <callcount> <callline> <oktext>
 #   ANCHOR <line>            (0 when the anchor does not occur at all)
+# and, since ticket 274, one row per build-gate token:
+#   BTOK <key> <count> <firstline>
 analyze() {  # $1 = the file to read
     tr -d '\015' < "$1" | awk \
         -v names="$nail_names" \
         -v oks="$nail_ok" \
         -v anchor="$sampling_anchor" \
+        -v t1="$bld_snapshot" \
+        -v t2="$bld_npmcall" \
+        -v t3="$bld_diff" \
+        -v t4="$bld_redline_token" \
+        -v t5="$bld_ok" \
+        -v t6="$bld_build_anchor" \
         -v SQ="'" '
         # Strip the two PowerShell comment forms and keep string contents, so a
         # sentence that survives only inside a comment cannot count as a nail.
@@ -262,6 +320,15 @@ analyze() {  # $1 = the file to read
                 }
             }
             if (anchorline == 0 && index(code, anchor) > 0) { anchorline = NR }
+            # ticket 274 build-gate tokens: substring counts on comment-stripped
+            # code lines, first hit line recorded for the verdict text.
+            nt[1] = t1; nt[2] = t2; nt[3] = t3; nt[4] = t4; nt[5] = t5; nt[6] = t6
+            for (j = 1; j <= 6; j++) {
+                if (index(code, nt[j]) > 0) {
+                    bcount[j]++
+                    if (bline[j] == 0) { bline[j] = NR }
+                }
+            }
         }
         END {
             if (nn != nok) { exit 3 }
@@ -271,6 +338,12 @@ analyze() {  # $1 = the file to read
                     callcount[i] + 0, callline[i] + 0, ok[i]
             }
             printf "ANCHOR %d\n", anchorline + 0
+            printf "BTOK snapshot %d %d\n", bcount[1] + 0, bline[1] + 0
+            printf "BTOK npmcall %d %d\n", bcount[2] + 0, bline[2] + 0
+            printf "BTOK diff %d %d\n", bcount[3] + 0, bline[3] + 0
+            printf "BTOK redline %d %d\n", bcount[4] + 0, bline[4] + 0
+            printf "BTOK okline %d %d\n", bcount[5] + 0, bline[5] + 0
+            printf "BTOK buildanchor %d %d\n", bcount[6] + 0, bline[6] + 0
         }'
 }
 
@@ -366,6 +439,91 @@ census() {
         cannot_decide "the reader returned $i nail row(s) for a declaration of $declared_nail_count - the rows do not cover the declaration, so no verdict can be built from them"
     fi
 
+    # ---------------------------------------------------------------------------
+    # the build-gate census (ticket 274): the same rows file carries the
+    # BTOK lines for scripts/build.ps1's frontend provenance gate.
+    # ---------------------------------------------------------------------------
+    bld_target=$here/build.ps1
+    bld_rel=scripts/build.ps1
+    if [ ! -f "$bld_target" ] || [ ! -r "$bld_target" ] || [ ! -s "$bld_target" ]; then
+        cannot_decide "the build gate $bld_rel is missing, unreadable, or empty - ticket 274's provenance declaration cannot be checked against anything, and that is not a pass"
+    fi
+
+    # The build-gate rows come from reading THE BUILD GATE, not the D32 gate:
+    # the same reader (comment strip included) runs against build.ps1 alone.
+    bld_rowsfile=$(mktemp 2>/dev/null) || cannot_decide "cannot create a temporary file for the build-gate rows"
+    if ! analyze "$bld_target" > "$bld_rowsfile"; then
+        cannot_decide "the reader (tr | awk) failed on $bld_rel - the build gate could not be turned into a reading"
+    fi
+    if [ ! -s "$bld_rowsfile" ]; then
+        cannot_decide "the reader produced no rows at all for $bld_rel"
+    fi
+
+    printf '%s: build gate %s - declared provenance tokens: snapshot / npmcall / diff / redline / okline / buildanchor, each exactly once\n' \
+        "$PROG" "$bld_rel"
+
+    bt_snapshot=0; bt_npmcall=0; bt_diff=0; bt_redline=0; bt_okline=0; bt_buildanchor=0
+    bl_snapshot=0; bl_npmcall=0; bl_diff=0; bl_redline=0; bl_okline=0; bl_buildanchor=0
+    bt_rows=0
+    while read -r kind name cnt ln; do
+        if [ "$kind" != "BTOK" ]; then continue; fi
+        bt_rows=$((bt_rows + 1))
+        case $name in
+            snapshot)    bt_snapshot=$cnt;    bl_snapshot=$ln ;;
+            npmcall)     bt_npmcall=$cnt;     bl_npmcall=$ln ;;
+            diff)        bt_diff=$cnt;        bl_diff=$ln ;;
+            redline)     bt_redline=$cnt;     bl_redline=$ln ;;
+            okline)      bt_okline=$cnt;      bl_okline=$ln ;;
+            buildanchor) bt_buildanchor=$cnt; bl_buildanchor=$ln ;;
+            *) cannot_decide "the reader emitted an unknown build-gate row [$name] - the rows do not cover the declaration" ;;
+        esac
+    done < "$bld_rowsfile"
+    if [ "$bt_rows" -ne 6 ]; then
+        cannot_decide "the reader returned $bt_rows build-gate row(s) for a declaration of 6 - no verdict can be built from them"
+    fi
+
+    bld_findings=0
+    bld_fail() {  # $1 = token key, $2 = the finding
+        bld_findings=$((bld_findings + 1))
+        printf '%s: FAIL slo-nail-census-build-%s: %s\n' "$PROG" "$1" "$2"
+    }
+
+    # each token exactly once, uncommented
+    for pair in "snapshot:$bt_snapshot:$bl_snapshot" "npmcall:$bt_npmcall:$bl_npmcall" \
+                "diff:$bt_diff:$bl_diff" "redline:$bt_redline:$bl_redline" \
+                "okline:$bt_okline:$bl_okline" "buildanchor:$bt_buildanchor:$bl_buildanchor"; do
+        key=${pair%%:*}; rest=${pair#*:}; cnt=${rest%%:*}; ln=${rest#*:}
+        if [ "$cnt" -eq 0 ]; then
+            bld_fail "$key" "the declared build-gate token [$key] occurs zero times in uncommented code of $bld_rel - the ticket 274 provenance gate shape this file declares has been deleted or commented out (ticket 274 AC#10/AC#11; same failure family as ticket 263's delete-nails mutant)."
+        elif [ "$cnt" -gt 1 ]; then
+            bld_fail "$key" "the declared build-gate token [$key] occurs $cnt times in $bld_rel (first at $bld_rel:$ln); this file declares exactly one."
+        fi
+    done
+
+    # ordering: snapshot precedes the npm call; diff, redline and okline sit
+    # between the npm call and the go build that embeds dist.
+    if [ "$bt_snapshot" -gt 0 ] && [ "$bt_npmcall" -gt 0 ] && [ "$bl_snapshot" -gt "$bl_npmcall" ]; then
+        bld_fail ordering "the pre-npm snapshot sits at $bld_rel:$bl_snapshot, AFTER the npm run build call at $bld_rel:$bl_npmcall. A snapshot taken after npm cannot prove provenance (ticket 274 AC#10)."
+    fi
+    for pair in "diff:$bl_diff" "redline:$bl_redline" "okline:$bl_okline"; do
+        key=${pair%%:*}; ln=${pair#*:}
+        if [ "$ln" -gt 0 ] && [ "$bl_npmcall" -gt 0 ] && [ "$ln" -lt "$bl_npmcall" ]; then
+            bld_fail ordering "the build-gate token [$key] sits at $bld_rel:$ln, BEFORE the npm run build call at $bld_rel:$bl_npmcall - the roster comparison must read dist after npm ran, not before (ticket 274 AC#10)."
+        fi
+        if [ "$ln" -gt 0 ] && [ "$bl_buildanchor" -gt 0 ] && [ "$ln" -gt "$bl_buildanchor" ]; then
+            bld_fail ordering "the build-gate token [$key] sits at $bld_rel:$ln, AFTER the go build call at $bld_rel:$bl_buildanchor - go:embed reads dist during that build, so a provenance verdict printed after it protects nothing (ticket 274 AC#10)."
+        fi
+    done
+
+    if [ "$bld_findings" -gt 0 ]; then
+        printf '%s: FAIL %s build-gate declaration violation(s) - the provenance gate of %s is not the shape this file declares (ticket 274). A green from a build whose provenance gate is gone ships page bytes nobody can attribute to this build.\n' \
+            "$PROG" "$bld_findings" "$bld_rel"
+        return 1
+    fi
+
+    printf '%s: build gate PASS - snapshot:%s npmcall:%s diff:%s redline:%s okline:%s buildanchor:%s in the declared order (ticket 274)\n' \
+        "$PROG" "$bl_snapshot" "$bl_npmcall" "$bl_diff" "$bl_redline" "$bl_okline" "$bl_buildanchor"
+
     if [ "$findings" -gt 0 ]; then
         printf '%s: FAIL %s declaration violation(s) - the D32 gate is not the shape this file declares (ticket 266). A green from a gate whose nails are gone is not a reading: ticket 263 measured an all-green screen with both call lines deleted.\n' \
             "$PROG" "$findings"
@@ -374,7 +532,7 @@ census() {
 
     printf '%s: PASS - %s/%s nails declared here are defined once, carry their own ok sentence, are called once at column 0, and run before the first sample at %s:%s\n' \
         "$PROG" "$declared_nail_count" "$declared_nail_count" "$rel" "$anchor"
-    printf '%s: NOTE - this tooth pins shape only. That those two ok lines were actually PRINTED is not asserted by any outer step yet (ticket 266 shape 2), and one commit deleting this file together with the CI step that calls it would leave nothing ringing.\n' \
+    printf '%s: NOTE - this tooth pins shape only. That those two ok lines were actually PRINTED is not asserted by any outer step yet (ticket 266 shape 2), and one commit deleting this file together with the CI step that calls it would leave nothing ringing. The build-gate half (ticket 274) pins shape only in the same way.\n' \
         "$PROG"
     return 0
 }
@@ -446,6 +604,14 @@ run_selftest() {
     bench_census=$BENCH/scripts/slo-nail-census.sh
     pristine=$BENCH/pristine.ps1
     cp "$pristine" "$bench_target"
+    # ticket 274: the bench also carries a copy of the build gate, so the
+    # build-gate half of the declaration gets its own positive control. Normalised
+    # to LF like pristine.ps1 (the reader strips \r itself).
+    tr -d '\015' < "$here/build.ps1" > "$BENCH/pristine-build.ps1" \
+        || cannot_decide "cannot copy scripts/build.ps1 into the bench"
+    bench_build=$BENCH/scripts/build.ps1
+    pristine_build=$BENCH/pristine-build.ps1
+    cp "$pristine_build" "$bench_build"
 
     # ---- 1. the healthy copy must be green, and must name what it read
     run_bench "$bench_census"
@@ -545,9 +711,82 @@ run_selftest() {
     expect_has "the red names the ordering token" "slo-nail-census-ordering"
     expect_has "the red says why the position matters" "not before the first sampling call"
 
+    # ---- 14. ticket 274: the healthy build gate copy is green, and the run
+    #          names the build gate's own PASS line. The D32 half is restored
+    #          first, so this control reads two healthy copies.
+    cp "$pristine" "$bench_target"
+    run_bench "$bench_census"
+    expect_rc "the pristine build gate is green" 0
+    expect_has "the green run prints the build gate PASS line" "build gate PASS"
+
+    # ---- 15. ticket 274 shot 1: delete the provenance diff line -> red
+    sed -e '/^\$freshNames = @(\$postRoster | Where-Object { \$preRoster -notcontains \$_ })$/d' \
+        "$pristine_build" > "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "deleting the roster diff turns the build-gate census red" 1
+    expect_has "the red names the missing diff token" "slo-nail-census-build-diff"
+
+    # ---- 16. ticket 274 shot 2: comment out the redline -> red
+    sed -e 's/^    Fail "frontend step: npm run build reported success but frontend\/dist holds no artifact name outside the snapshot taken before this run'"'"'s npm /    # Fail "frontend step: npm run build reported success but frontend\/dist holds no artifact name outside the snapshot taken before this run'"'"'s npm /' \
+        "$pristine_build" > "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "commenting out the unprovenanced Fail turns the build-gate census red" 1
+    expect_has "the red names the missing redline token" "slo-nail-census-build-redline"
+
+    # ---- 17. ticket 274 shot 3: restore -> green again
+    cp "$pristine_build" "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "restoring the build gate turns the census green again" 0
+    expect_absent "the restored run carries no FAIL line" "FAIL slo-nail-census"
+
+    # ---- 18. ticket 274 shot 4: snapshot moved AFTER the npm call -> ordering red
+    #          (delete the snapshot line, re-insert it right after the npm call)
+    sed -e '/^\$preRoster = @(\$preDistFiles | Sort-Object FullName | ForEach-Object { \$_\.FullName\.Substring(\$DistDir\.Length + 1) })$/d' \
+        "$pristine_build" > "$bench_build"
+    awk -v ins='$preRoster = @($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })' '
+        { print
+          if ($0 == "    & $npm.Source run build") { print ins } }' \
+        "$bench_build" > "$bench_build.tmp" && mv "$bench_build.tmp" "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "a snapshot taken after npm turns the build-gate census red" 1
+    expect_has "the ordering red names the snapshot-after-npm cause" "AFTER the npm run build call"
+
+    # ---- 19. ticket 274 shot 5: the ok sentence deleted -> red
+    sed -e 's/provenance: this run'"'"'s npm added new artifact name(s)/[provenance sentence removed by the census control]/' \
+        "$pristine_build" > "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "deleting the provenance ok sentence turns the build-gate census red" 1
+    expect_has "the red names the missing okline token" "slo-nail-census-build-okline"
+
+    # ---- 20. the whole build gate deleted (shots 15-19 all applied at once):
+    #          five tokens missing, five reds named
+    grep -v -e '^\$preRoster = @(\$preDistFiles' \
+            -e '^\$freshNames = @(\$postRoster' \
+            -e 'unprovenanced page bytes' \
+            -e '^\s*& \$npm\.Source run build' \
+            -e 'provenance: this run' \
+        "$pristine_build" > "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "deleting the whole provenance gate turns the census red" 1
+    expect_has "the whole-gate red names the snapshot" "slo-nail-census-build-snapshot"
+    expect_has "the whole-gate red names the npmcall" "slo-nail-census-build-npmcall"
+    expect_has "the whole-gate red names the diff" "slo-nail-census-build-diff"
+    expect_has "the whole-gate red names the redline" "slo-nail-census-build-redline"
+    expect_has "the whole-gate red names the okline" "slo-nail-census-build-okline"
+
+    # ---- 21. ticket 274 AC#11-shaped mutation: the array diff re-joined into a
+    #          string split (the -join/-split shred that AC#11 closed) - the
+    #          diff token itself is gone in that shape, so the gate must ring
+    sed -e 's/^\$freshNames = @(\$postRoster | Where-Object { \$preRoster -notcontains \$_ })$/\$freshNames = @((\$postRoster -join '"'"' '"'"') -split '"'"' '"'"' | Where-Object { (\$preRoster -join '"'"' '"'"') -notcontains \$_ })/' \
+        "$pristine_build" > "$bench_build"
+    run_bench "$bench_census"
+    expect_rc "reverting the array diff to the join-split shape turns the census red" 1
+    expect_has "the join-split red names the diff token" "slo-nail-census-build-diff"
+
     # leave the bench in its healthy state: the copies are the only things this
     # control ever wrote
     cp "$pristine" "$bench_target"
+    cp "$pristine_build" "$bench_build"
 
     printf '%s: positive control %s - %d control(s) ran, %d failed\n' \
         "$PROG" "$([ "$selftest_bad" -eq 0 ] && echo PASSED || echo FAILED)" \
