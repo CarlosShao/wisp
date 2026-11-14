@@ -2,7 +2,7 @@
 
 - **审计者**：`agent-26`（非实现者；这 5 张票的实现/收件都不是本腿）
 - **派单存档**：`.scratch/wisp/probes/orch/20261114/txt/audit-closures-20261114-dispatch.txt`
-- **起点 HEAD**：`3e9d9779f`（2026-11-14 17:33:55 +08）；**落笔时 HEAD** `81ba68874`、`origin/dev` `5ceb5af6d`（中间只多 2 笔 probe/台账 commit，**5 张票的 blob 一字未变**，见 §5）
+- **起点 HEAD**：`3e9d9779f`（2026-11-14 17:33:55 +08）；审计期间编排者并行推了 4 笔，本件落笔时 HEAD `48527e98f`。**判据不受影响**：`git diff --name-only 3e9d9779f 48527e98f^ -- .scratch/wisp/issues` = **0 行**，即 5 张票在整个窗口里一字未变（变的只有 probes/orch、台账、别的证据件）
 - **判据**：只认盘上读数——`git cat-file`／`git ls-tree`／`git merge-base`／文件字节与行号／`gh run view --json jobs` 的逐 job 逐 step 结论；票面自述与完成通知一律当**未验证**
 - **写面**：本件 ＋ `.scratch/wisp/probes/audit-20261114/**`。⛔ 未改票面、未改产码、未动阈值/golden/契约、未 push
 
@@ -241,8 +241,8 @@ ok  github.com/CarlosShao/wisp/internal/plugin/manifestslot  18.701s
 
 ```sh
 # 0) 树锚
-git rev-parse HEAD                                  # 落笔时 81ba68874；票面未变
-git diff --name-only 3e9d9779f HEAD                  # 只有 probes/orch + 台账两笔
+git rev-parse HEAD                                  # 本件落笔时 48527e98f
+git diff --name-only 3e9d9779f HEAD -- .scratch/wisp/issues   # 应为空：整段里 5 张票一字未变
 
 # 1) HEAD 双计数（每票必须 =1）
 git ls-tree -r --name-only HEAD -- .scratch/wisp/issues | grep -E '/(441|442|274|443|444)-'
@@ -285,4 +285,4 @@ git grep -n -E 'RED instrument|instrument is dead|RED INSTRUMENT' 8e1367bfd -- i
 - **没复跑 `cmd/wisp` 整包**（需 sherpa DLL 暂存；CI 里有 RUN 846／PASS 603 的读数）。442 的 48 例、444 的 9 发争用与 7 发突变，我只核了证据件、日志与 CI，**没有重造突变**。
 - **没裁决 Q-440 的"都按推荐"是否真的覆盖那 6 处改文**——那句话只在会话里，不在盘上；本件只报"盘上有这条裁定＋改文与提案逐字一致"。
 - **没动任何票面／产码／阈值／golden／契约**；未 `add -A`、未 amend/reset/rebase/stash/checkout、未 push。
-- HEAD 在审计期间前进了 2 笔（编排者并行写的 probe/台账）；5 张票的 blob 未变，本件所有票面读数在 `3e9d9779f` 与 `81ba68874` 上同值。
+- HEAD 在审计期间前进了 4 笔（编排者并行写的 probe/台账/池子分诊件）；`3e9d9779f → 48527e98f^` 区间对 `.scratch/wisp/issues` 的 diff 为 **0 行**，5 张票的字节未变 ⇒ 本件所有票面读数在该整段上同值。`origin/dev` 审计开始时 `c64a4fa22`，落笔时 `5ceb5af6d`。
