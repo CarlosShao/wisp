@@ -66,3 +66,13 @@
 - [2026-11-13 23:14:23 +08] agent=314b 写腿（cmd/wisp 面）did=**建议 (b) 落地**：两处裸接收改有界等待（`panel_pump_test.go:177` `<-done` → `waitDoneBounded314` 46s＝45s Execute ctx `:155`＋1s 边距；`approval_always_219ac2_test.go` 三枚用例的 `<-w.done`/`<-w.reply` → `waitRoundTripBounded314` 46s＝40s L2 窗 `approval_reply_201_test.go:154`＋6s 边距，reply 与 done 各一次有界接收共用同一 deadline）；超时 Fatalf 四要素全点名（等什么/等了多久/上界出处行号/当时可判读数——pump 报 pending 张数×2＋实显卡数＋发布数，219 报 done 闭没闭＋WIDEN-APPLIED 是否入账）。★正控：`-overlay` 变异（上界 50ms＋219 注入 reply 不关，变异件全在 `D:\tmp\wisp\20261113\314b\`，仓零触碰零还原）⇒ 两枚都红且失败语逐字点名（读数在证据件）；还原（nothing to restore）⇒ 真 carrier 定向 4 枚 **RUN=4 PASS=4 FAIL=0 SKIP=0**、rc=0。顺带同轮干了新红的 16r1 premortem 定因（判 (a)，修 `voice_e2e_demo_16r1_windows_test.go` 的 5s 墙钟猜想→mtime 前提）——全文见 `docs/evidence/s1/314-bounded-waits-and-16r1.md`（新）与票 111 progress log 同刻那行。门禁 build/vet/winlive-vet/d22scan/gofumpt 全绿。⛔ 未翻 AC 框、未 push、零产码/脚本/internal/models 改动。next=AC#0/AC#1 复验（整包色）仍待不被 portable 腿占用的窗口。
 
 - [2026-11-14 09:18:15 +08] agent=314c 写腿（脚本面；⛔ 非实现者）did=**建议 (c) 落地**：`scripts/portable-tests.sh` cli 分支加终点锚断言（+131 行／0 删）。跑前 `go test -list '.*' ./cmd/wisp/` 数出分母 **619** 枚、取最后枚举名 `TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask` 当锚；跑后必须出现该枚的 `--- PASS|FAIL|SKIP:` verdict 行，缺则响亮红并点名**跑了几枚／分母几枚／缺的锚／最后一行**，且 rc=124/137、128+n 信号（含 139）、`panic: test timed out` 归类为「被砍」而非「测试失败」。★正控真造早停：`-test.run` 只跑 1 枚 ⇒ carrier 自己打 `ok` 行、GUARD B 也放行，但断言红 rc=1（`RUN=1` vs 分母 619、锚缺失、末行 `ok ... 3.00s`）；拆掉断言同一发 rc=0 全绿。★负控本机两发真实全量**都给不出绿**（第一发 rc=139 死在 `Test145ArgsJSONComesFromTheBookedForensicsRow`、RUN=418/370s；第二发跑到 RUN=795 撞 90m `-test.timeout` panic rc=2、36149s 含挂起）——两发都被新断言当场点名，其中 panic 那发是最终码的真实读数（`KILLED, NOT FAILED (panic: test timed out)`）；另做合成完成流证明锚出现时断言静默 rc=0。门禁三条终态：`bash -n` rc=0／`sh scripts/d22scan.sh` clean／`sh scripts/check-path-length-budget.sh` GREEN。证据件 `docs/evidence/s1/314-end-anchor.md`（新）。⛔ 未翻 AC 框、⛔ 未 push、零 Go/阈值/golden/ledger/carrier 改动。next=本机全量绿仍欠（产品面 ticket 314 本人），交下一发 CI 第 7 步四数＋锚判色。
+
+## Progress log（编排者 2026-11-14 09:5x）
+
+**独占干净全量（单发、无竞争者）：`rc=1`、1442s、PASS=786 / FAIL=1 / SKIP=12，跑到终点锚 `TestZZ315A1`。**
+- **没有 `rc=139`、没有挂起、没有 `panic: test timed out`** ⇒ 本票的「整进程死亡」在单发条件下**不复现**。
+- 此前两处异常（`rc=139` @370s、90 分钟挂起）都发生在**两发整包并发**的窗口内（编排者自己的测量与一条腿的全量相撞）⇒ 机制是**并发**，与诊断腿 `314-hang-rootcause.md` 的「竞态＋嵌套变异抬长整包」一致。
+- 已落地两闸：①终点锚（`832e04489`，`docs/evidence/s1/314-end-anchor.md`）使「没跑完」响亮变红并点名；②并发纪律入 goal：整包同一时刻只许一发。
+- 唯一红 `TestAC4FocusReturnToPriorWindowGap33r5`＝真窗前台时序已知红，与本票无关；12 枚 SKIP 全部具名带 `文件:行`。
+- **仍未验**：候选 (a) 锁屏桌面（编排者自锁失败，`LogonUI` 前后为 0），待机主 `Win+L` 后补跑。
+- 证据件：`docs/evidence/s1/314-clean-single-run.md`。
