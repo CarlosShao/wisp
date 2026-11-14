@@ -1,0 +1,33 @@
+# 派单存档（先存档再发）
+# 路由：agent(prompt, { provider:'magpie-high', model:'auto/glm-5.3-flash' })
+# ⛔ 不许写 auto/deepseek-v4.1-flash，除非 glm 连续空交并在汇报首行点名
+Wisp 仓（D:\work\workspace\projects plans\Wisp）写腿。票 274 AC#8：**机主已批走 P1**，现在把 6 处规格文字改掉。
+
+## 已获批准（⛔ 不要再问要不要改）
+机主原话「都按推荐」⇒ 批了 P1。台账 `docs/reports/pending-and-issues.md` 的 `### Q-440 裁定` 一节是批准凭据，先读它。
+`SPEC-12 §4.1` 要求的「改契约须人工批准」这一步**已经过了**。
+
+## 逐句改文在哪
+`docs/evidence/s1/274-c1-three-cells-verdict.md` **§3.2**（`:145` 起）已经把 6 处的「现文→改文→为什么」逐句写好。**照抄那里的措辞**，⛔ 自己另写一套。
+
+6 处落点：
+1. `docs/specs/SPEC-11-build-deploy-containerization.md:44`（§2.2 第 2 步）
+2. 同文件 `:45`（§2.2 第 3 步）
+3. 同文件 **删整节 `:69-84`**（§3.2 那枚不存在的 Dockerfile）
+4. 同文件 `:125`（表格 frontend 行 → 真 job 名 `lint-frontend`）
+5. `docs/specs/SPEC-01-architecture.md:70` 与 `:82`（目录树两行）
+6. `.gitignore:33`（删死规则 `assets/web/dist/…`）
+
+## 硬约束
+- 只改这 6 处；⛔ 顺手改别的行；⛔ 动 `PLAN.md`、`C1–C32`、`D1–D47`、`thresholds.go`、golden、SLO 阈值。
+- ⛔ 让任何既有闸门变绿为目的的改文；改的是**规格描述与现实不一致**，不是为了让谁闭嘴。
+- 措辞必须与 §3.2 一致到「下一位读者能逐字对照」；如果 §3.2 某处与现在盘上事实不符，**先报告不要自行发挥**。
+
+## 验证
+- `git diff --stat` 必须是 **6 个落点**（改 5 处+删 1 节+改 1 行+删 1 行，按 §3.2 的清单核）
+- 改完后 `grep -rn 'with-frontend\|assets/web\|frontend.Dockerfile' docs/specs/ .gitignore | grep -v '^Binary'` 应为 **0 命中**（若 §3.2 保留了「已被取代」的历史说明，则按 §3.2 的字面判定，不要自行清零）
+- `sh scripts/d22scan.sh` clean；path-length budget GREEN
+- 票 274 Progress log 追加一节（只追加），把 6 处逐条记下
+
+## 交付
+commit（**显式 pathspec，6 个文件逐个列**）。回话第一行＝commit hash ＋「6 处逐条一句话」。没干完写「未完成，卡在哪」。⛔push。
