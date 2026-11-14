@@ -37069,3 +37069,16 @@ FAIL: TestPanelHostRealWindowHopAndLifecycle (0.37s)
 - 机主原话要点：**「规则要同步进 goal，别特么写到 tmp 下面，你记到 tmp 里有个吊用，你会读吗？」** 并要求：把「临时用两天 glm flash」记进 goal，**但不要把原审计路由那条去掉**，因为只是临时的。
 - **已执行**：goal `goal-c3efb0f7` 已 `edit` 到 **revision 13**，objective 里现在**同时**有：①★★临时覆盖（14、15 两天，全部子代理含审计类走 `magpie-high`＋`auto/glm-5.3-flash`，写明「周一机主通知后切回」）②原审计路由（`group/group-review-and-audit`，max 档，标注「周一恢复，临时令生效期间暂停」）。
 - **纪律修正**：**规则/裁定进 goal**（临时令也要进，并写到到期条件）；台账只是可核的事后记录，⛔ 不是规则的存放处；⛔ 把规则只写进 `D:\tmp`。
+
+### Q-1 ★票 274 AC#8：SPEC-11 §2.2 两步的归属 —— **等机主批（2026-11-14 14:1x 编排者登记）**
+
+**要裁的一句**：§2.2 第 2 步今天写「前端产物：**存在则跳过**；--with-frontend 时走 docker/frontend.Dockerfile（§3.2）」，第 3 步写「embed **ssets/web** 已就位」。盘上三条事实：① --with-frontend 在 scripts/build.ps1 **0 命中**（该脚本反而**无条件**跑 
+pm ci＋
+pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存在**（git ls-files docker 15 枚里没有）③ ssets/web **不存在**（真实通道是 rontend/dist，rontend/embed.go:19 //go:embed all:dist）。⇒ 不是「没实现」，是「实现成了反的」。
+
+**选项（编排者推荐 P1）**：
+- **P1 承认取代**（推荐）：一批改 **6 处**，逐句已写好「现文→改文→为什么」——SPEC-11:44、SPEC-11:45、**删整节 SPEC-11:69-84**、SPEC-11:125（表里 rontend 行 → 真 job 名 lint-frontend）、SPEC-01:70＋:82（目录树连带）、.gitignore:33 死规则。执行＝一枚写腿只改 4 枚文件，不改产码不改 CI。撤销口令「**274 P1 撤回**」。
+- **P2 兑现 --with-frontend 开关**（不推荐）：要新建 Dockerfile、给 uild.ps1 加开关并把第 2 步改成「默认跳过」——**这一步直接拆掉票 274 AC#10/#11 刚立的牙**（跳过＝不跑 npm＝名册对拉与出处闸门全失效），还要把 embed 通道搬家（3 处）。它买到的唯一东西是「宿主机无需 Node」，而 PLAN.md **从未写过**这条。
+- **不答的代价**：票 274 停在 11/12；SPEC-11 §2.2 与 §3.2 继续对下一位读者说谎（且本票立案时 uild.ps1:74 那句过期注释，引的就是 §3.2）。
+
+**逐字提案全文**：docs/evidence/s1/274-c1-three-cells-verdict.md §3（/L122 起，§3.2 是 6 处逐句改文）。
