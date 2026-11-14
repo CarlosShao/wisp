@@ -1,0 +1,31 @@
+# 票 446 — 「这个 errno 到底有没有」是拿**英文句子**判的：`"The operation completed successfully."`
+
+**状态**：待派（**一行级修法**，但是真 bug）
+**来路**：写腿 `w216` 在普查「用户可见句子由英文错误文本选」时点名交回的**不在 216 射程内的同形**，它没动、只报告 —— 这是正确的做法。
+
+## 现量（写腿给的，落地前自己复核）
+
+`internal/tools/system_backend_windows.go:286` 与 `:426`，用**英文全串**比对一个 errno 的 `Error()` 结果来判断「有没有 errno」：
+
+```
+"The operation completed successfully."
+```
+
+`syscall.Errno(0)` 的 `Error()` 恰好就是这句英文。⇒ 在**非英文 Windows** 上（系统错误表被本地化）这句话不是英文，比较**永远不成立** ⇒ 判「有 errno」⇒ 走错分支。
+
+**这不是文案问题，是行为问题**：判存在性应该用 `errors.Is(e, syscall.Errno(0))`，⛔ 不该拿句子。
+
+## 完成判据（AC）
+
+- [ ] **AC#1 现量复核**：`git grep -n 'operation completed successfully'` 给出全部命中（含测试件），逐条判是「判存在性」还是「只是打印」。⛔ 只改报上来的两处就完事。
+- [ ] **AC#2 改成码判**：存在性判定换成 `errors.Is(e, syscall.Errno(0))`（或该 errno 的正确零值判据），**两处都改**；若同一文件还有同形，一并改并在证据里点名。
+- [ ] **AC#3 能变红**：一发**能红的检查** —— 把修好的判定临时改回字符串比较、并让该分支必须被走到（构造 errno=0 的路径）⇒ 必须红且点名；还原后 SHA256 同串、再绿。⛔ 只写「改了」。
+- [ ] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`gofumpt -l` 本包空（⚠ 本机可能没装 gofumpt，如实记，⛔ 拿 gofmt 冒充）；`d22scan` clean；path-length GREEN；**产码改动只许这两处（或 AC#1 点名的同形）**。
+- [ ] **AC#5 CI**：`test-core` 与 `test-windows` 各一发含本修复的**完成**运行（给 run 号 ＋ `git merge-base --is-ancestor <fix> <head>` ＋ 完成时刻）。
+
+## 边界
+写面：`internal/tools/system_backend_windows.go`（及 AC#1 点名的同形）、`docs/evidence/s1/446-*`、`.scratch/wisp/probes/446/**`、本票 Progress log（只追加）。
+⛔ `cmd/wisp/**`、`internal/panel/**`、`internal/llm/**`（别的腿的写面，派单前现查）；⛔ 阈值/golden/契约；⛔ 放宽断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+## 撤销口令
+「票 446 撤」＝删本票＋回退其写腿 commit（新 commit 反改，不 reset/amend）。
