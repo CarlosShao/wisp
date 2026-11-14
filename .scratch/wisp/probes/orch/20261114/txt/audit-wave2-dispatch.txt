@@ -1,0 +1,25 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：审计腿（只读＋写证据件），审**这一波我刚翻的框**
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp **审计腿**。⛔ 信任票面与我的收件段，**只信盘上读数**。
+
+审这一波的 4 张（我刚翻过框的）：
+- 446-errno-presence-is-decided-by-an-english-error-sentence.md（我翻了 AC#1–#4）
+- 71-gates-must-self-report.md（我翻了 AC#4，AC#5 记为"半翻"，附我的裁定）
+- 216-menu-display-base-scrub-control-chars-and-two-sentences.md（腿说 2/3 改了、1 处要改契约）
+- 192-*.md（腿说 panel 侧做完、cmd/wisp 三步接线没做）
+
+逐张核这五件，每条给读数：
+1. **commit 真在**：`git cat-file -e` ＋ `git show --stat`；⚠ 若票面点名的 commit 与 HEAD 的关系说不清（漏推/未推），点名。
+2. **证据件真在**：路径＋字节，且**打开看**它写的东西是不是票面说的东西。
+3. **file:line 真在**：票面/证据引的行号，逐条打开看那一行是不是它说的内容。**行号指错也要点名**（今天 442 就错过两处）。
+4. **"能变红的检查"是不是真能红**：凡票面写「突变 ⇒ 红」的，核**仓里有没有那枚检查**；若那枚检查只存在于 `probes/` 而没进产码测试面，**点名它是"一次性证明"而不是"回归闸"**（446 与 71 都可能踩这条）。
+5. **过度声称**：凡「全绿／CI 绿／两发连续绿／已接进 CI」的句子，逐句核有没有 run id ＋ `git merge-base --is-ancestor <fix> <head>` ＋ 完成时刻三件。缺一样就点名。
+
+产出：docs/evidence/s1/audit-20261114-wave2.md，一张表 ＋ 结论段：每张票「框该不该翻」「要不要复开」。
+若判某张该复开，**不要自己改票面**，只写进证据件并在回话里点名。
+
+边界：写面只许 docs/evidence/s1/audit-20261114-wave2.md ＋ .scratch/wisp/probes/audit-wave2/**。⛔ 改产码、⛔ 改票面、⛔ 动阈值/golden/契约、⛔ add -A/--amend/reset/rebase/stash/checkout .、⛔push。
+⚠ `cmd/wisp` 这会儿有另一条写腿在做（票 447）⇒ **⛔ 跑 `go test ./cmd/wisp`**（会撞载具），只读代码与日志。
+回话第一行＝commit hash ＋「应当复开 N 张（票号）」＋「"只存在于 probes 的检查" M 处（票号）」。没干完写「未完成，卡在哪」。
