@@ -311,6 +311,11 @@ GOFLAGS='-tags=winlive' go test -c -o .scratch/wisp/probes/314-ruler/wisp-winliv
 
 日志：`probes/314-ruler2/{baseline2,final-green,d22scan,path-budget}.log`。
 
+**复核（2026-11-14 15:1x +08，免拿旧绿当现绿）**：本节读数跑完后，另两条腿先后落了 `a7f0e8d05`／`eecf7afe3`，
+所以两条树级门禁在 `HEAD=eecf7afe3` 上**又跑了一遍**：`d22scan` **clean／rc=0**、path-length **VERDICT GREEN／rc=0**
+（`probes/314-ruler2/{d22scan,path-budget}-postcommit.log`）；本腿的 `Test314` 在 `25acce221` 上复跑仍是
+**274 文件／2 命中／2 豁免／实红 0**、两测全 PASS（`probes/314-ruler2/post-commit-green.log`）。
+
 ### 7.8 诚实边界（本节不吹的地方）
 
 - **A1b/A1c 仍漏**，理由是函数边界（7.2 末两行）；要修得引入跨过程分析，那是另一件仪器，不在本票射程。
