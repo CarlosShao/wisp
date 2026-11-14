@@ -19,6 +19,7 @@ package winsec
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -79,10 +80,12 @@ func TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1(t *t
 	stageLink := filepath.Join(dir, "staged-leaf-322r1.lnk")
 	witnessAt := func(i int) string { return filepath.Join(dir, fmt.Sprintf("foreign-witness-%04d-322r1.bin", i)) }
 
+	// Ticket 444 probe knob: the committed denominator is the default, verbatim.
+	attempts := attemptsFor444(leafRaceAttempts322r1)
 	// One fresh foreign object per attempt, named by nobody, wide so any touch shows. Equal
 	// bytes imply equal size, so body and mtime are the whole before-picture.
-	bodies := make([]string, leafRaceAttempts322r1)
-	mtimes := make([]time.Time, leafRaceAttempts322r1)
+	bodies := make([]string, attempts)
+	mtimes := make([]time.Time, attempts)
 	for i := range bodies {
 		bodies[i] = fmt.Sprintf("foreign bytes %04d are not yours to truncate", i)
 		if err := os.WriteFile(witnessAt(i), []byte(bodies[i]), 0o600); err != nil {
@@ -133,7 +136,7 @@ func TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1(t *t
 			default:
 			}
 			i := int(atomic.LoadInt32(&cur))
-			if i >= leafRaceAttempts322r1 {
+			if i >= attempts {
 				continue
 			}
 			// Both states arrive by rename onto the SAME spelling, so the name is never absent
@@ -154,11 +157,11 @@ func TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1(t *t
 	defer stopRacer()
 
 	counts := map[string]int{}
-	for i := 0; i < leafRaceAttempts322r1; i++ {
+	for i := 0; i < attempts; i++ {
 		atomic.StoreInt32(&cur, int32(i))
 		counts[spokeLeg322r1(PrivateFile(name, []byte(leafRacePayload322r1), 0o600))]++
 	}
-	atomic.StoreInt32(&cur, leafRaceAttempts322r1)
+	atomic.StoreInt32(&cur, int32(attempts))
 	stopRacer()
 
 	// A sweep over EVERY witness, so damage landed after an attempt's own tally still counts.
@@ -189,26 +192,128 @@ func TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1(t *t
 		}
 	}
 	liveness := counts[legLeafOpen322r1]
+	ctl := leafLegControl444(t)
 	t.Logf("AC#1 paired reading on one screen: attempts=%d flips=%d flipErrs=%d damagedWitnesses=%d leafLegRefusals=%d foreignsNarrowed=%d foreignsHoldingPayload=%d",
-		leafRaceAttempts322r1, flips, flipErrs, damaged, liveness, narrowed, landed)
+		attempts, flips, flipErrs, damaged, liveness, narrowed, landed)
 	for _, leg := range legs322r1 {
 		if n := counts[leg.name]; n > 0 || leg.name == legLeafOpen322r1 {
 			t.Logf("AC#1' leg that answered = %s : %d attempts", leg.name, n)
 		}
 	}
+	ctl.print(t, "AC#1")
 	if damaged > 0 {
 		t.Errorf("AC#1 RED: %d of %d foreign witnesses lost their own bytes or mtime, so the open in "+
 			"privateFile followed a leaf link swapped into the caller's name and truncated a file no caller "+
 			"named (first: %s). This is ticket 322's shape and the outcome the leaf leg exists to prevent.",
-			damaged, leafRaceAttempts322r1, firstDamage)
+			damaged, attempts, firstDamage)
 	}
-	if liveness == 0 || flips == 0 {
-		t.Errorf("AC#1 RED instrument: across %d raced attempts the leaf leg (%q) answered %d and the racer landed "+
-			"%d flips (%d errors, first %q), so the damaged count above is not evidence about a window that was "+
-			"never reached", leafRaceAttempts322r1, whyOpenELOOP322r1, liveness, flips, flipErrs, firstFlip)
+	// Ticket 444's split, half one: the RACER's own arrival. A racer that landed zero flips means the
+	// fixture, not the schedule, produced this run's zero - and deleting the racer has to stay fatal,
+	// so this arm keeps its teeth (it is ticket 441's rule: the arm that proves the world was entered
+	// stays RED, the arm that proves the QUIET side was observed may abstain).
+	if flips == 0 {
+		t.Errorf("AC#1 RED instrument: across %d raced attempts the racer landed 0 flips (%d errors, first %q), "+
+			"so the damaged count above is not evidence about a window that was never reached and this "+
+			"instrument's own fixture is what failed", attempts, flipErrs, firstFlip)
+	}
+	// Ticket 444's split, half two: the GUARDRAIL, carried by an attempt nobody races over. The leaf
+	// leg is the open inside privateFile carrying oNoFollowPlatform; the control drives that open, on
+	// the route's own pin, against a name that carries a link, and requires the platform to refuse it.
+	if !ctl.refused || !ctl.witnessIntact {
+		t.Errorf("AC#1 RED instrument: the un-raced leaf-leg control did not get the refusal ticket 322 "+
+			"pays for. %s", ctl.verdict())
+	}
+	// The raced loop's own observation of the leaf leg, when contention starves it, is a named
+	// abstention and not a verdict about the guardrail - the control above carries that.
+	if liveness == 0 && flips > 0 {
+		t.Logf("AC#1 ABSTAIN(444:322-leaf:leg-starved) attempts=%d samples=1 flips=%d flipErrs=%d "+
+			"leaf-leg-refusals=0 damaged=%d - the racer landed %d flips but no attempt was inside the "+
+			"link state when the route opened, so this run cannot attest the leaf leg FROM THE RACE; the "+
+			"threshold that carries it is the un-raced control above (refused=%v, witness-intact=%v), "+
+			"not a green from absence",
+			attempts, flips, flipErrs, damaged, flips, ctl.refused, ctl.witnessIntact)
 	}
 	if landed > 0 || narrowed > 0 {
 		t.Errorf("AC#1 RED: %d foreign witnesses hold a raced private payload and %d were narrowed off 0666, so a "+
 			"write or a seal followed a flipped leaf link into a foreign object (ticket 120's surface re-opened)", landed, narrowed)
 	}
+}
+
+// leafLegReading444 is the un-raced control's whole reading: the refusal, the leg that produced it,
+// and the foreign object's state afterwards.
+type leafLegReading444 struct {
+	attempts      int
+	refused       bool
+	leg           string
+	witnessBody   string
+	witnessMode   fs.FileMode
+	witnessIntact bool
+	err           error
+}
+
+func (r leafLegReading444) verdict() string {
+	return fmt.Sprintf("attempts=%d refused=%v leg=%q witness-body=%q witness-mode=%v verbatim: %v",
+		r.attempts, r.refused, r.leg, r.witnessBody, r.witnessMode, r.err)
+}
+
+func (r leafLegReading444) print(t *testing.T, tag string) {
+	t.Helper()
+	t.Logf("%s un-raced leaf-leg control (the route's own open, no racer): %s", tag, r.verdict())
+}
+
+// leafLegControl444 is ticket 444's carrier for the half of this instrument that contention can
+// starve. The raced loop above can only see the leaf leg when its own call lands inside the racer's
+// link state - that is a coin flip under load, and reading its absence as "the guardrail is gone" is
+// the false red this ticket exists to remove.
+//
+// What is NOT a coin flip: the open inside privateFile carries oNoFollowPlatform, and that open
+// refuses a name carrying a leaf link on this platform, every time it is asked. So the control asks
+// it: the same pin (pinnedParent), the same helper (openPinnedLeaf), the same flag expression the
+// route hands it (winsec.go's `flags|oNoFollowPlatform`), on a name that carries a sibling link at a
+// foreign object. WHAT IT DOES NOT CLAIM: it does not prove the route still PASSES that flag - a route
+// that stopped passing it would keep this control green. That claim is the raced `liveness` reading
+// above, which is why that reading is printed and why deleting the flag from oNoFollowPlatform (or
+// dropping the flags inside openPinnedLeaf) turns this control red, as ticket 444's AC#3 measures.
+// openleaf_flag_322_other_test.go pins the same flag at the raw os.OpenFile the route used before
+// form 乙 moved it onto the pin.
+func leafLegControl444(t *testing.T) leafLegReading444 {
+	t.Helper()
+	dir := SealableTempDirForTest124(t)
+	const witnessBody = "an object the caller never named, and this body is longer on purpose"
+	witness := filepath.Join(dir, "foreign-witness-444-322r1.bin")
+	if err := os.WriteFile(witness, []byte(witnessBody), 0o600); err != nil {
+		t.Fatalf("control: stage the foreign witness: %v", err)
+	}
+	if err := os.Chmod(witness, 0o666); err != nil {
+		t.Fatalf("control: widen the foreign witness: %v", err)
+	}
+	link := filepath.Join(dir, "caller-name-444-322r1.bin")
+	if err := os.Symlink(filepath.Base(witness), link); err != nil {
+		t.Fatalf("control: plant the leaf link: %v", err)
+	}
+	pin, err := pinnedParent(link, link)
+	if err != nil {
+		t.Fatalf("control: pin the parent of a leaf link: %v", err)
+	}
+	defer func() { _ = pin.close() }()
+	f, _, openErr := openPinnedLeaf(pin, filepath.Base(link), os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if f != nil {
+		_ = f.Close()
+	}
+	r := leafLegReading444{attempts: 1, err: openErr}
+	if openErr != nil {
+		r.leg = spokeLeg322r1(openErr)
+		r.refused = r.leg == legLeafOpen322r1
+	}
+	body, rErr := os.ReadFile(witness)
+	info, sErr := os.Lstat(witness)
+	switch {
+	case rErr != nil || sErr != nil:
+		r.witnessBody = fmt.Sprintf("unreadable (%v / %v)", rErr, sErr)
+	default:
+		r.witnessBody = string(body)
+		r.witnessMode = info.Mode().Perm()
+		r.witnessIntact = r.witnessBody == witnessBody && r.witnessMode == 0o666
+	}
+	return r
 }

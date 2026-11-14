@@ -38,6 +38,8 @@ package winsec
 import (
 	"errors"
 	"io/fs"
+	"os"
+	"path/filepath"
 	"strconv"
 	"sync/atomic"
 	"testing"
@@ -51,6 +53,13 @@ import (
 // removal was safe" are different claims, and only the first one is what this case observes on the
 // landed bytes.
 func TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2(t *testing.T) {
+	// Ticket 444: the un-raced carrier runs FIRST, while `removeRefusedLeaf` is still the production
+	// removal - the seam below replaces that var, so a control run after it would be measuring the
+	// seam's own closure instead of the landing's act.
+	ctl := winAncWindowControl444(t, winAncFormSymDir, winAncCtlRemoval444)
+	ctl.print(t, "AC#2")
+	ctlOK := ctl.foreignIntact && ctl.actErr == "" && ctl.ownLeafGone
+
 	withInjectedSealFailure(t, errors.New("348r2: injected seal failure so the refusal-path removal runs"))
 	w := newWinAncWorld342r1(t, winAncFormSymDir)
 
@@ -93,7 +102,23 @@ func TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2(t
 
 	deleted := 0
 	proof := ""
-	for i := 0; i < winAncAttempts342r1; i++ {
+	attempts := attemptsFor444(winAncAttempts342r1)
+	// Ticket 444 AC#1 probe: WISP_444_HOP_REFUSE=1 makes the platform's own refusal branch
+	// the only one this run can take, by parking a NON-EMPTY directory where the flip moves
+	// the pinned ancestor to. rename(2) cannot replace a non-empty directory, so `w.toFlip()`
+	// answers an error on every seam call - the same branch the kernel takes on CI when the
+	// pinned handle turns the rename into "being used by another process". The counters and
+	// the sentences below are untouched by this: it manufactures the ANSWER, not the reading.
+	hopRefuseProbe := os.Getenv("WISP_444_HOP_REFUSE") != ""
+	if hopRefuseProbe {
+		if err := os.MkdirAll(w.parkReal, 0o700); err != nil {
+			t.Fatalf("probe: park a directory where the flip lands: %v", err)
+		}
+		if err := os.WriteFile(filepath.Join(w.parkReal, "occupied-444"), []byte("x"), 0o600); err != nil {
+			t.Fatalf("probe: fill the parked directory: %v", err)
+		}
+	}
+	for i := 0; i < attempts; i++ {
 		_ = PrivateFile(w.name, []byte(winAncPayload342r1), 0o600)
 		if kind, detail := w.readWitness(); kind == "deleted" {
 			deleted++
@@ -108,7 +133,7 @@ func TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2(t
 	landed := atomic.LoadInt32(&hopLanded)
 	refused := atomic.LoadInt32(&hopRefused)
 	t.Logf("AC#2 (ticket 348, Windows in-root ancestor form, through the removal seam): attempts=%d "+
-		"seamCalls=%d hopLanded=%d hopRefused=%d deleted=%d", winAncAttempts342r1, calls, landed,
+		"seamCalls=%d hopLanded=%d hopRefused=%d deleted=%d", attempts, calls, landed,
 		refused, deleted)
 	if landed > 0 {
 		t.Logf("AC#2' the flip STOOD at the hop on %d attempts (first: %s) - the world this ticket is "+
@@ -122,15 +147,37 @@ func TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2(t
 		t.Logf("AC#2' first damage verbatim: %s", proof)
 	}
 
-	if calls != int32(winAncAttempts342r1) {
+	if calls != int32(attempts) {
 		t.Errorf("AC#2 RED instrument: the removal seam was reached %d times in %d attempts, so this "+
 			"reading is not about the refusal-path removal at all (an attempt that never got there "+
-			"cannot say anything about what that removal would have done)", calls, winAncAttempts342r1)
+			"cannot say anything about what that removal would have done)", calls, attempts)
+	}
+	// Ticket 444's carrier, judged before anything below leans on it: with the racer absent by
+	// construction, does the landing's own removal still remove the PINNED name and leave the foreign
+	// one standing? This is the half that contention cannot starve.
+	if !ctlOK {
+		t.Errorf("AC#2 RED instrument: the un-raced removal control - the route's own pin, then the flip, "+
+			"then the refusal-path removal - neither kept the foreign name nor removed the pinned one: %s",
+			ctl.verdict())
 	}
 	if landed == 0 && refused == 0 {
-		t.Errorf("AC#2 RED instrument: %d seam calls produced neither a landed nor a refused flip, so "+
-			"the flip was never even asked and the deletion count below is unaccompanied by any "+
-			"statement about the ancestor", calls)
+		// Ticket 444: this arm names the shape "the flip was never asked", and the only way it can hold
+		// is that the route never reached the removal at all (every seam call increments exactly one of
+		// hopLanded/hopRefused, so landed==0 && refused==0 is calls==0). That shape is an abstention
+		// when nothing was asked, and the wiring defect line 126 already carries its own red for it; if
+		// it ever holds with calls>0 the seam is not counting, which stays RED in the original words.
+		if calls == 0 {
+			t.Logf("AC#2 ABSTAIN(444:348r2-seam:removal-never-reached) attempts=%d seamCalls=0 "+
+				"hopLanded=0 hopRefused=0 deleted=%d - the route never reached the refusal-path removal, "+
+				"so this run cannot attest the flip at the hop; the threshold that carries the removal is "+
+				"the un-raced control above (foreign-intact=%v, own-leaf-removed=%v), not a green from "+
+				"absence. The wiring red for 'the seam was reached fewer times than attempts' is a "+
+				"separate arm and is unaffected", attempts, deleted, ctl.foreignIntact, ctl.ownLeafGone)
+		} else {
+			t.Errorf("AC#2 RED instrument: %d seam calls produced neither a landed nor a refused flip, so "+
+				"the flip was never even asked and the deletion count below is unaccompanied by any "+
+				"statement about the ancestor", calls)
+		}
 	}
 	// ★The liveness floor, and it is deliberately the strong form rather than "> 0". AC#2 forbids
 	// reading a zero as evidence, and the zero below is only evidence about the REMOVAL if the world
@@ -138,14 +185,27 @@ func TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2(t
 	// (measured 400/400 across nine runs, logs/21-*), so anything less means the instrument lost the
 	// world it is named for - not that the removal got safer.
 	if landed != calls {
-		t.Errorf("AC#2 RED instrument: the ancestor flip stood at the removal instant on only %d of %d "+
-			"seam calls (refused=%d, first refusal verbatim: %q), so the deletion count is a reading "+
-			"about a world that was not entered rather than about the removal", landed, calls, refused,
-			firstRefuse)
+		// Ticket 444: this is the arm CI load actually fires (the kernel refuses the hop rename under
+		// contention). It abstains only when the un-raced control above carries the removal on this
+		// same run; if the control did not, the original sentence stands unchanged.
+		if ctlOK {
+			t.Logf("AC#2 ABSTAIN(444:348r2-seam-hop:flip-not-asked) attempts=%d samples=1 seamCalls=%d "+
+				"hopLanded=%d hopRefused=%d deleted=%d first-refusal-verbatim=%q - the real failure mode "+
+				"is the platform's own refusal of the hop rename under load (the same branch CI takes), "+
+				"so this run cannot attest the flip AT the removal instant; the threshold that carries "+
+				"the removal is the un-raced control above (foreign-intact=%v, own-leaf-removed=%v), "+
+				"not a green from absence",
+				attempts, calls, landed, refused, deleted, firstRefuse, ctl.foreignIntact, ctl.ownLeafGone)
+		} else {
+			t.Errorf("AC#2 RED instrument: the ancestor flip stood at the removal instant on only %d of %d "+
+				"seam calls (refused=%d, first refusal verbatim: %q), so the deletion count is a reading "+
+				"about a world that was not entered rather than about the removal", landed, calls, refused,
+				firstRefuse)
+		}
 	}
 	if deleted > 0 {
 		t.Errorf("AC#2 RED: %d of %d attempts found the foreign witness GONE through the refusal-path "+
 			"removal (first: %s), so that removal was moved by an ancestor flip and deleted a name in "+
-			"somebody else's tree", deleted, winAncAttempts342r1, proof)
+			"somebody else's tree", deleted, attempts, proof)
 	}
 }

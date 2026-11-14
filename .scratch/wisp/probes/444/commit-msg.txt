@@ -1,0 +1,46 @@
+winsec: seven race-window instruments stop calling a starved route a dead guardrail (444)
+
+Ticket 441 drew the line and one instrument used it; these seven still counted two
+different things inside one `if` - the racer's ARRIVAL (did the window exist at all)
+and the route's LANDING (did a PrivateFile call stand inside it). Under load either
+zero is legitimate: the route is a paced loop (2ms per attempt) against a window a
+few microseconds wide, and a pinned handle can make the racer's own rename fail
+outright ("Access is denied."), so often neither side arrives. Every such zero
+printed RED, i.e. the instrument shouted "the guardrail is gone" exactly when it knew
+the least. Measured before the change: 6/6 RED at a shrunk denominator on the
+Windows ancestor-open instrument, 5/5 on the removal one, 2/2 on the seam's hop arm,
+3/3 on each POSIX instrument.
+
+Each of the seven now has two carriers instead of one:
+
+  - the racer-side zero stays RED, byte for byte. If the racer proves no cycle the
+    fixture machinery is gone and no future run could test anything - that must fail;
+  - the route-side zero prints a named denial carrying that run's numbers:
+    ABSTAIN(444:<shape>:<why>) attempts=N samples=S ... and ends by saying what does
+    carry the row instead;
+  - a NEW un-raced control reaches the window deterministically - pin the parent,
+    flip the ancestor, perform the one act through the pin, then read back the
+    foreign witness and the caller's own leaf - and reds if the act left the pinned
+    object or the foreign name was touched. The control is the threshold now; the
+    raced sample is evidence.
+
+Seven mutations on an out-of-repo tree say the controls have teeth: oNoFollowPlatform=0,
+Openat->Open(path), Unlinkat->os.Remove(join), Root.OpenFile->os.OpenFile(join),
+Root.Remove->os.Remove(join) twice (once at the seam), and the refusal-path removal
+call deleted from winsec.go. Each went RED naming the leg verbatim, each was restored
+to the same SHA256 and went green again. The last one prints both
+"the removal seam was reached 0 times in 400 attempts" and the new abstention line -
+a denial does not swallow a red.
+
+Nothing was deleted or relaxed. Six red arms are kept verbatim, six are split into
+(kept red + new denial), seven deterministic control reds are added, and one early
+`return` is gone: the 342-unix "not a landing reading" branch used to return before
+the damage assertions, so on the run where it had least to say it also said nothing
+about damage. Those assertions now run.
+
+Production bytes changed: 0. No thresholds, goldens or contracts touched, no test
+hidden behind a build tag, no t.Skip.
+
+Evidence, with the verbatim sentence each instrument used to print and the reading it
+prints now: docs/evidence/s1/444-instrument-abstention.md. Logs for every number:
+.scratch/wisp/probes/444/logs/.

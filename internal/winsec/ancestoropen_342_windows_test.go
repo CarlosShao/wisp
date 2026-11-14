@@ -42,21 +42,44 @@ func TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile3
 	} {
 		t.Run(tc.form, func(t *testing.T) {
 			w := newWinAncWorld342r1(t, tc.form)
-			st := w.run(winAncAttempts342r1, func() error {
+			attempts := attemptsFor444(winAncAttempts342r1)
+			st := w.run(attempts, func() error {
 				return PrivateFile(w.name, []byte(winAncPayload342r1), 0o600)
 			})
 			st.print(t, "AC#1 (ticket 342, Windows ancestor form "+tc.form+": "+tc.why+")")
+			// Ticket 444: the un-raced carrier, printed on the same screen as the raced row.
+			ctl := winAncWindowControl444(t, tc.form, winAncCtlOpen444)
+			ctl.print(t, "AC#1")
 			if st.truncated > 0 {
 				t.Errorf("AC#1 RED: %d of %d attempts found the foreign witness's body replaced, so the open "+
 					"inside privateFile resolved through an ancestor swapped into a link and its truncate "+
 					"landed in somebody else's tree (first: %s)",
 					st.truncated, st.attempts, st.firstProof)
 			}
-			if st.provedReparse == 0 || st.formRefusals == 0 {
-				t.Errorf("AC#1 RED instrument: reparseAt proved %d flipped cycles and the landing's own legs "+
-					"answered %d attempts across %d (flipErrs=%d, first %q) - so the zeroes above are not "+
-					"evidence about a window that was ever reached",
-					st.provedReparse, st.formRefusals, st.attempts, st.flipErrs, st.firstFlip)
+			// Ticket 444's split, half one: the RACER's own arrival stays RED at zero. reparseAt proving
+			// no cycle means the fixture, not the schedule, produced the zeros - and deleting the racer
+			// has to stay fatal (ticket 441's rule: the arm that proves the world was entered stays RED).
+			if st.provedReparse == 0 {
+				t.Errorf("AC#1 RED instrument: reparseAt proved 0 flipped cycles across %d attempts "+
+					"(flipErrs=%d, first %q), so this instrument never entered the world it is named for and "+
+					"the zeroes above are not evidence about a closed window",
+					st.attempts, st.flipErrs, st.firstFlip)
+			}
+			// Ticket 444's split, half two: the GUARDRAIL, carried by the act nobody races over.
+			if !ctl.foreignIntact || ctl.actErr != "" ||
+				(ctl.kind == winAncCtlOpen444 && ctl.ownLeafAtPin != winAncPayload342r1) {
+				t.Errorf("AC#1 RED instrument: the un-raced window control - the route's own pin, then the "+
+					"flip, then the open through the pin - did not keep this route's act inside the pinned "+
+					"object: %s", ctl.verdict())
+			}
+			if st.formRefusals == 0 && st.provedReparse > 0 {
+				t.Logf("AC#1 ABSTAIN(444:342-win-ancestor:route-missed-link) form=%s attempts=%d samples=1 "+
+					"provedReparse=%d formBLegRefusals=0 truncated=%d flipErrs=%d - reparseAt proved %d "+
+					"flipped cycles but no PrivateFile call was inside one, so this run cannot attest the "+
+					"raced row; the threshold that carries the open's pin is the un-raced control above "+
+					"(foreign-intact=%v), not a green from absence",
+					tc.form, st.attempts, st.provedReparse, st.truncated, st.flipErrs, st.provedReparse,
+					ctl.foreignIntact)
 			}
 		})
 	}

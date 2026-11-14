@@ -43,6 +43,7 @@ package winsec
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -528,4 +529,115 @@ func (s winAncStats342r1) print(t *testing.T, tag string) {
 	if s.firstFlip != "" {
 		t.Logf("%s': first racer error verbatim: %s", tag, s.firstFlip)
 	}
+}
+
+// ---------------------------------------------------------------------------------------------
+// Ticket 444: the un-raced window control, Windows face.
+//
+// WHAT THIS IS FOR. The two ancestor instruments below gate a zero with "the world was entered AND
+// the route answered inside it", and that gate can read zero for two reasons: the guardrail is gone,
+// or no call happened to be inside the racer's link state. The second is a coin flip under CI load -
+// measured on this box at a shrunken denominator: `formBLegRefusals=0` while `provedReparse` was 1 -
+// and reading it as "the pin is gone" is the false red ticket 444 exists to remove.
+//
+// The control removes the coin flip by building the SAME world by construction: the route's own pin
+// (`pinnedParent`) first, then the flip (`toFlip`, which proves itself with reparseAt), then the act
+// through the same helpers the route uses (`openPinnedLeaf`, `removeRefusedLeaf`). The question it
+// asks does not depend on scheduling: with the ancestor standing on a reparse point, does the act
+// still land on a child of the object that was pinned?
+//
+// WHAT IT IS NOT. It is not a second route: resolveString and the placement floor are not re-driven,
+// and it does not replace the raced rows (they still measure the route end to end). It drives two
+// steps of the route directly, which is the shape 票 369 established for this package
+// (`ancestorunlink_348_windows_test.go`'s deterministic leaf case), and the flag expression is
+// copied from winsec.go's own call site so a change there is a change here.
+//
+// WHY IT HAS TEETH. Putting the act back by name - the pre-landing shape both tickets are about -
+// makes it resolve THROUGH the reparse point: `winAncCtlOpen444` then truncates the foreign witness
+// and `winAncCtlRemoval444` deletes it. Ticket 444's AC#3 measures exactly that on an exported tree.
+
+const (
+	winAncCtlOpen444    = "open"
+	winAncCtlRemoval444 = "removal"
+)
+
+// winAncWindow444 is one un-raced window's whole reading.
+type winAncWindow444 struct {
+	kind          string
+	form          string
+	flipped       bool
+	actErr        string
+	ownLeafAtPin  string
+	ownLeafGone   bool
+	foreignBody   string
+	foreignMode   fs.FileMode
+	foreignThere  bool
+	foreignIntact bool
+}
+
+func (r winAncWindow444) verdict() string {
+	return fmt.Sprintf("kind=%s form=%s flipped=%v act-error=%q foreign-present=%v foreign-body=%q "+
+		"foreign-mode=%v own-leaf-under-the-pin=%q",
+		r.kind, r.form, r.flipped, r.actErr, r.foreignThere, r.foreignBody, r.foreignMode, r.ownLeafAtPin)
+}
+
+func (r winAncWindow444) print(t *testing.T, tag string) {
+	t.Helper()
+	t.Logf("%s un-raced window control (the route's own pin, the flip landed in the gap, one act): %s",
+		tag, r.verdict())
+}
+
+// winAncWindowControl444 builds the window by construction on the given form and performs ONE act.
+func winAncWindowControl444(t *testing.T, form, kind string) winAncWindow444 {
+	t.Helper()
+	w := newWinAncWorld342r1(t, form)
+	r := winAncWindow444{kind: kind, form: form}
+	pin, err := pinnedParent(w.name, w.name)
+	if err != nil {
+		t.Fatalf("control: the route's own pin refused a real ancestor: %v", err)
+	}
+	defer func() { _ = pin.close() }()
+	if err := w.toFlip(); err != nil {
+		t.Fatalf("control: the world could not enter the flipped state (%v), so no window was entered", err)
+	}
+	r.flipped = true
+
+	f, pinned, err := openPinnedLeaf(pin, filepath.Base(w.name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		r.actErr = err.Error()
+	} else {
+		switch kind {
+		case winAncCtlOpen444:
+			if _, wErr := f.Write([]byte(winAncPayload342r1)); wErr != nil {
+				r.actErr = wErr.Error()
+			}
+			_ = f.Close()
+		case winAncCtlRemoval444:
+			_ = f.Close()
+			removeRefusedLeaf(pin, filepath.Base(w.name), pinned)
+		default:
+			t.Fatalf("control: unknown act %q", kind)
+		}
+	}
+
+	if body, rErr := os.ReadFile(w.witness); rErr != nil {
+		r.foreignBody = "unreadable: " + rErr.Error()
+	} else {
+		r.foreignThere = true
+		r.foreignBody = string(body)
+	}
+	if st, sErr := os.Stat(w.witness); sErr == nil {
+		r.foreignMode = st.Mode().Perm()
+	}
+	r.foreignIntact = r.foreignThere && r.foreignBody == winAncWitness342r1
+	if body, rErr := os.ReadFile(filepath.Join(w.parkReal, winAncLeaf342r1)); rErr != nil {
+		r.ownLeafAtPin = "absent: " + rErr.Error()
+		r.ownLeafGone = os.IsNotExist(rErr)
+	} else {
+		r.ownLeafAtPin = string(body)
+	}
+	if err := w.toReal(); err != nil {
+		t.Fatalf("control: settle the world after the act: %v", err)
+	}
+	return r
 }

@@ -69,39 +69,42 @@ import (
 // The tag is not decoration: a numerator is a reading only if the row says which bytes produced it
 // (this leg's whole finding is a zero that came from the wrong bytes).
 const (
-	ancBytesLanding342r2 = "landing"
-	ancBytesOldPin342r2  = "old-pin-bytes"
+	ancBytesLanding342r2   = "landing"
+	ancBytesOldPin342r2    = "old-pin-bytes"
+	ancBytesNoLanding342r2 = "not-a-landing-reading"
 )
 
 func TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1(t *testing.T) {
 	w := newAncWorld342r1(t, ancTargetRel)
-	st := w.run(ancAttempts342r1, func() error {
+	attempts := attemptsFor444(ancAttempts342r1)
+	st := w.run(attempts, func() error {
 		return PrivateFile(w.name, []byte(ancPayload342r1), 0o600)
 	})
 	landed := st.pinnedParentLeg > 0
-	bytes := ancBytesOldPin342r2
+	bytes := ancBytesNoLanding342r2
 	if landed {
 		bytes = ancBytesLanding342r2
 	}
 	st.print(t, "AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link, bytes="+bytes+")")
 
-	// ATTRIBUTION FIRST: a row that cannot say which route produced it is not a reading, and the
-	// landing requirement below would silently accept an old-side row that names a leg its bytes do
-	// not have. pinnedParentBeforeOpen is the landing's own numerator: the pre-landing route cannot
-	// raise it, and the landing's liveness gate requires it, so a row carrying 0 there is not a
-	// landing-side reading either way - on pre-landing bytes it is the pre-fix reading, and in this
-	// gate that is red, because what this gate certifies is the landing.
+	// Ticket 444: the un-raced carrier runs FIRST, so its reading sits on the same screen as the
+	// raced row it qualifies. It is the half of this instrument that contention cannot starve.
+	ctl := ancWindowControl444(t, ancCtlOpen444)
+	ctl.print(t, "AC#1")
+
+	// ATTRIBUTION IS A READING, NOT A VERDICT (ticket 444; before it, this was the first red arm and
+	// the one CI load actually fired). A row that cannot say which route produced it is not a reading,
+	// and the landing requirement below must never accept an old-side row that names a leg its bytes do
+	// not have - so the row still says out loud that it certifies nothing.
 	if !landed {
-		t.Errorf("AC#1 RED (not a landing reading): pinnedParentBeforeOpen answered %d attempts, and that "+
-			"numerator is the landing's own - the pre-landing route cannot raise it and the landing's "+
-			"liveness gate requires it - so this row cannot certify the landing's closed window either way. "+
-			"On pre-landing bytes these numbers are the pre-fix reading (342-v1's VPROD/VBASE measured "+
-			"deleted 65..86/1500 there; leg 342-r3 re-took deleted=%d of %d on the by-name route), and "+
-			"reading any zero among them as 'the window was already closed' is the exact mistake ticket "+
-			"342 AC#1 forbids (provedLinkCycles=%d, attempts=%d, flipErrs=%d, first %q)",
-			st.pinnedParentLeg, st.deleted, st.attempts, st.provedLinkCycles, st.attempts,
-			st.flipErrs, st.firstFlip)
-		return
+		t.Logf("AC#1 not a landing reading: pinnedParentBeforeOpen answered 0 attempts, so this row "+
+			"cannot certify the landing's closed window either way - the pre-landing route cannot raise "+
+			"that numerator and the landing's liveness gate requires it. On pre-landing bytes "+
+			"(bytes="+ancBytesOldPin342r2+") these numbers are the pre-fix reading (342-v1's VPROD/VBASE "+
+			"measured deleted 65..86/1500 there), "+
+			"and reading any zero among them as 'the window was already closed' is the exact mistake "+
+			"ticket 342 AC#1 forbids (provedLinkCycles=%d, attempts=%d, flipErrs=%d, first %q)",
+			st.provedLinkCycles, st.attempts, st.flipErrs, st.firstFlip)
 	}
 
 	if st.truncated > 0 || st.deleted > 0 {
@@ -113,11 +116,31 @@ func TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342
 			"342 AC#3 refuses. Ticket 348's own gate is the removal alone and does not borrow this reading.",
 			st.truncated, st.deleted, bytes, st.firstProof)
 	}
-	if st.provedLinkCycles == 0 || st.pinnedParentLeg == 0 {
-		t.Errorf("AC#1 RED instrument: the racer proved %d link-state cycles and the parent pin refused %d "+
-			"attempts BEFORE any open (walk-after-open answers: %d, attempts: %d, flipErrs=%d, first %q) - "+
-			"so the zeroes above are not evidence about a window that was ever reached, and a refusal that "+
-			"came after the open proves nothing about it",
-			st.provedLinkCycles, st.pinnedParentLeg, st.sealSideLeg, st.attempts, st.flipErrs, st.firstFlip)
+
+	// Ticket 444's split, half one: the RACER's own arrival. Zero proved link-state cycles means the
+	// fixture, not the schedule, produced the zeros above - and deleting the racer has to stay fatal,
+	// so this arm keeps its teeth (ticket 441's rule: the arm that proves the world was entered stays
+	// RED; the arm that says the route stood inside it may abstain).
+	if st.provedLinkCycles == 0 {
+		t.Errorf("AC#1 RED instrument: the racer proved 0 link-state cycles across %d attempts "+
+			"(flipErrs=%d, first %q), so the window this instrument is named for was never entered and "+
+			"the zeroes above say nothing about a closed one", st.attempts, st.flipErrs, st.firstFlip)
+	}
+	// Ticket 444's split, half two: the GUARDRAIL, carried by the act nobody races over.
+	if !ctl.foreignIntact || ctl.actErr != "" {
+		t.Errorf("AC#1 RED instrument: the un-raced window control - the route's own pin, then the "+
+			"ancestor flip, then the act - did not keep this route's act inside the pinned object: %s",
+			ctl.verdict())
+	}
+	// The abstention: the racer proved the world, the route never stood inside it. Named, with its
+	// numbers, and carried by the control above - not a green from absence.
+	if !landed && st.provedLinkCycles > 0 {
+		t.Logf("AC#1 ABSTAIN(444:342-unix-ancestor:route-missed-link) attempts=%d samples=1 "+
+			"provedLinkCycles=%d pinnedParentBeforeOpen=0 refusedAfterOpen=%d truncated=%d deleted=%d "+
+			"flipErrs=%d - the racer proved %d link-state cycles but no PrivateFile call was inside one, "+
+			"so this run cannot attest the raced row; the threshold that carries the open's pin is the "+
+			"un-raced control above (foreign-intact=%v), not a green from absence",
+			st.attempts, st.provedLinkCycles, st.sealSideLeg, st.truncated, st.deleted, st.flipErrs,
+			st.provedLinkCycles, ctl.foreignIntact)
 	}
 }

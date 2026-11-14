@@ -1,0 +1,22 @@
+time=2026-11-14T16:25:59.018+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face): form=symlink-dir attempts=1 cycles=0 provedReparse=1 formBLegRefusals=0 truncated=0 deleted=0 returnedNil=0 flipErrs=0
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = pinned chain, the walk could not pin a component (reason in the text: absent, or refused by the platform) : 1 attempts
+    ancestorunlink_348_windows_test.go:112: AC#2 RED instrument: reparseAt proved 1 flipped cycles and the landing's own legs answered 0 attempts across 1 (flipErrs=0, first "") - so the zero above is not evidence about a removal that was ever reachable
+--- FAIL: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.05s)
+=== RUN   TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face): form=symlink-dir attempts=1 cycles=0 provedReparse=1 formBLegRefusals=0 truncated=0 deleted=0 returnedNil=0 flipErrs=0
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = pinned chain, the walk could not pin a component (reason in the text: absent, or refused by the platform) : 1 attempts
+    ancestorunlink_348_windows_test.go:112: AC#2 RED instrument: reparseAt proved 1 flipped cycles and the landing's own legs answered 0 attempts across 1 (flipErrs=0, first "") - so the zero above is not evidence about a removal that was ever reachable
+--- FAIL: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.04s)
+=== RUN   TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face): form=symlink-dir attempts=1 cycles=0 provedReparse=1 formBLegRefusals=0 truncated=0 deleted=0 returnedNil=0 flipErrs=0
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = pinned chain, the walk could not pin a component (reason in the text: absent, or refused by the platform) : 1 attempts
+    ancestorunlink_348_windows_test.go:112: AC#2 RED instrument: reparseAt proved 1 flipped cycles and the landing's own legs answered 0 attempts across 1 (flipErrs=0, first "") - so the zero above is not evidence about a removal that was ever reachable
+--- FAIL: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.03s)
+=== RUN   TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face): form=symlink-dir attempts=1 cycles=0 provedReparse=1 formBLegRefusals=0 truncated=0 deleted=0 returnedNil=1 flipErrs=2
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = none: the call returned nil : 1 attempts
+    ancestorunlink_348_windows_test.go:105: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': first racer error verbatim: rename C:\Users\swq\AppData\Local\Temp\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1354516386\001\data\sub C:\Users\swq\AppData\Local\Temp\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1354516386\001\data\parked-real-sub: Access is denied.
+    ancestorunlink_348_windows_test.go:112: AC#2 RED instrument: reparseAt proved 1 flipped cycles and the landing's own legs answered 0 attempts across 1 (flipErrs=2, first "rename C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1354516386\\001\\data\\sub C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1354516386\\001\\data\\parked-real-sub: Access is denied.") - so the zero above is not evidence about a removal that was ever reachable
+--- FAIL: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.07s)

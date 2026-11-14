@@ -140,19 +140,42 @@ func TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignFile342r1(t 
 // own walk then refuses by name - so `deleted` has a way to be non-zero here, and a zero is a reading.
 func TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAForeignFile342r1(t *testing.T) {
 	w := newAncWorld342r1(t, ancTargetRel)
-	st := w.run(ancAttempts342r1, func() error {
+	attempts := attemptsFor444(ancAttempts342r1)
+	st := w.run(attempts, func() error {
 		return PrivateFile(w.name, []byte(ancPayload342r1), 0o600)
 	})
 	st.print(t, "AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)")
+	// Ticket 444: the un-raced carrier runs first, on the same screen as the raced row it qualifies.
+	ctl := ancWindowControl444(t, ancCtlRemoval444)
+	ctl.print(t, "AC#2")
 	if st.deleted > 0 {
 		t.Errorf("AC#2 RED: %d of %d attempts found the foreign witness GONE, so the refusal-path unlink in "+
 			"privateFile re-resolved the spelling through an ancestor swapped into a link and removed a "+
 			"name in somebody else's tree (first: %s)", st.deleted, st.attempts, st.firstProof)
 	}
-	if st.provedLinkCycles == 0 || st.liveness == 0 {
-		t.Errorf("AC#2 RED instrument: the racer proved %d link-state cycles and the pinned walk refused %d "+
-			"attempts across %d (flipErrs=%d, first %q), so the zero above is not evidence about a removal "+
-			"that was ever reachable", st.provedLinkCycles, st.liveness, st.attempts, st.flipErrs, st.firstFlip)
+	// Ticket 444's split, half one: the RACER's own arrival stays RED at zero (a racer that proves
+	// nothing is a broken fixture; deleting it has to remain fatal - ticket 441's rule).
+	if st.provedLinkCycles == 0 {
+		t.Errorf("AC#2 RED instrument: the racer proved 0 link-state cycles across %d attempts "+
+			"(flipErrs=%d, first %q), so the zero above is not evidence about a removal that was ever "+
+			"reachable", st.attempts, st.flipErrs, st.firstFlip)
+	}
+	// Ticket 444's split, half two: the GUARDRAIL, carried by the removal nobody races over. This is
+	// the same act the route performs (`removeRefusedLeaf`, fd-relative), with the ancestor flipped
+	// between the pin and the act - so it asks the removal's own question without a coin flip.
+	if !ctl.foreignIntact || ctl.actErr != "" || !ctl.ownLeafGone {
+		t.Errorf("AC#2 RED instrument: the un-raced removal control - the route's own pin, then the "+
+			"ancestor flip, then the refusal-path removal - neither kept the foreign name nor removed "+
+			"the pinned one: %s", ctl.verdict())
+	}
+	if st.liveness == 0 && st.provedLinkCycles > 0 {
+		t.Logf("AC#2 ABSTAIN(444:348-unix-removal:route-missed-link) attempts=%d samples=1 "+
+			"provedLinkCycles=%d pinnedWalkRefusals=0 deleted=%d narrowed=%d flipErrs=%d - the racer "+
+			"proved %d link-state cycles but no PrivateFile call was inside one, so this run cannot "+
+			"attest the raced row; the threshold that carries the removal is the un-raced control above "+
+			"(foreign-intact=%v, own-leaf-removed=%v), not a green from absence",
+			st.attempts, st.provedLinkCycles, st.deleted, st.narrowed, st.flipErrs, st.provedLinkCycles,
+			ctl.foreignIntact, ctl.ownLeafGone)
 	}
 	if st.narrowed > 0 {
 		t.Errorf("AC#2 RED: %d attempts left the foreign witness narrowed off 0666, so a seal followed the "+

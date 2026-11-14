@@ -34,3 +34,7 @@
 
 ## 撤销口令
 「票 444 撤」＝删本票＋回退其写腿 commit（新 commit 反改，不 reset/amend）。
+
+## Progress log
+
+- **2026-11-14 17:1x +08 — 七枚全部改成「到达过」可弃权、「护栏还在」必真红，真人实测。** 形照 441：每枚新增一条**无竞态控制**（钉父 → 翻祖先 → 单次 act，读回外来见证与自己那片叶子），控制违例＝真红；racer 侧零仍红（护栏被拆的牙），route 侧零打 `ABSTAIN(444:<shape>:<why>) attempts=… samples=…` 并带该发数字。实测读数：① 基线红句 7 枚逐字取到（`WISP_444_ATTEMPTS` 缩分母 1/4/0，Windows 侧 6/6、5/5、2/2，unix 侧 3/3；日志 `.scratch/wisp/probes/444/logs/0[1-6]-*`）；② 另发现票面没列的第三条：`ancestoropen_342_unix_test.go:96` 的 `!landed` 分支原来 `t.Errorf` 后 **`return`**，把下面的 damage 断言整段跳过——该 `return` 已删，damage 断言反而**多跑**（严格更强）；③ 突变 7 发（仓外导出树 `D:\tmp\wisp\444\export`，每发还原后 SHA256 同串再绿）：`oNoFollowPlatform=0`、`Openat→Open(path)`、`Unlinkat→os.Remove`、`p.Root.OpenFile→os.OpenFile`、`p.Root.Remove→os.Remove`、seam 同 `Remove` 突变、`winsec.go` 删掉 refusal-path removal 调用 ⇒ 各自真红且逐字点名，其中删除 removal 那发**同时**打出 `AC#2 RED instrument: the removal seam was reached 0 times in 400 attempts` 与 `ABSTAIN(444:348r2-seam:removal-never-reached)`，证明弃权**没有**吞掉红；④ 受控争用（4 个 CPU 燃烧器 + `GOMAXPROCS=1`、committed 分母、count=3）九发全绿，且 322 的那一发 `leafLegRefusals=0 flips=130` **走的是弃权行**——正是过去会假红的那一发；⑤ 门禁：`go vet` 双平台 rc=0、`gofmt -l` 空、`bash -n` OK、`d22scan clean`、产码 0 字节；**path-length 是 RED 但不是本腿的**（唯一出册路径 `.scratch/wisp/issues/274-…-done.md`，`git log -1` 指向前一条腿），本腿新路径 36/37/45/56 字符全在册内。⑥ 诚实射程：缩分母到 20 时 racer 侧仍会红 3/6（racer 自己一轮都没翻完），到 1 时 6/6 红——那是台面假象、句子点名的是 racer，不是 CI 的状态；刻意**不**把 racer 侧零也改成弃权，否则删掉 racer 也永远绿。证据表：`docs/evidence/s1/444-instrument-abstention.md`。

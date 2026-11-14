@@ -516,3 +516,142 @@ func (s ancStats342r1) print(t *testing.T, tag string) {
 		t.Logf("%s': first racer error verbatim: %s", tag, s.firstFlip)
 	}
 }
+
+// ---------------------------------------------------------------------------------------------
+// Ticket 444: the un-raced window control, POSIX face.
+//
+// WHAT THIS IS FOR. Both ancestor instruments above judge a zero with a liveness gate, and that gate
+// can read zero for two very different reasons: the guardrail is gone, or no attempt happened to be
+// inside the racer's link state (which is a coin flip under CI load, i.e. the false red ticket 444
+// exists to remove). The control below removes the coin flip: it builds the SAME window by
+// construction - the route's own pin first, then the ancestor flip, then the act - and asks the one
+// question that does not depend on scheduling: with the ancestor standing on a link, does the act
+// still land on a child of the object that was pinned?
+//
+// WHAT IT IS, AND IS NOT. It drives the route's two own steps (`pinnedParent`, then
+// `openPinnedLeaf` / `removeRefusedLeaf`) in the route's own order and with the route's own flag
+// expression, and it flips the ancestor by the same rename the racer performs. It is NOT a second
+// route: it does not re-drive resolveString or the placement floor, so it says nothing about whether
+// those still refuse first (routeguard_369 pins that order statically, and the raced rows above still
+// measure it). What it does prove is the claim the two tickets actually book: with the ancestor
+// turned into a link AFTER the pin and BEFORE the act, the act is relative to the pin.
+//
+// WHY IT HAS TEETH. `pinnedParent` and the prime are driven as the route drives them, so putting the
+// act back by name (the pre-landing shape both tickets are about) makes the act resolve through the
+// link: `ancCtlOpen444` then truncates the foreign witness, and `ancCtlRemoval444` deletes it. Ticket
+// 444's AC#3 measures exactly that on an exported tree.
+
+const (
+	ancCtlOpen444    = "open"
+	ancCtlRemoval444 = "removal"
+)
+
+// ancWindow444 is one un-raced window's whole reading. Every field prints; the tests judge.
+type ancWindow444 struct {
+	kind          string
+	flipped       bool
+	actErr        string
+	ownLeafAtPin  string
+	ownLeafGone   bool
+	foreignBody   string
+	foreignMode   os.FileMode
+	foreignThere  bool
+	foreignIntact bool
+}
+
+func (r ancWindow444) verdict() string {
+	return fmt.Sprintf("kind=%s flipped=%v act-error=%q foreign-present=%v foreign-body=%q "+
+		"foreign-mode=%v own-leaf-under-the-pin=%q",
+		r.kind, r.flipped, r.actErr, r.foreignThere, r.foreignBody, r.foreignMode, r.ownLeafAtPin)
+}
+
+func (r ancWindow444) print(t *testing.T, tag string) {
+	t.Helper()
+	t.Logf("%s un-raced window control (the route's own pin, the flip landed in the gap, one act): %s",
+		tag, r.verdict())
+}
+
+// ancWindowControl444 builds the window by construction and performs ONE act through the pin.
+func ancWindowControl444(t *testing.T, kind string) ancWindow444 {
+	t.Helper()
+	base := SealableTempDirForTest124(t)
+	data := filepath.Join(base, "data")
+	sub := filepath.Join(data, "sub")
+	park := filepath.Join(base, "parked-real-sub")
+	foreign := filepath.Join(data, ancOutsideDir342r1)
+	name := filepath.Join(sub, ancLeaf342r1)
+	witness := filepath.Join(foreign, ancLeaf342r1)
+	for _, d := range []string{data, sub, foreign} {
+		if err := os.MkdirAll(d, 0o700); err != nil {
+			t.Fatalf("control: stage %s: %v", d, err)
+		}
+	}
+	if err := os.WriteFile(witness, []byte(ancWitnessBody342r1), 0o600); err != nil {
+		t.Fatalf("control: stage the foreign witness: %v", err)
+	}
+	// Create then widen: the container's umask would silently land 0644 from a 0666 argument, and a
+	// narrowed mode on the witness is one of the readings below (the world file's own note).
+	if err := os.Chmod(witness, 0o666); err != nil {
+		t.Fatalf("control: widen the foreign witness: %v", err)
+	}
+	if err := os.WriteFile(name, []byte(ancOwnBody342r1), 0o600); err != nil {
+		t.Fatalf("control: give the caller its own object: %v", err)
+	}
+
+	r := ancWindow444{kind: kind}
+	pin, err := pinnedParent(name, name)
+	if err != nil {
+		t.Fatalf("control: the route's own pin refused a real ancestor: %v", err)
+	}
+	defer func() { _ = pin.close() }()
+
+	// The flip, in the gap the racer hunts: after the pin, before the act. Same two steps as toLink
+	// (move the real directory out, plant a bare sibling link), and proved before the act runs.
+	if err := os.Rename(sub, park); err != nil {
+		t.Fatalf("control: move the real ancestor out from under the pin: %v", err)
+	}
+	if err := os.Symlink(ancOutsideDir342r1, sub); err != nil {
+		t.Fatalf("control: plant the ancestor link after the pin: %v", err)
+	}
+	info, err := os.Lstat(sub)
+	if err != nil || info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("control: the ancestor is not a symlink after the flip (%v, mode %v), so no window was entered", err, info)
+	}
+	r.flipped = true
+
+	f, pinned, err := openPinnedLeaf(pin, filepath.Base(name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		r.actErr = err.Error()
+	} else {
+		switch kind {
+		case ancCtlOpen444:
+			if _, wErr := f.Write([]byte(ancPayload342r1)); wErr != nil {
+				r.actErr = wErr.Error()
+			}
+			_ = f.Close()
+		case ancCtlRemoval444:
+			_ = f.Close()
+			removeRefusedLeaf(pin, filepath.Base(name), pinned)
+		default:
+			t.Fatalf("control: unknown act %q", kind)
+		}
+	}
+
+	if body, rErr := os.ReadFile(witness); rErr != nil {
+		r.foreignBody = "unreadable: " + rErr.Error()
+	} else {
+		r.foreignThere = true
+		r.foreignBody = string(body)
+	}
+	if st, sErr := os.Stat(witness); sErr == nil {
+		r.foreignMode = st.Mode().Perm()
+	}
+	r.foreignIntact = r.foreignThere && r.foreignBody == ancWitnessBody342r1 && r.foreignMode == 0o666
+	if body, rErr := os.ReadFile(filepath.Join(park, ancLeaf342r1)); rErr != nil {
+		r.ownLeafAtPin = "absent: " + rErr.Error()
+		r.ownLeafGone = errors.Is(rErr, fs.ErrNotExist)
+	} else {
+		r.ownLeafAtPin = string(body)
+	}
+	return r
+}

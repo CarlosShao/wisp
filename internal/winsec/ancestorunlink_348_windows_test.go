@@ -98,19 +98,40 @@ func TestAC2WindowsPinRefusalOnAnAbsentAncestorIsNotFiledAsASealRefusal348r1(t *
 
 func TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1(t *testing.T) {
 	w := newWinAncWorld342r1(t, winAncFormSymDir)
-	st := w.run(winAncAttempts342r1, func() error {
+	attempts := attemptsFor444(winAncAttempts342r1)
+	st := w.run(attempts, func() error {
 		return PrivateFile(w.name, []byte(winAncPayload342r1), 0o600)
 	})
 	st.print(t, "AC#2 (ticket 348, Windows in-root ancestor form: the removal face)")
+	// Ticket 444: the un-raced carrier, on the same screen as the raced row.
+	ctl := winAncWindowControl444(t, winAncFormSymDir, winAncCtlRemoval444)
+	ctl.print(t, "AC#2")
 	if st.deleted > 0 {
 		t.Errorf("AC#2 RED: %d of %d attempts found the foreign witness GONE, so the refusal-path unlink in "+
 			"privateFile re-resolved the caller's spelling through a swapped ancestor and removed a name in "+
 			"somebody else's tree (first: %s)", st.deleted, st.attempts, st.firstProof)
 	}
-	if st.provedReparse == 0 || st.formRefusals == 0 {
-		t.Errorf("AC#2 RED instrument: reparseAt proved %d flipped cycles and the landing's own legs answered "+
-			"%d attempts across %d (flipErrs=%d, first %q) - so the zero above is not evidence about a removal "+
-			"that was ever reachable", st.provedReparse, st.formRefusals, st.attempts, st.flipErrs, st.firstFlip)
+	// Ticket 444's split, half one: the RACER's own arrival stays RED at zero (a racer that proves
+	// nothing is a broken fixture; deleting it has to remain fatal - ticket 441's rule).
+	if st.provedReparse == 0 {
+		t.Errorf("AC#2 RED instrument: reparseAt proved 0 flipped cycles across %d attempts (flipErrs=%d, "+
+			"first %q), so the zero above is not evidence about a removal that was ever reachable",
+			st.attempts, st.flipErrs, st.firstFlip)
+	}
+	// Ticket 444's split, half two: the GUARDRAIL, carried by the removal nobody races over.
+	if !ctl.foreignIntact || ctl.actErr != "" || !ctl.ownLeafGone {
+		t.Errorf("AC#2 RED instrument: the un-raced removal control - the route's own pin, then the flip, "+
+			"then the refusal-path removal - neither kept the foreign name nor removed the pinned one: %s",
+			ctl.verdict())
+	}
+	if st.formRefusals == 0 && st.provedReparse > 0 {
+		t.Logf("AC#2 ABSTAIN(444:348-win-removal:route-missed-link) form=%s attempts=%d samples=1 "+
+			"provedReparse=%d formBLegRefusals=0 deleted=%d flipErrs=%d - reparseAt proved %d flipped "+
+			"cycles but no PrivateFile call was inside one, so this run cannot attest the raced row; the "+
+			"threshold that carries the removal is the un-raced control above (foreign-intact=%v, "+
+			"own-leaf-removed=%v), not a green from absence",
+			st.form, st.attempts, st.provedReparse, st.deleted, st.flipErrs, st.provedReparse,
+			ctl.foreignIntact, ctl.ownLeafGone)
 	}
 }
 

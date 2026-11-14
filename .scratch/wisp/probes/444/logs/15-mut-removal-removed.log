@@ -1,0 +1,10 @@
+time=2026-11-14T16:44:16.407+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2
+    deleteseam_348r2_windows_test.go:60: AC#2 un-raced window control (the route's own pin, the flip landed in the gap, one act): kind=removal form=symlink-dir flipped=true act-error="" foreign-present=true foreign-body="foreign bytes are not yours to truncate, and this body is longer on purpose" foreign-mode=-rw-rw-rw- own-leaf-under-the-pin="absent: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor2729427841\\001\\data\\parked-real-sub\\leaf-342r1w.bin: The system cannot find the file specified."
+    deleteseam_348r2_windows_test.go:135: AC#2 (ticket 348, Windows in-root ancestor form, through the removal seam): attempts=400 seamCalls=0 hopLanded=0 hopRefused=0 deleted=0
+    deleteseam_348r2_windows_test.go:151: AC#2 RED instrument: the removal seam was reached 0 times in 400 attempts, so this reading is not about the refusal-path removal at all (an attempt that never got there cannot say anything about what that removal would have done)
+    deleteseam_348r2_windows_test.go:170: AC#2 ABSTAIN(444:348r2-seam:removal-never-reached) attempts=400 seamCalls=0 hopLanded=0 hopRefused=0 deleted=0 - the route never reached the refusal-path removal, so this run cannot attest the flip at the hop; the threshold that carries the removal is the un-raced control above (foreign-intact=true, own-leaf-removed=true), not a green from absence. The wiring red for 'the seam was reached fewer times than attempts' is a separate arm and is unaffected
+--- FAIL: TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2 (1.89s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	1.960s
+FAIL

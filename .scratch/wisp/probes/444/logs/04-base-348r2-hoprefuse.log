@@ -1,0 +1,14 @@
+time=2026-11-14T16:26:20.817+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2
+    deleteseam_348r2_windows_test.go:128: AC#2 (ticket 348, Windows in-root ancestor form, through the removal seam): attempts=4 seamCalls=4 hopLanded=0 hopRefused=4 deleted=0
+    deleteseam_348r2_windows_test.go:136: AC#2' the platform REFUSED the flip at the hop on 4 attempts; first verbatim: rename C:\Users\swq\AppData\Local\Temp\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor3398487702\001\data\sub C:\Users\swq\AppData\Local\Temp\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor3398487702\001\data\parked-real-sub: Access is denied.
+    deleteseam_348r2_windows_test.go:159: AC#2 RED instrument: the ancestor flip stood at the removal instant on only 0 of 4 seam calls (refused=4, first refusal verbatim: "rename C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor3398487702\\001\\data\\sub C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor3398487702\\001\\data\\parked-real-sub: Access is denied."), so the deletion count is a reading about a world that was not entered rather than about the removal
+--- FAIL: TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2 (0.07s)
+=== RUN   TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2
+    deleteseam_348r2_windows_test.go:128: AC#2 (ticket 348, Windows in-root ancestor form, through the removal seam): attempts=4 seamCalls=4 hopLanded=0 hopRefused=4 deleted=0
+    deleteseam_348r2_windows_test.go:136: AC#2' the platform REFUSED the flip at the hop on 4 attempts; first verbatim: rename C:\Users\swq\AppData\Local\Temp\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor4108703754\001\data\sub C:\Users\swq\AppData\Local\Temp\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor4108703754\001\data\parked-real-sub: Access is denied.
+    deleteseam_348r2_windows_test.go:159: AC#2 RED instrument: the ancestor flip stood at the removal instant on only 0 of 4 seam calls (refused=4, first refusal verbatim: "rename C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor4108703754\\001\\data\\sub C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestor4108703754\\001\\data\\parked-real-sub: Access is denied."), so the deletion count is a reading about a world that was not entered rather than about the removal
+--- FAIL: TestAC2SeamWindowsTheRefusalPathRemovalCannotBeMovedByAnAncestorFlip348r2 (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.212s
+FAIL
