@@ -1,0 +1,304 @@
+slo-full	Set up job	﻿2026-11-14T05:10:27.5644137Z Current runner version: '2.338.2'
+slo-full	Set up job	2026-11-14T05:10:27.5674932Z Runner name: 'wisp-selfhosted-01'
+slo-full	Set up job	2026-11-14T05:10:27.5676429Z Runner group name: 'Default'
+slo-full	Set up job	2026-11-14T05:10:27.5677765Z Machine name: 'DESKTOP-LVS7839'
+slo-full	Set up job	2026-11-14T05:10:27.5683842Z ##[group]GITHUB_TOKEN Permissions
+slo-full	Set up job	2026-11-14T05:10:27.5689996Z Contents: read
+slo-full	Set up job	2026-11-14T05:10:27.5691243Z Metadata: read
+slo-full	Set up job	2026-11-14T05:10:27.5692369Z Packages: read
+slo-full	Set up job	2026-11-14T05:10:27.5693306Z ##[endgroup]
+slo-full	Set up job	2026-11-14T05:10:27.5698669Z Secret source: Actions
+slo-full	Set up job	2026-11-14T05:10:27.5701280Z Cache mode: write
+slo-full	Set up job	2026-11-14T05:10:27.5702664Z Prepare workflow directory
+slo-full	Set up job	2026-11-14T05:10:27.7859256Z Prepare all required actions
+slo-full	Set up job	2026-11-14T05:10:27.7986074Z Getting action download info
+slo-full	Set up job	2026-11-14T05:10:29.2628873Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+slo-full	Set up job	2026-11-14T05:10:32.5760736Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+slo-full	Set up job	2026-11-14T05:10:35.0359619Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+slo-full	Set up job	2026-11-14T05:10:40.2976878Z Complete job name: slo-full
+slo-full	Run actions/checkout@v4	﻿2026-11-14T05:10:41.1171108Z ##[group]Run actions/checkout@v4
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1175655Z with:
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1176407Z   repository: CarlosShao/wisp
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1187372Z   token: ***
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1188473Z   ssh-strict: true
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1189538Z   ssh-user: git
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1190132Z   persist-credentials: true
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1190814Z   clean: true
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1191508Z   sparse-checkout-cone-mode: true
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1192267Z   fetch-depth: 1
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1192851Z   fetch-tags: false
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1193512Z   show-progress: true
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1194180Z   lfs: false
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1194889Z   submodules: false
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1195532Z   set-safe-directory: true
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1196252Z   allow-unsafe-pr-checkout: false
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1197606Z env:
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1198178Z   WISP_ENV: test
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1199180Z   MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:41.1200799Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.1576882Z Syncing repository: CarlosShao/wisp
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.1585054Z ##[group]Getting Git version info
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.1586751Z Working directory is 'E:\work\base\actions-runner\_work\wisp\wisp'
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.4559777Z [command]D:\work\soft\Git\cmd\git.exe version
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.5503511Z git version 2.54.0.windows.1
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.5628340Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.5654539Z Copying 'C:\Users\swq\.gitconfig' to 'E:\work\base\actions-runner\_work\_temp\fdb1a500-64a9-4e5d-900d-d7d43289f114\.gitconfig'
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.5709705Z Temporarily overriding HOME='E:\work\base\actions-runner\_work\_temp\fdb1a500-64a9-4e5d-900d-d7d43289f114' before making global git config changes
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.5717555Z Adding repository directory to the temporary git global config as a safe directory
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.5719890Z [command]D:\work\soft\Git\cmd\git.exe config --global --add safe.directory E:\work\base\actions-runner\_work\wisp\wisp
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.6772306Z [command]D:\work\soft\Git\cmd\git.exe config --local --get remote.origin.url
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.7675873Z https://github.com/CarlosShao/wisp
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.7823721Z ##[group]Removing previously created refs, to avoid conflicts
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.7915416Z [command]D:\work\soft\Git\cmd\git.exe rev-parse --symbolic-full-name --verify --quiet HEAD
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.8745807Z refs/heads/dev
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:42.8938583Z [command]D:\work\soft\Git\cmd\git.exe checkout --detach
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:43.1296622Z HEAD is now at b70ea907 ticket 197: the spawn path published a roster row and the stop handle in two steps, so a child inside its first model call could answer task.cancel with 没有在跑 while its state still read Thinking. It now publishes both in one critical section through PublishSubagentInFlight, and production code no longer calls the bare publish anywhere. A second leg re-ran the shape ruler in an exported tree outside the repo and the ruler named the three offending lines on the pre-fix tree, while the symptom instrument went to forty out of forty with sixty four hundred in flight subagents and no hits. I accept the extra edit to task.go: my dispatch named internal/agent/subagent_197.go which does not exist, so the path error is mine, and the atomic publish had nowhere else to land.
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:43.3900476Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:43.3901507Z [command]D:\work\soft\Git\cmd\git.exe submodule status
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:45.5239753Z ##[group]Cleaning the repository
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:45.5241157Z [command]D:\work\soft\Git\cmd\git.exe clean -ffdx
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:48.5482522Z Removing build/
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:48.5483338Z Removing frontend/dist/assets/
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:48.5484074Z Removing frontend/dist/index.html
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:48.5484915Z Removing frontend/node_modules/
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:48.5485755Z Removing third_party/
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:48.5613803Z [command]D:\work\soft\Git\cmd\git.exe reset --hard HEAD
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.2989531Z HEAD is now at b70ea907 ticket 197: the spawn path published a roster row and the stop handle in two steps, so a child inside its first model call could answer task.cancel with 没有在跑 while its state still read Thinking. It now publishes both in one critical section through PublishSubagentInFlight, and production code no longer calls the bare publish anywhere. A second leg re-ran the shape ruler in an exported tree outside the repo and the ruler named the three offending lines on the pre-fix tree, while the symptom instrument went to forty out of forty with sixty four hundred in flight subagents and no hits. I accept the extra edit to task.go: my dispatch named internal/agent/subagent_197.go which does not exist, so the path error is mine, and the atomic publish had nowhere else to land.
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.3159530Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.3165732Z ##[group]Disabling automatic garbage collection
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.3184250Z [command]D:\work\soft\Git\cmd\git.exe config --local gc.auto 0
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.4029093Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.4030193Z ##[group]Setting up auth
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.4062826Z [command]D:\work\soft\Git\cmd\git.exe config --local --name-only --get-regexp core\.sshCommand
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:49.4976835Z [command]D:\work\soft\Git\cmd\git.exe submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:51.2193874Z [command]D:\work\soft\Git\cmd\git.exe config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:51.3535187Z [command]D:\work\soft\Git\cmd\git.exe submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:53.7758077Z [command]D:\work\soft\Git\cmd\git.exe config --local --name-only --get-regexp ^includeIf\.gitdir:
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:53.8993109Z [command]D:\work\soft\Git\cmd\git.exe submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:55.6469765Z [command]D:\work\soft\Git\cmd\git.exe config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:55.8022931Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:55.8025129Z ##[group]Fetching the repository
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:55.8091272Z [command]D:\work\soft\Git\cmd\git.exe -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b52365b7120c8128f0b2a9ca2c3f297ba361bd62:refs/remotes/origin/dev
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.1299472Z From https://github.com/CarlosShao/wisp
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.1359346Z  + b70ea907...b52365b7 b52365b7120c8128f0b2a9ca2c3f297ba361bd62 -> origin/dev  (forced update)
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.2447594Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.2450423Z ##[group]Determining the checkout info
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.2453845Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.2472847Z [command]D:\work\soft\Git\cmd\git.exe sparse-checkout disable
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.4652584Z [command]D:\work\soft\Git\cmd\git.exe config --local --unset-all extensions.worktreeConfig
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.6136197Z ##[group]Checking out the ref
+slo-full	Run actions/checkout@v4	2026-11-14T05:10:59.6139354Z [command]D:\work\soft\Git\cmd\git.exe checkout --progress --force -B dev refs/remotes/origin/dev
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.6473666Z Previous HEAD position was b70ea907 ticket 197: the spawn path published a roster row and the stop handle in two steps, so a child inside its first model call could answer task.cancel with 没有在跑 while its state still read Thinking. It now publishes both in one critical section through PublishSubagentInFlight, and production code no longer calls the bare publish anywhere. A second leg re-ran the shape ruler in an exported tree outside the repo and the ruler named the three offending lines on the pre-fix tree, while the symptom instrument went to forty out of forty with sixty four hundred in flight subagents and no hits. I accept the extra edit to task.go: my dispatch named internal/agent/subagent_197.go which does not exist, so the path error is mine, and the atomic publish had nowhere else to land.
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.6888174Z Switched to and reset branch 'dev'
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.7068015Z branch 'dev' set up to track 'origin/dev'.
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.7075203Z Your branch is up to date with 'origin/dev'.
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.7267527Z ##[endgroup]
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.8325048Z [command]D:\work\soft\Git\cmd\git.exe log -1 --format=%H
+slo-full	Run actions/checkout@v4	2026-11-14T05:11:00.9263554Z b52365b7120c8128f0b2a9ca2c3f297ba361bd62
+slo-full	Run actions/setup-go@v5	﻿2026-11-14T05:11:01.0677693Z ##[group]Run actions/setup-go@v5
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0678954Z with:
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0679642Z   go-version-file: go.mod
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0680387Z   cache: false
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0681040Z   check-latest: false
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0689829Z   token: ***
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0690631Z env:
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0691652Z   WISP_ENV: test
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0692679Z   MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:01.0694658Z ##[endgroup]
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:02.2941367Z Setup go version spec 1.27
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:02.3070702Z Found in cache @ E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:02.3075702Z (node:68988) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:02.3078728Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:02.3100939Z Added go to the path
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:02.3115922Z Successfully set up Go version 1.27
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.0069332Z go version go1.27.1 windows/amd64
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.0069874Z 
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.0072306Z ##[group]go env
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2801825Z set AR=ar
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2804495Z set CC=gcc
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2805160Z set CGO_CFLAGS=-O2 -g
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2805691Z set CGO_CPPFLAGS=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2806267Z set CGO_CXXFLAGS=-O2 -g
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2807034Z set CGO_ENABLED=1
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2807606Z set CGO_FFLAGS=-O2 -g
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2808186Z set CGO_LDFLAGS=-O2 -g
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2808663Z set CXX=g++
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2809078Z set GCCGO=gccgo
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2809516Z set GO111MODULE=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2809947Z set GOAMD64=v1
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2810369Z set GOARCH=amd64
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2810795Z set GOAUTH=netrc
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2811320Z set GOBIN=D:\work\base\gopath\bin
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2812151Z set GOCACHE=E:\work\data\caches\go-build
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2812838Z set GOCACHEPROG=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2813365Z set GODEBUG=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2814180Z set GOENV=C:\Users\swq\AppData\Roaming\go\env
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2815151Z set GOEXE=.exe
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2815833Z set GOEXPERIMENT=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2816536Z set GOFIPS140=off
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2817095Z set GOFLAGS=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2819328Z set GOGCCFLAGS=-m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\swq\AppData\Local\Temp\go-build1656455657=/tmp/go-build -gno-record-gcc-switches
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2822477Z set GOHOSTARCH=amd64
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2823020Z set GOHOSTOS=windows
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2823529Z set GOINSECURE=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2824241Z set GOMOD=E:\work\base\actions-runner\_work\wisp\wisp\go.mod
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2825192Z set GOMODCACHE=D:\work\base\gopath\pkg\mod
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2825886Z set GONOPROXY=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2826410Z set GONOSUMDB=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2826911Z set GOOS=windows
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2827681Z set GOPACKAGESDRIVER=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2828667Z set GOPATH=D:\work\base\gopath
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2833245Z set GOPRIVATE=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2841050Z set GOPROXY=https://goproxy.cn,direct
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2843056Z set GOROOT=E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2844361Z set GOSUMDB=sum.golang.org
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2845866Z set GOTELEMETRY=local
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2846940Z set GOTELEMETRYDIR=C:\Users\swq\AppData\Roaming\go\telemetry
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2849404Z set GOTMPDIR=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2850025Z set GOTOOLCHAIN=auto
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2851394Z set GOTOOLDIR=E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64\pkg\tool\windows_amd64
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2852832Z set GOVCS=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2853384Z set GOVERSION=go1.27.1
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2853984Z set GOWORK=
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2854571Z set PKG_CONFIG=pkg-config
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2854941Z 
+slo-full	Run actions/setup-go@v5	2026-11-14T05:11:03.2856255Z ##[endgroup]
+slo-full	Build wisp.exe (deps cached on the runner)	﻿2026-11-14T05:11:03.3588667Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:03.3591462Z ^[[36;1mpowershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev^[[0m
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:03.3769558Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:03.3907361Z env:
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:03.3907867Z   WISP_ENV: test
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:03.3908333Z   MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:03.3910078Z ##[endgroup]
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:05.7834214Z build.ps1: repo root E:\work\base\actions-runner\_work\wisp\wisp (Env=dev)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:06.0327082Z build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:11:06.4195156Z fetch-deps: downloading (attempt 1): https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.8/sherpa-onnx-v1.13.8-win-x64-shared-MT-Release.tar.bz2
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:24.0958325Z fetch-deps: archive SHA256 verified (sherpa-onnx-v1.13.8-win-x64-shared-MT-Release.tar.bz2)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:32.0460313Z fetch-deps: extracted bin/onnxruntime.dll -> third_party/sherpa-onnx/onnxruntime.dll (sha256 ok)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:32.1104543Z fetch-deps: extracted lib/sherpa-onnx-c-api.dll -> third_party/sherpa-onnx/sherpa-onnx-c-api.dll (sha256 ok)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:32.1379999Z fetch-deps: extracted lib/sherpa-onnx-cxx-api.dll -> third_party/sherpa-onnx/sherpa-onnx-cxx-api.dll (sha256 ok)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:32.2401149Z fetch-deps: done (sherpa-onnx 1.13.8)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:33.4962730Z build.ps1: frontend: node = D:\work\server\node24\node.exe (v24.21.0); npm = D:\work\server\node24\npm.cmd (11.19.0)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:12:33.4997953Z build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3536034Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3540634Z added 127 packages, and audited 128 packages in 1m
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3542214Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3543196Z 14 packages are looking for funding
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3548131Z   run `npm fund` for details
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3828907Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3829984Z 2 high severity vulnerabilities
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3830565Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3830906Z To address all issues, run:
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3831599Z   npm audit fix
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3831903Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.3832242Z Run `npm audit` for details.
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.4833685Z build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:35.4853380Z build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:36.1867795Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:36.1868721Z > frontend@0.0.0 build
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:36.1870051Z > tsc -b && vite build
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:36.1870444Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:54.8942143Z ^[[36mvite v8.3.0 ^[[32mbuilding client environment for production...^[[36m^[[39m
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:54.9217332Z transforming...
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.4906830Z ✓ 2454 modules transformed.
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.5980781Z rendering chunks...
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7685880Z computing gzip size...
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7881344Z dist/index.html                   1.06 kB │ gzip:   0.64 kB
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7883142Z dist/assets/index-CZoXrb9N.css   65.26 kB │ gzip:  12.28 kB
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7896433Z dist/assets/index-DmXz6VZ6.js   640.33 kB │ gzip: 193.92 kB
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7898368Z 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7983457Z ^[[33m[plugin builtin:vite-reporter] 
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7985956Z (!) Some chunks are larger than 500 kB after minification. Consider:
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.7995985Z - Using dynamic import() to code-split the application
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.8000865Z - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.8004205Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.^[[39m
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:55.8129240Z ^[[32m✓ built in 915ms^[[39m
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:13:56.0081547Z build.ps1: frontend ok: 4 file(s) in frontend/dist (entry index.html is 1068 bytes): .gitkeep=0 assets\index-CZoXrb9N.css=65264 assets\index-DmXz6VZ6.js=640338 index.html=1068 || provenance: this run's npm added new artifact name(s) [assets\index-CZoXrb9N.css assets\index-DmXz6VZ6.js index.html] over the pre-build snapshot 1 file(s) [.gitkeep]; gone since snapshot: []
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:07.7841654Z build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:07.8225912Z build.ps1: DLLs colocated into E:\work\base\actions-runner\_work\wisp\wisp\build
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:07.8381116Z build.ps1: signed model manifest colocated into E:\work\base\actions-runner\_work\wisp\wisp\build\models
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:09.2366012Z build.ps1: wrote E:\work\base\actions-runner\_work\wisp\wisp\build\SHA256SUMS
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:09.2380894Z build.ps1: smoke test - running wisp.exe doctor
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:09.5411583Z time=2026-11-14T13:14:09.539+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6420881Z wisp doctor - build chain self-check
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6423327Z ------------------------------------------------------------------------
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6436706Z [INFO] wisp build                         version=0.0.0-dev commit=b52365b7 built=2026-11-14T05:13:56Z WISP_ENV=test
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6440777Z [INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6444836Z [INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6452999Z RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6456689Z [PASS] gcc (build-time)                   gcc.exe (Rev3, Built by MSYS2 project) 16.2.0
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6459049Z [PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir E:\work\base\actions-runner\_work\wisp\wisp\build)
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6462875Z [PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6467756Z [INFO] sherpa-onnx built against onnxruntime 1.28.2
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6471707Z [PASS] DLL colocated: sherpa-onnx-c-api.dll E:\work\base\actions-runner\_work\wisp\wisp\build\sherpa-onnx-c-api.dll
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6492526Z [PASS] DLL colocated: sherpa-onnx-cxx-api.dll E:\work\base\actions-runner\_work\wisp\wisp\build\sherpa-onnx-cxx-api.dll
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6496571Z [PASS] deps.toml sherpa-onnx pin          1.13.8
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6497611Z [PASS] deps.toml onnxruntime pin          1.28.2
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6498626Z [PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6500078Z [PASS] data dir writable (test)           C:\Users\swq\AppData\Local\Temp\wisp-test-66156
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6501643Z ------------------------------------------------------------------------
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6502627Z wisp doctor: PASS
+slo-full	Build wisp.exe (deps cached on the runner)	2026-11-14T05:14:10.6796083Z build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+slo-full	SLO full gate (six states + settle + leak)	﻿2026-11-14T05:14:11.0688206Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:11.0691222Z ^[[36;1mpowershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6^[[0m
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:11.0780432Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:11.0781346Z env:
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:11.0781703Z   WISP_ENV: test
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:11.0782199Z   MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:11.0782888Z ##[endgroup]
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:12.5177185Z slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:12.6558268Z slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:12.6716190Z slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1724264Z slo-check.ps1: NO CONCLUSION (machine-contended) - subset=full refused to sample, no numbers were produced
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1742667Z slo-check.ps1: machine-contended reason: machine-wide cpu utilisation 81% over a 1s window (>= 50%)
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1757489Z slo-check.ps1: NO CONCLUSION (machine-contended): 1 reason(s), 0 state file(s) written, slo-report.json NOT written
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1773045Z slo-check.ps1: NO CONCLUSION (machine-contended): this is a SAMPLING VALIDITY verdict, not a
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1788040Z slo-check.ps1: NO CONCLUSION (machine-contended): performance result - D32 (CPU <=0.5%, private
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1805228Z slo-check.ps1: NO CONCLUSION (machine-contended): RSS <=25MB) stays unverified for this run.
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1821241Z slo-check.ps1: NO CONCLUSION (machine-contended): Rerun when the machine is quiet (ticket 134
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1836960Z slo-check.ps1: NO CONCLUSION (machine-contended): AC#4, shape C: refuse loudly instead of
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1850934Z slo-check.ps1: NO CONCLUSION (machine-contended): reporting a contaminated sample as truth).
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1868774Z slo-check.ps1: NO CONCLUSION (machine-contended): AC#6 recolors the refusal, it does not lift it.
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1884192Z slo-check.ps1: NO CONCLUSION (machine-contended): what keeps "no conclusion" from rotting in
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1898739Z slo-check.ps1: NO CONCLUSION (machine-contended): silence is probe P3 of scripts/slo-freshness.sh,
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1912137Z slo-check.ps1: NO CONCLUSION (machine-contended): which ages on the newest uploaded SLO REPORT
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1931559Z slo-check.ps1: NO CONCLUSION (machine-contended): artifact - never on this job, never on this
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1948908Z slo-check.ps1: NO CONCLUSION (machine-contended): exit code. Enough busy days in a row and the
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.1964748Z slo-check.ps1: NO CONCLUSION (machine-contended): nail goes red by itself (ticket 134 AC#6).
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.2921273Z slo-check.ps1: NO CONCLUSION (machine-contended): record written to E:\work\base\actions-runner\_work\wisp\wisp\build\slo\slo-no-conclusion.json (NOT a report; slo-report.json is not written on this path)
+slo-full	SLO full gate (six states + settle + leak)	2026-11-14T05:14:24.3041486Z slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
+slo-full	Upload SLO report	﻿2026-11-14T05:14:24.5828600Z ##[group]Run actions/upload-artifact@v4
+slo-full	Upload SLO report	2026-11-14T05:14:24.5829613Z with:
+slo-full	Upload SLO report	2026-11-14T05:14:24.5830066Z   name: slo-full-report
+slo-full	Upload SLO report	2026-11-14T05:14:24.5830656Z   path: build/slo/slo-report.json
+slo-full	Upload SLO report	2026-11-14T05:14:24.5831607Z   if-no-files-found: warn
+slo-full	Upload SLO report	2026-11-14T05:14:24.5832284Z   compression-level: 6
+slo-full	Upload SLO report	2026-11-14T05:14:24.5832810Z   overwrite: false
+slo-full	Upload SLO report	2026-11-14T05:14:24.5833336Z   include-hidden-files: false
+slo-full	Upload SLO report	2026-11-14T05:14:24.5833929Z env:
+slo-full	Upload SLO report	2026-11-14T05:14:24.5834351Z   WISP_ENV: test
+slo-full	Upload SLO report	2026-11-14T05:14:24.5834931Z   MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+slo-full	Upload SLO report	2026-11-14T05:14:24.5835717Z ##[endgroup]
+slo-full	Upload SLO report	2026-11-14T05:14:25.9220766Z (node:38748) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-full	Upload SLO report	2026-11-14T05:14:25.9224700Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-full	Upload SLO report	2026-11-14T05:14:25.9344625Z ##[warning]No files were found with the provided path: build/slo/slo-report.json. No artifacts will be uploaded.
+slo-full	Post Run actions/setup-go@v5	﻿2026-11-14T05:14:26.0686555Z Post job cleanup.
+slo-full	Post Run actions/setup-go@v5	2026-11-14T05:14:27.3598172Z (node:68312) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-full	Post Run actions/setup-go@v5	2026-11-14T05:14:27.3600327Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-full	Post Run actions/checkout@v4	﻿2026-11-14T05:14:27.5055751Z Post job cleanup.
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.3057619Z [command]D:\work\soft\Git\cmd\git.exe version
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.4076008Z git version 2.54.0.windows.1
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.4278704Z Copying 'C:\Users\swq\.gitconfig' to 'E:\work\base\actions-runner\_work\_temp\e9f00e2a-baf3-4f31-914e-cdbda41bff17\.gitconfig'
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.4432182Z Temporarily overriding HOME='E:\work\base\actions-runner\_work\_temp\e9f00e2a-baf3-4f31-914e-cdbda41bff17' before making global git config changes
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.4435114Z Adding repository directory to the temporary git global config as a safe directory
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.4463341Z [command]D:\work\soft\Git\cmd\git.exe config --global --add safe.directory E:\work\base\actions-runner\_work\wisp\wisp
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.5775900Z [command]D:\work\soft\Git\cmd\git.exe config --local --name-only --get-regexp core\.sshCommand
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:28.7029303Z [command]D:\work\soft\Git\cmd\git.exe submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:31.0437686Z [command]D:\work\soft\Git\cmd\git.exe config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:31.1397509Z http.https://github.com/.extraheader
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:31.1531690Z [command]D:\work\soft\Git\cmd\git.exe config --local --unset-all http.https://github.com/.extraheader
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:31.2725588Z [command]D:\work\soft\Git\cmd\git.exe submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:33.1780786Z [command]D:\work\soft\Git\cmd\git.exe config --local --name-only --get-regexp ^includeIf\.gitdir:
+slo-full	Post Run actions/checkout@v4	2026-11-14T05:14:33.2558552Z [command]D:\work\soft\Git\cmd\git.exe submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+slo-full	Complete job	﻿2026-11-14T05:14:35.0922272Z Cleaning up orphan processes
+slo-full	Complete job	2026-11-14T05:14:35.1425574Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

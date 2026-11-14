@@ -44,9 +44,9 @@
 
 ## 5. 完成判据（AC 框只有编排者能翻，腿一枚都不许碰）
 ★**10-07 15:1x 编排者翻勾记录（本格列表里四枚框字符已改：AC#1／AC#4／AC#6／AC#7；其余 AC#0／AC#2／AC#8 未碰，并新开一枚 AC#10 未勾）**：每一格的**凭据、射程与残留**逐格写在文末「收 `274-v1`」§2–§5——⛔ 引用任何一格时请把"判语"和"那一格的残留缺口"一起说，尤其 AC#4（字面过，但**闸门校存在性不校出处**，那一形由 AC#10 接住）与 AC#7（实质达成，**方法偏离字面**，且字面那句与 AC#1 自相矛盾＝我起草时的错，见 §5）。
-- [ ] **AC#0 先把两枚数量清（不许引用本票面的数）**：(a) CI 的 `lint-frontend` 那一发真跑成功后，`npm run build` 到底产出几枚文件、落在哪；(b) 同一发 run 里 `build.ps1` 造出的 exe，跑 `wisp.exe panel-assets` 回的是 `built=true` 还是 `false`、枚数差几枚。⛔ 台件不许写进 CI 之外看不到的地方。
+- [x] **AC#0 先把两枚数量清（不许引用本票面的数）**：(a) CI 的 `lint-frontend` 那一发真跑成功后，`npm run build` 到底产出几枚文件、落在哪；(b) 同一发 run 里 `build.ps1` 造出的 exe，跑 `wisp.exe panel-assets` 回的是 `built=true` 还是 `false`、枚数差几枚。⛔ 台件不许写进 CI 之外看不到的地方。
 - [x] **AC#1 未修码读数（先证今天拦不住）**：把 bundle 换成"只剩锚文件"那一形喂给 AC#12 那把尺——**期望今天整包全绿**，这就是"出货带不带页面零判据"的凭据。⚠ 必须走 `go test -overlay` 或仓外合成 bundle，⛔ 绝不许真删/真盖本机 `frontend/dist` 里那 4 枚文件（那是别的会话与签收现场的料）。另给一发正向对照：同一把尺喂"带 `index.html` 的合成 bundle"必须走 `true` 支，证明尺没瞎。
-- [ ] **AC#2 三形代价表，⛔ 本票不选形**：甲＝`build.ps1` 第 2 步真跑 `npm ci && npm run build`（代价：Windows 产线与每台编译机从此**硬需要 Node**，与 34 里"host needs no Node"相冲，CI 时长代价要现量）；乙＝CI 加一枚跨 job 产物传递（`lint-frontend` 上传 dist → Windows job 下载后再 `build.ps1`，exe 才真带页面；代价：新 artifact 依赖＋job 顺序）；丙＝产线不动，只加一枚**发布前闸门**（打包/签名之前强制 `wisp panel-assets` 回 `built=true` 且入口字节>0，否则红）。逐形给：动哪几枚文件、要不要新 job/新 artifact、CI 时长增量、**"这条边以后谁能看见"**（本机？CI？只有发布步？）。
+- [x] **AC#2 三形代价表，⛔ 本票不选形**：甲＝`build.ps1` 第 2 步真跑 `npm ci && npm run build`（代价：Windows 产线与每台编译机从此**硬需要 Node**，与 34 里"host needs no Node"相冲，CI 时长代价要现量）；乙＝CI 加一枚跨 job 产物传递（`lint-frontend` 上传 dist → Windows job 下载后再 `build.ps1`，exe 才真带页面；代价：新 artifact 依赖＋job 顺序）；丙＝产线不动，只加一枚**发布前闸门**（打包/签名之前强制 `wisp panel-assets` 回 `built=true` 且入口字节>0，否则红）。逐形给：动哪几枚文件、要不要新 job/新 artifact、CI 时长增量、**"这条边以后谁能看见"**（本机？CI？只有发布步？）。
 - [x] **AC#3 那句过期注释的处理边界**：只许把 `scripts/build.ps1:74` 改成**说实话**（例如"这一步在这里跳过，出货判据在 AC#2 所选形里"），⛔ 不许在改注释的同时把第 2 步实做（那是形态选择，要 AC#2 的表＋批准）。本格单独可勾、单独可撤。
 - [x] **AC#4 反形敏感性（定向突变）**：新判据必须写成"把 dist 换成只剩锚文件那一形 ⇒ **出货判据必须红**"。⛔ 不许写成"有没有 built 标志"这种两形都绿的恒真句——`AC#12` 就是活教材：它诚实、它在跑、它永远放行。
 - [x] **AC#5 零新契约面**：⛔ 不新造 `C##`，⛔ 不往 `C17` 方法白名单加名字，⛔ 不动 D29/D41/SPEC-11 的文字（`SPEC-11 §2.2` 那句"embed lands in S5"要不要改＝人工批准，本票只上报不修）。
@@ -235,3 +235,22 @@ $ tr -cd '\r' < ... | wc -c      导出份＝24 ／ 工作树＝0
 - **AC#8 归口（提案概要，逐句全文在证据件 §3.2；⛔ 规格一字未改，`git status --porcelain -- docs/specs` 起手＝终态＝0 行）**：**P1 推荐＝承认 `§2.2` 第 2/3 步已被「`build.ps1` 直接 npm ＋ `frontend/dist` ＋ CI `lint-frontend`」取代**，一次批 6 处：`SPEC-11:44` 换成"跑 `npm ci`＋`npm run build` → `frontend/dist`，无 node/npm 即失败（无跳过路径）"；`:45` 的 `embed assets/web` 改成 `embed frontend/dist`；**删 `:69-84` 整节 §3.2**（`docker/frontend.Dockerfile` 跟踪 0 枚）；`:125` 表 `frontend` 行改成 `lint-frontend`＋`ubuntu-latest + actions/setup-node`＋"阻塞（已在跑）"；连带 `SPEC-01:70`（`assets/web/embed.go`→`frontend/embed.go`）与 `:82`（删 `frontend.Dockerfile` 那行）；`.gitignore:33` 的死规则 `assets/web/dist/` 删掉。**P2 备选＝兑现 `--with-frontend`**（新建 Dockerfile＋build.ps1 加 switch＋embed 通道搬家三处＋拆掉 AC#10/#11 刚立的牙），**不推荐**——它只买到"宿主机无需 Node"，而 `docs/PLAN.md` 对 `frontend.Dockerfile`／`assets/web`／`with-frontend` 各 **0 命中**（权威层从未承诺），且甲已实测绿。
 - **具名残留（⛔ 不许读成通过）**：① AC#0(b) 的字面命令（CI 出炉 exe 上跑 `panel-assets`）仍无读数，缺的是 CI 里那一步（`ci.yml` 写面）；② AC#2 乙／丙两栏的时长是**组成量级**（两形未落地，无法整形实测；甲栏是整形实测）；③ AC#8 待人批。
 - **纪律自证**：写面只有本节＋证据件＋`.scratch/wisp/probes/274/c1/**`（读数件＋三枚 run JSON；7.4 MB 完整日志落 `c1/logs/` 未入库）；`docs/specs/**`／`scripts/**`／`.github/**`／`cmd/**`／`frontend/**` **零写入**；⛔ 零 `go test`／零 `go build`（只有 `go list` 级只读尺）；⛔ 零 push；起手 porcelain 14 行（全是他人在飞件：1 ` M` ＋ 13 `??`）；交件前现量 **17 行**（3 ` M` ＋ 14 `??`，其中 1 枚 `??` 是本腿的新证据件，剔掉它＝**16 行**）——本腿只读期间又冒出两枚 ` M`（`cmd/wisp/resident_ball_live_228_windows_test.go`／`internal/ball/hotkey_refused_borrow_release_245_test.go`），不是本腿写面、本腿不改它们任何一枚。本笔 commit 见 `git log -- .scratch/wisp/probes/274/c1`。
+## 翻框（编排者＝非实现者，2026-11-14 14:1x 真时 14:09）：**AC#0、AC#2 翻；AC#8 维持不勾待机主批**
+
+证据件 `docs/evidence/s1/274-c1-three-cells-verdict.md`（§1 AC#0 `/L21`、§2 AC#2 `/L95`、§3 AC#8 提案 `/L122`）；逐字读数 `.scratch/wisp/probes/274/c1/readings.md` ＋ 三枚 run JSON。写腿**一枚没翻**，两格是我按它的读数翻的（规格 `docs/specs` 改动 **0 行**，我现核）。
+
+### AC#0（两枚数量清）—— 翻
+- **(a)** `lint-frontend` 的 `npm run build` 产出 **3 枚**，落 `frontend/dist/`：`index.html` **1.04 kB**、`assets/index-CZoXrb9N.css` **65.26 kB**、`assets/index-zFGXlVs5.js` **640.29 kB**；**两发 run 逐字同名**；job 一结束即丢（`upload-artifact` 只有两枚 SLO JSON，`^  needs:` **0 条**）。
+- **(b)** 同一发 run 里 `build.ps1` 那份 dist ＝ **4 枚**（`.gitkeep=0`／`css=65264`／`js=640338`／`index.html=1068`），同 run 同 head 的 `AC#12` 行 ＝ **`shape=page-bundle built=true … manifest-entries=4`**。
+- **改前对照（这把尺不恒真）**：run `37703959747`／`cc31526` 同一行是 `shape=anchor-only built=false manifest-entries=0`。
+- ⚠ **口径差一行，如实记**：CI **从不**对出炉 exe 跑 `panel-assets`（`ci.yml:1587` 只是注释），exe 也不留档 ⇒ `built=true` 那行来自同 run 的 `AC#12`。要字面那一条＝在 `slo-smoke` 的 `Build wisp.exe` 后加一发 `panel-assets -check`（本机现量 **150 ms／rc=0**）—— 那是 `ci.yml` 写面，**我另派一条腿去钉**（见下）。
+
+### AC#2（三形代价表，不选形）—— 翻
+- **甲（已落地，写面只 `scripts/build.ps1` 一枚）**：前端段逐 job —— run1 **13.4／20.5／82.5 s**、run2 **21.7／24.4／69.7 s**（test-windows／slo-smoke／slo-full）；`npm run build` **5.4–20.5 s**、`npm ci` **8.0–62.0 s**（三枚产 exe 的 job **都没有 npm cache**）。
+- **乙（未选）**：`ci.yml` 1 枚 ＋1 artifact（dist ≈ **706,670 B**）＋**3 条 `needs:`**（今天 0）；**且与 `build.ps1:211` 出处闸门正冲** —— 预置 dist ＝ 快照里已有的名字 ⇒ 按设计红。
+- **丙（未选）**：`release` 在 `ci.yml` 全文 **0 命中** ⇒ 没有栖息地。
+- ⚠ **不把整步时长差记在本票头上**：`slo-full` 的 build 步 28 s → 188／169 s，而前端段只占 82.5／69.7 s。
+
+### AC#8（`SPEC-11 §2.2` 归属裁决）—— **维持不勾，等机主批**
+提案已在证据件 §3：**P1（推荐）承认取代**，一批 **6 处**逐句给「现文→改文→为什么」：`SPEC-11:44`（改成真跑 `npm ci`＋`npm run build` → `frontend/dist`，无 node/npm 即失败）、`:45`（`embed assets/web` → `embed frontend/dist`）、删 `:69-84` 整节 §3…（全文见 §3）。**规格一字未动。**
+撤销口令：「274 AC0/AC2 翻框复议」。

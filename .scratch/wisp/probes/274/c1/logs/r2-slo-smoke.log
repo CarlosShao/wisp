@@ -1,0 +1,445 @@
+slo-smoke	Set up job	﻿2026-11-14T05:20:32.0908721Z Current runner version: '2.338.2'
+slo-smoke	Set up job	2026-11-14T05:20:32.0952520Z ##[group]Runner Image Provisioner
+slo-smoke	Set up job	2026-11-14T05:20:32.0953358Z Hosted Compute Agent
+slo-smoke	Set up job	2026-11-14T05:20:32.0953950Z Version: 20261103.629
+slo-smoke	Set up job	2026-11-14T05:20:32.0954531Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+slo-smoke	Set up job	2026-11-14T05:20:32.0955229Z Build Date: 2026-11-03T17:26:59Z
+slo-smoke	Set up job	2026-11-14T05:20:32.0955895Z Worker ID: {ba009177-55f4-4887-a026-c1014183c0d7}
+slo-smoke	Set up job	2026-11-14T05:20:32.0956580Z Region: westus2
+slo-smoke	Set up job	2026-11-14T05:20:32.0957084Z Cloud: Azure
+slo-smoke	Set up job	2026-11-14T05:20:32.0957586Z ##[endgroup]
+slo-smoke	Set up job	2026-11-14T05:20:32.0958829Z ##[group]Operating System
+slo-smoke	Set up job	2026-11-14T05:20:32.0959497Z Microsoft Windows Server 2025
+slo-smoke	Set up job	2026-11-14T05:20:32.0960095Z 10.0.26100
+slo-smoke	Set up job	2026-11-14T05:20:32.0960575Z Datacenter
+slo-smoke	Set up job	2026-11-14T05:20:32.0961043Z ##[endgroup]
+slo-smoke	Set up job	2026-11-14T05:20:32.0961516Z ##[group]Runner Image
+slo-smoke	Set up job	2026-11-14T05:20:32.0962064Z Image: windows-2025-vs2026
+slo-smoke	Set up job	2026-11-14T05:20:32.0962612Z Version: 20261103.298.1
+slo-smoke	Set up job	2026-11-14T05:20:32.0963747Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261103.298/images/windows/Windows2025-VS2026-Readme.md
+slo-smoke	Set up job	2026-11-14T05:20:32.0965670Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261103.298
+slo-smoke	Set up job	2026-11-14T05:20:32.0966653Z ##[endgroup]
+slo-smoke	Set up job	2026-11-14T05:20:32.0968297Z ##[group]GITHUB_TOKEN Permissions
+slo-smoke	Set up job	2026-11-14T05:20:32.0970180Z Contents: read
+slo-smoke	Set up job	2026-11-14T05:20:32.0970790Z Metadata: read
+slo-smoke	Set up job	2026-11-14T05:20:32.0971319Z Packages: read
+slo-smoke	Set up job	2026-11-14T05:20:32.0971857Z ##[endgroup]
+slo-smoke	Set up job	2026-11-14T05:20:32.0973772Z Secret source: Actions
+slo-smoke	Set up job	2026-11-14T05:20:32.0974714Z Cache mode: write
+slo-smoke	Set up job	2026-11-14T05:20:32.0975385Z Prepare workflow directory
+slo-smoke	Set up job	2026-11-14T05:20:32.1382914Z Prepare all required actions
+slo-smoke	Set up job	2026-11-14T05:20:32.1454074Z Getting action download info
+slo-smoke	Set up job	2026-11-14T05:20:32.4804357Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+slo-smoke	Set up job	2026-11-14T05:20:32.6130950Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+slo-smoke	Set up job	2026-11-14T05:20:32.9065544Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+slo-smoke	Set up job	2026-11-14T05:20:33.0511377Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+slo-smoke	Set up job	2026-11-14T05:20:33.4110382Z Complete job name: slo-smoke
+slo-smoke	Run actions/checkout@v4	﻿2026-11-14T05:20:33.5701817Z ##[group]Run actions/checkout@v4
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5703481Z with:
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5704043Z   repository: CarlosShao/wisp
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5710953Z   token: ***
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5711449Z   ssh-strict: true
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5711967Z   ssh-user: git
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5712486Z   persist-credentials: true
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5713083Z   clean: true
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5713605Z   sparse-checkout-cone-mode: true
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5714272Z   fetch-depth: 1
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5714768Z   fetch-tags: false
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5715290Z   show-progress: true
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5715818Z   lfs: false
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5716476Z   submodules: false
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5717043Z   set-safe-directory: true
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5717674Z   allow-unsafe-pr-checkout: false
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5718589Z env:
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5719047Z   WISP_ENV: test
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.5719534Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.7136746Z Syncing repository: CarlosShao/wisp
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.7138865Z ##[group]Getting Git version info
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.7139754Z Working directory is 'D:\a\wisp\wisp'
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:33.8060307Z [command]"C:\Program Files\Git\bin\git.exe" version
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1173589Z git version 2.56.0.windows.4
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1220029Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1239714Z Temporarily overriding HOME='D:\a\_temp\0ca1d085-72c8-4230-9e77-edf9c29b9fd6' before making global git config changes
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1241604Z Adding repository directory to the temporary git global config as a safe directory
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1249541Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\wisp\wisp
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1954649Z Deleting the contents of 'D:\a\wisp\wisp'
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1961729Z ##[group]Initializing the repository
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.1969568Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\wisp\wisp
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.2879734Z Initialized empty Git repository in D:/a/wisp/wisp/.git/
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.2928804Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/CarlosShao/wisp
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.3671291Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.3672781Z ##[group]Disabling automatic garbage collection
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.3680891Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.4050885Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.4052920Z ##[group]Setting up auth
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.4063375Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:34.4529774Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:35.9260823Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:35.9631276Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:36.5323429Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:36.5700558Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:37.1448093Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:37.1833788Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:37.1834701Z ##[group]Fetching the repository
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:37.1846841Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +df6a8e0359f665755be3739d63e4888b33e527a7:refs/remotes/origin/dev
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.1836575Z From https://github.com/CarlosShao/wisp
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.1842304Z  * [new ref]           df6a8e0359f665755be3739d63e4888b33e527a7 -> origin/dev
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.1877071Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.1877670Z ##[group]Determining the checkout info
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.1881131Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.1895539Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.2503208Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.2885731Z ##[group]Checking out the ref
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:43.2895612Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B dev refs/remotes/origin/dev
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.3652776Z Updating files:  15% (3164/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.4259703Z Updating files:  16% (3176/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.4906513Z Updating files:  17% (3374/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.5702670Z Updating files:  18% (3573/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.6188709Z Updating files:  19% (3771/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.6717009Z Updating files:  20% (3970/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.7378840Z Updating files:  21% (4168/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.8034675Z Updating files:  22% (4367/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.8574425Z Updating files:  23% (4565/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.9131980Z Updating files:  24% (4764/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:44.9701921Z Updating files:  25% (4962/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.0476652Z Updating files:  26% (5161/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.2301807Z Updating files:  27% (5359/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.2872946Z Updating files:  28% (5558/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.3459102Z Updating files:  29% (5756/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.3745583Z Updating files:  30% (5955/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.4041660Z Updating files:  30% (6051/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.4592349Z Updating files:  31% (6153/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.5124351Z Updating files:  32% (6352/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.5761171Z Updating files:  33% (6550/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.6311072Z Updating files:  34% (6748/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.6822762Z Updating files:  35% (6947/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.7395811Z Updating files:  36% (7145/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.8146389Z Updating files:  37% (7344/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.8822011Z Updating files:  38% (7542/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:45.9627088Z Updating files:  39% (7741/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.0259818Z Updating files:  40% (7939/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.0839120Z Updating files:  41% (8138/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.1319488Z Updating files:  42% (8336/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.1828800Z Updating files:  43% (8535/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.2271309Z Updating files:  44% (8733/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.2790089Z Updating files:  45% (8932/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.3299269Z Updating files:  46% (9130/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.3767438Z Updating files:  47% (9329/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.3787432Z Updating files:  47% (9518/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.4226792Z Updating files:  48% (9527/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.6216754Z Updating files:  49% (9726/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.6685181Z Updating files:  50% (9924/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.7269074Z Updating files:  51% (10122/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.7804443Z Updating files:  52% (10321/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.8417197Z Updating files:  53% (10519/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.8915947Z Updating files:  54% (10718/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.9415395Z Updating files:  55% (10916/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:46.9939979Z Updating files:  56% (11115/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.0499279Z Updating files:  57% (11313/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.1041551Z Updating files:  58% (11512/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.1525117Z Updating files:  59% (11710/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.1980369Z Updating files:  60% (11909/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.2458680Z Updating files:  61% (12107/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.2994038Z Updating files:  62% (12306/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.3857271Z Updating files:  63% (12504/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.3863747Z Updating files:  63% (12700/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.4403432Z Updating files:  64% (12703/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.4919596Z Updating files:  65% (12901/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.5398380Z Updating files:  66% (13100/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.5970411Z Updating files:  67% (13298/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.6413978Z Updating files:  68% (13496/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.6956251Z Updating files:  69% (13695/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:47.7663785Z Updating files:  70% (13893/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.0051052Z Updating files:  71% (14092/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.0748826Z Updating files:  72% (14290/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.1257794Z Updating files:  73% (14489/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.1737472Z Updating files:  74% (14687/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.2367245Z Updating files:  75% (14886/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.2842596Z Updating files:  76% (15084/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.3336593Z Updating files:  77% (15283/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.4134298Z Updating files:  78% (15481/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.4141276Z Updating files:  78% (15678/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.4631850Z Updating files:  79% (15680/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.5117112Z Updating files:  80% (15878/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.5858721Z Updating files:  81% (16077/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.6371916Z Updating files:  82% (16275/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.6970547Z Updating files:  83% (16474/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.7616031Z Updating files:  84% (16672/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.8306046Z Updating files:  85% (16870/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.9159904Z Updating files:  86% (17069/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:48.9857506Z Updating files:  87% (17267/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.0485805Z Updating files:  88% (17466/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.1082764Z Updating files:  89% (17664/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.1706849Z Updating files:  90% (17863/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.2552819Z Updating files:  91% (18061/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.4438971Z Updating files:  92% (18260/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.5010325Z Updating files:  92% (18268/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.5610779Z Updating files:  93% (18458/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.6149935Z Updating files:  94% (18657/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.6721767Z Updating files:  95% (18855/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.7290830Z Updating files:  96% (19054/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.7874219Z Updating files:  97% (19252/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.8585980Z Updating files:  98% (19451/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.9721540Z Updating files:  99% (19649/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.9722082Z Updating files: 100% (19847/19847)
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:49.9722474Z Updating files: 100% (19847/19847), done.
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:50.0091472Z Switched to a new branch 'dev'
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:50.0189210Z branch 'dev' set up to track 'origin/dev'.
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:50.0367985Z ##[endgroup]
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:50.0875106Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+slo-smoke	Run actions/checkout@v4	2026-11-14T05:20:50.1220722Z df6a8e0359f665755be3739d63e4888b33e527a7
+slo-smoke	Run actions/setup-go@v5	﻿2026-11-14T05:20:50.1699136Z ##[group]Run actions/setup-go@v5
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1699466Z with:
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1699655Z   go-version-file: go.mod
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1699882Z   check-latest: false
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1702460Z   token: ***
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1703174Z   cache: true
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1703447Z env:
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1703614Z   WISP_ENV: test
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.1703789Z ##[endgroup]
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.3226108Z Setup go version spec 1.27
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.3398426Z Attempting to download 1.27...
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.3577786Z (node:10200) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.3578985Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.7586731Z matching 1.27...
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:50.7596183Z Acquiring 1.27.4 from https://github.com/actions/go-versions/releases/download/1.27.4-42945153609/go-1.27.4-win32-x64.zip
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:51.4617181Z Extracting Go...
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:51.5700888Z [command]"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "$ErrorActionPreference = 'Stop' ; try { Add-Type -AssemblyName System.IO.Compression.ZipFile } catch { } ; try { [System.IO.Compression.ZipFile]::ExtractToDirectory('D:\a\_temp\go-1.27.4-win32-x64.zip', 'D:\a\_temp\9451313d-8a75-471c-b251-05b9ac41a011', $true) } catch { if (($_.Exception.GetType().FullName -eq 'System.Management.Automation.MethodException') -or ($_.Exception.GetType().FullName -eq 'System.Management.Automation.RuntimeException') ){ Expand-Archive -LiteralPath 'D:\a\_temp\go-1.27.4-win32-x64.zip' -DestinationPath 'D:\a\_temp\9451313d-8a75-471c-b251-05b9ac41a011' -Force } else { throw $_ } } ;"
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:56.9919966Z Successfully extracted go to D:\a\_temp\9451313d-8a75-471c-b251-05b9ac41a011
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:20:56.9920497Z Adding to the cache ...
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:08.7528018Z Created link C:\hostedtoolcache\windows\go\1.27.4\x64 => D:\hostedtoolcache\windows\go\1.27.4\x64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:08.7532491Z Created link C:\hostedtoolcache\windows\go\1.27.4\x64.complete => D:\hostedtoolcache\windows\go\1.27.4\x64.complete
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:08.7533999Z Successfully cached go to C:\hostedtoolcache\windows\go\1.27.4\x64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:08.7539951Z Added go to the path
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:08.7542630Z Successfully set up Go version 1.27
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:09.1436192Z [command]C:\hostedtoolcache\windows\go\1.27.4\x64\bin\go.exe env GOMODCACHE
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:09.1486901Z [command]C:\hostedtoolcache\windows\go\1.27.4\x64\bin\go.exe env GOCACHE
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:09.1743279Z C:\Users\runneradmin\go\pkg\mod
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:09.1800566Z C:\Users\runneradmin\AppData\Local\go-build
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:09.5420872Z Cache hit for: setup-go-Windows-x64-go-1.27.4-47754b61916ce7917f02a9bd193b5874bcdeb76e35f765172218124602cc1702
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:09.5541404Z (node:10200) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:10.8273244Z Received 54525952 of 208899704 (26.1%), 51.9 MBs/sec
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:11.8553100Z Received 208899704 of 208899704 (100.0%), 98.5 MBs/sec
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:11.8553990Z Cache Size: ~199 MB (208899704 B)
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:11.8587539Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/682b70fd-b9a7-4bf2-9b30-b816f5eda042/cache.tzst -P -C D:/a/wisp/wisp --force-local --use-compress-program "zstd -d"
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.1842438Z Cache restored successfully
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.1971899Z Cache restored from key: setup-go-Windows-x64-go-1.27.4-47754b61916ce7917f02a9bd193b5874bcdeb76e35f765172218124602cc1702
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.1991417Z go version go1.27.4 windows/amd64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.1991645Z 
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.1991918Z ##[group]go env
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4847899Z set AR=ar
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4848740Z set CC=gcc
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4849110Z set CGO_CFLAGS=-O2 -g
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4851946Z set CGO_CPPFLAGS=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4852329Z set CGO_CXXFLAGS=-O2 -g
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4852888Z set CGO_ENABLED=1
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4853223Z set CGO_FFLAGS=-O2 -g
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4853544Z set CGO_LDFLAGS=-O2 -g
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4853836Z set CXX=g++
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4854109Z set GCCGO=gccgo
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4854406Z set GO111MODULE=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4854692Z set GOAMD64=v1
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4854985Z set GOARCH=amd64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4855275Z set GOAUTH=netrc
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4855593Z set GOBIN=C:\Users\runneradmin\go\bin
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4856113Z set GOCACHE=C:\Users\runneradmin\AppData\Local\go-build
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4856580Z set GOCACHEPROG=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4856861Z set GODEBUG=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4857240Z set GOENV=C:\Users\runneradmin\AppData\Roaming\go\env
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4857695Z set GOEXE=.exe
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4857985Z set GOEXPERIMENT=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4858278Z set GOFIPS140=off
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4858580Z set GOFLAGS=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4859755Z set GOGCCFLAGS=-m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\RUNNER~1\AppData\Local\Temp\go-build3973541045=/tmp/go-build -gno-record-gcc-switches
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4861328Z set GOHOSTARCH=amd64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4861648Z set GOHOSTOS=windows
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4861945Z set GOINSECURE=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4862286Z set GOMOD=D:\a\wisp\wisp\go.mod
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4862709Z set GOMODCACHE=C:\Users\runneradmin\go\pkg\mod
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4863148Z set GONOPROXY=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4863425Z set GONOSUMDB=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4863697Z set GOOS=windows
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4863969Z set GOPACKAGESDRIVER=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4864629Z set GOPATH=C:\Users\runneradmin\go
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4865080Z set GOPRIVATE=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4865443Z set GOPROXY=https://proxy.golang.org,direct
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4865947Z set GOROOT=C:\hostedtoolcache\windows\go\1.27.4\x64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4866379Z set GOSUMDB=sum.golang.org
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4866701Z set GOTELEMETRY=local
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4867192Z set GOTELEMETRYDIR=C:\Users\runneradmin\AppData\Roaming\go\telemetry
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4867776Z set GOTMPDIR=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4868081Z set GOTOOLCHAIN=auto
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4868623Z set GOTOOLDIR=C:\hostedtoolcache\windows\go\1.27.4\x64\pkg\tool\windows_amd64
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4869245Z set GOVCS=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4869534Z set GOVERSION=go1.27.4
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4869838Z set GOWORK=
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4870135Z set PKG_CONFIG=pkg-config
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4870362Z 
+slo-smoke	Run actions/setup-go@v5	2026-11-14T05:21:29.4871463Z ##[endgroup]
+slo-smoke	Cache third_party (deps.toml key)	﻿2026-11-14T05:21:29.6203645Z ##[group]Run actions/cache@v4
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6203991Z with:
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6204173Z   path: third_party
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6205383Z   key: wisp-third_party-cee96349db1ecd5acca8fed0f80879a70305ca693f8076ac294f8377d60e5b29
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6205846Z   enableCrossOsArchive: false
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6206086Z   fail-on-cache-miss: false
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6206304Z   lookup-only: false
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6206499Z   save-always: false
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6206679Z env:
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6206832Z   WISP_ENV: test
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.6207004Z ##[endgroup]
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.7530395Z (node:9724) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:29.7531132Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:30.1159262Z Cache hit for: wisp-third_party-cee96349db1ecd5acca8fed0f80879a70305ca693f8076ac294f8377d60e5b29
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:30.1273401Z (node:9724) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:31.2938890Z Received 7901362 of 7901362 (100.0%), 8.5 MBs/sec
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:31.2940882Z Cache Size: ~8 MB (7901362 B)
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:31.2965053Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/bd647c07-b252-4d8d-9f31-9af1d90684bb/cache.tzst -P -C D:/a/wisp/wisp --force-local --use-compress-program "zstd -d"
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:31.3701856Z Cache restored successfully
+slo-smoke	Cache third_party (deps.toml key)	2026-11-14T05:21:31.3821714Z Cache restored from key: wisp-third_party-cee96349db1ecd5acca8fed0f80879a70305ca693f8076ac294f8377d60e5b29
+slo-smoke	Build wisp.exe	﻿2026-11-14T05:21:31.4100902Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+slo-smoke	Build wisp.exe	2026-11-14T05:21:31.4101678Z ^[[36;1mpowershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev^[[0m
+slo-smoke	Build wisp.exe	2026-11-14T05:21:31.4519783Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+slo-smoke	Build wisp.exe	2026-11-14T05:21:31.4520253Z env:
+slo-smoke	Build wisp.exe	2026-11-14T05:21:31.4520474Z   WISP_ENV: test
+slo-smoke	Build wisp.exe	2026-11-14T05:21:31.4520738Z ##[endgroup]
+slo-smoke	Build wisp.exe	2026-11-14T05:21:34.3361361Z build.ps1: repo root D:\a\wisp\wisp (Env=dev)
+slo-smoke	Build wisp.exe	2026-11-14T05:21:34.4691847Z build.ps1: toolchain: go version go1.27.4 windows/amd64; CC=C:\mingw64\bin\gcc.exe (gcc.exe (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0)
+slo-smoke	Build wisp.exe	2026-11-14T05:21:35.6332889Z fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+slo-smoke	Build wisp.exe	2026-11-14T05:21:39.2581082Z build.ps1: frontend: node = C:\Program Files\nodejs\node.exe (v22.23.4); npm = C:\Program Files\nodejs\npm.cmd (10.9.9)
+slo-smoke	Build wisp.exe	2026-11-14T05:21:39.2593645Z build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8602307Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8602816Z added 127 packages, and audited 128 packages in 12s
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8603192Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8603581Z 14 packages are looking for funding
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8604286Z   run `npm fund` for details
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8735680Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8736031Z 2 high severity vulnerabilities
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8736268Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8736380Z To address all issues, run:
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8736631Z   npm audit fix
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8736759Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:21:51.8736862Z Run `npm audit` for details.
+slo-smoke	Build wisp.exe	2026-11-14T05:21:54.8685198Z build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+slo-smoke	Build wisp.exe	2026-11-14T05:21:54.8694480Z build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+slo-smoke	Build wisp.exe	2026-11-14T05:21:55.2727549Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:21:55.2728099Z > frontend@0.0.0 build
+slo-smoke	Build wisp.exe	2026-11-14T05:21:55.2731326Z > tsc -b && vite build
+slo-smoke	Build wisp.exe	2026-11-14T05:21:55.2731863Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:22:02.6748655Z ^[[36mvite v8.3.0 ^[[32mbuilding client environment for production...^[[36m^[[39m
+slo-smoke	Build wisp.exe	2026-11-14T05:22:02.6930894Z transforming...
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.1592875Z ✓ 2454 modules transformed.
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.2314995Z rendering chunks...
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3161032Z computing gzip size...
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3260979Z dist/index.html                   1.06 kB │ gzip:   0.64 kB
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3262280Z dist/assets/index-CZoXrb9N.css   65.26 kB │ gzip:  12.28 kB
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3263171Z dist/assets/index-DmXz6VZ6.js   640.33 kB │ gzip: 193.92 kB
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3263656Z 
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3304277Z ^[[33m[plugin builtin:vite-reporter] 
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3304851Z (!) Some chunks are larger than 500 kB after minification. Consider:
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3305463Z - Using dynamic import() to code-split the application
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3306325Z - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3307367Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.^[[39m
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.3399132Z ^[[32m✓ built in 662ms^[[39m
+slo-smoke	Build wisp.exe	2026-11-14T05:22:03.6410024Z build.ps1: frontend ok: 4 file(s) in frontend/dist (entry index.html is 1068 bytes): .gitkeep=0 assets\index-CZoXrb9N.css=65264 assets\index-DmXz6VZ6.js=640338 index.html=1068 || provenance: this run's npm added new artifact name(s) [assets\index-CZoXrb9N.css assets\index-DmXz6VZ6.js index.html] over the pre-build snapshot 1 file(s) [.gitkeep]; gone since snapshot: []
+slo-smoke	Build wisp.exe	2026-11-14T05:22:22.6654170Z build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+slo-smoke	Build wisp.exe	2026-11-14T05:22:22.6791820Z build.ps1: DLLs colocated into D:\a\wisp\wisp\build
+slo-smoke	Build wisp.exe	2026-11-14T05:22:22.6827836Z build.ps1: signed model manifest colocated into D:\a\wisp\wisp\build\models
+slo-smoke	Build wisp.exe	2026-11-14T05:22:22.7844637Z build.ps1: wrote D:\a\wisp\wisp\build\SHA256SUMS
+slo-smoke	Build wisp.exe	2026-11-14T05:22:22.7853943Z build.ps1: smoke test - running wisp.exe doctor
+slo-smoke	Build wisp.exe	2026-11-14T05:22:22.8950799Z time=2026-11-14T05:22:22.860Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0619173Z wisp doctor - build chain self-check
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0620588Z ------------------------------------------------------------------------
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0622048Z [INFO] wisp build                         version=0.0.0-dev commit=df6a8e03 built=2026-11-14T05:22:03Z WISP_ENV=test
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0626567Z [INFO] Go runtime                         go1.27.4 (toolchain pinned by go.mod)
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0627391Z [INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0630989Z RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0632290Z [PASS] gcc (build-time)                   gcc.exe (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0633002Z [PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\a\wisp\wisp\build)
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0633910Z [PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0634638Z [INFO] sherpa-onnx built against onnxruntime 1.28.2
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0635455Z [PASS] DLL colocated: sherpa-onnx-c-api.dll D:\a\wisp\wisp\build\sherpa-onnx-c-api.dll
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0636498Z [PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\a\wisp\wisp\build\sherpa-onnx-cxx-api.dll
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0637125Z [PASS] deps.toml sherpa-onnx pin          1.13.8
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0637582Z [PASS] deps.toml onnxruntime pin          1.28.2
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0638085Z [PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0638676Z [PASS] data dir writable (test)           C:\Users\runneradmin\AppData\Local\Temp\wisp-test-1260
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0639538Z ------------------------------------------------------------------------
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0640099Z wisp doctor: PASS
+slo-smoke	Build wisp.exe	2026-11-14T05:22:23.0787145Z build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+slo-smoke	SLO smoke gate	﻿2026-11-14T05:22:23.2605401Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+slo-smoke	SLO smoke gate	2026-11-14T05:22:23.2606608Z ^[[36;1mpowershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4^[[0m
+slo-smoke	SLO smoke gate	2026-11-14T05:22:23.2685264Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+slo-smoke	SLO smoke gate	2026-11-14T05:22:23.2685617Z env:
+slo-smoke	SLO smoke gate	2026-11-14T05:22:23.2685798Z   WISP_ENV: test
+slo-smoke	SLO smoke gate	2026-11-14T05:22:23.2685988Z ##[endgroup]
+slo-smoke	SLO smoke gate	2026-11-14T05:22:23.9832093Z slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-smoke	SLO smoke gate	2026-11-14T05:22:24.0317788Z slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-smoke	SLO smoke gate	2026-11-14T05:22:24.0403312Z slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-smoke	SLO smoke gate	2026-11-14T05:22:27.8417033Z slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 7%
+slo-smoke	SLO smoke gate	2026-11-14T05:22:27.8435530Z slo-check.ps1: sampling state Sleeping for 4s
+slo-smoke	SLO smoke gate	2026-11-14T05:22:27.8986331Z time=2026-11-14T05:22:27.864Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	SLO smoke gate	2026-11-14T05:22:27.9047054Z time=2026-11-14T05:22:27.904Z level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\a\wisp\wisp\build\slo\data kind=inherited cleared="" cleared_inherited=S-1-3-0(A;OICIIOID;GA;;;CO),S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-32-545(A;CIID;LC;;;BU),S-1-5-32-545(A;CIID;DC;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+slo-smoke	SLO smoke gate	2026-11-14T05:22:41.1078419Z slo-check.ps1: state Sleeping exit=0 pass=True
+slo-smoke	SLO smoke gate	2026-11-14T05:22:41.1097405Z slo-check.ps1: sampling state Warm for 4s
+slo-smoke	SLO smoke gate	2026-11-14T05:22:41.1634140Z time=2026-11-14T05:22:41.131Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	SLO smoke gate	2026-11-14T05:22:54.3430699Z slo-check.ps1: state Warm exit=0 pass=True
+slo-smoke	SLO smoke gate	2026-11-14T05:22:54.3440552Z slo-check.ps1: settle check (10s window)
+slo-smoke	SLO smoke gate	2026-11-14T05:22:54.3967925Z time=2026-11-14T05:22:54.365Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	SLO smoke gate	2026-11-14T05:23:06.4496479Z slo-check.ps1: settle exit=0 pass=True
+slo-smoke	SLO smoke gate	2026-11-14T05:23:06.4505284Z slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+slo-smoke	SLO smoke gate	2026-11-14T05:23:06.5091886Z time=2026-11-14T05:23:06.472Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	SLO smoke gate	2026-11-14T05:23:17.6956663Z slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-smoke	SLO smoke gate	2026-11-14T05:23:17.7515965Z slo-check.ps1: report written to D:\a\wisp\wisp\build\slo\slo-report.json (all_pass=True)
+slo-smoke	Upload SLO report	﻿2026-11-14T05:23:17.8972171Z ##[group]Run actions/upload-artifact@v4
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8972538Z with:
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8972746Z   name: slo-smoke-report
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8972988Z   path: build/slo/slo-report.json
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8973245Z   if-no-files-found: error
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8973479Z   compression-level: 6
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8973693Z   overwrite: false
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8973922Z   include-hidden-files: false
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8974144Z env:
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8974309Z   WISP_ENV: test
+slo-smoke	Upload SLO report	2026-11-14T05:23:17.8974502Z ##[endgroup]
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.0953450Z (node:5588) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.0954796Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.1009842Z With the provided path, there will be 1 file uploaded
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.1014961Z Artifact name is valid!
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.1017220Z Root directory input is valid!
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.4827512Z Beginning upload of artifact content to blob storage
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.5072681Z (node:5588) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.7749914Z Uploaded bytes 6770
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.8497364Z Finished uploading artifact content to blob storage!
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.8499099Z SHA256 digest of uploaded artifact zip is ccfdeb571a6e45882a57b051bcee402b011ecc7b9caa9678b2d1b579bda4b880
+slo-smoke	Upload SLO report	2026-11-14T05:23:18.8501188Z Finalizing artifact upload
+slo-smoke	Upload SLO report	2026-11-14T05:23:19.2489119Z Artifact slo-smoke-report.zip successfully finalized. Artifact ID 14100860461
+slo-smoke	Upload SLO report	2026-11-14T05:23:19.2490386Z Artifact slo-smoke-report has been successfully uploaded! Final size is 6770 bytes. Artifact ID is 14100860461
+slo-smoke	Upload SLO report	2026-11-14T05:23:19.2500606Z Artifact download URL: https://github.com/CarlosShao/wisp/actions/runs/43561054718/artifacts/14100860461
+slo-smoke	Post Cache third_party (deps.toml key)	﻿2026-11-14T05:23:19.3787029Z Post job cleanup.
+slo-smoke	Post Cache third_party (deps.toml key)	2026-11-14T05:23:19.5259314Z Cache hit occurred on the primary key wisp-third_party-cee96349db1ecd5acca8fed0f80879a70305ca693f8076ac294f8377d60e5b29, not saving cache.
+slo-smoke	Post Cache third_party (deps.toml key)	2026-11-14T05:23:19.5260820Z (node:6524) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	Post Cache third_party (deps.toml key)	2026-11-14T05:23:19.5261692Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	Post Run actions/setup-go@v5	﻿2026-11-14T05:23:19.5552038Z Post job cleanup.
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.7052331Z (node:6252) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.7053155Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.8070922Z [command]C:\hostedtoolcache\windows\go\1.27.4\x64\bin\go.exe env GOCACHE
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.8147666Z [command]C:\hostedtoolcache\windows\go\1.27.4\x64\bin\go.exe env GOMODCACHE
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.8398269Z C:\Users\runneradmin\AppData\Local\go-build
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.8448836Z C:\Users\runneradmin\go\pkg\mod
+slo-smoke	Post Run actions/setup-go@v5	2026-11-14T05:23:19.8470299Z Cache hit occurred on the primary key setup-go-Windows-x64-go-1.27.4-47754b61916ce7917f02a9bd193b5874bcdeb76e35f765172218124602cc1702, not saving cache.
+slo-smoke	Post Run actions/checkout@v4	﻿2026-11-14T05:23:19.8770560Z Post job cleanup.
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.0716809Z [command]"C:\Program Files\Git\bin\git.exe" version
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.1080246Z git version 2.56.0.windows.4
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.1155175Z Temporarily overriding HOME='D:\a\_temp\bbcff452-4588-4c68-839a-8987088c477c' before making global git config changes
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.1156253Z Adding repository directory to the temporary git global config as a safe directory
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.1166240Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\wisp\wisp
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.1557517Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.2004553Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.7593600Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.7949870Z http.https://github.com/.extraheader
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.8010351Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:20.8406214Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:21.3887963Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+slo-smoke	Post Run actions/checkout@v4	2026-11-14T05:23:21.4267736Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+slo-smoke	Complete job	﻿2026-11-14T05:23:22.0083740Z Cleaning up orphan processes
+slo-smoke	Complete job	2026-11-14T05:23:22.0684011Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

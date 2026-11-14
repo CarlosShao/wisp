@@ -1,0 +1,1 @@
+panel assets embedded: 4 files, entry=index.html built=true

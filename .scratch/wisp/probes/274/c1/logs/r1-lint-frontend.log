@@ -1,0 +1,342 @@
+lint-frontend	Set up job	﻿2026-11-14T05:06:21.8788078Z Current runner version: '2.338.2'
+lint-frontend	Set up job	2026-11-14T05:06:21.8808021Z ##[group]Runner Image Provisioner
+lint-frontend	Set up job	2026-11-14T05:06:21.8808867Z Hosted Compute Agent
+lint-frontend	Set up job	2026-11-14T05:06:21.8809365Z Version: 20261103.629
+lint-frontend	Set up job	2026-11-14T05:06:21.8809980Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+lint-frontend	Set up job	2026-11-14T05:06:21.8810589Z Build Date: 2026-11-03T17:26:59Z
+lint-frontend	Set up job	2026-11-14T05:06:21.8811116Z Worker ID: {5fb4388a-4151-4f86-8bfd-e91dbbd22ebf}
+lint-frontend	Set up job	2026-11-14T05:06:21.8812266Z Region: westcentralus
+lint-frontend	Set up job	2026-11-14T05:06:21.8812757Z Cloud: Azure
+lint-frontend	Set up job	2026-11-14T05:06:21.8813241Z ##[endgroup]
+lint-frontend	Set up job	2026-11-14T05:06:21.8814356Z ##[group]Operating System
+lint-frontend	Set up job	2026-11-14T05:06:21.8814867Z Ubuntu
+lint-frontend	Set up job	2026-11-14T05:06:21.8815393Z 26.04.1
+lint-frontend	Set up job	2026-11-14T05:06:21.8815822Z LTS
+lint-frontend	Set up job	2026-11-14T05:06:21.8816314Z ##[endgroup]
+lint-frontend	Set up job	2026-11-14T05:06:21.8816782Z ##[group]Runner Image
+lint-frontend	Set up job	2026-11-14T05:06:21.8817279Z Image: ubuntu-26.04
+lint-frontend	Set up job	2026-11-14T05:06:21.8817816Z Version: 20261111.196.1
+lint-frontend	Set up job	2026-11-14T05:06:21.8818676Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261111.196/images/ubuntu/Ubuntu2604-Readme.md
+lint-frontend	Set up job	2026-11-14T05:06:21.8820072Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261111.196
+lint-frontend	Set up job	2026-11-14T05:06:21.8820896Z ##[endgroup]
+lint-frontend	Set up job	2026-11-14T05:06:21.8822212Z ##[group]GITHUB_TOKEN Permissions
+lint-frontend	Set up job	2026-11-14T05:06:21.8823778Z Contents: read
+lint-frontend	Set up job	2026-11-14T05:06:21.8824343Z Metadata: read
+lint-frontend	Set up job	2026-11-14T05:06:21.8824807Z Packages: read
+lint-frontend	Set up job	2026-11-14T05:06:21.8825279Z ##[endgroup]
+lint-frontend	Set up job	2026-11-14T05:06:21.8826932Z Secret source: Actions
+lint-frontend	Set up job	2026-11-14T05:06:21.8827704Z Cache mode: write
+lint-frontend	Set up job	2026-11-14T05:06:21.8828345Z Prepare workflow directory
+lint-frontend	Set up job	2026-11-14T05:06:21.9155947Z Prepare all required actions
+lint-frontend	Set up job	2026-11-14T05:06:21.9194008Z Getting action download info
+lint-frontend	Set up job	2026-11-14T05:06:22.1457234Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+lint-frontend	Set up job	2026-11-14T05:06:22.2231250Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+lint-frontend	Set up job	2026-11-14T05:06:22.3874046Z Complete job name: lint-frontend
+lint-frontend	Run actions/checkout@v4	﻿2026-11-14T05:06:22.4557266Z ##[group]Run actions/checkout@v4
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4558040Z with:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4558394Z   repository: CarlosShao/wisp
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4561734Z   token: ***
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4562111Z   ssh-strict: true
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4562472Z   ssh-user: git
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4562827Z   persist-credentials: true
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4563215Z   clean: true
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4563569Z   sparse-checkout-cone-mode: true
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4563981Z   fetch-depth: 1
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4564325Z   fetch-tags: false
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4564678Z   show-progress: true
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4565071Z   lfs: false
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4565405Z   submodules: false
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4565768Z   set-safe-directory: true
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4566161Z   allow-unsafe-pr-checkout: false
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.4566775Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6375532Z Syncing repository: CarlosShao/wisp
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6377430Z ##[group]Getting Git version info
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6377986Z Working directory is '/home/runner/work/wisp/wisp'
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6378826Z [command]/usr/bin/git version
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6401940Z git version 2.56.1
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6423900Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6438172Z Temporarily overriding HOME='/home/runner/work/_temp/b20dff69-efd1-48d4-9177-a0c7f9c5dc1d' before making global git config changes
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6439955Z Adding repository directory to the temporary git global config as a safe directory
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6443626Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6491978Z Deleting the contents of '/home/runner/work/wisp/wisp'
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6495844Z ##[group]Initializing the repository
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6499478Z [command]/usr/bin/git init /home/runner/work/wisp/wisp
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6573642Z hint: Using 'master' as the name for the initial branch. This default branch name
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6575173Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6577045Z hint: to use in all of your new repositories, which will suppress this warning,
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6578290Z hint: call:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6579035Z hint:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6579914Z hint: 	git config --global init.defaultBranch <name>
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6580941Z hint:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6582015Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6583322Z hint: 'development'. The just-created branch can be renamed via this command:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6584380Z hint:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6585013Z hint: 	git branch -m <name>
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6585721Z hint:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6586632Z hint: Disable this message with "git config set advice.defaultBranchName false"
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6587945Z Initialized empty Git repository in /home/runner/work/wisp/wisp/.git/
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6591116Z [command]/usr/bin/git remote add origin https://github.com/CarlosShao/wisp
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6632142Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6633116Z ##[group]Disabling automatic garbage collection
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6635094Z [command]/usr/bin/git config --local gc.auto 0
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6664041Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6664939Z ##[group]Setting up auth
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6669373Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.6699263Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7048710Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7080705Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7306822Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7335240Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7558289Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7592311Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7592949Z ##[group]Fetching the repository
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:22.7599590Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b52365b7120c8128f0b2a9ca2c3f297ba361bd62:refs/remotes/origin/dev
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2545051Z From https://github.com/CarlosShao/wisp
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2546833Z  * [new ref]           b52365b7120c8128f0b2a9ca2c3f297ba361bd62 -> origin/dev
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2551026Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2552741Z ##[group]Determining the checkout info
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2553814Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2556731Z [command]/usr/bin/git sparse-checkout disable
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2602971Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2629384Z ##[group]Checking out the ref
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:27.2637854Z [command]/usr/bin/git checkout --progress --force -B dev refs/remotes/origin/dev
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.2906842Z Updating files:  85% (16943/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.3213509Z Updating files:  86% (17069/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.3422906Z Updating files:  87% (17267/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.3610804Z Updating files:  88% (17466/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.3785807Z Updating files:  89% (17664/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.3958097Z Updating files:  90% (17863/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.4278285Z Updating files:  91% (18061/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.4738285Z Updating files:  92% (18260/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.4883849Z Updating files:  93% (18458/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.4999928Z Updating files:  94% (18657/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.5115810Z Updating files:  95% (18855/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.5241589Z Updating files:  96% (19054/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.5372039Z Updating files:  97% (19252/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.5611095Z Updating files:  98% (19451/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6148480Z Updating files:  99% (19649/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6149026Z Updating files: 100% (19847/19847)
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6149421Z Updating files: 100% (19847/19847), done.
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6300750Z Switched to a new branch 'dev'
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6305752Z branch 'dev' set up to track 'origin/dev'.
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6377165Z ##[endgroup]
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6423493Z [command]/usr/bin/git log -1 --format=%H
+lint-frontend	Run actions/checkout@v4	2026-11-14T05:06:28.6446581Z b52365b7120c8128f0b2a9ca2c3f297ba361bd62
+lint-frontend	Run actions/setup-node@v4	﻿2026-11-14T05:06:28.6745965Z ##[group]Run actions/setup-node@v4
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6746407Z with:
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6746704Z   node-version: 24
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6747017Z   cache: npm
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6747408Z   cache-dependency-path: frontend/package-lock.json
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6747848Z   always-auth: false
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6748170Z   check-latest: false
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6752271Z   token: ***
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.6752614Z ##[endgroup]
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.7907334Z (node:2278) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.7908380Z (Use `node --trace-deprecation ...` to show where the warning was created)
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.7915426Z Found in cache @ /opt/hostedtoolcache/node/24.22.2/x64
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:28.7915997Z ##[group]Environment details
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.0776339Z node: v24.22.2
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.0776882Z npm: 11.19.1
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.0777136Z yarn: 1.22.22
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.0778223Z ##[endgroup]
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.0802306Z [command]/opt/hostedtoolcache/node/24.22.2/x64/bin/npm config get cache
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.1650161Z /home/runner/.npm
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.3610698Z Cache hit for: node-cache-Linux-x64-npm-ad4ec10dc3f2f1b4e71f2e81a0d689eaab1db32ea59f762e734fdb5300816044
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:29.3690463Z (node:2278) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:30.5629540Z Received 62961913 of 62961913 (100.0%), 60.5 MBs/sec
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:30.5630188Z Cache Size: ~60 MB (62961913 B)
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:30.5654442Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e0f9428f-ac7d-496a-8ba0-a5ada24a7e9a/cache.tzst -P -C /home/runner/work/wisp/wisp --use-compress-program unzstd
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:30.6587049Z Cache restored successfully
+lint-frontend	Run actions/setup-node@v4	2026-11-14T05:06:30.6624925Z Cache restored from key: node-cache-Linux-x64-npm-ad4ec10dc3f2f1b4e71f2e81a0d689eaab1db32ea59f762e734fdb5300816044
+lint-frontend	npm ci (lockfile is the only source of deps)	﻿2026-11-14T05:06:30.6820552Z ##[group]Run npm ci
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:30.6820826Z ^[[36;1mnpm ci^[[0m
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:30.6874263Z shell: /usr/bin/bash -e {0}
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:30.6874511Z ##[endgroup]
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5498684Z 
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5504896Z added 132 packages, and audited 133 packages in 3s
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5505334Z 
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5505557Z 16 packages are looking for funding
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5505834Z   run `npm fund` for details
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5579406Z 
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5579863Z 2 high severity vulnerabilities
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5580145Z 
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5580336Z To address all issues, run:
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5580687Z   npm audit fix
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5580853Z 
+lint-frontend	npm ci (lockfile is the only source of deps)	2026-11-14T05:06:33.5581023Z Run `npm audit` for details.
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	﻿2026-11-14T05:06:33.6173323Z ##[group]Run npm run typecheck
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.6173605Z ^[[36;1mnpm run typecheck^[[0m
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.6219309Z shell: /usr/bin/bash -e {0}
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.6219540Z ##[endgroup]
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.7047408Z 
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.7047898Z > frontend@0.0.0 typecheck
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.7048259Z > tsc -b
+lint-frontend	typecheck (tsc -b, noEmit per tsconfig.*.json)	2026-11-14T05:06:33.7048411Z 
+lint-frontend	lint (oxlint)	﻿2026-11-14T05:06:37.6611319Z ##[group]Run npm run lint
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.6611949Z ^[[36;1mnpm run lint^[[0m
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.6655464Z shell: /usr/bin/bash -e {0}
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.6655695Z ##[endgroup]
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.7442448Z 
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.7443079Z > frontend@0.0.0 lint
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.7443411Z > oxlint
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.7443524Z 
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8847831Z ##[warning]scripts/gen-tokens.mjs:127:26: Parameter 'out' is declared but never used. Unused parameters should start with a '_'.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8855291Z ##[warning]scripts/vendor.mjs:15:16: Identifier 'cwd' is imported but never used.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8857197Z ##[warning]scripts/vendor.mjs:63:82: Unexpected combining class in character class.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8858434Z ##[warning]scripts/vendor-beautifului.mjs:34:16: Identifier 'cwd' is imported but never used.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8859746Z ##[warning]scripts/vendor-beautifului.mjs:73:5: Duplicate key 'subs'
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8860913Z ##[warning]scripts/vendor-beautifului.mjs:191:67: Unexpected combining class in character class.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8862370Z ##[warning]src/components/composer.tsx:299:12: Cannot create components during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8863578Z ##[warning]src/components/composer.tsx:312:8: Cannot create components during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8865066Z ##[warning]src/App.tsx:94:17: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8866493Z ##[warning]src/App.tsx:165:5: Calling setState synchronously within an effect can trigger cascading renders
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8867990Z ##[warning]src/components/palette-screen.tsx:99:5: Calling setState synchronously within an effect can trigger cascading renders
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8869770Z ##[warning]src/components/harness/workspace-picker.tsx:191:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8871856Z ##[warning]src/components/harness/monitor-popover.tsx:295:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8873361Z ##[warning]src/components/harness/monitor-popover.tsx:297:37: Unnecessary escape character 'w'
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8874603Z ##[warning]src/components/harness/monitor-popover.tsx:297:42: Unnecessary escape character 'w'
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8875823Z ##[warning]src/components/harness/monitor-popover.tsx:297:52: Unnecessary escape character 'p'
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8877124Z ##[warning]src/components/harness/monitor-popover.tsx:297:67: Unnecessary escape character 'W'
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8878362Z ##[warning]src/components/l2-approval-card.tsx:285:16: Cannot create components during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8879957Z ##[warning]src/components/ui/button.tsx:77:18: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8881929Z ##[warning]src/components/ui/badge.tsx:61:17: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8883865Z ##[warning]src/components/harness/firstrun-overlay.tsx:74:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8885544Z ##[warning]src/components/ai-native/flowchart.tsx:498:18: Cannot access refs during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8887007Z ##[warning]src/fixtures/harness.ts:358:70: Unnecessary escape character '会'
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8888532Z ##[warning]src/components/harness/toast.tsx:78:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8890008Z ##[warning]src/components/react-bits/line-sidebar.tsx:160:53: Cannot access variable while it is being initialized
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8891304Z ##[warning]src/components/react-bits/line-sidebar.tsx:133:12: Cannot access refs during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8893483Z ##[warning]src/components/react-bits/line-sidebar.tsx:134:15: Cannot access refs during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8895032Z ##[warning]src/components/react-bits/magnet.tsx:59:7: Calling setState synchronously within an effect can trigger cascading renders
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8896550Z ##[warning]src/components/ai-native/agent-screen.tsx:213:19: Calling setState synchronously within an effect can trigger cascading renders
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8898248Z ##[warning]src/components/ai-native/button.tsx:42:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8899871Z ##[warning]src/components/ai-native/records-table.tsx:518:34: Calling setState synchronously within an effect can trigger cascading renders
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8901202Z ##[warning]src/components/ai-native/records-table.tsx:615:5: Expected expression to be used
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8902654Z ##[warning]src/components/ai-native/records-table.tsx:919:17: Expected expression to be used
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8903863Z ##[warning]src/components/glide-highlight.tsx:157:19: Cannot access refs during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8905269Z ##[warning]src/components/glide-highlight.tsx:157:19: Cannot access refs during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8906399Z ##[warning]src/components/model-settings.tsx:371:16: Cannot access refs during render
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8907009Z 
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8907275Z Found 36 warnings and 0 errors.
+lint-frontend	lint (oxlint)	2026-11-14T05:06:37.8907626Z Finished in 106ms on 104 files with 116 rules using 4 threads.
+lint-frontend	token drift guard (generated theme must equal the C21 table)	﻿2026-11-14T05:06:37.8984694Z ##[group]Run npm run tokens:check
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.8984947Z ^[[36;1mnpm run tokens:check^[[0m
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.9029566Z shell: /usr/bin/bash -e {0}
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.9029798Z ##[endgroup]
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.9835436Z 
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.9836005Z > frontend@0.0.0 tokens:check
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.9836415Z > node scripts/gen-tokens.mjs --check
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:37.9836593Z 
+lint-frontend	token drift guard (generated theme must equal the C21 table)	2026-11-14T05:06:38.0202417Z gen-tokens: src/styles/tokens.generated.css matches the generator (97 keys, 43 tokens, light+dark)
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	﻿2026-11-14T05:06:38.0322929Z ##[group]Run npm run build
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.0323177Z ^[[36;1mnpm run build^[[0m
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.0367776Z shell: /usr/bin/bash -e {0}
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.0367995Z ##[endgroup]
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.1224286Z 
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.1224778Z > frontend@0.0.0 build
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.1225157Z > tsc -b && vite build
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:38.1225365Z 
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.4561626Z ^[[36mvite v8.3.0 ^[[32mbuilding client environment for production...^[[36m^[[39m
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.4641196Z transforming...
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.7067362Z ✓ 2454 modules transformed.
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.7560462Z rendering chunks...
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8161381Z computing gzip size...
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8247869Z dist/index.html                   1.04 kB │ gzip:   0.63 kB
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8248681Z dist/assets/index-CZoXrb9N.css   65.26 kB │ gzip:  12.28 kB
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8249440Z dist/assets/index-zFGXlVs5.js   640.29 kB │ gzip: 193.92 kB
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8249813Z 
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8280850Z ^[[33m[plugin builtin:vite-reporter] 
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8281875Z (!) Some chunks are larger than 500 kB after minification. Consider:
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8282530Z - Using dynamic import() to code-split the application
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8283272Z - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8284019Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.^[[39m
+lint-frontend	build (vite build -> frontend/dist, the bytes go:embed carries)	2026-11-14T05:06:42.8327867Z ^[[32m✓ built in 375ms^[[39m
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	﻿2026-11-14T05:06:42.8728633Z ##[group]Run npm run render:l2 -- fixtures/l2-card-fs-delete.json
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.8729045Z ^[[36;1mnpm run render:l2 -- fixtures/l2-card-fs-delete.json^[[0m
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.8773050Z shell: /usr/bin/bash -e {0}
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.8773276Z ##[endgroup]
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.9607957Z 
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.9608557Z > frontend@0.0.0 render:l2
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.9609782Z > vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js fixtures/l2-card-fs-delete.json
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:42.9610919Z 
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4566927Z <div class="flex h-screen w-full flex-col overflow-hidden bg-page text-ink"><header class="flex h-11 shrink-0 select-none items-center gap-2 border-b border-line bg-surface pl-4 pr-2.5"><div class="flex min-w-0 shrink-0 items-center gap-2.5"><span aria-hidden="true" class="size-2.5 rounded-full bg-accent"></span><span class="shrink-0 text-[13px] font-medium text-ink">一缕</span><span class="shrink-0 rounded-full bg-warn-soft px-2 py-0.5 text-[10.5px] font-medium tabular-nums text-warn">待审批 1</span></div><div class="flex min-w-0 flex-1 items-center gap-1.5"></div><div class="flex shrink-0 items-center gap-0.5"><div class="relative"><button type="button" aria-expanded="false" aria-label="任务监控" class="flex h-7 size-7 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-2 hover:bg-hover hover:text-ink"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity" aria-hidden="true"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg></button></div><kbd class="kbd hidden sm:flex">Ctrl K</kbd><button type="button" aria-label="命令面板" class="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink" title="命令面板"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-command" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg></button><button type="button" aria-label="展开右侧栏" class="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink" title="展开右侧栏"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button><button type="button" aria-label="切换主题" class="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink" title="切换主题"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button></div></header><div class="relative flex min-h-0 flex-1 overflow-hidden"><div class="contents"><aside class="flex h-full w-60 min-w-60 shrink-0 flex-col border-r border-line bg-surface"><nav aria-label="工作区会话" class="flex min-h-0 flex-1 flex-col overflow-y-auto p-2"><button type="button" title="尚未收到工作区" class="mb-1.5 flex w-full items-center gap-2.5 rounded-control p-1.5 text-left transition-[background-color,transform] duration-100 hover:bg-hover active:scale-[0.96]"><span class="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-ink text-[13px] font-semibold text-surface">W</span><span class="min-w-0 flex-1"><span class="block truncate text-[13px] font-medium leading-tight text-ink">一缕</span><span class="block truncate font-mono text-[10.5px] leading-tight text-ink-3">尚未收到工作区</span></span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down shrink-0 rotate-180 text-ink-3" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><label class="mb-1 flex h-8 items-center gap-2 rounded-control bg-inset px-2.5 shadow-hairline"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search shrink-0 text-ink-3" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg><input aria-label="搜索会话" placeholder="搜索会话" class="min-w-0 flex-1 bg-transparent text-[12.5px] text-ink outline-none placeholder:text-ink-3" value=""/><kbd class="flex size-4.5 shrink-0 items-center justify-center rounded-[5px] bg-surface text-[10px] text-ink-3 shadow-hairline">/</kbd></label><button type="button" class="mb-1 flex w-full items-center gap-2 rounded-control px-2 py-1.5 text-[13px] font-medium text-accent transition-[background-color,transform] duration-100 hover:bg-accent-tint active:scale-[0.96]"><span class="min-w-0 flex-1 truncate text-left">新建任务</span><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-accent text-white"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></span></button><div class="group/glide-menu relative flex flex-col gap-0.5"><span aria-hidden="true" class="m-glide pointer-events-none absolute inset-x-0 rounded-[7px] bg-hover" style="top:0;height:0;opacity:0;transition:top 220ms cubic-bezier(0.23,1,0.32,1), height 220ms cubic-bezier(0.23,1,0.32,1), opacity 150ms ease"></span><div><div class="px-2 pb-1 pt-2 text-[10.5px] font-medium tracking-[0.08em] text-ink-3">工作区</div><button type="button" aria-expanded="true" aria-label="一缕" data-menu-row="true" class="relative z-10 flex w-full items-center gap-1.5 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right shrink-0 text-ink-3 transition-transform duration-150 rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder shrink-0 text-ink-2" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg><span class="min-w-0 flex-1 truncate text-[13px] text-ink-2">一缕</span></button><p class="py-1 pl-6 pr-2 text-[11.5px] leading-[1.6] text-ink-3">这个工作区下还没有会话。</p></div></div></nav><div class="group/glide-menu relative flex flex-col gap-1 border-t border-line p-2"><span aria-hidden="true" class="m-glide pointer-events-none absolute inset-x-2 rounded-[7px] bg-hover" style="top:0;height:0;opacity:0;transition:top 220ms cubic-bezier(0.23,1,0.32,1), height 220ms cubic-bezier(0.23,1,0.32,1), opacity 150ms ease"></span><button type="button" aria-label="设置" data-menu-row="true" class="relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[12.5px] transition-colors duration-150 text-ink-2 hover:text-ink"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg>设置</button><button type="button" data-menu-row="true" class="relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[12.5px] text-ink-2 transition-colors duration-150 hover:text-ink"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>暗色</button></div></aside></div><div class="flex min-w-0 flex-1 flex-col"><div data-slot="card" class="flex flex-col rounded-xl border shadow-sm relative w-full gap-0 overflow-hidden rounded-card border-line bg-surface py-0 text-ink shadow-card"><div aria-hidden="true" class="h-[2px] w-full shrink-0 bg-stop"></div><div data-slot="card-header" class="@container/card-header auto-rows-min grid-rows-[auto_auto] items-start gap-2 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 block px-4 pb-2 pt-3"><div class="flex items-start justify-between gap-3"><div class="flex min-w-0 items-center gap-2.5"><div class="flex size-8 shrink-0 items-center justify-center rounded-control bg-inset text-ink-2 shadow-hairline"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash lucide-trash-2 size-4" aria-hidden="true"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div><div class="min-w-0"><p class="text-[13px] font-medium text-ink">需要你的确认</p><div data-slot="card-title" class="mt-0.5 flex min-w-0 items-center gap-2 text-[11.5px] font-normal leading-snug text-ink-2"><span class="truncate font-mono">fs.delete</span><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full px-1.5 border-red/40 text-red"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-alert size-3" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span class="uppercase tracking-wide">L2 强确认</span></span></div></div></div></div></div><div data-slot="card-content" class="flex flex-col gap-2.5 px-4 pb-3"><div><p class="mb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-3">完整参数</p><div class="overflow-x-auto rounded-control border border-line bg-inset px-3 py-2.5 shadow-hairline"><pre class="m-0 whitespace-pre font-mono text-[11.5px] leading-[1.45] text-ink">fs.delete
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4595049Z render-l2: OK, 1 card(s) rendered from real risk decisions, 21822 bytes of HTML
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4618258Z C:/Users/swq/Documents/notes.md</pre></div></div><div><p class="mb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-3">为什么需要确认</p><p class="text-[12.5px] leading-[1.6] text-ink-2">R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除）</p><div class="mt-2"><ul aria-label="matched risk rules" class="m-0 flex list-none flex-wrap gap-1 p-0"><li><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full border-line px-1.5 text-ink-2" style="font-family:var(--font-mono-stack);font-size:10.5px;height:20px" title="R1">R1</span></li><li><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full border-line px-1.5 text-ink-2" style="font-family:var(--font-mono-stack);font-size:10.5px;height:20px" title="R8">R8</span></li></ul></div></div><p class="font-mono text-[11.5px] text-ink-2">调用链：cli &gt; panel-assets &gt; fs.delete</p><div class="flex items-start gap-1.5 text-[11px] leading-[1.6] text-ink-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info mt-px size-3.5 shrink-0" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg><span>批准权在原生侧 · 面板不提供允许按钮</span></div></div><div data-slot="card-footer" class="flex [.border-t]:pt-6 flex-col items-stretch gap-2 border-t border-line px-4 py-2.5"><p class="flex items-center gap-1.5 text-[11px] text-ink-2"><svg aria-hidden="true" class="shrink-0 text-ink-2" height="20" viewBox="0 0 20 20" width="20"><circle class="l2-ball-ring" cx="10" cy="10" fill="none" r="8" stroke="currentColor" stroke-width="1"></circle><circle cx="10" cy="10" fill="currentColor" r="5"></circle></svg>点击悬浮球以批准</p><div class="flex items-center gap-2"><span class="mr-auto text-[11px] text-ink-3">判定来自 原生风险评估</span><button data-slot="button" data-variant="destructive" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5 rounded-control bg-red text-white hover:bg-red/90">拒绝</button><button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 border shadow-xs hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5 rounded-control border-line bg-surface text-ink hover:bg-hover">查看完整参数</button></div></div></div><div class="flex min-h-0 flex-1 flex-col"><div class="flex min-h-0 flex-1 overflow-hidden"><div class="flex min-h-0 flex-1 flex-col overflow-y-auto"><div class="mx-auto flex w-full max-w-[720px] flex-1 flex-col px-6"><div class="flex flex-1 items-start justify-center pt-[13vh]"><div class="w-full max-w-[440px] text-center" style="animation:fade-up 320ms var(--ease-out-strong) both"><p class="text-[15px] font-medium text-ink">一缕在这儿</p><p class="mx-auto mt-1.5 max-w-[360px] text-[12.5px] leading-[1.7] text-ink-3">面板不自己造内容。在下面说一句话，或者从悬浮球开口，原生侧会把结果一条条推上来。</p><div class="mt-4 flex items-center justify-center gap-1.5"><span class="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-ink-3">流式回复</span><span class="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-ink-3">工具调用</span><span class="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-ink-3">思考过程</span></div><p class="mt-3.5 text-[10.5px] text-ink-3">还没收到任何一条</p></div></div></div></div></div><div class="shrink-0 border-t border-line bg-surface px-6 pb-4 pt-2.5"><div class="mx-auto w-full max-w-[720px]"><div class="mb-1.5 flex items-center gap-1.5 text-[11.5px] text-ink-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-cog lucide-folder-cog-2 size-3.5 shrink-0" aria-hidden="true"><path d="M10.3 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.98a2 2 0 0 1 1.69.9l.66 1.2A2 2 0 0 0 12 6h8a2 2 0 0 1 2 2v3.3"></path><path d="m14.305 19.53.923-.382"></path><path d="m15.228 16.852-.923-.383"></path><path d="m16.852 15.228-.383-.923"></path><path d="m16.852 20.772-.383.924"></path><path d="m19.148 15.228.383-.923"></path><path d="m19.53 21.696-.382-.924"></path><path d="m20.772 16.852.924-.383"></path><path d="m20.772 19.148.924.383"></path><circle cx="18" cy="18" r="3"></circle></svg><span class="min-w-0 flex-1 truncate font-mono" title="尚未收到原生侧的状态快照">尚未收到原生侧的状态快照</span><input aria-label="工作区路径（由原生侧解析与校验）" class="w-32 shrink-0 rounded-chip border border-line bg-surface px-1.5 py-0.5
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4638540Z               font-mono text-[11px] text-ink outline-none transition-colors duration-100
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4640205Z               focus:border-line-strong" placeholder="D:\work\project" value=""/><button aria-label="请求切换工作区" class="flex shrink-0 items-center gap-0.5 rounded-chip px-1 py-0.5 text-ink-3
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4641285Z               transition-colors duration-100 hover:bg-hover hover:text-ink
+lint-frontend	L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)	2026-11-14T05:06:43.4659996Z               disabled:pointer-events-none disabled:opacity-50" disabled="" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right size-3" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>切换</button></div><p class="truncate text-[10.5px] text-ink-3 mb-1.5">上下文与用量还没有收到数据，面板不自己造这个数字。</p><div class="relative w-full"><div class="relative isolate flex flex-col gap-1.5 overflow-hidden border border-line bg-surface p-1.5 shadow-card transition-[border-color] duration-150 focus-within:border-line-strong rounded-[14px]"><span aria-hidden="true" class="pointer-events-none absolute invisible whitespace-pre text-[13px] leading-[18px]"></span><div class="grid items-end gap-x-1 gap-y-1.5 grid-cols-[28px_minmax(0,1fr)_auto_28px_28px]"><button type="button" aria-label="添加附件与来源" aria-expanded="false" class="flex size-7 shrink-0 items-center justify-center justify-self-start text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-hover hover:text-ink active:scale-[0.94] rounded-[8px] col-start-1 row-start-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button><textarea rows="1" placeholder="输入消息…" aria-label="Prompt" class="min-h-7 min-w-0 w-full resize-none bg-transparent px-1 py-[5px] text-[13px] leading-[18px] text-ink outline-none [overflow-wrap:anywhere] placeholder:text-ink-3 col-start-2 row-start-1"></textarea><button type="button" aria-label="开始听写" aria-pressed="false" class="flex size-7 shrink-0 items-center justify-center transition-[background-color,color,transform] duration-150 active:scale-[0.94] rounded-[8px] text-ink-3 hover:bg-hover hover:text-ink col-start-4 row-start-1"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic" aria-hidden="true"><path d="M12 19v3"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><rect x="9" y="2" width="6" height="13" rx="3"></rect></svg></button><button type="button" aria-label="发送" disabled="" class="flex size-7 shrink-0 items-center justify-center transition-[background-color,color,transform] duration-200 enabled:active:scale-[0.94] rounded-[8px] col-start-5 row-start-1" style="background:var(--line-strong);color:var(--ink-2)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button></div></div><div class="mt-1.5 flex flex-wrap items-center gap-1.5 px-0.5"><button type="button" aria-pressed="true" title="档位未知" class="inline-flex h-6 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium transition-colors duration-100 bg-accent-tint text-accent-ink">档位未知</button></div></div><input class="hidden" multiple="" type="file"/></div></div></div></div></div></div>
+lint-frontend	Composer states paint the real envelope (render evidence)	﻿2026-11-14T05:06:43.4699195Z ##[group]Run npm run render:composer
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.4699501Z ^[[36;1mnpm run render:composer^[[0m
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.4742558Z shell: /usr/bin/bash -e {0}
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.4742788Z ##[endgroup]
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.5546018Z 
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.5546458Z > frontend@0.0.0 render:composer
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.5547213Z > vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.5547726Z 
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.8958036Z OK no host attached: 4375 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.8977205Z OK workspace chosen, video stored: 5801 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.8988055Z OK unsupported attachment told to the user: 5702 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.9010288Z OK no modelSwitch section: 2681 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.9022057Z OK picker with rows and tiers: 3795 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.9029065Z OK no offerable rows: 2774 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.9039594Z OK current pair not in the offerable list: 3809 bytes painted
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.9042478Z fixture: /home/runner/work/wisp/wisp/frontend/fixtures/composer-states.html
+lint-frontend	Composer states paint the real envelope (render evidence)	2026-11-14T05:06:43.9043015Z composer render: all states painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	﻿2026-11-14T05:06:43.9179454Z ##[group]Run npm run render:composer
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:43.9179735Z ^[[36;1mnpm run render:composer^[[0m
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:43.9180050Z ^[[36;1mgit diff --exit-code -- frontend/fixtures/composer-states.html^[[0m
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:43.9222945Z shell: /usr/bin/bash -e {0}
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:43.9223169Z ##[endgroup]
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.0000769Z 
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.0001611Z > frontend@0.0.0 render:composer
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.0002404Z > vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.0002888Z 
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3288427Z OK no host attached: 4375 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3306457Z OK workspace chosen, video stored: 5801 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3317304Z OK unsupported attachment told to the user: 5702 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3338905Z OK no modelSwitch section: 2681 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3349338Z OK picker with rows and tiers: 3795 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3357749Z OK no offerable rows: 2774 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3367323Z OK current pair not in the offerable list: 3809 bytes painted
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3372631Z fixture: /home/runner/work/wisp/wisp/frontend/fixtures/composer-states.html
+lint-frontend	Committed composer fixture equals what the renderer emits (ticket 114 AC#11)	2026-11-14T05:06:44.3375043Z composer render: all states painted
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	﻿2026-11-14T05:06:44.3569754Z ##[group]Run npm run render:stream
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.3570017Z ^[[36;1mnpm run render:stream^[[0m
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.3612832Z shell: /usr/bin/bash -e {0}
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.3613062Z ##[endgroup]
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.4434134Z 
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.4434725Z > frontend@0.0.0 render:stream
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.4435877Z > vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.4436620Z 
+lint-frontend	Streaming output honours PLAN.md's SSE row (render evidence)	2026-11-14T05:06:44.6836014Z render-stream: OK, spec 1x14 --accent 1->0.2->1 1s, 8 corpus input(s), caret markup checked at count=0
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	﻿2026-11-14T05:06:44.6956455Z ##[group]Run npm run render:nav
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.6956705Z ^[[36;1mnpm run render:nav^[[0m
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.7000172Z shell: /usr/bin/bash -e {0}
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.7000398Z ##[endgroup]
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.7823997Z 
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.7824413Z > frontend@0.0.0 render:nav
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.7825087Z > vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:44.7825520Z 
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:45.2096419Z panel-views: snapshot names unknown view "settings-page"
+lint-frontend	Nav rail names only icons PLAN.md's frozen list carries (render evidence)	2026-11-14T05:06:45.2545851Z render-nav: OK, 9 screens against 70 frozen §17.4 names + 7 owner-approved (2026-09-25), tree sidebar, 7 rows correctly NOT navigation, 12 settings categories, narrow-window path at 860px, no substitutions, no view state in the nav layer
+lint-frontend	Post Run actions/setup-node@v4	﻿2026-11-14T05:06:45.2814826Z Post job cleanup.
+lint-frontend	Post Run actions/setup-node@v4	2026-11-14T05:06:45.3840441Z (node:2699) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+lint-frontend	Post Run actions/setup-node@v4	2026-11-14T05:06:45.3841129Z (Use `node --trace-deprecation ...` to show where the warning was created)
+lint-frontend	Post Run actions/setup-node@v4	2026-11-14T05:06:45.3843634Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-ad4ec10dc3f2f1b4e71f2e81a0d689eaab1db32ea59f762e734fdb5300816044, not saving cache.
+lint-frontend	Post Run actions/checkout@v4	﻿2026-11-14T05:06:45.3970813Z Post job cleanup.
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4700904Z [command]/usr/bin/git version
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4737369Z git version 2.56.1
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4769812Z Temporarily overriding HOME='/home/runner/work/_temp/a71e1bb5-6d6f-4fdd-afb0-ae9e7bb20af8' before making global git config changes
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4770871Z Adding repository directory to the temporary git global config as a safe directory
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4774314Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4808604Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.4839233Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.5129025Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.5154480Z http.https://github.com/.extraheader
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.5164628Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.5196196Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.5474989Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint-frontend	Post Run actions/checkout@v4	2026-11-14T05:06:45.5504936Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint-frontend	Complete job	﻿2026-11-14T05:06:45.5884900Z Cleaning up orphan processes
+lint-frontend	Complete job	2026-11-14T05:06:45.6190102Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
