@@ -793,7 +793,7 @@
       实测：漂移名字 `-run TestLayoutForTestEnvRenamedAway` ⇒ 裸 `go test` **rc=0**、经脚本 **rc=1**
       （`PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=1`）；CI 的 `-run` 两步（test-core 的
       `TestLayoutForTestEnv`、test-windows 的 `TestPathResolverJunctionWindows`）已改走该脚本。
-      (c) **`cmd/balldebug -diff` 恒返回 nil：未闭** —— 实现者被明确限定只碰
+      (c) ~~**`cmd/balldebug -diff` 恒返回 nil：未闭**~~ ⇒ **已闭于票 71**（`08c4c51e2`，2026-11-05：`px_delta_ge8`／缺行／零定时器任一不满足即非零退出；读数见 A1870 与本条末） —— 实现者被明确限定只碰
       `tools/d22scan/**` 与 `.github/workflows/ci.yml`，`cmd/balldebug` 不在其内（AC#1/AC#2 的那半张票
       需要单独派活；`internal/ball` 此刻正被票 74 占用）。
       **另见 A43：本轮又挖出两架同族空仪器**（一条是 CI 步骤次序造成的"门从未跑过"，一条是 run 取消的真机制）。
