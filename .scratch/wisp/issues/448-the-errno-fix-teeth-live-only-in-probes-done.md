@@ -12,7 +12,7 @@
 - [x] **AC#2 两个方向都要红**：①判定函数本体退回句子比较 ⇒ 红；②调用点绕过 `errnoPresent` 直接用旧比较 ⇒ 红（静态闸可，但要在证据里说明它为什么能抓到）。
 - [x] **AC#3 不引入 env 依赖**：检查要在**任何语言**的 Windows 上都成立（⛔ 依赖 `GetUserDefaultUILanguage` 的返回值），可用 `syscall.Errno(0)` 的字面值／本地化样例做输入。
 - [x] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`go test ./internal/tools` rc=0 且**四数给出**；`gofumpt -l` 空（⚠ `gofumpt.exe` 在盘上：`D:\work\base\gopath\bin\gofumpt.exe`）；`d22scan` clean；path-length GREEN。
-- [ ] **AC#5 CI**：`test-core` 与 `test-windows` 各一发**含本修复且完成**的运行（run 号＋`merge-base`＋完成时刻三项齐全）。
+- [x] **AC#5 CI**：`test-core` 与 `test-windows` 各一发**含本修复且完成**的运行（run 号＋`merge-base`＋完成时刻三项齐全）。
 
 ## 边界
 写面：`internal/tools/*_test.go`（新件）或 `tools/d22scan/**`；`docs/evidence/s1/448-*`；`.scratch/wisp/probes/448/**`；本票 Progress log（只追加）。
@@ -45,3 +45,6 @@
 - **我认可它的选型**：闸落包内测试、**不往 `d22scan` 加 ban** —— 因为 d22scan 的 ban 清单是 `PLAN.md` D22 冻结清单的转写，**加 ban #11 等于动契约**（要机主批），为一个小符号把一次人工批准拖进小活不值。它还给了覆盖率理由：`internal/tools` 在 `scripts/portable-tests.sh` 的 core scope（`:385`），无 tag 那半个在 **test-core(ubuntu) 与 test-windows 都跑**；d22scan 只在 lint。
 - **它最值钱的一条读数**：M1（判定退回句子比较）下，`errno-zero-raw` 在**本机仍是绿**（en-US 表恰好对得上）⇒ 那两行**不能当牙**。这正是本票 AC#3 要求的「不依赖本机语言」的机器判据（结构字段 `localeIndependentTooth`，门里断言 ≥3，现 4）。M2（调用点回退）下**行为闸 10/10 全绿、静态闸红** ⇒ 这就是静态牙必须存在的证明。
 - **AC#5 留白**：等我推后 CI 的 `test-core`/`test-windows` 各一发**含 `016426b3c` 且完成**的运行（run 号＋`merge-base`＋完成时刻）。
+**AC#5 填上（2026-11-14 19:3x 编排者现读）**：run **`43588827772`**，head `016426b3c`，**6/6 job success**，其中 `test-core`=success、`test-windows`=success；`git merge-base --is-ancestor 016426b3c HEAD` = True；该发完成时刻 **2026-11-14 19:29:07 +08**（UTC 11:29:07）。⇒ 三件（run 号／含修复／完成时刻）齐全。
+
+**五格全齐，本票结案。**
