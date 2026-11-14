@@ -220,7 +220,48 @@ pristine `preview_192.go` sha256＝`70eeb417f2fb2aaa2497e972deb709b94db212e632d9
 ⚠ **诚实交代**：`sh .scratch/wisp/probes/154/gate-clauses.sh` 在本腿现跑（`logs/10-gate-clauses-with-preview.txt`），
 到本件落笔时它**仍在历史扫描阶段**（`git` 进程累计 CPU 100 秒以上、log 已 186 KB，跑的是逐提交的家族普查），
 本件**没有**拿到它的最终聚合退码，也不假装拿到；随本件提交的 `10-gate-clauses-with-preview.txt` 是那一刻的
-**186 KB 中途快照**，它跑完之后会以**未提交改动**的形式留在工作树里（git status 里那一枚就是它继续长的部分）。本腿对"名册不该动"给的是**另一把尺**的读数（不是它的替代品）：
+**186 KB 中途快照** —— 它在本腿提交之后跑完了，跑完的 **241397 字节／2081 行**全文在同一条追加提交里
+（读数见下面的 §4.1）。
+
+### §4.1 gate-clauses 跑完了（本腿提交之后）—— 读数、以及它量的是哪棵树
+
+写这件的时候它跑完了：**`rc=2`（聚合退码 2＝两腿 BAD）**，逐腿行逐字是
+`BAD 腿=G7 声明=ring 基线=6枚 实测=7枚` 与 `BAD 腿=G7neg 声明=ring 基线=7枚 实测=8枚`，
+其余十二腿（G1／G1b／G2／G3／G4／G5／G5pos／G5neg／G6／G6pos／G6neg／G7pos）与各自声明一致。
+完整 log 见工作树里跑完后的 `.scratch/wisp/probes/192/logs/10-gate-clauses-with-preview.txt`。
+
+**这两腿 BAD 不是本腿造成的，而且这一点不是推测，是它的口径决定的**：那支尺把 anchor 写进了每一条命令
+（`gate-clauses.sh:96` `A="${1:-$(git rev-parse HEAD)}"`，日志里每条 grep 都是
+`git grep ... b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go`）
+⇒ 它量的是**锚点 `b06f7fa0f` 那棵树**（本腿起手 HEAD `48527e98f` 的祖先，比本腿提交 `7ff4d9e9f` 早三枚提交）。
+`git ls-tree b06f7fa0f internal/panel/` 里**没有** `preview_192.go`／`preview_192_test.go`
+⇒ 本腿两枚文件**物理上不在**这次扫描的树里，那两腿的 6→7／7→8 与本腿无关（是那棵树上别的腿的落点）。
+
+**那么"本腿对名册的影响"用什么读数回答**：G1–G7 各腿的 grep 是
+`Defer(Named)?|(New)?DisposalScope|OpenScope|CloseScope|OpenTask|CloseTask|ToolRequest{` 这一族词（`git grep -nEw`，**区分大小写**），
+本腿两枚文件在这些词上的命中数是可数的，而**主尺腿一律 `:!*_test.go`**：
+
+```
+Select-String -CaseSensitive -Path internal/panel/preview_192.go \
+  -Pattern 'OpenScope|CloseScope|OpenTask|CloseTask|DisposalScope|Defer(Named)?|NewDisposalScope|ToolRequest\{'   => 0 行
+Select-String -CaseSensitive -Path internal/panel/preview_192_test.go 同 pattern
+  => 3 行（`:604`／`:637`／`:657` 三发 prov.OpenScope，每一发紧跟着 `defer func() { _ = scope.Close() }()`）
+```
+
+（⚠ 这一格必须加 `-CaseSensitive`：不加的话 `defer func() { _ = f.Close() }()` 那两行小写 `defer` 会被算进来，读数就成了 2／6——
+那是**量错**不是"更多命中"，记在这里免得下一程照抄一个错读数。）
+
+⇒ 主尺腿（排 `*_test.go`）的分子**变化量为 0**；G5 那一族的判据件三发是"开且关＋句柄已绑"，
+落"开且关"堆，也不进"只开"堆。**结论：本腿交付后，gate-clauses 的名册与锚点 `b06f7fa0f` 上的完全相同**
+（这条是"我的文件在那些 grep 上零命中"推出来的，不是重跑一遍得到的数；要"重跑一遍的聚合退码"，
+请编排者用 `sh .scratch/wisp/probes/154/gate-clauses.sh 7ff4d9e9f` 跑一遍——那会花 30 分钟以上，
+本腿不再占机时，而且本腿的写面里没有能改 G7 那一族的东西）。
+
+**逐腿现状照抄（锚点 `b06f7fa0f`，14 腿：12 腿 ok、2 腿 BAD、0 腿 SHR）**：
+`G1 0/0 ok · G1b 4/4 ok · G2 2/2 ok · G3 0/0 ok · G4 0/0 ok · G5 2/2 ok · G5pos 0/0 ok · G5neg 14/14 ok ·
+G6 0/0 ok · G6pos 0/0 ok · **G6neg 1/1 ok** · **G7 6→7 BAD** · G7pos 0/0 ok · **G7neg 7→8 BAD**`。
+票面 AC#5 要求的"只 `G6neg`"这一格今天**是对得上的**（1/1）；两腿 BAD 是 G7 那一族（DisposalScope／Defer），
+与产物预览无关，且如上所述产生在**没有我文件的那棵树**上。本腿对"名册不该动"给的是**另一把尺**的读数（不是它的替代品）：
 `Select-String -Path internal/panel/preview_192.go -Pattern 'OpenScope|CloseScope|OpenTask|CloseTask|DisposalScope|Defer\('`
 ＝ 0 行。gate-clauses 的最终数由下一程（或编排者）补，判据只有一条：**除 `G6neg` 外逐腿与名册一致**。
 
