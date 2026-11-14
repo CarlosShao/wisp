@@ -142,7 +142,15 @@ func TestLive228ResidentLegOwnsABallWindowOnTheDesktop(t *testing.T) {
 	}
 	hot := ""
 	if i := strings.Index(verdict, "hotkeys live"); i >= 0 {
-		hot = verdict[i:min(len(verdict), i+80)]
+		// The whole line, not a fixed-width window: ticket 245 AC#6 reads the
+		// count AND which slots are in it (summon/mute/panel live, cancel
+		// standby), and an 80-byte cut stops in the middle of the cancel
+		// sentence. Cut at the line end so the log carries the product's own
+		// sentence and nothing after it.
+		hot = verdict[i:]
+		if j := strings.IndexAny(hot, "\r\n"); j >= 0 {
+			hot = hot[:j]
+		}
 	}
 	t.Logf("AC#1 LIVE: hwnd=%v pid=%d owns the ball window; %s", mine[0], leg.pid(), hot)
 	// Two counts are findings here, and they are findings about DIFFERENT bugs

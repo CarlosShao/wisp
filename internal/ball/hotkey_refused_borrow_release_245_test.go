@@ -97,9 +97,17 @@ type t245Reading struct {
 	finalProbs     []string
 	finalLive      map[uint32]Accelerator
 	finalTaken     bool
-	secondRelease  HotkeyReport // a second return step must be a no-op
-	doorErr        error
-	staHWND        uintptr
+	// finalPublic* is the same end state read through the accessors a host
+	// actually consumes (ticket 245 AC#7 is a report symptom, not a field
+	// one). They are read on the ui-sta thread from inside the closure, so the
+	// field and the accessor cannot disagree because of a later snapshot.
+	finalPublic      HotkeyReport
+	finalPublicProbs []string
+	finalPublicLive  map[uint32]Accelerator
+	finalPublicTaken bool
+	secondRelease    HotkeyReport // a second return step must be a no-op
+	doorErr          error
+	staHWND          uintptr
 }
 
 // t245Run stands the windowless ui-sta door up around one ball and walks the
@@ -163,6 +171,13 @@ func t245Run(t *testing.T, mode t245Mode) t245Reading {
 			o.finalProbs = b.hotkeyReport.Problems()
 			o.finalLive = b.registeredHotkeys
 			o.finalTaken = b.escTakenOver
+			// The same end state through the public seam. b.uiRun runs inline on
+			// this thread, so these are three reads of the state just left
+			// behind, not a later snapshot.
+			o.finalPublic = b.HotkeyReport()
+			o.finalPublicProbs = o.finalPublic.Problems()
+			o.finalPublicLive = b.RegisteredHotkeys()
+			o.finalPublicTaken = b.EscTakenOver()
 			// Idempotency: the host may sync state twice. A second return step
 			// must not move anything - in particular it must not turn a healthy
 			// standby line back into a failure or re-register a key.
@@ -265,6 +280,38 @@ func TestRefusedBorrowReleaseReturnsTheIdleRoster245(t *testing.T) {
 	}
 	if o.finalTaken {
 		t.Error("escTakenOver reads true after the session ended: the ball claims a key it never got")
+	}
+	// AC#7 at the seam the host reads. The fields above are the UI-thread
+	// truth; HotkeyReport/RegisteredHotkeys/EscTakenOver are what cmd/wisp
+	// prints, what the next state sync consumes and what this package's other
+	// rulers read. A fix that only left the fields right would pass every line
+	// above and still hand the operator a stale refusal.
+	if cancel, ok := o.finalPublic.Binding(hkCancel); !ok || cancel.Status != HotkeyStandby || cancel.Err != nil {
+		t.Errorf("the public HotkeyReport() cancel line = %+v (present=%t), want standby with no error: the "+
+			"accessor the host prints still describes the refused borrow", cancel, ok)
+	}
+	if !reflect.DeepEqual(o.finalPublic.Bindings(), o.final.Bindings()) {
+		t.Errorf("HotkeyReport() after the session ended = %s, want the UI-thread truth %s",
+			describe245(o.finalPublic.Bindings()), describe245(o.final.Bindings()))
+	}
+	if got := o.finalPublicProbs; len(got) != 0 {
+		t.Errorf("HotkeyReport().Problems() after the session ended = %q, want none: the accessor the host prints "+
+			"still carries the refusal", got)
+	}
+	if !o.finalPublic.AllLive() {
+		t.Errorf("HotkeyReport().AllLive() = false after the session ended (lines: %s): the seam the host reads "+
+			"still reports a failure Win32 never left behind", describe245(o.finalPublic.Bindings()))
+	}
+	if !reflect.DeepEqual(o.finalPublicLive, o.finalLive) {
+		t.Errorf("RegisteredHotkeys() = %v after the session ended, want the UI-thread set %v",
+			o.finalPublicLive, o.finalLive)
+	}
+	if _, live := o.finalPublicLive[hkCancel]; live {
+		t.Errorf("RegisteredHotkeys() still names the cancel key after a refused borrow was returned: %v",
+			o.finalPublicLive)
+	}
+	if o.finalPublicTaken {
+		t.Error("EscTakenOver() reads true after the session ended: the accessor says the ball holds a key it never got")
 	}
 	// A second return step (the host may sync state twice) changes nothing.
 	if !reflect.DeepEqual(o.secondRelease.Bindings(), o.final.Bindings()) {
