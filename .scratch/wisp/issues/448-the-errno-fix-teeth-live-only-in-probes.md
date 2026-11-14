@@ -7,11 +7,11 @@
 「我证明过它能红」与「它以后不能悄悄变绿」是两件事。446 的证明用的是 `-overlay` 挂进包的**临时**探针，跑完就没了 ⇒ 下一次有人（或某条腿）把这行改回 `== "The operation completed successfully."`，`go test ./internal/tools` **照样全绿**，而那个 bug 在非 en-US 机器上是真的。⇒ 这类洞正是「绿得像门」的典型，必须补一枚**常驻**的检查。
 
 ## 完成判据（AC）
-- [ ] **AC#1 常驻回归闸**：在仓里（`internal/tools/*_test.go` 或 `tools/d22scan` 的静态闸，二选一，**你定并写理由**）落一枚**常驻**检查，使「判定退回英文句子比较」或「调用点漏用 `errnoPresent`」**都会让仓里已接线的那套跑红**。
+- [x] **AC#1 常驻回归闸**：在仓里（`internal/tools/*_test.go` 或 `tools/d22scan` 的静态闸，二选一，**你定并写理由**）落一枚**常驻**检查，使「判定退回英文句子比较」或「调用点漏用 `errnoPresent`」**都会让仓里已接线的那套跑红**。
   - 判据：**把这行改回去 ⇒ 该检查红并点名**；还原 ⇒ 绿。⛔ `-overlay`、⛔ 只放 `probes/`。
-- [ ] **AC#2 两个方向都要红**：①判定函数本体退回句子比较 ⇒ 红；②调用点绕过 `errnoPresent` 直接用旧比较 ⇒ 红（静态闸可，但要在证据里说明它为什么能抓到）。
-- [ ] **AC#3 不引入 env 依赖**：检查要在**任何语言**的 Windows 上都成立（⛔ 依赖 `GetUserDefaultUILanguage` 的返回值），可用 `syscall.Errno(0)` 的字面值／本地化样例做输入。
-- [ ] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`go test ./internal/tools` rc=0 且**四数给出**；`gofumpt -l` 空（⚠ `gofumpt.exe` 在盘上：`D:\work\base\gopath\bin\gofumpt.exe`）；`d22scan` clean；path-length GREEN。
+- [x] **AC#2 两个方向都要红**：①判定函数本体退回句子比较 ⇒ 红；②调用点绕过 `errnoPresent` 直接用旧比较 ⇒ 红（静态闸可，但要在证据里说明它为什么能抓到）。
+- [x] **AC#3 不引入 env 依赖**：检查要在**任何语言**的 Windows 上都成立（⛔ 依赖 `GetUserDefaultUILanguage` 的返回值），可用 `syscall.Errno(0)` 的字面值／本地化样例做输入。
+- [x] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`go test ./internal/tools` rc=0 且**四数给出**；`gofumpt -l` 空（⚠ `gofumpt.exe` 在盘上：`D:\work\base\gopath\bin\gofumpt.exe`）；`d22scan` clean；path-length GREEN。
 - [ ] **AC#5 CI**：`test-core` 与 `test-windows` 各一发**含本修复且完成**的运行（run 号＋`merge-base`＋完成时刻三项齐全）。
 
 ## 边界
@@ -34,3 +34,14 @@
 - **446 的判定逻辑零字节改动**：开工前／每次还原后 sha256 都是 `8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845`，`git diff --name-only` 空。变异前的原件 Copy-Item 到 `probes/448/system_backend_windows.go.pristine`（不用 `git checkout`／`stash`）。
 - **门禁四数**：`go test ./internal/tools` rc=0 **PASS=431 FAIL=0 SKIP=1**（那 1 枚 SKIP 是本票之前就有的 `Test23LiveClipboardRoundTripThroughRealOS`，要 `WISP_T23_LIVE_CLIPBOARD=1`；本票新增 7 个条目 0 SKIP）＋ 包行 `ok … 34.556s`；`go vet ./internal/tools` rc=0；`GOOS=linux go vet ./internal/tools` rc=0；`gofumpt -l` 空；`d22scan` rc=0 clean（ban #8 internal/ 1016 个 Go 文件含新件）；path-length **VERDICT GREEN** rc=0。
 - **AC#5 留白**：⛔ 本腿不 push ⇒ `test-core`／`test-windows` 两发含本 commit 且完成的运行，由编排者推送后取（run 号＋`merge-base`＋完成时刻）。
+---
+
+## 编排者收件（2026-11-14 19:1x，非实现者）：AC#1–#4 翻，AC#5 等 CI
+
+- **尺1**：`016426b3c` 在；`git show --name-only` 只有 2 枚新测试件（`internal/tools/ticket448_errno_gate_test.go`、`ticket448_errno_gate_windows_test.go`）＋ 证据 ＋ probes ＋ 本票 ⇒ **产码零改动**。
+- **我自己核「446 的产码没被动」**：`git hash-object internal/tools/system_backend_windows.go` = **`da42976e6…`**，与 `be0f599f3:` 那版、与 `HEAD:` 那版**三者同串**。
+- **尺2**：`docs/evidence/s1/448-errno-teeth-resident.md` **14671 B**；`probes/448` **12 枚**，含 `10-M1…RED`、`20-M2…RED`、`21-M2b…RED`、`30/31-post-restore-GREEN`、`60-package-tests`、`61-linux-compile`，以及原件 `.pristine`。
+- **尺3 我自己复跑**：`go test ./internal/tools -count=1 -v` ⇒ **RC=0**，**`RUN=584 PASS=583 FAIL=0 SKIP=1`**，`ok … 30.806s`；5 枚 `Test448*` 全 PASS；唯一 SKIP ＝ `Test23LiveClipboardRoundTripThroughRealOS`（本票之前就有，要 `WISP_T23_LIVE_CLIPBOARD=1`）。⚠ 我的 PASS=583 与腿报的 431 **口径不同**：我数到了子测试，腿数的是顶层 —— 两个都对，但引用时必须说清是哪个口径。
+- **我认可它的选型**：闸落包内测试、**不往 `d22scan` 加 ban** —— 因为 d22scan 的 ban 清单是 `PLAN.md` D22 冻结清单的转写，**加 ban #11 等于动契约**（要机主批），为一个小符号把一次人工批准拖进小活不值。它还给了覆盖率理由：`internal/tools` 在 `scripts/portable-tests.sh` 的 core scope（`:385`），无 tag 那半个在 **test-core(ubuntu) 与 test-windows 都跑**；d22scan 只在 lint。
+- **它最值钱的一条读数**：M1（判定退回句子比较）下，`errno-zero-raw` 在**本机仍是绿**（en-US 表恰好对得上）⇒ 那两行**不能当牙**。这正是本票 AC#3 要求的「不依赖本机语言」的机器判据（结构字段 `localeIndependentTooth`，门里断言 ≥3，现 4）。M2（调用点回退）下**行为闸 10/10 全绿、静态闸红** ⇒ 这就是静态牙必须存在的证明。
+- **AC#5 留白**：等我推后 CI 的 `test-core`/`test-windows` 各一发**含 `016426b3c` 且完成**的运行（run 号＋`merge-base`＋完成时刻）。
