@@ -37140,3 +37140,10 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 3. 下一次汇报**首行点名**用了哪条路由。
 
 **报警线**：若 glm 到**周一**仍 0 交付，需要机主决定是继续等还是把 14/15 两天的临时令作废。
+
+**★2026-11-14 16:2x 追加（我自己的假设被推翻，只追加不改上文）**：我在 16:1x 一度判定「真因是 provider 写错（该用 `magpie` 而非 `magpie-high`）」，依据是 `~/.dsh/AGENTS.md` 铁律 3 写着 `provider:"magpie"`＋`auto/glm-5.3-flash` 返回正常。
+**实测推翻**：`w443c` 用 **`provider:'magpie'`** ＋ `auto/glm-5.3-flash` 跑，**同样两次 null**。
+⇒ 累计 **glm 15 次尝试 0 交付**（`magpie-high` 13 ＋ `magpie` 2），跨 4 张票（442/443/444/274-P1）、跨长短两种提示词。
+⇒ **结论修正为**：今天坏的是「DSH → glm」这条组合本身，与 provider 选择无关；`AGENTS.md` 铁律 3 里「magpie＋glm 返回正常」这句**今天不成立**（那句是 2026-11-06 的实测，不是永久事实）。
+⇒ **处置**：全部写腿改 `provider:'magpie'` ＋ `auto/deepseek-v4.1-flash`，**每次汇报首行点名**；glm 一旦恢复由机主发话切回。
+⇒ 我先前那句「provider 那条假设：证据在变强」是**过早判断**（当时只看到两条腿还在跑就当地证），记在此作为我自己的口径错。

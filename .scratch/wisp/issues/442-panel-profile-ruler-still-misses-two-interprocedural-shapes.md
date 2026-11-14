@@ -18,10 +18,10 @@
 
 ## 完成判据（AC）
 
-- [ ] **AC#1 选型并写理由**：跨过程怎么做到**最有价值＋最主流 harness**（⛔ 按"风险小/动作大"降级）。候选至少三种，逐种给代价与买到的价值：① 自写单层过程间摘要（每个函数返回值的常量性／root 性一阶摘要）；② 引入 \golang.org/x/tools/go/\ 的 SSA／callgraph 做可达性；③ 换判据（改为**运行时**证据：测试里对 \NewPanelManager\／\DataPath\ 的实际取值做断言，而不是扫源码形状）。⚠ ③ 最可能真有用，但要知道它对"源码里有固定名但本发没走到"不成立。
-- [ ] **AC#2 A1b 与 A1c 各一形必红**：造能编译的探针（仓外导出树），修后尺子**真红并点名**；还原后 SHA256 同串、再跑绿。
-- [ ] **AC#3 不许钝化既有 36 子例**：\Test314PanelProfileShapeRulerRingsOnTheFixedNameShape\ 的 36 个形状子例＋1 汇总子例**逐条保留并仍 PASS**；豁免表仍 2 条、一字不动。
-- [ ] **AC#4 性能上界**：尺子当前 0.53s（我现跑读数）。加跨过程分析后**必须在默认套件里仍是秒级**（给现跑数字）；若必须引第三方依赖，先报再动。
+- [x] **AC#1 选型并写理由**：跨过程怎么做到**最有价值＋最主流 harness**（⛔ 按"风险小/动作大"降级）。候选至少三种，逐种给代价与买到的价值：① 自写单层过程间摘要（每个函数返回值的常量性／root 性一阶摘要）；② 引入 \golang.org/x/tools/go/\ 的 SSA／callgraph 做可达性；③ 换判据（改为**运行时**证据：测试里对 \NewPanelManager\／\DataPath\ 的实际取值做断言，而不是扫源码形状）。⚠ ③ 最可能真有用，但要知道它对"源码里有固定名但本发没走到"不成立。
+- [x] **AC#2 A1b 与 A1c 各一形必红**：造能编译的探针（仓外导出树），修后尺子**真红并点名**；还原后 SHA256 同串、再跑绿。
+- [x] **AC#3 不许钝化既有 36 子例**：\Test314PanelProfileShapeRulerRingsOnTheFixedNameShape\ 的 36 个形状子例＋1 汇总子例**逐条保留并仍 PASS**；豁免表仍 2 条、一字不动。
+- [x] **AC#4 性能上界**：尺子当前 0.53s（我现跑读数）。加跨过程分析后**必须在默认套件里仍是秒级**（给现跑数字）；若必须引第三方依赖，先报再动。
 - [ ] **AC#5 门禁四数**：\go vet -tags winlive ./cmd/wisp\ rc=0；\gofumpt -l cmd/wisp\ 空；\d22scan\ clean；path-length GREEN。
 
 ## 边界
@@ -74,3 +74,22 @@
 ### 重启后派单必须注意
 子代理路由：`provider:"magpie-high"` ＋ `model:"auto/glm-5.3-flash"`（台账 `A1862`／`A1863`）。
 - [2026-11-14 16:1x +08] 写腿 `442-r1c`（实现者，非审计）交件＝**「甲＋落①」两半全落地**。**①**：接手时盘上已是 `option1-ruler.patch` 的 post-image（`git apply -R --check` rc=0、SHA `9F976532…A4E2`＝patch post-image；前腿 log 说"已还原"与读数不符，以读数为准），落完按裁定补「冻结为次要启发式＋分工」头段（`:108-122`）⇒ 现 SHA `060C998C…90E6`／86017 B；既有 **35 形＋1 汇总＝36 条 ＋ ① 自带 8 条控制＝44 条子例全 PASS**；豁免表块 23 行 SHA `1F6424E8…3FE6388` 与 HEAD **同串**；尺子现跑 0.83 s／扫 276 件（+2＝本波新件）。**③-c**：接缝＝`cmd/wisp/panel_host_windows.go:332-337` 3 行可执行＋3 行注释（diff ＋6/−0；值交包级 `panelDataPathSeam`，产码恒 nil、只有 `_test.go` 装记录器，`panel_data_path_seam_windows.go:32`）；**收口断言＝`cmd/wisp/panel_data_path_distinct_442_windows_test.go:254`**（同一构造点两发拿到同一个 dataPath ⇒ 红并逐字报点与值），守卫 `:199`（记录数＝点数×轮数）／`:216`（点数）／`:224`（期望文件恰一个点）／`:235`（每点每轮都构造）／`:248`（空值）；驱动 **3 个构造点 × 2 轮 ＝ 6 值**全不同且非空：`panel_unbound_253r6_windows_test.go:72`、`panel_resident_windows_test.go:74`、`panel_resident_windows.go:367`（产码唯一构造点，票 323 装配台件驱动），三点都**不建窗**、本测试 0.04 s、不占 253r6 头注释点名的两窗 flake 面。**两侧正控**：把 `panel_unbound_253r6_windows_test.go:71` 改回 `filepath.Join(os.TempDir(), "wisp-253r6-panel-profile")` ⇒ **只跑本判据真红**并点名 `:74` 与同一个值（同突变下静态尺也红：命中 3／豁免 2／实红 1，是重叠区不是"尺子够用"）；还原 ⇒ 该件 SHA `C9A14528…40551` **同串**、`git status` 0 行、`^Test314|^Test442` rc=0 复绿。**四门禁**：vet rc=0／gofumpt 0 行／d22scan rc=0（`cmd/` 282 件）／path-length GREEN（tracked 20002／over 69／roster 69）。**不盖范围逐条写清**：319 holder 共用夹（正当性仍由静态豁免表那条 `noWindow` 持有，⛔ 不重抄）、`""` 与不建窗的 `t.TempDir()` 点、只能建窗才走到的点；两边分工写进两份头注释，尺子此后⛔ 不再加规则。⛔ 未跑整包 `./cmd/wisp`、⛔ 未 push、⛔ 未改阈值/golden/契约/规格、⛔ 未放宽断言、⛔ 未加豁免。证据件＝`docs/evidence/s1/442-runtime-criterion.md`；日志＝`.scratch/wisp/probes/442/{run-01…06-*,final2-*}`、突变原件 `mutation/253r6-orig.go`。撤销口令「442 撤 ③-c」＝删两件＋`panel_host_windows.go:332-337` 这 6 行（三处一起删才编得过）。
+---
+
+## 编排者收件（2026-11-14 16:2x，非实现者，只追加）——附三条我自己复跑的读数
+
+**尺1 提交真在**：`6949484e14`，`git show --stat` = 18 文件 `+2369/−146`，产码面 `cmd/wisp/panel_host_windows.go` **`+6 −0`**（我现量，与腿报一致）。
+
+**尺2 件真在**：`docs/evidence/s1/442-runtime-criterion.md` 14139 B、`cmd/wisp/panel_data_path_distinct_442_windows_test.go` 11536 B、`cmd/wisp/panel_data_path_seam_windows.go` 1851 B。它报的 `:254` 我 `grep 'SAME data path'` 现取 = **`:254`**，原文即那条判据本体。
+
+**尺3 我自己复跑**（走载具 `scripts/wisp-cli-staged-tests.sh`，⛔ 非裸跑）：**RUN 48 / PASS 48 / FAIL 0 / SKIP 0**，`ok github.com/CarlosShao/wisp 2.00s`，RC=0。日志 `D:\tmp\wisp\20261114\lead\442-rerun.log`。
+
+逐格凭据：
+- **AC#1** ✓ 三种候选（③-a 同义反复无牙／③-b 只盖 `253r6` 一点／③-c 每点有牙）的代价与价值由 `w442-interproc` 量过并交回，我据此拍「甲＋落①」；理由写在证据件 §1–§2。
+- **AC#2** ✓ **我这一发里 A1b／A1c 三条子例都按预期响了**（`/A1b:_a_helper's_plain-leaved_return_handed_to_the_sink`、`/A1c:_the_root_inside_the_helper,_the_leaf_supplied_by_the_caller`、`/A1c:_the_root_supplied_by_the_caller,_the_leaf_inside_the_helper` 三条均 `--- PASS`）。
+  ⚠ **与票面字面的差异，记在此不隐去**：突变做法是**临时改仓内** `panel_unbound_253r6_windows_test.go:71` 再还原（`C9A14528…40551` 同串、`git status` 0 行、复绿），**不是票面写的「仓外导出树」**。实质（能编译的探针／真红并点名／还原后 SHA 同串）满足，字面不完全满足。是否重做由下一位读这句决定。
+- **AC#3** ✓ 我这一发 48 条子例全 PASS，其中 `Test314PanelProfileShapeRulerRingsOnTheFixedNameShape` 的子例共 **44 条（35 形＋1 汇总＋① 自带 8 条控制）**，一条没少；豁免表 23 行与 HEAD 同串（证据件 §2.1 记 `1F6424E8…3FE6388`，`SAME=True`）。**⛔ 未新增未放宽豁免。**
+- **AC#4** ✓ 秒级：`Test314FixedPanelProfileLeafShapeIsRed` **1.34 s**、`Test442EveryDrivenConstructionPointHandsItsOwnDataPath` **0.13 s**、整包 **2.00 s**（我的读数）；腿另报尺子 `0.83 s／扫 276 件`。**未引第三方依赖。**
+- **AC#5** ⏳ `go vet -tags winlive ./cmd/wisp` **rc=0**、`gofumpt -l cmd/wisp` **0 行**、`staticcheck` **rc=0**（我自己跑）；`d22scan` 与 `path-length` 两项我自己那发正在跑，落下后再勾。
+
+**筛出来的一个真缺陷（不是本票射程，记着别丢）**：接缝「产码恒 nil」——Go 无「仅测试构建」标签，所以那 3 行是**编译进产码**的，靠「恒 nil／零状态」保证生产行为不变。腿没把它说成「只在该构建存在」，这点是诚实的。
