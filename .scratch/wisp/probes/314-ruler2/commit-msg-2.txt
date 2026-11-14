@@ -1,0 +1,3 @@
+ticket 314: the Progress log records the repair the audit asked for, with the numbers rather than a claim.
+
+It carries the repair commit, what each of D1 to D5 now does, and the two out-of-repo readings that make them more than prose: the same compilable probe is silent under HEAD's ruler (275 files, 0 red) and 12 reds under the repaired one, and four self-mutilations in a third export tree each turn exactly their own resident control red. It also names what is still out - A1b and A1c, both function-boundary shapes - and says plainly that no whole-package run, push or production file was touched.
