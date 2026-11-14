@@ -3,6 +3,7 @@ package observe
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -218,8 +219,32 @@ func (p QuotaParams) SelectChain(chain []string, cards map[string]QuotaModel, pr
 // same DayKey shape memory validates; on a bucket change the old numbers are
 // dropped, because a new day/month resets per-model caps by definition —
 // exactly the "resumable next day" behavior 票 44:22 asks of budgets.
+//
+// Concurrency (ticket 44 race leg, docs/evidence/s1/44-quota-ledger-race.md):
+// ONE ledger serves the whole run. QuotaGate.Decide snapshots it before every
+// dispatch (internal/agent/quota_44r4.go) while Book posts spend after each
+// turn, and a root agent plus its subagents do both at the same time. So
+// Spend and Post are concurrent entry points, and rollLocked is a WRITER of
+// the bucket stamps plus a clear() of the maps whenever the calendar day or
+// month moved — the torn stamp read CI's Test197Subagent… hit inside roll is
+// exactly the access this mutex now serializes.
+//
+// mu guards EVERY field below, the two stamps included: deciding "did the
+// bucket change" against a stamp another goroutine is rewriting is the same
+// race as touching the maps, and the pair must be seen together or a reader
+// can judge a fresh day against yesterday's buckets. The critical sections are
+// pure in-memory map work (no I/O, no clock wait); Spend already copies all
+// three maps into its QuotaSpend result, so the lock covers the work the
+// reader would do anyway, and it is taken once per DISPATCH, not per model —
+// a dispatch is a network round trip, so this cannot become the throughput
+// ceiling. The alternative shape, an immutable snapshot replaced by an atomic
+// pointer, would buy a lock-free Spend by moving that same copy onto every Post
+// (three fresh maps per booking) and turning "the day rolled" into a
+// compare-and-swap over a whole state struct: more machinery for no measured
+// gain on a path where two goroutines hand each other the ball once per turn.
 type QuotaLedger struct {
-	now      func() time.Time
+	mu       sync.Mutex       // guards every field below
+	now      func() time.Time // injected clock; written once by NewQuotaLedger
 	dayKey   string
 	monthKey string
 	modelDay map[string]int64
@@ -241,10 +266,12 @@ func NewQuotaLedger(now func() time.Time) *QuotaLedger {
 	}
 }
 
-// roll advances the bucket stamps; a zero or changed day empties the day
+// rollLocked advances the bucket stamps; a zero or changed day empties the day
 // maps, a changed month empties the month maps. Called on every read and
 // write so a long idle session cannot judge against yesterday's numbers.
-func (l *QuotaLedger) roll() {
+// The caller holds l.mu: roll takes it, Post and Spend take it, so no reader
+// ever sees a stamp its own map state was not rolled with.
+func (l *QuotaLedger) rollLocked() {
 	t := l.now()
 	d := DayKey(t)
 	m := d[:len("YYYY-MM")]
@@ -259,6 +286,20 @@ func (l *QuotaLedger) roll() {
 	}
 }
 
+// roll is rollLocked with the lock taken, for the one writer whose call site
+// lives outside this file: SeedFrom (internal/observe/costmodel_44b.go) opens
+// with l.roll() and then books rows into the maps itself. That seed is
+// documented as a boot-time call made before any task books
+// (QuotaGate.SeedBaseline), so it is not on the concurrent path this leg
+// closes; its own map writes are a NAMED open item in
+// docs/evidence/s1/44-quota-ledger-race.md, because protecting them needs one
+// line in costmodel_44b.go, which is outside this leg's write face.
+func (l *QuotaLedger) roll() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.rollLocked()
+}
+
 // Post books one dispatch's spend against the model's caps and, when the
 // model bills as a plan, against its provider's credit line. Negative micros
 // are refused rather than credited: a ledger that accepts negatives is one
@@ -267,7 +308,9 @@ func (l *QuotaLedger) Post(m QuotaModel, micros int64) error {
 	if micros < 0 {
 		return fmt.Errorf("observe: quota ledger refuses negative spend (%d micros for %s)", micros, m.Key())
 	}
-	l.roll()
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.rollLocked()
 	if micros == 0 {
 		return nil
 	}
@@ -279,9 +322,13 @@ func (l *QuotaLedger) Post(m QuotaModel, micros int64) error {
 	return nil
 }
 
-// Spend snapshots the current buckets for JudgeModel/SelectChain.
+// Spend snapshots the current buckets for JudgeModel/SelectChain. The copy is
+// made under l.mu, which is what makes the returned QuotaSpend a consistent
+// picture instead of three maps sampled while another task booked.
 func (l *QuotaLedger) Spend() QuotaSpend {
-	l.roll()
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.rollLocked()
 	cp := func(src map[string]int64) map[string]int64 {
 		dst := make(map[string]int64, len(src))
 		for k, v := range src {
