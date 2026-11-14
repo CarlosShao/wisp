@@ -246,6 +246,6 @@ build\wisp.exe panel-assets -check     → rc=0，150 ms，
 - **零测试**：⛔ 未跑 `go test`／`go build`／`go vet`（`cmd/wisp` 面全程没碰）；四条 `go list -f '{{.EmbedFiles}}' ./frontend` 级别的只读尺是 `go list`，不编译不落盘。
 - **零 push**、⛔ 无 `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`；commit 走显式 pathspec。
 - **框数**：起手 9/12（未勾 `AC#0`／`AC#2`／`AC#8`），本件交件后**仍是 9/12**——⛔ 一枚没翻（翻勾归编排者）。
-- **六族 porcelain 两头（如实记一处别人的在飞变动）**：起手＝**14 行**（1 ` M` `frontend/fixtures/composer-states.html` ＋ 13 `??`）；本腿交件前现量＝**16 行**（3 ` M` ＋ 13 `??`），多出的两枚 ` M` 是 `cmd/wisp/resident_ball_live_228_windows_test.go` 与 `internal/ball/hotkey_refused_borrow_release_245_test.go`，出现在本腿**只读**期间，属别的腿在飞，本腿不改、不算进作差。
+- **六族 porcelain 两头（如实记一处别人的在飞变动）**：起手＝**14 行**（1 ` M` `frontend/fixtures/composer-states.html` ＋ 13 `??`）；本腿交件前现量＝**17 行**（3 ` M` ＋ 14 `??`，其中 1 枚 `??` 是本件；剔掉本件＝16 行），多出的两枚 ` M` 是 `cmd/wisp/resident_ball_live_228_windows_test.go` 与 `internal/ball/hotkey_refused_borrow_release_245_test.go`，出现在本腿**只读**期间，属别的腿在飞，本腿不改、不算进作差。
 - **未采信任何腿的自报**：本件全部数字来自 `gh` 现拉＋本机现跑；引用旧件（`274-ac0-counts.md`／`near-done-triage.md`）只用于指出"哪些栏过去判过"，未拿它们的数当本件读数。
 - **不采信通知**：本腿没有别人交来的件要收。
