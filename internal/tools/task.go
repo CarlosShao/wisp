@@ -284,6 +284,14 @@ func (r *TaskRoster) Record(taskID string, o TaskOutput) {
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	r.recordLocked(taskID, o)
+}
+
+// recordLocked is Record's body; the caller already holds r.mu. It exists
+// because ticket 197's in-flight publish has to write the row and the stop
+// handle in ONE critical section (see PublishSubagentInFlight), so it must reuse
+// this exact identity-preserving write rather than keep a second copy of it.
+func (r *TaskRoster) recordLocked(taskID string, o TaskOutput) {
 	if r.byTask == nil {
 		r.byTask = map[string]TaskOutput{}
 	}
@@ -403,15 +411,61 @@ func (r *TaskRoster) Descendants(taskID string) []TaskRecord {
 }
 
 // PublishSubagent files (or re-files) the identity row of one subagent as
-// in-flight. Both publishers of ticket 197's row - the spawner's goroutine and
-// the child loop's own admission hook - call this with the SAME values, so
-// last-writer-wins is idempotent and the row exists before the child's first
-// model call either way.
+// in-flight, WITHOUT a stop handle. That is honest only for a row that has no
+// handle by construction: a fixture, or the "sibling that nobody may stop" a leg
+// files to prove Cancel touches exactly one row.
+//
+// The production spawn path must NOT use it. A row that reads in flight and
+// cannot be stopped is precisely the lie ticket 70 step 7 read out of CI
+// (state=Thinking yet 「没有在跑 … 没有可停的句柄」), so the spawner files through
+// PublishSubagentInFlight, which writes the row and the handle in one critical
+// section. Test197SpawnPathPublishesRowAndStopHandleTogether is the ruler that
+// keeps that split; this function's own callers are tests only.
 func (r *TaskRoster) PublishSubagent(taskID, parentTaskID, label string) {
 	r.Record(taskID, TaskOutput{
 		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindSubagent,
 		State: statemachine.State(subagentStateRunning),
 	})
+}
+
+// PublishSubagentInFlight files (or re-files) one in-flight subagent's roster
+// row AND attaches its one stop handle in the SAME critical section. This is the
+// spawn path's only publisher (ticket 197, rewired by ticket 70 step 7).
+//
+// Why one call and not two calls: Cancel answers 「没有在跑」 for a known row whose
+// handle is nil (Cancel below). With the row published first and the handle
+// attached second there is an instant where both facts are true of the same row
+// - the row says this child IS running, the refusal says it is NOT - and the only
+// way to close it is to make 「行可见 ⇒ 句柄已挂」 a property of the table instead
+// of an ordering convention between two call sites. CI caught exactly that
+// instant in 2 of 20 runs of Test221SubagentCannotStopSiblingOrItself /
+// Test221ParentStopsItsOwnChildRowAndStreamSettle; the local instrument
+// (Test197InFlightRowNeverLacksItsStopHandle) reproduces it under scheduler
+// contention and reads 0 hits afterwards.
+//
+// Re-publishing is idempotent and safe: both publishers (the child's admission
+// hook, which is the one that matters because it runs before the child's first
+// model call, and the spawn goroutine, which keeps "a child that has started has
+// a row" true) pass identical values and the SAME cancel handle, so
+// last-writer-wins on either map cannot erase the other half.
+//
+// A nil cancel publishes NOTHING: this call exists to make a row stoppable, and
+// a row that cannot be stopped must not become visible as in flight. The two
+// call sites in subagent_197.go both pass the child's real cancel handle.
+func (r *TaskRoster) PublishSubagentInFlight(taskID, parentTaskID, label string, cancel func()) {
+	if r == nil || taskID == "" || cancel == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.recordLocked(taskID, TaskOutput{
+		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindSubagent,
+		State: statemachine.State(subagentStateRunning),
+	})
+	if r.cancel == nil {
+		r.cancel = map[string]func(){}
+	}
+	r.cancel[taskID] = cancel
 }
 
 // MarkRoot files the root identity for a task the host is running itself.

@@ -35,8 +35,9 @@ import (
 //     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
 //     an off-register source would be exactly the unowned channel D30 warns about.
 //   - not a second stop path. The only cancel that exists is the child's own
-//     context.CancelFunc, stored in the roster (TaskRoster.AttachCancel) and read
-//     back by TaskRoster.Cancel.
+//     context.CancelFunc, stored in the roster by the SAME publish that files the
+//     row (TaskRoster.PublishSubagentInFlight, so the handle can never be missing
+//     from a row that reads in flight) and read back by TaskRoster.Cancel.
 
 // Subagent identity, pool and depth constants. They live in this one file on
 // purpose: leg B (internal/panel) reads the KEY SHAPE, not these numbers.
@@ -330,12 +331,31 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	if t.d.Stream != nil {
 		opt.Sink = subagentTextSink(t)
 	}
+	// The child's own cancelable context is minted HERE, ahead of the admission
+	// hook below, because that hook is what files the roster row together with
+	// this handle. Parent cancellation must not cascade (ticket 197 §0):
+	// WithoutCancel keeps the call's values (its cancel handle carrier, the C25
+	// boxes) while dropping its cancellation and its deadline, so the child is a
+	// task the host can still find, stop and audit - not a detached goroutine.
+	childCtx, cancelChild := context.WithCancel(context.WithoutCancel(ctx))
+
 	// The child is admitted through the PARENT's admission hook, i.e. the host's
-	// one approval queue - which is also the second publisher of its roster row
-	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+	// one approval queue - and that hook is also where the roster row is filed,
+	// because it is the only publisher that runs before the child's first model
+	// call (internal/agent/loop.go:409-414 is upstream of every provider call).
+	//
+	// Ticket 70 step 7: this hook used to file the row WITHOUT the stop handle,
+	// and the handle was attached one statement after the spawn goroutine's own
+	// publish below. That gap is the window CI caught twice in 20 runs - the row
+	// read state=Thinking while task.cancel answered 「没有在跑 … 没有可停的句柄」,
+	// two contradictory facts about the same row. The row and the handle now land
+	// in ONE critical section (TaskRoster.PublishSubagentInFlight), so the row
+	// cannot be observed before the handle is attached. The status dimension's
+	// visible semantics are unchanged: D43's Thinking from admission until the
+	// finalize below, Muted when the host stops it.
 	baseAdmit := base.AdmitTask
 	opt.AdmitTask = func(taskID string) func() {
-		t.d.Roster.PublishSubagent(taskID, parentID, label)
+		t.d.Roster.PublishSubagentInFlight(taskID, parentID, label, cancelChild)
 		revoke := baseAdmit(taskID)
 		return func() {
 			if revoke != nil {
@@ -346,32 +366,25 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 
 	child, err := agent.New(opt)
 	if err != nil {
+		// The child's cancel handle was minted above (its admission hook needs
+		// it); no loop exists to own it now, so the parent link is dropped here
+		// rather than left registered until the tool call's ctx goes away.
+		cancelChild()
 		release()
 		return Result{Text: "子代理环路装配失败：" + err.Error(), IsError: true}, nil
 	}
 
-	// Parent cancellation must not cascade (ticket 197 §0). WithoutCancel keeps
-	// the call's values (including its cancel handle and C22 deadline carrier)
-	// while dropping its cancellation/deadline, so the child is a task the host
-	// can still find, stop and audit - not a detached goroutine.
 	// The child loop's task id is minted by the loop itself (agent.newTaskID,
-	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
-	// Loop has no exported entry point that takes a caller-supplied id - that
-	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
-	// and inventing one is not this ticket's call. So the row is published from
-	// THIS goroutine as the first act after the id exists, and the child's own
-	// admission hook (below, always fired before its first model call) publishes
-	// the identical row a second time: there is no window in which a running
-	// child has no roster row, which is the DSH/Step-Code failure mode this step
-	// exists to prevent.
-	// Parent cancellation must not cascade (ticket 197 §0). WithoutCancel keeps
-	// the call's values (its cancel handle carrier, the C25 boxes) while dropping
-	// its cancellation and its deadline, so the child is a task the host can still
-	// find, stop and audit - not a detached goroutine.
-	childCtx, cancelChild := context.WithCancel(context.WithoutCancel(ctx))
+	// internal/agent/loop.go:364), and Loop has no exported entry point that takes
+	// a caller-supplied id - that gap is the open question Q-56 recorded in
+	// bridge.go's CloseTask comment, and inventing one is not this ticket's call.
+	// So the spawn goroutine files the identical row as its first act after the id
+	// exists - through the SAME one-step publisher and with the SAME handle the
+	// admission hook above uses. That keeps ticket 197's "a child that has started
+	// has a roster row" true without reopening ticket 70 step 7's window: this
+	// write can no more expose a row without its handle than the admission one.
 	bg := child.RunAsync(childCtx, prompt)
-	t.d.Roster.PublishSubagent(bg.ID, parentID, label)
-	t.d.Roster.AttachCancel(bg.ID, cancelChild)
+	t.d.Roster.PublishSubagentInFlight(bg.ID, parentID, label, cancelChild)
 	// Ticket 222 (丙): the wait below is not an execution, so it must not hold a
 	// D38d bridge token. Until here the spawn held one across the whole wait for
 	// its child, and the child asks for one of those SAME tokens to run any tool
