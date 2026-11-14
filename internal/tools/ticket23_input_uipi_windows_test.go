@@ -23,6 +23,10 @@ package tools
 //     resolves to our own pid when it does not - either way the pid under the
 //     predicate is OURS, so the non-elevated answer is guaranteed and no
 //     ambient focus can flip it;
+//   - the predicate's own token reading, anchored on this process: our token
+//     integrity must equal the independently read currentIntegrity(). Without
+//     that leg the two legs above cannot tell a wrong "not elevated" from a
+//     right one, because the not-elevated answer is the same either way;
 //   - realProcessName producing exactly the D45 input.type binding key
 //     (approval_grant.pattern, memory/schema.go:105): the image name, lower
 //     case, no directory - the shape ticket 49's grant rows will be written
@@ -34,6 +38,7 @@ package tools
 
 import (
 	"errors"
+	"os"
 	"strings"
 	"testing"
 
@@ -151,6 +156,47 @@ func Test23UIPIPredicateLetsLiveNonElevatedTargetThrough(t *testing.T) {
 	}
 	if got != 1234567890 || strings.TrimSpace(name) == "" {
 		t.Fatalf("放行腿读数异常：hwnd=%d name=%q", got, name)
+	}
+}
+
+// Test23IntegrityOfProcessAnchorsOnThisProcess is the leg that can actually
+// fail on the handle mistake realProcessElevated used to make. The other two
+// legs cannot: one stubs the predicate true, and the live one asks about a
+// target whose true answer is "not elevated" - which is exactly the answer a
+// broken predicate gives too (integrity 0 > self is false for every target), so
+// a handle mix-up passes them both.
+//
+// The anchor is the one integrity level the test knows independently: its own.
+// currentIntegrity() opens our token through the current-process pseudo handle
+// (the correct shape), so if integrityOfProcess (which must open the process and
+// THEN its token) mistakes the process handle for a token, its answer collapses
+// to 0 while currentIntegrity() still reads the real level - and this leg goes
+// red. On this machine both read 8192 (0x2000, medium); the assertion is equality
+// plus "neither is the unknown 0", which is what makes the two readings one
+// measurement instead of two zeros agreeing.
+func Test23IntegrityOfProcessAnchorsOnThisProcess(t *testing.T) {
+	pid := uint32(os.Getpid())
+	self := currentIntegrity()
+	got := integrityOfProcess(pid)
+	t.Logf("本进程 pid=%d：integrityOfProcess=0x%x (%d)／currentIntegrity=0x%x (%d)",
+		pid, got, got, self, self)
+	if self == 0 {
+		t.Fatalf("currentIntegrity() 回了 0：本进程自己的令牌都读不出来，这枚锚不成立（门禁环境异常，不是谓词问题）")
+	}
+	if got == 0 {
+		t.Fatalf("integrityOfProcess(本进程 pid=%d) 回了 0，currentIntegrity() 是 %d：进程句柄被当成令牌句柄喂给 GetTokenInformation 了（UIPI 谓词会因此恒假）", pid, self)
+	}
+	if got != self {
+		t.Fatalf("integrityOfProcess=%d 与 currentIntegrity=%d 不等：同一个进程的两个读数必须相同，差的那一侧是错句柄", got, self)
+	}
+	if got < 0x1000 {
+		t.Fatalf("integrityOfProcess=%#x 低于最低的完整性 RID 0x1000：读到的不是 IL", got)
+	}
+	// Same measurement, through the predicate that ships: a process at our own
+	// integrity level is never "elevated", and the single token reader above is
+	// the one it now uses.
+	if realProcessElevated(pid) {
+		t.Fatalf("realProcessElevated(本进程 pid=%d)=true：同 IL 目标被判提权，input.type 会对自己也拒", pid)
 	}
 }
 

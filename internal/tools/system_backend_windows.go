@@ -726,22 +726,50 @@ func realProcessName(pid uint32) string {
 // exactly when the target's integrity level is higher, and asking first is what
 // turns a silent no-delivery into the explicit message ticket 23 requires.
 func realProcessElevated(pid uint32) bool {
-	self := currentIntegrity()
 	if pid == 0 {
 		return false
 	}
-	h, err := windows.OpenProcess(processQueryLimitedInfo, false, pid)
-	if err != nil {
-		// Cannot open (already an access refusal): treat as elevated, which is
-		// the fail-closed answer - we do not attempt an injection we cannot
-		// verify.
+	self := currentIntegrity()
+	target := integrityOfProcess(pid)
+	if target == 0 {
+		// Fail closed. Opening the process (or its token) is itself refused for
+		// a higher-integrity target, and a label we cannot read is not proof
+		// that the target is reachable: guessing "not elevated" is exactly the
+		// silent UIPI drop ticket 23 exists to remove, while guessing "elevated"
+		// costs only an honest refusal. So an unmeasurable target counts as
+		// elevated - never the other way round.
 		return true
 	}
-	defer windows.CloseHandle(h)
-	return integrityOf(windows.Token(h)) > self
+	return target > self
 }
 
-// integrityRID returns the integrity level of the current process token.
+// integrityOfProcess returns the integrity level of pid's primary token (0x1000
+// low, 0x2000 medium, 0x3000 high, 0x4000 system), or 0 when it could not be
+// read. Two handles are involved and both are closed here: OpenProcess gives the
+// process, and OpenProcessToken(h, TOKEN_QUERY, ...) gives the TOKEN that carries
+// TOKEN_MANDATORY_LABEL. GetTokenInformation only understands token handles, so
+// passing it a process handle answers "The handle is invalid" and the level reads
+// as 0 - the defect that made realProcessElevated answer "not elevated" for every
+// protected window. Keeping the measurement in one function is what lets the
+// test pin it against currentIntegrity() on our own process.
+func integrityOfProcess(pid uint32) uint32 {
+	if pid == 0 {
+		return 0
+	}
+	h, err := windows.OpenProcess(processQueryLimitedInfo, false, pid)
+	if err != nil {
+		return 0
+	}
+	defer windows.CloseHandle(h)
+	var tok windows.Token
+	if err := windows.OpenProcessToken(h, windows.TOKEN_QUERY, &tok); err != nil {
+		return 0
+	}
+	defer tok.Close()
+	return integrityOf(tok)
+}
+
+// currentIntegrity returns the integrity level of the current process token.
 func currentIntegrity() uint32 {
 	var h windows.Token
 	if err := windows.OpenProcessToken(windows.CurrentProcess(), windows.TOKEN_QUERY, &h); err != nil {
@@ -752,8 +780,9 @@ func currentIntegrity() uint32 {
 }
 
 // integrityOf reads TOKEN_MANDATORY_LABEL's last RID (the integrity level: 0x1000
-// medium, 0x2000 high, 0x3000 system). Zero means "unknown", and callers treat an
-// unknown target as NOT elevated only when the source is the same unknown.
+// low, 0x2000 medium, 0x3000 high, 0x4000 system). Zero means "unknown" - either
+// the handle is not a token handle or the query failed - and realProcessElevated
+// treats an unknown TARGET as elevated (refuse), never as "safe to inject".
 func integrityOf(tok windows.Token) uint32 {
 	var n uint32
 	_ = windows.GetTokenInformation(tok, windows.TokenIntegrityLevel, nil, 0, &n)
