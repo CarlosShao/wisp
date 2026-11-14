@@ -22,9 +22,9 @@
   (c) 真产码缺陷（⇒ 立刻停手上报，票升格）；
   (d) 墙钟上界（⛔ 不许拿 `took<5s` 当判据，改用可判事实）。
 - [x] **AC#3 修或弃权，逐枚给读数**：(a)/(d) 按 441/445 已确立的形修（等落定＋具名弃权行＋数字＋可 grep token）；(b) 具名弃权；(c) 单独立票。
-- [ ] **AC#4 不许钝化**：⛔ 不许删/放宽任何既有断言来让它绿；若要放宽，必须在证据里逐条列出放宽了什么、为什么，并标 `⚠ 放宽`。
+- [x] **AC#4 不许钝化**：⛔ 不许删/放宽任何既有断言来让它绿；若要放宽，必须在证据里逐条列出放宽了什么、为什么，并标 `⚠ 放宽`。
 - [ ] **AC#5 收尾判据**：修后**连续 5 发** `test-windows` 的 step10 里 `FAIL` 那一位恒为 0（给 5 个 run 号）；且本地 `./cmd/wisp` 走载具跑一次给四数。
-- [ ] **AC#6 牙**：至少对修过的其中 **2 枚**各造一发「把护栏拆掉」的突变（仓外导出树）⇒ 必须真红并点名；还原 SHA256 同串、再绿。
+- [x] **AC#6 牙**：至少对修过的其中 **2 枚**各造一发「把护栏拆掉」的突变（仓外导出树）⇒ 必须真红并点名；还原 SHA256 同串、再绿。
 
 ## 边界
 写面：`cmd/wisp/**` 的 `*_test.go`（**本波只有你一枚写腿碰 `cmd/wisp`**）、`docs/evidence/s1/447-*`、`.scratch/wisp/probes/447/**`、本票 Progress log（只追加）。
@@ -101,3 +101,25 @@
 - **整包四数（载具，本机，21:24–21:48）**：`RUN=853 PASS=611 FAIL=2 SKIP=17`（`FAIL … cmd/wisp 1817.00s`）。两枚红**都不是本腿的、且都是票面点过名的本机已知红**：`TestAC4FocusReturnToPriorWindowGap33r5`（前台被占）、`TestAC246DevLegIgnoresTheTestTaskInjection`（"a dev Wisp is already running in this session"）。三枚靶子里两枚在同一次整包内**绿**。
 - **没翻的**：AC#5（CI 连续 5 发 FAIL 恒 0）要推送后由编排者复读，本腿 ⛔ push；`AC13ColdStart` 的 (c) 最终定性要等下一发 CI。
 - **踩坑记（给下一腿）**：PowerShell 直接调载具 exe 时，`-test.count=3` 会被 PS 拆成 `-test` ＋ `.count=3`，二进制报 `flag provided but not defined: -test` ⇒ **每个 `-test.*` 必须单独引号**，或走 cmd.exe。第一次载具跑就是因为这个假红。
+---
+
+## 第二轮收件（2026-11-14 21:5x，`25f85a678`）：三枚新红全定性，AC#4／AC#6 翻
+
+**尺**：提交在，落点＝`cmd/wisp/panel_resident_windows_test.go`、`cmd/wisp/resident_voice_selfecho_26r3_windows_test.go`、`internal/agent/ticket285_corr_distinct_rulers_test.go`（**全是 `_test.go`，产码 0 字节**）；证据件 `docs/evidence/s1/447b-three-new-reds.md` **19942 B**；★**我自己跑** `go test ./internal/agent -run '^Test285LoopDispatchesOneCorrPerCall$' -race -count=3` ⇒ **`ok … 1.152s` RC=0，零 race**，锁在 `:40/:52/:61`。
+
+### 三枚的判（腿的原判，我照录）
+| 枚 | 判 | 关键读数 |
+|---|---|---|
+| `Test285LoopDispatchesOneCorrPerCall`（0.00s，linux） | **缺陷在「尺」上，不在产码** | 产码 `loop.go:791` 为每枚调用真起一个 goroutine（D38d 上限 4）；尺 `:37` 无锁 `append`，两条 goroutine 同读 `len=0` 同写 `index 0`，**后写覆盖先写** ⇒ `-race` 点名 `DATA RACE … (*recordCorrProvider).Execute`。改法：加 `sync.Mutex` ＋同锁快照，**断言一行没改**；`-count=5` 10/10、`-race -count=3` 零 race |
+| `Test26R3AnnounceClosesTheCaptureGate`（9.87s） | **(a) 读早了** | 同一毫秒里 `to=Warm`（11:54:56.826）先写、`capture gate reopened` 后写；而 `SetSpeaking(false)` 在 stage 之后 ⇒ 尺等 stage、判 gate。改法：`waitGate26r3`（谓词＝gate 自己落定），**M1/M2 两句命名原样搬到超时路径**，精确计数未动 |
+| `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`（15.64s） | **(d) 墙钟上界，⚠ 带 (c) 风险** | 关键不是"0 of 1"，而是 `no probe attempt over 8 attempt(s) … last report: ""` —— 15s 里 **8 次探针一次回话都没有**；同一发里 `299` 从同一个 entry URL 读出 `ready=complete root=yes`。冷启动 511.5ms vs 绿发 445.8ms ＝1.15×（**不是"慢"**）。⚠ (c) 风险写清：六个 head 全是文档/台账提交 ⇒ 3 红 3 绿跑**同一份产码**，只证明偶发、不证明产码无罪；`serveEntry` 只发 `Navigate`、**无 `NavigationCompleted` 读面、无重试**。改法：新增 settle 闸（问 `href|readyState|title`，超时打 `447-ac13-handover-never-answered` ＋数），**AC#13 内容断言一字未改** |
+
+### 牙（AC#6 的两枚，都在仓外导出树）
+- `285Loop`：把 `callCorr` 的 call id 去掉 ⇒ 红并点名 `:150 … the two asks share one routing key`；还原 SHA256 同串再绿。
+- `AC13`：顺序突变 ⇒ `about:blank|complete|` ⇒ `"0"` ⇒ **原 AC#13 那句红**；还原 SHA256 同值再绿。★谓词**故意不要求 href 是 entry**，否则"顺序反了"的世界会落到新红上、原句再也不点名 —— 这个设计我认。
+
+### AC#4 翻（放宽已逐条列）
+第一轮那条 D32 冷预算搬 `winlive` 档的放宽，已在证据 §5 列「放宽什么／为什么／代价／撤销口令」，并已按台账告知机主。本轮无新放宽。
+
+### AC#5 **仍未翻**（我不放过）
+要**连续 5 发** `test-windows` 的 `FAIL` 恒 0。现在含修复的 6 发是 **3 绿 3 红**（红的是本票正在修的三枚），**凑不出连 5**。等这三枚修复推上去后由 CI 自然产生，我不用再推。
