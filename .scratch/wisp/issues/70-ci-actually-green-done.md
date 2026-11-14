@@ -301,3 +301,12 @@
 2. `6f23ce632`＋`756ebbcfa`＋`f8e94bbd8` `QuotaLedger` 无锁竞争（修前 39 条 DATA RACE ＋ 1 fatAL，修后 `-race` 5/5 绿）
 3. `d8e2f4dc8`＋`0c9ff7c0c` 子代理发布/挂句柄窗口（6400 枚在飞 0 命中）
 4. `b52365b71` 起 CI 转绿
+
+### 更正记（2026-11-14 15:5x，编排者补，只追加不改上文）
+
+本票结案判据是「两发连续绿」，那两发**确实**达到了，判据没被降低。但今天后续 10 发里 **3 发红**，两处**互不相干**的 flake 源现量如下 ⇒ **「CI 已经稳稳绿了」这句话不成立，本票不作此声明**：
+
+1. `test-core`（Linux）`TestPOSIX120SealWindowLeafSwapIsClosed` —— run `43565131755`(head `05fb21317`) 红，同套在 `069f97cac`／`779d6c6fa`／`86e5655ba` 三发绿 ⇒ **已立票 441，已修**（拆两载体、弃权具名带数字）。
+2. `test-windows` step 13 `Test52TimeoutKillsTheProcessTree` —— run `43567331249`(head `e1cc304e0`) 与 `43568581591`(head `1f0d04714`) 红，`a46352fd3` 绿 ⇒ **3 发红 2**，**已立票 443**。红句 `command_52_test.go:748: the fixture never reported a grandchild pid` ＝仪器没观测到就判红（与 441 同机理）。
+
+⇒ 本票修的是**名单闸那道**（roster gate），那部分证据依然成立；**整条 CI 的可信度**由 441／443 负责，不等于本票已结。
