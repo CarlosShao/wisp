@@ -209,6 +209,16 @@ func main() {
 	record("focus_is_edit", focus == st.edit)
 	if err != nil || fg != st.hwnd || focus != st.edit {
 		record("ABORTED", "focus could not be placed on the fixture edit control; nothing was typed")
+		// PROBE23-UIPI-SPLIT (orchestrator 2026-11-14): the two halves of AC#3
+		// have different premises. Typing 300 chars needs the fixture to own the
+		// foreground; the elevated-target half does NOT - the refusal happens at
+		// the integrity gate, before a single character is typed, so it needs no
+		// focus at all. Measured on this desktop: an elevated window (Taskmgr,
+		// High IL) held the foreground and a Medium-IL process cannot take it
+		// back, which aborted the run and left the UIPI reading unmeasured even
+		// though it was measurable. Run that half before exiting.
+		record("fixture_half_skipped", "foreground held by a higher-integrity window")
+		elevatedForm(entries, st, fixtureDir)
 		_ = cmd.Process.Kill()
 		writeSummary()
 		os.Exit(3)
