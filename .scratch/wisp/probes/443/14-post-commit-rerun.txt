@@ -1,0 +1,24 @@
+time=2026-11-14T16:51:27.694+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:51:28.482+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 44696 reached the test (budget-ms=500 elapsed-ms=737 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 44696 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.52s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin/manifestslot	1.601s
+time=2026-11-14T16:51:31.735+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:51:32.481+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:811: AC#2 ABSTAIN(443:timeout-tree:raced-no-pid) budget-ms=500 elapsed-ms=755 waited-ms=1005 polls=96 pid-seen=no pid-file="C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid" last-poll-error="open C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid: The system cannot find the file specified." - the budget expired before the fixture reported the grandchild it was supposed to be killed with, so THIS run cannot attest the tree kill from the race; the carrier is the 4000ms control run below, not a green from absence
+time=2026-11-14T16:51:37.740+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:813: AC#2 control run: grandchild pid 59440 reached the test (budget-ms=4000 elapsed-ms=4216 waited-ms=0 polls=1)
+    command_52_test.go:813: AC#2 control run: grandchild pid 59440 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (6.42s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin/manifestslot	6.476s
+time=2026-11-14T16:51:40.459+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test138TaskCancelKillsTheProcessTree
+time=2026-11-14T16:51:40.971+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test138TaskCancelKillsTheProcessTree (0.87s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin/manifestslot	0.928s

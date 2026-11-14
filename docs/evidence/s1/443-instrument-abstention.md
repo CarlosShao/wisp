@@ -197,3 +197,16 @@ go test -run 'Test138TaskCancelKillsTheProcessTree$' -count=1 ./internal/plugin/
   ⛔ 证「CI 从此不会红」（还有 §4 表里那些臂与别的红源）；⛔ 把本机自然 N=50 的 6% 读成 CI 的实际频率。
 - **撤销口令**：「票 443 撤」＝删本件＋回退本腿 commit（新 commit 反改，不 reset/amend）；`WISP52_443_FIXTURE_DELAY_MS` 不设即为 0，删旋钮等价于去掉 `fixtureDelay443` 与两处 env 传递。
 - ⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`；commit 用显式 pathspec；⛔ push。
+
+## 七、落地复跑（commit `d78a0ae5c` 的字节）
+
+落地后工作树对本腿路径为干净（`git status --porcelain -- internal/plugin/manifestslot/ docs/evidence/s1/443-instrument-abstention.md .scratch/wisp/probes/443` ＝ 空），在该字节上复跑三条（串行，未跑 `cmd/wisp`）：
+
+| 跑法 | 读数 |
+|---|---|
+| `go test -run 'Test52TimeoutKillsTheProcessTree$' -count=1`（无旋钮） | **PASS**（`raced run: grandchild pid 44696 … is gone`） |
+| 同上 + `WISP52_443_FIXTURE_DELAY_MS=1500` | **PASS**，先 `ABSTAIN(443:timeout-tree:raced-no-pid) … elapsed-ms=755 polls=96 pid-seen=no`，再由 `control run: grandchild pid 59440 … is gone` 接住 |
+| `go test -run 'Test138TaskCancelKillsTheProcessTree$' -count=1` | **PASS**（补了 `clearPIDFile` 之后） |
+
+原始 log：`.scratch/wisp/probes/443/14-post-commit-rerun.txt`。
+
