@@ -1,0 +1,30 @@
+===== A: real name =====
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261114-195517-1592 - this run's t.TempDir() family lands here; nothing deletes it.
+=== RUN   TestLayoutForTestEnv
+=== RUN   TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR
+=== RUN   TestLayoutForTestEnv/falls_back_to_TEMP_per_pid
+    envfork_test.go:140: test DataDir = "C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-test-6416" (TMPDIR = "C:\\Users\\swq\\AppData\\Local\\Temp", which reaches "C:\\Users\\swq\\AppData\\Local\\Temp")
+--- PASS: TestLayoutForTestEnv (0.01s)
+    --- PASS: TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR (0.01s)
+    --- PASS: TestLayoutForTestEnv/falls_back_to_TEMP_per_pid (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	0.077s
+runtests.sh: OK - packages=[./internal/proc/ -run TestLayoutForTestEnv] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=3, '[no tests to run]'=0
+===== B: drifted name =====
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261114-195526-1631 - this run's t.TempDir() family lands here; nothing deletes it.
+testing: warning: no tests to run
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	0.082s [no tests to run]
+runtests.sh: go test exited 0 but reported NO top-level result at all (ticket 71 AC#3) - packages=[./internal/proc/ -run TestLayoutForTestEnvRenamedAway] top-level: PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=1
+runtests.sh: this is what a -run pattern that matches nothing looks like. Name the tests you
+             intended to run, or delete the step - a green no-op is worse than a red.
+===== C: skip fixture =====
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261114-195532-1665 - this run's t.TempDir() family lands here; nothing deletes it.
+=== RUN   TestSkipsOnPurpose
+    skip_test.go:6: AC#3 fixture: runtests.sh must treat SKIP as fatal, not as a pass
+--- SKIP: TestSkipsOnPurpose (0.00s)
+PASS
+ok  	skipfixture	0.083s
+runtests.sh: 1 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - packages=[./...] top-level: PASS=0 FAIL=0 SKIP=1, === RUN=1, '[no tests to run]'=0
+runtests.sh: either make the step's scope exclude it or run it where it can execute;
+             do not relax this script.

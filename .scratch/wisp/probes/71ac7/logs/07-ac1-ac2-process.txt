@@ -1,0 +1,30 @@
+===== 1: ticket-62 baseline table (px_delta_ge8=0) =====
+time=2026-11-14T19:56:44.495+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+balldebug: diff gate: 1 violation(s) at min px_delta_ge8=800
+gate: table=docs/evidence/s1/62-diff-baseline/diff-table.txt
+gate: examined 3 rows, min px_delta_ge8=800
+gate: floor source: SPEC-08 §2 (rest body 56*SleepRestRatio=34.72px, 1.5R halo => 2130 px predicted, 2098/2103/2120 recorded; SleepingRestMinPx=30 => 1590 px floor)
+gate: FAIL 01: Sleeping: px_delta_ge8=0 < 800 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: 1 violation(s) - this run is not evidence
+===== 2: accepted signoff table =====
+time=2026-11-14T19:56:44.864+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+gate: table=docs/evidence/s1/62-diff-signoff/diff-table.txt
+gate: examined 6 rows, min px_delta_ge8=800
+gate: floor source: SPEC-08 §2 (rest body 56*SleepRestRatio=34.72px, 1.5R halo => 2130 px predicted, 2098/2103/2120 recorded; SleepingRestMinPx=30 => 1590 px floor)
+gate: PASS - every examined row imaged and every zero-timer state held timers=no
+===== 3: floor lowered to 10 (must be refused) =====
+time=2026-11-14T19:56:44.983+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+balldebug: -diff-gate-min-px8=10 is below the documented floor 800, and it may only be raised: SPEC-08 §2 (rest body 56*SleepRestRatio=34.72px, 1.5R halo => 2130 px predicted, 2098/2103/2120 recorded; SleepingRestMinPx=30 => 1590 px floor)
+===== 4: floor raised to 100000 (AC#2 impossible-threshold construct) =====
+time=2026-11-14T19:56:45.089+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+balldebug: diff gate: 6 violation(s) at min px_delta_ge8=100000
+gate: table=docs/evidence/s1/62-diff-signoff/diff-table.txt
+gate: examined 6 rows, min px_delta_ge8=100000
+gate: floor source: SPEC-08 §2 (rest body 56*SleepRestRatio=34.72px, 1.5R halo => 2130 px predicted, 2098/2103/2120 recorded; SleepingRestMinPx=30 => 1590 px floor)
+gate: FAIL 01: Sleeping: px_delta_ge8=2120 < 100000 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: FAIL 02: Sleeping-dock-right: px_delta_ge8=1620 < 100000 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: FAIL 03: Listening: px_delta_ge8=4856 < 100000 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: FAIL 04: Listening-dock-right: px_delta_ge8=3230 < 100000 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: FAIL 05: Speaking: px_delta_ge8=4848 < 100000 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: FAIL 06: Speaking-dock-right: px_delta_ge8=3220 < 100000 - the ball did not image (the >=8/255 count is too small to be the glass body)
+gate: 6 violation(s) - this run is not evidence

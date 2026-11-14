@@ -1,0 +1,16 @@
+===== A: timers=yes on a zero-timer state =====
+gate: table=.scratch\wisp\probes\71ac7\fixtures\timers-yes.txt
+time=2026-11-14T20:00:55.963+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+balldebug: diff gate: 1 violation(s) at min px_delta_ge8=800
+gate: examined 6 rows, min px_delta_ge8=800
+gate: floor source: SPEC-08 §2 (rest body 56*SleepRestRatio=34.72px, 1.5R halo => 2130 px predicted, 2098/2103/2120 recorded; SleepingRestMinPx=30 => 1590 px floor)
+gate: FAIL 01: Sleeping: timers=yes but SPEC-08 §2 grants this state no animation timer ("?" means the status file proved neither)
+gate: 1 violation(s) - this run is not evidence
+===== B: duplicated row =====
+time=2026-11-14T20:00:56.922+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+gate: table=.scratch\wisp\probes\71ac7\fixtures\duplicate-row.txt
+gate: examined 7 rows, min px_delta_ge8=800
+gate: floor source: SPEC-08 §2 (rest body 56*SleepRestRatio=34.72px, 1.5R halo => 2130 px predicted, 2098/2103/2120 recorded; SleepingRestMinPx=30 => 1590 px floor)
+gate: FAIL 01: Sleeping: 2 rows for one state - a measurement must be unambiguous
+gate: 1 violation(s) - this run is not evidence
+balldebug: diff gate: 1 violation(s) at min px_delta_ge8=800

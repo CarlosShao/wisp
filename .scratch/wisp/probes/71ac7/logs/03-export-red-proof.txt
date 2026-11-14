@@ -1,0 +1,21 @@
+export-red-proof: exporting 4ce5c86ff (4ce5c86ffacfcc35ae1af37280708df9036c2a13) to /tmp/wisp-71-export-1563
+export-red-proof: export completeness: 20124 tracked paths, 0 missing
+export-red-proof: baseline tree sha256 = 14d07cc44adbb715ddff54cbf0039b9c9bcc47dce5ca73fe188a288a32cb5975
+export-red-proof: running the CI lint step (baseline): sh scripts/d22scan.sh
+export-red-proof: baseline exit code = 0 (log: /tmp/wisp-71-export-1563.base.log)
+export-red-proof: baseline self-report lines = 9
+export-red-proof: baseline bans #1-5 internal/ examined 404
+export-red-proof: planted internal/zz71export/leak.go (ban #1: bare goroutine)
+export-red-proof: running the CI lint step (planted): sh scripts/d22scan.sh
+export-red-proof: planted exit code = 1 (log: /tmp/wisp-71-export-1563.red.log)
+export-red-proof: planted bans #1-5 internal/ examined 405 (baseline 404)
+export-red-proof: RED line -> internal/zz71export/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+export-red-proof: restored tree sha256 = 14d07cc44adbb715ddff54cbf0039b9c9bcc47dce5ca73fe188a288a32cb5975
+export-red-proof: running the CI lint step (restored): sh scripts/d22scan.sh
+export-red-proof: restored exit code = 0 (log: /tmp/wisp-71-export-1563.restore.log)
+export-red-proof: RESULT PASS (rev 4ce5c86ff)
+export-red-proof:   export tree   = /tmp/wisp-71-export-1563 (20124 tracked paths, 0 missing)
+export-red-proof:   self-report   = 9 scope lines per run; baseline and restored both green
+export-red-proof:   planted       = internal/zz71export/leak.go -> exit 1, line names it, bans #1-5 internal/ 404 -> 405
+export-red-proof:   rolled back   = tree sha256 identical (14d07cc44adbb715ddff54cbf0039b9c9bcc47dce5ca73fe188a288a32cb5975), exit 0, count back to 404
+export-red-proof:   logs          = /tmp/wisp-71-export-1563.base.log /tmp/wisp-71-export-1563.red.log /tmp/wisp-71-export-1563.restore.log

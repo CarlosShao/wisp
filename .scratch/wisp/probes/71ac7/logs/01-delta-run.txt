@@ -1,0 +1,33 @@
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261114-195249-307 - this run's t.TempDir() family lands here; nothing deletes it.
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/bans_1-5_internal_
+    selfreport_delta_test.go:228: bans #1-5 internal/: examined 3 -> 4, rc 0 -> 1, line "d22scan: scope bans #1-5 internal/      examined   4 production Go files"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/bans_1-5_cmd_
+    selfreport_delta_test.go:228: bans #1-5 cmd/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope bans #1-5 cmd/           examined   2 production Go files"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_6_frontend_
+    selfreport_delta_test.go:228: ban #6 frontend/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope ban #6 frontend/         examined   2 text files"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_7_internal_tools_
+    selfreport_delta_test.go:228: ban #7 internal/tools/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope ban #7 internal/tools/   examined   2 production Go files"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_10_internal_risk_
+    selfreport_delta_test.go:228: ban #10 internal/risk/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope ban #10 internal/risk/   examined   2 production Go files, comment symbol citations"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_design_
+    selfreport_delta_test.go:228: ban #8 design/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope ban #8 design/           examined   2 text files"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_frontend_
+    selfreport_delta_test.go:228: ban #8 frontend/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope ban #8 frontend/         examined   2 text files"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_internal_
+    selfreport_delta_test.go:228: ban #8 internal/: examined 3 -> 4, rc 0 -> 1, line "d22scan: scope ban #8 internal/         examined   4 Go files, comments and _test.go included"
+=== RUN   TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_cmd_
+    selfreport_delta_test.go:228: ban #8 cmd/: examined 1 -> 2, rc 0 -> 1, line "d22scan: scope ban #8 cmd/              examined   2 Go files, comments and _test.go included"
+--- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven (1.31s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/bans_1-5_internal_ (0.18s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/bans_1-5_cmd_ (0.15s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_6_frontend_ (0.15s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_7_internal_tools_ (0.14s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_10_internal_risk_ (0.15s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_design_ (0.12s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_frontend_ (0.13s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_internal_ (0.13s)
+    --- PASS: TestEveryDeclaredScopeCountsTheFileItIsGiven/ban_8_cmd_ (0.14s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	1.355s
+runtests.sh: OK - packages=[./... -run TestEveryDeclaredScopeCountsTheFileItIsGiven] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=10, '[no tests to run]'=0
