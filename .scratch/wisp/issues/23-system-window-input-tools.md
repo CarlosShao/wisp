@@ -77,3 +77,17 @@ per-target-process session-binding groundwork.
 - **修复后**（本件）：⇒ `elevated_is_error=true`、文本＝冻结拒绝句「目标程序以管理员身份运行，Wisp 无法向其输入（Windows UIPI 平台硬限制…）」、`elevated_fixture_chars_unchanged=true`。
 - **我改了探针一处并留痕**：`probe23` 原本抢不到前台就 `os.Exit(3)`，导致提权形**根本没跑**（本机桌面被 Taskmgr 占前台，Medium 抢不回）。已加 `PROBE23-UIPI-SPLIT` 分叉：前台抢不到时**先把提权形跑完**——因为拒绝发生在完整性门、发生在打第一个字之前，**不需要前台**。`ABORTED` 记录保留，没伪装成通过。
 - **仍欠**：①AC#3 第三半（确认卡三选项＋「所有应用」danger 样式）未量；②300 字那半**修复后复跑**被 Taskmgr 前台挡住，需机主让出前台。**故 AC#3 框未翻。**
+
+## AC#3 结构性裁定（编排者，2026-11-14 11:0x）：**本票 AC#3 我们翻不了，不是欠账，是边界**
+
+AC#3 全文拆成三块，逐块现状（判据=真机读数，非自述）：
+
+| 块 | 内容 | 现状 | 依据 |
+|---|---|---|---|
+| **R1** | 真 fixture app 聚焦窗里打 300 字 | **✓ 已量** | runA ASCII `chars=300／wm_char=300／sha256 逐字相同`；runB CJK 同形（`ad50ee24e`，`docs/evidence/s1/23-input-type-real-window.md`） |
+| **R2** | 真提权窗 ⇒ 显式 UIPI 错误 | **✓ 已量（修复后）** | `elevated_is_error=true`＋冻结拒绝句＋`elevated_fixture_chars_unchanged=true`（`docs/evidence/s1/23-uipi-end-to-end-after-fix.md`） |
+| **R3** | 确认卡三选项 UI ＋「所有应用」danger 样式 | **⛔ 结构性写不到** | 票面原文（`:61`）自己写着 **R3 在 `frontend/`**；`frontend/**` 自 09-25 起在每张票的禁改面，归**机主外部前端 agent** |
+
+**裁定**：AC#3 的**产品侧两半（R1/R2）已满足**；剩下 R3 **不在本编队写面**，只能由前端那条会话交件。
+⇒ **本票 AC#3 框不翻，且不应记为本编队的欠账**；撤销口令＝若日后 `frontend/**` 划回本编队，此条作废、重开 R3。
+（同形先例：票 262 的两格「结构上不可能」由编排者裁并写进票面。）
