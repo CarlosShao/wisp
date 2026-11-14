@@ -1,0 +1,7 @@
+=== RUN   TestAC297KnownAmplitudePairSeparates
+    amplitudepair_297_windows_test.go:142: AC#1 injection face: window A (amp 0 counts) mean=0.000000, window B (amp 13107 counts) mean=0.399994
+    amplitudepair_297_windows_test.go:144: AC#1 injection face: mean ratio = +Inf, amplitude ratio = +Inf -- the ruler SEPARATES at the injection seam
+    amplitudepair_297_windows_test.go:146: AC#1 pair half: same ruler on the real-mic face = ticket 247 six-window run (sound/quiet-A = 1.0402); paired reading archived in probes/297/
+--- PASS: TestAC297KnownAmplitudePairSeparates (0.58s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.626s

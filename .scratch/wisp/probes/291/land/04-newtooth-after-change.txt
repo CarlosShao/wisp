@@ -1,0 +1,10 @@
+=== RUN   TestLevelDCFrameReadsZero
+--- PASS: TestLevelDCFrameReadsZero (0.00s)
+=== RUN   TestLevelTranslationInvariant
+--- PASS: TestLevelTranslationInvariant (0.00s)
+=== RUN   TestLevelDCPlusSineReadsClosedFormRMS
+--- PASS: TestLevelDCPlusSineReadsClosedFormRMS (0.00s)
+=== RUN   TestLevelHottestLegalFrameStaysBelowMaxLevel
+--- PASS: TestLevelHottestLegalFrameStaysBelowMaxLevel (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.051s

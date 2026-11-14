@@ -4,6 +4,7 @@ package audio
 
 import (
 	"context"
+	"math"
 	"testing"
 	"time"
 
@@ -20,7 +21,7 @@ func TestAC247RealCaptureLoopEmitsLevels(t *testing.T) {
 	const frames = 8
 	samples := make([]int16, frames*FrameSamples)
 	for i := range samples {
-		samples[i] = 12345 // a steady DC level: RMS is exactly this magnitude
+		samples[i] = 12345 // a steady DC offset: the level must ignore it and read exactly 0
 	}
 	dev := DeviceDescriptor{ID: "dev-level", Name: "Level Fixture Mic"}
 	watcher := &fakeWatcher{devs: []DeviceDescriptor{dev}}
@@ -50,6 +51,21 @@ func TestAC247RealCaptureLoopEmitsLevels(t *testing.T) {
 		want := float32(LevelOfSamples(samples[i*FrameSamples : (i+1)*FrameSamples]))
 		if l != want {
 			t.Fatalf("frame %d: level = %v, want %v", i, l, want)
+		}
+		// Ticket 291: this window is a constant DC level, so the whole chain
+		// (convert -> downmix -> resample -> frame -> emitLevel) has to read
+		// exactly zero here. Stated positively on purpose: the expected value
+		// above is derived through the same function, so on its own it would
+		// witness nothing but "0 equals 0". Before ticket 291 this loop read
+		// 12345/32768 = 0.376740 for every frame - the offset itself.
+		if want != 0 {
+			t.Fatalf("frame %d: a constant DC window read %v, want exactly 0: the ruler still counts DC", i, want)
+		}
+		if l != 0 {
+			t.Fatalf("frame %d: emitted level %v for a constant DC window, want exactly 0", i, l)
+		}
+		if math.Signbit(float64(l)) {
+			t.Fatalf("frame %d: constant DC window level is negative zero (%08x)", i, math.Float32bits(l))
 		}
 	}
 	// The thread the loop runs on is booked in the injected registry only.

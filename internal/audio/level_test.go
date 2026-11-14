@@ -70,21 +70,23 @@ func TestLevelSilentFrameIsExactZero(t *testing.T) {
 // and the strongest symmetric square (the named bound FullScaleSquareLevel)
 // are pinned to the bit, plus the smallest non-zero reading of the scale.
 func TestLevelFullScaleSquareEndpoints(t *testing.T) {
-	// The endpoint itself: every sample at the largest magnitude an int16
-	// carries. LevelFullScale is abs(-32768), so this reads exactly 1.
+	// A frame held at one constant value is pure DC: it carries no level.
+	// (Before ticket 291 this block asserted the OPPOSITE - all -32768 read
+	// exactly 1.0 because the scale counted the offset. The endpoint claim
+	// moved with the definition, it was not relaxed.)
 	hot := make([]int16, FrameSamples)
 	for i := range hot {
 		hot[i] = -32768
 	}
-	if l := LevelOfSamples(hot); l != MaxLevel {
-		t.Fatalf("all-minus-32768 frame = %v, want exactly %v", l, MaxLevel)
+	if l := LevelOfSamples(hot); l != MinLevel {
+		t.Fatalf("all-minus-32768 frame = %v, want exactly %v (a constant frame is pure DC)", l, MinLevel)
 	}
 	gotHot, err := FrameLevel(EncodeFrame(hot))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if float64(gotHot) != MaxLevel {
-		t.Fatalf("FrameLevel(all-minus-32768) = %v, want exactly %v", gotHot, MaxLevel)
+	if float64(gotHot) != MinLevel {
+		t.Fatalf("FrameLevel(all-minus-32768) = %v, want exactly %v", gotHot, MinLevel)
 	}
 
 	// The named upper bound for a real symmetric square wave: 32767/32768,

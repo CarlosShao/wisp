@@ -25,11 +25,15 @@ package audio
 // No goroutine is created by this file; the loop's pinned thread is booked by
 // SpawnCapture as in production.
 //
-// Signal choice: DC windows, not sine. DC makes the level exact (RMS of a
-// steady value v is |v|), so the ratio check cannot hide behind a waveform
-// argument; the level scale doc (level.go) defines it as plain RMS, and the
-// DC-counts clause there says consumers gate DC themselves -- this test is
-// the producer-side instrument, not a consumer.
+// Signal choice: a constant DC offset plus a square wave - not a sine, and no
+// longer a pure DC window. The RMS of a centred square wave is exactly its
+// amplitude, so the ratio check cannot hide behind a waveform argument. Before
+// ticket 291 a pure-DC window was the easy way to make the level exact (RMS of
+// a steady value v is |v|); after it, a pure-DC window reads 0 and this fixture
+// would go blind. A DC-offset square keeps the exactness (RMS of +-A about the
+// offset is A) and turns the same fixture into a DC-rejection witness: the
+// offset is identical in both windows, so if it ever leaks back into the level
+// both windows read the offset and the ratio collapses towards 1.
 
 import (
 	"context"
@@ -57,11 +61,26 @@ func TestAC297KnownAmplitudePairSeparates(t *testing.T) {
 	highCounts := int16(math.Round(ampHigh * 32767))
 
 	var samples []int16
+	// Ticket 291: the windows ride on a constant DC offset AND carry a square
+	// wave at the known amplitude. Before the scale removed DC, a pure-DC window
+	// was the easy way to make the level exact; after it, a pure-DC window reads
+	// 0 and the fixture would go blind. A DC-offset square keeps the exactness
+	// (RMS of +-A is A) and turns the same fixture into a DC-rejection witness:
+	// if the offset ever leaks back into the level, this test reds.
+	const dcOffset = 12345
 	for i := 0; i < frames*FrameSamples; i++ {
-		samples = append(samples, lowCounts)
+		v := lowCounts
+		if i%2 == 1 {
+			v = -lowCounts
+		}
+		samples = append(samples, v+dcOffset)
 	}
 	for i := 0; i < frames*FrameSamples; i++ {
-		samples = append(samples, highCounts)
+		v := highCounts
+		if i%2 == 1 {
+			v = -highCounts
+		}
+		samples = append(samples, v+dcOffset)
 	}
 
 	path := t.TempDir() + "/ac297-pair.wav"
@@ -110,6 +129,15 @@ func TestAC297KnownAmplitudePairSeparates(t *testing.T) {
 
 	meanLow := meanF32(got[:frames])
 	meanHigh := meanF32(got[frames : frames*2])
+	// Guard the denominator before dividing. 0/0 is NaN, and every comparison
+	// against NaN is false, so math.Abs(NaN-ampRatio) > 0.01 is false and a
+	// vanished level would make the ratio assertion below pass silently. (The
+	// wantLow assertion after it does catch this whenever lowCounts != 0; this
+	// guard is the hole that keeps a future zero-amplitude fixture from reading
+	// as "separated well".)
+	if meanLow <= 0 {
+		t.Fatalf("window A mean = %v: the ruler read silence for a %d-count square, so the ratio has no denominator", meanLow, lowCounts)
+	}
 	ratio := float64(meanHigh) / float64(meanLow)
 	ampRatio := float64(highCounts) / float64(lowCounts)
 

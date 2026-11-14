@@ -1,0 +1,12 @@
+=== RUN   TestLevelDCFrameReadsZero
+    level_dc_291_test.go:41: constant 1 frame = 3.0517578125e-05, want exactly 0: a frame that does not change carries no level
+--- FAIL: TestLevelDCFrameReadsZero (0.00s)
+=== RUN   TestLevelTranslationInvariant
+    level_dc_291_test.go:76: adding a constant DC of -12345 moved the level from 0.06473924235500596 to 0.38226145742487416: the scale still counts DC
+--- FAIL: TestLevelTranslationInvariant (0.00s)
+=== RUN   TestLevelHottestLegalFrameStaysBelowMaxLevel
+    level_dc_291_test.go:117: hottest legal frame = 0.9999847413273546, want exactly 0.9999847412109375
+--- FAIL: TestLevelHottestLegalFrameStaysBelowMaxLevel (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.103s
+FAIL
