@@ -37176,9 +37176,9 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 
 **实例**：274-no-nail-…-in-both-halves-done.md（102）→ 274-no-nail-shipped-exe-carry-page-build-step-2-comment-false-done.md（69），修后 VERDICT GREEN / roster equals the tree。
 
-## A'@ + $next + @' — 一条**没上界**的等待：`Test16r1PremoremModelSha256CorruptRefusesTheHandOff` 在本机挂住 10 分钟以上
+## A'@ + $next + @' — 一条**没上界**的等待：`Test16r1PremortemModelSha256CorruptRefusesTheHandOff` 在本机挂住 10 分钟以上
 
-**读数**：2026-11-14 17:2x 我复跑票 445 那 5 枚测试件（20 枚用例），**前 19 枚 18 PASS / 1 SKIP / 0 FAIL**；最后一枚 `Test16r1PremremModelSha256CorruptRefusesTheHandOff` **从 17:28:33 起日志一行不动**，`wisp.test` 进程还在（145 MB、CPU 111 s），我 17:4x 杀掉。
+**读数**：2026-11-14 17:2x 我复跑票 445 那 5 枚测试件（20 枚用例），**前 19 枚 18 PASS / 1 SKIP / 0 FAIL**；最后一枚 `Test16r1PremortemModelSha256CorruptRefusesTheHandOff` **从 17:28:33 起日志一行不动**，`wisp.test` 进程还在（145 MB、CPU 111 s），我 17:4x 杀掉。
 
 **它挂在哪**（读代码，不是猜）：这枚用例调的是**生产路径** `residentVoiceHandOff(dataDir)(voiceAsrModelID, …)`，那是模型交付器的真实走法；本机没有可用镜像／被墙时它**没有上界地等**。⇒ 这是「网络调用没有 deadline」的形状，不是测试写得差。
 
