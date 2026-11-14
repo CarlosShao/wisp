@@ -269,8 +269,12 @@ func NewQuotaLedger(now func() time.Time) *QuotaLedger {
 // rollLocked advances the bucket stamps; a zero or changed day empties the day
 // maps, a changed month empties the month maps. Called on every read and
 // write so a long idle session cannot judge against yesterday's numbers.
-// The caller holds l.mu: roll takes it, Post and Spend take it, so no reader
-// ever sees a stamp its own map state was not rolled with.
+// The caller holds l.mu: Post, Spend and SeedFrom all take it, so no reader
+// ever sees a stamp its own map state was not rolled with. There is no
+// lock-taking variant of this call: SeedFrom (internal/observe/costmodel_44b.go)
+// takes l.mu itself, calls this first and then books rows into the maps in the
+// same critical section, which is what makes the boot seed one atomic step
+// against Spend/Post too (docs/evidence/s1/44-quota-seedfrom-lock.md).
 func (l *QuotaLedger) rollLocked() {
 	t := l.now()
 	d := DayKey(t)
@@ -284,20 +288,6 @@ func (l *QuotaLedger) rollLocked() {
 		l.dayKey = d
 		clear(l.modelDay)
 	}
-}
-
-// roll is rollLocked with the lock taken, for the one writer whose call site
-// lives outside this file: SeedFrom (internal/observe/costmodel_44b.go) opens
-// with l.roll() and then books rows into the maps itself. That seed is
-// documented as a boot-time call made before any task books
-// (QuotaGate.SeedBaseline), so it is not on the concurrent path this leg
-// closes; its own map writes are a NAMED open item in
-// docs/evidence/s1/44-quota-ledger-race.md, because protecting them needs one
-// line in costmodel_44b.go, which is outside this leg's write face.
-func (l *QuotaLedger) roll() {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	l.rollLocked()
 }
 
 // Post books one dispatch's spend against the model's caps and, when the

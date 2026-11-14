@@ -268,3 +268,65 @@ go test -race -count=1 ./internal/observe/
 2. **`SeedFrom` 的并发产品形状本腿没有断言**（`SeedBaseline` 与第一次 `Decide` 的先后由
    `internal/agent` 的装配决定，不属 `internal/observe` 的可见面）。本腿只断言**内存安全**
    与**种子值不丢**；不声称"产品里一定发生过跨线程重叠"——这不是本腿能看到的层。
+
+---
+
+## 6. U1000 摘壳（2026-11-14，`44-quota-u1000` 腿）
+
+§5.1 把这一枚具名留给了下一位（"删 `quota_44.go:289-301` 那 13 行"）。本节就是那一步的读数。
+
+### 6.1 做了什么（`internal/observe/quota_44.go`，只注释与删除）
+
+1. **删掉** `func (l *QuotaLedger) roll()` 这枚薄壳（`rollLocked` 加锁版）**及其 doc 注释**。
+   删前先数调用点：全仓 `.go` 里 `\.roll()` 命中 **6 处 = 1 处定义（`quota_44.go:297`）
+   + 5 处注释**，**生产与测试的调用点均为 0**。所以这不是"某平台假死"，是**两个 GOOS 都死**：
+   唯一真调用点（`SeedFrom`）在 `756ebbcfa` 已改成 `rollLocked`，而 `SeedFrom` 位于平台中立文件。
+   `A1773`（不许删 U1000 报的符号）针对的是 windows 活着、linux 假死的形状，与这一枚不同类。
+2. **改写 `rollLocked` 的 doc**，把两处对 `roll` 的指涉换成现状：
+   原来写 "`roll` takes it, Post and Spend take it"，现在写 **`Post`/`Spend`/`SeedFrom` 各自持
+   `l.mu`**，并明说**没有取锁变体可调**——`SeedFrom` 自己持锁、先调 `rollLocked`、再在同一临界区
+   入桶，所以 boot seed 对 `Spend`/`Post` 是一次原子步骤（引本件）。
+   ⛔ 没有为了"让它被用到"而加任何调用：U1000 报的是**死符号**，加调用是把账藏起来而不是修它。
+
+### 6.2 读数（全部现跑，本机 staticcheck 2026.2.2 / go1.27）
+
+| 门禁 | 修前 | 修后 |
+|---|---|---|
+| `staticcheck -checks=all ./internal/observe/`（`GOOS=windows`） | `quota_44.go:297:23: func (*QuotaLedger).roll is unused (U1000)`，**rc=1** | **rc=0，逐字无输出** |
+| `staticcheck -checks=all ./internal/observe/ ./internal/agent/ ./internal/tools/` | 未跑（同口径含 U1000） | **rc=0，逐字无输出** |
+| `go test -race -count=1 ./internal/observe/` | `ok`（`756ebbcfa` 上） | **rc=0，`ok … 29.560s`** |
+| `go build ./internal/... ./cmd/... ./tools/...` | rc=0 | **rc=0** |
+| `go vet ./internal/observe` | rc=0 | **rc=0** |
+| `gofumpt -l internal/observe` | 空 | **空（0 行）** |
+| `sh scripts/d22scan.sh` | clean | **rc=0 clean**（真扫 `internal/`+`cmd/` 481 枚生产 Go 文件，正控在） |
+
+文件行数 384 → **374**（删 13 行，doc 改写净增 3 行；`rollLocked`/`Post`/`Spend`/`SeedFrom`
+的函数体一个字未动）。
+
+### 6.3 `staticcheck -checks=all ./...` 为什么仍是 rc=1（不属本腿）
+
+全仓那一发 rc=1，三处命中**全部在 HEAD 上就已存在、且文件与 `HEAD` 逐字节相同**
+（`git status --porcelain -- internal/ball frontend/embed.go build/` 输出为空）：
+
+```
+build\mut_rvw.go:255:6: undefined: voiceTtsFiles   … (11 处 undefined，compile)
+frontend\embed.go:4:1: ineffectual compiler directive due to extraneous space (SA9009)
+internal\ball\orb_windows.go:204:7: const orbHwndTopmost is unused (U1000)
+internal\ball\renderer_windows.go:822:20: func (*renderer).overlayGlyphPixels is unused (U1000)
+```
+
+- `build/mut_rvw.go` **未被 git 跟踪**（`git ls-files build/mut_rvw.go` 空输出），是树上的变异
+  实验遗留件，所以 `build` 包在 `./...` 下编不过；`go build ./internal/... ./cmd/... ./tools/...`
+  （CI 实际跑的那一发）不含 `build/`，rc=0 不受影响。
+- `internal/ball` 那两条正是 `429387f46`（票 122）**具名留下的 Tier-4 残渣**（只在
+  `-tags=winlive` 下有读者），不是新账。
+
+### 6.4 具名遗留（都在本腿写面外，纯注释，零编译/门禁影响）
+
+1. `internal/observe/costmodel_44b.go:191` 的注释仍写着 "Taking the lock here and then calling
+   `roll()` would re-enter the same mutex and deadlock"——`roll()` 已不存在，这句现在指空。
+   建议下一腿改成 "there is no lock-taking variant to call"（1 行、纯注释）。
+2. `internal/observe/quota_44_race_test.go:19/36/71` 三处注释仍以 `roll()` 指代换日/换月的动作
+   （实际执行者是 `rollLocked`）。三处都不是调用，测试语义不受影响。
+
+⚠ 本腿**没有**碰这两处：写面只有 `quota_44.go`、本件、票 70 的一行 log。
