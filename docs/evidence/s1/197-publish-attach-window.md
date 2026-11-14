@@ -270,3 +270,83 @@ go test -count=3 -run '^Test197' ./internal/tools（六路负载下）     ⇒ 3
    ⚠ 因此 §4.4／§4.5 的绿是在"含别人未提交 quota 改动"的树上量的；它们与本票写面无交集。
 4. **Git**：`git commit -- <显式 pathspec>`；未 `add -A`／`add .`；未 amend／reset／rebase／stash／`checkout .`／clean；
    未建 worktree；**未 push**。
+
+---
+
+## ⑦ 独立复跑（第二腿，非实现者；2026-11-14 12:5x +08）
+
+> 本腿起手 HEAD `f8e94bbd8`，一读盘就发现本票的修复已由 **`d8e2f4dc8`** 在本腿派单前约 35 秒落库
+> （`git show --stat d8e2f4dc8`：本证据件＋`internal/tools/{task,subagent_197}.go`＋新仪器＋票面 Progress log）。
+> ⇒ 本腿**不重复实现**（重复改同一处只会制造两枚互顶的提交），只做独立复跑——收件三把尺之「自己复跑」——
+> 并把读数追加在这里。**产品码／测试／阈值／契约零改动**；本腿唯一落盘就是本节。
+
+### 7.1 复核（盘上现读，结论与 ① 一致）
+
+- `internal/agent/subagent_197.go` **不存在**，`internal/agent/` 下也没有 `*197*` 与 `legs_test.go`；
+  真文件是 `internal/tools/subagent_197.go`、测试是 `internal/tools/task_cancel_221_legs_test.go`。
+- 四处行号**逐枚对得上**（`Get-Content` 现读）：`task_cancel_221_legs_test.go:132-158`＝`spawnHeld`（放行点
+  `started`＝第一次模型调用）、`:322`＝`t.Fatalf("父任务停自己的孩子被拒了：%s", res.Text)`、
+  `:452`＝`t.Errorf("父任务停甲号孩子被拒…")`；修前树 `99ae90113` 的
+  `subagent_197.go:338`（裸发布）、`:373`（裸发布）、`:374`（`AttachCancel`）三行由 7.2 的红句逐字复现。
+- 派单写面 `internal/agent/subagent_197.go` 是路径笔误（triage step 7 开头也自我更正过同一处）；
+  **实质修复点**在 `internal/tools/`，并且需要 `internal/tools/task.go` 里新增的那枚发布方法
+  （`PublishSubagentInFlight`）——它超出派单字面写面，但不改 `task.go` 就没有「一次发布」可调用。
+  这条偏差**具名上报编排者**（接受或退回由编排者判），本腿不自行改回。
+
+### 7.2 修前红（独立树复现，证明仪器不是空转）
+
+在仓库**之外**的临时树里复现（`git archive 99ae90113` → `C:\Temp\wisp-prefix-99ae90113`，拷入本枚形状尺；
+未在仓库内建 worktree、未 checkout、未动工作树）：
+
+```
+go test -count=1 -run '^Test197SpawnPathPublishesRowAndStopHandleTogether$' ./internal/tools -v
+--- FAIL: Test197SpawnPathPublishesRowAndStopHandleTogether (0.01s)
+    subagent_publish_window_197_test.go:147: 派生路径没有调用 PublishSubagentInFlight：行与句柄必须由一次发布落地，否则「行可见 ⇒ 句柄已挂」就只是一个约定而不是不变量
+    subagent_publish_window_197_test.go:156: subagent_197.go:338 仍在用裸 PublishSubagent 发行（这一调用不带句柄）：t.d.Roster.PublishSubagent(taskID, parentID, label)
+    subagent_publish_window_197_test.go:156: subagent_197.go:373 仍在用裸 PublishSubagent 发行（这一调用不带句柄）：t.d.Roster.PublishSubagent(bg.ID, parentID, label)
+    subagent_publish_window_197_test.go:161: subagent_197.go:374 仍把 AttachCancel 当第二次发布：t.d.Roster.AttachCancel(bg.ID, cancelChild)
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.225s（rc=1）
+```
+
+⇒ 这枚尺在修前树上**确定性红**，且逐行指认 `:338`／`:373`／`:374`；修后同尺 PASS（7.3）。**红的对象不是夹具。**
+
+### 7.3 修后读数（当前 HEAD，与修前同形同量）
+
+```
+# 症状仪器：40 发
+go test -count=40 -run '^Test197InFlightRowNeverLacksItsStopHandle$' ./internal/tools -v
+⇒ === RUN 40 / --- PASS 40 / --- FAIL 0 / 「没有在跑」0 次
+  分母＝40 发 × 40 轮 × 4 枚并发 = 6400 枚在飞子代理，命中 0
+  （修前同尺六路负载下 1/480，红句见 §2.3）
+
+# 形状尺
+--- PASS: Test197SpawnPathPublishesRowAndStopHandleTogether (0.00s)
+
+# 原两枚用例
+go test -count=5 -run '^(Test221SubagentCannotStopSiblingOrItself|Test221ParentStopsItsOwnChildRowAndStreamSettle)$' ./internal/tools -v
+⇒ --- PASS 10 / --- FAIL 0；ok …/internal/tools 1.157s
+
+# 全包四数
+go test -count=1 -v ./internal/agent/ ./internal/tools/
+⇒ === RUN 767 / --- PASS 584 / --- FAIL 0 / --- SKIP 1
+  ok  github.com/CarlosShao/wisp/internal/agent  21.507s
+  ok  github.com/CarlosShao/wisp/internal/tools  63.587s
+```
+
+### 7.4 门禁四把尺（本腿现跑，`2026-11-14 12:5x +08`）
+
+| 尺 | 读数 |
+|---|---|
+| `go build ./internal/... ./cmd/... ./tools/...` | **rc=0** |
+| `go vet ./internal/agent ./internal/tools` | **rc=0** |
+| `gofumpt -l internal/agent internal/tools`（v0.12.0，从本机 module cache 编出） | **空**（0 行） |
+| `sh scripts/d22scan.sh` | **clean**，rc=0 |
+
+### 7.5 本节的边界
+
+- **零产品码／测试改动**：`git status --porcelain -- internal/` 空；`internal/tools/{task,subagent_197}.go`
+  与两枚测试的 blob 均等于 `d8e2f4dc8`。
+- 临时树与编译出的 `gofumpt.exe` 都在 `C:\Temp\`（仓外）；本腿未建 worktree、未用禁字 git 命令、未 push。
+- 本节**不勾任何 AC、不裁判**；它只回答一个问题：`d8e2f4dc8` 声称的读数，**换一条腿、换一台进程**
+  在同一天复跑是否站得住。答：**站得住**（形状尺修前红／修后绿、症状尺 6400 枚 0 命中、
+  原两枚 10/10、全包 FAIL=0、四把门禁 rc=0）。
