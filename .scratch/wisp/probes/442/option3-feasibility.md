@@ -13,7 +13,7 @@
 | 真正把值交给 WebView2 的一跳 | `panel_host_windows.go:625` → `panel_control_windows.go:355`（`browser.DataPath = dataPath`） |
 | 产码自己的 dataPath 是**固定**的（产品行为：一个应用一个 profile） | `panel_resident_windows.go:362`（`filepath.Join(dataDir, "panel-webview2")`） |
 | 测试侧每个构造点都是**自己算**一个值再直接调 `NewPanelManager` | 例：`panel_unbound_253r6_windows_test.go:71-72`（`panelProfileLeaf("wisp-253r6-panel-profile")`）、`panel_holder_319_windows_test.go:53+62/121/246/326`、`panel_assets_299_windows_test.go:167` |
-| 今天**没有任何**测试读 `.dataPath`；`cmd/wisp` **没有** `TestMain` | 现跑 `Select-String '\.dataPath' cmd/wisp/*_test.go` ＝ 2 命中，全是形状尺里的**源文本常量**（`:1968`/`:1972`）；`Select-String 'func TestMain'` ＝ 0 |
+| 今天**没有任何**测试读 `.dataPath`；`cmd/wisp` **没有** `TestMain` | 现跑 `Select-String '\.dataPath' cmd/wisp/*_test.go` ＝ 2 命中，全是形状尺里的**源文本常量**（`:1513`/`:1517`，尺子还原成 HEAD 那枚后的行号）；`Select-String 'func TestMain'` ＝ 0 |
 
 ⇒ 结论一：**运行时不存在"收集这一发所有构造点拿到的 dataPath"的接缝**。值只在
 `PanelManager` 实例里，而实例只有构造它的那段代码手里有；`cmd/wisp` 里既没有包级记录器，也没有
