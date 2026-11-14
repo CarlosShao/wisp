@@ -1,0 +1,52 @@
+=== T1 drop newPanelControl from panelProfileSinkCall === build_rc=0 run_rc=1 fails=1
+    --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm (0.00s)
+    panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【绿】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+=== T2 DataPath field-assignment arm never fires === build_rc=0 run_rc=1 fails=1
+    --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm (0.00s)
+    panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【绿】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+=== T3 DataPath: key arm does nothing === build_rc=0 run_rc=1 fails=2
+    --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared (0.00s)
+    --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body (0.00s)
+    panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【绿】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+=== RESTORED === build_rc=0 run_rc=0
+    panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【绿】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+--- PASS: Test314FixedPanelProfileLeafShapeIsRed (0.82s)
+--- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape (0.01s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/two_literal_halves_inside_one_Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_whole_path_by_concatenation (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_leaf_by_strings.Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_literal_suffix_outside_the_Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_concatenated_leaf_bound_to_a_local,_then_to_the_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_folded_leaf_with_no_temp_root_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_constant_prefix_plus_a_runtime_suffix_is_not_a_fixed_name (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TEMP) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TMP) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_Getenv_that_is_not_TEMP_or_TMP_is_not_a_root (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.UserHomeDir_through_its_two_results (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_cache_directory_is_not_one_of_the_roots_this_ruler_claims (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_is_a_drive-letter_absolute_literal (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_drive-letter_absolute_literal_joined_with_a_leaf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_relative_literal_root_is_not_a_root (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_handed_to_a_sink_in_a_function (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_that_never_reaches_a_sink_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_summary_line_cannot_read_green_while_anything_is_red (0.00s)
+RESTORED_SHA=6E54A0B34D6A3CD79888F5CD33535EB0754F4549DDD3D2FE1FD8FFE3CAA723F2
+ARCHIVE_SHA=6E54A0B34D6A3CD79888F5CD33535EB0754F4549DDD3D2FE1FD8FFE3CAA723F2

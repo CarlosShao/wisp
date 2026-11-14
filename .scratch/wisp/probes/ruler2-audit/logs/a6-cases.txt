@@ -1,0 +1,17 @@
+old cases: 14  HEAD cases: 35  (plus 1 summary subtest = 36 RUN subtests)
+ 1 SAME | "the audit's revert, default tier verbatim",
+ 2 SAME | "the literal first, the root second",
+ 3 SAME | "wrapped across lines",
+ 4 SAME | "local alias of os.TempDir",
+ 5 SAME | "package-level alias of os.TempDir",
+ 6 SAME | "concatenated instead of joined",
+ 7 SAME | "a profile-shaped leaf behind a helper return (the 319 holder shape)",
+ 8 SAME | "a non-profile leaf handed to the panel sink",
+ 9 SAME | "a local binding handed to the panel sink",
+10 SAME | "a non-profile fixed temp file for another purpose stays silent",
+11 SAME | "per-run leaf through fmt.Sprintf",
+12 SAME | "the panelProfileLeaf helper",
+13 SAME | "a test-local temp dir is per run by construction",
+14 SAME | "prose in a comment and text in a quoted string",
+old 14 all present and byte-identical after whitespace normalisation: True
+extra shape cases in HEAD: 21

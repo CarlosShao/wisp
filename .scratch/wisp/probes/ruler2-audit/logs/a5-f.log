@@ -1,0 +1,9 @@
+time=2026-11-14T15:10:44.726+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+    panel_profile_leaf_shape_windows_test.go:226: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:226: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:232: 豁免 cmd/wisp/panel_holder_319_windows_test.go 的理由句在源码里找不到了："Nothing here creates a window (the headless half never asks bringUp), so"
+        这条豁免的正当性是从那段注释读出来的；注释改掉后它还留着，就成了一张没有出处的通行证。重读源码、逐字重抄一句，或删掉这条豁免。
+    panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【红】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 1 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+--- FAIL: Test314FixedPanelProfileLeafShapeIsRed (1.50s)
+FAIL

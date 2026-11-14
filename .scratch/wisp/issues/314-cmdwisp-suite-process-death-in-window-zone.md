@@ -153,3 +153,24 @@
 ## Progress log（写腿 `w314-ruler2`，2026-11-14 14:5x）：审计 D1–D5 全部修好；A1b/A1c 具名仍漏
 
 - [2026-11-14 14:5x +08] agent=w314-ruler2 写腿（实现者；⛔ 审计者；⛔ 未翻任何 AC 框）did=**把形状尺补到它自己声称的样子**，提交 **`c5be2d703`**（只 commit ⛔ push）。★**D1**：`panelProfileFold` 折叠 `+` 链／`strings.Join` 字面量切片／`Join(...)`＋字面尾巴，叶在折叠值上判；只一半常量的叶（`"wisp-panel-"+pid`）判静默（收紧，不是放宽）。★**D2**：根扩到 `os.Getenv("TEMP"|"TMP")`、`os.UserHomeDir()`（含 `home, err :=` 二值赋值）、盘符绝对字面量；孤立绝对字面量只走 SINK（A3c 的正形就是交给 `NewPanelManager`），所以测试数据里只是拼着 `profile` 的 Windows 路径不冤枉。★**D3**：包级声明同时走 NAME 与 SINK，包级固定 `Join` 变量 seed 进每个函数体。★**D4**：`newPanelControl`／`DataPath` 字段赋值／函数体内 `DataPath:` 键各加 1 条常驻必红控制。★**D5**：汇总行印「形状命中 N／其中已豁免 M／实红 K」＋「豁免自检红 F」，`K>0` 或 `F>0` 一律写【红】。★★**仓外可编译突变体**（`C:\Temp\wisp-ruler2-20261114`，旧尺/新尺两棵树放**同一枚**探针，`go test -c` 都 rc=0）：旧尺 275 文件/2 命中/**0 红 PASS**（12 形全静默），新尺 275 文件/14 命中/**12 红 FAIL**，红句逐字点名探针 `:36/:40/:44/:48/:52/:57/:61/:69/:73/:77/:84/:86`。★★**常驻控制有牙**：仓外 `teeth` 树四点自残——从 sink 集合删 `newPanelControl`／让 selector-LHS 字段臂永不触发／让 `DataPath:` 键臂空转／汇总退回旧口径——分别红在 `the_newPanelControl_sink_arm`／`the_DataPath_field-assignment_sink_arm`／`the_DataPath_key_sink_arm_inside_a_function_body`＋`a_package-level_DataPath_key_is_a_sink_where_it_is_declared`／`the_summary_line_cannot_read_green_while_anything_is_red`；每次还原后 `RESTORED_SHA == REPO_SHA == 6E54A0B3…` 且跑绿。★**常驻正控 14→36 例＋1 条汇总控制，全 PASS**；EXEMPTIONS **原样 2 条未动**。★门禁：`go vet -tags winlive ./cmd/wisp` **rc=0**、`gofumpt -l cmd/wisp` **空**、`sh scripts/d22scan.sh` **clean rc=0**（cmd/ 280 文件）、path-length **VERDICT GREEN**。★**仍漏（已具名写进测试件头注释）**：A1b（helper 返回非 profile 叶、值到下沉点）与 A1c（根在 helper 形参）——都要值跨函数边界，要跨过程分析，是另一件仪器；四根之外的根、一半常量的叶刻意不追（理由在头注释）。★**未跑整包 `./cmd/wisp`**、未 push、未改产码/其他测试/`scripts/**`/`internal/**`/规格/阈值/golden。证据＝`docs/evidence/s1/314-shape-ruler.md` §7，读数根＝`.scratch/wisp/probes/314-ruler2/`。撤销口令＝「314 形状尺补洞不采信」：`git revert c5be2d703`，并删本节这一行。
+
+---
+
+## 非实现者审计（第二轮，补洞后的形状尺）：D4/D5 真修好；D1/D2/D3 只修了示例（2026-11-14 15:2x）
+
+审计件 **`docs/evidence/s1/314-ruler2-audit.md`（新）**，读数根 `.scratch/wisp/probes/ruler2-audit/**`（9 份日志、4 枚探针源、旧/HEAD 尺备份）。
+审计对象＝`cmd/wisp/panel_profile_leaf_shape_windows_test.go` @ HEAD `a46352fd3`（blob `627c2fcd`，SHA256 `6E54A0B3…`＝`c5be2d703` 的交付）。
+树＝`git archive HEAD` 导出 `C:\Temp\wisp-ruler2-audit-20261114`；⛔ 仓内零跟踪件改动；⛔ 未跑整包（只 `-test.run '^Test314'`）；⛔ 未 push。
+★审计期间工作树那枚尺被另一个腿改成未提交的 442 实现（1630→2362 行，SHA 变两次），本件只认 `git archive HEAD` 的已提交版本。
+
+**六节结论：1 漏／2 漏／3 漏／4 抓／5 抓／6 抓。**
+
+- **基线**：274 文件/2 命中/2 豁免/实红 0/自检红 0，rc=0；`-test.v` 36 个子例＝35 形状＋1 汇总（证据 §7.4/§7.7 的「36 形状＋1 汇总」多算一条）。
+- **攻击 1（D1 折叠）漏**：`"a"+suf`（suf 是同文件/别处 const，全常量）、`fmt.Sprintf`、`strings.Replace`、切片变量 `strings.Join`、`append(...)...` 展开——全静默（探针 `:24/:28/:33/:38/:43/:47`）；三参 Join `:51`、嵌套 Join `:56`、Join+Join `:60` 红。因 `panelProfileFold` 的 Ident 分支（`:637-641`）不做常量求值，CallExpr 只认三种调用（`:655-666`），`strings.Join` 只吃 `CompositeLit`（`:699-702`），`...` 落兜底 opaque（`:666`）。
+- **攻击 2（D2 根）漏**：`os.Getenv(变量)`（探针 `:71`）、`filepath.Dir(os.Executable())`（`:76`）、根先经 `+` 拼一段再绑局部（`:104`）静默；`path.Join`（`:94`，被当 Join）与 `root := os.Getenv("TEMP")`（`:99`）红。`Getenv` 只认字面量（`:878-880`），根源只认三调用（`:848-869`），别名只登记直接根源（`:806-808`）。`TMPDIR`／`t.TempDir`／`MkdirTemp` 静默是具名射程/每发独立，不算洞。
+- **攻击 3（D3 包级）漏**：包级固定 Join 在**另一文件**（声明 `d3a:15` → 使用 `d3b:9`）、`init()` 里赋值（`d3a:20`→`:35`）、`sync.Once` 里赋值（`:29`→`:40`）——三形全静默；同文件 `var = Join(...)` 对照（`d3c:14`→`:17`）红。seed 逐文件算（`:401/:405/:445-448`），`panelProfilePackageFixedJoins` 只收 `ValueSpec`（`:545-553`），`AssignStmt` 只 `stored` 不 `add`（`:497-500`）。⇒ 修的是「同文件值规格」，不是包作用域。
+- **攻击 4（D4 正控）抓**：仓外 `teeth` 树逐臂打断——T1 删 `newPanelControl`→只红 `the_newPanelControl_sink_arm`；T2 字段臂永不触发→只红 `the_DataPath_field-assignment_sink_arm`；T3 键臂空转→红 `the_DataPath_key_sink_arm_inside_a_function_body`＋`a_package-level_DataPath_key_is_a_sink_where_it_is_declared`（同一臂，2 控制）。无错配；还原后 SHA 同串、跑绿。
+- **攻击 5（D5 汇总）抓（两枚被指读数）**：K>0（探针 `:11`）→`【红】…实红 1 处`；F>0（删 holder `:46` 理由句）→`【红】…实红 0、自检红 1`。残余：正控表红时扫描测试的汇总仍印 `【绿】`（`a4-teeth.log`），因 `clean` 只看本测试两计数（`:247-256`）；「任何一处红」措辞大于射程，实际数字没回退。
+- **攻击 6（36 子例）抓**：14 例与旧尺 `cb308abd` 逐块归一化比较**全 SAME**；断言从 `Contains(code, leaf)` 变 `raw != "" && Contains(code, raw)`＋显式 `lineNeedle`，**更强**不是更弱；总数 35 形状＋1 汇总＝36。
+- **AC#4 判读不变**：本尺仍不能单独翻 AC#4（残余 holder/spike 是登记不是清零；换根/拆字面量仍可绕；AC#2 静桌面读数仍缺）。
+- 撤销口令＝「314 形状尺二轮审计不采信」：删本节与 `docs/evidence/s1/314-ruler2-audit.md`，读数根可原样留着复跑。
