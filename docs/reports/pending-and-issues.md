@@ -37161,3 +37161,17 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 4. 出现双计数时，补一笔 git commit -- <旧名> <新名> 即可（c0e48dbc4 是范例），⛔ reset/amend。
 
 **为什么值得单独立一条**：这个错**不报错、不红、盘上看不出来**，只有拿 HEAD 跟盘上对账才会现形 —— 而"盘上三把尺"里的第一把（提交真在）正是唯一能抓它的尺。今天是从「票池 430 vs HEAD 431」这个差里抓到的。
+
+## A1866 — ★治具规矩：结票改名 \xxx.md\ → \xxx-done.md\ **会把文件名顶过 100 字符帽**，一结票就把 path-length 门禁顶红
+
+**症状**：票 274 原名 97 字符（合法），加 -done 后 **102 字符** ⇒ scripts/check-path-length-budget.sh 报 RED - over budget and NOT in the roster 且 count guard: roster 69 / tree 70 ⇒ **VERDICT RED**。红是**我结票这个动作**造成的，不报错、不红在测试里，只有跑 path 门禁才现形。
+
+**谁发现的**：不是我，是写腿 w443e 在跑自己门禁时撞见的（它 AC#5 唯一没绿的一项，且它**没吸收**这个红，如实交回）。⇒ 说明"每腿都跑四门禁"这条规矩是有价值的：**它能抓编排者自己造成的红**。
+
+**规矩（此后照做）**：
+1. **结票前先量名字**：len(<stem>) + 5 + 3 <= 100（-done 5 字符 ＋ .md 3 字符）⇒ stem ≤ 92。超了就**先把 slug 改短再结**，⛔ 不许结了再说。
+2. 已有 **67 枚历史文件名超 100**，它们靠 roster 兜着（69 条 roster ＝ 这些 ＋ 若干）；**新车票不要往 roster 里加**，那是给存量欠账用的，不是给出票用的。
+3. 修法优先级：**改短文件名** ＞ 加 roster 行（改 roster 属 scripts/** 写面，且会让 count guard 长期歪）。
+4. 改名提交**必须两个路径都进 pathspec**（见 A1865），提交后核 <票号>- 在 HEAD 里 = 1。
+
+**实例**：274-no-nail-…-in-both-halves-done.md（102）→ 274-no-nail-shipped-exe-carry-page-build-step-2-comment-false-done.md（69），修后 VERDICT GREEN / roster equals the tree。
