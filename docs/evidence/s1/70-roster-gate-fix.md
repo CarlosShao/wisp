@@ -251,9 +251,16 @@ rc=0
 | 1 | `997..1067` | `1111..1181` | `89aff5ba7cf4ecd177c8e79dc2871989943e98bbee8773d3edfe3dc6db700ebf` **两侧相同** |
 | 2 | `1218..1277` | `1332..1391` | `c60726a0eddc95ddf376accfe673472db331280366e0063d8db9efeb5181549d` **两侧相同** |
 
-> CRLF 这两行取自把工作副本规范化为 LF **之前**的 worktree（为什么规范化见 §5.1），
-> 两侧现在都能逐字复算：改前 `fix/pre70-portable-worktree-crlf.sh`、改后 `fix/after70-portable-worktree-crlf.sh`
-> （各自按其行号取块，保留 `\r\n` 逐字节 SHA256）。当前**提交的 blob** 与上面 LF 行的 hash 相同。
+> CRLF 这两行取自把工作副本规范化为 LF **之前**的 worktree（为什么规范化见 §5.1）。
+> 注意：仓库里那两个 `*.sh` 快照被 `.gitattributes` 的 `*.sh text eol=lf` 规范化回 LF，
+> 从 git 取出的是 LF 形态，**不是** CRLF 字节；要复算 CRLF 读数，先把 LF 逐行补 `\r` 再按表中行号取块：
+> ```
+> # 改前（dada2ed9e 的父提交）与改后（dada2ed9e）；行号见上表
+> git show dada2ed9e^:scripts/portable-tests.sh | awk '{printf "%s\r\n", $0}' > /tmp/pre-crlf.sh
+> git show dada2ed9e:scripts/portable-tests.sh  | awk '{printf "%s\r\n", $0}' > /tmp/post-crlf.sh
+> ```
+> 当前**提交的 blob** 与上面 LF 行的 hash 相同 —— 那才是"落盘字节"的判据；CRLF 表是同一段内容的
+> 另一套字节读数（证明连行尾都没动），两者不冲突。
 
 **为什么行号变了字节没变**：本腿在 `:838-910`（块 1 之前）加行，块 1 下移 114 行、块 2 下移 114 行；
 `git diff -U0` 的 hunk 旧行号是 `849/851/860/878/900/1279` 与 `213/242`，**没有一条落在这两段里**。
