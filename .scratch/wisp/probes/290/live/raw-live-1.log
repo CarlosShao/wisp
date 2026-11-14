@@ -1,0 +1,38 @@
+time=2026-11-14T10:24:02.743+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC290LiveShapeOneDefaultBootOpensNoDevice
+    resident_audio_290_live_windows_test.go:170: AC#3 shape1 boot verdict: wisp: 采集腿：采集腿已装配、门处于静音：设备未打开（[audio] mic_muted_default=true，来源 compiled defaults (config.NewDefaults)）
+    resident_audio_290_live_windows_test.go:171: AC#3 shape1 config source line: 
+    resident_audio_290_live_windows_test.go:188: AC#3 shape1 exit line: wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+--- PASS: TestAC290LiveShapeOneDefaultBootOpensNoDevice (18.92s)
+=== RUN   TestAC290LiveShapeTwoTheMuteHotkeyOpensTheGate
+    resident_audio_290_live_windows_test.go:222: AC#3 shape2 boot verdict: wisp: 采集腿：采集腿已装配、门处于静音：设备未打开（[audio] mic_muted_default=true，来源 compiled defaults (config.NewDefaults)）
+    resident_audio_290_live_windows_test.go:223: AC#3 shape2 boot hotkey line: 
+    resident_audio_290_live_windows_test.go:232: AC#3 shape2 before the gesture: mute slot live, device not opened
+    resident_audio_290_live_windows_test.go:243: AC#3 shape2 gesture line: wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+    resident_audio_290_live_windows_test.go:261: AC#3 shape2 exit line: wisp: audio capture leg stopped: levels_delivered=129 frames_sent=6 frames_dropped=123 reopens=0
+    resident_audio_290_live_windows_test.go:276: AC#3 shape2 RED: frames_dropped=123 exceeds frames_sent=6, which is not a reading of a live device.
+        wisp: audio capture leg stopped: levels_delivered=129 frames_sent=6 frames_dropped=123 reopens=0
+--- FAIL: TestAC290LiveShapeTwoTheMuteHotkeyOpensTheGate (17.49s)
+=== RUN   TestAC290LiveScalarsAtTheBallSeamAfterTheUserPath
+time=2026-11-14T10:24:40.085+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\Temp\TestAC290LiveScalarsAtTheBallSeamAfterTheUserPath3430076443\001\config.toml path=T
+    resident_audio_290_live_windows_test.go:305: AC#3 assembly verdict: 采集腿已装配、门处于静音：设备未打开（[audio] mic_muted_default=true，来源 C:\Users\swq\AppData\Local\Temp\TestAC290LiveScalarsAtTheBallSeamAfterTheUserPath3430076443\001\config.toml）
+    resident_audio_290_live_windows_test.go:324: AC#3 gesture open: executed=true outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+time=2026-11-14T10:24:40.539+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+time=2026-11-14T10:24:41.555+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=33 dropped_bytes_total=33792 bounded_window=192ms frame_ms=32
+time=2026-11-14T10:24:42.561+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=64 dropped_bytes_total=65536 bounded_window=192ms frame_ms=32
+    resident_audio_290_live_windows_test.go:344: AC#3 counters after open: levels_delivered=94 frames_sent=6 frames_dropped=88 last_err=""
+    resident_audio_290_live_windows_test.go:346: AC#3 scalars after open: after-user-open: samples=94 mean=0.001152 max=0.023777 levels_per_s=31.33
+    resident_audio_290_live_windows_test.go:355: AC#3 gesture close: executed=true outcome="已静音：采集已关闭，设备未打开（再按一次取消静音）"
+    resident_audio_290_live_windows_test.go:364: AC#3 scalars after close: after-close: samples=0 mean=0.000000 max=0.000000 levels_per_s=0.00
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=94 frames_sent=6 frames_dropped=88 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=94 frames_sent=6 frames_dropped=88 reopens=0
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-11-14T10:24:44.366+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290LiveScalarsAtTheBallSeamAfterTheUserPath (5.21s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	41.764s
+FAIL
