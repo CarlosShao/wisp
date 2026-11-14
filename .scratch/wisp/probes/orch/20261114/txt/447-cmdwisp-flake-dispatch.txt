@@ -1,0 +1,17 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864；明示 fallback）
+# 来路：编排者现查 CI 日志（三次失败、红的那枚在换）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 447：`cmd/wisp` 在 CI 争用下**每发红一枚不同的测试**。
+
+先读票全文 .scratch/wisp/issues/447-*.md（6 格 AC ＋ 三次失败的点名表 ＋ 边界）。
+核心事实：同一套 `RUN=846 PASS=603 FAIL=1 SKIP=19`，但红的是 `Test390r1BallClickPlayingInterruptAbortsAndWalks27`（`43575891409`）与 `TestPanelHostRealWindowHopAndLifecycle`（`43583105791`）——**换人了**。
+
+第一件事：**量出"谁在红"**，不是"红了几次"。取最近 20 发 `test-windows` 的 step10 日志（`gh run view <id> --log-failed`，gh 在 `C:\Program Files\GitHub CLI\gh.exe`），逐发抽 `--- FAIL: <名字>`，出表。
+然后逐枚定性 (a) 读快照读早了 / (b) 硬件前提缺失该具名弃权 / (c) 真产码缺陷（**停手上报**）/ (d) 墙钟上界（⛔ 拿 `took<5s` 当判据）。
+
+修法照 441/445 已确立的形（等目标落定＋具名弃权行＋数字＋可 grep token）。⛔ 删/放宽既有断言。
+
+⚠ 本波**只有你一枚**碰 `cmd/wisp`；`go test ./cmd/wisp` 必须走载具 `scripts/wisp-cli-staged-tests.sh`，⛔ 同时跑两发。
+
+回话第一行＝commit hash ＋「最近 20 发里红过的测试 N 枚，名单是 …」。没干完写「未完成，卡在哪」。⛔push。
