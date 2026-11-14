@@ -89,6 +89,7 @@ if totals.refused == 0 || totals.sealedOwn == 0 {
 | 台面 | N | 结果 | 读数 |
 |---|---|---|---|
 | tmpfs，全分母 2000 | 10 | **10/10 绿，0 弃权** | 每发都打出 `un-raced quiet control ... sealed-own-object=1`；`repro-postfix-quiet-count10.log` |
+| **提交后**（commit `8e1367bfd` 的字节，三枚一起跑） | 1 | **3/3 绿，0 弃权** | 3 条 control 行（每形一条）；`07-post-commit-green.log` |
 | tmpfs + `WISP_120_ATTEMPTS=1`（= §1.3 F 的同一批抽样） | 20 | **15 绿 / 5 红** | 15 绿里 **7 发**打出 `ABSTAIN(441:leaf-swap:raced-quiet)` 并带数字；5 红全是**另一臂**（`refused=0, sealed-own=4`：racer 一次也没把换态递给密封）→ `repro-postfix-att1-count20.log` |
 
 5 条红的逐字（这臂**故意保留红**，理由见 2.4）：
@@ -177,7 +178,7 @@ AC#1 ABSTAIN(441:leaf-swap:raced-quiet) attempts=4 samples=4 attempts-per-sample
 |---|---|---|
 | `bash -n`（本腿碰了 shell：`probes/441/{census,repro-leafswap}.sh`） | **rc=0 / rc=0** | 容器内 `bash -n .scratch/wisp/probes/441/census.sh`、`.../repro-leafswap.sh` |
 | `sh scripts/d22scan.sh`（clean） | **rc=0**：`d22scan: clean - no D22 ban violations`；step1 正控 `go test -count=1 ./...` rc=0 | 本机无 POSIX sh（WSL 无发行版）；**容器里跑该 wrapper 时 `tools/d22scan` 自检命中 `go test` 默认 10m 超时**（`FAIL .../tools/d22scan 600.331s`），故按 wrapper 的两条命令在**本机原生**逐条跑（`cd tools/d22scan && go test -count=1 ./...` → rc=0；`go run . -root <repo>` → rc=0）。口径同 wrapper，扫描集：internal/ 1010 Go 文件、cmd/ 280 |
-| path-length budget | **VERDICT GREEN**（tracked paths=19952，over-budget=69 全在册，not in roster=0） | `sh scripts/check-path-length-budget.sh`（提交后复跑，见票尾） |
+| path-length budget | **VERDICT GREEN**（提交后复跑：tracked paths=19987，over-budget=69 全在册，not in roster=0） | `sh scripts/check-path-length-budget.sh` |
 | 改动只碰写面 | `internal/winsec` 仅 1 枚 `*_test.go`；产码 0 字节 | `git status --porcelain internal/winsec`、`git diff --stat -- internal/winsec/*.go ':!*_test.go'`（空） |
 
 ## 六、边界自证（可核）
