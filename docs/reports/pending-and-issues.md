@@ -37175,3 +37175,13 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 4. 改名提交**必须两个路径都进 pathspec**（见 A1865），提交后核 <票号>- 在 HEAD 里 = 1。
 
 **实例**：274-no-nail-…-in-both-halves-done.md（102）→ 274-no-nail-shipped-exe-carry-page-build-step-2-comment-false-done.md（69），修后 VERDICT GREEN / roster equals the tree。
+
+## A'@ + $next + @' — 一条**没上界**的等待：`Test16r1PremoremModelSha256CorruptRefusesTheHandOff` 在本机挂住 10 分钟以上
+
+**读数**：2026-11-14 17:2x 我复跑票 445 那 5 枚测试件（20 枚用例），**前 19 枚 18 PASS / 1 SKIP / 0 FAIL**；最后一枚 `Test16r1PremremModelSha256CorruptRefusesTheHandOff` **从 17:28:33 起日志一行不动**，`wisp.test` 进程还在（145 MB、CPU 111 s），我 17:4x 杀掉。
+
+**它挂在哪**（读代码，不是猜）：这枚用例调的是**生产路径** `residentVoiceHandOff(dataDir)(voiceAsrModelID, …)`，那是模型交付器的真实走法；本机没有可用镜像／被墙时它**没有上界地等**。⇒ 这是「网络调用没有 deadline」的形状，不是测试写得差。
+
+**为什么值得单记而不是塞回 445**：445 的射程是「读快照读早了」，与这条无关；而「生产路径无上界等待」在 CI 上不出现（CI 有 skip ledger 兜着），只在**本机**出现 ⇒ 谁在本机跑全量谁就撞上，且撞上时没有任何一行能告诉他等的是什么。**待立票**（下一轮），判据要含：无上界等待必须给出**具名行＋它在等什么＋已等多久**，或干脆有上界。
+
+⚠ 另记：`internal/models/acl_sid_121_test.go` 的 `gofumpt -l` 命中是**工作树 CRLF／HEAD 是 LF** 的检出伪影，两腿独立报到同一件事 ⇒ 不立票，记在此备查。
