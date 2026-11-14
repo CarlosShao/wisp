@@ -1,0 +1,17 @@
+# 派单存档（先存档再发；重启后直接用）
+# 路由：agent(prompt, { provider:'magpie-high', model:'auto/glm-5.3-flash' })
+# ⛔ 不许写 auto/deepseek-v4.1-flash（我 2026-11-14 下午连犯 6 次，见台账 A1863）
+Wisp 仓（D:\work\workspace\projects plans\Wisp）写腿。票 442：面板 profile 判据，走编排者裁定「甲＋落①」。
+
+先读票全文（含 15:5x 裁定段）：.scratch/wisp/issues/442-panel-profile-ruler-still-misses-two-interprocedural-shapes.md
+上一腿 w442-interproc 已交两笔 commit（ca58bec01 探针/① patch/读数、efd6e47aa 门禁日志），并把 ③ 的三种牙口量清了。你不是从零开始。
+
+裁定要点（照做，⛔ 再争）：
+1 主判据＝③-c：NewPanelManager 加 3–5 行观察点（收 dataPath 到只在该测试构建可读的记录器），收口断言「这一发里每个构造点收到的 dataPath 两两互不相同」。为什么它最有价值：③ 三种里唯一有牙且每点都盖；③-a 同义反复没牙（上一腿量过并拒绝）、③-b 只覆盖 253r6 一个点。
+2 次要＝落①：git apply .scratch/wisp/probes/442/option1-ruler.patch（57796B，--check 已 rc=0），落完冻结——此后不再往尺子里加规则。
+3 顺序：先落 ① 跑全门禁 → 再做 ③-c → 两侧正控（把 panel_unbound_253r6_windows_test.go:71 改回固定名⇒真红；还原⇒绿、SHA 同串）→ 证据件。
+
+边界：cmd/wisp 是共享编译面，本波你唯一一枚可动 cmd/wisp 的写腿。写面：cmd/wisp/**（仅 ③-c 那 3–5 行 + 相关测试件）、docs/evidence/s1/442-*、.scratch/wisp/probes/442/**、票 442 Progress log。⛔ 阈值/golden/契约；⛔ 放宽断言（36 子例与 2 条豁免逐字节不动）；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔ push。
+⚠ 必须走载具：GOFLAGS='-tags=winlive' scripts/wisp-cli-staged-tests.sh -test.run '^Test314|^Test442'（裸 go test ./cmd/wisp 会因 DLL 出假红 0xc0000135）；⛔ 同时跑两发。
+
+交付：① 落地+门禁读数、③-c 的两侧读数、突变正控、36 子例仍 PASS、commit（显式 pathspec）。回话第一行写 commit hash + 「③-c 断言在哪 file:line」。没干完写「未完成，卡在哪」。

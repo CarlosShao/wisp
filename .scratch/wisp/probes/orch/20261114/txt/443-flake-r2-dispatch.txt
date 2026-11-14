@@ -1,0 +1,20 @@
+# 派单存档（先存档再发；重启后直接用）
+# 路由：agent(prompt, { provider:'magpie-high', model:'auto/glm-5.3-flash' })
+# ⛔ 不许写 auto/deepseek-v4.1-flash（我 2026-11-14 下午连犯 6 次，见台账 A1863）
+Wisp 仓（D:\work\workspace\projects plans\Wisp）写腿。票 443：一枚「超时杀进程树」仪器在夹具没报出孙进程 pid 时判红。
+
+先读票全文：.scratch/wisp/issues/443-test52-timeout-tree-instrument-reds-when-fixture-never-reports-a-pid.md
+⚠ 该票 Progress log 末尾有一条「接手须知」：工作树里有 2 枚被中断的半成品测试件
+internal/plugin/manifestslot/command_52_main_test.go / command_52_test.go
+开工第一件事＝git diff -- internal/plugin/manifestslot/ 读它们：能用就接着做并说明，不能用就显式还原并在 Progress log 记一行。⛔ 不许默默覆盖、⛔ 不许当已修。
+
+先例必读（同机理，已结）：internal/winsec/posix_seal_window_120_other_test.go + docs/evidence/s1/441-instrument-abstention.md
+核心手法＝把「条件到达过」与「护栏还在」拆成两个载体；弃权打具名行+数字+可 grep 的 token（AC#1 ABSTAIN(...) attempts=... samples=...），⛔ 不用 t.Skip（runtests.sh 把 core 档顶层 SKIP 判致命，而 scripts/** 不在你写面）。
+
+立案读数：CI run 43567331249 与 43568581591 都红、a46352fd3 绿 ⇒ 3 发红 2；红句 command_52_test.go:748: the fixture never reported a grandchild pid。
+
+要做：AC#1 本机 Windows 复现（给 N 与命中率，⛔ 不许拿「跑一百次没红」当复现）；AC#2 拆两载体，弃权具名带数字、杀树失效必须仍真红；AC#3 仓外导出树里让杀树那手失效⇒修后真红点名，还原 SHA256 同串；AC#4 grep 全仓同形自检给点名表；AC#5 四门禁 + 产码 0 字节。
+
+边界：写面只许 internal/plugin/manifestslot/** 的 *_test.go、docs/evidence/s1/443-*、.scratch/wisp/probes/443/**、票 443 Progress log（只追加）。⛔ 放宽断言；⛔ t.Skip；⛔ 其他包；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔ push。只跑定向 go test -run 'Test52' ./internal/plugin/manifestslot，⛔ 同时跑多条、⛔ 跑 cmd/wisp。
+
+交付：复现数字+弃权/真红两侧读数+突变正控+普查表+commit（显式 pathspec）。回话第一行写 commit hash + 一句话说清「弃权怎么具名、真红怎么保住」。没干完写「未完成，卡在哪」。
