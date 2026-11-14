@@ -1,0 +1,37 @@
+全部 RegisterHotKey 调用点（git ls-files '*.go'，2026-11-14 现跑，按面分类）
+
+== 产品（唯一 Win32 调用） ==
+internal/ball/hotkey_windows.go:414
+  r, _, err := pRegisterHotKey.Call(uintptr(hwnd), uintptr(id), …)   // 在 hotkeyRegisterer 内
+
+== 产品（idle 名册：显式不绑 cancel） ==
+internal/ball/hotkey_windows.go:480-490
+  if p.id == hkCancel { … cancelIdleLine(bindings[i]); continue }
+  注释 :485-488「takeEscWith is the only caller that ever binds this id」
+
+== 产品（借用：唯一 cancel / 裸 Esc 注册路径） ==
+internal/ball/ball_windows.go:961-992   TakeEscForCancel
+internal/ball/ball_windows.go:966       borrow := resolveCancelBorrow(b.cancelBinding)
+internal/ball/hotkey_windows.go:631-633 takeEscBorrow → takeEscWithAcc
+internal/ball/hotkey_windows.go:609-617 takeEscWithAcc → reg(hkCancel, b.Acc)
+internal/ball/ball_windows.go:948-950   注释「this is the ONLY path that registers the cancel id」
+产品调用者：cmd/wisp/resident_approval_windows.go:924（借）/ :1026（还）
+
+== 调试缝（调用者只有测试） ==
+internal/ball/ball_windows.go:1037-1040 DebugRegisterHotkeySquat
+  调用者：cmd/wisp/resident_hotkey_258_windows_test.go:456 / :462
+
+== 测试 / 台件 ==
+cmd/wisp/testdata/esclistener/main.go:243          （-steal / 探针）
+cmd/wisp/resident_esc_delivery_245_windows_test.go:86（bareEscClaimed245 探针）
+internal/ball/hotkey_live_test.go:71 / :603       （hotkeyFreeProbe / uiRegisterHotkey）
+cmd/wisp/resident_hotkey_live_258_windows_test.go:273
+cmd/wisp/resident_audio_290_live_windows_test.go:162
+internal/ball/hotkey_borrow_refused_260r5_test.go:213（只 Unregister）
+
+== spike（非产品） ==
+scripts/spike/common/winshell.go:437
+
+判：产品里裸 Esc 的注册点只有一处（Confirming 借用）；idle 由 registerAllWith 跳过。
+残余：foreign 判定以"报告集干净"为准；掉出报告的同进程注册会被读成外人
+（代码自己在 internal/ball/hotkey_windows.go:525-528 写了这个形状）。

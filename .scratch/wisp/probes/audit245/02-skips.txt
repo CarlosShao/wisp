@@ -1,0 +1,42 @@
+本 commit 触到的五个代码/测试文件里全部 t.Skip / t.Skipf 点
+（Select-String -Pattern "t\.Skip"；2026-11-14 现跑）
+
+—— 本 commit 新增/改动的 ——
+internal/ball/hotkey_live_test.go:518
+  t.Skipf("SKIP-LOUD (ticket 245 AC#8, FOREIGN OWNER): bare Esc is claimed on this desktop while the ball is "+
+      "idle, but the ball's own registration set is clean (%d live entries, no bare key), so the claim belongs "+
+      "to another program. Probe attempts=%d, each answered errno 1409 %q. …")
+  判：具名＋带数字（attempts、errno 1409 文本）
+
+internal/ball/interaction_live_test.go:243（预存位置；本 commit 只把参数/文案改成 %q）
+  t.Skipf("SKIP-LOUD: injected %q never reached the input stream, so this run did NOT prove the physical "+
+      "cancel during Confirming. …", borrowed)
+  判：具名、无数字；触发条件未被放宽
+
+cmd/wisp/resident_esc_delivery_245_windows_test.go:110
+  t.Skipf("SKIP-LOUD (ticket 245 AC#9, FOREIGN OWNER at baseline): … RegisterHotKey(foreign id) failed %d/3 "+
+      "times with %s. …")
+  判：具名＋带数字
+
+cmd/wisp/resident_esc_delivery_245_windows_test.go:148
+  t.Skipf("SKIP-LOUD (ticket 245 AC#9): the shipped leg reported %q, so there is no idle ball whose key "+
+      "ownership could be measured on this host. …", ballAbsentClaim, out)
+  判：具名、无数字（环境缺失；引 ballAbsentClaim 原文）
+
+cmd/wisp/resident_esc_delivery_245_windows_test.go:169
+  t.Skipf("SKIP-LOUD (ticket 245 AC#9, FOREIGN OWNER): … reached the observer only %d time(s); after the leg "+
+      "left … Win32 STILL says the key is claimed (%d/3 attempts: %s) …")
+  判：具名＋带数字
+
+cmd/wisp/resident_esc_delivery_245_windows_test.go:195
+  t.Skipf("SKIP-LOUD (ticket 245 AC#9, FOREIGN OWNER after exit): … keydown_esc=%d … (%d/3 attempts: %s) …")
+  判：具名＋带数字
+
+—— 同一批文件里的预存跳点（不在本 commit diff 里，列出以免误读为新增）——
+internal/ball/hotkey_live_test.go:263 / :274 / :299 / :434
+internal/ball/interaction_live_test.go:340
+
+裸跳过（无判词、无数字）：0 处。
+放宽上界：0 处。改宽断言：0 处。把红改 log：0 处。
+唯一实义放宽：hotkey_live_test.go:517-522 把旧 t.Fatal（"ticket 245 RED: bare Esc is claimed …"）改成 t.Skipf。
+  证据 §5 具名请裁；票面 13:4x 裁定按派单口径接受（撤销口令：改回 t.Fatalf）。

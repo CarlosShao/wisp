@@ -1,0 +1,54 @@
+证据件四条声称 ↔ 盘上逐字（全部 file:line 现读）
+
+[A① ours 判词不可达]
+evidence :37 声称 ours 判词 = "ticket 245 RED (AC#8, OUR OWN SET)"
+internal/ball/hotkey_live_test.go:504-506
+  if reds := idleRosterReds245(rep); len(reds) != 0 {
+      t.Fatalf("the live ball's idle roster is not the standby one: %v\n%+v", reds, rep.Bindings())
+internal/ball/hotkey_idle_bare_key_245_test.go:64-68
+  if b, held := idleBareKeyHeld245(rep); held {
+      reds = append(reds, fmt.Sprintf("ticket 245 RED: the idle ball holds %s = %q as a bare key "+
+internal/ball/hotkey_live_test.go:511-516（escIdleBall245 支，逐字前缀）
+  t.Fatalf("ticket 245 RED (AC#8, OUR OWN SET): bare Esc is claimed on this desktop while the ball is "+
+⇒ 同一条 idleBareKeyHeld245 在 :505 先红 ⇒ :511 支不可达。
+
+[A① foreign 支]
+internal/ball/hotkey_live_test.go:517-522
+  t.Skipf("SKIP-LOUD (ticket 245 AC#8, FOREIGN OWNER): … Probe attempts=%d, each answered errno 1409 %q. …",
+      len(rep.Live()), p.attempts, windows.ERROR_HOTKEY_ALREADY_REGISTERED.Error())
+
+[A① errno 构造性]
+internal/ball/hotkey_live_test.go:84-89
+  if errors.Is(e, windows.ERROR_HOTKEY_ALREADY_REGISTERED) { return false, nil }
+  return false, e
+internal/ball/hotkey_live_test.go:530-549 probeBareEsc245（3 次；非 free 记录常量；非 nil err 致命）
+
+[A② 借哪枚注哪枚]
+git show 137bf535c:internal/ball/interaction_live_test.go
+  :231 if !injectBinding(t, "Esc") {
+  :238 t.Fatalf("the taken-over Esc did not cancel Confirming (machine %s)", m.State())
+现盘：
+  internal/ball/interaction_live_test.go:241 borrowed := b.ConfiguredHotkeys().Cancel
+  internal/ball/interaction_live_test.go:242 if !injectBinding(t, borrowed) {
+  internal/ball/interaction_live_test.go:249 t.Fatalf("the taken-over Esc did not cancel Confirming (machine %s)", m.State())
+internal/ball/ball_windows.go:916-923 ConfiguredHotkeys → b.boundCfg
+internal/ball/ball_windows.go:966 borrow := resolveCancelBorrow(b.cancelBinding)
+internal/ball/hotkey_live_test.go:45-47 liveHotkeys(): Cancel "Ctrl+Alt+V"
+
+[A③ 四形]
+cmd/wisp/resident_esc_delivery_245_windows_test.go
+  :103-120 E1（:110 skip / :116 instrument red）
+  :122-132 E2（:128 instrument blind red）
+  :134-180 E3（:148 absent skip / :169 foreign skip / :175 PRODUCT red）
+  :182-204 E4（:195 after-exit skip / :200 hard red）
+  :206 四形读数 logf
+cmd/wisp/resident_approval_live_246_windows_test.go:405-436 buildEscListener246（:429-430 build 失败 fatal）
+cmd/wisp/resident_approval_live_246_windows_test.go:452-518 observeEsc246（:466/:491/:518 fatal）
+
+[D 台件在册]
+git ls-files cmd/wisp/testdata/esclistener → cmd/wisp/testdata/esclistener/main.go
+main.go:162-166 -watch / -steal；:243 RegisterHotKey；:265 READY；:293 READING
+
+[C 还原核]
+git status --short -- cmd/wisp/resident_ball_windows.go cmd/wisp/resident_windows.go → 空
+(Get-FileHash cmd/wisp/resident_ball_windows.go).Hash = 1D47ECCB205328A744FB1FF4507EF6962FA8CB29826671BAF2C5CE9406178425

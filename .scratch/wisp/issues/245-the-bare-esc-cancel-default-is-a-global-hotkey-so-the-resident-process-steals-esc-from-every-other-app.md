@@ -126,3 +126,15 @@
 - **AC#4 仍不勾**：阻塞于票 228（现读 `resident_ball_windows.go:426/:350/:452`，`Test245AC4ResidentChainReadsAConfiguredCancel` PASS 只证「链读得进配置」，不证「卡挂着时借的是配置值」）。
 - **AC#6① 本发 0/4 是我造成的**：我为等机主按 `Ctrl+Alt+M` 拉起的 `wisp-live.exe`（pid 21340）占着 Q/M/P 热键。**不是回归**；下一发热键腿之前我会先把它停掉。
 - 票面 `resident_ball_windows.go:86 / DefaultHotkeys()` 已过期，现读 `:452 Hotkeys: cfg,`。
+
+## 静态验收回执 — 2026-11-14（非实现者腿，目标 `7f5f36b0d`）
+
+**`7f5f36b0d` ｜ A:部分 ｜ B:通过 ｜ C:通过 ｜ D:通过**
+
+- 腿：`245-static-accept`（验收腿，非实现者；**只读、零测试**——另一条腿此刻占用桌面，本腿未跑 `go test`／未建窗／未跑 bash 测试载具；判据全来自 `git show`／读源码／`grep`／`git diff`／`git status`／哈希，加上证据件里已有的逐字读数）。
+- 交件：`docs/evidence/s1/245-static-accept.md`（A/B/C/D 四节＋逐条 `file:line`＋逐字引文）；盘上附件 `.scratch/wisp/probes/audit245/**`（只建不删）。
+- **A 部分（AC#8）**：两形确实分开——ours 仍硬红且**先于**探针，foreign 具名跳过带 `attempts=3` 与 `errno 1409 "Hot key is already registered."` 原文。但证据 `:37` 与本票 `:119` 点名的 `ticket 245 RED (AC#8, OUR OWN SET)` 在 winlive 路径**不可达**：`requireIdleRoster` 先被 `idleRosterReds245` 的裸键红句挡下（`hotkey_live_test.go:504-506`＋`hotkey_idle_bare_key_245_test.go:64-68`），实到红句是 `hotkey_live_test.go:505` 的 `the live ball's idle roster is not the standby one`；`:513` 那句要等"名册空＋分类 held"两个互斥条件。⇒ 行为未放宽，错的是判词引文；**AC#8 仍可翻，但翻前必须把引文改成 `:505` 实句，或把名册检查并进分类之后**。AC#8 的 `interaction_live_test.go` 修成立（`borrowed := b.ConfiguredHotkeys().Cancel`／`injectBinding(t, borrowed)`，现 `:241-242`；引用 `:231` 是改前行号，红句现 `:249`）。AC#9 四形判词/跳过语均在盘上（`:110/:116/:128/:148/:169/:175/:195/:200`）。
+- **B 通过**：本 commit 6 处 Skip 逐处列（详证据 §B.1）：5 处具名带数字（`hotkey_live_test.go:518`、AC#9 `:110/:169/:195`），`resident_esc_delivery_245_windows_test.go:148` 具名无数字（缺球环境形），`interaction_live_test.go:243` 为预存位置仅改文案。**裸跳过 0、放宽上界 0、改宽断言 0、把红改 log 0**。唯一实义放宽＝AC#8 foreign 支旧 `t.Fatal`→`t.Skipf`，已由 `:116-120` 裁定接受（撤销口令在 `:120`）。
+- **C 通过**：7 枚文件；`internal/ball` 四件全 `_test.go`（非测试文件 0）；`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`internal/statemachine/**` 零改动，`D43` 只出现在注释。生产字节还原现核：两文件 `git status --short` 空、`resident_ball_windows.go` SHA256 `1D47ECCB205328A744FB1FF4507EF6962FA8CB29826671BAF2C5CE9406178425` 与证据 `:161` 同串。⚠ 证据 §写面列 6 枚，漏列本票那 1 行（实际 7 枚，票面 1 增 0 删）。
+- **D 通过**：`cmd/wisp/testdata/esclistener/main.go` 在 `git ls-files`（10,226 B；`-watch`/`-steal` 在 `:162-166`）；台件缺失/不可执行**不静默**（`buildEscListener246` `:429-430` fatal；`observeEsc246` `:466/:491/:518` fatal）；产品里裸 Esc 唯一注册点＝`Confirming` 借用（`ball_windows.go:961` → `hotkey_windows.go:631-633` → `:414`），idle 由 `registerAllWith:484-490` 显式跳过；调试缝 `DebugRegisterHotkeySquat` 仅测试调用。
+- 一句话：**AC#8 能翻（改引文后）／AC#9 能翻**。`19.78s`、5/5、4/4 等绿读数是写腿自述，本腿未复跑；未 commit、未 push。

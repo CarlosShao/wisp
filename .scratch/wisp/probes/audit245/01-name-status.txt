@@ -1,0 +1,24 @@
+git show 7f5f36b0d --name-status
+（2026-11-14 现跑；7 枚）
+
+M	.scratch/wisp/issues/245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md
+A	cmd/wisp/resident_esc_delivery_245_windows_test.go
+A	docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r4.md
+A	internal/ball/hotkey_esc_idle_owner_245_test.go
+M	internal/ball/hotkey_idle_bare_key_245_test.go
+M	internal/ball/hotkey_live_test.go
+M	internal/ball/interaction_live_test.go
+
+git diff --numstat 137bf535c 7f5f36b0d
+1	0	.scratch/wisp/issues/245-...-steals-esc-from-every-other-app.md
+208	0	cmd/wisp/resident_esc_delivery_245_windows_test.go
+223	0	docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r4.md
+93	0	internal/ball/hotkey_esc_idle_owner_245_test.go
+48	0	internal/ball/hotkey_idle_bare_key_245_test.go
+44	5	internal/ball/hotkey_live_test.go
+18	7	internal/ball/interaction_live_test.go
+
+判：
+- internal/ball 四件全 `_test.go`（非测试文件 0 处）。
+- 票面只 1 增 0 删（Progress log 一行），正文未改。
+- 证据件 §写面列 6 枚，漏列票面那一行（第 7 枚）。
