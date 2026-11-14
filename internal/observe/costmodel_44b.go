@@ -183,8 +183,17 @@ func (m *CostMeter) ReconcileModels(ctx context.Context, day string) (ReconcileM
 // today's label; cards decides which model spends also draw the provider plan
 // credit bucket (billing=plan, same rule as Post). Negative rows are refused
 // rather than credited — the anti-negative rule Post already states.
+//
+// The whole body runs under l.mu and rolls through rollLocked, so the seed is
+// one atomic step against Spend/Post like any other writer: a boot seed that
+// overlapped the first dispatch's Decide used to write the three maps with no
+// lock at all (docs/evidence/s1/44-quota-seedfrom-lock.md). Taking the lock
+// here and then calling roll() would re-enter the same mutex and deadlock, so
+// this path must use the caller-holds-the-lock spelling throughout.
 func (l *QuotaLedger) SeedFrom(rows []CostModelDayTotal, currentDay string, cards map[string]QuotaModel) error {
-	l.roll()
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.rollLocked()
 	for _, r := range rows {
 		if r.Micros < 0 {
 			return fmt.Errorf("observe: quota ledger refuses negative stored spend (%d micros for %s)", r.Micros, r.Key())

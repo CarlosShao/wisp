@@ -118,3 +118,83 @@ func TestQuotaLedgerConcurrentSpendAndPostKeepEveryMicro(t *testing.T) {
 			quotaRaceCard.Provider, got, want)
 	}
 }
+
+// TestQuotaLedgerSeedFromOverlapsSpend is the positive control for the one
+// writer the mutex skipped: SeedFrom rebuilds the three buckets from stored
+// rows (QuotaGate.SeedBaseline on boot), and on the unfixed ledger it did that
+// with no lock while Spend was already making its copy under one. The product
+// shape is a boot seed that loses the race with the first dispatch's Decide:
+// one goroutine ranges a bucket map while the seeder is writing it, and the
+// pair has no happens-before edge to hide behind.
+//
+// The assertions after the barrier are the safety half, and they are what keeps
+// this test honest once the detector is quiet: every seeded micro must land in
+// the snapshot exactly once, so a fix that serialises the reads but drops a
+// seeded row still fails.
+func TestQuotaLedgerSeedFromOverlapsSpend(t *testing.T) {
+	const readers = 4
+	const seedRounds = 40
+	const readerRounds = 200
+	const dayMicros = 7
+	const monthMicros = 11
+
+	currentDay := "2026-11-03"
+	now := time.Date(2026, 11, 3, 9, 0, 0, 0, time.UTC)
+
+	rows := []CostModelDayTotal{
+		// Today's plan-billed row: day bucket, month bucket, provider credit.
+		{Day: currentDay, Provider: quotaRaceCard.Provider, Model: quotaRaceCard.Model, Micros: dayMicros},
+		// A row from yesterday of a model with no card: month bucket only.
+		{Day: "2026-11-02", Provider: "seedprov", Model: "seedmodel", Micros: monthMicros},
+	}
+	cards := map[string]QuotaModel{quotaRaceCard.Key(): quotaRaceCard}
+
+	l := NewQuotaLedger(func() time.Time { return now })
+
+	var wg sync.WaitGroup
+	wg.Add(readers + 1)
+	for i := 0; i < readers; i++ {
+		go func() {
+			defer wg.Done()
+			for j := 0; j < readerRounds; j++ {
+				sp := l.Spend()
+				if sp.ModelDay == nil || sp.ModelMonth == nil || sp.ProviderPlan == nil {
+					// Report without t.Fatalf from a non-test goroutine.
+					t.Errorf("QuotaLedger.Spend returned a nil bucket map while a seed was in flight")
+					return
+				}
+			}
+		}()
+	}
+	go func() {
+		defer wg.Done()
+		for j := 0; j < seedRounds; j++ {
+			if err := l.SeedFrom(rows, currentDay, cards); err != nil {
+				t.Errorf("QuotaLedger.SeedFrom refused legal seed rows: %v", err)
+				return
+			}
+		}
+	}()
+	wg.Wait()
+
+	wantDay := int64(seedRounds * dayMicros)
+	wantMonth := int64(seedRounds * (dayMicros + monthMicros))
+	sp := l.Spend()
+	if got := sp.ModelDay[quotaRaceCard.Key()]; got != wantDay {
+		t.Fatalf("ModelDay[%s] = %d, want %d (a seeded micro was lost)", quotaRaceCard.Key(), got, wantDay)
+	}
+	if got := sp.ModelMonth[quotaRaceCard.Key()]; got != wantDay {
+		t.Fatalf("ModelMonth[%s] = %d, want %d (a seeded micro was lost)", quotaRaceCard.Key(), got, wantDay)
+	}
+	if got := sp.ProviderPlan[quotaRaceCard.Provider]; got != wantDay {
+		t.Fatalf("ProviderPlan[%s] = %d, want %d (plan credit lost a seeded micro)",
+			quotaRaceCard.Provider, got, wantDay)
+	}
+	if got := sp.ModelMonth["seedprov/seedmodel"]; got != wantMonth-wantDay {
+		t.Fatalf("ModelMonth[seedprov/seedmodel] = %d, want %d (a month-only row was lost)",
+			got, wantMonth-wantDay)
+	}
+	if got := sp.ModelDay["seedprov/seedmodel"]; got != 0 {
+		t.Fatalf("ModelDay[seedprov/seedmodel] = %d, want 0 (a non-today row leaked into the day bucket)", got)
+	}
+}
