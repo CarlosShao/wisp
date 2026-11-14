@@ -36,19 +36,53 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
+// wantHead216 is the test's OWN copy of the 17 expected leading sentences -
+// one Go string literal per class, written out by hand, never read back from
+// the production table errorCopy216. The production table and this table are
+// two independent artifacts: change the production sentence without changing
+// this one and TestErrorCodeSelectsTheSentence216 goes red. The old shape
+// (want := errorCopy216[c] + err.Error()) was a tautology - both sides of the
+// comparison read the same table, so mutating the table mutated the
+// expectation and the ruler had no teeth (ticket 216 AC#5 re-run finding).
+var wantHead216 = map[observe.ErrorClass]string{
+	observe.ClassConfig:           "配置这一步出了问题，先看下面这句具体原因：",
+	observe.ClassAuth:             "身份或密钥没有通过，先检查密钥配置：",
+	observe.ClassNetwork:          "网络这一步不通，先确认机器能连上外网：",
+	observe.ClassRateLimit:        "上游限流了，稍等再试：",
+	observe.ClassProvider:         "上游服务这一步出错，具体原因见下面这句：",
+	observe.ClassModel:            "模型这一步出了问题，具体原因见下面这句：",
+	observe.ClassAudioDevice:      "音频设备这一步出了问题，先检查麦克风与扬声器：",
+	observe.ClassASR:              "语音识别这一步出了问题，具体原因见下面这句：",
+	observe.ClassTool:             "工具这一步执行出错，具体原因见下面这句：",
+	observe.ClassPermissionDenied: "这一步被权限拦下了，先看需要哪条许可：",
+	observe.ClassUserRejected:     "这一步被你拒绝了，所以没有继续：",
+	observe.ClassCancelled:        "这一步被取消了，所以没有继续：",
+	observe.ClassBudget:           "预算这一步用完了，先确认额度再继续：",
+	observe.ClassLoop:             "任务这一步卡住了，先看下面这句具体卡在哪：",
+	observe.ClassInjection:        "这一步被判定为疑似注入，已按安全规则拦下：",
+	observe.ClassInternal:         "程序内部这一步出了错，具体原因见下面这句：",
+	observe.ClassResource:         "资源这一步超限了，先看下面这句具体是哪一项：",
+}
+
 // TestErrorCodeSelectsTheSentence216 is the code→sentence table test. Each of
-// the 17 D37 classes feeds the SAME error text; the branch must pick the
-// class's own leading sentence.
+// the 17 D37 classes feeds the SAME error text; the HEAD (the class's leading
+// sentence, errorHead216) must equal the test's own literal for that class -
+// an expectation that does not live in the production table.
 func TestErrorCodeSelectsTheSentence216(t *testing.T) {
 	// The same underlying text for every class - the branch key must be the
 	// class, never this text.
 	const sameDetail = "upstream 413 payload too large"
 	for _, c := range observe.AllClasses() {
 		err := observe.New(c, sameDetail)
-		got := errorSentence216(err)
-		want := errorCopy216[c] + err.Error()
+		got := errorHead216(err)
+		want := wantHead216[c]
 		if got != want {
-			t.Errorf("class %s: sentence = %q, want %q", c, got, want)
+			t.Errorf("class %s: head = %q, want literal %q", c, got, want)
+		}
+		// The whole sentence keeps the same shape it always had: the head
+		// followed by the cause verbatim.
+		if whole := errorSentence216(err); whole != want+err.Error() {
+			t.Errorf("class %s: sentence = %q, want head+cause %q", c, whole, want+err.Error())
 		}
 	}
 	// The table must be exhaustive over the taxonomy: an 18th class added
@@ -79,20 +113,31 @@ func TestUnclassifiedKeepsThePlainSentence216(t *testing.T) {
 }
 
 // TestErrorCopySentencesAreAllDistinct216 is the discriminating half: the same
-// error text under 17 different classes must yield 17 DIFFERENT sentences. A
-// substring-of-err.Error() implementation (the forbidden ChatInput.tsx:2205
-// "413" shape) reads the same text under every class and collapses to one
-// branch - this test is red the moment the branch key becomes the string.
+// error text under 17 different classes must yield 17 DIFFERENT HEADS. The
+// old shape compared whole sentences (head + err.Error()); err.Error() embeds
+// the class name, so every class differed even when every head was identical,
+// and a table that collapsed two classes onto one sentence slipped through.
+// Comparing errorHead216 alone removes that blindfold. The prefix self-check
+// at the bottom additionally forbids any head being a prefix of (or equal to)
+// another - a "distinct" pair that only differs inside the appended cause can
+// no longer masquerade as separation.
 func TestErrorCopySentencesAreAllDistinct216(t *testing.T) {
 	const sameDetail = "upstream 413 payload too large"
 	seen := map[observe.ErrorClass]string{}
 	for _, c := range observe.AllClasses() {
-		seen[c] = errorSentence216(observe.New(c, sameDetail))
+		seen[c] = errorHead216(observe.New(c, sameDetail))
 	}
-	for i, a := range observe.AllClasses() {
-		for _, b := range observe.AllClasses()[i+1:] {
+	classes := observe.AllClasses()
+	for i, a := range classes {
+		for _, b := range classes[i+1:] {
 			if seen[a] == seen[b] {
-				t.Errorf("classes %s and %s produce the same sentence %q - the branch no longer separates codes", a, b, seen[a])
+				t.Errorf("classes %s and %s produce the same head %q - the branch no longer separates codes", a, b, seen[a])
+			}
+			if strings.HasPrefix(seen[a], seen[b]) {
+				t.Errorf("head of %s is a prefix of head of %s (%q) - the heads do not separate on their own", b, a, seen[b])
+			}
+			if strings.HasPrefix(seen[b], seen[a]) {
+				t.Errorf("head of %s is a prefix of head of %s (%q) - the heads do not separate on their own", a, b, seen[a])
 			}
 		}
 	}

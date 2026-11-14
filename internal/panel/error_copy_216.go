@@ -59,21 +59,36 @@ func errorCopy216Complete() bool {
 	return true
 }
 
-// errorSentence216 is the branch point AC#5 requires: class in, sentence out,
-// via observe.ClassOf (errors.As over the chain). err.Error() is appended
-// verbatim AFTER the branch, as the cause, never used to pick the sentence.
-func errorSentence216(err error) string {
+// errorHead216 returns only the class's leading sentence - the mapped table
+// value alone, without err.Error() appended. It is the half the table test
+// pins against its own literals: comparing whole sentences (head + cause)
+// can never go red when the table changes, because the cause half differs
+// per class anyway. The head is the branch output; the cause is not.
+func errorHead216(err error) string {
 	if err == nil {
 		return ""
 	}
 	if class, ok := observe.ClassOf(err); ok {
 		if sentence, ok := errorCopy216[class]; ok {
-			return sentence + err.Error()
+			return sentence
 		}
 	}
-	// Unclassified errors keep the plain sentence - the pre-AC#5 shape, byte
-	// for byte, so existing fixtures do not move.
-	return err.Error()
+	// Unclassified errors have no leading sentence to give - the head is
+	// empty, mirroring errorSentence216's verbatim fallthrough.
+	return ""
+}
+
+// errorSentence216 is the branch point AC#5 requires: class in, sentence out,
+// via observe.ClassOf (errors.As over the chain). err.Error() is appended
+// verbatim AFTER the branch, as the cause, never used to pick the sentence.
+// Behavior is byte-for-byte identical to the pre-head split shape: a
+// classified error with a table row gains its head, everything else (nil
+// aside) is verbatim err.Error().
+func errorSentence216(err error) string {
+	if err == nil {
+		return ""
+	}
+	return errorHead216(err) + err.Error()
 }
 
 // userFacingErrorSentence216 is the one page-visible error sentence this
