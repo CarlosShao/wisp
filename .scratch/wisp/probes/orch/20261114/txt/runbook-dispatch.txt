@@ -1,0 +1,25 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：探针/跑本腿（不占写额，写面只有 probes 与 docs/evidence）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp。做一件**只需要机主做一次、能同时销掉 3–4 张票**的东西：**一次真机会话的跑本（runbook）＋一个采集脚本**。
+
+**为什么值得**：有四张票都卡在「机主本人在机器前」这一条，但它们要的动作**互不冲突**、可以在**一次 3 分钟**里全采完：
+- 票 **290** AC#3②：按一次静音热键 ⇒ 要日志里出现 `取消静音`／`mute-hotkey`／`levels_delivered`
+- 票 **291** AC#2：真麦**四形**各 ≥3 秒（①完全安静 ②正常音量说话 ③外放已知幅度音调 ④合成帧）逐形给 `mean/max`
+- 票 **449** AC#8：修后安静态读数必须从 **0.368** 掉到 **0.0013–0.0031** 量级
+- 票 **247** AC#2/AC#6：真麦说话那一发
+
+**产出两件**：
+1. `.scratch/wisp/probes/runbook/real-machine-once.md`：给**不看代码的人**的编号步骤（每步一行、可照着按），带「这一步采到哪个读数、给哪张票用」；⚠ 写明每题**要等几秒**、**哪一步可以跳过**（跳过会缺哪一格，具名）。
+2. `.scratch/wisp/probes/runbook/capture-once.ps1`（或 `.sh`，选**主流**那个并写理由）：一次跑完采集，落 `D:\tmp\wisp\<YYYYMMDD>\realonce\`，每个读数**带时间戳与可判来源**（日志行号/文件路径），⛔ 不猜、⛔ 不补零、缺就写 `ABSENT`。
+3. `docs/evidence/s1/real-machine-once.md`：**读数表骨架**（每格留空，标明"待机主一次会话填入"），标明哪格填完就能翻哪张票的哪个框。
+
+**纪律**：
+- 脚本必须**幂等**、**不覆盖已有采集**（新目录带时间戳）、**不改任何产码/配置/阈值**、**不启停产品进程**（球已经在跑，别动它）。
+- ⛔ 不要把"球已跑多久"当判据；用**日志行号＋文件 mtime** 这类可判事实。
+- 读 `internal/ball/liquid.go` 的 `SilenceLevelGate` 与 `internal/audio/level.go` 现在的算法，把「安静态该读多少」的**期望区间**从码里算出来（⛔ 编数字）。
+- ⛔ 阈值/golden/契约/`docs/specs/**`/`frontend/**`/`design/**`/`cmd/wisp/**`/`internal/panel/**`；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+写面：`.scratch/wisp/probes/runbook/**`、`docs/evidence/s1/real-machine-once.md`。
+
+回话第一行＝commit hash ＋「跑本 N 步／脚本 1 枚／覆盖哪几张票的哪几格（逐格列）」。没干完写「未完成，卡在哪」。
