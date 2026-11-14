@@ -1,0 +1,16 @@
+=== T1 newPanelControl arm === build_rc=0 run_rc=1 fails=1
+        --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm (0.00s)
+=== T2 DataPath field-assignment arm === build_rc=0 run_rc=1 fails=1
+        --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm (0.00s)
+=== T3 DataPath: key arm === build_rc=0 run_rc=1 fails=2
+        --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared (0.00s)
+        --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body (0.00s)
+=== T4 summary verdict === build_rc=0 run_rc=1 fails=1
+        --- FAIL: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_summary_line_cannot_read_green_while_anything_is_red (0.00s)
+=== RESTORED === build_rc=0 run_rc=0
+        panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【绿】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+    --- PASS: Test314FixedPanelProfileLeafShapeIsRed (0.84s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape (0.01s)
+RESTORED_SHA=6E54A0B34D6A3CD79888F5CD33535EB0754F4549DDD3D2FE1FD8FFE3CAA723F2
+REPO_SHA=6E54A0B34D6A3CD79888F5CD33535EB0754F4549DDD3D2FE1FD8FFE3CAA723F2
+DONE

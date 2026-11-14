@@ -1,0 +1,196 @@
+OLD_SHA=7D0CB395303D09212DE920A9E24F3658F06E93FD48371B373A5A86C03F89A6E7
+NEW_SHA=6E54A0B34D6A3CD79888F5CD33535EB0754F4549DDD3D2FE1FD8FFE3CAA723F2
+OLD_FILES=274 NEW_FILES=274
+=== build old ===
+BUILD_RC_old=0
+=== run old ===
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+time=2026-11-14T14:36:19.166+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:192: 314 形状尺：扫了 275 个源文件，2 处固定名命中（2 处具名豁免、0 处红）
+--- PASS: Test314FixedPanelProfileLeafShapeIsRed (0.72s)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string
+--- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string (0.00s)
+PASS
+RUN_RC_old=0
+=== build new ===
+BUILD_RC_new=0
+=== run new ===
+time=2026-11-14T14:36:23.106+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+    panel_profile_leaf_shape_windows_test.go:226: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:36 命中固定名面板 profile 形状（叶 "wisp-audit2a-panel-profile"）：
+            return filepath.Join(os.TempDir(), "wisp-audit2a"+"-panel-profile")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        （这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit2a-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:40 命中固定名面板 profile 形状（叶 "/wisp-audit2b-panel-profile"）：
+            return os.TempDir() + "/wisp-audit2b" + "-panel-profile"
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        （这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("/wisp-audit2b-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:44 命中固定名面板 profile 形状（叶 "wisp-audit2c-panel-profile"）：
+            return filepath.Join(os.TempDir(), strings.Join([]string{"wisp-audit2c", "-panel-profile"}, ""))
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        （这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit2c-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:48 命中固定名面板 profile 形状（叶 "wisp-audit2d-panel-profile"）：
+            return filepath.Join(os.TempDir(), "wisp-audit2d") + "-panel-profile"
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        （这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit2d-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:52 命中固定名面板 profile 形状（叶 "wisp-audit2e-panel-profile"）：
+            p := filepath.Join(os.TempDir(), "wisp-audit2e") + "-panel-profile"
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        （这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit2e-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:57 命中固定名面板 profile 形状（叶 "wisp-audit3a-panel-profile"）：
+            return filepath.Join(os.Getenv("TEMP"), "wisp-audit3a-panel-profile")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit3a-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:61 命中固定名面板 profile 形状（叶 "wisp-audit3a2-panel-profile"）：
+            return filepath.Join(os.Getenv("TMP"), "wisp-audit3a2-panel-profile")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit3a2-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:69 命中固定名面板 profile 形状（叶 "wisp-audit3b-panel-profile"）：
+            return filepath.Join(home, "wisp-audit3b-panel-profile")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit3b-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:73 命中固定名面板 profile 形状（叶 "C:\\Temp\\wisp-audit3c-panel-profile"）：
+            return NewPanelManager(nil, nil, "C:\\Temp\\wisp-audit3c-panel-profile")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("C:\\Temp\\wisp-audit3c-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:77 命中固定名面板 profile 形状（叶 "C:\\Temp\\wisp-audit3c2-panel-profile"）：
+            return NewPanelManager(nil, nil, filepath.Join("C:\\Temp", "wisp-audit3c2-panel-profile"))
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        （这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("C:\\Temp\\wisp-audit3c2-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:84 命中固定名面板 profile 形状（叶 "wisp-audit-pkg-sink"）：
+            var zzzRuler2PkgSink = zzzRuler2Sink{DataPath: filepath.Join(os.TempDir(), "wisp-audit-pkg-sink")}
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit-pkg-sink")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:229: cmd/wisp/zzz_ruler2_probe_windows_test.go:86 命中固定名面板 profile 形状（叶 "wisp-audit-pkg-var"）：
+            var zzzRuler2PkgJoin = filepath.Join(os.TempDir(), "wisp-audit-pkg-var")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit-pkg-var")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:226: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:238: 314 形状尺【红】：扫了 275 个源文件，形状命中 14 处；其中已豁免 2 处、实红 12 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+--- FAIL: Test314FixedPanelProfileLeafShapeIsRed (0.70s)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/two_literal_halves_inside_one_Join
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_whole_path_by_concatenation
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_leaf_by_strings.Join
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_literal_suffix_outside_the_Join
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_concatenated_leaf_bound_to_a_local,_then_to_the_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_folded_leaf_with_no_temp_root_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_constant_prefix_plus_a_runtime_suffix_is_not_a_fixed_name
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TEMP)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TMP)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_Getenv_that_is_not_TEMP_or_TMP_is_not_a_root
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.UserHomeDir_through_its_two_results
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_cache_directory_is_not_one_of_the_roots_this_ruler_claims
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_is_a_drive-letter_absolute_literal
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_drive-letter_absolute_literal_joined_with_a_leaf
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_relative_literal_root_is_not_a_root
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_handed_to_a_sink_in_a_function
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_that_never_reaches_a_sink_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_summary_line_cannot_read_green_while_anything_is_red
+--- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape (0.01s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/two_literal_halves_inside_one_Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_whole_path_by_concatenation (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_leaf_by_strings.Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_literal_suffix_outside_the_Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_concatenated_leaf_bound_to_a_local,_then_to_the_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_folded_leaf_with_no_temp_root_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_constant_prefix_plus_a_runtime_suffix_is_not_a_fixed_name (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TEMP) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TMP) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_Getenv_that_is_not_TEMP_or_TMP_is_not_a_root (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.UserHomeDir_through_its_two_results (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_cache_directory_is_not_one_of_the_roots_this_ruler_claims (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_is_a_drive-letter_absolute_literal (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_drive-letter_absolute_literal_joined_with_a_leaf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_relative_literal_root_is_not_a_root (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_handed_to_a_sink_in_a_function (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_that_never_reaches_a_sink_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_summary_line_cannot_read_green_while_anything_is_red (0.00s)
+FAIL
+RUN_RC_new=1
+DONE
