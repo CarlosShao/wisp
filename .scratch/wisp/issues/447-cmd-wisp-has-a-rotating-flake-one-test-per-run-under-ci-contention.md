@@ -33,3 +33,14 @@
 
 ## 撤销口令
 「票 447 撤」＝删本票＋回退其写腿 commit（新 commit 反改，不 reset/amend）。
+
+## Progress log
+
+- **2026-11-14 18:38–19:5x +08，写腿（委派，起手 HEAD `c605f3ecb`）** — AC#1 量完、AC#2 三枚全部定性、AC#3 修两处（全是 `*_test.go`，产码 0 字节）、AC#6 两枚牙在仓外导出树里真红并点名（`verdict=ALL-TEETH-BIT`）。证据全文 `docs/evidence/s1/447-rotating-flake.md`，台件 `.scratch/wisp/probes/447/**`。
+  - **谁在红（20 发，结论非空的最近 20 发）**：只有 **3 枚**——`Test390r1BallClickPlayingInterruptAbortsAndWalks27`（2 发：`43575891409`/`43577965575`，**都早于 445 的 `d1dcf6fd7`（09:23Z）**，445 之后 11 发零复发）、`TestPanelHostRealWindowHopAndLifecycle`（1 发：`43583105791`）、`TestWireR1AnnounceEndToEnd`（1 发：`43575529807`）。另 2 发（`43575854808`/`43575830504`）红在 `lint` 的路径长度预算，不在本包。
+  - **逐枚定性**：390r1 = (a) 已由 445 修；PanelHost = (d) hosted runner 的冷启动 4130.7ms 越 D32 1500ms（同码本机 964–1113ms），判决该由 winlive 档下；WireR1 = (a) 在「转写到文本路」这个标记上读 `stage()`，而 `enterWarm` 在那之后——本机修前 `-count=20` **4 红**，其中 2 发逐字就是 CI 那句。
+  - **修**：WireR1 两处读点换 `waitStage447`（谓词＝断言条件，1ms 轮询，5s 上界，超时行带 `engines_hot/warm_turn_end/loads_after_warm/refs/finals/handed`）；D32 冷预算 1500ms 的判决从默认档搬到 winlive 档（**边界一字未改**，默认档保留读数与「没有读数＝红」，并留可 grep token `447-cold-budget-verdict-in-winlive`）。⚠ 一条**放宽**已在证据 §5 逐条列出并给了撤销口令。
+  - **牙**：m1 去掉 `enterWarm("turn-end")` ⇒ 红并点名（`engines_hot=2, warm_turn_end=0, stage="Awake"`）；m2 冷启动真慢 2s ⇒ winlive 档红 `2991.5 ms exceeds D32 panel cold budget 1500 ms`；两次还原 sha256 与仓同值、再绿。
+  - **AC#5 的一半做不了**：CI 连续 5 发要等编排者推送后用 `collect-ci-fails.ps1 -Limit 12 -Need 5` 复读；本机整包四数见证据 §7。
+  - **报而不改**：`-test.count=20`（同进程重复）会多出第三种红（`wire_r1:370` #26 走未落，`state=Sleeping`，2/20；`-count=1` 不见）——像同进程里上一发的收尾把机器按回初始态，属第五个候选，建议单独立票。
+

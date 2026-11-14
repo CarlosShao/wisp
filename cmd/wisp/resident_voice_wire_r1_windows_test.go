@@ -316,9 +316,31 @@ func TestWireR1AnnounceEndToEnd(t *testing.T) {
 		t.Fatalf("the punctuation stage did not attach; problems=%v", rv.problemsSnapshot())
 	}
 	// The turn ended into WARM, not into a teardown.
-	stage := rv.residency.stage()
-	if stage != session.StageWarm && stage != session.StageSettling {
-		t.Fatalf("stage after the turn = %q, want Warm (engines kept hot, ticket 28)", string(stage))
+	//
+	// TICKET 447: this read used to be satisfied by the marker above - the
+	// transcript reaching the text path - and that marker is published BEFORE
+	// the turn-end transition. finish() (resident_voice_windows.go) hands the
+	// transcript over at :1396, dispatches D43#11 at :1408, releases the turn
+	// borrow at :1417 and only then calls residency.enterWarm at :1418 - so a
+	// read taken at :319 can legitimately see stage "Awake" while the very same
+	// millisecond's log line says "turn ended into Warm". CI run 43575529807
+	// (312a58612, test-windows step 10) read exactly that, verbatim:
+	//
+	//   resident_voice_wire_r1_windows_test.go:321: stage after the turn =
+	//   "Awake", want Warm (engines kept hot, ticket 28)
+	//
+	// The waiting predicate is NOT "sleep longer": it is the assertion's own
+	// condition (the session reached Warm or Settling), polled every 1ms up to
+	// 5s. A turn end that never keeps the engines hot fails here with the
+	// numbers instead of passing quietly, and the assertion's own sentence is
+	// kept, so the failure still names the wrong world.
+	stage, landed := waitStage447(t, rv, "the turn end to land the session in Warm/Settling",
+		session.StageWarm, session.StageSettling)
+	if !landed {
+		st := rv.residency.stats()
+		t.Fatalf("stage after the turn = %q, want Warm (engines kept hot, ticket 28); the turn-end transition did not land within %s: engines_hot=%d, warm_turn_end=%d, loads_after_warm=%d, refs=%d, finals=%d, handed=%d (problems=%v)",
+			string(stage), bound447, st.EnginesHot, rv.warmTurnEnd.Load(), st.LoadsAfterWarm, st.Refs,
+			rv.finals.Load(), rv.handed.Load(), rv.problemsSnapshot())
 	}
 	st := rv.residency.stats()
 	if st.EnginesHot < 1 {
@@ -397,8 +419,17 @@ func TestWireR1AnnounceEndToEnd(t *testing.T) {
 		t.Fatalf("fourth edge %+v, want Speaking+tts.speak-done->Warm (D43#26)", timeline[3])
 	}
 	// The session landed back in Warm after speaking, with the TTS still hot.
-	if st := rv.residency.stage(); st != session.StageWarm {
-		t.Fatalf("stage after the announcement = %q, want Warm", string(st))
+	//
+	// TICKET 447: same window as the turn-end read above, one dispatch later -
+	// the announcement end publishes #26 at resident_voice_engines_windows.go:1293
+	// and calls enterWarm at :1295, so waiting for the #26 row (the wait above)
+	// still leaves the stage one call short of Warm. Bounded wait, then the same
+	// sentence.
+	stageAfterAnnounce, landed := waitStage447(t, rv, "the announcement end to land the session in Warm", session.StageWarm)
+	if !landed {
+		stats := rv.residency.stats()
+		t.Fatalf("stage after the announcement = %q, want Warm; the announce-end transition did not land within %s: engines_hot=%d, warm_turn_end=%d, loads_after_warm=%d, spoken=%d (problems=%v)",
+			string(stageAfterAnnounce), bound447, stats.EnginesHot, rv.warmTurnEnd.Load(), stats.LoadsAfterWarm, rv.ttsSpoken.Load(), rv.problemsSnapshot())
 	}
 	t.Logf("ANNOUNCE spoken=%d chunks=%d samples=%d peak=%.4f rms=%.4f rate=%d gate_ok=%d gate_refused=%d slot=%s loads=%d closes=%d",
 		rv.ttsSpoken.Load(), chunks, samples, peak, rms, speaker.rate,

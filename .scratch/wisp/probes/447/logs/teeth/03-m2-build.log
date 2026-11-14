@@ -1,0 +1,6 @@
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-447/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-447/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-447/sherpa-onnx-cxx-api.dll
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-447/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-447/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-447/sherpa-onnx-cxx-api.dll

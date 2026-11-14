@@ -1,0 +1,16 @@
+local four numbers (RUN=847 PASS=605 FAIL=2 SKIP=17)
+CI reference (run 43584365596, green): RUN=847/PASS=605/FAIL=0/SKIP=19
+--- only in CI skip ---
+Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware
+Test381r2RealDevicePlayingPhaseAbortWithin400ms
+Test390r1BallClickRealDeviceWithin400ms
+Test41a2r1WakeEndToEndArmedToListening
+Test41a2r1WarmGateFeedsKwsNotTheAsr
+TestTicket223PermissionDeniedSitsInItsOwnSentence
+TestWireR1TheRealDeviceTakesTheAudio
+--- only in local skip ---
+Test258BridgeMutationNoSrcKeepsOldBinding
+Test258OccupiedCombinationNamesTheNewValue
+Test258V1ProbeSummonEditRebindsLiveBall
+Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable
+Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots

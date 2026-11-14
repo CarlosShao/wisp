@@ -1,0 +1,51 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T19:08:22.504+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestWireR1AnnounceEndToEnd
+time=2026-11-14T19:08:23.119+08:00 level=INFO msg="voice: ChTTS gate wired" scope=voice-announce channel=tts.announce
+time=2026-11-14T19:08:23.346+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad=D:/tmp/wisp/20261114/447-tree/third_party/spike-models/silero_vad.onnx asr_dir=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2134597467\001\models\asr-streaming-paraformer-zh-en config_source="wire-r1 test"
+time=2026-11-14T19:08:24.198+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T19:08:24.198+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2134597467\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T19:08:24.202+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2134597467\001\models manifest=D:\tmp\wisp\20261114\447-tree\build\models\manifest.json
+time=2026-11-14T19:08:27.032+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，2.83s，store=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2134597467\001\models）
+time=2026-11-14T19:08:27.032+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\TestWireR1AnnounceEndToEnd2134597467\\001\\models"
+time=2026-11-14T19:08:31.137+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad=D:/tmp/wisp/20261114/447-tree/third_party/spike-models/silero_vad.onnx goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2134597467\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T19:08:31.137+08:00 level=INFO msg="voice: punctuation stage attached" model=D:/tmp/wisp/20261114/447-tree/third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx attach_point=Transcriber.SetPunctuator scope="the ASR epoch (released with it)"
+wisp: 标点级已接上：ASR 的 final 过 CT-Transformer 标点模型（D:/tmp/wisp/20261114/447-tree/third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx），partial 结构性不带标点
+time=2026-11-14T19:08:32.295+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 3392ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T19:08:32.296+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=2 warm_timeout=1m30s"
+time=2026-11-14T19:08:32.296+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=2
+    resident_voice_wire_r1_windows_test.go:349: WARM-TURN-END stage=Warm engines_hot=2 loads_after_warm=0 refs=0 turn_end=1 cold_acquire=4.0780162s
+time=2026-11-14T19:08:32.482+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:tts:tts.announce cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=2"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+time=2026-11-14T19:08:37.186+08:00 level=INFO msg="voice: D43 walked" from=Thinking event=llm.first-token to=Speaking why="播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）"
+time=2026-11-14T19:08:37.957+08:00 level=INFO msg="voice: announcement spoken" runes=21 chunks=1 samples=89628 rate=22050 acquire=4.8882593s scope=voice-announce
+time=2026-11-14T19:08:37.957+08:00 level=INFO msg="voice: D43 walked" from=Speaking event=tts.speak-done to=Warm why="播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）"
+time=2026-11-14T19:08:37.957+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=announce-end engines_hot=1 warm_timeout=1m30s"
+    resident_voice_wire_r1_windows_test.go:434: ANNOUNCE spoken=1 chunks=1 samples=89628 peak=0.5395 rms=0.0688 rate=22050 gate_ok=1 gate_refused=0 slot=tts loads=2 closes=1
+    resident_voice_wire_r1_windows_test.go:438: ANNOUNCE-ACQUIRE cold(turn1)=4.0780162s announce(tts)=4.8882593s
+    resident_voice_wire_r1_windows_test.go:439: TIMELINE [{From:Sleeping To:Listening Event:session.summon AtSample:13824 Say:麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）} {From:Listening To:Thinking Event:asr.vad-stop AtSample:92672 Say:判停（end）且语音 3392ms 不小于 300ms：D43#11 让球走 Thinking} {From:Thinking To:Speaking Event:llm.first-token AtSample:92672 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）} {From:Speaking To:Warm Event:tts.speak-done AtSample:92672 Say:播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）}]
+time=2026-11-14T19:08:37.979+08:00 level=INFO msg="voice: the announce swapped the engine family; phase 1 re-armed" reason=tts-resident asr_released=true
+time=2026-11-14T19:08:37.979+08:00 level=ERROR msg="state machine rejected transition" from=Warm event=llm.first-token err="statemachine: illegal transition Warm + llm.first-token (no D43 row; undefined = stop)"
+time=2026-11-14T19:08:37.979+08:00 level=WARN msg="voice: D43 拒绝 Warm + llm.first-token：statemachine: illegal transition Warm + llm.first-token (no D43 row; undefined = stop)"
+wisp: 语音链：D43 拒绝 Warm + llm.first-token：statemachine: illegal transition Warm + llm.first-token (no D43 row; undefined = stop)
+time=2026-11-14T19:08:37.979+08:00 level=WARN msg="voice: 这一句没有可说内容（空或纯标点）：引擎拒绝合成，不播一段近静音"
+wisp: 语音链：这一句没有可说内容（空或纯标点）：引擎拒绝合成，不播一段近静音
+    resident_voice_wire_r1_windows_test.go:452: SILENT-TEXT silent=1 samples_after=89628
+time=2026-11-14T19:08:37.985+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T19:08:38.068+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=process-exit cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T19:08:38.068+08:00 level=INFO msg="voice leg stopped: frames_drained=181 paused_drops=0 partials=5 finals=1 discarded=0 handed=1 handoffs=1 handoff_exit=0 asr_loaded=false punct_attached=true punctuated_finals=1 announce_asked=2 spoken=1 aborted=0 gated=0 samples=89628 warm_turn_end=2 warm_wake=0 gate_closed=0 gate_reopened=0 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=181 paused_drops=0 partials=5 finals=1 discarded=0 handed=1 handoffs=1 handoff_exit=0 asr_loaded=false punct_attached=true punctuated_finals=1 announce_asked=2 spoken=1 aborted=0 gated=0 samples=89628 warm_turn_end=2 warm_wake=0 gate_closed=0 gate_reopened=0 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- PASS: TestWireR1AnnounceEndToEnd (15.61s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	16.00s

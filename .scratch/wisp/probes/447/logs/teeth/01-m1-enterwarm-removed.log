@@ -1,0 +1,31 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/tmp/wisp/20261114/447-tree/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T19:07:59.226+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestWireR1AnnounceEndToEnd
+time=2026-11-14T19:07:59.651+08:00 level=INFO msg="voice: ChTTS gate wired" scope=voice-announce channel=tts.announce
+time=2026-11-14T19:07:59.803+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad=D:/tmp/wisp/20261114/447-tree/third_party/spike-models/silero_vad.onnx asr_dir=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2394063134\001\models\asr-streaming-paraformer-zh-en config_source="wire-r1 test"
+time=2026-11-14T19:08:00.655+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T19:08:00.656+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2394063134\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T19:08:00.658+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2394063134\001\models manifest=D:\tmp\wisp\20261114\447-tree\build\models\manifest.json
+time=2026-11-14T19:08:04.505+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.85s，store=C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2394063134\001\models）
+time=2026-11-14T19:08:04.506+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\TestWireR1AnnounceEndToEnd2394063134\\001\\models"
+time=2026-11-14T19:08:08.142+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad=D:/tmp/wisp/20261114/447-tree/third_party/spike-models/silero_vad.onnx goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd2394063134\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T19:08:08.142+08:00 level=INFO msg="voice: punctuation stage attached" model=D:/tmp/wisp/20261114/447-tree/third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx attach_point=Transcriber.SetPunctuator scope="the ASR epoch (released with it)"
+wisp: 标点级已接上：ASR 的 final 过 CT-Transformer 标点模型（D:/tmp/wisp/20261114/447-tree/third_party/model-fetch/x-punc/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx），partial 结构性不带标点
+time=2026-11-14T19:08:09.021+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 3392ms 不小于 300ms：D43#11 让球走 Thinking"
+    resident_voice_wire_r1_windows_test.go:337: 447: waiting for the turn end to land the session in Warm/Settling: last read stage="Awake" after 5s (wanted [Warm Settling])
+    resident_voice_wire_r1_windows_test.go:341: stage after the turn = "Awake", want Warm (engines kept hot, ticket 28); the turn-end transition did not land within 5s: engines_hot=2, warm_turn_end=0, loads_after_warm=0, refs=0, finals=1, handed=1 (problems=[])
+time=2026-11-14T19:08:14.128+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T19:08:14.183+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=process-exit cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=2"
+time=2026-11-14T19:08:14.183+08:00 level=INFO msg="voice leg stopped: frames_drained=181 paused_drops=0 partials=5 finals=1 discarded=0 handed=1 handoffs=1 handoff_exit=0 asr_loaded=true punct_attached=true punctuated_finals=1 announce_asked=0 spoken=0 aborted=0 gated=0 samples=0 warm_turn_end=0 warm_wake=0 gate_closed=0 gate_reopened=0 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=181 paused_drops=0 partials=5 finals=1 discarded=0 handed=1 handoffs=1 handoff_exit=0 asr_loaded=true punct_attached=true punctuated_finals=1 announce_asked=0 spoken=0 aborted=0 gated=0 samples=0 warm_turn_end=0 warm_wake=0 gate_closed=0 gate_reopened=0 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- FAIL: TestWireR1AnnounceEndToEnd (14.99s)
+FAIL
+FAIL  github.com/CarlosShao/wisp/cmd/wisp	15.00s

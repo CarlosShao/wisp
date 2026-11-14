@@ -45,6 +45,7 @@ import (
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/audio/aecspike"
+	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
@@ -467,4 +468,45 @@ func voiceLastHop445(hops []voiceTransition) string {
 		return "<none>"
 	}
 	return fmt.Sprintf("%+v", hops[len(hops)-1])
+}
+
+// bound447 is the upper bound every ticket-447 wait uses. 5s is the same bound
+// 445's two helpers above use: long enough that no scheduler preemption on a
+// contended runner can reach it (the measured window between the marker and the
+// transition is sub-millisecond to a few ms - 445's probe read a maximum of
+// 6.04ms), short enough that a real defect fails the run instead of hanging it.
+const bound447 = 5 * time.Second
+
+// waitStage447 waits, bounded and 1ms-polled, for the session to reach one of
+// the wanted residency stages, and reports the last stage it read.
+//
+// WHY THIS EXISTS (ticket 447). The residency's stage is published LATER than
+// every completion marker the voice cases wait on: a turn end hands the
+// transcript to the text path, dispatches D43#11 and releases the borrow BEFORE
+// it calls residency.enterWarm (resident_voice_windows.go:1396/:1408/:1417/:1418),
+// and an announcement end dispatches #26 and only then calls enterWarm
+// (resident_voice_engines_windows.go:1293/:1295). A read taken at those markers
+// can therefore see the pre-turn stage - CI run 43575529807 did, verbatim:
+// "stage after the turn = \"Awake\", want Warm (engines kept hot, ticket 28)".
+//
+// WHY NOT A LONGER SLEEP: the predicate is the assertion's own condition, so the
+// wait can only end on the world the case wants; and it returns the stage rather
+// than swallowing it, so every caller keeps its own red sentence WITH numbers.
+// A wait that never lands is not a skip: the caller fails.
+func waitStage447(t *testing.T, rv *residentVoice, what string, want ...session.Stage) (session.Stage, bool) {
+	t.Helper()
+	start := time.Now()
+	for {
+		st := rv.residency.stage()
+		for _, w := range want {
+			if st == w {
+				return st, true
+			}
+		}
+		if time.Since(start) > bound447 {
+			t.Logf("447: waiting for %s: last read stage=%q after %s (wanted %v)", what, string(st), bound447, want)
+			return st, false
+		}
+		time.Sleep(time.Millisecond)
+	}
 }
