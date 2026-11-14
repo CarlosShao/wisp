@@ -1,0 +1,17 @@
+=== RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+    panel_resident_windows_test.go:629: AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=<nil> err=<nil> created=true
+    panel_resident_windows_test.go:631: AC#13 reused-thread release: tid=65844 dispatched 3 message(s) before unlocking; windows left on that thread=0 queue head=empty
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (1.92s)
+=== RUN   TestAC13BringUpRefusesAThreadWithAQueuedClose
+    panel_resident_windows_test.go:716: AC#13 queued-close: tid=65844 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0x71E05FA, plantQueued=true), then bringUp#2 err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x71E05FA. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false; the close was still queued after the refusal=true; released with windows=0 queue head=empty
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.63s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+wisp: panel window is up (test-harness, cold 1597.5 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:1011: AC#14 push nail: the handover document settled on probe attempt 8: "https://wisp.panel/index.html|complete|Wisp"
+    panel_resident_windows_test.go:1020: AC#14 nail 2 (Eval push hop), page's own words: title="PUSHED-33R5-OK"
+--- PASS: TestAC14GoSideEvalPushReachesThePage (2.64s)
+=== RUN   TestPanelThreadIsSTAAndExitsCleanly
+wisp: panel window is up (test-harness, cold 1455.1 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:1063: panel thread up and down: hwnd 0x2c1770, exits observed, shows=1
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (1.66s)
+PASS
