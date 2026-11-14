@@ -1,0 +1,16 @@
+# 裁决存档：票 228 切片 1 的写面扩到 internal/ball（编排者 2026-11-14 22:5x）
+
+**腿的现量（可判）**：托盘今天**没有一枚答复按钮** —— `internal/ball/tray_windows.go:20-23` 四枚 id、`:86-91` 标签＝打开面板/静音/暂停唤醒/退出；`Events` 键＝OnTrayPanel/Mute/PauseWake/Exit（`ball_windows.go:49-60`）；wndproc 分流 `ball_windows.go:745-762`。
+⇒ AC#2 要的「允许一次→Replies.Allow／拒绝→Replies.Reject／长期允许→replySurface.always」**在盘上无承载**。
+
+**裁决＝① 批准扩写面**：`internal/ball` 三处（`tray_windows.go` 三枚 menu id＋三个中文标签；`ball_windows.go` `Events` 加三键＋wndproc 三条分流；`cmd/wisp/resident_ball_228_test.go` 的 `ballEventCallbacks228` 名册各加一行）。
+
+**理由（按 ⓪⓪⓪）**：不动那三处 ⇒ AC#2 无法交付、228 整票的存在理由（球能答复）落空 ⇒ 判据是「最有价值」，⛔「风险小／动作小」。写面互斥已核：此刻全编队只有这一枚写腿，`internal/ball` 无人争用。
+
+**四条约束（违反即返工）**：
+1. **只加不改**：现有四枚 id／四个中文标签／`OnTrayPanel|Mute|PauseWake|Exit` 一字节不动；F7 裁甲＝名册**只扩列表、⛔ 扩断言维度**。
+2. **F4「永远显示、按下去落空就出声」**，且"出声"钉死：无待答卡时按下 ⇒ 走**具名路径**（日志含 `no pending card` 类字样），⛔ 静默 no-op、⛔ 假成功；给可判事实。
+3. **D38**：回调用 ui-sta 线程内非阻塞事，⛔ 第二条 UI 线程、⛔ 新 goroutine（AC#4 收口未做，现在多起一枚＝给下一波埋红）；非起不可就停下问。
+4. **AC#5 正控仍必须红**：加三枚托盘键不许开出任何"面板侧来源的允许"通路；`DecideFromPanel` 一字节不动。
+
+**顺序裁决**：`cmd/wisp` 侧三个执行器（Replies.Allow／Reject／replySurface.always 的宿主闭包）**先落**，托盘键再接上去 —— ⛔ 反过来写一个够不着的回调。
