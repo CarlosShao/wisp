@@ -1,0 +1,18 @@
+time=2026-11-14T10:28:46.502+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+ts=2026-11-14T10:28:46.510 probe=probe23 pid=68680 exe=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\23\logs\probe23.exe
+ts=2026-11-14T10:28:46.510 out_dir=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\23\logs\run2
+ts=2026-11-14T10:28:46.514 injector_integrity=0x2000
+ts=2026-11-14T10:28:46.514 roster_entries=11
+ts=2026-11-14T10:28:46.542 fixture_pid=55328
+ts=2026-11-14T10:28:46.702 fixture_hwnd=0x3221122 (52564258)
+ts=2026-11-14T10:28:46.702 fixture_edit_hwnd=0x98916ec (159979244)
+ts=2026-11-14T10:28:46.702 fixture_foreground_method=failed
+ts=2026-11-14T10:28:46.702 fixture_is_foreground_at_start=0
+ts=2026-11-14T10:28:46.703 fixture_process_name_probe_side=wisp23fixture.exe
+ts=2026-11-14T10:28:46.703 fixture_integrity=0x2000
+ts=2026-11-14T10:28:46.716 focus_method=foreground-failed/unverified
+ts=2026-11-14T10:28:46.716 foreground_hwnd=0x1706be
+ts=2026-11-14T10:28:46.716 keyboard_focus_hwnd=0x9fc058e
+ts=2026-11-14T10:28:46.716 foreground_is_fixture=false
+ts=2026-11-14T10:28:46.716 focus_is_edit=false
+ts=2026-11-14T10:28:46.716 ABORTED=focus could not be placed on the fixture edit control; nothing was typed

@@ -1,0 +1,64 @@
+ts=2026-11-14T10:24:35.825 probe=probe23 pid=58056 exe=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\23\logs\probe23.exe
+ts=2026-11-14T10:24:35.825 out_dir=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\23\logs\run1
+ts=2026-11-14T10:24:35.829 injector_integrity=0x2000
+ts=2026-11-14T10:24:35.829 roster_entries=11
+ts=2026-11-14T10:24:35.859 fixture_pid=29516
+ts=2026-11-14T10:24:36.126 fixture_hwnd=0x82e1476 (137237622)
+ts=2026-11-14T10:24:36.126 fixture_edit_hwnd=0x6f10fba (116461498)
+ts=2026-11-14T10:24:36.126 fixture_foreground_method=already-foreground
+ts=2026-11-14T10:24:36.126 fixture_is_foreground_at_start=1
+ts=2026-11-14T10:24:36.126 fixture_process_name_probe_side=wisp23fixture.exe
+ts=2026-11-14T10:24:36.127 fixture_integrity=0x2000
+ts=2026-11-14T10:24:36.146 focus_method=already-focused
+ts=2026-11-14T10:24:36.146 foreground_hwnd=0x82e1476
+ts=2026-11-14T10:24:36.146 keyboard_focus_hwnd=0x6f10fba
+ts=2026-11-14T10:24:36.146 foreground_is_fixture=true
+ts=2026-11-14T10:24:36.146 focus_is_edit=true
+ts=2026-11-14T10:24:36.153 system_get_text={"battery":{"ac":true,"percent":57,"present":true},"focused_hwnd":137237622,"focused_process":"wisp23fixture.exe","focused_title":"WISP23-FIXTURE input.type target","input_language":"en","local_time":"2026-11-14T10:24:36+08:00","os":"windows","volume":null}
+ts=2026-11-14T10:24:36.154 window_focus_text=已切到窗口：WISP23-FIXTURE input.type target
+ts=2026-11-14T10:24:36.154 window_focus_is_error=false
+ts=2026-11-14T10:24:36.312 raw_control_sendinput=n=2 err=nil
+ts=2026-11-14T10:24:36.370 raw_control_chars_in_window=1
+ts=2026-11-14T10:24:36.370 raw_control_wm_char=1
+ts=2026-11-14T10:24:36.370 runA_expected_chars=300
+ts=2026-11-14T10:24:36.370 runA_expected_utf16_units=300
+ts=2026-11-14T10:24:36.370 runA_expected_sha256=1f47881ec9b983bda34c61a1a419b2483bd0091dc3c8f5a994d65b1c792fedbf
+ts=2026-11-14T10:24:36.522 runA_chars_after_clear=0
+ts=2026-11-14T10:24:38.155 runA_is_error=false
+ts=2026-11-14T10:24:38.155 runA_text=已向 wisp23fixture.exe 注入 300 个字符
+ts=2026-11-14T10:24:38.155 runA_elapsed_ms=1632
+ts=2026-11-14T10:24:38.995 runA_readback_chars=300
+ts=2026-11-14T10:24:38.995 runA_readback_runes=300
+ts=2026-11-14T10:24:38.995 runA_readback_utf16_units=300
+ts=2026-11-14T10:24:38.995 runA_readback_sha256=1f47881ec9b983bda34c61a1a419b2483bd0091dc3c8f5a994d65b1c792fedbf
+ts=2026-11-14T10:24:38.995 runA_readback_wm_char=300
+ts=2026-11-14T10:24:38.995 runA_readback_wm_keydown=300
+ts=2026-11-14T10:24:38.995 runA_readback_equals_expected=true
+ts=2026-11-14T10:24:38.995 runA_result={{已向 wisp23fixture.exe 注入 300 个字符 false false [] wisp23fixture.exe []} {300 300 300 1f47881ec9b983bda34c61a1a419b2483bd0091dc3c8f5a994d65b1c792fedbf 300 300} true 1632}
+ts=2026-11-14T10:24:38.996 runB_expected_chars=300
+ts=2026-11-14T10:24:38.996 runB_expected_utf16_units=300
+ts=2026-11-14T10:24:38.996 runB_expected_sha256=84056f1d0140b27916fd6811b594712249973a76881169a15473942946910e0c
+ts=2026-11-14T10:24:40.746 runB_is_error=false
+ts=2026-11-14T10:24:40.746 runB_text=已向 wisp23fixture.exe 注入 300 个字符
+ts=2026-11-14T10:24:40.746 runB_elapsed_ms=1598
+ts=2026-11-14T10:24:41.360 runB_readback_chars=300
+ts=2026-11-14T10:24:41.361 runB_readback_runes=300
+ts=2026-11-14T10:24:41.361 runB_readback_utf16_units=300
+ts=2026-11-14T10:24:41.361 runB_readback_sha256=84056f1d0140b27916fd6811b594712249973a76881169a15473942946910e0c
+ts=2026-11-14T10:24:41.361 runB_readback_wm_char=300
+ts=2026-11-14T10:24:41.361 runB_readback_wm_keydown=300
+ts=2026-11-14T10:24:41.361 runB_readback_equals_expected=true
+ts=2026-11-14T10:24:41.361 runB_result={{已向 wisp23fixture.exe 注入 300 个字符 false false [] wisp23fixture.exe []} {300 300 300 84056f1d0140b27916fd6811b594712249973a76881169a15473942946910e0c 300 300} true 1598}
+ts=2026-11-14T10:24:41.366 top_windows_scanned=14
+ts=2026-11-14T10:24:41.366 windows_above_our_integrity=2
+ts=2026-11-14T10:24:41.366 elevated_candidate_0=hwnd=0x1706be pid=6904 name=taskmgr.exe il=0x3000 title="Task Manager"
+ts=2026-11-14T10:24:41.366 elevated_candidate_1=hwnd=0x10346 pid=12780 name=cua-driver.exe il=0x3000 title="Cua.AgentCursorOverlay.default"
+ts=2026-11-14T10:24:41.366 elevated_target=hwnd=0x1706be pid=6904 name=taskmgr.exe il=0x3000 title="Task Manager"
+ts=2026-11-14T10:24:41.367 elevated_is_error=false
+ts=2026-11-14T10:24:41.367 elevated_text=已向 taskmgr.exe 注入 15 个字符
+ts=2026-11-14T10:24:41.768 elevated_fixture_chars_unchanged=true
+ts=2026-11-14T10:24:41.768 pre_elevated_foreground=0x1706be
+ts=2026-11-14T10:24:41.769 window.focus on the elevated target returned without host error
+ts=2026-11-14T10:24:41.769 elevated_foreground_after_focus=0x1706be
+ts=2026-11-14T10:24:41.769 elevated_raw_sendinput=n=2 err=nil
+ts=2026-11-14T10:24:42.072 fixture_closed=false

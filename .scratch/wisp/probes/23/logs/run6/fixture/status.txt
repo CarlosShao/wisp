@@ -1,0 +1,1 @@
+ts=2026-11-14T10:35:14.7813613+08:00 hwnd=169480420 edit=183308538 pid=38748 title="WISP23-FIXTURE input.type target" class="Wisp23FixtureWindow" foreground_method=failed is_foreground=0 focus_hwnd=183308538 elapsed_ms=101

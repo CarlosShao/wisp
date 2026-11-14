@@ -1,0 +1,1 @@
+ts=2026-11-14T10:34:51.2938185+08:00 top=37885318 edit=52957474 pid=52108 chars=0 runes=0 utf16_units=0 sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 wm_char=0 wm_keydown=0 foreground_hwnd=72750288 is_foreground=0 focus_hwnd=52957474 dumps=1

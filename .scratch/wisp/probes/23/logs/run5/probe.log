@@ -1,0 +1,17 @@
+ts=2026-11-14T10:34:51.117 probe=probe23 pid=66844 exe=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\23\logs\probe23.exe
+ts=2026-11-14T10:34:51.118 out_dir=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\23\logs\run5
+ts=2026-11-14T10:34:51.121 injector_integrity=0x2000
+ts=2026-11-14T10:34:51.121 roster_entries=11
+ts=2026-11-14T10:34:51.143 fixture_pid=52108
+ts=2026-11-14T10:34:51.296 fixture_hwnd=0x2421586 (37885318)
+ts=2026-11-14T10:34:51.297 fixture_edit_hwnd=0x3281122 (52957474)
+ts=2026-11-14T10:34:51.297 fixture_foreground_method=failed
+ts=2026-11-14T10:34:51.297 fixture_is_foreground_at_start=0
+ts=2026-11-14T10:34:51.297 fixture_process_name_probe_side=wisp23fixture.exe
+ts=2026-11-14T10:34:51.298 fixture_integrity=0x2000
+ts=2026-11-14T10:34:51.314 focus_method=foreground-failed/unverified
+ts=2026-11-14T10:34:51.315 foreground_hwnd=0x45614d0
+ts=2026-11-14T10:34:51.315 keyboard_focus_hwnd=0xf980b74
+ts=2026-11-14T10:34:51.315 foreground_is_fixture=false
+ts=2026-11-14T10:34:51.315 focus_is_edit=false
+ts=2026-11-14T10:34:51.315 ABORTED=focus could not be placed on the fixture edit control; nothing was typed

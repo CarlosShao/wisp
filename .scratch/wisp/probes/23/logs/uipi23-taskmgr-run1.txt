@@ -1,0 +1,32 @@
+target_hwnd=0x1706be
+target_pid=6904
+injector_integrity=8192
+target_integrity_shipped_shape=0 (error=sizing call returned no size)
+target_integrity_corrected=12288
+target_thread=26548
+injector_thread=16172
+focus_before=0x9fc058e class="DirectUIHWND"
+foreground_before=0x1706be
+attach_thread_input_result=0 err=Access is denied.
+set_foreground_window=ok err=The operation completed successfully.
+foreground_after_focus=0x1706be
+focus_after=0x9fc058e class="DirectUIHWND"
+sendinput_inserted=2 err=<nil>
+focus_after_sendinput=0x9fc058e class="DirectUIHWND"
+child_controls_begin
+child=0x1c06d6 class="Windows.UI.Composition.DesktopWindowContentBridge" rect=1721,748,1718,643 text_len_cross_process=23
+child=0x4d41052 class="Windows.UI.Input.InputSite.WindowClass" rect=1721,748,0,0 text_len_cross_process=0
+child=0x737044a class="FilterControlGlassWindow" rect=2275,704,578,36 text_len_cross_process=27
+child=0x738116a class="GlassWindow" rect=2853,704,400,36 text_len_cross_process=12
+child=0xd6f085c class="GlassWindow" rect=1765,704,510,36 text_len_cross_process=12
+child=0x1706c2 class="Windows.UI.Composition.DesktopWindowContentBridge" rect=1765,704,1488,36 text_len_cross_process=23
+child=0x906c4 class="Windows.UI.Input.InputSite.WindowClass" rect=1765,704,0,0 text_len_cross_process=0
+child=0x86c13fc class="Windows.UI.Composition.DesktopWindowContentBridge" rect=1961,748,1478,51 text_len_cross_process=23
+child=0x6200bc class="Windows.UI.Input.InputSite.WindowClass" rect=1961,748,0,0 text_len_cross_process=0
+child=0x4a31378 class="NativeHWNDHost" rect=1963,800,1476,591 text_len_cross_process=15
+child=0x9fc058e class="DirectUIHWND" rect=1963,800,1476,591 text_len_cross_process=0
+child=0x7dd0c14 class="CtrlNotifySink" rect=3422,849,17,542 text_len_cross_process=0
+child=0xe590592 class="ScrollBar" rect=3422,849,17,542 text_len_cross_process=0
+child=0xe067a class="Windows.UI.Composition.DesktopWindowContentBridge" rect=1961,800,1478,591 text_len_cross_process=23
+child=0x5d90fd6 class="Windows.UI.Input.InputSite.WindowClass" rect=1961,800,0,0 text_len_cross_process=0
+child_controls_end

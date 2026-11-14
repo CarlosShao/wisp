@@ -1,0 +1,17 @@
+{
+  "ABORTED": "focus could not be placed on the fixture edit control; nothing was typed",
+  "fixture_edit_hwnd": "0x98916ec (159979244)",
+  "fixture_foreground_method": "failed",
+  "fixture_hwnd": "0x3221122 (52564258)",
+  "fixture_integrity": "0x2000",
+  "fixture_is_foreground_at_start": 0,
+  "fixture_pid": 55328,
+  "fixture_process_name_probe_side": "wisp23fixture.exe",
+  "focus_is_edit": false,
+  "focus_method": "foreground-failed/unverified",
+  "foreground_hwnd": "0x1706be",
+  "foreground_is_fixture": false,
+  "injector_integrity": "0x2000",
+  "keyboard_focus_hwnd": "0x9fc058e",
+  "roster_entries": 11
+}

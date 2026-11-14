@@ -1,0 +1,4 @@
+self pid=48572 integrity=0x2000
+pid=6904 name=C:\Windows\System32\Taskmgr.exe shipped_integrity=0 shipped_err=The handle is invalid. corrected_integrity=0x3000 corrected_sid=S-1-16-12288 corrected_err=<nil> shipped_says_elevated=false corrected_says_elevated=true
+pid=12780 name=C:\Users\swq\.cua-driver\packages\releases\0.6.8-x86_64-pc-windows-msvc\cua-driver.exe shipped_integrity=0 shipped_err=The handle is invalid. corrected_integrity=0x3000 corrected_sid=S-1-16-12288 corrected_err=<nil> shipped_says_elevated=false corrected_says_elevated=true
+pid=69160 name=C:\Program Files\PowerShell\7\pwsh.exe shipped_integrity=0 shipped_err=The handle is invalid. corrected_integrity=0x2000 corrected_sid=S-1-16-8192 corrected_err=<nil> shipped_says_elevated=false corrected_says_elevated=false
