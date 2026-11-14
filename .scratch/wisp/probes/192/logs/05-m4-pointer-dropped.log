@@ -1,0 +1,6 @@
+time=2026-11-14T18:11:09.494+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestPreview192TextFirstViewSaysWhatItHidAndWhereTheRestIs (0.32s)
+    preview_192_test.go:338: the notice shows head 4096 but the pointer resumes at 0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.415s
+FAIL

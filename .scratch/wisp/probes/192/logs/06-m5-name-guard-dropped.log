@@ -1,0 +1,6 @@
+time=2026-11-14T18:11:15.692+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestPreview192RefusesPathShapedNamesBeforeItOpensAnything (0.15s)
+    preview_192_test.go:237: "..": status = 403 (产物 ".." 不是普通文件（是目录或设备）；预览不读它), want 400
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.342s
+FAIL

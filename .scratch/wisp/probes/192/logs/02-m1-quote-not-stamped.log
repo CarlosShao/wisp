@@ -1,0 +1,6 @@
+time=2026-11-14T18:10:43.032+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestPreview192QuoteDoorStampsAndTheEgressGateThenCatches (0.39s)
+    preview_192_test.go:618: after the quote the C25 egress scan found nothing: the stamp is not live
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.501s
+FAIL

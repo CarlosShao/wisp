@@ -1,0 +1,68 @@
+pristine sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71  (/d/tmp/wisp/20261114/192-tree/internal/panel/preview_192.go)
+== 01-baseline rc=0 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/01-baseline.log
+   ok  	github.com/CarlosShao/wisp/internal/panel	3.165s
+--- mutant m1-quote-not-stamped: sed -i 's/if !marker\.Mark(scopeID, PreviewSourceTool/if false \&\& marker.Mark(scopeID, PreviewSourceTool/' (sha256 d72459b1a6d715ea6b37fae12df8ecd2c62631b5e8aba783afff7ee7d43f7e01)
+   723c723
+   < 	if !marker.Mark(scopeID, PreviewSourceTool, "artifact:"+artifact, quoted) {
+   ---
+   > 	if false && marker.Mark(scopeID, PreviewSourceTool, "artifact:"+artifact, quoted) {
+== 02-m1-quote-not-stamped rc=1 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/02-m1-quote-not-stamped.log
+   --- FAIL: TestPreview192QuoteDoorStampsAndTheEgressGateThenCatches (0.39s)
+       preview_192_test.go:618: after the quote the C25 egress scan found nothing: the stamp is not live
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/panel	0.501s
+   FAIL
+   restored sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71 (equals pristine)
+--- mutant m2-laundering-allowed: sed -i 's/if !bytes\.Contains(body, \[\]byte(quoted))/if !bytes.Contains(body, []byte(""))/' (sha256 89255cc7f556fe7c327e739803f7b44322a1a89c2e35485e9b98ded9cf35b458)
+   720c720
+   < 	if !bytes.Contains(body, []byte(quoted)) {
+   ---
+   > 	if !bytes.Contains(body, []byte("")) {
+== 03-m2-laundering-allowed rc=1 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/03-m2-laundering-allowed.log
+   --- FAIL: TestPreview192QuoteDoorRefusesTextThatIsNotInTheArtifact (0.39s)
+       preview_192_test.go:642: the quote door stamped text the artifact does not contain: the page could choose what the C25 index believes
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/panel	0.531s
+   FAIL
+   restored sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71 (equals pristine)
+--- mutant m3-sandbox-dropped: sed -i 's/sandbox; default-src 'none'; img-src data:/default-src 'none'; img-src data:/' (sha256 cb9b1aca5135408ae366a0896a20f8c5b4e0a867ecd537c5b66b5531034d2941)
+   105c105
+   < 	previewHTMLPolicy   = "sandbox; default-src 'none'; img-src data:; style-src 'unsafe-inline'"
+   ---
+   > 	previewHTMLPolicy   = "default-src 'none'; img-src data:; style-src 'unsafe-inline'"
+== 04-m3-sandbox-dropped rc=1 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/04-m3-sandbox-dropped.log
+   --- FAIL: TestPreview192HTMLIsSandboxedSoAPreviewCannotSpeak (0.15s)
+       preview_192_test.go:512: CSP = "default-src 'none'; img-src data:; style-src 'unsafe-inline'": it must start with the sandbox directive, or the previewed page keeps this window's origin and can postMessage as the composer
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/panel	0.363s
+   FAIL
+   restored sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71 (equals pristine)
+--- mutant m4-pointer-dropped: sed -i 's/doc\.NextOffset = int64(len(head))/doc.NextOffset = 0/' (sha256 6e72507c85f09dce7ff8f36bd8ff7943b1545f40524ddd72bc5bc5d97e9e0b3f)
+   624c624
+   < 	doc.NextOffset = int64(len(head))
+   ---
+   > 	doc.NextOffset = 0
+== 05-m4-pointer-dropped rc=1 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/05-m4-pointer-dropped.log
+   --- FAIL: TestPreview192TextFirstViewSaysWhatItHidAndWhereTheRestIs (0.32s)
+       preview_192_test.go:338: the notice shows head 4096 but the pointer resumes at 0
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/panel	0.415s
+   FAIL
+   restored sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71 (equals pristine)
+--- mutant m5-name-guard-dropped: sed -i 's/if err := r\.guard(name); err != nil {/if err := error(nil); err != nil {/' (sha256 d1e29e792894cc9e30f9894e6163b75d72ca137e04c08cf57cc526fd61b91cb7)
+   466c466
+   < 	if err := r.guard(name); err != nil {
+   ---
+   > 	if err := error(nil); err != nil {
+== 06-m5-name-guard-dropped rc=1 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/06-m5-name-guard-dropped.log
+   --- FAIL: TestPreview192RefusesPathShapedNamesBeforeItOpensAnything (0.15s)
+       preview_192_test.go:237: "..": status = 403 (产物 ".." 不是普通文件（是目录或设备）；预览不读它), want 400
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/panel	0.342s
+   FAIL
+   restored sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71 (equals pristine)
+--- final green run on the restored bytes
+== 07-final-green rc=0 log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/192/logs/07-final-green.log
+   ok  	github.com/CarlosShao/wisp/internal/panel	3.860s
+final sha256 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71 (pristine 70eeb417f2fb2aaa2497e972deb709b94db212e632d9ae0d07fce66a1189db71)
+redproof-192: 5 mutants, each went red on its own named assertion, each restored to the pristine bytes

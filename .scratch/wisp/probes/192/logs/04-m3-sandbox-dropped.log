@@ -1,0 +1,6 @@
+time=2026-11-14T18:11:01.917+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestPreview192HTMLIsSandboxedSoAPreviewCannotSpeak (0.15s)
+    preview_192_test.go:512: CSP = "default-src 'none'; img-src data:; style-src 'unsafe-inline'": it must start with the sandbox directive, or the previewed page keeps this window's origin and can postMessage as the composer
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.363s
+FAIL

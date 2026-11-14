@@ -1,0 +1,1690 @@
+# 票 154 AC#1 触发门 —— 锚点 b06f7fa0fab6ef9c943e66408a90867859f536a5
+# 生成时刻 2026-11-14T18:12:41+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+
+## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
+$ git grep -nE -w 'ToolRequest\{' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1002:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+# 名册行数＝1 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
+# 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1002:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+# 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
+$ git grep -nE  '\.Execute\(' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/tier2.go:46:		out, err := ex.Execute(ctx, plugin.Tier2ToolRequest{
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/tier2_gate.go:210:	return rt.Execute(ctx, call)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/tier2_loader.go:195:	out, err := e.gate.Execute(ctx, GojaCall{
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:629:	return p.inner.Execute(ctx, req)
+# 名册行数＝4 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
+# 命中行数＝4   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
+# 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
+# 基线枚数＝4   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
+$ git grep -nE -w 'OpenTask|CloseTask' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:848:	//     the CloseTask boundary (ticket 163 AC#3; the teeth test kills the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1384:		// ONLY collector - CloseTask fires this at the same task-end boundary
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1389:		// boundary is CloseTask, and nothing here adds a parallel one.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1680:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1682:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1721:	rt.bridge.OpenTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1727:		rt.bridge.CloseTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:54://     (Bridge.CloseTask -> Options.TaskCleanup, one janitor verb, no second
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:34://     task-end boundary (Bridge.CloseTask -> Options.TaskCleanup) is the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:380:	// bridge.go's CloseTask comment, and inventing one is not this ticket's call.
+# 名册行数＝10 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
+# 命中行数＝2   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:848:	//     the CloseTask boundary (ticket 163 AC#3; the teeth test kills the
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1384:		// ONLY collector - CloseTask fires this at the same task-end boundary
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1389:		// boundary is CloseTask, and nothing here adds a parallel one.
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1680:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1682:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:54://     (Bridge.CloseTask -> Options.TaskCleanup, one janitor verb, no second
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:34://     task-end boundary (Bridge.CloseTask -> Options.TaskCleanup) is the
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:380:	// bridge.go's CloseTask comment, and inventing one is not this ticket's call.
+# 基线枚数＝2   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/agent
+# 名册行数＝0 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
+# 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
+# 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
+# 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
+$ git grep -nE  'PassThroughUnclassifiedRisk:' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- *.go :!*_test.go
+# 名册行数＝0 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
+# 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
+# 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
+# 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/diff_windows.go:227:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/diffgate_windows.go:199:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:266:			b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:298:			b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:390:	b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/shot_windows.go:118:		f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/autostart_windows.go:80:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/logsink.go:114:	_ = s.pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/models.go:395:	defer machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_attachment_214.go:154:	return s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_cost_194.go:56:	defer func() { _ = st.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_ball_windows.go:577:	rb.b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_present_windows.go:80:	if prov.OpenScope(presentClipboardScope) == nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:434:			_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:585:				_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:615:		_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:619:		_ = m.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:249:func (h *voiceEngineHandle) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:258:		if cerr := h.punct.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:272:			if cerr := h.slot.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:890:		if cerr := r.slot.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:1222:	_ = speaker.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:638:	scope := p.OpenScope(rv.provScope)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:644:			scope = p.OpenScope(rv.provScope)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:813:		rv.machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:841:			_ = phase1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:854:			_ = asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:861:			_ = rv.kwsWake.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:951:				phase1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:1238:			_ = r.asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:1241:			_ = r.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_windows.go:208:			_ = st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1643:		rt.scheduler.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1651:		_ = rt.store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1691:// here: Provenance.OpenScope's doc says "composition root calls this at task
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1692:// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:2103:	instrScope := rt.c25.OpenScope("run:project-instructions")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:2104:	defer instrScope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:176:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:214:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:299:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:306:			_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:315:			_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:329:	_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_out_windows.go:72:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_out_windows.go:447:func (s *waveOutSpeaker) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler.go:487:func (s *Scheduler) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler.go:531:	s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec_stub.go:29:func (a *Apm) Close() error { return ErrUnavailable }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec_webrtc_windows.go:110:func (a *Apm) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/dmo_cgo_windows.go:111:func (s *DmoSession) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/dmo_nocgo_windows.go:41:func (s *DmoSession) Close() {}
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/device.go:44:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/device.go:130:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/mmdevice_windows.go:184:func (w *mmDeviceWatcher) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapi_windows.go:248:		_ = s.Close() // release the half-initialized client (idempotent)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapi_windows.go:418:func (s *wasapiStream) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:195:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:214:			_ = stream.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:270:	_ = (*stream).Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/ball_windows.go:1081:func (b *Ball) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_windows.go:745:			if err := c.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:216:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:220:		tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/childjob_windows.go:40:		_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/childjob_windows.go:49:		if err := job.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:152:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:164:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:389:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/anthropic/adapter.go:174:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/anthropic/adapter.go:185:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/discover.go:70:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter.go:111:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter.go:122:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openairesponses/adapter.go:143:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openairesponses/adapter.go:154:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costdao_44.go:42:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodeldao_44b.go:85:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_memory.go:76:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_memory.go:136:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:85:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:97:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:175:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:250:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_profile.go:132:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_reminders.go:97:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session.go:153:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session.go:325:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_tasklog.go:103:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_toolcall.go:177:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_toolcall.go:188:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:307:		_ = s.reader.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:318:		_ = s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:378:func (s *Store) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:391:			_ = s.reader.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:394:			_ = s.writer.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:429:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:434:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:438:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:447:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:455:		if err := boot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:467:			_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:477:	_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:726:	defer in.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:732:		out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:735:	return out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:426:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:486:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:635:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:25:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:82:			out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:85:		if err := out.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:476:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:507:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:569:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:762:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:804:	defer in.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:809:	defer out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:109:			f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:294:	if err := zw.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:300:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:611:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45.go:396:func (d *diskGatedWriter) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45.go:406:	return d.w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:109:			_ = w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:159:func (p *LogPipeline) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:162:	return p.writer.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:317:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:332:	cerr := w.file.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:353:func (w *rollingWriter) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/tree_reader_190.go:57:		_ = d.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/command.go:320:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command.go:472:			job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command.go:552:		c.job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command_job_other.go:30:func (j *childJob) Close() {}
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command_job_windows.go:152:func (j *childJob) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:140:			_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:152:		_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:280:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows.go:170:func (j *JobScope) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope.go:85:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope.go:674:		if cerr := sl.eng.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr.go:186:func (a *StreamingAsr) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cer/sources.go:204:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cer/sources.go:296:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudasr.go:382:func (a *CloudASR) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudasr.go:493:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:124:				_ = built.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:155:				_ = built.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:299:func (c *CloudASRChain) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:302:		if err := e.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:563:func (c *CloudTTSChain) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:566:		if err := e.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudprobe.go:83:	defer engine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudprobe.go:110:	defer engine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudtts.go:169:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudtts.go:269:func (t *CloudTTS) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:72:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:102:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:133:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:226:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws.go:301:func (k *KwsEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:89:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:162:	defer func() { _ = f.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:248:func (p *CTTransformerPunctuator) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:180:func (s *Slot) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:194:			err = s.asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:200:			err = s.tts.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:206:			err = s.kws.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/tts.go:233:func (m *MatchaTts) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/vad.go:215:func (d *Detector) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine.go:169:func (m *Machine) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:956:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:976:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1064:		closeErr = scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:177:	defer zr.Close() //nolint:errcheck // read-only archive handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:193:	defer rc.Close() //nolint:errcheck // read-only entry handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:343:	defer f.Close() //nolint:errcheck // read-only
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs.go:150:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs.go:214:	defer dir.Close() //nolint:errcheck // read-only handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:302:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:322:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:507:	defer src.Close() //nolint:errcheck // read-only handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:520:	_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/launcher_windows.go:70:	_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/launcher_windows.go:162:			_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/search_apps_windows.go:63:		_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:116:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:142:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_exec.go:110:	defer func() { _ = tree.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:181:	_ = s.carrier.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:547:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:552:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:562:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:596:func (s *cmdSessionShell) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:597:	return s.tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:673:	defer h.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:768:	defer tok.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:778:	defer h.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_firstvisit.go:126:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_firstvisit.go:130:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_search.go:160:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/webnet.go:469:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_unix.go:105:	return p.dir.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:115:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:120:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:121:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:125:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:126:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:129:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:133:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:224:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:232:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:236:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:240:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:293:	return p.root.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:118:// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:212:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:217:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:221:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:123:	defer target.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:172:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:177:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:178:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:182:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:183:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:186:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:191:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:196:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:197:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:201:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:202:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:205:	_ = cur.Close()
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenScope|CloseScope|Close\(\)' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1691:// here: Provenance.OpenScope's doc says "composition root calls this at task
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1692:// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:956:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:118:// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+# 开方丢了句柄的文件（handle 味：合方写什么都不算关）：
+#   DISCARD-HANDLE cmd/wisp/panel_assets.go
+#   DISCARD-HANDLE cmd/wisp/resident_present_windows.go
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED cmd/wisp/resident_present_windows.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+# 合方只由泛用 Close() 命中的开方文件（这一味＝人来判那只 Close() 是不是这族句柄）：
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/resident_voice_windows.go
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/run.go
+#   CLOSE-BY-GENERIC-CLOSE internal/tools/bridge.go
+# 未成对枚数＝2   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝2   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=2   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G5 正控（形状照 G1–G4 的「正控先跑」：同一把尺打在已知「开又合」的样本上，必须不响）
+# 样本＝internal/tools/bridge.go（:648 b.scopes[taskID] = b.prov.OpenScope(taskID) 与
+#   :706 closeErr = scope.Close() 同文件成对——票 160 之后收尾是句柄自带的那枚 Close，
+#   行号＝09-27 本程在锚上现量（git grep -nE 'OpenScope|scope\.Close\(\)' <锚> -- internal/tools/bridge.go），
+#   改前那句注释写的 :642/:691 已经因为这次落地位移过，出处＝票 171 票面 AC#6 与台账 A329）
+# 写法上的两条自纠（都是本程实测撞出来的，不是设想的）：
+#   (1) pathspec 必须与主尺同形再逐条排除。第一版图省事写成 'internal/tools/**/*.go'，
+#       实测 git grep rc=1、名册空、未成对 0——那是一枚**根本产不出读数的装饰腿**，
+#       它「不响」不能算正控（票 154 的 AC#3 就是拿「零区别」否掉装饰腿的）。
+#       本机现量：git grep -lEw OpenScope <锚> -- internal/tools/**/*.go => rc=1 零命中；
+#                          同尺 -- internal/tools/*.go  => rc=0 命中 bridge.go。
+#   (2) 必须排 *_test.go。第一版没排，正控自己被本程新测试里那句解释 Mark 机理的**注释**
+#       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。
+
+## G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go :!cmd/wisp/resident_present_windows.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/diff_windows.go:227:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/diffgate_windows.go:199:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:266:			b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:298:			b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:390:	b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/shot_windows.go:118:		f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/autostart_windows.go:80:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/logsink.go:114:	_ = s.pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/models.go:395:	defer machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_attachment_214.go:154:	return s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_cost_194.go:56:	defer func() { _ = st.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_ball_windows.go:577:	rb.b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:434:			_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:585:				_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:615:		_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:619:		_ = m.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:249:func (h *voiceEngineHandle) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:258:		if cerr := h.punct.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:272:			if cerr := h.slot.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:890:		if cerr := r.slot.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:1222:	_ = speaker.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:638:	scope := p.OpenScope(rv.provScope)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:644:			scope = p.OpenScope(rv.provScope)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:813:		rv.machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:841:			_ = phase1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:854:			_ = asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:861:			_ = rv.kwsWake.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:951:				phase1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:1238:			_ = r.asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:1241:			_ = r.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_windows.go:208:			_ = st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1643:		rt.scheduler.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1651:		_ = rt.store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1691:// here: Provenance.OpenScope's doc says "composition root calls this at task
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1692:// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:2103:	instrScope := rt.c25.OpenScope("run:project-instructions")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:2104:	defer instrScope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:176:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:214:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:299:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:306:			_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:315:			_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:329:	_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_out_windows.go:72:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_out_windows.go:447:func (s *waveOutSpeaker) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler.go:487:func (s *Scheduler) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler.go:531:	s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec_stub.go:29:func (a *Apm) Close() error { return ErrUnavailable }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec_webrtc_windows.go:110:func (a *Apm) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/dmo_cgo_windows.go:111:func (s *DmoSession) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/dmo_nocgo_windows.go:41:func (s *DmoSession) Close() {}
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/device.go:44:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/device.go:130:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/mmdevice_windows.go:184:func (w *mmDeviceWatcher) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapi_windows.go:248:		_ = s.Close() // release the half-initialized client (idempotent)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapi_windows.go:418:func (s *wasapiStream) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:195:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:214:			_ = stream.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:270:	_ = (*stream).Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/ball_windows.go:1081:func (b *Ball) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_windows.go:745:			if err := c.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:216:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:220:		tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/childjob_windows.go:40:		_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/childjob_windows.go:49:		if err := job.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:152:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:164:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:389:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/anthropic/adapter.go:174:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/anthropic/adapter.go:185:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/discover.go:70:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter.go:111:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter.go:122:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openairesponses/adapter.go:143:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openairesponses/adapter.go:154:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costdao_44.go:42:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodeldao_44b.go:85:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_memory.go:76:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_memory.go:136:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:85:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:97:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:175:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:250:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_profile.go:132:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_reminders.go:97:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session.go:153:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session.go:325:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_tasklog.go:103:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_toolcall.go:177:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_toolcall.go:188:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:307:		_ = s.reader.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:318:		_ = s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:378:func (s *Store) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:391:			_ = s.reader.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:394:			_ = s.writer.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:429:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:434:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:438:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:447:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:455:		if err := boot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:467:			_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:477:	_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:726:	defer in.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:732:		out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:735:	return out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:426:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:486:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:635:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:25:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:82:			out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:85:		if err := out.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:476:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:507:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:569:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:762:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:804:	defer in.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:809:	defer out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:109:			f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:294:	if err := zw.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:300:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:611:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45.go:396:func (d *diskGatedWriter) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45.go:406:	return d.w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:109:			_ = w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:159:func (p *LogPipeline) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:162:	return p.writer.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:317:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:332:	cerr := w.file.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:353:func (w *rollingWriter) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/tree_reader_190.go:57:		_ = d.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/command.go:320:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command.go:472:			job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command.go:552:		c.job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command_job_other.go:30:func (j *childJob) Close() {}
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command_job_windows.go:152:func (j *childJob) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:140:			_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:152:		_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:280:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows.go:170:func (j *JobScope) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope.go:85:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope.go:674:		if cerr := sl.eng.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr.go:186:func (a *StreamingAsr) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cer/sources.go:204:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cer/sources.go:296:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudasr.go:382:func (a *CloudASR) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudasr.go:493:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:124:				_ = built.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:155:				_ = built.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:299:func (c *CloudASRChain) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:302:		if err := e.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:563:func (c *CloudTTSChain) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:566:		if err := e.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudprobe.go:83:	defer engine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudprobe.go:110:	defer engine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudtts.go:169:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudtts.go:269:func (t *CloudTTS) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:72:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:102:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:133:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:226:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws.go:301:func (k *KwsEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:89:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:162:	defer func() { _ = f.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:248:func (p *CTTransformerPunctuator) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:180:func (s *Slot) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:194:			err = s.asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:200:			err = s.tts.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:206:			err = s.kws.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/tts.go:233:func (m *MatchaTts) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/vad.go:215:func (d *Detector) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine.go:169:func (m *Machine) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:956:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:976:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1064:		closeErr = scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:177:	defer zr.Close() //nolint:errcheck // read-only archive handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:193:	defer rc.Close() //nolint:errcheck // read-only entry handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:343:	defer f.Close() //nolint:errcheck // read-only
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs.go:150:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs.go:214:	defer dir.Close() //nolint:errcheck // read-only handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:302:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:322:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:507:	defer src.Close() //nolint:errcheck // read-only handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:520:	_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/launcher_windows.go:70:	_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/launcher_windows.go:162:			_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/search_apps_windows.go:63:		_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:116:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:142:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_exec.go:110:	defer func() { _ = tree.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:181:	_ = s.carrier.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:547:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:552:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:562:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:596:func (s *cmdSessionShell) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:597:	return s.tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:673:	defer h.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:768:	defer tok.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:778:	defer h.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_firstvisit.go:126:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_firstvisit.go:130:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_search.go:160:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/webnet.go:469:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_unix.go:105:	return p.dir.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:115:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:120:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:121:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:125:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:126:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:129:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:133:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:224:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:232:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:236:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:240:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:293:	return p.root.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:118:// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:212:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:217:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:221:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:123:	defer target.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:172:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:177:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:178:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:182:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:183:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:186:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:191:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:196:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:197:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:201:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:202:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:205:	_ = cur.Close()
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenScope|CloseScope|Close\(\)' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1691:// here: Provenance.OpenScope's doc says "composition root calls this at task
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1692:// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:956:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:118:// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 合方只由泛用 Close() 命中的开方文件（这一味＝人来判那只 Close() 是不是这族句柄）：
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/resident_voice_windows.go
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/run.go
+#   CLOSE-BY-GENERIC-CLOSE internal/tools/bridge.go
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）
+
+## G5-负一负 同尺不过滤任何文件
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/diff_windows.go:227:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/diffgate_windows.go:199:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:266:			b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:298:			b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/main.go:390:	b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/balldebug/shot_windows.go:118:		f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/llmrecord/main_test.go:47:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_always_201_test.go:96:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_always_201_test.go:203:	defer func() { _ = pw.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_always_219ac2_test.go:126:	defer func() { _ = pw.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_reply_201_test.go:196:	h.cleaner = append(h.cleaner, func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_reply_201_test.go:205:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_reply_201_test.go:275:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_reply_201_test.go:353:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_reply_201_test.go:524:		t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_reply_201_test.go:599:		t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_revoke_226_test.go:56:	defer func() { _ = pw.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_unanswerable_375_test.go:178:	defer pw.Close() // ends the listener's read only after the run has finished
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_veto_170_test.go:58:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_veto_170_test.go:130:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/approval_veto_170_test.go:186:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/autostart_43_windows_test.go:32:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/autostart_43_windows_test.go:58:	k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/autostart_windows.go:80:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/child_task_log_378_test.go:40:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/child_task_log_378_test.go:93:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/child_task_log_378_test.go:115:	defer func() { _ = db.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/child_task_log_378_test.go:120:	defer func() { _ = rows.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/config_reload_223_test.go:90:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/config_wire_423_windows_test.go:293:	if err := on.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/crash_recovery_43_test.go:61:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/crash_recovery_43_test.go:87:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/crash_recovery_43_test.go:106:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/crash_recovery_43_test.go:158:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/dataroot_128_test.go:706:	w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/dataroot_128_test.go:709:	r.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/diagnostics_cmd_test.go:131:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/diagnostics_cmd_test.go:250:	t.Cleanup(func() { _ = f.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/diagnostics_cmd_test.go:267:		defer rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/leg_sink_nail_131_windows_test.go:185:		defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/leg_sink_nail_131_windows_test.go:190:	if err := outW.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/leg_sink_nail_131_windows_test.go:193:	if err := errW.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/lifecycle_43_windows_test.go:51:func (a *fakeAsr43) Close() error    { a.closed.Add(1); return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/lifecycle_live_43_windows_test.go:225:		if err := st.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/lifecycle_live_43_windows_test.go:260:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/logsink.go:114:	_ = s.pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/logsink_test.go:141:	if err := pipeW.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/logsink_test.go:148:	if err := pipeR.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/models.go:395:	defer machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/models_effect_273_test.go:462:	defer machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets_143_test.go:82:		outFile.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets_143_test.go:92:	if err := outFile.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets_143_test.go:95:	if err := errFile.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_attachment_214.go:154:	return s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_attachment_214_test.go:197:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_cost_194.go:56:	defer func() { _ = st.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_cost_194_test.go:88:	if err := st.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_gate_test.go:459:			rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_gate_test.go:463:			rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_gate_test.go:464:			outf.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_gate_test.go:467:		rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_gate_test.go:468:		outf.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_windows_test.go:1205:	defer func() { _ = ln4.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_windows_test.go:1228:		defer func() { _ = ln6.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_windows_test.go:1237:		_ = ln6.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_host_windows_test.go:1249:	if err := ln4.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_models_320_test.go:117:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_models_320_test.go:159:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_models_320_test.go:447:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_models_320_test.go:639:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_models_320_test.go:719:			defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_models_320_test.go:767:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_run_145_test.go:223:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/plan_assembled_165r2_test.go:105:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/plan_assembled_165r2_test.go:190:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/present_wiring_30w1_windows_test.go:169:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/providers_test.go:74:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_approval_live_246_windows_test.go:469:		_ = stdin.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_ball_windows.go:577:	rb.b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_present_windows.go:80:	if prov.OpenScope(presentClipboardScope) == nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_task_source_live_246_windows_test.go:511:		_ = a.stdin.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_41a2r1_windows_test.go:538:func (s *voice41a2r1StubKws) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_41a2r1_windows_test.go:630:	defer func() { _ = eng.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_acting_395r1_windows_test.go:208:	t.Cleanup(func() { _ = st2.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_echo_windows_test.go:87:		_ = det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_echo_windows_test.go:92:		_ = asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_echo_windows_test.go:93:		_ = det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_echo_windows_test.go:105:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_echo_windows_test.go:181:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_echo_windows_test.go:357:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_windows_test.go:222:	_ = apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_windows_test.go:242:	defer func() { _ = eng.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_windows_test.go:332:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_26p_windows_test.go:512:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_392_windows_test.go:398:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_392_windows_test.go:548:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_392_windows_test.go:644:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:434:			_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:585:				_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:615:		_ = m.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_bargein_windows.go:619:		_ = m.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:249:func (h *voiceEngineHandle) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:258:		if cerr := h.punct.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:272:			if cerr := h.slot.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:890:		if cerr := r.slot.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_engines_windows.go:1222:	_ = speaker.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_interrupt_381r2_windows_test.go:149:func (s *voice381r2ProbeSpeaker) Close() error { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_interrupt_381r2_windows_test.go:465:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_interrupt_390r1_windows_test.go:180:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_machine_273_windows_test.go:30:	defer rv.machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_markseam_394_windows_test.go:46:	scope := prov.OpenScope("task-394r1-closed")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_markseam_394_windows_test.go:48:		t.Fatal("OpenScope refused the task scope")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_markseam_394_windows_test.go:64:	scope := prov.OpenScope("task-394r1-closed")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_markseam_394_windows_test.go:66:		t.Fatal("OpenScope refused the task scope")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_markseam_394_windows_test.go:71:	if err := scope.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_ttsinherit_382wr2_windows_test.go:78:	scope := prov.OpenScope("task-382wr2-closed")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_ttsinherit_382wr2_windows_test.go:80:		t.Fatal("OpenScope refused the task scope")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_ttsinherit_382wr2_windows_test.go:86:	if err := scope.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:638:	scope := p.OpenScope(rv.provScope)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:644:			scope = p.OpenScope(rv.provScope)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:813:		rv.machine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:841:			_ = phase1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:854:			_ = asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:861:			_ = rv.kwsWake.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:951:				phase1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:1238:			_ = r.asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_windows.go:1241:			_ = r.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_wire_r1_windows_test.go:88:func (s *voiceWireSpeaker) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_wire_r1_windows_test.go:141:func (a *voiceWireAsr) Close() error   { a.closes.Add(1); return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_voice_wire_r1_windows_test.go:830:	defer func() { _ = sp.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_watchdog_windows_test.go:155:	t.Cleanup(func() { rt.Job.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_watchdog_windows_test.go:364:	t.Cleanup(func() { rt.Job.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/resident_windows.go:208:			_ = st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1643:		rt.scheduler.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1651:		_ = rt.store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1691:// here: Provenance.OpenScope's doc says "composition root calls this at task
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1692:// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:2103:	instrScope := rt.c25.OpenScope("run:project-instructions")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:2104:	defer instrScope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run_mode101_test.go:584:	defer st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run_test.go:174:	f.t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/secret_argv_windows_test.go:260:		_ = stdin.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/secret_argv_windows_test.go:265:	if err := stdin.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/secret_argv_windows_test.go:355:		_ = stdin.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/secret_argv_windows_test.go:469:	_ = stdin.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/secret_test.go:1147:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:176:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:214:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions.go:299:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions_test.go:100:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/sessions_test.go:136:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/settle_trace_12r2_windows_test.go:44:func (s *settle12r2Tts) Close() error { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:306:			_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:315:			_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/slo_windows.go:329:	_ = pipeline.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/tasklog_fkcheck_378_test.go:339:	defer func() { _ = db.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/tasklog_fkcheck_378_test.go:347:	defer func() { _ = rows.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/tasklog_fkcheck_378_test.go:462:	defer func() { _ = st.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/tasklog_subloop_378_test.go:121:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/tasklogstate_365_test.go:157:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket123_replyleg_test.go:67:		s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket123_replyleg_test.go:113:func (s *t123replyScript) Close() { s.once.Do(func() { close(s.done) }) }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_ac3_realprocess_windows_test.go:116:		st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_ac3_realprocess_windows_test.go:121:		st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_ac3_realprocess_windows_test.go:124:	if err := st.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_ac3_realprocess_windows_test.go:143:	defer st2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_assembly_test.go:85:	t.Cleanup(func() { _ = pw.Close(); _ = pr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_assembly_test.go:180:		defer lt.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/ticket224_assembly_test.go:559:	defer st.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_e2e_demo_16r1_windows_test.go:184:		_ = probe.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_e2e_demo_16r1_windows_test.go:377:	t.Cleanup(func() { _ = st2.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_out_windows.go:72:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/voice_out_windows.go:447:func (s *waveOutSpeaker) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/zz315a1probe_test.go:287:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/approval/corr_clash_e2e_340_test.go:167:	t.Cleanup(func() { _ = mem.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/cost_44_test.go:26:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/cost_44_test.go:99:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/costbook_44_test.go:33:	t.Cleanup(func() { _ = store.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/declared_l0_risk_179_test.go:71:	t.Cleanup(func() { store.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/forensics_test.go:29:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/forensics_test.go:89:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/guard_test.go:157:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/guard_test.go:217:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/instructions_test.go:73:	scope := prov.OpenScope("task-200-agent")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/instructions_test.go:74:	defer scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/instructions_test.go:228:	scope := prov.OpenScope("task-200-agent")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/instructions_test.go:229:	defer scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/loop_golden_test.go:316:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/maxoutput_370_ac0_test.go:76:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/plan_present_crowded_world_330r2_test.go:173:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/plan_present_doorbell_165r3_test.go:123:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler.go:487:func (s *Scheduler) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler.go:531:	s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/scheduler/scheduler_test.go:701:	s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/spill_path_invariant_test.go:351:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/tasklogstate_365_test.go:107:			defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/truncation_test.go:28:	defer store.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:244:		apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:255:		apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:267:		apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:279:		apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:366:	apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:413:		defer apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:425:		defer apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec393r2_reset_windows_test.go:441:		defer apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec_stub.go:29:func (a *Apm) Close() error { return ErrUnavailable }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aec/aec_webrtc_windows.go:110:func (a *Apm) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/aec3_windows_test.go:191:		_ = apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/dmo_cgo_windows.go:111:func (s *DmoSession) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/dmo_nocgo_windows.go:41:func (s *DmoSession) Close() {}
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:157:	defer func() { _ = eng.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:306:		_ = eng.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:310:		_ = eng.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:351:			_ = j.eng.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:357:			_ = j.eng.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:380:			_ = j.eng.apm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:413:			_ = j.eng.det.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:955:	defer func() { _ = det.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/keepalive392r2_windows_test.go:988:	defer func() { _ = det2.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/longrun_windows_test.go:143:	defer func() { _ = tts.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/longrun_windows_test.go:230:	defer func() { _ = apm.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/rig_windows_test.go:128:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/rig_windows_test.go:159:	defer func() { _ = tts.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/rig_windows_test.go:181:	t.Cleanup(func() { _ = asr.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/rig_windows_test.go:243:		defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/rig_windows_test.go:251:		defer ck.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/aecspike/rig_windows_test.go:467:	defer sess.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/device.go:44:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/device.go:130:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/hotplug_test.go:70:func (f *fakeWatcher) Close() error { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/hotplug_test.go:121:func (s *fakeStream) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/livepacket_297_windows_test.go:65:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/mmdevice_windows.go:184:func (w *mmDeviceWatcher) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapi_windows.go:248:		_ = s.Close() // release the half-initialized client (idempotent)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapi_windows.go:418:func (s *wasapiStream) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:195:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:214:			_ = stream.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/audio/wasapimic_windows.go:270:	_ = (*stream).Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/ball_windows.go:1081:func (b *Ball) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_guard_windows_test.go:195:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:85:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:191:	b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:212:		b2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:238:	defer b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:343:	defer b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:517:	defer b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/live_windows_test.go:673:	defer b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_close_leak_probe_winlive_test.go:109:				b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_close_leak_probe_winlive_test.go:118:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_glass62_live_windows_test.go:63:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_jarvis_live_windows_test.go:116:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_jarvis_pure_particles_live_windows_test.go:310:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_live_windows_test.go:64:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_live_windows_test.go:185:	b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_live_windows_test.go:504:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_live_windows_test.go:730:		b.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/orb_windows.go:745:			if err := c.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/ball/sta_release_windows_test.go:392:					b.Close() // the shipping door, whole: ball_windows.go:935-966
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/manager_readfail_42r1_envprobe_windows_test.go:75:		f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/manager_readfail_42r1_envprobe_windows_test.go:78:	f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:216:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:220:		tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/childjob_windows.go:40:		_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/childjob_windows.go:49:		if err := job.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:152:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:164:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/adaptertest/mockllm.go:389:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/anthropic/adapter.go:174:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/anthropic/adapter.go:185:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/catalog_test.go:194:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/catalog_test.go:231:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/discover.go:70:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/enabled_reach_261_test.go:127:		req.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/golden/golden_test.go:124:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/golden/golden_test.go:133:	resp1.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/golden/golden_test.go:139:	resp2.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/golden/golden_test.go:148:	defer resp3.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter.go:111:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter.go:122:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter_test.go:184:	defer proxy.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/adapter_test.go:213:	defer tlsSrv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/mockllm_integ_test.go:129:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/mockllm_integ_test.go:140:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/mockllm_integ_test.go:166:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openaichat/mockllm_integ_test.go:199:			srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openairesponses/adapter.go:143:		defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/openairesponses/adapter.go:154:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/probe_health_test.go:54:	t.Cleanup(func() { _ = store.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/probe_health_test.go:84:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/artifacts_path_invariant_test.go:133:	t.Cleanup(func() { _ = s.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/concurrent_test.go:171:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/concurrent_test.go:193:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/concurrent_test.go:280:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costdao_44.go:42:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodel_44b_test.go:39:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodel_44b_test.go:46:	defer s2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodel_44b_test.go:93:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodel_44b_test.go:101:		if err := s2.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodel_44b_test.go:109:	defer s3.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/costmodeldao_44b.go:85:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_memory.go:76:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_memory.go:136:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:85:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:97:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:175:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_misc.go:250:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_profile.go:132:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_reminders.go:97:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session.go:153:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session.go:325:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session_append_326_test.go:52:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session_append_326_test.go:140:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session_test.go:184:	if err := old.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session_test.go:206:		_ = s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session_test.go:225:	db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_session_test.go:236:	defer replayed.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_tasklog.go:103:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_test.go:508:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_test.go:515:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_toolcall.go:177:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/dao_toolcall.go:188:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migrate_v1seed_test.go:52:	if err := old.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migrate_v1seed_test.go:61:	defer fresh.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:40:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:45:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:69:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:120:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:155:		db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:178:		legacy.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:185:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:199:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:204:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:226:		defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:244:		if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:251:		defer s2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:297:			defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:358:	if err := first.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:367:	defer second.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:399:		defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:416:		defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:475:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:495:		rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:545:		defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:581:		if err := seed.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:590:		defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:613:		defer brokenStore.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:620:		defer goodStore.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/migration_fkcheck_366_test.go:645:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:307:		_ = s.reader.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:318:		_ = s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:378:func (s *Store) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:391:			_ = s.reader.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:394:			_ = s.writer.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:429:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:434:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:438:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:447:		_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:455:		if err := boot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:467:			_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:477:	_ = boot.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:726:	defer in.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:732:		out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open.go:735:	return out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open_196r3_test.go:100:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/open_196r3_test.go:190:		defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/reminders_test.go:41:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/reminders_test.go:53:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/reminders_test.go:105:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/reminders_test.go:114:	defer s2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/reminders_test.go:129:	t.Cleanup(func() { _ = s.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:426:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:486:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema.go:635:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:24:	t.Cleanup(func() { _ = s.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:247:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:318:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:360:	defer rows.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:402:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:409:	defer s2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:477:	if err := s1.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:492:	defer s2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:541:	if err := s1.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:568:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:603:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:620:	db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:630:		_ = s2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/schema_test.go:664:	db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196_test.go:306:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196_test.go:337:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196_test.go:407:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196r2_test.go:40:	defer db.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196r2_test.go:75:	defer s.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196r2_test.go:132:	defer dbOff.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/memory/taskstate_196r2_test.go:156:	defer dbOn.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:25:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:82:			out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/archive.go:85:		if err := out.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:476:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:507:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:569:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:762:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:804:	defer in.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader.go:809:	defer out.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/models/downloader_test.go:412:	defer slow.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:109:			f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:294:	if err := zw.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:300:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics.go:611:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics_test.go:57:	defer zr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics_test.go:65:		_ = rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics_test.go:147:	defer zr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/diagnostics_test.go:153:			_ = rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/earlylog_takeover_130r1_test.go:145:	t.Cleanup(func() { _ = p.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45.go:396:func (d *diskGatedWriter) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45.go:406:	return d.w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45_test.go:96:func (s *sink45) Close() error { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45_test.go:328:	if err := d.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45_test.go:392:	_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45_test.go:530:	defer zr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45_test.go:544:	defer zr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/guards_45_test.go:553:		defer rc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:109:			_ = w.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:159:func (p *LogPipeline) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:162:	return p.writer.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:317:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:332:	cerr := w.file.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging.go:353:func (w *rollingWriter) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging_test.go:145:	if err := w.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging_test.go:176:	if err := w.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging_test.go:227:	if err := w.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging_test.go:254:	if err := p.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logging_test.go:307:	if err := p.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logprivate_132_test.go:41:	t.Cleanup(func() { _ = p.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logprivate_132_test.go:57:	t.Cleanup(func() { _ = p.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logprivate_132_test.go:104:	t.Cleanup(func() { _ = p.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logprivate_132_test.go:127:		_ = p.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/observe/logprivate_132_windows_test.go:172:		_ = p.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/attachments_test.go:189:			_ = fh.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/attachments_test.go:192:		_ = fh.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/display_scrub_216_test.go:195:	t.Cleanup(func() { _ = store.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/pump_test.go:193:		t.Errorf("done = c:%v a:%v b:%v, want only the key Close() named: the old fold OR-ed "+
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/subagent_stream_197_test.go:338://  5. Close() on a key that never appeared still opens a row (pre-existing
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/tree_reader_190.go:57:		_ = d.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/perm/ticket90_persist_test.go:262:	if err := store.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/perm/ticket90_persist_test.go:271:	defer reopened.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/command.go:320:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/disposal_risk_403_test.go:55:	handle := p.OpenScope("session-1") // ticket 160: the handle is what closes it
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/disposal_risk_403_test.go:57:		// Stricter than the old p.CloseScope("session-1") line, which could not
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/disposal_risk_403_test.go:59:		if err := handle.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/disposal_risk_403_test.go:74:	p.OpenScope("session-2")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command.go:472:			job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command.go:552:		c.job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command_job_other.go:30:func (j *childJob) Close() {}
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/command_job_windows.go:152:func (j *childJob) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/install_50r1f_test.go:349:	t.Cleanup(func() { _ = st.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/present/dispatch_test.go:139:	t.Cleanup(func() { _ = store.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:140:			_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:152:		_ = job.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/boot_windows.go:280:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows.go:170:func (j *JobScope) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows_test.go:111:	t.Cleanup(func() { _ = job.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows_test.go:137:	if err := job.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows_test.go:149:	if err := job.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows_test.go:161:	t.Cleanup(func() { _ = job.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows_test.go:188:	if err := job.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/proc/jobscope_windows_test.go:204:	t.Cleanup(func() { _ = job.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/projctx/projctx_test.go:313:	sc := prov.OpenScope("task-200-marked")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/projctx/projctx_test.go:314:	defer sc.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/projctx/projctx_test.go:335:	sc2 := prov.OpenScope("task-200-unmarked")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/projctx/projctx_test.go:336:	defer sc2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:39:	scope := prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:62:	if err := scope.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:82:	prov.OpenScope("task-394a")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:83:	prov.OpenScope("task-394b")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:127:	prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:161:	prov.OpenScope("task-394empty")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:182:	_ = prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:203:	prov.OpenScope("task-394shared")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/markseam_394_test.go:215:			prov.OpenScope(own)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/pathresolver_rewrite_account_test.go:239:		defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/pointer_185_test.go:250:	s := p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/pointer_185_test.go:260:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:17:// (ticket 160's lifetime rule: OpenScope hands back a *Scope, and that handle —
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:59:// 21, 22, 26) must (1) OpenScope at task start and close what it handed back on
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:60:// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:269:// owner is nil for a registration that Mark created out of a missing OpenScope
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:370:// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:377:// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:383:// Scope is the handle OpenScope issues. It is the only thing that can close the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:434:func (s *Scope) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:458:// OpenScope registers a task/session scope (composition root calls this at task
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:465:func (p *Provenance) OpenScope(scopeID string) *Scope {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:632:		logf("risk/C25: scope %q not open (no OpenScope for it, or its handle already closed); taint stored — it cannot leak into other scopes", scopeID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:696:// OpenScope, or closed by its own handle) while the engine holds taints in
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:701:// by-id CloseScope gone, the only way to reach "not registered" is a handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:718:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:742:			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:843:			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:44:// `_ = prov.OpenScope(...)` — is never reclaimed. No goroutine, no timer, no
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:53:	_ = p.OpenScope("panel-assets-l2") // handle thrown away on purpose: this is the leak
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:84:	owner := p.OpenScope("panel-assets-l2") // the one that owns the close
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:102:	if err := owner.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:114:// owns. With the by-id CloseScope route gone (ticket 160) such a registration
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:115:// has no closer at all: only a later OpenScope on that EXACT id hands ownership
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:125:	other := p.OpenScope("another-task")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:134:	late := p.OpenScope("typo-scope")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_syncdirs_other_test.go:56:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:21:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:302:	p.OpenScope("task-2")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:310:// package's four p.CloseScope(id) calls with this: the old calls could not
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:314:	if err := s.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:328:	h1 := p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:347:	h2 := p.OpenScope("task-2")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:442:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:710:	p2.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:768:	p.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:780:	p.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:786:	p2.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:800:	p.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:879:	stale := p.OpenScope("task-victim") // generation 1 opens it
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:880:	fresh := p.OpenScope("task-victim") // the task restarts: ownership moves
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:883:	if err := stale.Close(); !errors.Is(err, ErrScopeNotOwner) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:909:	stale := p.OpenScope("task-victim")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:910:	fresh := p.OpenScope("task-victim") // same id, empty: no taint anywhere in the engine
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:911:	if err := stale.Close(); !errors.Is(err, ErrScopeNotOwner) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:927:	h := p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:930:	if err := h.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:937:		if err := h.Close(); !errors.Is(err, ErrScopeAlreadyClosed) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:942:	reborn := p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:943:	if err := h.Close(); !errors.Is(err, ErrScopeAlreadyClosed) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:949:	if err := nilScope.Close(); !errors.Is(err, ErrScopeNotOpen) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:960:	h := p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/shape_a_exemption_test.go:171:	sc := p.OpenScope("task-9")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/shape_a_exemption_test.go:178:	if err := sc.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/shape_a_exemption_test.go:184:	sc2 := p.OpenScope("task-9")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/shape_a_exemption_test.go:189:		sc2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/shape_a_exemption_test.go:192:	if err := sc2.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_redteam_windows_test.go:89:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_redteam_windows_test.go:154:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_redteam_windows_test.go:253:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_test.go:453:	e.p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_test.go:534:	e.p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_windows.go:43:		k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_windows.go:65:	defer k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/syncdirs_windows_test.go:68:	p.OpenScope("task-1")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/taintmatch_test.go:176:	h := p.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/taintmatch_test.go:181:		if err := h.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/taintmatch_test.go:184:		h = p.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/taintmatch_test.go:192:	p.OpenScope("s")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate.go:194:	// This handles the case where OpenScope(id) was called again (change of ownership)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate.go:250:// Call this at task open time (after OpenScope) to enable form B later.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:61:	scope := prov.OpenScope("task-test-direct")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:62:	defer scope.Close() // close after test
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:84:// This is the core of ticket 382: proving that taint can survive Scope.Close() via inheritance chain.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:91:	scope := prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:127:	if err := scope.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:160:	scope := prov.OpenScope("task-short-taint")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:162:	scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:176:	scope2 := prov.OpenScope("task-long-taint")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:179:	scope2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:199:	scope := prov.OpenScope("task-case-test")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:201:	scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:234:	scope := prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:253:	scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:363:	scope := prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:370:	scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:395:	scope := prov.OpenScope("task-whitespace")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:397:	scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:458:	scopeA := prov.OpenScope(taskA)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:460:	scopeA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:488:	scope1 := prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:490:	scope1.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:497:	scope2 := prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:499:	scope2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/grants_test.go:60:	t.Cleanup(func() { _ = s.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope.go:85:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope.go:674:		if cerr := sl.eng.Close(); cerr != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope_cascade_test.go:38:func (e *heapEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope_engines_windows_test.go:120:func (v *vadEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope_engines_windows_test.go:124:	return v.Detector.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope_engines_windows_test.go:142:func (a *asrEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope_engines_windows_test.go:146:	return a.StreamingAsr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/scope_test.go:129:func (e *fakeEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/session/warm_l1_29_test.go:84:	defer func() { _ = store.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr.go:186:func (a *StreamingAsr) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr_test.go:67:	t.Cleanup(func() { _ = a.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr_test.go:80:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr_test.go:176:	if err := asr.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/asr_test.go:179:	if err := asr.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cer/sources.go:204:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cer/sources.go:296:	defer f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cgo_boundary_windows_test.go:164:		if err := d.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:130:	t.Cleanup(func() { _ = a.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:180:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:240:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:285:			defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:320:		defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:343:		defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:361:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:366:	if err := a.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:369:	if err := a.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:393:	srv.Close() // now the base URL refuses connections
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:408:	defer func() { _ = a.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:440:	defer srvA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:442:	defer srvB.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:455:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:517:func (r *recordingASR) Close() error     { r.closeN++; return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:522:	defer srvA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:534:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:555:	_ = chain.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:565:	defer srvA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:567:	defer srvB.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:584:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:609:	defer srvA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:624:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:679:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:687:	defer func() { _ = tts.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:737:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:752:	_ = tts.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:780:	defer srv.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:789:	defer func() { _ = tts.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:811:	defer srvA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:813:	defer srvB.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:825:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:858:	defer srvC.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:860:	defer srvD.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:866:	defer srvE.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:878:	defer func() { _ = chain2.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1051:	defer srvIn.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1061:	defer srv500.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1071:	defer srvOut.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1097:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1101:	defer srvASR.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1103:	defer srvTTS.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1111:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1138:	defer func() { _ = ttsChain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1167:	defer srvA.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1178:	defer func() { _ = chain.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1201:	_ = chain.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloud61_test.go:1227:func (r *recordingTTS) Close() error { r.closeN++; return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudasr.go:382:func (a *CloudASR) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudasr.go:493:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:124:				_ = built.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:155:				_ = built.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:299:func (c *CloudASRChain) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:302:		if err := e.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:563:func (c *CloudTTSChain) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudchain.go:566:		if err := e.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudprobe.go:83:	defer engine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudprobe.go:110:	defer engine.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudtts.go:169:	defer resp.Body.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/cloudtts.go:269:func (t *CloudTTS) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:72:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:102:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:133:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines.go:226:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines_test.go:79:func (s *stubTts) Close() error    { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines_test.go:95:func (s *stubKws) Close() error { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines_test.go:112:func (s *stubRealtime) Close() error    { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines_test.go:236:func (c *cloudStubAsr) Close() error   { c.open = false; return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/engines_test.go:250:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws.go:301:func (k *KwsEngine) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws_test.go:29:func (f *fakeKws41) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws_test.go:167:	t.Cleanup(func() { _ = k.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws_test.go:184:	t.Cleanup(func() { _ = k.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws_test.go:572:	if err := k.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws_test.go:575:	if err := k.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/kws_test.go:631:	if err := slot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:89:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:162:	defer func() { _ = f.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate.go:248:func (p *CTTransformerPunctuator) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:76:	t.Cleanup(func() { _ = p.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:120:func (c *punctStubAsr) Close() error   { c.open = false; return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:129:func (e *emptyPunct) Close() error           { return nil }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:443:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:506:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:566:				_ = p.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:582:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/punctuate_test.go:621:	t.Cleanup(func() { _ = det.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:180:func (s *Slot) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:194:			err = s.asr.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:200:			err = s.tts.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot.go:206:			err = s.kws.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_real_test.go:24:	t.Cleanup(func() { _ = slot.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_real_test.go:49:	if err := slot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_real_test.go:65:	if err := slot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_test.go:28:func (f *fakeAsr26) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_test.go:40:func (f *fakeTts26) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_test.go:100:	if err := slot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_test.go:109:	if err := slot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/slot_test.go:153:	if err := slot.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/tts.go:233:func (m *MatchaTts) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/tts_test.go:53:	t.Cleanup(func() { _ = tts.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/tts_test.go:321:	if err := tts.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/tts_test.go:324:	if err := tts.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/vad.go:215:func (d *Detector) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/speech/vad_test.go:39:	t.Cleanup(func() { _ = d.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine.go:169:func (m *Machine) Close() {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine_test.go:96:			m.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine_test.go:124:	m.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine_test.go:136:	m2.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine_test.go:180:		m.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/statemachine/machine_test.go:194:	m.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/app_launch_windows_test.go:50:	t.Cleanup(func() { _ = js.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/app_launch_windows_test.go:90:	if err := js.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/assessorfor_taint_instrument_309_test.go:41:	// p.scopes[id] even with no OpenScope (provenance.go MarkWithHostPath: a
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:956:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:976:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1064:		closeErr = scope.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_path_account_ticket105_test.go:40:	t.Cleanup(func() { _ = f.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:177:	defer zr.Close() //nolint:errcheck // read-only archive handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:193:	defer rc.Close() //nolint:errcheck // read-only entry handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text.go:343:	defer f.Close() //nolint:errcheck // read-only
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text_test.go:64:	if err := zw.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text_test.go:67:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text_test.go:171:				if err := zw.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/document_text_test.go:174:				if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs.go:150:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs.go:214:	defer dir.Close() //nolint:errcheck // read-only handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_edit_ac34_test.go:558:	closeErr := f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_staging_windows_test.go:361:			_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:302:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:322:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:507:	defer src.Close() //nolint:errcheck // read-only handle
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/fs_write.go:520:	_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/helpers_test.go:58:	t.Cleanup(func() { _ = s.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/launcher_windows.go:70:	_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/launcher_windows.go:162:			_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/loop_approval_test.go:91:	t.Cleanup(func() { _ = mem.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/search_apps_windows.go:63:		_ = k.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:116:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:142:	Close() error
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_exec.go:110:	defer func() { _ = tree.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_live_windows_test.go:169:func (t *fakeExecTree) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:181:	_ = s.carrier.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:547:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:552:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:562:		_ = tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:596:func (s *cmdSessionShell) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:597:	return s.tree.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_test.go:83:func (f *fakeSessionShell) Close() error {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_test.go:87:	f.closeOnce.Do(func() { _ = f.pipeW.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_test.go:129:			_ = f.pipeW.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:673:	defer h.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:768:	defer tok.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/system_backend_windows.go:778:	defer h.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/ticket224_grantid_column_test.go:45:	t.Cleanup(func() { _ = s.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_firstvisit.go:126:		_ = tmp.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_firstvisit.go:130:	if err := tmp.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_guard_test.go:163:	defer func() { _ = ln.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_guard_test.go:171:			_ = c.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_guard_test.go:231:	defer func() { _ = ln.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_guard_test.go:239:			_ = c.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_search.go:160:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/webnet.go:469:	defer func() { _ = resp.Body.Close() }()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/watchdog/settle_test.go:52:	defer sm.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/acl_windows_test.go:199:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/acl_windows_test.go:235:	if err := store.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/acl_windows_test.go:253:	if err := g.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorunlink_348_windows_test.go:170:		_ = handle.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorwindow_342r2_windows_test.go:658:	_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorwindow_342r2_windows_test.go:677:	t.Cleanup(func() { _ = pin.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorwindow_342r2_windows_test.go:682:	_ = lf.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorworld_342_348_unix_test.go:631:			_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorworld_342_348_unix_test.go:633:			_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorworld_342_348_windows_test.go:614:			_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/ancestorworld_342_348_windows_test.go:616:			_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/deleteseam_348r2_windows_test.go:15:// only free-handed instant is between `_ = f.Close()` and `os.Remove(resolved)`, two syscalls. With
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/openleaf_322_other_test.go:301:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/openleaf_flag_322_other_test.go:55:			_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_unix.go:105:	return p.dir.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:115:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:120:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:121:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:125:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:126:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:129:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:133:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:224:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:232:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:236:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:240:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/pinnedleaf_342_windows.go:293:	return p.root.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/production_windows_test.go:53:	if err := store.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/sealhandle_window_120_other_test.go:159:	t.Cleanup(func() { _ = f.Close() })
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:118:// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:212:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:217:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:221:	if err := f.Close(); err != nil {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:123:	defer target.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:172:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:177:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:178:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:182:			_ = next.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:183:			_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:186:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:191:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:196:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:197:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:201:		_ = f.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:202:		_ = cur.Close()
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec_other.go:205:	_ = cur.Close()
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenScope|CloseScope|Close\(\)' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1691:// here: Provenance.OpenScope's doc says "composition root calls this at task
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1692:// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/panel/subagent_stream_197_test.go:338://  5. Close() on a key that never appeared still opens a row (pre-existing
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/disposal_risk_403_test.go:57:		// Stricter than the old p.CloseScope("session-1") line, which could not
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:17:// (ticket 160's lifetime rule: OpenScope hands back a *Scope, and that handle —
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:59:// 21, 22, 26) must (1) OpenScope at task start and close what it handed back on
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:60:// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:269:// owner is nil for a registration that Mark created out of a missing OpenScope
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:370:// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:377:// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:383:// Scope is the handle OpenScope issues. It is the only thing that can close the
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:458:// OpenScope registers a task/session scope (composition root calls this at task
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:696:// OpenScope, or closed by its own handle) while the engine holds taints in
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance.go:701:// by-id CloseScope gone, the only way to reach "not registered" is a handle
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:44:// `_ = prov.OpenScope(...)` — is never reclaimed. No goroutine, no timer, no
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:114:// owns. With the by-id CloseScope route gone (ticket 160) such a registration
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_160_boundary_test.go:115:// has no closer at all: only a later OpenScope on that EXACT id hands ownership
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/provenance_test.go:310:// package's four p.CloseScope(id) calls with this: the old calls could not
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate.go:194:	// This handles the case where OpenScope(id) was called again (change of ownership)
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate.go:250:// Call this at task open time (after OpenScope) to enable form B later.
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/risk/tts_gate_test.go:84:// This is the core of ticket 382: proving that taint can survive Scope.Close() via inheritance chain.
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/assessorfor_taint_instrument_309_test.go:41:	// p.scopes[id] even with no OpenScope (provenance.go MarkWithHostPath: a
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:956:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/deleteseam_348r2_windows_test.go:15:// only free-handed instant is between `_ = f.Close()` and `os.Remove(resolved)`, two syscalls. With
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/winsec/winsec.go:118:// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+# 开方丢了句柄的文件（handle 味：合方写什么都不算关）：
+#   DISCARD-HANDLE cmd/wisp/panel_assets.go
+#   DISCARD-HANDLE cmd/wisp/resident_present_windows.go
+#   DISCARD-HANDLE cmd/wisp/resident_voice_markseam_394_windows_test.go
+#   DISCARD-HANDLE cmd/wisp/resident_voice_ttsinherit_382wr2_windows_test.go
+#   DISCARD-HANDLE internal/plugin/disposal_risk_403_test.go
+#   DISCARD-HANDLE internal/risk/markseam_394_test.go
+#   DISCARD-HANDLE internal/risk/provenance.go
+#   DISCARD-HANDLE internal/risk/provenance_160_boundary_test.go
+#   DISCARD-HANDLE internal/risk/provenance_syncdirs_other_test.go
+#   DISCARD-HANDLE internal/risk/provenance_test.go
+#   DISCARD-HANDLE internal/risk/syncdirs_redteam_windows_test.go
+#   DISCARD-HANDLE internal/risk/syncdirs_test.go
+#   DISCARD-HANDLE internal/risk/syncdirs_windows_test.go
+#   DISCARD-HANDLE internal/risk/taintmatch_test.go
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED cmd/wisp/resident_present_windows.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED cmd/wisp/resident_voice_markseam_394_windows_test.go (开方调用点=4)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED cmd/wisp/resident_voice_ttsinherit_382wr2_windows_test.go (开方调用点=2)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/plugin/disposal_risk_403_test.go (开方调用点=2)  # 同文件另见收尾动词，判「真漏／委托」
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/markseam_394_test.go (开方调用点=8)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/provenance.go (开方调用点=5)  # 同文件另见收尾动词，判「真漏／委托」
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/provenance_160_boundary_test.go (开方调用点=4)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/provenance_syncdirs_other_test.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/provenance_test.go (开方调用点=17)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/syncdirs_redteam_windows_test.go (开方调用点=3)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/syncdirs_test.go (开方调用点=2)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/syncdirs_windows_test.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+#   UNPAIRED internal/risk/taintmatch_test.go (开方调用点=3)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+# 合方只由泛用 Close() 命中的开方文件（这一味＝人来判那只 Close() 是不是这族句柄）：
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/resident_voice_markseam_394_windows_test.go
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/resident_voice_ttsinherit_382wr2_windows_test.go
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/resident_voice_windows.go
+#   CLOSE-BY-GENERIC-CLOSE cmd/wisp/run.go
+#   CLOSE-BY-GENERIC-CLOSE internal/agent/instructions_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/plugin/disposal_risk_403_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/projctx/projctx_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/markseam_394_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/pointer_185_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/provenance.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/provenance_160_boundary_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/provenance_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/shape_a_exemption_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/taintmatch_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/risk/tts_gate_test.go
+#   CLOSE-BY-GENERIC-CLOSE internal/tools/bridge.go
+# 未成对枚数＝14   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝14   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=14   （本枚子句的响＝未成对枚数；0＝不响）
+
+## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）
+$ git grep -cE 'ToolRequest\{' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal cmd 里 *_test.go 的枚数
+106
+
+## 附：今日 production .Execute( 全名册（不过滤）＝G1b 的排除项本体
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/loop.go:880:		return l.opt.Tools.Execute(ctx, req)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/agent/loop.go:884:	out, err := l.opt.Tools.Execute(tctx, req)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/manifestslot/tier2.go:46:		out, err := ex.Execute(ctx, plugin.Tier2ToolRequest{
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/tier2_gate.go:210:	return rt.Execute(ctx, call)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/plugin/tier2_loader.go:195:	out, err := e.gate.Execute(ctx, GojaCall{
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:639:	res, err := entry.Tool.Execute(ectx, req.Args, onUpdate)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:629:	return p.inner.Execute(ctx, req)
+
+## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了环路却没在同一文件关掉那一枚 id
+# 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。
+# 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体
+#   在那儿（:855 与 :923；09-27 登记时是 :633／:684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。
+# 票 178 四堆口径（piles 味）：判据只吃【只开】那一堆。09-27 登记的那 `ring 1` 是一发【只关】
+#   （run.go 关 bridge.mark／组合根开的那一枚——票 178 判语：关的是别处开的不算缺陷）；票 315
+#   （bfc74ae9）把 admitTask 补成开合成对之后，这条射程两堆都空，诚实登记是 quiet＋0。
+#   `改完之后 AC#2 那一发仍会红`：在生产码里真造一枚【只开】（合成树 8ca0a52e＝锚树 1675e844
+#   ＋internal/tools/subagent_197.go 的变异 blob f534915a）⇒ ② 堆 1 枚 > 基线 0 ⇒ BAD。
+#   读数＝.scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt——同一发在改前尺上实测 1 枚
+#   恰好等于那时登记的基线 1 ⇒ 沉默；改完才点得出来（票 178 AC#2 那句「未修上响不出来」的正文）。
+
+## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；四堆只吃『只开』）
+$ git grep -nEw 'OpenTask|CloseTask' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:848:	//     the CloseTask boundary (ticket 163 AC#3; the teeth test kills the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1384:		// ONLY collector - CloseTask fires this at the same task-end boundary
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1389:		// boundary is CloseTask, and nothing here adds a parallel one.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1680:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1682:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1721:	rt.bridge.OpenTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1727:		rt.bridge.CloseTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:54://     (Bridge.CloseTask -> Options.TaskCleanup, one janitor verb, no second
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:34://     task-end boundary (Bridge.CloseTask -> Options.TaskCleanup) is the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:380:	// bridge.go's CloseTask comment, and inventing one is not this ticket's call.
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:848:	//     the CloseTask boundary (ticket 163 AC#3; the teeth test kills the
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1384:		// ONLY collector - CloseTask fires this at the same task-end boundary
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1389:		// boundary is CloseTask, and nothing here adds a parallel one.
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1680:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1682:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:54://     (Bridge.CloseTask -> Options.TaskCleanup, one janitor verb, no second
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:34://     task-end boundary (Bridge.CloseTask -> Options.TaskCleanup) is the
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:380:	// bridge.go's CloseTask comment, and inventing one is not this ticket's call.
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）：
+#   ① 开且关＝1 枚文件（同文件两枚都调过；不是缺陷）
+#      BALANCED cmd/wisp/run.go
+#   ② 只开＝0 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   ③ 只关＝0 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）
+#   ④ 注释里提到＝8 行（分子已剔；逐行在『COMMENT-ONLY』格里）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G6 正控（同一把尺打在已知「开了又关」的样本上，两向都必须不响）
+# 样本＝internal/tools/bridge.go 自己：:657 的 b.OpenTask 与 :923 的 CloseTask 在同一枚文件里。
+# 这条射程是真吃得住的（本程现量 git grep rc=0、剔注释后 3 行调用点），不是「射程里根本没这东西」
+#   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。
+
+## G6-正控 同尺只放已知「开又合」的那一枚 internal/tools/bridge.go ⇒ 两向都必须 0 枚
+$ git grep -nEw 'OpenTask|CloseTask' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/tools/bridge.go :!*_test.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:124:	// TaskCleanup is the task-end janitor seam (ticket 163 AC#3): CloseTask
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:132:	// CloseTask, and anything a task owns must be collected through it, not
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:183:	// taskCleanup is ticket 163 AC#3's janitor, invoked from CloseTask (the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:769:	b.OpenTask(dec.TaskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:954:// OpenTask opens the C25 taint scope for one task - ticket 19's
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:964:// calls, and a caller that opens a scope and never reaches CloseTask still
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:967:func (b *Bridge) OpenTask(taskID string) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:979:// CloseTask closes one task's taint scope. The composition root defers this on
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1035:func (b *Bridge) CloseTask(taskID string) {
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:124:	// TaskCleanup is the task-end janitor seam (ticket 163 AC#3): CloseTask
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:132:	// CloseTask, and anything a task owns must be collected through it, not
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:183:	// taskCleanup is ticket 163 AC#3's janitor, invoked from CloseTask (the
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:954:// OpenTask opens the C25 taint scope for one task - ticket 19's
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:964:// calls, and a caller that opens a scope and never reaches CloseTask still
+#   COMMENT-ONLY b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:979:// CloseTask closes one task's taint scope. The composition root defers this on
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G6 负一负（同尺摘掉「排测试＋排定义」两条；票 178 起四堆只吃『只开』）
+# 票 178 立案的形状就住在这条腿里：175-r2 的判据件（internal/tools/ticket175r2_stamp_live_test.go，
+#   5 处 CloseTask）与 pointer_183 的接缝件（2 处）只调合方——它们关的是 bridge.mark／组合根开的
+#   scope，合法。四堆口径下这两枚落【③ 只关】堆、逐枚点名但不顶红（改前它们把基线 1 顶到 2）。
+#   今天【② 只开】全树 0 枚 ⇒ 诚实登记是 quiet＋0；「真造一枚只开仍会红」那一发＝
+#   .scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt（合成树 8ca0a52e 上 ② 堆 1 枚 ⇒ BAD）。
+
+## G6-负一负 同尺不过滤任何文件（四堆只吃『只开』；『只关』逐枚点名不顶红）
+$ git grep -nEw 'OpenTask|CloseTask' b06f7fa0fab6ef9c943e66408a90867859f536a5 -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:848:	//     the CloseTask boundary (ticket 163 AC#3; the teeth test kills the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1384:		// ONLY collector - CloseTask fires this at the same task-end boundary
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1389:		// boundary is CloseTask, and nothing here adds a parallel one.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1680:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1682:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1721:	rt.bridge.OpenTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/run.go:1727:		rt.bridge.CloseTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/task_scope_close_151_test.go:7://	   一整轮真 `wisp run`，要求任务结束时那发 CloseTask 的审计行带着**本轮
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/task_scope_close_151_test.go:16:// 承重读数（变异＝只把 admitTask 里那一发 CloseTask 摘掉，其余一字不动）：
+b06f7fa0fab6ef9c943e66408a90867859f536a5:cmd/wisp/zz315a1probe_test.go:40://      task's own C25 scope at its start, pairing the CloseTask ticket 151 put
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:124:	// TaskCleanup is the task-end janitor seam (ticket 163 AC#3): CloseTask
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:132:	// CloseTask, and anything a task owns must be collected through it, not
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:183:	// taskCleanup is ticket 163 AC#3's janitor, invoked from CloseTask (the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:769:	b.OpenTask(dec.TaskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:954:// OpenTask opens the C25 taint scope for one task - ticket 19's
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:964:// calls, and a caller that opens a scope and never reaches CloseTask still
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:967:func (b *Bridge) OpenTask(taskID string) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:979:// CloseTask closes one task's taint scope. The composition root defers this on
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge.go:1035:func (b *Bridge) CloseTask(taskID string) {
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:6:// b.OpenTask(dec.TaskID)，本包 115/79/0/0 零枚红；同一发变异换到 cmd/wisp 才红
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:12://     读数的那枚变异（摘掉 OpenTask）唯一直接改变的包内状态。
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:13://  2. 收尾那一条 CloseTask 审计行必须报 was_open=true / dropped=1 —— 判据 1 的**后果**，
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:116:			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:121:	b.CloseTask(taintedTask)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/bridge_scope_open_ticket158_test.go:133:			"（was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、"+
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_183_cli_seam_test.go:218:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_183_cli_seam_test.go:285:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:42://     b.OpenTask the composition root would have done at task start.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:217:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:243:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:282:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:323:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:346:	b.OpenTask(borrowerTask)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:364:	b.CloseTask(ownerTask)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:365:	b.CloseTask(borrowerTask)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_cli_seam_test.go:404:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_reread_chain_test.go:90:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/pointer_185_reread_chain_test.go:127:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell.go:54://     (Bridge.CloseTask -> Options.TaskCleanup, one janitor verb, no second
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session.go:34://     task-end boundary (Bridge.CloseTask -> Options.TaskCleanup) is the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:151:// the collector. Positive arm: CloseTask kills the session's tree. Scope
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:153:// (the mutation): WITHOUT the janitor wiring the session survives CloseTask,
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:169:	b.CloseTask("t163-ac3")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:183:	b.CloseTask("t163-ac3-a")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:191:	b.CloseTask("t163-ac3-b")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:198:// test above its teeth: with the janitor unwired, CloseTask leaves the
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/shell_session_teeth_test.go:210:	b.CloseTask("t163-mut")
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_197.go:380:	// bridge.go's CloseTask comment, and inventing one is not this ticket's call.
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_222_test.go:332:					h.bridge.OpenTask(taskID)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/subagent_222_test.go:333:					return func() { h.bridge.CloseTask(taskID) }
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/ticket175r2_stamp_live_test.go:176:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/ticket175r2_stamp_live_test.go:199:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/ticket175r2_stamp_live_test.go:271:	clean.CloseTask(aloneTask)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/ticket175r2_stamp_live_test.go:272:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/ticket175r2_stamp_live_test.go:324:	b.CloseTask(task)
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_bridge_test.go:171:	// OpenTask is the composition root's duty at task admission (ticket 12);
+b06f7fa0fab6ef9c943e66408a90867859f536a5:internal/tools/web_bridge_test.go:176:	b.OpenTask("task-22-clean")

@@ -1,0 +1,81 @@
+# AC#1 four questions -- code positions and the criteria that pin them
+# file: internal/panel/preview_192.go (production) / internal/panel/preview_192_test.go (criteria)
+
+## Q1 能预览哪几类
+$ grep -n "PreviewKind" internal/panel/preview_192.go
+137:	PreviewKindHTML  PreviewKind = "html"
+138:	PreviewKindImage PreviewKind = "image"
+139:	PreviewKindPDF   PreviewKind = "pdf"
+140:	PreviewKindText  PreviewKind = "text"
+$ grep -n "func classifyPreviewArtifact" internal/panel/preview_192.go
+515:func classifyPreviewArtifact(head []byte) (PreviewKind, string, string) {
+$ grep -n "attachmentTypes" internal/panel/preview_192.go
+516:	for _, t := range attachmentTypes {
+# criterion: TestPreview192FourClassesAndTheRestRefused / TestPreview192ClassComesFromBytesNotFromTheName
+
+## Q2 渲染本地路径还是内容字节
+$ grep -n "r.guard(name)" internal/panel/preview_192.go
+466:	if err := r.guard(name); err != nil {
+$ grep -n "filepath.Join" internal/panel/preview_192.go
+345:	full := filepath.Join(r.dir.ArtifactsDir(), name)
+699:	full := filepath.Join(r.dir.ArtifactsDir(), artifact)
+$ grep -n "ArtifactsDir" internal/panel/preview_192.go
+171:	ArtifactsDir() string
+270:	if strings.TrimSpace(dir.ArtifactsDir()) == "" {
+345:	full := filepath.Join(r.dir.ArtifactsDir(), name)
+699:	full := filepath.Join(r.dir.ArtifactsDir(), artifact)
+# criterion: TestPreview192RefusesPathShapedNamesBeforeItOpensAnything / TestPreview192TheResponseNeverCarriesTheArtifactsPath
+
+## Q3 大文件截断语义
+$ grep -n "previewHeadBytes\|previewTailBytes\|PreviewMaxTextWindow\|preview.*Cap " internal/panel/preview_192.go
+113:	previewHeadBytes = 4096
+114:	previewTailBytes = 1024
+117:	PreviewMaxTextWindow = 64 << 10
+$ grep -n "func (r \*PreviewResolver) text" internal/panel/preview_192.go
+568:func (r *PreviewResolver) textFirstView(f *os.File, name string, size int64, doc PreviewDocument) PreviewDocument {
+631:func (r *PreviewResolver) textWindow(f *os.File, name string, size int64, window previewWindow, doc PreviewDocument) PreviewDocument {
+# criterion: TestPreview192TextFirstViewSaysWhatItHidAndWhereTheRestIs / TestPreview192ThePointerWalksEveryByteOfTheFile / TestPreview192BinaryOverTheCapIsRefusedNotTruncated / TestPreview192SmallTextComesBackWholeWithNoEnvelope
+
+## Q4 截断时界面看到什么
+$ grep -n "previewNotice" internal/panel/preview_192.go
+101:	previewNoticeTotal  = "[wisp 产物预览]"
+102:	previewNoticeResume = "[wisp 续读]"
+103:	previewNoticeBody   = "[wisp 正文]"
+104:	previewNoticeElided = "[wisp 省略]"
+$ grep -n "Fprintf(&b" internal/panel/preview_192.go
+607:	fmt.Fprintf(&b, "%s %s · 共 %d 字节 · 显示开头 %d 与结尾 %d 字节，中间 %d 字节未显示\n",
+609:	fmt.Fprintf(&b, "%s %s · 每窗最多 %d 字节，一直取到结尾；这段指针能把全文一字节不差地取回\n",
+611:	fmt.Fprintf(&b, "%s 开头 %d 字节\n", previewNoticeBody, len(head))
+618:	fmt.Fprintf(&b, "%s 中间 %d 字节未显示，用上面的续读地址取\n", previewNoticeElided, elided)
+619:	fmt.Fprintf(&b, "%s 结尾 %d 字节\n", previewNoticeBody, len(tail))
+# criterion: TestPreview192TextFirstViewSaysWhatItHidAndWhereTheRestIs (it PARSES the display and checks the numbers add up)
+
+## the criteria, run
+   === RUN   TestPreview192FourClassesAndTheRestRefused
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-html.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-image.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-pdf.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-text.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-xml.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-video.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-binary.bin
+   === RUN   TestPreview192FourClassesAndTheRestRefused/artifact-utf16.bin
+   --- PASS: TestPreview192FourClassesAndTheRestRefused (0.64s)
+   === RUN   TestPreview192ClassComesFromBytesNotFromTheName
+   --- PASS: TestPreview192ClassComesFromBytesNotFromTheName (0.41s)
+   === RUN   TestPreview192RefusesPathShapedNamesBeforeItOpensAnything
+   --- PASS: TestPreview192RefusesPathShapedNamesBeforeItOpensAnything (0.43s)
+   === RUN   TestPreview192TheResponseNeverCarriesTheArtifactsPath
+   --- PASS: TestPreview192TheResponseNeverCarriesTheArtifactsPath (0.30s)
+   === RUN   TestPreview192TextFirstViewSaysWhatItHidAndWhereTheRestIs
+   --- PASS: TestPreview192TextFirstViewSaysWhatItHidAndWhereTheRestIs (0.47s)
+   === RUN   TestPreview192ThePointerWalksEveryByteOfTheFile
+   --- PASS: TestPreview192ThePointerWalksEveryByteOfTheFile (0.31s)
+   === RUN   TestPreview192SmallTextComesBackWholeWithNoEnvelope
+   --- PASS: TestPreview192SmallTextComesBackWholeWithNoEnvelope (0.27s)
+   === RUN   TestPreview192BinaryOverTheCapIsRefusedNotTruncated
+   --- PASS: TestPreview192BinaryOverTheCapIsRefusedNotTruncated (0.24s)
+   PASS
+   ok  	github.com/CarlosShao/wisp/internal/panel	3.400s
+
+## AC#2 criteria, run (the injection face)

@@ -1,0 +1,12 @@
+time=2026-11-14T18:24:32.023+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+artifact bytes=300080 kind=text status=200 complete=false next=4096
+body bytes=5551
+line 1 (notice): [wisp 产物预览] big-log.txt · 共 300080 字节 · 显示开头 4096 与结尾 1023 字节，中间 294961 字节未显示
+line 2 (pointer): [wisp 续读] /__artifact/big-log.txt?offset=4096&limit=65536 · 每窗最多 65536 字节，一直取到结尾；这段指针能把全文一字节不差地取回
+line 3 (head marker): [wisp 正文] 开头 4096 字节
+notice: [wisp 省略] 中间 294961 字节未显示，用上面的续读地址取
+notice: [wisp 正文] 结尾 1023 字节
+head bytes shown=4096 first 20="[wisp 产物预览] "
+notice: [wisp 正文] 结尾 1023 字节
+walk windows=5 recovered=300080/300080 bytes equal=true sha256=f9c1eeace35b3cf0
+artifact sha256=f9c1eeace35b3cf0

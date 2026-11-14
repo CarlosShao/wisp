@@ -1,0 +1,6 @@
+time=2026-11-14T18:10:51.529+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestPreview192QuoteDoorRefusesTextThatIsNotInTheArtifact (0.39s)
+    preview_192_test.go:642: the quote door stamped text the artifact does not contain: the page could choose what the C25 index believes
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.531s
+FAIL
