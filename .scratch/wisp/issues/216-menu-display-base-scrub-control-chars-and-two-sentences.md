@@ -109,3 +109,5 @@
   ⑥ **panel 层复核**：重打编排者那发突变（`ClassCancelled` 句→`ClassConfig` 句）⇒ 两尺同红、5 条具名（`error_copy_216_test.go:80/85/134/137/140`），还原 SHA256 `90E6436F…3ADF` 同串、复绿 `ok 0.083s`；`-run 216` 4 枚全绿。
   ⑦ **门禁**：`go build ./internal/... ./cmd/... ./tools/...` rc=0；`go vet ./internal/llm ./cmd/wisp` rc=0；`go test ./internal/llm/...` **6 包全 ok**（122.99/10.87/34.17/0.38/58.29/52.17 s）；`./internal/panel` `ok 29.912s`；定向 `./cmd/wisp` 改前 30 vs 改后 31、**PASS→FAIL 0**（两枚 FAIL→PASS＝基线导出树缺未跟踪 `third_party/spike-models`，基线日志逐字 `cannot find ... silero_vad.onnx`；环境红 `WISP_SPIKE_MODELS is not set`／onnxruntime 影子改前改后同色）；**整包 `./cmd/wisp` 没跑**（本机在册 hang＋历史超时，不冒充）；`d22scan` clean rc=0；`check-path-length-budget.sh` GREEN rc=0；`gofmt -l` 空；**gofumpt 本机未安装**（如实记，未拿 gofmt 冒充）。
   ⑧ 证据件 `docs/evidence/s1/216-ac5-branch-by-code.md`（含 §8 可复跑清单）。框不翻理由：3 处不合格里 1 处未改且修法越契约线。
+
+**行号更正（2026-11-14 18:5x，审计腿 `fc580501b` 查出）**：本票引的 `:1212`／`:1240` 是**改前**行号；改后真身在 **`:1214`／`:1248`**。读数与结论不变，仅行号更正。
