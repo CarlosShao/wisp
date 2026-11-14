@@ -1,0 +1,5 @@
+readings: sentence-hits=1 text-compares=1 errnoPresent-defs=1 errnoPresent-calls=1 code-judgements=1
+  call site line 301: if r == 0 && errnoPresent(e) {
+RED: sentence still decided on at line(s): 441
+RED: error TEXT compared to a literal at line(s): 441
+RED: expected exactly 2 call sites of errnoPresent(e), found 1 at line(s) 301

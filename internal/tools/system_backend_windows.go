@@ -4,8 +4,10 @@ package tools
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
+	"syscall"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -256,6 +258,19 @@ func moveMemory(dst, src, n uintptr) error {
 	return nil
 }
 
+// errnoPresent reports whether e carries a real Windows error code.
+//
+// The "no error" case is syscall.Errno(0): what Proc.Call returns after a call
+// that succeeded, as a NON-NIL error interface, which is why a nil test alone
+// proves nothing. It is decided BY CODE, never by comparing e.Error() to a
+// sentence (ticket 446). Two reasons, both about the text not being a contract:
+// Errno.Error() is prose out of a message table, so the same errno can read
+// differently across builds and locales; and a wrapped error ("ctx: <prose>")
+// never equals that prose at all, while errors.Is unwraps down to the code.
+func errnoPresent(e error) bool {
+	return e != nil && !errors.Is(e, syscall.Errno(0))
+}
+
 func realEnumWindows(cb func(hwnd uintptr) bool) error {
 	if procEnumWindows.Find() != nil {
 		return fmt.Errorf("EnumWindows 不可用")
@@ -283,7 +298,7 @@ func realEnumWindows(cb func(hwnd uintptr) bool) error {
 	if innerErr != nil {
 		return innerErr
 	}
-	if r == 0 && e != nil && e.Error() != "The operation completed successfully." {
+	if r == 0 && errnoPresent(e) {
 		return e
 	}
 	return nil
@@ -423,7 +438,7 @@ func sendInputs(ins []inputUnion) error {
 	}
 	n, _, e := procSendInput.Call(uintptr(len(ins)), uintptr(unsafe.Pointer(&ins[0])), unsafe.Sizeof(ins[0]))
 	if int(n) != len(ins) {
-		if e != nil && e.Error() != "The operation completed successfully." {
+		if errnoPresent(e) {
 			return fmt.Errorf("SendInput 只送达 %d/%d 个事件（UIPI 拒绝或输入桌面不可用）: %w", int(n), len(ins), e)
 		}
 		return fmt.Errorf("SendInput 只送达 %d/%d 个事件（UIPI 拒绝或输入桌面不可用）", int(n), len(ins))

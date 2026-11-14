@@ -1,0 +1,15 @@
+time=2026-11-14T18:20:57.836+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe446ErrnoPresenceIsDecidedByCode
+    zz_446_errno_probe_test.go:60: probe446 case nil                              errnoPresent=false want=false err="<nil>"
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-raw                   errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-via-windows-alias     errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-wrapped               errnoPresent=false want=false err="SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-wrapped-twice         errnoPresent=false want=false err="outer: SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:60: probe446 case errno-5-access-denied            errnoPresent=true  want=true  err="Access is denied."
+    zz_446_errno_probe_test.go:60: probe446 case errno-87-bad-parameter           errnoPresent=true  want=true  err="The parameter is incorrect."
+    zz_446_errno_probe_test.go:60: probe446 case errno-87-wrapped                 errnoPresent=true  want=true  err="ctx: The parameter is incorrect."
+    zz_446_errno_probe_test.go:60: probe446 case lookalike-text-is-not-errno-zero errnoPresent=true  want=true  err="The operation completed successfully."
+    zz_446_errno_probe_test.go:67: probe446 GREEN: 9 cases, 4 of them on the errno=0 path
+--- PASS: TestProbe446ErrnoPresenceIsDecidedByCode (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.077s

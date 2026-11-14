@@ -1,0 +1,4 @@
+readings: sentence-hits=0 text-compares=0 errnoPresent-defs=1 errnoPresent-calls=2 code-judgements=1
+  call site line 301: if r == 0 && errnoPresent(e) {
+  call site line 441: if errnoPresent(e) {
+GREEN: no sentence decides anything in this file; both call sites use the code judgement.

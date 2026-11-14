@@ -29,3 +29,15 @@
 
 ## 撤销口令
 「票 446 撤」＝删本票＋回退其写腿 commit（新 commit 反改，不 reset/amend）。
+
+## Progress log（只追加）
+
+### 2026-11-14 18:3x +08 — 写腿（agent-30），基线 `447929bfe`
+
+- **AC#1 全量 132 处**（`git grep -n 'operation completed successfully' HEAD`）：`*.go` **2** 处（`internal/tools/system_backend_windows.go:286` / `:426`，**两处都是判存在性**）、`*_test.go` **0** 处、非产码 **130** 处（probe/CI 日志 121、已落档证据 5、票面 4，全是打印/散文）。同形族 `Err(or)?().*(==|!=)\s*"` 全仓 `*.go` 只有这 2 处 ⇒ **M=2，改了 2，无漏改**。
+- **AC#2**：判定收成一个函数 `errnoPresent(e error) bool { return e != nil && !errors.Is(e, syscall.Errno(0)) }`，两处调用点（`:301` / `:441`）都改走它；新增 import `errors`、`syscall`。句子在 `internal/tools/*.go` 里 **0 命中**。
+- **AC#3 能变红，两向**：探针 `probes/446/r1/probe446_errno_presence_windows_test.go`（`go test -overlay`，不在 `internal/tools/` 留测试件），10 格其中 5 格在 errno=0 路上。A 修复后 PASS；B 判定改回句子比较 ⇒ **FAIL 并点名** `errno-zero-localized-text`（`操作成功完成。`）；C 还原 ⇒ **sha256 同串** `8CAD96…38845` 且 PASS。调用点回退方向由 `gate-446-static.ps1` 抓：修复后 GREEN（0 句子命中 / 2 调用点），`:441` 回退 ⇒ **RED 三行点名 line 441**。
+- **AC#4 门禁**：`go build`/`go vet ./internal/tools` rc=0；`d22scan` clean rc=0；path-length **GREEN** rc=0（20122 tracked / 69 over-budget / 69 rostered / 0 not in roster）；`gofumpt` **本机没装、离线装不上 ⇒ 这一格留空**，`gofmt -l internal/tools` 空输出只作旁证、不冒充。测试：`go test ./internal/tools -count=1` rc=0。
+- **AC#5 CI**：**留白**（本腿无 CI 权限，不声称绿）。
+- **前提核查（票面那半句要改口径）**：`Errno.Error()` 的英文来自 `syscall_windows.go:169` **显式索要 en-US**，失败才在 `:171` 退回系统默认语言；本机界面语言 0x0409 ⇒ 旧比较**在本机碰巧成立**，bug 在一台拿不到 en-US 表的机器上才现形。本地化文本已量出：`FormatMessage(errno=0, zh-CN 0x0804) = "操作成功完成。"`。**真机复现那一支本腿做不到**（需要没有 en-US 表的机器），已在证据里单列。
+- **证据**：`docs/evidence/s1/446-errno-presence.md`；器具与日志 `.scratch/wisp/probes/446/r1/`（`32-ac3-sequence.log`、`04-locale-reading.log`、`50-d22scan.log`、`51-path-length.log`）。

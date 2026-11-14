@@ -1,0 +1,11 @@
+time=2026-11-14T18:19:57.381+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe446ErrnoPresenceIsDecidedByCode
+    zz_446_errno_probe_test.go:60: probe446 case nil                              errnoPresent=false want=false err="<nil>"
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-raw                   errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-via-windows-alias     errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:60: probe446 case errno-zero-wrapped               errnoPresent=true  want=false err="SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:63: PROBE 446 RED at case "errno-zero-wrapped": errnoPresent("SendInput wrapper: The operation completed successfully.") = true, want false -- the decision is reading the message text again instead of the code
+--- FAIL: TestProbe446ErrnoPresenceIsDecidedByCode (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.164s
+FAIL

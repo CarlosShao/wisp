@@ -1,0 +1,7 @@
+GetUserDefaultUILanguage   = 0x0409
+GetSystemDefaultLangID     = 0x0804
+FormatMessage(errno=0, en-US 0x0409)      = "The operation completed successfully."
+FormatMessage(errno=0, zh-CN 0x0804)      = "操作成功完成。"
+FormatMessage(errno=0, langid 0 = default)= "The operation completed successfully."
+syscall.Errno(0).Error()                  = "The operation completed successfully."
+syscall.Errno(5).Error()                  = "Access is denied."

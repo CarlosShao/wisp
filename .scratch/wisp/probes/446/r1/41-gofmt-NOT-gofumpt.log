@@ -1,0 +1,4 @@
+# NOT gofumpt: gofumpt is not installed here (Get-Command gofumpt empty; GOPATH\bin empty; GOMODCACHE\mvdan.cc absent).
+# This reading is plain gofmt only and must NOT be counted as the AC#4 gofumpt cell.
+gofmt-output-lines=0
+gofmt rc=0

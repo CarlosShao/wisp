@@ -1,0 +1,3 @@
+# go vet ./internal/tools  (captured 2026-11-14T18:27:55.0291821+08:00)
+vet rc=0
+build rc=0

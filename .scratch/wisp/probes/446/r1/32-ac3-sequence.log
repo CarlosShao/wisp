@@ -1,0 +1,46 @@
+== A. fixed tree: sha256=8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845 ==
+time=2026-11-14T18:24:44.100+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe446ErrnoPresenceIsDecidedByCode
+    zz_446_errno_probe_test.go:73: probe446 case nil                              errnoPresent=false want=false err="<nil>"
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-raw                   errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-via-windows-alias     errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-localized-text        errnoPresent=false want=false err="操作成功完成。"
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-wrapped               errnoPresent=false want=false err="SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-wrapped-twice         errnoPresent=false want=false err="outer: SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-5-access-denied            errnoPresent=true  want=true  err="Access is denied."
+    zz_446_errno_probe_test.go:73: probe446 case errno-87-bad-parameter           errnoPresent=true  want=true  err="The parameter is incorrect."
+    zz_446_errno_probe_test.go:73: probe446 case errno-87-wrapped                 errnoPresent=true  want=true  err="ctx: The parameter is incorrect."
+    zz_446_errno_probe_test.go:73: probe446 case lookalike-text-is-not-errno-zero errnoPresent=true  want=true  err="The operation completed successfully."
+    zz_446_errno_probe_test.go:80: probe446 GREEN: 10 cases, 5 of them on the errno=0 path
+--- PASS: TestProbe446ErrnoPresenceIsDecidedByCode (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.164s
+== B. judgement reverted to the sentence compare: sha256=AE4F3236022B2980907943500CB048EC8BEDEF9E7096200A74B517FFAB74E178 ==
+time=2026-11-14T18:24:55.793+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe446ErrnoPresenceIsDecidedByCode
+    zz_446_errno_probe_test.go:73: probe446 case nil                              errnoPresent=false want=false err="<nil>"
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-raw                   errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-via-windows-alias     errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-localized-text        errnoPresent=true  want=false err="操作成功完成。"
+    zz_446_errno_probe_test.go:76: PROBE 446 RED at case "errno-zero-localized-text": errnoPresent("操作成功完成。") = true, want false -- the decision is reading the message text again instead of the code
+--- FAIL: TestProbe446ErrnoPresenceIsDecidedByCode (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.324s
+FAIL
+== C. restored: sha256=8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845 identical-to-A=True ==
+time=2026-11-14T18:25:02.868+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe446ErrnoPresenceIsDecidedByCode
+    zz_446_errno_probe_test.go:73: probe446 case nil                              errnoPresent=false want=false err="<nil>"
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-raw                   errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-via-windows-alias     errnoPresent=false want=false err="The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-localized-text        errnoPresent=false want=false err="操作成功完成。"
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-wrapped               errnoPresent=false want=false err="SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-zero-wrapped-twice         errnoPresent=false want=false err="outer: SendInput wrapper: The operation completed successfully."
+    zz_446_errno_probe_test.go:73: probe446 case errno-5-access-denied            errnoPresent=true  want=true  err="Access is denied."
+    zz_446_errno_probe_test.go:73: probe446 case errno-87-bad-parameter           errnoPresent=true  want=true  err="The parameter is incorrect."
+    zz_446_errno_probe_test.go:73: probe446 case errno-87-wrapped                 errnoPresent=true  want=true  err="ctx: The parameter is incorrect."
+    zz_446_errno_probe_test.go:73: probe446 case lookalike-text-is-not-errno-zero errnoPresent=true  want=true  err="The operation completed successfully."
+    zz_446_errno_probe_test.go:80: probe446 GREEN: 10 cases, 5 of them on the errno=0 path
+--- PASS: TestProbe446ErrnoPresenceIsDecidedByCode (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.620s
