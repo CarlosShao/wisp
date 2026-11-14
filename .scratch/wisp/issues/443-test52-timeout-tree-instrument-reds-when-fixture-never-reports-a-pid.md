@@ -34,3 +34,13 @@ FAIL	github.com/CarlosShao/wisp/internal/plugin/manifestslot	13.385s
 
 ## 撤销口令
 「票 443 撤」＝删本票＋回退其写腿 commit（新 commit 反改，不 reset/amend）。
+
+---
+
+## Progress log
+
+- **2026-11-14 15:4x 编排者**：本票立。依据＝CI run `43567331249`(head `e1cc304e0`) 与 `43568581591`(head `1f0d04714`) 均红，`a46352fd3` 绿 ⇒ **3 发红 2**；红句 `command_52_test.go:748: the fixture never reported a grandchild pid`。
+- **2026-11-14 15:5x 编排者**：机主要重启 DSH，**写腿被中途叫停**（不是我判它错）。⇒ 工作树里留下 **2 枚未提交的测试件改动**：
+  `internal/plugin/manifestslot/command_52_main_test.go`、`internal/plugin/manifestslot/command_52_test.go`
+  **接手腿须知**：这两枚是**被中断的半成品**，**既不可采信也不可当成已修**。开工第一件事＝读一遍 `git diff -- internal/plugin/manifestslot/` 判断：能用就接着做并说明，不能用就**显式 `git checkout --` 还原后在 Progress log 记一行**（⛔ 不许默默覆盖，⛔ 也不许默认它们是对的）。
+  **产码 0 字节**（`internal/plugin/manifestslot` 的非测试文件零改动），`cmd/wisp` 干净（0 行）。
