@@ -1,0 +1,28 @@
+diff --git a/internal/audio/level.go b/internal/audio/level.go
+index ed10664ec..be974e542 100644
+--- a/internal/audio/level.go
++++ b/internal/audio/level.go
+@@ -97,12 +97,19 @@ func LevelOfSamples(samples []int16) float64 {
+ 	if len(samples) == 0 {
+ 		return MinLevel
+ 	}
+-	var sumSquares int64
++	// PROBE MUTATION (ticket 291 AC#3, export tree only): remove this window's
++	// own DC (its mean) before taking the RMS. Two passes, float64, no state.
++	var sum int64
+ 	for _, s := range samples {
+-		v := int64(s)
+-		sumSquares += v * v
++		sum += int64(s)
+ 	}
+-	rms := math.Sqrt(float64(sumSquares) / float64(len(samples)))
++	mean := float64(sum) / float64(len(samples))
++	var sumSquares float64
++	for _, s := range samples {
++		d := float64(s) - mean
++		sumSquares += d * d
++	}
++	rms := math.Sqrt(sumSquares / float64(len(samples)))
+ 	return rms / LevelFullScale
+ }
+ 

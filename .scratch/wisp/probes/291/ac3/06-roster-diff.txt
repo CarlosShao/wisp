@@ -1,0 +1,27 @@
+roster size: baseline=66 after-change=69 after-fix=69
+
+== red in baseline ==
+
+== red after the level.go-only change ==
+FAIL TestAC297KnownAmplitudePairSeparates
+FAIL TestLevelFullScaleSquareEndpoints
+
+== red after change + fixture rebaseline (new teeth included) ==
+
+== red-name set differences (before vs after-change) ==
+
+InputObject                                            SideIndicator
+-----------                                            -------------
+FAIL TestAC297KnownAmplitudePairSeparates              =>
+PASS TestLevelAC291DCFrameReadsZero                    =>
+PASS TestLevelAC291TranslationInvariant                =>
+PASS TestLevelAC291HottestLegalFrameStaysBelowMaxLevel =>
+FAIL TestLevelFullScaleSquareEndpoints                 =>
+PASS TestAC297KnownAmplitudePairSeparates              <=
+PASS TestLevelFullScaleSquareEndpoints                 <=
+
+
+
+== PASS names that changed colour ==
+PASS TestAC297KnownAmplitudePairSeparates
+PASS TestLevelFullScaleSquareEndpoints

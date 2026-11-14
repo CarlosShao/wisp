@@ -1,0 +1,80 @@
+diff --git a/internal/audio/amplitudepair_297_windows_test.go b/internal/audio/amplitudepair_297_windows_test.go
+index dd225774c..71a3b75a3 100644
+--- a/internal/audio/amplitudepair_297_windows_test.go
++++ b/internal/audio/amplitudepair_297_windows_test.go
+@@ -57,11 +57,26 @@ func TestAC297KnownAmplitudePairSeparates(t *testing.T) {
+ 	highCounts := int16(math.Round(ampHigh * 32767))
+ 
+ 	var samples []int16
++	// Ticket 291: the windows ride on a constant DC offset AND carry a square
++	// wave at the known amplitude. Before the scale removed DC, a pure-DC window
++	// was the easy way to make the level exact; after it, a pure-DC window reads
++	// 0 and the fixture would go blind. A DC-offset square keeps the exactness
++	// (RMS of +-A is A) and turns the same fixture into a DC-rejection witness:
++	// if the offset ever leaks back into the level, this test reds.
++	const dcOffset = 12345
+ 	for i := 0; i < frames*FrameSamples; i++ {
+-		samples = append(samples, lowCounts)
++		v := lowCounts
++		if i%2 == 1 {
++			v = -lowCounts
++		}
++		samples = append(samples, v+dcOffset)
+ 	}
+ 	for i := 0; i < frames*FrameSamples; i++ {
+-		samples = append(samples, highCounts)
++		v := highCounts
++		if i%2 == 1 {
++			v = -highCounts
++		}
++		samples = append(samples, v+dcOffset)
+ 	}
+ 
+ 	path := t.TempDir() + "/ac297-pair.wav"
+@@ -110,6 +125,12 @@ func TestAC297KnownAmplitudePairSeparates(t *testing.T) {
+ 
+ 	meanLow := meanF32(got[:frames])
+ 	meanHigh := meanF32(got[frames : frames*2])
++	// Guard the denominator before dividing: 0/0 is NaN, and every comparison
++	// against NaN is false, so a vanished level would make the ratio assertion
++	// below pass silently. (Measured on the pre-fix tree: it did exactly that.)
++	if meanLow <= 0 {
++		t.Fatalf("window A mean = %v: the ruler read silence for a %d-count square, so the ratio has no denominator", meanLow, lowCounts)
++	}
+ 	ratio := float64(meanHigh) / float64(meanLow)
+ 	ampRatio := float64(highCounts) / float64(lowCounts)
+ 
+diff --git a/internal/audio/level_test.go b/internal/audio/level_test.go
+index 5e2c13c81..c7469de06 100644
+--- a/internal/audio/level_test.go
++++ b/internal/audio/level_test.go
+@@ -70,21 +70,23 @@ func TestLevelSilentFrameIsExactZero(t *testing.T) {
+ // and the strongest symmetric square (the named bound FullScaleSquareLevel)
+ // are pinned to the bit, plus the smallest non-zero reading of the scale.
+ func TestLevelFullScaleSquareEndpoints(t *testing.T) {
+-	// The endpoint itself: every sample at the largest magnitude an int16
+-	// carries. LevelFullScale is abs(-32768), so this reads exactly 1.
++	// A frame held at one constant value is pure DC: it carries no level.
++	// (Before ticket 291 this block asserted the OPPOSITE - all -32768 read
++	// exactly 1.0 because the scale counted the offset. The endpoint claim
++	// moved with the definition, it was not relaxed.)
+ 	hot := make([]int16, FrameSamples)
+ 	for i := range hot {
+ 		hot[i] = -32768
+ 	}
+-	if l := LevelOfSamples(hot); l != MaxLevel {
+-		t.Fatalf("all-minus-32768 frame = %v, want exactly %v", l, MaxLevel)
++	if l := LevelOfSamples(hot); l != MinLevel {
++		t.Fatalf("all-minus-32768 frame = %v, want exactly %v (a constant frame is pure DC)", l, MinLevel)
+ 	}
+ 	gotHot, err := FrameLevel(EncodeFrame(hot))
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+-	if float64(gotHot) != MaxLevel {
+-		t.Fatalf("FrameLevel(all-minus-32768) = %v, want exactly %v", gotHot, MaxLevel)
++	if float64(gotHot) != MinLevel {
++		t.Fatalf("FrameLevel(all-minus-32768) = %v, want exactly %v", gotHot, MinLevel)
+ 	}
+ 
+ 	// The named upper bound for a real symmetric square wave: 32767/32768,

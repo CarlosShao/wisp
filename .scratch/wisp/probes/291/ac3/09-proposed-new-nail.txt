@@ -1,0 +1,112 @@
+package audio
+
+// PROBE ONLY (export tree D:\tmp\wisp\20261114\291-ac3-tree, never committed,
+// never landed in the repo). Ticket 291 AC#3: the shape of the new nail the
+// landing leg must add. Three teeth, all on the scale's own terms:
+//
+//  1. a frame held at ONE constant value is pure DC and must read exactly 0,
+//     for any offset (this is the negative of today's "all -32768 reads 1.0");
+//  2. the scale must be TRANSLATION INVARIANT: level(s) == level(s + c), bit
+//     for bit, for any constant c that keeps the samples inside int16. This is
+//     the fact that says "DC is gone" without borrowing the words "lower",
+//     "flatter" or "looks right";
+//  3. the closed top of the scale is still respected: no legal frame reads 1.0,
+//     and the hottest legal frame is the anti-symmetric square, whose level is
+//     named by the derivation below.
+
+import (
+	"math"
+	"testing"
+)
+
+func ac291ConstFrame(v int16) []int16 {
+	s := make([]int16, FrameSamples)
+	for i := range s {
+		s[i] = v
+	}
+	return s
+}
+
+func TestLevelAC291DCFrameReadsZero(t *testing.T) {
+	for _, v := range []int16{0, 1, -1, 12345, 32767, -32768} {
+		s := ac291ConstFrame(v)
+		if l := LevelOfSamples(s); l != MinLevel {
+			t.Fatalf("constant %d frame = %v, want exactly %v: a frame that does not change carries no level", v, l, MinLevel)
+		}
+		got, err := FrameLevel(EncodeFrame(s))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got != float32(MinLevel) {
+			t.Fatalf("FrameLevel(constant %d) = %v, want exactly %v", v, got, MinLevel)
+		}
+		if math.Signbit(float64(got)) {
+			t.Fatalf("constant %d frame level is negative zero (%08x)", v, math.Float32bits(got))
+		}
+	}
+	// The ticket's own fixture value, stated as a reading: the old scale read
+	// 12345/32768 = 0.376740 here.
+	if l := LevelOfSamples(ac291ConstFrame(12345)); l != 0 {
+		t.Fatalf("the DC fixture (12345) reads %v, want exactly 0", l)
+	}
+}
+
+func TestLevelAC291TranslationInvariant(t *testing.T) {
+	base := wholeCycleSine(FrameSamples, 3000, 5)
+	want := LevelOfSamples(base)
+	if want <= 0 {
+		t.Fatalf("the base window is silent (%v), the tooth would be vacuous", want)
+	}
+	for _, c := range []int16{-12345, -3000, -1, 1, 3000, 12345, 20000} {
+		shifted := make([]int16, len(base))
+		for i, v := range base {
+			shifted[i] = v + c
+		}
+		got := LevelOfSamples(shifted)
+		if math.Float64bits(got) != math.Float64bits(want) {
+			t.Fatalf("adding a constant DC of %d moved the level from %v to %v: the scale still counts DC", c, want, got)
+		}
+	}
+	// Same fact through the seam form, float32 and all.
+	frame := EncodeFrame(base)
+	shiftedFrame := EncodeFrame(func() []int16 {
+		out := make([]int16, len(base))
+		for i, v := range base {
+			out[i] = v + 12345
+		}
+		return out
+	}())
+	a, err := FrameLevel(frame)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := FrameLevel(shiftedFrame)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if math.Float32bits(a) != math.Float32bits(b) {
+		t.Fatalf("FrameLevel moved under a constant offset: %v vs %v", a, b)
+	}
+}
+
+func TestLevelAC291HottestLegalFrameStaysBelowMaxLevel(t *testing.T) {
+	// The hottest legal frame is the anti-symmetric square +32767/-32768: its
+	// mean is -0.5, its RMS is sqrt((32767^2+32768^2)/2), so its level is that
+	// over LevelFullScale - strictly below 1.0 because no legal frame has all
+	// samples at the same extreme once DC is removed.
+	hot := make([]int16, FrameSamples)
+	for i := range hot {
+		if i%2 == 0 {
+			hot[i] = 32767
+		} else {
+			hot[i] = -32768
+		}
+	}
+	want := (32767.0 + 32768.0) / 2 / LevelFullScale // = MaxLevel - LevelLSB/2 exactly
+	if got := LevelOfSamples(hot); got != want {
+		t.Fatalf("hottest legal frame = %v, want exactly %v", got, want)
+	}
+	if l := LevelOfSamples(hot); !(l > FullScaleSquareLevel && l < MaxLevel) {
+		t.Fatalf("hottest legal frame %v is not strictly inside (FullScaleSquareLevel=%v, MaxLevel=%v)", l, FullScaleSquareLevel, MaxLevel)
+	}
+}

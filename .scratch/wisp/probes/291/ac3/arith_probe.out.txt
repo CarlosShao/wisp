@@ -1,0 +1,94 @@
+== fixture readings: baseline (no DC removal) vs proposed (per-frame mean removal) ==
+all-zero frame                                 mean=      0.0000  baseline=0.000000000  proposed=0.000000000  delta=+0.000e+00
+constant -32768 frame                          mean= -32768.0000  baseline=1.000000000  proposed=0.000000000  delta=-1.000e+00
+constant +32767 frame                          mean=  32767.0000  baseline=0.999969482  proposed=0.000000000  delta=-1.000e+00
+constant 12345 frame (capturelevel fixture)    mean=  12345.0000  baseline=0.376739502  proposed=0.000000000  delta=-3.767e-01
+square +-32767                                 mean=      0.0000  baseline=0.999969482  proposed=0.999969482  delta=+0.000e+00
+square +-16384 (half scale)                    mean=      0.0000  baseline=0.500000000  proposed=0.500000000  delta=+0.000e+00
+square +-8192 (quarter)                        mean=      0.0000  baseline=0.250000000  proposed=0.250000000  delta=+0.000e+00
+square +-1 (LevelLSB)                          mean=      0.0000  baseline=0.000030518  proposed=0.000030518  delta=+0.000e+00
+hottest legal bipolar square +32767/-32768     mean=     -0.5000  baseline=0.999984741  proposed=0.999984741  delta=-1.164e-10
+whole-cycle sine amp 32767 (8 cycles)          mean=      0.0000  baseline=0.707083649  proposed=0.707083649  delta=+0.000e+00
+whole-cycle sine amp 16384                     mean=      0.0000  baseline=0.353552264  proposed=0.353552264  delta=+0.000e+00
+whole-cycle sine amp 8192                      mean=      0.0000  baseline=0.176778961  proposed=0.176778961  delta=+0.000e+00
+DC 12345 + sine 6000 (ticket 291 shape)        mean=  12345.0000  baseline=0.398367696  proposed=0.129476519  delta=-2.689e-01
+
+== amplitude-pair fixture (internal/audio/amplitudepair_297_windows_test.go) ==
+lowCounts=1638 highCounts=13107 amplitude ratio=8.001832
+window A: baseline=0.049987793 proposed=0.000000000 (want |1638|/FS=0.049987793)
+window B: baseline=0.399993896 proposed=0.000000000
+mean ratio: baseline=8.001832 proposed=NaN (0/0 => true)
+
+== capturelevel fixture (internal/audio/capturelevel_windows_test.go:21-24) ==
+constant 12345: baseline=0.376739502 proposed=0.000000000; the test's want is derived with the same function
+so the fixture stays GREEN but witnesses 0 instead of 0.3767, and its comment 'RMS is exactly this magnitude' becomes false
+
+== convertpacket S2 (float32 bytes sliced as int16, pair-mean) ==
+S2 wrong-byte window: mean=-3998.000 counts  baseline=0.383045  proposed=0.363094 (assertion is > 0.1)
+S1 float-path window: baseline=0.035355974 proposed=0.035355974 (want amp/sqrt2=0.035355339)
+S4 pair-square window: mean=0.000 baseline=0.049987793 proposed=0.049987793 (want 1638/FS=0.049987793)
+
+== sine tolerance after the change (level_test.go TestLevelSineAgainstRootTwo) ==
+amp 32767: ideal=0.707085202 baseline err=-1.553e-06 proposed err=-1.553e-06 (tolerance 5.0e-05) PASS
+amp 16384: ideal=0.353553391 baseline err=-1.127e-06 proposed err=-1.127e-06 (tolerance 5.0e-05) PASS
+amp  8192: ideal=0.176776695 baseline err=+2.265e-06 proposed err=+2.265e-06 (tolerance 5.0e-05) PASS
+
+== 'exactly zero' / bit checks for a constant frame ==
+constant      0: proposed float64 bits=0000000000000000 value=0 ; float32 bits=00000000 value=0
+constant      1: proposed float64 bits=0000000000000000 value=0 ; float32 bits=00000000 value=0
+constant     -1: proposed float64 bits=0000000000000000 value=0 ; float32 bits=00000000 value=0
+constant  12345: proposed float64 bits=0000000000000000 value=0 ; float32 bits=00000000 value=0
+constant  32767: proposed float64 bits=0000000000000000 value=0 ; float32 bits=00000000 value=0
+constant -32768: proposed float64 bits=0000000000000000 value=0 ; float32 bits=00000000 value=0
+
+== translation invariance (the judgeable 'DC is gone' fact) ==
+shift -12345: level=0.064739242355 bits-equal-to-unshifted=true
+shift  -3000: level=0.064739242355 bits-equal-to-unshifted=true
+shift     -1: level=0.064739242355 bits-equal-to-unshifted=true
+shift     +1: level=0.064739242355 bits-equal-to-unshifted=true
+shift  +3000: level=0.064739242355 bits-equal-to-unshifted=true
+shift +12345: level=0.064739242355 bits-equal-to-unshifted=true
+shift +20000: level=0.064739242355 bits-equal-to-unshifted=true
+translation invariant (bit-exact) over all shifts that did not clip: true
+
+== frame-mean removal frequency response (gain in dB, best/worst phase, 512 samples @16kHz) ==
+f=   5.00 Hz  gain min=-28.246 dB  max=-0.006 dB  ripple=28.240 dB
+f=  10.00 Hz  gain min=-15.646 dB  max=-0.005 dB  ripple=15.640 dB
+f=  15.00 Hz  gain min=-7.983 dB  max=-0.001 dB  ripple=7.982 dB
+f=  20.00 Hz  gain min=-3.019 dB  max=-0.000 dB  ripple=3.019 dB
+f=  23.00 Hz  gain min=-1.304 dB  max=-0.000 dB  ripple=1.304 dB
+f=  25.00 Hz  gain min=-0.629 dB  max=-0.000 dB  ripple=0.629 dB
+f=  30.00 Hz  gain min=-0.016 dB  max=-0.000 dB  ripple=0.016 dB
+f=  31.25 Hz  gain min=+0.000 dB  max=+0.000 dB  ripple=0.000 dB
+f=  40.00 Hz  gain min=-0.294 dB  max=-0.000 dB  ripple=0.294 dB
+f=  50.00 Hz  gain min=-0.343 dB  max=-0.000 dB  ripple=0.343 dB
+f=  60.00 Hz  gain min=-0.015 dB  max=-0.000 dB  ripple=0.015 dB
+f=  70.00 Hz  gain min=-0.077 dB  max=-0.000 dB  ripple=0.077 dB
+f=  85.00 Hz  gain min=-0.076 dB  max=-0.000 dB  ripple=0.076 dB
+f= 100.00 Hz  gain min=-0.028 dB  max=-0.000 dB  ripple=0.028 dB
+f= 120.00 Hz  gain min=-0.014 dB  max=-0.000 dB  ripple=0.014 dB
+f= 150.00 Hz  gain min=-0.014 dB  max=-0.000 dB  ripple=0.014 dB
+f= 200.00 Hz  gain min=-0.019 dB  max=-0.000 dB  ripple=0.019 dB
+f= 300.00 Hz  gain min=-0.009 dB  max=-0.000 dB  ripple=0.009 dB
+f= 440.00 Hz  gain min=-0.000 dB  max=-0.000 dB  ripple=0.000 dB
+f= 800.00 Hz  gain min=-0.001 dB  max=-0.000 dB  ripple=0.001 dB
+f=1000.00 Hz  gain min=+0.000 dB  max=+0.000 dB  ripple=0.000 dB
+worst-phase -3 dB corner = 0.50 Hz
+
+== endpoint reachability after the change ==
+max proposed level found = 0.999984741211  (MaxLevel=1.0 attained? false)
+named bipolar-square bound 32767.5/32768 = 0.999984741211
+closed-scale check: 0 <= max <= 1 -> true
+
+== exact-integer variant: int64 overflow boundary ==
+n*sumSq is safe up to n = 92681 samples (5.79 s at 16 kHz); LevelOfSamples accepts any n
+exact variant on DC+sine window: 0.129476519242 ok=true (proposed 0.129476519242)
+
+== cost: ns per 512-sample window ==
+baseline 425.8 ns/window ; proposed 978.2 ns/window ; x2.30 ; at 31.25 windows/s the added cost is 0.017 ms/s of one thread (sink true)
+
+== SilenceLevelGate direction (monotonicity) ==
+largest increase of proposed over baseline across fixtures = +0.000e+00 (must be <= 0)
+
+== 297 live heuristic band (printed, not asserted) ==
+livepacket_297_windows_test.go:244 prints the 0.30..0.45 band as a device-floor signature; after the change a DC floor reads ~0 so that branch can never print -- a note, not a red (WISP_LIVE_MIC-gated).
