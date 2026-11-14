@@ -88,3 +88,15 @@
 - **不成立的部分（我打的突变）**：把 `ClassCancelled` 的句子换成 `ClassConfig` 那句（两格同句＝不再按码分支）⇒ `go test -count=1 ./internal/panel -run 216` 仍 **`ok`、rc=0**。根因＝`observe.Error.Error()` **首句就写类名**，于是：①`:49` 的 `want := errorCopy216[c] + err.Error()` 是**同义反复**（期望值取自同一张产码表）；②互异尺比的是含类名的整句 ⇒ **对表内容不敏感**。腿自述「牙在 table test」**这半句被证伪**。
 - **已派**：`w216-fix-rulers`——拆 `errorHead216` 只返头句；table test 改用**测试文件自己写死的 17 条字面量**当独立判据；互异尺改比头句；并须重打我这发突变拿到真红再还原复绿。
 - [2026-11-14 10:5x +08] 实现腿 **`w216-fix-rulers`**（写·只 `internal/panel/error_copy_216.go`＋`error_copy_216_test.go`）交件：①产码新增 `errorHead216(err)` 只返分类映射头句（未分类返空串），`errorSentence216` 改为 `errorHead216(err) + err.Error()` **行为逐字节不变**，`userFacingErrorSentence216` 未动；②table test 改用**测试文件自己写死的 17 条字面量表 `wantHead216`**（逐类一行、⛔ 不从产码表取），断言 `errorHead216(observe.New(c, sameDetail))` 逐类等于字面量，另保留整句 `want+err.Error()` 对照；③互异尺改对 17 个 `errorHead216` 两两比＋**前缀自检**（任一头句是另一头句的前缀/相同即红）。**正控**＝重打编排者那发突变（`ClassCancelled` 句改 `ClassConfig` 句，可编译）⇒ **两尺都红**：表测红句 `class cancelled: head = "配置这一步出了问题，先看下面这句具体原因：", want literal "这一步被取消了，所以没有继续："`；互异尺红句 `classes config and cancelled produce the same head "配置这一步出了问题，先看下面这句具体原因：" - the branch no longer separates codes`（＋前缀自检两枚红）；逐字节还原（SHA256 `90E6436F4A2D06E9BDE45B1BEE878FE5D976A82B4D05998395CE608AAF3C3ADF`＝改后未突变态、表内容 `git diff` 0 行）⇒ `-run 216` 复绿。**门禁**＝`go test -count=1 ./internal/panel` **ok 23.9s rc=0**（`-v` 四数 PASS=233／FAIL=0／SKIP=0）、`go vet ./internal/panel` **rc=0**、`sh scripts/d22scan.sh` **rc=0 clean**、`gofumpt -l internal/panel` **空列表**。证据件 `docs/evidence/s1/216-ac5-rulers-have-teeth.md`。
+
+## AC#5 复核（编排者＝非实现者，2026-11-14 11:1x）：**两把尺已装牙，AC#5 落地**
+
+依据 `096f247ed` ＋ `docs/evidence/s1/216-ac5-rulers-have-teeth.md` ＋ **我自己重打的突变**。
+
+- **修法**：`errorHead216` 只返头句（未分类返空串）；`errorSentence216 = errorHead216 + err.Error()`，行为逐字节不变。
+- **独立判据**：`wantHead216` 是**测试文件自己写死的 17 条字面量**（`:47`，⛔ 不再从产码表取）。
+- **我那发突变重打（ClassCancelled 句 → ClassConfig 句）现在两尺同时红，5 条具名断言**：
+  `:80` head≠字面量、`:85` 整句≠head+cause、`:134` 两类同头句、`:137`/`:140` 前缀自检。
+  之前同一发突变是 **`ok`**（同义反复）⇒ 现在**有牙**。
+- **还原**：SHA256 同串、`git diff` 0 件、复绿 `ok 0.072s`。零越界（4 件）。
+- 门禁（腿报＋我抽查）：`go test ./internal/panel` PASS=233/FAIL=0/SKIP=0、`go vet` rc=0、`d22scan` clean、`gofumpt -l` 空。
