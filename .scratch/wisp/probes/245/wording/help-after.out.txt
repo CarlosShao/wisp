@@ -1,0 +1,68 @@
+wisp - personal voice agent for Windows
+
+Usage:
+  wisp             GUI resident process: boots the runtime skeleton, hosts the
+                   floating ball window, its tray icon and its three always-on
+                   global hot keys in this same process (summon, mute, panel;
+                   the cancel slot is the fourth key: a bare binding such as the
+                   default Esc is borrowed only while a confirmation card is
+                   waiting and handed back when it leaves, so an idle wisp holds
+                   no bare key against the rest of the desktop, while a binding
+                   carrying a modifier such as Ctrl+Alt+X stays bound all the
+                   time because a combination takes no bare key from any other
+                   program), shows confirmation cards on that ball, and takes
+                   tasks from the operator's console when this process really
+                   owns one (ticket 246 AC#7: no interactive console means the
+                   task entry says so out loud and the ball keeps running;
+                   Ctrl+C stops the process, and so does the tray's Exit item,
+                   which asks the resident loop for the orderly D38(e) shutdown
+                   instead of exiting in place (ticket 228 AC#11))
+  wisp run "task"  run one task end to end through the agent loop (ticket 12:
+                   the S1 text path - streamed reply + notification + exit code
+                   that reflects the error class)
+  wisp sessions    cross-restart conversation list (ticket 166 outlet #1,
+                   wired by 364-r1a): sessions list prints the newest sessions
+                   through the existing session.Manager.List - id, updated_at,
+                   title
+  wisp commands    the command roster (ticket 213 AC#4): prints every command
+                   this machine can really execute, one row each - the name, what
+                   it does, its argument shape, whether a human approval is
+                   involved, and which existing door runs it. The rows come from
+                   internal/command's production roster, so a capability with no
+                   door cannot appear here
+  wisp providers   provider catalog path (ticket 12, ruling A11): discover
+                   <provider> lists /v1/models; probe <provider>/<model> runs
+                   the capability probe suite into provider_health
+  wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
+                   blob without the key ever entering argv, a log line or chat
+  wisp config      config.toml keys from the console (ticket 65): get/set/list
+                   over the keys this CLI owns - today ball.style (glass|
+                   jarvis, the appearance switch 默认玻璃球), written through
+                   the same guarded setter the settings page uses; the receipt
+                   names the tier honestly (a CLI write lands in the file, a
+                   running wisp picks the new style up at next boot)
+  wisp models      signed model store (C29, ticket 121 AC#2): list the verified
+                   manifest, re-check an installed model, or make one available
+                   through the Downloading hand-off and its re-verification
+  wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
+  wisp panel-assets  embedded panel bundle (ticket 77): -manifest lists what the
+                   binary carries, -render <path> writes the bytes the WebView2
+                   host would serve (proof the UI needs no node and no network)
+  wisp panel-inbound  inbound panel dispatch leg (ticket 33 AC#9): reads one raw
+                   composer envelope per stdin line and hands it to the inbound
+                   router; -data names the data root (this leg never resolves one)
+  wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
+                   verdict; driven by scripts/slo-check.ps1
+  wisp diagnostics  diagnostics bundle (ticket 45 engine, wired by the
+                    deferred-disposition 20261110 #5): the total switch is
+                    [privacy] diagnostics_opt_in in config.toml - false refuses
+                    the whole command (fail-closed, no preview, no log read),
+                    true runs preview (what the zip WOULD carry, nothing
+                    written) and export (same preview, then the bundle zip;
+                    -o names the output, -slo-snapshot attaches a sampler JSON).
+                    Transcripts and watchdog snapshots stay default-excluded
+                    with per-item consent recorded in the manifest
+  wisp version     print version information
+  wisp help        show this help
+
+Environment: WISP_ENV in {prod|dev|test}, default from build (SPEC-03 §5).

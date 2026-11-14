@@ -28,10 +28,13 @@ Usage:
   wisp             GUI resident process: boots the runtime skeleton, hosts the
                    floating ball window, its tray icon and its three always-on
                    global hot keys in this same process (summon, mute, panel;
-                   the cancel slot is the fourth key, bound only while a
-                   confirmation card is waiting and handed back when it leaves,
-                   so an idle wisp holds no bare key against the rest of the
-                   desktop), shows confirmation cards on that ball, and takes
+                   the cancel slot is the fourth key: a bare binding such as the
+                   default Esc is borrowed only while a confirmation card is
+                   waiting and handed back when it leaves, so an idle wisp holds
+                   no bare key against the rest of the desktop, while a binding
+                   carrying a modifier such as Ctrl+Alt+X stays bound all the
+                   time because a combination takes no bare key from any other
+                   program), shows confirmation cards on that ball, and takes
                    tasks from the operator's console when this process really
                    owns one (ticket 246 AC#7: no interactive console means the
                    task entry says so out loud and the ball keeps running;
