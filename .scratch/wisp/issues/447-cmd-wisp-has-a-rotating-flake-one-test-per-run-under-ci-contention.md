@@ -60,3 +60,28 @@
 - **腿的诚实缺口（照记）**：本机整包四数 `RUN=847 PASS=605 FAIL=2 SKIP=17`，两枚红不是它的用例、且都自述非产码：`TestAC4Focus…`（前台被另一扇真窗口占着）、`TestAC246DevLeg…`「a dev Wisp is already running in this session」。★**第二条是我造成的** —— 我 16:23 起的那个驻留球就在跑，所以本机跑整包时那枚必红。⇒ 记：**本机跑 `cmd/wisp` 整包前，先把我起的球停掉**。
 
 **新读数（2026-11-14 20:5x，编排者自己复跑，来自票 192 接线腿的整包满载跑）**：`Test219AC2SecondRevokeOfTheSameRuleIsRefused` 在**整包满载**时红，红句 `waited on w.reply 46s`（单枚整包 55.78s）；我**低位**单独跑 **`-count=3` ⇒ 3/3 PASS**（2.57／2.12／2.10s，`ok … 7.00s`）⇒ 判 **(d) 满载时序**，不是产码。⇒ 本票 flake 集合从 3 枚增至 **4 枚**（`390r1…Walks27`／`PanelHostRealWindowHopAndLifecycle`／`WireR1AnnounceEndToEnd`／`219AC2SecondRevoke`）。AC#1 那张 20 发表只覆盖 CI；**这一枚是"整包满载"才出现的，CI 上未观测到** —— 口径记明。
+
+---
+
+## 射程更正（2026-11-14 21:1x，编排者现查 CI 日志后自己改的）
+
+**我上面那张 20 发表只看 `test-windows` step10，漏了两件事** ⇒ 本票射程必须扩大到**两个 job**：
+
+**① 含 447 修复的 6 发里，3 发红、3 发绿**（不是我以为的"修完就绿"）：
+
+| run | head | 红的那一枚 | 用时 | job |
+|---|---|---|---|---|
+| `ff0edb4b0` | `ff0edb4b0` | `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` | 15.64s | test-windows step10 |
+| `1984618a4` | `1984618a4` | `Test26R3AnnounceClosesTheCaptureGate` | 9.87s | test-windows step10 |
+| `35faf8064` | `35faf8064` | `Test285LoopDispatchesOneCorrPerCall` | **0.00s** | **test-core step7（linux）** |
+
+绿的 3 发：`445ea5b98`、`468cd2894`、`6aa244b67`。
+
+**② 落点（我自己 grep 的）**：
+- `cmd/wisp/panel_resident_windows_test.go:461`
+- `cmd/wisp/resident_voice_selfecho_26r3_windows_test.go:104`
+- `internal/agent/ticket285_corr_distinct_rulers_test.go:101`（同包还有 `corr_roster_join_328_test.go` 也提到它）
+
+**③ 由此更正本票的计数**：flake 集合**不是 3 枚、也不是 4 枚，现在是 7 枚**（`390r1…Walks27`／`PanelHostRealWindowHopAndLifecycle`／`WireR1AnnounceEndToEnd`／`219AC2SecondRevoke`（本地满载）／`AC13ColdStart`／`26R3Announce`／`285LoopDispatches`），**跨 `cmd/wisp` 与 `internal/agent` 两个包、`test-windows` 与 `test-core` 两个 job**。
+
+**④ `285Loop` 那枚最可疑**：`0.00s` 就红 ⇒ 不是"读早了"（那类要等），形状像**真缺陷或顺序依赖**。⇒ 派腿时写死：这一枚若判成 (c) 真缺陷，**立刻停手上报**，不许用改测试的方式抹平。

@@ -1,0 +1,25 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：票 447 第二轮（射程已扩大到两个 job、7 枚 flake）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 447 第二轮：**三枚新红的定性**。
+
+先读 `.scratch/wisp/issues/447-*.md` 全文（含我 21:1x 追加的「射程更正」段）。
+
+**三枚靶子**（CI 日志里的原文，不是我猜的）：
+1. `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`（15.64s，test-windows）→ `cmd/wisp/panel_resident_windows_test.go:461`
+2. `Test26R3AnnounceClosesTheCaptureGate`（9.87s，test-windows）→ `cmd/wisp/resident_voice_selfecho_26r3_windows_test.go:104`
+3. `Test285LoopDispatchesOneCorrPerCall`（**0.00s**，**test-core/linux**）→ `internal/agent/ticket285_corr_distinct_rulers_test.go:101`
+
+**逐枚定性，四选一，每枚给读数**：(a) 读早了（等落定）／(b) 环境前提缺失（具名弃权＋数字）／(c) **真产码缺陷**（⇒ **立刻停手上报**，不许改测试抹平）／(d) 满载时序。
+★ `285Loop` 在 **0.00 秒**就红 ⇒ 形状不像 (a)（那类要等）⇒ 优先按 (c) 查：读它的断言与它依赖的顺序/共享状态，给出「它凭什么在 linux 上是 0.00s 红」的可判事实（顺序依赖／时间依赖／全局状态／真实逻辑错）。
+
+**复跑纪律**：
+- `cmd/wisp` 必须走载具 `scripts/wisp-cli-staged-tests.sh`，⛔ 同时跑两发；⚠ 本机整包有 2 枚已知红**不是你的**（`TestAC4Focus…` 前台被占、`TestAC246DevLeg…` 因编排者起的驻留球在跑），具名记下别修别删。
+- `internal/agent` 可直接 `go test`，但**一次一发**。
+- 低位复跑用 `-count=3` 起，把"偶发"与"稳定"分开。
+
+⛔ 删/放宽任何既有断言（若要放宽，必须在证据里逐条列出放宽什么/为什么/标 ⚠）；⛔ 动产码（判 (c) 就停）；⛔ 阈值/golden/契约；⛔ 别人写面（`internal/panel`、`internal/tools`、`internal/llm`、`tools/d22scan`、`frontend`、`design`）；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+写面：`cmd/wisp/**` 的 `*_test.go`、`internal/agent/**` 的 `*_test.go`、`docs/evidence/s1/447-*`、`.scratch/wisp/probes/447/**`、本票 Progress log（只追加）。
+
+回话第一行＝commit hash ＋「三枚各判成 (a)/(b)/(c)/(d) 是什么」＋「有没有 (c)」。没干完写「未完成，卡在哪」。
