@@ -1,0 +1,8 @@
+=== RUN   Test221SubagentCannotStopSiblingOrItself
+--- PASS: Test221SubagentCannotStopSiblingOrItself (0.01s)
+=== RUN   Test221SubagentCannotStopSiblingOrItself
+--- PASS: Test221SubagentCannotStopSiblingOrItself (0.00s)
+=== RUN   Test221SubagentCannotStopSiblingOrItself
+--- PASS: Test221SubagentCannotStopSiblingOrItself (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.533s
