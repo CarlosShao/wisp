@@ -37252,3 +37252,21 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 **未闭的两格（如实）**：`AC#5` 要**runner 上的一发真红**（腿给的红是**仓外导出树**里的红，我不把它说成 CI 红）；`AC#7` 要**非实现者**的 1:1 裁决表 —— 已派审计腿。
 
 **新挖到的同类空仪器（按 AC#6 后半句继续登记）**：`internal/tools` 的 errno 判定曾只有 `-overlay` 临时探针当牙（票 446），已由**票 448** 补成包内常驻闸（`ticket448_errno_gate_test.go`，两方向各红过一次，`43588827772` 上 6/6 绿）。⇒ 这一类「牙只在 probes 里」的形态今天出现 2 起，**规矩**：能变红的检查必须落在**产码测试面**，否则只算一次性证明。
+
+## A1871（11-14 21:0x）：**给票改名结案会同时弄红路径预算** —— 名册在守门脚本**内部**，规则 B 专抓这个
+
+**症状**：把票 192 改名结案（102 字符 → 53 字符）后，`sh scripts/check-path-length-budget.sh` 立刻 **`VERDICT RED`**，两句红：
+```
+RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree)
+RED - count guard: the roster holds 69 entries, the tree has 68 over-budget tracked paths
+```
+
+**机制**：那张名册**不是外挂文件**，是 `scripts/check-path-length-budget.sh` 里的 `R["<path>"] = "<reason>"` 数据行（这次那条在 `:373`）。守门件有两条对偶规则：
+- **A**：树上有超预算路径却不在名册 ⇒ 红（防树长大）；
+- **B**：名册有一条**已经不再是**超预算路径 ⇒ 红（**防改名把名册留在原地**）。
+
+改名把一条 102 字符路径换成 53 字符 ⇒ 它不再超预算 ⇒ **B 立刻红**。两条在盘上看起来都像绿，只能靠这两条规则抓。
+
+**处置**：删掉名册里那条旧名（新名在预算内、不需要入册）⇒ 68 超预算 / 68 在册 ⇒ 回到 `VERDICT GREEN`。
+
+**规矩（此后照做）**：**凡给票改名（尤其为结案而缩短），同一次提交里必须做两件**：① `git mv` 两个路径都进 commit（A1865，否则票在 HEAD 里计数为 2）；② **在 `check-path-length-budget.sh` 的名册里加/删对应条目**，并**当场跑一次**看 `VERDICT`。⛔ 只看"我改的文件很短"就以为绿 —— 绿不绿由**名册与树是否相等**决定。

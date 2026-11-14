@@ -58,3 +58,5 @@
 - **AC#5 未翻**：要**连续 5 发** `test-windows` step10 的 `FAIL` 恒 0（给 5 个 run 号），现在还没跑够。
 - **AC#6 未翻**：腿给了两发牙（m1 去掉 `enterWarm` ⇒ 红且点名 `engines_hot=2, warm_turn_end=0`；m2 冷启动真慢 2s ⇒ winlive 档红 `2991.5 ms`；还原 sha256 与仓同值再绿），但 AC#6 要的是「**至少 2 枚**各造一发」，它给的是 2 发 —— 我判**内容满足**，但落点是 `cmd/wisp` 的测试面（回归闸）还是只在 probes，等我下一条审计腿核完再翻（今天已经被这条打过一次）。
 - **腿的诚实缺口（照记）**：本机整包四数 `RUN=847 PASS=605 FAIL=2 SKIP=17`，两枚红不是它的用例、且都自述非产码：`TestAC4Focus…`（前台被另一扇真窗口占着）、`TestAC246DevLeg…`「a dev Wisp is already running in this session」。★**第二条是我造成的** —— 我 16:23 起的那个驻留球就在跑，所以本机跑整包时那枚必红。⇒ 记：**本机跑 `cmd/wisp` 整包前，先把我起的球停掉**。
+
+**新读数（2026-11-14 20:5x，编排者自己复跑，来自票 192 接线腿的整包满载跑）**：`Test219AC2SecondRevokeOfTheSameRuleIsRefused` 在**整包满载**时红，红句 `waited on w.reply 46s`（单枚整包 55.78s）；我**低位**单独跑 **`-count=3` ⇒ 3/3 PASS**（2.57／2.12／2.10s，`ok … 7.00s`）⇒ 判 **(d) 满载时序**，不是产码。⇒ 本票 flake 集合从 3 枚增至 **4 枚**（`390r1…Walks27`／`PanelHostRealWindowHopAndLifecycle`／`WireR1AnnounceEndToEnd`／`219AC2SecondRevoke`）。AC#1 那张 20 发表只覆盖 CI；**这一枚是"整包满载"才出现的，CI 上未观测到** —— 口径记明。
