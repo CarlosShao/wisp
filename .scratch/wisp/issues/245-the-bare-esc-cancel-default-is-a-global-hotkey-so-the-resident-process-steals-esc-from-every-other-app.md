@@ -42,7 +42,7 @@
 **我现跑复认的（不采信通知正文）**：四枚 commit 逐枚 `git log -1` 都在（`f91feddd` 骨架 17:06 → `e6d6426f` 产码 17:25 → `08886b8d` 表填满 17:38 → `60f888c8` §6 名册 17:39）；表「docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md」＝**114 行／26,518 字节、占位符 0 枚**；写面已空（`git status --porcelain cmd/wisp internal/ball`＝**0 枚**）。
 **我自己重跑的那把能力尺**（不是背它的读数）：`grep -rn "standby|Confirming" internal/ball/ball_windows.go` ⇒ 稳态那一支真的存在且注释具名指向本票（`:243` 逐字「an idle ball may hold and leaves the cancel slot standby (ticket 245)」、`:808`「set is the idle set, and the idle set does not include cancel」、`:868`「this is the ONLY path that registers the cancel id」）。
 
-- [ ] **AC#6（新补，我自己抓到的两笔）"四枚"这句用户可见文案与稳态枚数不一致 ＋ 判据锚在"枚数"而不是"裸键"**：
+- [x] **AC#6①（新补，我自己抓到的两笔）"四枚"这句用户可见文案与稳态枚数不一致 ＋ 判据锚在"枚数"而不是"裸键"**：
       ① `cmd/wisp/main.go:24`（`wisp -h` 打给用户的正文，反引号原始串）现读逐字仍写「its four global hot keys in this same process」，而 245-r1 的实测稳态读数＝**3/4** ⇒ **本票落地把这句变成了半假话**（它上一轮刚被 228-r1 改过，那一轮改的是"票 07"，枚数没人管）。**完成判据**＝改成带条件的事实句（说清"稳态三枚、进入 Confirming 借第四枚"），凭据要现跑那发 `winlive` 读数。
       ② **J#2 由我裁（这是我重切自己的判据，不是盘上现成的答案）**：本格字面"注册集只能是三枚"写窄了——真缺陷的形状是「**没有任何修饰键的裸键被全局抢走**」，不是"稳态必须恰好三枚"。⇒ 用户把 `[hotkey] cancel` 配成**带修饰键**的组合时**应当常绑**（那不会吞别的程序，且与 `ApplyHotkeyDefaults` 逐字写着的方向一致：「a live hotkey the user can see, never a dead silent one」）；配成**裸键**时仍走借用。⚠ **今天没有行为差别**（`[hotkey]` 还没接进常驻腿＝AC#4 阻塞于票 228，默认档只有一枚裸键）⇒ 本格是**判据精度与钉子形状**的账：AC#3① 那枚"稳态三枚"的钉要改成**判裸键**（判据＝稳态注册集里不存在"无修饰键"的那一枚），否则等 AC#4 通了，用户配的组合键会被这枚钉打红、或被实现方为了过钉而悄悄不绑。**完成判据**＝钉子改成按"有无修饰键"判＋正控两形各一发（稳态绑裸 Esc 必红／稳态绑用户配的组合键必不红）。
 - ⚠ **SPEC-12 §5 那一行我不搬**：`docs/specs/**` 是**一字不改**的禁地（对腿、对我都成立；那张表最后一次被动是 09-19，早于编队开工）。五字段登记落在**本票末尾＋台账 A478**，⛔ 未加 `DEFERRED(D-xx)` 代码标记（加了就会打破"标记 ↔ 表 1:1 双向"那条硬规矩——245-r1 这一步判断正确，记它一笔）。**欠账具名**：要真进那张总表，需要 owner 一句「搬」。
@@ -63,7 +63,7 @@
 - [x] **AC#5 成立**，且比我落笔时更全：`SPEC-12 §5` 那一行已在（`docs/specs/SPEC-12-roadmap-governance.md:80`，就是我 17:50 那枚「dc694430」搬进去的），代码里 `DEFERRED(D-` 标记**仍 0 枚** ⇒ 双向核对未被我这一步打破（它替我复认了这件事）。
 - [ ] **AC#6 两半都不翻**：①`main.go:25` 那句「its four global hot keys」**不成立**——它跑了这一版二进制 `-h`，打出的就是这句，而同一枚二进制稳态实测 3/4；②它**独立裁了我那句自裁**：判"编排者把锚改到'裸键'方向成立"，但**四枚钉全还锚在枚数**（`hotkey_live_test.go:435`／`live_windows_test.go:74`／`hotkey_status_test.go:181`/`:245`）⇒ **顺序必须"先改钉、再改行为"**，且它实测到"用户配成组合键也不绑"这一形**已经在读配置那条腿上真发生**（E5 逐字「cancel hotkey left unbound while idle … binding=Ctrl+Alt+V」＋`live=3`）⇒ 我那句"今天零行为差别"**说轻了，就地更正**：差别在另一条腿上今天就能量到。
 
-- [ ] **AC#7（新补，它的 V-F1）借被拒那一支的记账陈旧**：`takeEsc` 失败时不设 `escTakenOver`，于是 `ReleaseEscAfterSession` 首行早退 ⇒ 报告永久停在 `HotkeyError`、`AllLive()` 恒 false、`Problems()` 一直说"没注册"，**而桌面其实什么都没绑**（`ball_windows.go:878-899`）。完成判据＝失败那一支也要把状态归位＋一枚正控（借被拒之后报告必须说"稳态三枚、cancel 未绑"，不是"注册失败"）。
+- [x] **AC#7（新补，它的 V-F1）借被拒那一支的记账陈旧**：`takeEsc` 失败时不设 `escTakenOver`，于是 `ReleaseEscAfterSession` 首行早退 ⇒ 报告永久停在 `HotkeyError`、`AllLive()` 恒 false、`Problems()` 一直说"没注册"，**而桌面其实什么都没绑**（`ball_windows.go:878-899`）。完成判据＝失败那一支也要把状态归位＋一枚正控（借被拒之后报告必须说"稳态三枚、cancel 未绑"，不是"注册失败"）。
 - [x] **AC#8（新补，它的 V-F2）别的程序已经占了裸 Esc 时，正确的实现也过不了**：它起真外来进程占住 Esc（E6）⇒ 四枚真机用例**全硬红**（逐字「ticket 245 RED: bare Esc is claimed on this desktop while the ball is idle」），`SKIP-LOUD` 0 枚 ⇒ 在这种机器上**测不绿**，而写腿表里"被拒＝具名绿"那一支结构性走不到。完成判据＝把"桌面已有占位者"与"我们自己没绑上"这两种红分开判（分开两条红句），⛔ 不许改成跳过。
 - [x] **AC#9（新补，它的条件①）把那套"第二个进程真收到 Esc"的台件搬进仓里当常驻尺**：现在它只在验收侧（E1 正常 `keydown_esc=1`／E2 自占裸 Esc `0`＋`wm_hotkey=1`／E3 出厂进程挂着仍 `1`／E4 反回去的 `0`）。完成判据＝仓内一条能跑的用例做同样的四形＋**不依赖人工桌面**。⚠ 改文案时注意它抓到的另一枚钉：`leg_dispatch_gate_133_test.go:156` 的 `usageBare133` 钉住 `  wisp   ` 行首形状 ⇒ AC#6① 那处改动必须保住它。
 
@@ -180,3 +180,19 @@
 - **AC#6②**：行为半边没动（260 判「永远待命」，改它要人工批准）。
 撤销口令：「245 AC8/9 翻框复议」。
 - [2026-11-14T14:12:00+08:00] agent=245-r5 claimed=票 245 写/验腿（AC#7 复核＋AC#6① 取数，非裁决腿） did=①AC#7：票面 `:878-899` 已过期，现读失败分支 `ball_windows.go:972-986`（`:982 escBorrowRefused=true`）、归还两路判据 `:1009`；**修复早已由 245-r2 在 `02799be92`（2026-11-05）落地**（证据 `245-ac7-refused-borrow-release-r2.md`），本腿产品字节零改动，只把判据补到宿主实际读的 `HotkeyReport()`／`RegisteredHotkeys()`／`EscTakenOver()`（新断言 `hotkey_refused_borrow_release_245_test.go:289-314`）；两发旧形突变（归还只看 `escTakenOver`／失败分支不记 refused）均 `go build` rc=0、新断言逐字红 `:290/:298/:302`，还原 SHA256 `52FDB60F…` 同串且 `git diff --quiet` rc=0；②AC#6①：干净桌面（wisp/wisp-live/balldebug 三查均 No tasks）单发 winlive 读出 `hotkeys live 3/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live)`，N=3、在册 summon/mute/panel、不在册 cancel，与 `main.go:28-34`（`9e84ae42e` 改的条件句）逐句一致；本腿未改文案；`resident_ball_live_228_windows_test.go:144` 的日志窗口由 80 字节改为整行（仅读数，不改断言）；③AC#4 未动，票面维持「阻塞于票 228」，现读 `resident_ball_windows.go:452 Hotkeys: cfg,` 与 `:934` no approval gate；门禁 vet(winlive) rc=0／gofumpt 空／d22scan clean／path-budget GREEN／ball 全包 ok 1.528s evidence=docs/evidence/s1/245-ac7-ac6-r5.md skipped=none next=交非实现者裁决 AC#7 框（本腿未翻）＋编排者补记 02799be92 那一笔；只 commit 不 push
+## 翻框（编排者＝非实现者，2026-11-14 14:2x）：**AC#7 翻；AC#6 只翻①；②我裁定采纳并已派腿**
+
+### AC#7 —— 翻（但账要记清：票面描述的是「修复前」，修复 11-05 就在盘上了）
+- 修复由 `245-r2` 在 **`02799be92`（2026-11-05 10:11）** 落地，证据件 `docs/evidence/s1/245-ac7-refused-borrow-release-r2.md`；**票面框与 Progress log 从未记录这一笔** ⇒ 才看起来像「未修」。**这不是我发现的，是写腿 `3b1553259` 纠正的**，记它一笔。
+- 现读机理（HEAD）：失败分支 `internal/ball/ball_windows.go:972-986`（`:982 b.escBorrowRefused = true`、`:983` 写 `HotkeyError`、`:984` 同步注册集）；归还判据 **`:1009 if !b.escTakenOver && !b.escBorrowRefused`**，`:1012-1014` 只有真借到才 `releaseEsc`，`:1015-1016` 两旗清零，`:1019` 写回 standby；重绑清旗 `:899`／`:902`。票面引的 `:878-899` 已过期（票 260 在上头加了注释块）。
+- 本轮加的是**判据**：旧主尺只判 UI 线程私有字段，新断言改判宿主实际读的三个访问器（`HotkeyReport()`／`RegisteredHotkeys()`／`EscTakenOver()`），在 `internal/ball/hotkey_refused_borrow_release_245_test.go:289-314`。
+- **正控两发（都能编译，`go build ./internal/ball` rc=0）**：突变 A 归还判据改回 `if !b.escTakenOver`；突变 B 失败分支不记 `escBorrowRefused` ⇒ 新断言**逐字真红** 3 条（`…:290`／`:298`／`:302`，原文在证据件）。还原后 SHA-256 **同串 `52FDB60F6E8E466FAE0F356DCF4BDDFA56D9392A3311FF5B88DB36ED7AA04F1B`**（**我现核同串**）、`git diff --quiet -- internal/ball/ball_windows.go` rc=0、`internal/ball` 全包 `ok 1.528s`。
+
+### AC#6① —— 翻（文案已真改成一致）
+- `cmd/wisp/main.go:28-34` 现读逐字：`… its three always-on global hot keys in this same process (summon, mute, panel; the cancel slot is the fourth key, bound only while a confirmation card is waiting and handed back when it leaves, so an idle wisp holds no bare key against the rest of the desktop)`；全仓 `four global hot keys` **0 命中**。
+- 干净桌面（`wisp.exe`／`wisp-live.exe`／`balldebug.exe` 三条 `No tasks`）单发 winlive 逐字读数：`hotkeys live 3/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live)`，`--- PASS (19.72s)`、`ok cmd/wisp 20.00s`。
+
+### AC#6② —— **编排者裁定：采纳它的判据重切，并派腿兑现**（不摆机主，理由在下面）
+- 票面 ② 自己写着「本格字面『注册集只能是三枚』写窄了 —— 真缺陷是『**没有任何修饰键的裸键**被全局抢走』，不是『稳态必须恰好三枚』」，并指出**用户把 `[hotkey] cancel` 配成带修饰键的组合时应当常绑**（那不会吞别的程序，且与 `ApplyHotkeyDefaults` 逐字写着的方向一致）。
+- **我裁决：采纳②的判据重切（裸键 vs 带修饰键），并按它派腿兑现「带修饰键的 cancel 常绑」。** 理由：①这不是改契约文字（`SPEC-11/12` 一字不动）；②不花钱；③不可逆？否 —— 配错一句话就退回来。铁律⓪⓪⓪ 明令这三类之外**我自己拍**。④它比「永远待命」更符合用户意图：用户显式配了 `Ctrl+Alt+X` 就是要它常驻，而今天这个配置**被静默忽略**。
+- ⚠ 与票 260 的「永远待命」判定的冲突**由我承担**：260 那枚判定针对的是**裸键**（防吞键），②只对**带修饰键**放开，两者不矛盾。撤销口令：「**245 AC6② 回永远待命**」。
