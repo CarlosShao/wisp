@@ -264,6 +264,8 @@ MANIFEST| index.html 1044 664520b87528f607
 
 > ⚠ 一处口径：这枚 `.ps1` 在 `.gitattributes` 里是 `*.ps1 text eol=crlf`，**将来 checkout 出来的副本会是 CRLF，哈希必然变**。判据是 ci.yml 里 `run:` 字段的正文，⛔ 不是这枚文件的哈希；哈希只是"我当时跑的就是当时文件里那串"的封条。
 
+4. **提交之后，又对 `HEAD` 的那枚 blob 复验了一次**（判据升级：GitHub 读的是对象，⛔ 不是我工作区那份）：`git show HEAD:.github/workflows/ci.yml` → `yaml.safe_load` **OK**、`steps=7`、新步索引 **4**、`prev='Build wisp.exe'`／`next='SLO smoke gate'`、blob 全文 sha256 **`c9cc3b46…`**；从**blob**里再抽一次 `run:` → sha256 仍是 **`52109f41…`**，与工作区抽出的那枚 **`identical=True`**。全文 `post-commit-blob-check.txt`，被解析的那枚对象留档为 `ci-committed-blob.yml`。
+
 ---
 
 ## 4. YAML 合法性与"步骤真在我说的地方"

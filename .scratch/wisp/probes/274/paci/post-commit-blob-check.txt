@@ -1,0 +1,14 @@
+=== parse the COMMITTED blob, not the worktree ===
+blob_yaml_parse=OK
+steps= 7 new_step_index= 4
+prev= 'Build wisp.exe' next= 'SLO smoke gate'
+blob_sha256(whole file)= c9cc3b46f42f3620d2ba2dea7739c9860625a86c8616063e2766070c33d27985
+run_chars= 1846 run_lines= 44
+extracted_from_blob_sha256= 52109f410e83fffa22afe085f566bd53166e73cbae40591736a692841991f25f
+=== the two extractions must be byte-identical (worktree-extracted vs blob-extracted) ===
+worktree_extracted=52109f410e83fffa22afe085f566bd53166e73cbae40591736a692841991f25f
+blob_extracted    =52109f410e83fffa22afe085f566bd53166e73cbae40591736a692841991f25f
+identical=True
+=== not pushed ===
+## dev...cnb/dev [ahead 3036]
+origin_dev_relation: 1 commit(s) ahead of origin/dev
