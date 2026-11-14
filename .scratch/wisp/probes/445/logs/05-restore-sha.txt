@@ -1,0 +1,2 @@
+restored  cmd/wisp/resident_ball_windows.go              1d47eccb205328a744fb1ff4507ef6962fa8cb29826671baf2c5ce9406178425 pristine_same=True
+restored  cmd/wisp/resident_voice_windows.go             d6d2a659903a8c20858249f5bf520058fcd2b0a28df3d291d9d3351ffeeaafee pristine_same=True

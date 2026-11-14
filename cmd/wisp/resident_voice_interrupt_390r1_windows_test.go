@@ -27,6 +27,16 @@ package main
 //	       playback leaves the announcement alone - it plays out. This is what
 //	       makes the mutation reading meaningful: the ONLY delta between Play
 //	       and Unhook is the attachVoiceInterrupt hop.
+//
+// Ticket 445's repair of this file (CI run 43575891409, the red at old line 107):
+// the Play case judged "the edge that landed last" at the instant its completion
+// marker said the walk was over, and the marker is satisfied one edge early - the
+// state is published by statemachine.Dispatch while rv.dispatch appends the edge
+// only after Dispatch returns. The judgement now waits for the walk to land first
+// (waitHopAfter445), so the same assertion reads the edge it is about. The
+// instrument's tooth is unchanged and re-measured in the export tree: with the
+// click's executor really not called the case still reds, naming the MUTANT line;
+// with the timeline's append really removed the wait itself reds with its numbers.
 
 import (
 	"fmt"
@@ -84,6 +94,9 @@ func Test390r1BallClickPlayingInterruptAbortsAndWalks27(t *testing.T) {
 			}
 		}()
 	})
+	// The baseline for "the click appended exactly one edge" is taken before the
+	// gesture: the announce's own #15 edge is already on record by now.
+	hopsBefore := len(rv.timelineSnapshot())
 	ball.clickInterruptGesture()
 	voice15eWaitFor(t, "the click to end the announcement (aborted or played out)", func() bool {
 		return (rv.ttsAborted.Load() >= 1 && rv.machine.State() == statemachine.StateListening) ||
@@ -101,10 +114,20 @@ func Test390r1BallClickPlayingInterruptAbortsAndWalks27(t *testing.T) {
 	if got := rv.problemsSnapshot(); len(got) != 0 {
 		t.Fatalf("a click interrupt left problems behind: %v", got)
 	}
-	timeline := rv.timelineSnapshot()
-	last := timeline[len(timeline)-1]
+	// TICKET 445 AC#2: wait for the walk to LAND, then judge it. The marker above
+	// is satisfied by (aborted>=1 && state==Listening), and that state is visible
+	// BEFORE this leg appends the edge - statemachine.Dispatch publishes the state
+	// inside its own critical section and rv.dispatch appends after Dispatch
+	// returns - so a last-edge read at that instant can see the #15 edge. CI run
+	// 43575891409 read exactly there. The wait is bounded and named, and the
+	// assertion below is unchanged: #27 must be the edge that landed LAST.
+	hops := waitHopAfter445(t, rv, hopsBefore, "the click's stop (D43#27 voice.interrupt Speaking -> Listening)")
+	last := hops[len(hops)-1]
 	if last.Event != statemachine.EvInterrupt || last.To != statemachine.StateListening {
 		t.Fatalf("the click's stop walked %+v, want #27 voice.interrupt -> Listening", last)
+	}
+	if n := len(hops) - hopsBefore; n != 1 {
+		t.Fatalf("the click appended %d D43 edge(s), want exactly 1: %+v", n, hops[hopsBefore:])
 	}
 	voice15eWaitFor(t, "the capture gate to reopen after the click's stop", func() bool {
 		closed, reopened := gate.count()
@@ -374,4 +397,74 @@ func Test390r1UnattachedClickDoesNotInterrupt(t *testing.T) {
 	}
 	t.Logf("UNATTACHED spoken=%d aborted=0 problems=0 (the pre-390 shape, kept honest)",
 		rv.ttsSpoken.Load())
+}
+
+// waitHopAfter445 is ticket 445 AC#2's shape: wait for the walk to LAND, then
+// judge what landed. It returns the leg's whole D43 timeline once it has grown
+// past `from`, and fails with a named line and numbers if it never does.
+//
+// WHY A WAIT AND NOT A LONGER SLEEP: the state and the edge are published in two
+// steps. statemachine.Dispatch sets the new state inside its own critical
+// section (internal/statemachine/machine.go:144) and returns only after firing
+// the row's side effects (machine.go:162-164); cmd/wisp's rv.dispatch appends
+// the edge after that call returns (resident_voice_windows.go:1441-1453). Every
+// completion marker in this family waits for (a counter, machine.State()), so it
+// can be satisfied one edge early - which is exactly what CI run 43575891409
+// read at this file's old line 107 (the #15 edge instead of #27).
+//
+// The probe under .scratch/wisp/probes/445 measures the window on this host:
+// with a continuous sampler the pre-#27 read is 3/20 shots, at the shipped 5ms
+// poll it is 0/20 - the defect is real and its visual rate is a sampling-rate
+// artefact. So the fix cannot be "wait longer": the wait's predicate is the
+// assertion itself (an edge past the baseline exists), and the assertion still
+// says WHICH edge must have landed last.
+func waitHopAfter445(t *testing.T, rv *residentVoice, from int, what string) []voiceTransition {
+	t.Helper()
+	const bound = 5 * time.Second
+	start := time.Now()
+	for {
+		if hops := rv.timelineSnapshot(); len(hops) > from {
+			return hops
+		}
+		if time.Since(start) > bound {
+			hops := rv.timelineSnapshot()
+			t.Fatalf("the D43 walk never landed within %s: %s: timeline has %d edge(s) (baseline %d), state=%s, "+
+				"aborted=%d spoken=%d, last=%s", bound, what, len(hops), from,
+				string(rv.machine.State()), rv.ttsAborted.Load(), rv.ttsSpoken.Load(), voiceLastHop445(hops))
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+// waitWalked445 is the same discipline for the cases whose assertion is "this row
+// is on record" rather than "this row is last": it waits, bounded, for the named
+// edge, so a reading taken at a counter's flip cannot judge a walk the announce
+// has not appended yet. A row that never lands fails here with the numbers -
+// never passes quietly.
+func waitWalked445(t *testing.T, rv *residentVoice, from statemachine.State, ev statemachine.Event, to statemachine.State, what string) {
+	t.Helper()
+	const bound = 5 * time.Second
+	start := time.Now()
+	for {
+		for _, tr := range rv.timelineSnapshot() {
+			if tr.From == from && tr.Event == ev && tr.To == to {
+				return
+			}
+		}
+		if time.Since(start) > bound {
+			t.Fatalf("the D43 walk never landed within %s: %s (%s + %s -> %s): state=%s, aborted=%d spoken=%d, timeline=%+v",
+				bound, what, string(from), string(ev), string(to), string(rv.machine.State()),
+				rv.ttsAborted.Load(), rv.ttsSpoken.Load(), rv.timelineSnapshot())
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+// voiceLastHop445 is the "what did we actually read" half of a failure line: an
+// empty timeline is named instead of indexed.
+func voiceLastHop445(hops []voiceTransition) string {
+	if len(hops) == 0 {
+		return "<none>"
+	}
+	return fmt.Sprintf("%+v", hops[len(hops)-1])
 }

@@ -326,6 +326,12 @@ allowed_dirs = [%q]
 	})
 
 	// ---- the record: state trace, tool rows, transcript, settle, counters.
+	// TICKET 445 AC#4: the wait above is on ttsSpoken, which is incremented one
+	// statement BEFORE the #26 dispatch (resident_voice_engines_windows.go:1265
+	// vs :1282), so the last row the record asserts below can still be one
+	// append away. Wait for it to land, then take the record.
+	waitWalked445(t, rv16demo, statemachine.StateSpeaking, statemachine.EvSpeakDone, statemachine.StateWarm,
+		"the reply's D43#26 Speaking -> Warm walk")
 	timeline := rv16demo.timelineSnapshot()
 	for _, tr := range timeline {
 		t.Logf("DEMO16 D43 %s+%s->%s at_sample=%d", tr.From, tr.Event, tr.To, tr.AtSample)

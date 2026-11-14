@@ -1,0 +1,2 @@
+restored  cmd/wisp/resident_ball_windows.go              1d47eccb205328a744fb1ff4507ef6962fa8cb29826671baf2c5ce9406178425 pristine_same=True
+no pristine copy for cmd/wisp/resident_voice_windows.go (never mutated in this tree)

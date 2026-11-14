@@ -1,0 +1,32 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/tmp/wisp/20261114/445-tree/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/tmp/wisp/20261114/445-tree/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/tmp/wisp/20261114/445-tree/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T17:18:28.600+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test390r1BallClickPlayingInterruptAbortsAndWalks27
+time=2026-11-14T17:18:28.606+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T17:18:29.785+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad=D:/tmp/wisp/20261114/445-tree/third_party/spike-models/silero_vad.onnx asr_dir="" config_source="390-r1 test"
+time=2026-11-14T17:18:29.786+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:18:29.786+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="test: D43#11 Listening 到 Thinking"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+time=2026-11-14T17:18:33.634+08:00 level=INFO msg="voice: capture gate closed for the announcement" reason=speaking path=T
+time=2026-11-14T17:18:33.634+08:00 level=INFO msg="voice: D43 walked" from=Thinking event=llm.first-token to=Speaking why="播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）"
+time=2026-11-14T17:18:34.217+08:00 level=INFO msg="ball: click interrupt dispatched" executed=true
+wisp: ball click: interrupt requested
+time=2026-11-14T17:18:34.217+08:00 level=INFO msg="voice: announcement aborted mid-playback" chunks=2 samples=66682 rate=22050
+time=2026-11-14T17:18:34.217+08:00 level=INFO msg="voice: D43 walked" from=Speaking event=voice.interrupt to=Listening why="播报出声期被打断：D43#27 回到 Listening（Abort 真停出声）"
+time=2026-11-14T17:18:34.217+08:00 level=INFO msg="voice: capture gate reopened (speech ended)" reason=announce-done path=T
+    resident_voice_interrupt_390r1_windows_test.go:124: the D43 walk never landed within 5s: the click's stop (D43#27 voice.interrupt Speaking -> Listening): timeline has 0 edge(s) (baseline 0), state=Listening, aborted=1 spoken=0, last=<none>
+time=2026-11-14T17:18:39.228+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T17:18:39.282+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=process-exit cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T17:18:39.282+08:00 level=INFO msg="voice leg stopped: frames_drained=0 paused_drops=0 partials=0 finals=0 discarded=0 handed=0 handoffs=0 handoff_exit=0 asr_loaded=false punct_attached=false punctuated_finals=0 announce_asked=1 spoken=0 aborted=1 gated=0 samples=66682 warm_turn_end=0 warm_wake=0 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=0 paused_drops=0 partials=0 finals=0 discarded=0 handed=0 handoffs=0 handoff_exit=0 asr_loaded=false punct_attached=false punctuated_finals=0 announce_asked=1 spoken=0 aborted=1 gated=0 samples=66682 warm_turn_end=0 warm_wake=0 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- FAIL: Test390r1BallClickPlayingInterruptAbortsAndWalks27 (10.68s)
+FAIL
+FAIL  github.com/CarlosShao/wisp/cmd/wisp	11.00s

@@ -361,6 +361,18 @@ func TestWireR1AnnounceEndToEnd(t *testing.T) {
 		t.Fatalf("counted %d samples, the device got %d", got, samples)
 	}
 	// HOP 5: the ball walked Thinking -> Speaking -> Warm, and nothing else.
+	// TICKET 445 AC#4: the wait above is on ttsSpoken, which is incremented one
+	// statement BEFORE the #26 dispatch (resident_voice_engines_windows.go:1265
+	// vs :1282), so this projection - and the four-edge record below it - must not
+	// be judged at the counter's flip. Wait for the row to land, then for the ball
+	// hop that projects it (rv.dispatch appends the edge first and calls
+	// rb.setVoiceState right after), then judge.
+	waitWalked445(t, rv, statemachine.StateSpeaking, statemachine.EvSpeakDone, statemachine.StateWarm,
+		"the announcement's D43#26 Speaking -> Warm walk")
+	voice15eWaitFor(t, "the ball to project the announcement's D43#26 walk (Warm)", func() bool {
+		states := ball.voiceStatesSnapshot()
+		return len(states) > 0 && states[len(states)-1] == statemachine.StateWarm
+	})
 	states := ball.voiceStatesSnapshot()
 	want := []statemachine.State{
 		statemachine.StateListening, statemachine.StateThinking,

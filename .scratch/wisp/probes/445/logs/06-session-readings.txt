@@ -1,0 +1,56 @@
+# Ticket 445 - the readings taken in the writing leg's session, verbatim
+#
+# These are copied character-for-character from the carrier output of the runs
+# this leg made (the runs themselves are reproducible with the commands in the
+# evidence file's section 7). They are NOT re-typed numbers: every line below was
+# printed by the command named above it.
+#
+# The AC#3 logs (01..05) next to this file ARE the runs' own files, written by
+# .scratch/wisp/probes/445/ac3-445.sh.
+
+## A. the window probe, three runs (export tree D:/tmp/wisp/20261114/445-tree)
+# command: WISP_445_ROUNDS=<N> scripts/wisp-cli-staged-tests.sh -test.run '^Test445ProbeClickStopTriggerCalledAndWindow$'
+# run 1: N=20, spin only (the first version of the probe had one sampling mode)
+    zz445probe_windows_test.go:205: 445-REDLINE round 3: the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=3 aborted=3 state=Listening edges=9)
+    zz445probe_windows_test.go:205: 445-REDLINE round 15: the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=15 aborted=15 state=Listening edges=45)
+    zz445probe_windows_test.go:205: 445-REDLINE round 16: the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=16 aborted=16 state=Listening edges=48)
+    zz445probe_windows_test.go:207: 445-WINDOW rounds=20 redline_hits=3 hit_rate=15.0% trigger_calls=20 aborted=20 spoken=0 lag_min=0s lag_median=0s lag_max=0s
+--- PASS: Test445ProbeClickStopTriggerCalledAndWindow (9.51s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	9.00s
+
+# run 2: N=40, alternating spin / the shipped 5ms poll
+    zz445probe_windows_test.go:238: 445-REDLINE round 27 (fast sampling): the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=27 aborted=27 state=Listening edges=81)
+    zz445probe_windows_test.go:240: 445-WINDOW rounds=40 redline_hits=1 hit_rate=2.5% fast=1/20 shipped_5ms=0/20 trigger_calls=40 aborted=40 spoken=0 settle_min=0s settle_median=0s settle_max=6.0389ms
+--- PASS: Test445ProbeClickStopTriggerCalledAndWindow (17.30s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	17.00s
+
+# run 3: N=200, alternating spin / the shipped 5ms poll (the headline reading)
+    zz445probe_windows_test.go:238: 445-REDLINE round 25 (fast sampling): the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=25 aborted=25 state=Listening edges=75)
+    zz445probe_windows_test.go:238: 445-REDLINE round 117 (fast sampling): the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=117 aborted=117 state=Listening edges=351)
+    zz445probe_windows_test.go:238: 445-REDLINE round 163 (fast sampling): the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=163 aborted=163 state=Listening edges=489)
+    zz445probe_windows_test.go:238: 445-REDLINE round 165 (fast sampling): the click's stop walked {From:Thinking To:Speaking Event:llm.first-token AtSample:0 Say:播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）}, want #27 voice.interrupt -> Listening (trigger_calls=165 aborted=165 state=Listening edges=495)
+    zz445probe_windows_test.go:240: 445-WINDOW rounds=200 redline_hits=4 hit_rate=2.0% fast=4/100 shipped_5ms=0/100 trigger_calls=200 aborted=200 spoken=0 settle_min=0s settle_median=0s settle_max=635.6µs
+--- PASS: Test445ProbeClickStopTriggerCalledAndWindow (63.89s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	64.00s
+
+## B. the five repaired instruments in the repo (all green)
+# command: scripts/wisp-cli-staged-tests.sh -test.run '^(Test390r1...|Test381r2...|TestWireR1AnnounceEndToEnd|Test395r1...|Test16r1...)$'
+--- PASS: Test395r1VoiceToolTurnWalksActing (12.40s)
+--- PASS: Test381r2PlayingPhaseInterruptAbortsAndWalks27 (7.17s)
+--- PASS: Test390r1BallClickPlayingInterruptAbortsAndWalks27 (7.12s)
+--- PASS: TestWireR1AnnounceEndToEnd (12.78s)
+--- PASS: Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware (31.77s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	72.00s
+
+# after the last edit (the ball-projection wait added to the wire_r1 case)
+--- PASS: TestWireR1AnnounceEndToEnd (18.21s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	19.00s
+
+## C. the gates
+go vet ./...                                        rc=0 (no output)
+gofumpt -l <the five changed test files>             (empty), rc=0
+gofumpt -l internal cmd tools scripts frontend       (one line: internal\models\acl_sid_121_test.go)  -> section 5.2 of the evidence: the
+                                                     worktree copy carries CRLF (268 LF / 268 CRLF) while the HEAD blob is LF (268 LF / 0 CRLF)
+                                                     and gofumpt-clean, so the hit is a Windows checkout artifact in a file this leg never touched
+sh scripts/d22scan.sh                                rc=0, "clean - no D22 ban violations", positive control PASS=45 FAIL=0 SKIP=0
+sh scripts/check-path-length-budget.sh --with-self-test  rc=0, "VERDICT GREEN", tracked=20086 over-budget=69 covered by roster=69 not in roster=0

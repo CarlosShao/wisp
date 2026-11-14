@@ -327,6 +327,7 @@ func Test381r2PlayingPhaseInterruptAbortsAndWalks27(t *testing.T) {
 			}
 		}()
 	})
+	hopsBefore := len(rv.timelineSnapshot())
 	rv.TriggerInterrupt()
 	// Same completion marker as the live case: the counter AND the #27 walk,
 	// since ttsAborted is incremented one statement before the dispatch.
@@ -346,10 +347,17 @@ func Test381r2PlayingPhaseInterruptAbortsAndWalks27(t *testing.T) {
 	if got := rv.problemsSnapshot(); len(got) != 0 {
 		t.Fatalf("a user interrupt left problems behind: %v", got)
 	}
-	timeline := rv.timelineSnapshot()
+	// TICKET 445 AC#2/AC#4: the same read-early shape the 390-r1 file had. The
+	// marker above is satisfied while the #27 edge can still be one append away
+	// (statemachine.Dispatch publishes the state, rv.dispatch appends after it
+	// returns), so wait for the walk to land and then judge it.
+	timeline := waitHopAfter445(t, rv, hopsBefore, "the Esc's stop (D43#27 voice.interrupt Speaking -> Listening)")
 	last := timeline[len(timeline)-1]
 	if last.Event != statemachine.EvInterrupt || last.To != statemachine.StateListening {
 		t.Fatalf("the abort walked %+v, want #27 voice.interrupt -> Listening", last)
+	}
+	if n := len(timeline) - hopsBefore; n != 1 {
+		t.Fatalf("the abort appended %d D43 edge(s), want exactly 1: %+v", n, timeline[hopsBefore:])
 	}
 	for _, tr := range timeline {
 		if tr.Event == statemachine.EvSpeakDone {
