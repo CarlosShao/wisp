@@ -1,0 +1,141 @@
+time=2026-11-14T21:09:36.092+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+==================
+WARNING: DATA RACE
+Read at 0x00c00000a390 by goroutine 17:
+  github.com/CarlosShao/wisp/internal/agent.(*recordCorrProvider).Execute()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:37 +0x5d
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:884 +0x1be
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:882 +0xa4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls.func1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:794 +0x266
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x98
+
+Previous write at 0x00c00000a390 by goroutine 18:
+  github.com/CarlosShao/wisp/internal/agent.(*recordCorrProvider).Execute()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:37 +0x139
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:884 +0x1be
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:882 +0xa4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls.func1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:794 +0x266
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x98
+
+Goroutine 17 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:791 +0x138d
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:594 +0x27e4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).Run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:375 +0xba
+  github.com/CarlosShao/wisp/internal/agent.(*harness).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/harness_test.go:184 +0xd6
+  github.com/CarlosShao/wisp/internal/agent.Test285LoopDispatchesOneCorrPerCall()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:104 +0x135
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+
+Goroutine 18 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:791 +0x138d
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:594 +0x27e4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).Run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:375 +0xba
+  github.com/CarlosShao/wisp/internal/agent.(*harness).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/harness_test.go:184 +0xd6
+  github.com/CarlosShao/wisp/internal/agent.Test285LoopDispatchesOneCorrPerCall()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:104 +0x135
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c00032c0c0 by goroutine 17:
+  runtime.growslice()
+      D:/work/base/go/src/runtime/slice.go:178 +0x0
+  github.com/CarlosShao/wisp/internal/agent.(*recordCorrProvider).Execute()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:37 +0x95
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:884 +0x1be
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:882 +0xa4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls.func1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:794 +0x266
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x98
+
+Previous write at 0x00c00032c0c0 by goroutine 18:
+  github.com/CarlosShao/wisp/internal/agent.(*recordCorrProvider).Execute()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:37 +0xc9
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:884 +0x1be
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).dispatch()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:882 +0xa4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls.func1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:794 +0x266
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x98
+
+Goroutine 17 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:791 +0x138d
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:594 +0x27e4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).Run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:375 +0xba
+  github.com/CarlosShao/wisp/internal/agent.(*harness).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/harness_test.go:184 +0xd6
+  github.com/CarlosShao/wisp/internal/agent.Test285LoopDispatchesOneCorrPerCall()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:104 +0x135
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+
+Goroutine 18 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).executeCalls()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:791 +0x138d
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:594 +0x27e4
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).Run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/loop.go:375 +0xba
+  github.com/CarlosShao/wisp/internal/agent.(*harness).run()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/harness_test.go:184 +0xd6
+  github.com/CarlosShao/wisp/internal/agent.Test285LoopDispatchesOneCorrPerCall()
+      C:/Users/swq/AppData/Local/Temp/wisp447b/internal/agent/ticket285_corr_distinct_rulers_test.go:104 +0x135
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+--- FAIL: Test285LoopDispatchesOneCorrPerCall (0.02s)
+    testing.go:1865: race detected during execution of test
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.113s
+FAIL
+

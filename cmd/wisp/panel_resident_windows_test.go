@@ -445,6 +445,67 @@ func awaitSettledHandoverDocument(t *testing.T, rp *residentPanel, h *recordingM
 	}
 }
 
+// ac13HandoverProbeID is the requestId the SETTLE probe rides, kept apart from
+// "ac13-probe" (the id bitmap) so a late answer to one can never be read as an
+// answer to the other.
+const ac13HandoverProbeID = "447-ac13-handover"
+
+// awaitHandoverEntryDocument is ticket 447's split of AC#13's reading into the
+// two readings the single-phase form conflated. It asks the page ONE question -
+// "what document are you?" - and returns only once the page has answered with a
+// COMPLETE document (href|readyState|title), bounded by panelThreadWait.
+//
+// WHY (CI run 43591208796, test-windows step 10, 15.64s): the failing run's own
+// line reads "no probe attempt over 8 attempt(s) saw a present id; last report:
+// \"\"" - the door received NOTHING for the whole 15 s budget. An empty string is
+// not the answer "none of the ids are present"; the old single-phase ruler
+// nevertheless printed "the live document contains NONE of the 1 element ids the
+// embedded entry declares (the page itself answered \"\")", i.e. it accused the
+// product's document of missing content on a reading in which the page never
+// spoke. The known AC#13 defect (order swapped: the round-trip probe page keeps
+// the last word) is a DIFFERENT reading - the page answers "0", and it does so
+// hundreds of times inside the same budget (measured on the 33 order-swap
+// mutant: "718 attempt(s) ... last report: \"0\""). Splitting the transport
+// reading (did any document answer at all) from the content reading (does that
+// document carry the entry's ids) keeps the AC#13 assertion exactly where it
+// was and stops it making a claim it never measured.
+//
+// TEETH: the settle predicate is `readyState == "complete"` ALONE, not "href is
+// the entry". An order-swapped world settles at once on the probe page and then
+// reds on the id bitmap with the original AC#13 sentence; only a world in which
+// no document answers at all reaches the 447-ac13-handover-never-answered red.
+func awaitHandoverEntryDocument(t *testing.T, rp *residentPanel, h *recordingModeHandler) string {
+	t.Helper()
+	deadline := time.Now().Add(panelThreadWait)
+	attempts := 0
+	last := ""
+	for time.Now().Before(deadline) {
+		attempts++
+		seen := reportCount(h, ac13HandoverProbeID)
+		evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv(ac13HandoverProbeID,
+			"location.href + '|' + document.readyState + '|' + document.title")+");")
+		settle := time.Now().Add(probeAttemptSettle)
+		got := ""
+		for time.Now().Before(settle) && time.Now().Before(deadline) {
+			if reportCount(h, ac13HandoverProbeID) > seen {
+				if v, ok := latestReport(h, ac13HandoverProbeID); ok {
+					got = v
+					last = v
+				}
+				break
+			}
+			time.Sleep(20 * time.Millisecond)
+		}
+		if parts := strings.SplitN(got, "|", 3); len(parts) == 3 && parts[1] == "complete" {
+			t.Logf("447-ac13-handover-settled on probe attempt %d: %q", attempts, got)
+			return got
+		}
+	}
+	t.Fatalf("447-ac13-handover-never-answered: not one probe over %d attempt(s) in %v got a reply from the window (%d report(s) recorded under %q, last %q; what DID arrive at the door: %s). An empty answer is a failed MEASUREMENT of the handover - the page never said which document it is - not the AC#13 verdict that the entry's ids are absent, so this case refuses to draw the content conclusion it did not measure. A recurrence here is the reading that would justify calling the handover itself defective (no completion/failure surface); the ruler cannot see that today",
+		attempts, panelThreadWait, reportCount(h, ac13HandoverProbeID), ac13HandoverProbeID, last, describeRequests(h))
+	return ""
+}
+
 // TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe is ticket 33 AC#13's ruler: after a
 // real cold start the document in the window must be the embedded page, not the
 // round-trip probe the host shows while it checks the message channel.
@@ -466,6 +527,11 @@ func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
 	rp, mgr := startPanelForTest(t)
 	showAndWait(t, rp)
 	h := mgr.disp.Mode.(*recordingModeHandler)
+
+	// 447: settle first, then ask the content question. The settle reading is the
+	// transport's own answer ("which document are you, and is it complete?");
+	// only a page that answered may be judged on what it contains.
+	awaitHandoverEntryDocument(t, rp, h)
 
 	answer := awaitEntryReport(t, rp, h, probes)
 	present := strings.Count(answer, "1")

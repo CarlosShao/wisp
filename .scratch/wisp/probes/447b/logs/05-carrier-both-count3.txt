@@ -1,0 +1,320 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-447b/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-447b/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-447b/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T21:13:12.855+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:523: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+time=2026-11-14T21:13:12.859+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T21:13:12.864+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-14T21:13:12.868+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x10260bde"
+time=2026-11-14T21:13:12.868+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x18 known=true"
+time=2026-11-14T21:13:12.868+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x46 known=true"
+time=2026-11-14T21:13:12.872+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x46 known=true"
+time=2026-11-14T21:13:12.874+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x1c known=true"
+time=2026-11-14T21:13:12.874+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x86 known=true"
+time=2026-11-14T21:13:12.874+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:12.875+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:12.875+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:12.875+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x6 known=true"
+time=2026-11-14T21:13:12.884+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x281 known=true"
+time=2026-11-14T21:13:12.889+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x282 known=true"
+time=2026-11-14T21:13:12.891+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x3d known=true"
+time=2026-11-14T21:13:12.892+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x3d known=true"
+time=2026-11-14T21:13:12.892+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7 known=true"
+time=2026-11-14T21:13:12.892+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x85 known=true"
+time=2026-11-14T21:13:12.892+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x14 known=true"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x47 known=true"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x5 known=true"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x3 known=true"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0xf known=true"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-14T21:13:12.893+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-14T21:13:12.916+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x210 known=true"
+time=2026-11-14T21:13:12.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:12.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x31f known=true"
+time=2026-11-14T21:13:12.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0xc0fa known=true"
+time=2026-11-14T21:13:12.928+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:12.930+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:13.468+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-14T21:13:13.697+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x14 known=true"
+time=2026-11-14T21:13:13.716+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:13.717+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:13.720+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 869.3 ms, hot path 0.0 ms)
+time=2026-11-14T21:13:13.769+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+time=2026-11-14T21:13:13.843+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:13.845+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+time=2026-11-14T21:13:13.850+08:00 level=INFO msg="MARK299 wndproc hwnd=0x10260bde msg=0x7f known=true"
+    panel_resident_windows_test.go:534: 447-ac13-handover-settled on probe attempt 5: "https://wisp.panel/index.html|complete|Wisp"
+    panel_resident_windows_test.go:536: AC#13 entry-id report arrived on probe attempt 1: "1"
+    panel_resident_windows_test.go:538: AC#13 page answer (head 2512c900b): "1" - 1 of 1 probe id(s) present in the live document
+time=2026-11-14T21:13:14.237+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-11-14T21:13:14.237+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.46s)
+=== RUN   Test26R3AnnounceClosesTheCaptureGate
+time=2026-11-14T21:13:15.101+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T21:13:16.374+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" asr_dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models\asr-streaming-paraformer-zh-en config_source="26r3 test"
+time=2026-11-14T21:13:17.224+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T21:13:17.225+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T21:13:17.227+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models manifest="D:\\work\\workspace\\projects plans\\Wisp\\build\\models\\manifest.json"
+time=2026-11-14T21:13:19.999+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，2.77s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models）
+time=2026-11-14T21:13:19.999+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\Test26R3AnnounceClosesTheCaptureGate996817231\\001\\models"
+time=2026-11-14T21:13:22.862+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T21:13:22.862+08:00 level=INFO msg="voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw"
+wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点
+time=2026-11-14T21:13:23.901+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 3392ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T21:13:23.901+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:13:23.901+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=1
+time=2026-11-14T21:13:24.034+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:tts:tts.announce cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+time=2026-11-14T21:13:29.366+08:00 level=INFO msg="voice: capture gate closed for the announcement" reason=speaking path=T
+time=2026-11-14T21:13:29.366+08:00 level=INFO msg="voice: D43 walked" from=Thinking event=llm.first-token to=Speaking why="播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\character-lexicon.cc:ConvertTextToTokenIds:181 Ignore OOV 'r'
+time=2026-11-14T21:13:30.177+08:00 level=INFO msg="voice: announcement spoken" runes=22 chunks=1 samples=89490 rate=22050 acquire=5.4638876s scope=voice-announce
+time=2026-11-14T21:13:30.177+08:00 level=INFO msg="voice: D43 walked" from=Speaking event=tts.speak-done to=Warm why="播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）"
+time=2026-11-14T21:13:30.177+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=announce-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:13:30.177+08:00 level=INFO msg="voice: capture gate reopened (speech ended)" reason=announce-done path=T
+    resident_voice_selfecho_26r3_windows_test.go:233: GATE-26R3 closed=1 reopened=1 events=2 mid_speech_transcripts=0 spoken_samples=89490 gate_on=1 gate_off=1
+time=2026-11-14T21:13:30.201+08:00 level=INFO msg="voice: the announce swapped the engine family; phase 1 re-armed" reason=tts-resident asr_released=true
+    resident_voice_selfecho_26r3_windows_test.go:263: ECHO-26R3 gate_state_during_feed=speaking(PathT capture refused) frames_fed=6 drained_total=187 transcripts_after=1
+time=2026-11-14T21:13:31.051+08:00 level=INFO msg="voice: D43 walked" from=Warm event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T21:13:31.051+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T21:13:31.053+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models manifest="D:\\work\\workspace\\projects plans\\Wisp\\build\\models\\manifest.json"
+time=2026-11-14T21:13:34.691+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.64s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models）
+time=2026-11-14T21:13:34.691+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\Test26R3AnnounceClosesTheCaptureGate996817231\\001\\models"
+time=2026-11-14T21:13:34.755+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:asr:first-use cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T21:13:38.142+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate996817231\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T21:13:38.142+08:00 level=INFO msg="voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw"
+wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点
+time=2026-11-14T21:13:39.082+08:00 level=INFO msg="voice: warm wake took its ASR borrow back" acquire=0s stage=Awake loads_after_warm=0
+time=2026-11-14T21:13:39.083+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 2592ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T21:13:39.083+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:13:39.083+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=1
+    resident_voice_selfecho_26r3_windows_test.go:289: REOPEN-26R3 finals=2 warm_wake=1 stage=Warm gate_speaking=false
+time=2026-11-14T21:13:39.178+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T21:13:39.180+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=process-exit cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T21:13:39.180+08:00 level=INFO msg="voice leg stopped: frames_drained=367 paused_drops=0 partials=9 finals=2 discarded=0 handed=2 handoffs=2 handoff_exit=0 asr_loaded=true punct_attached=false punctuated_finals=0 announce_asked=1 spoken=1 aborted=0 gated=0 samples=89490 warm_turn_end=3 warm_wake=1 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=367 paused_drops=0 partials=9 finals=2 discarded=0 handed=2 handoffs=2 handoff_exit=0 asr_loaded=true punct_attached=false punctuated_finals=0 announce_asked=1 spoken=1 aborted=0 gated=0 samples=89490 warm_turn_end=3 warm_wake=1 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- PASS: Test26R3AnnounceClosesTheCaptureGate (24.91s)
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:523: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+time=2026-11-14T21:13:39.237+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T21:13:39.242+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-14T21:13:39.247+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x2371612"
+time=2026-11-14T21:13:39.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x18 known=true"
+time=2026-11-14T21:13:39.248+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x46 known=true"
+time=2026-11-14T21:13:39.251+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x46 known=true"
+time=2026-11-14T21:13:39.252+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x1c known=true"
+time=2026-11-14T21:13:39.253+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x86 known=true"
+time=2026-11-14T21:13:39.253+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.254+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.254+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.254+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x6 known=true"
+time=2026-11-14T21:13:39.262+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x281 known=true"
+time=2026-11-14T21:13:39.265+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x282 known=true"
+time=2026-11-14T21:13:39.266+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x3d known=true"
+time=2026-11-14T21:13:39.266+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x3d known=true"
+time=2026-11-14T21:13:39.267+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7 known=true"
+time=2026-11-14T21:13:39.267+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x85 known=true"
+time=2026-11-14T21:13:39.269+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x14 known=true"
+time=2026-11-14T21:13:39.269+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x47 known=true"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x5 known=true"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x3 known=true"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0xf known=true"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-14T21:13:39.270+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-14T21:13:39.279+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x210 known=true"
+time=2026-11-14T21:13:39.280+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.280+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x31f known=true"
+time=2026-11-14T21:13:39.280+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0xc0fa known=true"
+time=2026-11-14T21:13:39.310+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.311+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.727+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.727+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:39.968+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-14T21:13:40.256+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x14 known=true"
+time=2026-11-14T21:13:40.280+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 1051.0 ms, hot path 0.0 ms)
+time=2026-11-14T21:13:40.388+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:40.388+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:40.388+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+    panel_resident_windows_test.go:534: 447-ac13-handover-settled on probe attempt 7: "https://wisp.panel/index.html|complete|Wisp"
+time=2026-11-14T21:13:40.709+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+time=2026-11-14T21:13:40.710+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2371612 msg=0x7f known=true"
+    panel_resident_windows_test.go:536: AC#13 entry-id report arrived on probe attempt 1: "1"
+    panel_resident_windows_test.go:538: AC#13 page answer (head 2512c900b): "1" - 1 of 1 probe id(s) present in the live document
+time=2026-11-14T21:13:40.835+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-11-14T21:13:40.836+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.75s)
+=== RUN   Test26R3AnnounceClosesTheCaptureGate
+time=2026-11-14T21:13:41.599+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T21:13:41.628+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" asr_dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models\asr-streaming-paraformer-zh-en config_source="26r3 test"
+time=2026-11-14T21:13:42.482+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T21:13:42.482+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T21:13:42.483+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models manifest="D:\\work\\workspace\\projects plans\\Wisp\\build\\models\\manifest.json"
+time=2026-11-14T21:13:46.137+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.65s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models）
+time=2026-11-14T21:13:46.137+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\Test26R3AnnounceClosesTheCaptureGate4016062755\\001\\models"
+time=2026-11-14T21:13:49.753+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T21:13:49.753+08:00 level=INFO msg="voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw"
+wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点
+time=2026-11-14T21:13:50.741+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 3392ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T21:13:50.741+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:13:50.741+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=1
+time=2026-11-14T21:13:50.871+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:tts:tts.announce cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+time=2026-11-14T21:13:56.131+08:00 level=INFO msg="voice: capture gate closed for the announcement" reason=speaking path=T
+time=2026-11-14T21:13:56.131+08:00 level=INFO msg="voice: D43 walked" from=Thinking event=llm.first-token to=Speaking why="播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\character-lexicon.cc:ConvertTextToTokenIds:181 Ignore OOV 'r'
+time=2026-11-14T21:13:56.913+08:00 level=INFO msg="voice: announcement spoken" runes=22 chunks=1 samples=89490 rate=22050 acquire=5.3881874s scope=voice-announce
+time=2026-11-14T21:13:56.913+08:00 level=INFO msg="voice: D43 walked" from=Speaking event=tts.speak-done to=Warm why="播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）"
+time=2026-11-14T21:13:56.913+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=announce-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:13:56.913+08:00 level=INFO msg="voice: capture gate reopened (speech ended)" reason=announce-done path=T
+    resident_voice_selfecho_26r3_windows_test.go:233: GATE-26R3 closed=1 reopened=1 events=2 mid_speech_transcripts=0 spoken_samples=89490 gate_on=1 gate_off=1
+time=2026-11-14T21:13:56.939+08:00 level=INFO msg="voice: the announce swapped the engine family; phase 1 re-armed" reason=tts-resident asr_released=true
+    resident_voice_selfecho_26r3_windows_test.go:263: ECHO-26R3 gate_state_during_feed=speaking(PathT capture refused) frames_fed=6 drained_total=187 transcripts_after=1
+time=2026-11-14T21:13:57.797+08:00 level=INFO msg="voice: D43 walked" from=Warm event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T21:13:57.797+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T21:13:57.798+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models manifest="D:\\work\\workspace\\projects plans\\Wisp\\build\\models\\manifest.json"
+time=2026-11-14T21:14:01.567+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.77s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models）
+time=2026-11-14T21:14:01.567+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\Test26R3AnnounceClosesTheCaptureGate4016062755\\001\\models"
+time=2026-11-14T21:14:01.642+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:asr:first-use cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T21:14:04.935+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate4016062755\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T21:14:04.935+08:00 level=INFO msg="voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw"
+wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点
+time=2026-11-14T21:14:05.921+08:00 level=INFO msg="voice: warm wake took its ASR borrow back" acquire=0s stage=Awake loads_after_warm=0
+time=2026-11-14T21:14:05.921+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 2592ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T21:14:05.921+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:14:05.921+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=1
+    resident_voice_selfecho_26r3_windows_test.go:289: REOPEN-26R3 finals=2 warm_wake=1 stage=Warm gate_speaking=false
+time=2026-11-14T21:14:06.016+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T21:14:06.016+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=process-exit cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T21:14:06.016+08:00 level=INFO msg="voice leg stopped: frames_drained=367 paused_drops=0 partials=9 finals=2 discarded=0 handed=2 handoffs=2 handoff_exit=0 asr_loaded=true punct_attached=false punctuated_finals=0 announce_asked=1 spoken=1 aborted=0 gated=0 samples=89490 warm_turn_end=3 warm_wake=1 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=367 paused_drops=0 partials=9 finals=2 discarded=0 handed=2 handoffs=2 handoff_exit=0 asr_loaded=true punct_attached=false punctuated_finals=0 announce_asked=1 spoken=1 aborted=0 gated=0 samples=89490 warm_turn_end=3 warm_wake=1 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- PASS: Test26R3AnnounceClosesTheCaptureGate (25.08s)
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:523: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+time=2026-11-14T21:14:06.069+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T21:14:06.072+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-14T21:14:06.078+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x108206ce"
+time=2026-11-14T21:14:06.079+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x18 known=true"
+time=2026-11-14T21:14:06.079+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x46 known=true"
+time=2026-11-14T21:14:06.083+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x46 known=true"
+time=2026-11-14T21:14:06.084+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x1c known=true"
+time=2026-11-14T21:14:06.085+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x86 known=true"
+time=2026-11-14T21:14:06.085+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.085+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.085+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.086+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x6 known=true"
+time=2026-11-14T21:14:06.094+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x281 known=true"
+time=2026-11-14T21:14:06.099+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x282 known=true"
+time=2026-11-14T21:14:06.099+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x3d known=true"
+time=2026-11-14T21:14:06.099+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x3d known=true"
+time=2026-11-14T21:14:06.100+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7 known=true"
+time=2026-11-14T21:14:06.100+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x85 known=true"
+time=2026-11-14T21:14:06.100+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x14 known=true"
+time=2026-11-14T21:14:06.100+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x47 known=true"
+time=2026-11-14T21:14:06.100+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x5 known=true"
+time=2026-11-14T21:14:06.101+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x3 known=true"
+time=2026-11-14T21:14:06.101+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-14T21:14:06.101+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0xf known=true"
+time=2026-11-14T21:14:06.101+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-14T21:14:06.101+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-14T21:14:06.101+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-14T21:14:06.110+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x210 known=true"
+time=2026-11-14T21:14:06.110+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.110+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x31f known=true"
+time=2026-11-14T21:14:06.111+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0xc0fa known=true"
+time=2026-11-14T21:14:06.139+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.140+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.723+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-14T21:14:06.731+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:06.731+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:07.049+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x14 known=true"
+time=2026-11-14T21:14:07.054+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 991.8 ms, hot path 0.0 ms)
+time=2026-11-14T21:14:07.181+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:07.181+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+time=2026-11-14T21:14:07.182+08:00 level=INFO msg="MARK299 wndproc hwnd=0x108206ce msg=0x7f known=true"
+    panel_resident_windows_test.go:534: 447-ac13-handover-settled on probe attempt 8: "https://wisp.panel/index.html|complete|Wisp"
+    panel_resident_windows_test.go:536: AC#13 entry-id report arrived on probe attempt 1: "1"
+    panel_resident_windows_test.go:538: AC#13 page answer (head 2512c900b): "1" - 1 of 1 probe id(s) present in the live document
+time=2026-11-14T21:14:07.676+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-11-14T21:14:07.676+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.74s)
+=== RUN   Test26R3AnnounceClosesTheCaptureGate
+time=2026-11-14T21:14:08.422+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T21:14:08.446+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" asr_dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models\asr-streaming-paraformer-zh-en config_source="26r3 test"
+time=2026-11-14T21:14:09.298+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T21:14:09.298+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T21:14:09.299+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models manifest="D:\\work\\workspace\\projects plans\\Wisp\\build\\models\\manifest.json"
+time=2026-11-14T21:14:12.316+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.02s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models）
+time=2026-11-14T21:14:12.316+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\Test26R3AnnounceClosesTheCaptureGate3762974503\\001\\models"
+time=2026-11-14T21:14:15.130+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T21:14:15.130+08:00 level=INFO msg="voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw"
+wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点
+time=2026-11-14T21:14:16.042+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 3392ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T21:14:16.042+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:14:16.042+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=1
+time=2026-11-14T21:14:16.149+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:tts:tts.announce cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\lexicon.cc:ConvertTokensToIds:93 Unknown token: shei2
+time=2026-11-14T21:14:20.388+08:00 level=INFO msg="voice: capture gate closed for the announcement" reason=speaking path=T
+time=2026-11-14T21:14:20.388+08:00 level=INFO msg="voice: D43 walked" from=Thinking event=llm.first-token to=Speaking why="播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）"
+D:\a\sherpa-onnx\sherpa-onnx\sherpa-onnx\csrc\character-lexicon.cc:ConvertTextToTokenIds:181 Ignore OOV 'r'
+time=2026-11-14T21:14:21.071+08:00 level=INFO msg="voice: announcement spoken" runes=22 chunks=1 samples=89490 rate=22050 acquire=4.3421047s scope=voice-announce
+time=2026-11-14T21:14:21.072+08:00 level=INFO msg="voice: D43 walked" from=Speaking event=tts.speak-done to=Warm why="播报结束：D43#26 Speaking 到 Warm（会话落 Warm，引擎保持热）"
+time=2026-11-14T21:14:21.072+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=announce-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:14:21.072+08:00 level=INFO msg="voice: capture gate reopened (speech ended)" reason=announce-done path=T
+    resident_voice_selfecho_26r3_windows_test.go:233: GATE-26R3 closed=1 reopened=1 events=2 mid_speech_transcripts=0 spoken_samples=89490 gate_on=1 gate_off=1
+time=2026-11-14T21:14:21.092+08:00 level=INFO msg="voice: the announce swapped the engine family; phase 1 re-armed" reason=tts-resident asr_released=true
+    resident_voice_selfecho_26r3_windows_test.go:263: ECHO-26R3 gate_state_during_feed=speaking(PathT capture refused) frames_fed=6 drained_total=187 transcripts_after=1
+time=2026-11-14T21:14:21.941+08:00 level=INFO msg="voice: D43 walked" from=Warm event=session.summon to=Listening why="麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）"
+time=2026-11-14T21:14:21.941+08:00 level=INFO msg="voice: model hand-off and engine load started on the roster's model thread" goroutine=model-downloader id=asr-streaming-paraformer-zh-en dir=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models\asr-streaming-paraformer-zh-en
+time=2026-11-14T21:14:21.943+08:00 level=INFO msg="voice: model hand-off starting" id=asr-streaming-paraformer-zh-en store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models manifest="D:\\work\\workspace\\projects plans\\Wisp\\build\\models\\manifest.json"
+time=2026-11-14T21:14:24.768+08:00 level=INFO msg="voice: model hand-off: effect d43=37 name=model.verify-sha256-signature at=1"
+wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，2.83s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models）
+time=2026-11-14T21:14:24.768+08:00 level=INFO msg="voice: model hand-off: hand-off OK id=asr-streaming-paraformer-zh-en state=FirstRun root=C:\\Users\\swq\\AppData\\Local\\Temp\\Test26R3AnnounceClosesTheCaptureGate3762974503\\001\\models"
+time=2026-11-14T21:14:24.831+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=family-change:asr:first-use cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T21:14:27.773+08:00 level=INFO msg="voice: the chain is live" asr=asr-streaming-paraformer-zh-en vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" goroutine=asr-infer window_samples=512
+wisp: 语音链接管：模型交还已通过（id=asr-streaming-paraformer-zh-en），ASR 字节从 C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3762974503\001\models\asr-streaming-paraformer-zh-en 打开，VAD 句柄换成第二枚会话接管回放
+time=2026-11-14T21:14:27.773+08:00 level=INFO msg="voice: punctuation switched off by config ([voice] punctuation=false); finals stay raw"
+wisp: 标点级已按配置关闭（[voice] punctuation=false）：final 是原始假设，不带标点
+time=2026-11-14T21:14:28.605+08:00 level=INFO msg="voice: warm wake took its ASR borrow back" acquire=0s stage=Awake loads_after_warm=0
+time=2026-11-14T21:14:28.605+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 2592ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T21:14:28.605+08:00 level=INFO msg="voice[scope]: session: SCOPE-WARM reason=turn-end engines_hot=1 warm_timeout=1m30s"
+time=2026-11-14T21:14:28.605+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Warm loads_after_warm=0 engines_hot=1
+    resident_voice_selfecho_26r3_windows_test.go:289: REOPEN-26R3 finals=2 warm_wake=1 stage=Warm gate_speaking=false
+time=2026-11-14T21:14:28.676+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T21:14:28.677+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=process-exit cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-14T21:14:28.677+08:00 level=INFO msg="voice leg stopped: frames_drained=367 paused_drops=0 partials=9 finals=2 discarded=0 handed=2 handoffs=2 handoff_exit=0 asr_loaded=true punct_attached=false punctuated_finals=0 announce_asked=1 spoken=1 aborted=0 gated=0 samples=89490 warm_turn_end=3 warm_wake=1 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=367 paused_drops=0 partials=9 finals=2 discarded=0 handed=2 handoffs=2 handoff_exit=0 asr_loaded=true punct_attached=false punctuated_finals=0 announce_asked=1 spoken=1 aborted=0 gated=0 samples=89490 warm_turn_end=3 warm_wake=1 gate_closed=1 gate_reopened=1 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- PASS: Test26R3AnnounceClosesTheCaptureGate (20.93s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	76.00s
+

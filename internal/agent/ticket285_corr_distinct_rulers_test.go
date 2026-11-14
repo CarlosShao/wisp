@@ -16,13 +16,28 @@ import (
 	"context"
 	"encoding/json"
 	"strings"
+	"sync"
 	"testing"
 )
 
 // recordCorrProvider answers every call immediately and keeps the ToolRequest
 // the loop actually dispatched, so the request side is read without a gate, a
 // database or an approval card.
+//
+// THE LOCK IS NOT DECORATION (ticket 447's 285Loop red on linux, CI run
+// 43593532737, test-core step 7): the "parallel-tools" fixture makes the loop
+// dispatch both calls of one turn CONCURRENTLY (D38d, loop.executeCalls, one
+// observe.Spawn per call), so Execute runs on two goroutines at once. An
+// unguarded `p.reqs = append(p.reqs, req)` loses one of the two appends - both
+// goroutines read len=0, both write index 0, the last writer wins - and the
+// ruler then reads "dispatched requests = 1, want 2" with the SURVIVING call
+// being whichever wrote last (`call_p2` in that log). That is a defect in this
+// recorder, not in the product: the same binary under -race reported
+// "DATA RACE ... (*recordCorrProvider).Execute ... ticket285_corr_distinct_rulers_test.go"
+// between the two Execute goroutines spawned by loop.executeCalls.
+// Assertions below are byte-identical; only the recorder stopped losing writes.
 type recordCorrProvider struct {
+	mu   sync.Mutex
 	reqs []ToolRequest
 }
 
@@ -34,8 +49,18 @@ func (p *recordCorrProvider) Tools(context.Context) ([]ToolInfo, error) {
 }
 
 func (p *recordCorrProvider) Execute(_ context.Context, req ToolRequest) (ToolOutcome, error) {
+	p.mu.Lock()
 	p.reqs = append(p.reqs, req)
+	p.mu.Unlock()
 	return ToolOutcome{Text: "answered"}, nil
+}
+
+// requests returns a snapshot taken under the same lock Execute writes with, so
+// the reading is the loop's dispatches and never a torn slice header.
+func (p *recordCorrProvider) requests() []ToolRequest {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return append([]ToolRequest(nil), p.reqs...)
 }
 
 // Test285CallCorrIsDistinctPerCall is the differential ruler on both branches
@@ -103,13 +128,14 @@ func Test285LoopDispatchesOneCorrPerCall(t *testing.T) {
 	h := newHarness(t, "parallel-tools", withTools(p))
 	res := h.run("两件事一起办")
 
+	reqs := p.requests()
 	if res.Status != StatusCompleted {
 		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
 	}
-	if len(p.reqs) != 2 {
-		t.Fatalf("dispatched requests = %d, want 2 (one per tool call): %+v", len(p.reqs), p.reqs)
+	if len(reqs) != 2 {
+		t.Fatalf("dispatched requests = %d, want 2 (one per tool call): %+v", len(reqs), reqs)
 	}
-	first, second := p.reqs[0], p.reqs[1]
+	first, second := reqs[0], reqs[1]
 
 	// 夹具前置（票面 AC#4 那句）：任务身份与调用身份在这里必须是两枚值，
 	// 否则两发必同绿不算读数。这一条本身也是断言，不是注释。
@@ -124,7 +150,7 @@ func Test285LoopDispatchesOneCorrPerCall(t *testing.T) {
 		t.Fatalf("both calls of one task dispatched with corr %q: the two asks share one routing key",
 			first.CorrelationID)
 	}
-	for _, req := range p.reqs {
+	for _, req := range reqs {
 		if req.CorrelationID == "" {
 			t.Errorf("call %s carried an empty corr", req.CallID)
 			continue

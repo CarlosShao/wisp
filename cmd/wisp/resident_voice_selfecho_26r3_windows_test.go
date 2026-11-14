@@ -97,6 +97,31 @@ func (g *voice26r3Gate) windows() (drainedDelta, finalsDelta uint64) {
 	return g.drainedAtOpen - g.drainedAtClose, g.finalsAtOpen - g.finalsAtClose
 }
 
+// waitGate26r3 waits, bounded, for the announce path to SETTLE the capture gate:
+// at least one close, at least one release, and the gate not left speaking. It
+// returns false only when the deadline passed without that reading, and the
+// caller then names the mutant shape the numbers describe.
+//
+// It exists because "the sentence is over" (stage back in Warm) and "the gate is
+// released" are two different moments on one goroutine - see the call site for
+// the CI window that measured them a scheduling gap apart. A 10 ms poll on a
+// monotonic deadline, no product threshold: the only number here is the same
+// panelThreadWait every other wait in this package uses.
+func waitGate26r3(t *testing.T, g *voice26r3Gate, within time.Duration) bool {
+	t.Helper()
+	deadline := time.Now().Add(within)
+	for {
+		closed, reopened, speaking, _ := g.snapshot()
+		if closed >= 1 && reopened >= 1 && !speaking {
+			return true
+		}
+		if !time.Now().Before(deadline) {
+			return false
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
 // Test26R3AnnounceClosesTheCaptureGate is reading #1 plus the self-echo
 // fixture: one real dictation turn, then one real announcement with the gate
 // driven by the production speak() body, and speech-time frames fed into the
@@ -145,18 +170,31 @@ func Test26R3AnnounceClosesTheCaptureGate(t *testing.T) {
 	voice15eWaitFor(t, "the announcement to be spoken", func() bool {
 		return rv.ttsSpoken.Load() == 1
 	})
-	// The named red shapes come BEFORE the wait: a mutant must fail with its own
-	// sentence, not with a generic timeout. Wait for the sentence to be over
-	// first (the TTS slot is back in Warm), then diagnose the gate state.
 	voice15eWaitFor(t, "the announcement to end (the slot back in Warm)", func() bool {
 		return rv.residency.stage() == session.StageWarm
 	})
-	closed0, reopened0, speaking0, _ := gate.snapshot()
-	if closed0 == 0 {
-		t.Fatalf("MUTANT 26r3-M1 SHAPE: the announce path never closed the capture gate (closed=%d reopened=%d): SetSpeaking(true) is not on the path, so the D16 half-duplex close never happens and the microphone would hear the announcement", closed0, reopened0)
-	}
-	if reopened0 == 0 || speaking0 {
-		t.Fatalf("MUTANT 26r3-M2 SHAPE: the capture gate was left in Speaking after the sentence finished (closed=%d reopened=%d speaking=%v): SetSpeaking(false) is not on the path; capture stays closed - stuck in Speaking - and no later utterance can ever be captured again", closed0, reopened0, speaking0)
+	// The named red shapes come BEFORE the wait: a mutant must fail with its own
+	// sentence, not with a generic timeout. Wait for the sentence to be over
+	// first (the TTS slot is back in Warm), then wait for the GATE's own settled
+	// reading before judging it.
+	//
+	// WHY THE STAGE IS NOT THE GATE'S PREDICATE (ticket 447, CI run 43591105754,
+	// test-windows step 10, 2026-11-14T11:54:56.826Z): finish() walks the stage
+	// Speaking -> Warm on tts.speak-done and calls SetSpeaking(false) AFTER that
+	// walk, on the same goroutine - the CI log prints both inside the same
+	// millisecond ("D43 walked ... event=tts.speak-done to=Warm" and then
+	// "capture gate reopened (speech ended)"). A ruler that waits only for the
+	// stage and then reads the gate can land in that gap and accuse the mutant:
+	// measured there closed=1 reopened=0 speaking=true - while the SAME run's
+	// stop line reads gate_closed=1 gate_reopened=1. The predicate under
+	// judgement is the gate's, so the gate is what this ruler waits for; the
+	// mutant sentences stay exactly where they were, on the timeout path.
+	if !waitGate26r3(t, gate, panelThreadWait) {
+		closed0, reopened0, speaking0, _ := gate.snapshot()
+		if closed0 == 0 {
+			t.Fatalf("MUTANT 26r3-M1 SHAPE: the announce path never closed the capture gate (closed=%d reopened=%d): SetSpeaking(true) is not on the path, so the D16 half-duplex close never happens and the microphone would hear the announcement [447-26r3-gate-not-settled after %v]", closed0, reopened0, panelThreadWait)
+		}
+		t.Fatalf("MUTANT 26r3-M2 SHAPE: the capture gate was left in Speaking after the sentence finished (closed=%d reopened=%d speaking=%v): SetSpeaking(false) is not on the path; capture stays closed - stuck in Speaking - and no later utterance can ever be captured again [447-26r3-gate-not-settled after %v]", closed0, reopened0, speaking0, panelThreadWait)
 	}
 	voice15eWaitFor(t, "the capture gate to be reopened after the sentence", func() bool {
 		return rv.speakGateOff.Load() == 1

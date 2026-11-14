@@ -85,3 +85,19 @@
 **③ 由此更正本票的计数**：flake 集合**不是 3 枚、也不是 4 枚，现在是 7 枚**（`390r1…Walks27`／`PanelHostRealWindowHopAndLifecycle`／`WireR1AnnounceEndToEnd`／`219AC2SecondRevoke`（本地满载）／`AC13ColdStart`／`26R3Announce`／`285LoopDispatches`），**跨 `cmd/wisp` 与 `internal/agent` 两个包、`test-windows` 与 `test-core` 两个 job**。
 
 **④ `285Loop` 那枚最可疑**：`0.00s` 就红 ⇒ 不是"读早了"（那类要等），形状像**真缺陷或顺序依赖**。⇒ 派腿时写死：这一枚若判成 (c) 真缺陷，**立刻停手上报**，不许用改测试的方式抹平。
+
+---
+
+## 第二轮写腿（2026-11-14 21:0x–21:5x +08，委派，起手 HEAD `2512c900b`）：三枚新红的定性，两枚已修，一枚只改读数形状
+
+证据全文 `docs/evidence/s1/447b-three-new-reds.md`，台件 `.scratch/wisp/probes/447b/logs/**`。**产码 0 字节。**
+
+- **判决**：`285LoopDispatches` ＝ **真缺陷，但缺陷在尺不在产码**（不是产码 (c)）；`26R3Announce` ＝ **(a) 读早了**；`AC13ColdStart` ＝ **(d) 墙钟上界，⚠ 带 (c) 风险标记**（下面写清为什么不是 (c)、为什么也不敢说产码无罪）。
+- **③ `285Loop`（0.00 s，linux test-core step7）**：CI 原文 `dispatched requests = 1, want 2 … [{… CallID:call_p2 Name:echo Args:{"text":"second"}}]` ⇒ **少一条、活的是后写的那条**。查到底：产码 `loop.go:791` 为每枚调用 `observe.Spawn` 一个 goroutine（D38d 上限 4），**真并发**；尺的 `recordCorrProvider` 在 `:37` 无锁 `append` ⇒ 两条 goroutine 同读 `len=0` 同写 `index 0`，后写覆盖先写。`-race` 直接点名 `DATA RACE … (*recordCorrProvider).Execute … ticket285_corr_distinct_rulers_test.go`（日志 `02-pristine-race-red.txt`，跑在仓外导出树上）。⇒ **尺加 `sync.Mutex` ＋ `requests()` 同锁快照，断言一行未改**；`-count=5` 10/10 PASS、`-race -count=3` 零 race；牙：导出树把 `callCorr` 的 call id 抠掉 ⇒ 红并点名 `:150 both calls of one task dispatched with corr "…"#call: the two asks share one routing key`，SHA256 还原再绿。
+- **② `26R3Announce`（9.87 s）**：红句 `MUTANT 26r3-M2 SHAPE … closed=1 reopened=0 speaking=true`，而**同一毫秒**里 `to=Warm` 先写、`capture gate reopened` 后写，且同一发的 stop 行是 `gate_closed=1 gate_reopened=1` ⇒ 尺等的是 `stage==Warm`、判的是 gate，`SetSpeaking(false)` 在 stage 之后。⇒ 加 `waitGate26r3`（10 ms 轮询、单调时钟、上界 `panelThreadWait`、谓词＝gate 自己的落定态），**M1/M2 两句命名原样搬到超时路径**、精确计数/事件序列/leg 计数器未动；载具 `-test.count=3` 三发全 PASS（`GATE-26R3 closed=1 reopened=1 … gate_on=1 gate_off=1`，20.9–25.1 s）。⚠ 26r3 的牙**没跑**：突变要去掉产码 `SetSpeaking(false)`，而 voice 夹具 `third_party/`（git-ignored）不在仓外导出树里 —— 我不在本仓工作树里改产码，欠账照记。
+- **① `AC13ColdStart`（15.64 s）**：红句的关键不是"0 of 1"，而是 `no probe attempt over 8 attempt(s) … last report: ""` —— 15 s 预算内 **8 次探针一次回话都没有**，而同一发里 `TestPanelPageFetchesItsOwnAssets299` 把同一 entry URL 读出 `ready=complete root=yes`。⇒ (a) 不成立（重问已在等、跨 15 s）；AC#13 的**已知缺陷形状**是 `718 attempt(s) … last report: "0"`（导出树 m1 读数）——"空回话"与"0"是两个世界。同发冷启动 511.5 ms vs 绿发 445.8 ms ＝ **1.15×**，不是 30×，所以我不拿"慢"当解释。⇒ 判 **(d)**：判据只建在"15 s 内必须落定"这条墙钟上，且那 15 s 里**一个读数都没有**。
+  - **⚠ (c) 风险**：六个 head（`ff0edb4b0`/`1984618a4`/`6aa244b67`/`445ea5b98`/`468cd2894`/`35faf8064`）**全是文档/派单/台账提交**（`git show --stat` 逐枚核过），3 红 3 绿跑的是**同一份产码** ⇒ 只证明"偶发"，不证明产码无罪；`serveEntry` 只发 `Navigate(panelEntryURL)`、没有 `NavigationCompleted` 读面、没有重试、没有失败读数（`panel_host_windows.go:789`）⇒ "导航 15 s 没落定"也可能是真缺陷。这一轮**不判 (c)**（手上没有一个"产码错了"的正面事实），但下一发若在新尺下再红成 `447-ac13-handover-never-answered`，那次就是判 (c) 的起点。
+  - **改了什么**：新增 settle 闸 `awaitHandoverEntryDocument`（问 `location.href|readyState|title`，谓词**只要** `readyState=="complete"`，超时打 `447-ac13-handover-never-answered` ＋ attempts/reportCount/last/`describeRequests`），**AC#13 内容断言一字未改**。谓词故意不要求 "href 是 entry"：否则"顺序反了"的世界会落到新红上、**原句再也不点名**（钝化）。牙（仓外导出树）：顺序突变 ⇒ `settled on probe attempt 1: "about:blank|complete|"` ⇒ `page answer "0"` ⇒ **原 AC#13 句子红**（16.44 s）；还原 SHA256 同值、再绿。
+- **整包四数（载具，本机，21:24–21:48）**：`RUN=853 PASS=611 FAIL=2 SKIP=17`（`FAIL … cmd/wisp 1817.00s`）。两枚红**都不是本腿的、且都是票面点过名的本机已知红**：`TestAC4FocusReturnToPriorWindowGap33r5`（前台被占）、`TestAC246DevLegIgnoresTheTestTaskInjection`（"a dev Wisp is already running in this session"）。三枚靶子里两枚在同一次整包内**绿**。
+- **没翻的**：AC#5（CI 连续 5 发 FAIL 恒 0）要推送后由编排者复读，本腿 ⛔ push；`AC13ColdStart` 的 (c) 最终定性要等下一发 CI。
+- **踩坑记（给下一腿）**：PowerShell 直接调载具 exe 时，`-test.count=3` 会被 PS 拆成 `-test` ＋ `.count=3`，二进制报 `flag provided but not defined: -test` ⇒ **每个 `-test.*` 必须单独引号**，或走 cmd.exe。第一次载具跑就是因为这个假红。
