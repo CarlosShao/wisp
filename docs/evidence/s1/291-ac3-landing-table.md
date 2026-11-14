@@ -266,6 +266,7 @@ git diff --stat -- internal/ball cmd/wisp docs/PLAN.md docs/specs tools/d22scan 
 
 ## 9. 写面与纪律自证
 
-- 主仓 `git status --porcelain -- internal cmd docs/specs docs/PLAN.md tools internal/observe` 收工读数：只有本件（`?? docs/evidence/s1/291-ac3-landing-table.md`）与 `probes/291/ac3/**` 的未跟踪件；**`internal/**`／`cmd/**` 零改动**。
+- 主仓 `git status --porcelain -- internal cmd docs/specs docs/PLAN.md tools internal/observe` 收工读数：**只有两枚别人的既有未跟踪件**（`?? tools/d22scan/check_blob_417.sh`、`?? tools/jarvis-export/.verify.js`，开工时就在，非本腿）；**`internal/**`／`cmd/**` 零改动**（对照开工时的同一把尺，读数一致）。
+- 本件与 `.scratch/wisp/probes/291/ac3/**` 已随 commit **`8d98e4dfb`** 入盘（显式 pathspec；13 枚文件、1654 行插入）；`git show --stat 8d98e4dfb` 的 13 枚名册里 **`internal/**`／`cmd/**` 零命中**。⚠ 树里另有一枚**别人**的已改未跟踪/已改件（`.scratch/wisp/probes/291/mic/resident_audio_291_probe_windows_test.go`，` M`）＝非本腿，**未入我的 commit**。
 - ⛔ 未改票面／台账／`PLAN.md`／`specs`／`thresholds.go`／golden／`allowlist.txt`／C 表／D43；⛔ 未跑真麦（未设 `WISP_LIVE_MIC`，两枚真机台件仍 SKIP）；⛔ `add -A`／amend／reset／rebase／stash／checkout .；⛔ push。
-- 临时件：导出树 `D:\tmp\wisp\20261114\291-ac3-tree`（仓外，只建不删）。
+- 临时件：导出树 `D:\tmp\wisp\20261114\291-ac3-tree`（仓外，只建不删）。它里面躺着**提案的产码改动**（`level.go` 去均值 ＋ 两枚夹具重定 ＋ 新钉），**只在导出树里存在**，主仓零字节。
