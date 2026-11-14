@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 来路：审计腿 fc580501b 查出「446 的牙只在 probes 里」，编排者立票
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 448（小活，但它是「回归闸 vs 一次性证明」的分界）。
+
+先读票全文 .scratch/wisp/issues/448-the-errno-fix-teeth-live-only-in-probes.md。
+背景：446 把 `internal/tools/system_backend_windows.go` 的 errno 存在性判定从**英文句子比较**改成 `errors.Is(e, syscall.Errno(0))`（`errnoPresent`，定义 `:270`，调用 `:301`/`:441`）。它的「能变红」证明用的是 `-overlay` 挂进包的**临时**探针，跑完就没了。审计现跑：`internal/tools` 里**零测试**提到 `errnoPresent` ⇒ **今天把这行改回句子比较，仓里没有任何测试会红**。
+
+你要做的：落一枚**常驻**检查（`internal/tools/*_test.go` 新件，或 `tools/d22scan` 的静态闸 —— **你选一个并写理由**），使两件事都红：
+① 判定函数退回英文句子比较；
+② 调用点绕过 `errnoPresent` 直接用旧比较。
+⛔ `-overlay`、⛔ 只放 `probes/`、⛔ 依赖本机 `GetUserDefaultUILanguage`（要任何语言的 Windows 上都成立，用 `syscall.Errno(0)` 字面值/本地化样例做输入）。
+
+⛔ 改 446 已修好的判定逻辑本身（只补牙）；⛔ cmd/wisp/internal/panel/internal/llm（别人写面）；⛔ 阈值/golden/契约；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+⚠ `gofumpt.exe` 在盘上：D:\work\base\gopath\bin\gofumpt.exe（别再说本机没装）。
+
+回话第一行＝commit hash ＋「常驻闸落在哪里（文件:行）＋两个方向各红过一次（是/否）」。没干完写「未完成，卡在哪」。
