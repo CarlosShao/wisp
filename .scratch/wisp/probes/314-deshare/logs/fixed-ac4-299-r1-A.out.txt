@@ -1,0 +1,9 @@
+=== RUN   TestPanelPageFetchesItsOwnAssets299
+    panel_assets_299_windows_test.go:223: 299 AC#2 page report (head 1ce39a651, 1 attempt(s)): "href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=110;root=yes;roottext=116;resjs=1;rescss=1;" | href="https://wisp.panel/index.html" base="https://wisp.panel/index.html" ready="complete" sheets=1 rules=110 root="yes" roottext=116 resjs=1 rescss=1
+--- PASS: TestPanelPageFetchesItsOwnAssets299 (2.66s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+wisp: panel window hidden (focus returned to hwnd 0x7aa06e6)
+wisp: panel window hidden (focus returned to hwnd 0x7aa06e6)
+    panel_host_windows_test.go:1099: AC#4 focus hop (head 1ce39a651): foreground before any panel 0x40c0698 | the ruler's own editor window 0x7aa06e6 | foreground while hidden (prior) 0x7aa06e6 | after Show 0x75a059e | panel hwnd 0x75a059e | prevFocus recorded at Show 0x7aa06e6 | after Hide 0x7aa06e6 | Hide attempted restore to 0x7aa06e6 (SetForegroundWindow 1, SetFocus 128583398)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (1.63s)
+PASS

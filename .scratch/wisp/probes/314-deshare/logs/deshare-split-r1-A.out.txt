@@ -1,0 +1,12 @@
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:751: cold bring-up measured on this box: 1864.275 ms (HEAD 1ce39a651 at read time, 2026-11-14T11:48:01+08:00)
+    panel_host_windows_test.go:756: cold bring-up 1864.3 ms exceeds D32 panel cold budget 1500 ms
+    panel_host_windows_test.go:804: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=8 (machine-wide 46)
+wisp: panel window hidden (no prior window to return focus to)
+    panel_host_windows_test.go:840: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=8 (machine-wide 46)
+    panel_host_windows_test.go:870: AC#1 denominators (head 1ce39a651): our tree webview=8 direct-children=1 tree-pids=8 | browser hosts pre=[67344] mine=[67344] post=[67344] added=[] mine-died=[] | machine-wide msedgewebview2=46 | same HWND 0xcab0768 across hide->re-show=true
+    panel_host_windows_test.go:894: hot re-show measured on this box: 105.408 ms
+    panel_host_windows_test.go:919: AC#3 listening-socket ruler (head 1ce39a651): IPv4 rows=234 LISTEN-owned-by-tree=0 ; IPv6 rows=98 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:945: AC#1 after Destroy (head 1ce39a651), ONE sample and no timing claim: our tree webview baseline 0 -> now 8, machine-wide 31 -> 46. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (3.07s)
+FAIL

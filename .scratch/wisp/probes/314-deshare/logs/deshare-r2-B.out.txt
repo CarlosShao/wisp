@@ -1,0 +1,15 @@
+=== RUN   TestPanelPageFetchesItsOwnAssets299
+    panel_assets_299_windows_test.go:221: 299 AC#2 page report (head 1ce39a651, 1 attempt(s)): "href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=110;root=yes;roottext=116;resjs=1;rescss=1;" | href="https://wisp.panel/index.html" base="https://wisp.panel/index.html" ready="complete" sheets=1 rules=110 root="yes" roottext=116 resjs=1 rescss=1
+--- PASS: TestPanelPageFetchesItsOwnAssets299 (2.64s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:751: cold bring-up measured on this box: 1641.124 ms (HEAD 1ce39a651 at read time, 2026-11-14T11:42:46+08:00)
+    panel_host_windows_test.go:756: cold bring-up 1641.1 ms exceeds D32 panel cold budget 1500 ms
+    panel_host_windows_test.go:804: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=15 (machine-wide 54)
+wisp: panel window hidden (no prior window to return focus to)
+    panel_host_windows_test.go:840: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=15 (machine-wide 54)
+    panel_host_windows_test.go:870: AC#1 denominators (head 1ce39a651): our tree webview=15 direct-children=2 tree-pids=15 | browser hosts pre=[31864 48704] mine=[31864] post=[31864 48704] added=[] mine-died=[] | machine-wide msedgewebview2=54 | same HWND 0xc5e006a across hide->re-show=true
+    panel_host_windows_test.go:894: hot re-show measured on this box: 58.581 ms
+    panel_host_windows_test.go:919: AC#3 listening-socket ruler (head 1ce39a651): IPv4 rows=284 LISTEN-owned-by-tree=0 ; IPv6 rows=113 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:945: AC#1 after Destroy (head 1ce39a651), ONE sample and no timing claim: our tree webview baseline 7 -> now 15, machine-wide 45 -> 54. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (2.80s)
+FAIL

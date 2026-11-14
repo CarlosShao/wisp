@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -31,6 +32,102 @@ import (
 	"github.com/CarlosShao/wisp/internal/panel"
 	"golang.org/x/sys/windows"
 )
+
+// panelProfileLeaf returns this run's private WebView2 user-data leaf for the
+// panel fixtures in this file and in panel_assets_299_windows_test.go, and
+// best-effort clears the stale leftovers of the same family before it does.
+//
+// The leaf is unique per run because a shared one is a real defect surface, not
+// a cosmetic name: the fixture folder IS the browser's user-data folder
+// (panel_control_windows.go:355 DataPath -> Embed -> the fork's
+// createCoreWebView2EnvironmentWithOptions(nil, <dataPath>, ...)), so a fixed
+// name puts two concurrent runs on ONE folder. The two measured deaths for that
+// shape are internal/ball/orb_windows.go:432-458 - a contended CreateEnvironment
+// answering S_OK with a NULL environment, and a new environment JOINing a dying
+// browser process - and both need the two runs to land at the SAME moment.
+// Ticket 314's audit measured exactly that: one user-data folder carrying two
+// top-level browser hosts for ~1.2 s, each parented by a different test pid.
+//
+// Two deliberate boundaries, both from the existing file, not invented here:
+//
+//  1. the root stays os.TempDir(). t.TempDir() would move the root to GOTMPDIR
+//     and shift the instrumentation readings of the neighbouring tickets (314
+//     audit), so only the leaf is made unique - see uniqueProfileLeaf in
+//     panel_resident_windows_test.go, the 68275983e precedent this reuses.
+//  2. nothing is deleted at the end of the test, and this helper does not
+//     register a t.Cleanup(os.RemoveAll). The sibling precedent can, because its
+//     fixtures are not the ones with the long-lived browser; the caller comment
+//     on TestPanelHostRealWindowHopAndLifecycle states why these cannot: the
+//     auto-RemoveAll races the browser's own profile-DB teardown and fails on a
+//     locked file, which is the teardown, not a product assertion.
+//
+// "Never delete" is therefore paid for up front instead: each prefix is swept
+// once per test process and only leaves named exactly prefix-<pid>-<nanotime>
+// whose mtime is older than stalePanelProfileAge go away. A concurrent run's
+// leaf is seconds-to-minutes old, so it is never in range - deleting it would be
+// the very shared-state damage this change removes - and errors are ignored, so
+// a locked profile DB cannot turn a clean run red.
+func panelProfileLeaf(prefix string) string {
+	sweepStalePanelProfiles(prefix)
+	return uniqueProfileLeaf(prefix)
+}
+
+// stalePanelProfileAge is how old a leftover panel profile folder has to be
+// before nobody can be using it. These fixtures take 4.5-8.7 s per run
+// (probes/314-profile), so an hour is orders of magnitude past any live holder,
+// while still stopping "one new folder per run, forever" from accumulating.
+const stalePanelProfileAge = time.Hour
+
+// sweptPanelProfilePrefixes makes the sweep run once per prefix per process:
+// three fixtures share two prefixes, and re-listing the temp dir per test buys
+// nothing.
+var sweptPanelProfilePrefixes sync.Map
+
+// sweepStalePanelProfiles removes the leaves uniqueProfileLeaf would have made
+// for prefix in os.TempDir() that are older than stalePanelProfileAge. Every
+// error is ignored on purpose: this is housekeeping, not an assertion.
+func sweepStalePanelProfiles(prefix string) {
+	if _, loaded := sweptPanelProfilePrefixes.LoadOrStore(prefix, struct{}{}); loaded {
+		return
+	}
+	root := os.TempDir()
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		return
+	}
+	for _, e := range entries {
+		if !e.IsDir() || !isPanelProfileLeafName(e.Name(), prefix) {
+			continue
+		}
+		info, err := e.Info()
+		if err != nil || time.Since(info.ModTime()) < stalePanelProfileAge {
+			continue
+		}
+		_ = os.RemoveAll(filepath.Join(root, e.Name()))
+	}
+}
+
+// isPanelProfileLeafName reports whether name has the shape uniqueProfileLeaf
+// produces for prefix: prefix-<pid>-<nanotime>, both decimal. Anything else is
+// left alone - notably the old fixed names (which several other files still
+// use) and the "-second" sibling one fixture derives by suffixing a leaf.
+func isPanelProfileLeafName(name, prefix string) bool {
+	rest, ok := strings.CutPrefix(name, prefix+"-")
+	if !ok {
+		return false
+	}
+	pid, nano, ok := strings.Cut(rest, "-")
+	if !ok || pid == "" || nano == "" {
+		return false
+	}
+	if _, err := strconv.ParseInt(pid, 10, 64); err != nil {
+		return false
+	}
+	if _, err := strconv.ParseInt(nano, 10, 64); err != nil {
+		return false
+	}
+	return true
+}
 
 // hostThreadHarness runs the host on a private locked OS thread for the local
 // measurement / round-trip tests. It is deliberately a TEST harness - ban #1
@@ -606,7 +703,12 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 	// races the browser's own profile-DB teardown and fails on a locked file - that
 	// is the teardown, not a product assertion. The AC#1 exit deadline below is the
 	// thing that actually bounds the child processes.
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")
+	//
+	// What DID change (ticket 314) is the name, not the lifetime: it is per-run
+	// unique now, because the fixed name put two concurrent runs on ONE WebView2
+	// user-data folder. The stale-sibling sweep inside panelProfileLeaf is what
+	// keeps "never delete" from leaking one folder per run.
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
 	h := &recordingModeHandler{}
 	disp := &panel.ComposerDispatch{Mode: h}
 	mgr := NewPanelManager(disp, nil, dataPath)
@@ -919,7 +1021,10 @@ func waitForegroundNot(target uintptr, budget time.Duration) uintptr {
 func TestAC4FocusReturnToPriorWindowGap33r5(t *testing.T) {
 	foregroundBefore := uintptr(windows.GetForegroundWindow())
 
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")
+	// Per-run unique for the same reason as the lifecycle test above: the fixed
+	// name shared one WebView2 user-data folder with it, and this test runs a real
+	// window too. Lifetime unchanged - still never deleted by the fixture.
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
 	h := &recordingModeHandler{}
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
 

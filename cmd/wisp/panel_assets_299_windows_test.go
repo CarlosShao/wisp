@@ -41,8 +41,6 @@ package main
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -158,7 +156,12 @@ func TestPanelPageFetchesItsOwnAssets299(t *testing.T) {
 		t.Skipf("299 AC#2 has no subject: the embed reports built but the entry does not resolve (%v)", err)
 	}
 
-	dataPath := filepath.Join(os.TempDir(), "wisp-299r1-panel-profile")
+	// Per-run unique user-data folder (ticket 314): the fixed name here was the
+	// second half of the same shared-WebView2-user-data surface as
+	// panel_host_windows_test.go:609, and this test embeds a real window too. The
+	// root stays os.TempDir() and the folder is still never deleted by the test -
+	// see panelProfileLeaf's comment for both boundaries.
+	dataPath := panelProfileLeaf("wisp-299r1-panel-profile")
 	h := &recordingModeHandler{}
 	disp := &panel.ComposerDispatch{Mode: h}
 	mgr := NewPanelManager(disp, assets, dataPath)

@@ -1,0 +1,4 @@
+=== RUN   TestPanelPageFetchesItsOwnAssets299
+    panel_assets_299_windows_test.go:221: 299 AC#2 page report (head 1ce39a651, 1 attempt(s)): "href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=110;root=yes;roottext=116;resjs=1;rescss=1;" | href="https://wisp.panel/index.html" base="https://wisp.panel/index.html" ready="complete" sheets=1 rules=110 root="yes" roottext=116 resjs=1 rescss=1
+--- PASS: TestPanelPageFetchesItsOwnAssets299 (4.16s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle

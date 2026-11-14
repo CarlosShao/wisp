@@ -1,0 +1,6 @@
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+wisp: panel window hidden (focus returned to hwnd 0x9ba1458)
+wisp: panel window hidden (focus returned to hwnd 0x9ba1458)
+    panel_host_windows_test.go:1099: AC#4 focus hop (head 444b69338): foreground before any panel 0x9511070 | the ruler's own editor window 0x9ba1458 | foreground while hidden (prior) 0x9ba1458 | after Show 0x3c9073e | panel hwnd 0x3c9073e | prevFocus recorded at Show 0x9ba1458 | after Hide 0x9ba1458 | Hide attempted restore to 0x9ba1458 (SetForegroundWindow 1, SetFocus 163189848)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (1.87s)
+PASS
