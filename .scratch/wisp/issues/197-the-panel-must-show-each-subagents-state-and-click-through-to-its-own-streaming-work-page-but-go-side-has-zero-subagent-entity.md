@@ -236,3 +236,22 @@
 - ▶ **197-pw 实现腿：票 70 step 7 那枚「行已发布、取消句柄未挂」窗口（票 221 家族的两枚 CI 红；锚 HEAD `99ae90113`／分支 dev；证据件 `docs/evidence/s1/197-publish-attach-window.md`）**：复核把派单的三处偏差钉正了——真文件在 **`internal/tools/subagent_197.go`**（不是 `internal/agent/`）、测试是 `internal/tools/task_cancel_221_legs_test.go`（派单里 `legs_test.go` 就是它）、triage 注释里 `loop.go:360` 盘上是 `:409-414`（`newTaskID` `:364`）；**行号 `:337-345`／`:373`／`:374`／`:132-158`／`:452`／`:322` 逐枚对得上**。修前先造红：既有两枚用例空载 `-count=40` **80/80 绿**、`-race -count=25` **50/50 绿**（窗口窄，空载打不开），故另写两半仪器——**形状红（确定性）** `Test197SpawnPathPublishesRowAndStopHandleTogether` 在修前逐字红（`:338`／`:373` 裸 `PublishSubagent`、`:374` 把 `AttachCancel` 当第二次发布）；**症状红（给分母）** `Test197InFlightRowNeverLacksItsStopHandle`（40 轮 × 4 枚并发＝整池同时派生，放行点仍是第一次模型调用，无 sleep／无 deadline）在六路负载下 3 发 **1/480 命中**，逐字红句＝`任务 5b0c8f82-… 没有在跑（kind=subagent，state=Thinking），没有可停的句柄`——与 CI `:452`／`:322` 同一句自证矛盾。**修法**：新增 `TaskRoster.PublishSubagentInFlight`（`mu.Lock` 内写行＋挂句柄一次 Unlock；`Record` 的锁内体抽 `recordLocked` 复用身份三格保留），`AdmitTask`（happens-before 第一次模型调用，是唯一"因果"发布点）与派生侧 `:373/:374` 都收敛到它（同值同句柄，幂等；票 197 的「已启动的孩子必有行」不丢，`Test197RowExistsBeforeFirstChildModelCall` 仍绿）；`nil` 句柄不发布（fail-closed）；`PublishSubagent` 保留给没有句柄的夹具／兄弟行并由形状尺钉住。**状态机零改动**（`Thinking`／`Settling`／`Muted`／`Error` 与 D43 转移表一字未动）。**修后同一仪器**：空载 160 枚 **0 命中**、同六路负载 480 枚 **0 命中**；原两枚 `-count=5` **10/10 绿**；`go test -count=1 -v ./internal/agent/ ./internal/tools/` ⇒ **RUN=767 PASS=584 FAIL=0 SKIP=1**（两包 `ok`）。门禁：`go build ./internal/... ./cmd/... ./tools/...` rc=0、`go vet ./internal/agent ./internal/tools` rc=0、`gofumpt -l` 空、`sh scripts/d22scan.sh` clean。写面仅 `internal/tools/task.go`＋`internal/tools/subagent_197.go`＋新测试＋本证据件＋本行；`cmd/wisp`／`panel`／`observe`／`scripts`／`frontend`／阈值／golden／契约零改动；`cmd/wisp` 测试本机 `0xc0000135`（DLL 未暂存，triage step 13 同形）属环境、非本改动；未 push、未用禁字 git 命令。**裁决（这格是否算完成）归非实现者。**
 
 - ▶ **197-pw 独立复跑腿（非实现者；起手 HEAD `f8e94bbd8`）**：读到修复已由 `d8e2f4dc8` 在本腿派单前落库 ⇒ **不重复实现**，只复跑并把读数追加进证据件 §⑦。复核：真文件在 `internal/tools/`（`internal/agent/` 下无 `*197*`／无 `legs_test.go`），`:132-158`／`:322`／`:452` 与修前 `:338`／`:373`／`:374` 逐枚对得上；派单写面 `internal/agent/subagent_197.go` 系路径笔误，实质修复点连同 `internal/tools/task.go` 的新发布方法超出字面写面，**具名上报编排者**。修前红在**仓外临时树**（`git archive 99ae90113` ＋本枚形状尺）确定性复现：`--- FAIL: Test197SpawnPathPublishesRowAndStopHandleTogether` 逐字四条（`:338`／`:373` 裸 `PublishSubagent`、`:374` `AttachCancel`）rc=1。修后：症状尺 `-count=40` **40/40 PASS**（40 发 × 40 轮 × 4 枚＝**6400 枚在飞子代理、0 命中**）＋形状尺 PASS；原两枚 `-count=5` **10/10**；`go test -count=1 -v ./internal/agent/ ./internal/tools/` ⇒ **RUN=767 PASS=584 FAIL=0 SKIP=1**（ok 21.507s／63.587s）；门禁 build rc=0／vet rc=0／gofumpt -l 空（v0.12.0）／`d22scan.sh` clean rc=0。**产品码／测试零改动**（`git status --porcelain -- internal/` 空）；本腿唯一落盘＝证据件 §⑦ 与本行；未 push、未建 worktree、未用禁字 git 命令。裁决仍归非实现者。
+
+## 编排者裁定（2026-11-14 13:0x）：发布/挂句柄窗口已修，`task.go` 越界**接受**（错在派单）
+
+### 一、缺陷与修复
+- 机理：`internal/tools/subagent_197.go` 的派生路径原来**分两次发布** —— `:338`／`:373` 裸 `PublishSubagent`（行先可见），`:374` 才 `AttachCancel`（句柄后挂）⇒ 子代理在**第一次模型调用期间**会出现「行在、句柄不在」：`task.cancel` 回「没有在跑」而状态却显示 `Thinking`。
+- 修法（`d8e2f4dc8`）：`internal/tools/task.go` 新增 `PublishSubagentInFlight(taskID, parentTaskID, label, cancel func())` —— 行与取消句柄在**同一个临界区**落地；派生路径改调它（`:358`／`:387`）。**生产码里裸 `.PublishSubagent(` 调用现为 0 处**（我现跑核过）。
+
+### 二、独立复跑（换腿换进程，`0c9ff7c0c`）
+- 在**仓库外**临时树（`git archive 99ae90113` → `C:\Temp`，未建 worktree、未 checkout）里跑形状尺，**修前逐字红并点名叫对三处**：`subagent_197.go:338 仍在用裸 PublishSubagent 发行（这一调用不带句柄）`、`:373` 同形、`:374 仍把 AttachCancel 当第二次发布`。
+- 修后：症状仪器 `-count=40` **40/40 PASS**（40 发 × 40 轮 × 4 枚并发 = **6400 枚在飞子代理，0 命中**）；原两枚用例 `-count=5` **10/10 绿**；`./internal/agent/ ./internal/tools/` **RUN=767 PASS=584 FAIL=0 SKIP=1**。
+
+### 三、写面偏差裁定：**接受**
+`d8e2f4dc8` 动了 `internal/tools/task.go`，超出我派单的字面写面。**裁定接受，理由：错在派单，不在腿**——
+1. 我派单写的是 `internal/agent/subagent_197.go`，**该文件不存在**（真文件 `internal/tools/subagent_197.go`，我现跑 `Test-Path` 核过：agent 侧 False、tools 侧 True）。路径是我写错的，triage 件里早已写明真路径。
+2. `PublishSubagentInFlight` 是「一次发布」**唯一能落地的接缝**；不改 `task.go` 就没有可调用的原子发布方法。
+3. 它**没有**趁势改语义：`TaskRoster.PublishSubagent` 保留、行为不变，新增的是并列方法。撤销口令：`git revert --no-edit d8e2f4dc8 0c9ff7c0c`。
+
+### 四、留给下一腿的一行（纯注释，零门禁影响）
+`internal/observe/costmodel_44b.go:191` 仍写 "calling `roll()` would … deadlock"，而 `roll()` 已在 `f8e94bbd8` 删除 ⇒ 该句现在指空，宜改为 "no lock-taking variant to call"。
