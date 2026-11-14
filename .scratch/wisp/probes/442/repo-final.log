@@ -1,0 +1,107 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T15:29:34.311+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+    panel_profile_leaf_shape_windows_test.go:422: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:422: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:434: 314 形状尺【绿】：扫了 274 个源文件，形状命中 2 处；其中已豁免 2 处、实红 0 处，豁免自检红 0 处 —— 只有「实红 0 且自检红 0」才是绿，任何一处红都不能当绿证
+--- PASS: Test314FixedPanelProfileLeafShapeIsRed (0.73s)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/two_literal_halves_inside_one_Join
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_whole_path_by_concatenation
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_leaf_by_strings.Join
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_literal_suffix_outside_the_Join
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_concatenated_leaf_bound_to_a_local,_then_to_the_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_folded_leaf_with_no_temp_root_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_constant_prefix_plus_a_runtime_suffix_is_not_a_fixed_name
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TEMP)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TMP)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_Getenv_that_is_not_TEMP_or_TMP_is_not_a_root
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.UserHomeDir_through_its_two_results
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_cache_directory_is_not_one_of_the_roots_this_ruler_claims
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_is_a_drive-letter_absolute_literal
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_drive-letter_absolute_literal_joined_with_a_leaf
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_relative_literal_root_is_not_a_root
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_handed_to_a_sink_in_a_function
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_that_never_reaches_a_sink_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/A1b:_a_helper's_plain-leaved_return_handed_to_the_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/A1c:_the_root_inside_the_helper,_the_leaf_supplied_by_the_caller
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/A1c:_the_root_supplied_by_the_caller,_the_leaf_inside_the_helper
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper_that_computes_into_a_local_and_returns_it
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper's_per-run_leaf_handed_to_the_sink_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper's_fixed_leaf_that_never_reaches_a_sink_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_parameter_the_caller_cannot_fill_stays_silent_at_the_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper_with_two_different_returns_is_not_one_summary
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_summary_line_cannot_read_green_while_anything_is_red
+--- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape (0.01s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/two_literal_halves_inside_one_Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_whole_path_by_concatenation (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_leaf_by_strings.Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_literal_suffix_outside_the_Join (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_concatenated_leaf_bound_to_a_local,_then_to_the_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_folded_leaf_with_no_temp_root_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_constant_prefix_plus_a_runtime_suffix_is_not_a_fixed_name (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TEMP) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.Getenv(TMP) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_Getenv_that_is_not_TEMP_or_TMP_is_not_a_root (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_os.UserHomeDir_through_its_two_results (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_cache_directory_is_not_one_of_the_roots_this_ruler_claims (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/root_is_a_drive-letter_absolute_literal (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_drive-letter_absolute_literal_joined_with_a_leaf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_relative_literal_root_is_not_a_root (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_DataPath_key_is_a_sink_where_it_is_declared (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_handed_to_a_sink_in_a_function (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_package-level_fixed_join_that_never_reaches_a_sink_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_newPanelControl_sink_arm (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_field-assignment_sink_arm (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_DataPath_key_sink_arm_inside_a_function_body (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/A1b:_a_helper's_plain-leaved_return_handed_to_the_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/A1c:_the_root_inside_the_helper,_the_leaf_supplied_by_the_caller (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/A1c:_the_root_supplied_by_the_caller,_the_leaf_inside_the_helper (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper_that_computes_into_a_local_and_returns_it (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper's_per-run_leaf_handed_to_the_sink_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper's_fixed_leaf_that_never_reaches_a_sink_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_parameter_the_caller_cannot_fill_stays_silent_at_the_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_helper_with_two_different_returns_is_not_one_summary (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_summary_line_cannot_read_green_while_anything_is_red (0.00s)
+=== RUN   Test442CrossFileHelperReturnReachesTheSink
+--- PASS: Test442CrossFileHelperReturnReachesTheSink (0.00s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	1.00s

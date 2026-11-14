@@ -1,0 +1,1339 @@
+diff --git a/cmd/wisp/panel_profile_leaf_shape_windows_test.go b/cmd/wisp/panel_profile_leaf_shape_windows_test.go
+index 627c2fcdb..21139e35a 100644
+--- a/cmd/wisp/panel_profile_leaf_shape_windows_test.go
++++ b/cmd/wisp/panel_profile_leaf_shape_windows_test.go
+@@ -57,8 +57,13 @@ package main
+ // A temp root is not only os.TempDir(): os.Getenv("TEMP"), os.Getenv("TMP"),
+ // os.UserHomeDir() (also through `home, err := os.UserHomeDir()`), and a
+ // drive-letter absolute literal (`C:\Temp\...`, which carries the whole path and
+-// needs no root expression) all count. The root and the leaf still have to meet
+-// in one expression in the scanned file - that is boundary 1 below. A lone
++// needs no root expression) all count. The root and the leaf have to meet in one
++// value this ruler can read: either in one expression of the scanned files, or
++// across a call to a function defined in those same files (the 2026-11-14 audit's
++// A1b/A1c, closed by ticket 442 - see "ACROSS A FUNCTION BOUNDARY" below). A
++// value that leaves the scanned text - into a struct field, a slice, an
++// interface, a function value, or a method this ruler does not resolve - is
++// still outside it and is named as such below. A lone
+ // absolute literal is a path rather than a join, so the NAME rule leaves it to
+ // the SINK rule: it is a shape where it reaches a data-path sink (which is the
+ // audit's A3c), and a quoted Windows path that merely spells "profile" in test
+@@ -67,14 +72,51 @@ package main
+ // planted-key control file in os.TempDir() is a regular file and a detector
+ // control, not a browser profile folder, and accusing it would be wrong.
+ //
++// ACROSS A FUNCTION BOUNDARY (ticket 442, the audit's A1b/A1c). The 2026-11-14
++// audit broke the ruler with two shapes that only differ from the ones above in
++// WHERE the value is spelled: a helper returns a fixed leaf the caller hands to
++// the sink (A1b), and a helper takes the temp root as a parameter while its
++// caller supplies it (A1c). Neither root nor leaf meets the other in one
++// expression, so a fold that only walked one function body went blind. The ruler
++// now follows a value through a call to a function the scan set parses, by
++// substituting the caller's arguments into the callee's return expression:
++//   - a call whose callee is a plain identifier defined (once) in a file of the
++//     same package directory is read as the callee's return expression folded
++//     with that call's arguments; the helper's own local bindings are resolved
++//     in up to three rounds (so `p := Join(...); return p` is read too), and the
++//     temp roots the helper's own body binds (a local `root := os.TempDir()`)
++//     are seeded before the return is read;
++//   - a parameter that the caller fills with a temp root contributes exactly
++//     what the caller's expression contributes, and a parameter the caller fills
++//     with a literal is read as that literal, which is what closes the two
++//     directions of A1c (root as parameter, leaf as parameter);
++//   - the value is still judged after constant folding, so a helper that returns
++//     a leaf assembled from pieces keeps the fold's judgement;
++//   - the red sentence names the file:line of the CONSTANT LEAF, which may be
++//     the helper rather than the sink, and prints where the value reached the
++//     sink. That is why the hit carries a second sentence (panelProfileShapeHit.
++//     via): "the literal is here, and here is the sink it lands in" is the whole
++//     finding, and a reader must not have to guess which half is which.
++// The fold is depth-bounded (panelProfileCrossDepth: three calls deep), a call
++// cycle is opaque, and a substituted return is memoised by (function, argument
++// values) so reading one shape twice costs one walk - so a recursive or mutually
++// recursive helper pair is not followed, and a nine-hop chain reads as "not
++// known", never as "not a defect". Nothing about the sink set, the root set, the
++// fold or the exemption table changed: this is the same instrument reading one
++// more place a value can be written.
++//
+ // WHAT IT STILL CANNOT SEE - named, not hidden, the same honesty the 197 publish
+ // ruler's audit asked for (today-four-fixes-audit section 3 D):
+-//  1. a helper that joins a literal with a temp root behind a parameter, and a
+-//     helper whose fixed join (with a non-profile leaf) is handed to a sink by
+-//     its caller: the root and the literal never meet in one expression in the
+-//     scanned file, and this ruler does not follow values across a function
+-//     boundary. Closing either needs interprocedural analysis, a different
+-//     instrument (the 2026-11-14 audit's A1b/A1c);
++//  1. a value that leaves the scanned text between the helper and the sink: a
++//     helper whose result is stored in a struct field, a slice, a map, a channel
++//     or an interface, returned through a method (a selector call), passed
++//     through a function value, or handed back by a helper this scan set does not
++//     define (another package, a builtin). Method calls are deliberately opaque:
++//     a receiver's state is a different instrument (the audit's A1b/A1c were
++//     plain functions, and both are now read). A helper whose several returns
++//     disagree is not one summary either - this ruler will not pick one of them
++//     for the reader, so a non-profile leaf handed to a sink through such a
++//     helper is not followed (each return is still judged where it is written);
+ //  2. a root that is none of the four above: os.UserCacheDir(), a UNC literal,
+ //     %TEMP% re-spelled through another variable;
+ //  3. a leaf that looks fixed but ends in a runtime value (`Join(root, "wisp-")
+@@ -98,9 +140,9 @@ package main
+ //   A3c root is a drive-letter absolute literal        FIXED  (root rule)
+ //   X1  package-level DataPath: key                    FIXED  (SINK over package decls)
+ //   X2  package-level fixed Join given to a sink       FIXED  (package bindings seeded)
+-//   A1b helper return with a plain leaf, value to sink STILL OUT (function boundary)
+-//   A1c root behind a helper parameter                 STILL OUT (root and literal never meet)
+-//
++//   A1b helper return with a plain leaf, value to sink FIXED  (ticket 442: call substitution)
++//   A1c root behind a helper parameter                 FIXED  (ticket 442: argument substitution)
++
+ // EXEMPTIONS (panelProfileLeafExemptions) are named HERE, in the test - never in
+ // a workflow file or a scanner allowlist - and each is checked three ways:
+ //   - it must still cover at least one live hit (a stale exemption is red, so
+@@ -122,6 +164,7 @@ import (
+ 	"go/parser"
+ 	"go/token"
+ 	"os"
++	"path"
+ 	"path/filepath"
+ 	"sort"
+ 	"strconv"
+@@ -144,13 +187,18 @@ const panelProfileSpikeDisplay = "scripts/spike/webview2-latency/main.go"
+ // these on every run.
+ var panelProfileWindowCalls = []string{"bringUp", "newPanelControl", "startPanelHolder319"}
+ 
+-// panelProfileShapeHit is one fixed-name leaf found in one source line.
++// panelProfileShapeHit is one fixed-name leaf found in one source line. display
++// and line are the LEAF's own file and line, which for a value read across a
++// function boundary is the helper rather than the sink; via then says where that
++// value was handed to a data-path sink, so neither half of the finding has to be
++// guessed.
+ type panelProfileShapeHit struct {
+-	display string // repo-relative path, as the red sentence must name it
+-	line    int    // 1-based line of the offending expression
++	display string // repo-relative path of the file the leaf is written in
++	line    int    // 1-based line of the leaf literal in that file
+ 	leaf    string // the fixed leaf, after constant folding, unquoted
+ 	raw     string // the literal token that leaf starts with (quoted, as written)
+ 	code    string // that source line, trimmed, so the red shows the shape
++	via     string // empty for a one-expression shape; the crossing sentence otherwise
+ }
+ 
+ // panelProfileLeafExemption books one deliberate shared folder. file+leaf are
+@@ -203,14 +251,162 @@ type panelProfileShapeSource struct {
+ 	fset    *token.FileSet
+ }
+ 
++// panelProfileCrossDepth bounds how many function boundaries one value may cross
++// before this ruler stops following it. A bounded depth is not a hedge: a value
++// that needs nine hops is a shape whose provenance no reader holds in their head
++// either, and every hop costs another recursion per expression. A call cycle (a
++// helper that reaches itself) is opaque by the same rule - "not known", never
++// "not a defect".
++const panelProfileCrossDepth = 3
++
++// panelProfileLocalRounds is how many times a helper's own bindings are re-read
++// before they are trusted. One round reads `p := Join(...)`; a second reads
++// `q := p`; three is past any path a reader would still call a fixed name rather
++// than laundering.
++const panelProfileLocalRounds = 3
++
++// panelProfileScope is the reading context of ONE piece of source: which names
++// are temp roots there, which names are parameters of the function whose text is
++// being read (nil at a definition site, where a parameter's value is unknown),
++// which names a substituted helper body bound to a folded value (the local
++// binding rounds), and the world a call may cross into.
++type panelProfileScope struct {
++	display  string                        // the file this text belongs to
++	roots    map[string]bool               // names bound to a temp root
++	params   map[string]panelProfileFolded // nil unless reading a substituted call
++	bindings map[string]panelProfileFolded // nil unless reading a helper's body
++	world    *panelProfileWorld
++}
++
++// panelProfileWorld is the scan set read as one program: the parsed sources by
++// display path, the single-value functions of each package directory, and the
++// cycle/depth state of the substitution in flight. It exists so a call in one
++// file can be read as a return expression written in another.
++type panelProfileWorld struct {
++	lines     map[string][]string               // display -> lines, for the red sentence
++	fsets     map[string]*token.FileSet         // display -> the parse that owns its positions
++	roots     map[string]map[string]bool        // display -> that file's package-level roots
++	funcs     map[string]*panelProfileWorldFunc // "dir\x00name" -> the one function of that name
++	ambiguous map[string]bool                   // names declared twice in one package directory
++	active    map[string]bool                   // functions whose return is being substituted
++	depth     int                               // boundaries crossed in this substitution
++	// cache holds substituted returns by (function, argument values). A value is
++	// only stored when its computation neither hit the cycle guard nor the depth
++	// cap (contextSkips saw no change): a truncated answer depends on where the
++	// substitution started, so it must not be reused from a different start.
++	cache        map[string]panelProfileFolded
++	contextSkips int
++}
++
++// panelProfileWorldFunc is one function a call may be substituted with: where it
++// is written, its declaration, and its parameters in order.
++type panelProfileWorldFunc struct {
++	key     string
++	display string
++	decl    *ast.FuncDecl
++	params  []string
++}
++
++// panelProfileNewWorld indexes a parsed scan set so calls can cross a function
++// boundary. Two files that declare the same name in one package directory are
++// the build-tag pair shape (a _windows and a _linux variant): this ruler parses
++// every file regardless of build tags, so neither declaration can be called
++// "the" definition, and the name is marked ambiguous instead of guessed.
++func panelProfileNewWorld(sources []panelProfileShapeSource) *panelProfileWorld {
++	world := &panelProfileWorld{
++		lines:     make(map[string][]string, len(sources)),
++		fsets:     make(map[string]*token.FileSet, len(sources)),
++		roots:     make(map[string]map[string]bool, len(sources)),
++		funcs:     make(map[string]*panelProfileWorldFunc, len(sources)),
++		ambiguous: map[string]bool{},
++		active:    map[string]bool{},
++		cache:     map[string]panelProfileFolded{},
++	}
++	for _, src := range sources {
++		world.lines[src.display] = strings.Split(string(src.src), "\n")
++		world.fsets[src.display] = src.fset
++		world.roots[src.display] = panelProfilePackageTempRoots(src.file)
++		for _, decl := range src.file.Decls {
++			fn, ok := decl.(*ast.FuncDecl)
++			if !ok || fn.Body == nil || fn.Recv != nil {
++				continue
++			}
++			params, ok := panelProfileParamNames(fn)
++			if !ok {
++				continue
++			}
++			key := panelProfileWorldKey(src.display, fn.Name.Name)
++			if _, dup := world.funcs[key]; dup {
++				delete(world.funcs, key)
++				world.ambiguous[key] = true
++				continue
++			}
++			if world.ambiguous[key] {
++				continue
++			}
++			world.funcs[key] = &panelProfileWorldFunc{key: key, display: src.display, decl: fn, params: params}
++		}
++	}
++	return world
++}
++
++// panelProfileWorldKey scopes a function name to its package directory: cmd/wisp
++// and scripts/spike/webview2-latency are both "package main", and the spike's
++// main.main is not cmd/wisp's.
++func panelProfileWorldKey(display, name string) string {
++	return path.Dir(display) + "\x00" + name
++}
++
++// panelProfileParamNames answers a function's parameters in order, or false for
++// a shape this ruler will not substitute: a variadic parameter (its arity at the
++// call is not its arity at the declaration) or an unnamed one.
++func panelProfileParamNames(fn *ast.FuncDecl) ([]string, bool) {
++	if fn.Type.Params == nil {
++		return nil, true
++	}
++	var names []string
++	for _, field := range fn.Type.Params.List {
++		if _, variadic := field.Type.(*ast.Ellipsis); variadic {
++			return nil, false
++		}
++		for _, name := range field.Names {
++			names = append(names, name.Name)
++		}
++	}
++	return names, true
++}
++
++// lineOf answers the 1-based line of pos in display, or 0 when that parse is not
++// in this world. A fold never invents a line: an origin it cannot place is an
++// origin the red sentence must not print.
++func (world *panelProfileWorld) lineOf(display string, pos token.Pos) int {
++	fset, ok := world.fsets[display]
++	if !ok {
++		return 0
++	}
++	return fset.Position(pos).Line
++}
++
++// codeAt answers the trimmed source line the red sentence prints.
++func (world *panelProfileWorld) codeAt(display string, line int) string {
++	lines := world.lines[display]
++	if line < 1 || line > len(lines) {
++		return ""
++	}
++	return strings.TrimSpace(lines[line-1])
++}
++
+ // Test314FixedPanelProfileLeafShapeIsRed is the ruler. A fixed leaf that is not
+ // in the exemption table reds with the file, the line and the reason the shape
+ // matters; a source it cannot read or parse fatals rather than being skipped.
+ func Test314FixedPanelProfileLeafShapeIsRed(t *testing.T) {
+ 	sources := panelProfileShapeSources(t)
++	// One world for the whole scan set, so a call in one file is read as the
++	// return expression written in another (ticket 442).
++	world := panelProfileNewWorld(sources)
+ 	var hits []panelProfileShapeHit
+ 	for _, src := range sources {
+-		hits = append(hits, panelProfileHitsInSource(t, src)...)
++		hits = append(hits, panelProfileHitsInSource(t, world, src)...)
+ 	}
+ 	sort.Slice(hits, func(i, j int) bool {
+ 		if hits[i].display != hits[j].display {
+@@ -268,7 +464,15 @@ func panelProfileFixedNameRed(t *testing.T, hit panelProfileShapeHit) {
+ 	if written, err := strconv.Unquote(hit.raw); err == nil && written != hit.leaf {
+ 		foldNote = "\n（这枚叶由多段字面量折叠得到：上面那行是它的拼法，红句写的是折叠后的值）"
+ 	}
+-	t.Errorf("%s:%d 命中固定名面板 profile 形状（叶 %q）：\n    %s\n"+
++	// A value read across a function boundary has its leaf in one place and its
++	// sink in another; the SINK rule wrote that second half into hit.via, and the
++	// red sentence must print it rather than leave the reader hunting for a sink
++	// on the leaf's line.
++	crossedNote := ""
++	if hit.via != "" {
++		crossedNote = "\n" + hit.via
++	}
++	t.Errorf("%s:%d 命中固定名面板 profile 形状（叶 %q）：\n    %s%s\n"+
+ 		"这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，"+
+ 		"两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，"+
+ 		"后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；"+
+@@ -277,7 +481,7 @@ func panelProfileFixedNameRed(t *testing.T, hit panelProfileShapeHit) {
+ 		"go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。\n"+
+ 		"改法＝panelProfileLeaf(%q)（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；"+
+ 		"确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。",
+-		hit.display, hit.line, hit.leaf, hit.code, foldNote, hit.leaf)
++		hit.display, hit.line, hit.leaf, hit.code, foldNote, crossedNote, hit.leaf)
+ }
+ 
+ // panelProfileCheckExemptions runs the three checks every exemption owes: it is
+@@ -398,28 +602,38 @@ func panelProfileShapeSourceWithSource(t *testing.T, display, path string) panel
+ // planted-key control file in os.TempDir() is the measured one: it is a regular
+ // file and a detector control, not a browser profile folder, and a red that
+ // accused it would be a false accusation.
+-func panelProfileHitsInSource(t *testing.T, src panelProfileShapeSource) []panelProfileShapeHit {
++func panelProfileHitsInSource(t *testing.T, world *panelProfileWorld, src panelProfileShapeSource) []panelProfileShapeHit {
+ 	t.Helper()
+-	lines := strings.Split(string(src.src), "\n")
+-	packageRoots := panelProfilePackageTempRoots(src.file)
+-	packageJoins := panelProfilePackageFixedJoins(t, src.display, src.file, packageRoots)
++	packageRoots := world.roots[src.display]
++	packageJoins := panelProfilePackageFixedJoins(t, &panelProfileScope{display: src.display, roots: packageRoots, world: world}, src.file)
+ 	var hits []panelProfileShapeHit
+-	seen := map[string]bool{}
+-	// The line is the LEAF literal's line, not the call's: on a wrapped Join the
+-	// literal is the thing a reader has to change, and this keeps the printed
+-	// source line containing the leaf it names.
++	seen := map[string]int{}
++	// The line is the LEAF literal's line and the display is the file it is
++	// written in, not the sink's: on a wrapped Join the literal is the thing a
++	// reader has to change, and when the value crossed a function boundary the
++	// literal and the sink are two different places (hit.via carries the second).
++	// The key carries the display, so one leaf spelled in two files is two
++	// findings - the exemption table is keyed the same way.
+ 	add := func(fixed panelProfileFixedJoin) {
+-		line := src.fset.Position(fixed.pos).Line
+-		key := strconv.Itoa(line) + "|" + fixed.leaf
+-		if seen[key] {
++		if fixed.line < 1 || fixed.display == "" {
+ 			return
+ 		}
+-		seen[key] = true
+-		code := ""
+-		if line >= 1 && line <= len(lines) {
+-			code = strings.TrimSpace(lines[line-1])
++		key := fixed.display + "|" + strconv.Itoa(fixed.line) + "|" + fixed.leaf
++		if at, ok := seen[key]; ok {
++			if hits[at].via == "" && fixed.via != "" {
++				hits[at].via = fixed.via
++			}
++			return
+ 		}
+-		hits = append(hits, panelProfileShapeHit{display: src.display, line: line, leaf: fixed.leaf, raw: fixed.raw, code: code})
++		seen[key] = len(hits)
++		hits = append(hits, panelProfileShapeHit{
++			display: fixed.display,
++			line:    fixed.line,
++			leaf:    fixed.leaf,
++			raw:     fixed.raw,
++			code:    world.codeAt(fixed.display, fixed.line),
++			via:     fixed.via,
++		})
+ 	}
+ 	// Package-level declarations carry BOTH rules, not just NAME: a package-level
+ 	// `var` initialiser can hold the fixed join (NAME) and can be the sink itself
+@@ -427,8 +641,9 @@ func panelProfileHitsInSource(t *testing.T, src panelProfileShapeSource) []panel
+ 	// was NAME-only, so a package-level sink was invisible (X1).
+ 	for _, decl := range src.file.Decls {
+ 		if gen, ok := decl.(*ast.GenDecl); ok {
+-			panelProfileNameRule(t, gen, src.display, packageRoots, add)
+-			panelProfileSinkRule(t, gen, src.display, packageRoots, packageJoins, add)
++			scope := &panelProfileScope{display: src.display, roots: packageRoots, world: world}
++			panelProfileNameRule(t, gen, scope, add)
++			panelProfileSinkRule(t, gen, scope, packageJoins, add)
+ 		}
+ 	}
+ 	// Function bodies: each one gets its own alias scope, so one function's
+@@ -436,7 +651,10 @@ func panelProfileHitsInSource(t *testing.T, src panelProfileShapeSource) []panel
+ 	// root. Closures inside a body share that body's scope (over-approximate:
+ 	// an extra red is possible, a missed one is not). The package-level fixed
+ 	// joins are seeded into every body, so a package-level binding handed to a
+-	// sink is caught (X2).
++	// sink is caught (X2). This is also the only scope where a parameter's value
++	// is NOT known: at a definition site nobody has filled it in, which is why the
++	// fold reads a parameter as opaque here and only a substituted call reads it
++	// (ticket 442).
+ 	for _, decl := range src.file.Decls {
+ 		fn, ok := decl.(*ast.FuncDecl)
+ 		if !ok || fn.Body == nil {
+@@ -444,22 +662,33 @@ func panelProfileHitsInSource(t *testing.T, src panelProfileShapeSource) []panel
+ 		}
+ 		roots := panelProfileCopyRoots(packageRoots)
+ 		panelProfileTempRoots(fn.Body, roots)
+-		panelProfileNameRule(t, fn.Body, src.display, roots, add)
+-		panelProfileSinkRule(t, fn.Body, src.display, roots, packageJoins, add)
++		// A parameter that shares a package-level root's name is a parameter here:
++		// its value comes from the caller, so it must not be read as the root of
++		// the same name (the substitution path removes it for the same reason).
++		if fn.Type.Params != nil {
++			for _, field := range fn.Type.Params.List {
++				for _, name := range field.Names {
++					delete(roots, name.Name)
++				}
++			}
++		}
++		scope := &panelProfileScope{display: src.display, roots: roots, world: world}
++		panelProfileNameRule(t, fn.Body, scope, add)
++		panelProfileSinkRule(t, fn.Body, scope, packageJoins, add)
+ 	}
+ 	return hits
+ }
+ 
+ // panelProfileNameRule is the shape the ticket is named after: a temp root
+ // joined with a leaf that spells a profile folder.
+-func panelProfileNameRule(t *testing.T, node ast.Node, display string, roots map[string]bool, add func(panelProfileFixedJoin)) {
++func panelProfileNameRule(t *testing.T, node ast.Node, scope *panelProfileScope, add func(panelProfileFixedJoin)) {
+ 	t.Helper()
+ 	ast.Inspect(node, func(n ast.Node) bool {
+ 		expr, ok := n.(ast.Expr)
+ 		if !ok {
+ 			return true
+ 		}
+-		fixed, ok := panelProfileFixedJoinIn(t, display, expr, roots)
++		fixed, ok := panelProfileFixedJoinIn(t, scope, expr)
+ 		if ok && !fixed.bare && strings.Contains(strings.ToLower(fixed.leaf), "profile") {
+ 			add(fixed)
+ 		}
+@@ -470,17 +699,31 @@ func panelProfileNameRule(t *testing.T, node ast.Node, display string, roots map
+ // panelProfileSinkRule catches a fixed join with ANY leaf once its value is
+ // handed to a WebView2 data-path sink - directly, through a local binding, or
+ // through a DataPath field/key. seeded carries the package-level fixed joins, so
+-// a package-level boundary is no longer a hiding place (audit X2). A helper
+-// return is still a boundary this rule cannot cross (header, boundary 1).
+-func panelProfileSinkRule(t *testing.T, node ast.Node, display string, roots map[string]bool, seeded map[string]panelProfileFixedJoin, add func(panelProfileFixedJoin)) {
++// a package-level boundary is no longer a hiding place (audit X2). A value read
++// through a call to a function in this scan set is no longer a boundary either
++// (ticket 442): the fold follows it, and the hit's via sentence says where the
++// sink was.
++func panelProfileSinkRule(t *testing.T, node ast.Node, scope *panelProfileScope, seeded map[string]panelProfileFixedJoin, add func(panelProfileFixedJoin)) {
+ 	t.Helper()
+ 	stored := make(map[string]panelProfileFixedJoin, len(seeded)+4)
+ 	for name, fixed := range seeded {
+ 		stored[name] = fixed
+ 	}
+-	hits := func(expr ast.Expr) {
+-		if fixed, ok := panelProfileFixedJoinIn(t, display, expr, roots); ok {
+-			add(fixed)
++	// crossedNote turns a hit whose value was read through a helper into a
++	// sentence a reader can act on: the leaf is in one place, the sink in another,
++	// and neither has to be guessed.
++	crossedNote := func(fixed panelProfileFixedJoin, sinkLine int, sink string) panelProfileFixedJoin {
++		if !fixed.crossed {
++			return fixed
++		}
++		fixed.via = fmt.Sprintf("这一形是跨函数边界读到的：值在 %s:%d 交给下沉点 %s，而常量叶写在 %s:%d。"+
++			"跨边界的值不在下沉点那一行上，所以上面点名的是叶本身 - 要改的是叶（或让它在边界处变成 per-run），不是把 helper 拆开。",
++			scope.display, sinkLine, sink, fixed.display, fixed.line)
++		return fixed
++	}
++	hits := func(expr ast.Expr, sinkLine int, sink string) {
++		if fixed, ok := panelProfileFixedJoinIn(t, scope, expr); ok {
++			add(crossedNote(fixed, sinkLine, sink))
+ 		}
+ 	}
+ 	ast.Inspect(node, func(n ast.Node) bool {
+@@ -490,7 +733,7 @@ func panelProfileSinkRule(t *testing.T, node ast.Node, display string, roots map
+ 				return true
+ 			}
+ 			name, isIdent := expr.Lhs[0].(*ast.Ident)
+-			fixed, isFixed := panelProfileFixedJoinIn(t, display, expr.Rhs[0], roots)
++			fixed, isFixed := panelProfileFixedJoinIn(t, scope, expr.Rhs[0])
+ 			if !isFixed {
+ 				return true
+ 			}
+@@ -499,33 +742,35 @@ func panelProfileSinkRule(t *testing.T, node ast.Node, display string, roots map
+ 				return true
+ 			}
+ 			if sel, isSel := expr.Lhs[0].(*ast.SelectorExpr); isSel && sel.Sel != nil && panelProfileSinkKey(sel.Sel.Name) {
+-				add(fixed)
++				add(crossedNote(fixed, scope.world.lineOf(scope.display, expr.Pos()), sel.Sel.Name+" 字段"))
+ 			}
+ 		case *ast.ValueSpec:
+ 			if len(expr.Names) == 1 && len(expr.Values) == 1 {
+-				if fixed, ok := panelProfileFixedJoinIn(t, display, expr.Values[0], roots); ok {
++				if fixed, ok := panelProfileFixedJoinIn(t, scope, expr.Values[0]); ok {
+ 					stored[expr.Names[0].Name] = fixed
+ 				}
+ 			}
+ 		case *ast.CallExpr:
+-			if !panelProfileSinkCall(panelProfileCalleeName(expr)) {
++			callee := panelProfileCalleeName(expr)
++			if !panelProfileSinkCall(callee) {
+ 				return true
+ 			}
++			callLine := scope.world.lineOf(scope.display, expr.Pos())
+ 			for _, arg := range expr.Args {
+ 				if name, isIdent := arg.(*ast.Ident); isIdent {
+ 					if fixed, ok := stored[name.Name]; ok {
+-						add(fixed)
++						add(crossedNote(fixed, callLine, callee+"(...)"))
+ 					}
+ 					continue
+ 				}
+-				hits(arg)
++				hits(arg, callLine, callee+"(...)")
+ 			}
+ 		case *ast.KeyValueExpr:
+ 			key, isIdent := expr.Key.(*ast.Ident)
+ 			if !isIdent || !panelProfileSinkKey(key.Name) {
+ 				return true
+ 			}
+-			hits(expr.Value)
++			hits(expr.Value, scope.world.lineOf(scope.display, expr.Pos()), "DataPath 键")
+ 		}
+ 		return true
+ 	})
+@@ -534,7 +779,7 @@ func panelProfileSinkRule(t *testing.T, node ast.Node, display string, roots map
+ // panelProfilePackageFixedJoins collects the package-level names bound exactly to
+ // a fixed join, so a function that hands one to a sink is caught (audit X2). A
+ // value computed at run time is not a fixed name and is not collected.
+-func panelProfilePackageFixedJoins(t *testing.T, display string, file *ast.File, roots map[string]bool) map[string]panelProfileFixedJoin {
++func panelProfilePackageFixedJoins(t *testing.T, scope *panelProfileScope, file *ast.File) map[string]panelProfileFixedJoin {
+ 	t.Helper()
+ 	out := map[string]panelProfileFixedJoin{}
+ 	for _, decl := range file.Decls {
+@@ -547,7 +792,7 @@ func panelProfilePackageFixedJoins(t *testing.T, display string, file *ast.File,
+ 			if !ok || len(value.Names) != 1 || len(value.Values) != 1 {
+ 				continue
+ 			}
+-			if fixed, ok := panelProfileFixedJoinIn(t, display, value.Values[0], roots); ok {
++			if fixed, ok := panelProfileFixedJoinIn(t, scope, value.Values[0]); ok {
+ 				out[value.Names[0].Name] = fixed
+ 			}
+ 		}
+@@ -558,56 +803,53 @@ func panelProfilePackageFixedJoins(t *testing.T, display string, file *ast.File,
+ // panelProfileFixedJoinIn answers the fixed leaf an expression carries when a
+ // temp root and constant text meet in it, after constant folding:
+ // Join(...root..., "leaf"), `root + "/leaf"`, a leaf assembled from literal
+-// pieces, and a drive-letter absolute literal (which is the whole path).
+-func panelProfileFixedJoinIn(t *testing.T, display string, expr ast.Expr, roots map[string]bool) (panelProfileFixedJoin, bool) {
++// pieces, a drive-letter absolute literal (which is the whole path), and - since
++// ticket 442 - a value a call hands back from another function of this scan set.
++func panelProfileFixedJoinIn(t *testing.T, scope *panelProfileScope, expr ast.Expr) (panelProfileFixedJoin, bool) {
+ 	t.Helper()
+-	folded := panelProfileFold(t, display, expr, roots)
++	folded := panelProfileFold(t, scope, expr)
+ 	if !folded.rooted || folded.leaf == "" || folded.opaque {
+ 		return panelProfileFixedJoin{}, false
+ 	}
+ 	return panelProfileFixedJoin{
+-		leaf: folded.leaf,
+-		pos:  folded.pos,
+-		raw:  folded.raw,
+-		bare: panelProfileBareAbsolute(t, display, expr),
++		leaf:    folded.leaf,
++		raw:     folded.raw,
++		display: folded.display,
++		line:    folded.line,
++		bare:    folded.bare,
++		crossed: folded.crossed,
+ 	}, true
+ }
+ 
+-// panelProfileBareAbsolute answers whether expr is nothing but one drive-letter
+-// absolute literal. Such a literal is a path, not a JOIN: it is only a defect
+-// where it reaches a sink (A3c is handed straight to NewPanelManager), so the
+-// NAME rule leaves it to the SINK rule. Without this split the ruler would
+-// convict any quoted Windows path that happens to spell "profile" - test data,
+-// documentation strings - which is the spelling self-certification the audit
+-// criticised, not a data path.
+-func panelProfileBareAbsolute(t *testing.T, display string, expr ast.Expr) bool {
+-	lit, ok := panelProfileUnparen(expr).(*ast.BasicLit)
+-	if !ok || lit.Kind != token.STRING {
+-		return false
+-	}
+-	return panelProfileDriveAbsolute(panelProfileUnquote(t, display, lit.Value))
+-}
+-
+ // panelProfileFixedJoin is one fixed leaf: what it names, where it is written,
+-// the literal token it starts with, and whether it is a lone absolute path. A
+-// folded leaf is not spelled verbatim on any one line, so the red sentence and
+-// the controls check the named line against that token instead.
++// the literal token it starts with, whether it is a lone absolute path, and
++// whether the value reached this point through a function call (a leaf written in
++// a helper). A folded leaf is not spelled verbatim on any one line, so the red
++// sentence and the controls check the named line against that token instead.
+ type panelProfileFixedJoin struct {
+-	leaf string
+-	pos  token.Pos
+-	raw  string
+-	bare bool
++	leaf    string
++	raw     string
++	display string // file the leaf literal is written in
++	line    int    // 1-based line of that literal
++	bare    bool
++	crossed bool   // true when the value was read across a function boundary
++	via     string // the crossing sentence the SINK rule fills in
+ }
+ 
+ // panelProfileFolded is one expression read as a piece of a data path: whether a
+-// temp root lives in it, the constant text it contributes with roots elided, and
+-// the literal token that text starts with.
++// temp root lives in it, the constant text it contributes with roots elided, the
++// literal token that text starts with and where that token is written, whether
++// the whole value is nothing but one drive-letter absolute literal, and whether
++// the value crossed a function boundary to get here.
+ type panelProfileFolded struct {
+-	rooted bool
+-	opaque bool
+-	leaf   string
+-	raw    string
+-	pos    token.Pos
++	rooted  bool
++	opaque  bool
++	bare    bool
++	crossed bool
++	leaf    string
++	raw     string
++	display string
++	line    int
+ }
+ 
+ // panelProfileJoinSeparator is the separator Join puts between its arguments.
+@@ -617,72 +859,95 @@ var panelProfileJoinSeparator = string(filepath.Separator)
+ 
+ // panelProfileFold reads expr as constant text plus temp roots, so the leaf is
+ // judged on the folded value rather than on one literal token: a `+` chain, a
+-// strings.Join over a literal slice, and a Join over literal pieces all fold. A
+-// value that is only part constant is opaque, and an opaque expression is NOT a
+-// fixed name - that is what keeps a constant prefix plus a pid silent.
+-func panelProfileFold(t *testing.T, display string, expr ast.Expr, roots map[string]bool) panelProfileFolded {
++// strings.Join over a literal slice, a Join over literal pieces, and (ticket 442)
++// a call whose callee is a function of this scan set all fold. A value that is
++// only part constant is opaque, and an opaque expression is NOT a fixed name -
++// that is what keeps a constant prefix plus a pid silent.
++func panelProfileFold(t *testing.T, scope *panelProfileScope, expr ast.Expr) panelProfileFolded {
+ 	t.Helper()
+ 	switch node := panelProfileUnparen(expr).(type) {
+ 	case *ast.BasicLit:
+ 		if node.Kind != token.STRING {
+-			return panelProfileFolded{opaque: true, pos: node.Pos()}
++			return panelProfileFolded{opaque: true}
+ 		}
+-		value := panelProfileUnquote(t, display, node.Value)
++		value := panelProfileUnquote(t, scope.display, node.Value)
+ 		return panelProfileFolded{
+-			rooted: panelProfileDriveAbsolute(value),
+-			leaf:   value,
+-			raw:    node.Value,
+-			pos:    node.Pos(),
++			rooted:  panelProfileDriveAbsolute(value),
++			bare:    panelProfileDriveAbsolute(value),
++			leaf:    value,
++			raw:     node.Value,
++			display: scope.display,
++			line:    scope.world.lineOf(scope.display, node.Pos()),
+ 		}
+ 	case *ast.Ident:
+-		if roots[node.Name] {
+-			return panelProfileFolded{rooted: true, pos: node.Pos()}
++		// A parameter is read before a root of the same name: the caller filled it
++		// in, so it is that value and not whatever the name means at package level.
++		if scope.params != nil {
++			if value, ok := scope.params[node.Name]; ok {
++				return value
++			}
++		}
++		if scope.bindings != nil {
++			if value, ok := scope.bindings[node.Name]; ok {
++				return value
++			}
+ 		}
+-		return panelProfileFolded{opaque: true, pos: node.Pos()}
++		if scope.roots[node.Name] {
++			return panelProfileFolded{rooted: true}
++		}
++		return panelProfileFolded{opaque: true}
+ 	case *ast.BinaryExpr:
+ 		if node.Op != token.ADD {
+-			return panelProfileFolded{opaque: true, pos: node.Pos()}
++			return panelProfileFolded{opaque: true}
+ 		}
+-		left := panelProfileFold(t, display, node.X, roots)
+-		right := panelProfileFold(t, display, node.Y, roots)
++		left := panelProfileFold(t, scope, node.X)
++		right := panelProfileFold(t, scope, node.Y)
++		raw, display, line := panelProfileFirstLiteral(left, right)
+ 		return panelProfileFolded{
+-			rooted: left.rooted || right.rooted,
+-			opaque: left.opaque || right.opaque,
+-			leaf:   left.leaf + right.leaf,
+-			raw:    panelProfileFirstRaw(left, right),
+-			pos:    panelProfileFirstPos(left, right, node.Pos()),
++			rooted:  left.rooted || right.rooted,
++			opaque:  left.opaque || right.opaque,
++			crossed: left.crossed || right.crossed,
++			leaf:    left.leaf + right.leaf,
++			raw:     raw,
++			display: display,
++			line:    line,
+ 		}
+ 	case *ast.CallExpr:
+-		if panelProfileIsTempRoot(node, roots) {
+-			return panelProfileFolded{rooted: true, pos: node.Pos()}
++		if panelProfileIsTempRoot(node, scope.roots) {
++			return panelProfileFolded{rooted: true}
+ 		}
+ 		if panelProfileQualifiedCallee(node) == "strings.Join" {
+-			return panelProfileFoldStringsJoin(t, display, node, roots)
++			return panelProfileFoldStringsJoin(t, scope, node)
+ 		}
+ 		if panelProfileCalleeName(node) == "Join" {
+-			return panelProfileFoldJoin(t, display, node, roots)
++			return panelProfileFoldJoin(t, scope, node)
++		}
++		if folded, ok := scope.world.foldCall(t, scope, node); ok {
++			return folded
+ 		}
+ 	}
+-	return panelProfileFolded{opaque: true, pos: expr.Pos()}
++	return panelProfileFolded{opaque: true}
+ }
+ 
+ // panelProfileFoldJoin folds one Join over its arguments: literal pieces keep
+-// their order, roots contribute no text, and an argument the ruler cannot read
+-// makes the whole join opaque.
+-func panelProfileFoldJoin(t *testing.T, display string, node *ast.CallExpr, roots map[string]bool) panelProfileFolded {
++// their order, roots contribute no text, a parameter contributes the text its
++// argument contributes (ticket 442), and an argument the ruler cannot read makes
++// the whole join opaque.
++func panelProfileFoldJoin(t *testing.T, scope *panelProfileScope, node *ast.CallExpr) panelProfileFolded {
+ 	t.Helper()
+-	out := panelProfileFolded{pos: node.Pos()}
++	out := panelProfileFolded{}
+ 	var pieces []string
+ 	for _, arg := range node.Args {
+-		part := panelProfileFold(t, display, arg, roots)
++		part := panelProfileFold(t, scope, arg)
+ 		out.rooted = out.rooted || part.rooted
+ 		out.opaque = out.opaque || part.opaque
++		out.crossed = out.crossed || part.crossed
+ 		if part.leaf == "" {
+ 			continue
+ 		}
+ 		pieces = append(pieces, part.leaf)
+ 		if out.raw == "" {
+-			out.raw, out.pos = part.raw, part.pos
++			out.raw, out.display, out.line = part.raw, part.display, part.line
+ 		}
+ 	}
+ 	out.leaf = strings.Join(pieces, panelProfileJoinSeparator)
+@@ -691,53 +956,242 @@ func panelProfileFoldJoin(t *testing.T, display string, node *ast.CallExpr, root
+ 
+ // panelProfileFoldStringsJoin folds strings.Join over a literal slice: the one
+ // shape the audit assembled with no Join of the path kind at all (A2c).
+-func panelProfileFoldStringsJoin(t *testing.T, display string, node *ast.CallExpr, roots map[string]bool) panelProfileFolded {
++func panelProfileFoldStringsJoin(t *testing.T, scope *panelProfileScope, node *ast.CallExpr) panelProfileFolded {
+ 	t.Helper()
+ 	if len(node.Args) != 2 {
+-		return panelProfileFolded{opaque: true, pos: node.Pos()}
++		return panelProfileFolded{opaque: true}
+ 	}
+ 	slice, ok := panelProfileUnparen(node.Args[0]).(*ast.CompositeLit)
+ 	if !ok {
+-		return panelProfileFolded{opaque: true, pos: node.Pos()}
++		return panelProfileFolded{opaque: true}
+ 	}
+-	sep := panelProfileFold(t, display, node.Args[1], roots)
++	sep := panelProfileFold(t, scope, node.Args[1])
+ 	if sep.rooted || sep.opaque {
+-		return panelProfileFolded{opaque: true, pos: node.Pos()}
++		return panelProfileFolded{opaque: true}
+ 	}
+-	out := panelProfileFolded{pos: node.Pos()}
++	out := panelProfileFolded{}
+ 	pieces := make([]string, 0, len(slice.Elts))
+ 	for _, elt := range slice.Elts {
+-		part := panelProfileFold(t, display, elt, roots)
++		part := panelProfileFold(t, scope, elt)
+ 		if part.rooted || part.opaque {
+-			return panelProfileFolded{opaque: true, pos: node.Pos()}
++			return panelProfileFolded{opaque: true}
+ 		}
++		out.crossed = out.crossed || part.crossed
+ 		pieces = append(pieces, part.leaf)
+ 		if out.raw == "" && part.raw != "" {
+-			out.raw, out.pos = part.raw, part.pos
++			out.raw, out.display, out.line = part.raw, part.display, part.line
+ 		}
+ 	}
+ 	out.leaf = strings.Join(pieces, sep.leaf)
+ 	return out
+ }
+ 
+-// panelProfileFirstRaw answers the raw token of the first literal the fold kept.
+-func panelProfileFirstRaw(a, b panelProfileFolded) string {
++// panelProfileFirstLiteral answers the first literal the fold kept - its raw
++// token and the file:line it is written in - so the red can name the line the
++// literal is actually on, even when the value was read in another function.
++func panelProfileFirstLiteral(a, b panelProfileFolded) (string, string, int) {
+ 	if a.raw != "" {
+-		return a.raw
++		return a.raw, a.display, a.line
+ 	}
+-	return b.raw
++	return b.raw, b.display, b.line
+ }
+ 
+-// panelProfileFirstPos answers the position of the first literal the fold kept,
+-// falling back to the expression's own position.
+-func panelProfileFirstPos(a, b panelProfileFolded, fallback token.Pos) token.Pos {
+-	if a.raw != "" {
+-		return a.pos
++// panelProfileFoldCall reads a call as the callee's return expression with this
++// call's arguments substituted into it - the ticket 442 crossing. It answers
++// false (the caller then reads the call as opaque) whenever the value cannot be
++// followed honestly: the callee is not a plain identifier, is not defined exactly
++// once in this package directory, is already being substituted (a cycle), the
++// arity does not match, the crossing budget is spent, or the callee has no
++// single-value return this ruler can read.
++func (world *panelProfileWorld) foldCall(t *testing.T, scope *panelProfileScope, call *ast.CallExpr) (panelProfileFolded, bool) {
++	t.Helper()
++	callee, ok := call.Fun.(*ast.Ident)
++	if !ok {
++		return panelProfileFolded{}, false
++	}
++	key := panelProfileWorldKey(scope.display, callee.Name)
++	fn, ok := world.funcs[key]
++	if !ok {
++		return panelProfileFolded{}, false
++	}
++	if world.active[key] || world.depth >= panelProfileCrossDepth {
++		// Refusing a function this scan set DOES define is a context-dependent
++		// answer (the same value may be followed from a shallower start), so no
++		// result computed above this point may be cached.
++		world.contextSkips++
++		return panelProfileFolded{}, false
++	}
++	if len(call.Args) != len(fn.params) {
++		return panelProfileFolded{}, false
++	}
++	actuals := make([]panelProfileFolded, len(call.Args))
++	for i, arg := range call.Args {
++		actuals[i] = panelProfileFold(t, scope, arg)
++	}
++	cacheKey := panelProfileCallKey(key, actuals)
++	if cached, ok := world.cache[cacheKey]; ok {
++		return cached, true
++	}
++	skipsBefore := world.contextSkips
++	world.active[key] = true
++	world.depth++
++	defer func() {
++		delete(world.active, key)
++		world.depth--
++	}()
++	fnScope := &panelProfileScope{
++		display: fn.display,
++		roots:   panelProfileCopyRoots(world.roots[fn.display]),
++		params:  make(map[string]panelProfileFolded, len(fn.params)),
++		world:   world,
+ 	}
+-	if b.raw != "" {
+-		return b.pos
++	for i, name := range fn.params {
++		fnScope.params[name] = actuals[i]
++		delete(fnScope.roots, name)
+ 	}
+-	return fallback
++	panelProfileTempRoots(fn.decl.Body, fnScope.roots)
++	fnScope.bindings = world.localBindings(t, fnScope, fn.decl.Body)
++	folded, ok := panelProfileFunctionReturn(t, fnScope, fn.decl)
++	if !ok {
++		return panelProfileFolded{}, false
++	}
++	folded.crossed = true
++	if world.contextSkips == skipsBefore {
++		world.cache[cacheKey] = folded
++	}
++	return folded, true
++}
++
++// panelProfileCallKey is the identity of one substitution: the function plus the
++// value of every argument, including where the argument's literal is written
++// (that origin is what the red sentence prints, so two calls are only the same
++// answer if their origins match too).
++func panelProfileCallKey(function string, actuals []panelProfileFolded) string {
++	var b strings.Builder
++	b.WriteString(function)
++	for _, actual := range actuals {
++		b.WriteByte('|')
++		if actual.rooted {
++			b.WriteByte('r')
++		}
++		if actual.opaque {
++			b.WriteByte('o')
++		}
++		if actual.bare {
++			b.WriteByte('b')
++		}
++		if actual.crossed {
++			b.WriteByte('c')
++		}
++		b.WriteString(actual.display)
++		b.WriteByte(':')
++		b.WriteString(strconv.Itoa(actual.line))
++		b.WriteByte(':')
++		b.WriteString(actual.raw)
++		b.WriteByte(':')
++		b.WriteString(actual.leaf)
++	}
++	return b.String()
++}
++
++// panelProfileFunctionReturn answers the one value a function returns, folded in
++// the function's own scope. A bare return (named results) or a multi-value
++// return is not a single-value summary this ruler will guess at, and two returns
++// that disagree are not one either.
++func panelProfileFunctionReturn(t *testing.T, scope *panelProfileScope, fn *ast.FuncDecl) (panelProfileFolded, bool) {
++	t.Helper()
++	var returns []panelProfileFolded
++	usable := true
++	ast.Inspect(fn.Body, func(n ast.Node) bool {
++		if !usable {
++			return false
++		}
++		if _, isLit := n.(*ast.FuncLit); isLit {
++			// A closure's return is the closure's value, not this function's.
++			return false
++		}
++		stmt, isReturn := n.(*ast.ReturnStmt)
++		if !isReturn {
++			return true
++		}
++		if len(stmt.Results) != 1 {
++			usable = false
++			return false
++		}
++		returns = append(returns, panelProfileFold(t, scope, stmt.Results[0]))
++		return true
++	})
++	if !usable || len(returns) == 0 {
++		return panelProfileFolded{}, false
++	}
++	first := returns[0]
++	for _, other := range returns[1:] {
++		if !panelProfileSameFolded(first, other) {
++			return panelProfileFolded{}, false
++		}
++	}
++	return first, true
++}
++
++// panelProfileSameFolded answers whether two folds carry the same value. The
++// literal's position is deliberately not compared: the same constant read at two
++// return sites is one summary, and the first site is the one the red names.
++func panelProfileSameFolded(a, b panelProfileFolded) bool {
++	return a.rooted == b.rooted && a.opaque == b.opaque && a.bare == b.bare &&
++		a.crossed == b.crossed && a.leaf == b.leaf
++}
++
++// panelProfileLocalBindings answers the names a helper body binds to a folded
++// value, re-read in panelProfileLocalRounds rounds so `p := Join(...)` and a
++// later `q := p` are both read. Order is deliberately not modelled (any
++// assignment in the body is a candidate), which can only over-approximate: an
++// extra red is possible, a missed one is not.
++func (world *panelProfileWorld) localBindings(t *testing.T, scope *panelProfileScope, body *ast.BlockStmt) map[string]panelProfileFolded {
++	t.Helper()
++	type localBinding struct {
++		name string
++		expr ast.Expr
++	}
++	var list []localBinding
++	ast.Inspect(body, func(n ast.Node) bool {
++		if _, isLit := n.(*ast.FuncLit); isLit {
++			return false
++		}
++		switch node := n.(type) {
++		case *ast.AssignStmt:
++			if len(node.Lhs) == 1 && len(node.Rhs) == 1 {
++				if name, ok := node.Lhs[0].(*ast.Ident); ok {
++					list = append(list, localBinding{name: name.Name, expr: node.Rhs[0]})
++				}
++			}
++		case *ast.ValueSpec:
++			if len(node.Names) == 1 && len(node.Values) == 1 {
++				list = append(list, localBinding{name: node.Names[0].Name, expr: node.Values[0]})
++			}
++		}
++		return true
++	})
++	out := make(map[string]panelProfileFolded, len(list))
++	for round := 0; round < panelProfileLocalRounds; round++ {
++		changed := false
++		for _, binding := range list {
++			folded := panelProfileFold(t, &panelProfileScope{
++				display:  scope.display,
++				roots:    scope.roots,
++				params:   scope.params,
++				bindings: out,
++				world:    world,
++			}, binding.expr)
++			if prev, seen := out[binding.name]; !seen || !panelProfileSameFolded(prev, folded) {
++				out[binding.name] = folded
++				changed = true
++			}
++		}
++		if !changed {
++			break
++		}
++	}
++	return out
+ }
+ 
+ // panelProfileUnparen strips any number of parentheses.
+@@ -995,6 +1449,7 @@ func Test314PanelProfileShapeRulerRingsOnTheFixedNameShape(t *testing.T) {
+ 		source     string
+ 		want       []string // expected fixed leaves; nil means the shape must stay silent
+ 		lineNeedle string   // text on the line the red must name; needed when the leaf is folded
++		viaNeedle  string   // when set, the hit must carry a crossing sentence containing it
+ 	}{
+ 		{
+ 			name: "the audit's revert, default tier verbatim",
+@@ -1536,6 +1991,203 @@ func mutant() auditConfig {
+ 			want:       []string{"wisp-key-arm"},
+ 			lineNeedle: `return auditConfig{DataPath: filepath.Join(os.TempDir(), "wisp-key-arm")}`,
+ 		},
++		// --- ticket 442: values that cross a function boundary (A1b/A1c) ------
++		// These four must red: a helper's plain-leaved return handed to the sink
++		// (A1b), the leaf supplied by the caller while the root stays in the helper
++		// (A1c, the audit's own reading), the root supplied by the caller (A1c,
++		// the ticket's reading), and a helper that computes into a local first.
++		// Each names the LEAF's line - which is the helper's for three of them -
++		// and carries the sink sentence, because a reader who is handed only the
++		// leaf has to hunt for why it matters.
++		{
++			name: "A1b: a helper's plain-leaved return handed to the sink",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func plainLeaf442() string {
++	return filepath.Join(os.TempDir(), "wisp-442-plain")
++}
++
++func mutant442() *PanelManager {
++	return NewPanelManager(nil, nil, plainLeaf442())
++}
++`,
++			want:       []string{"wisp-442-plain"},
++			lineNeedle: `"wisp-442-plain"`,
++			viaNeedle:  "NewPanelManager",
++		},
++		{
++			name: "A1c: the root inside the helper, the leaf supplied by the caller",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func paramLeaf442(leaf string) string {
++	return filepath.Join(os.TempDir(), leaf)
++}
++
++func mutant442() *PanelManager {
++	return NewPanelManager(nil, nil, paramLeaf442("wisp-442-leaf-profile"))
++}
++`,
++			want:       []string{"wisp-442-leaf-profile"},
++			lineNeedle: `paramLeaf442("wisp-442-leaf-profile")`,
++			viaNeedle:  "NewPanelManager",
++		},
++		{
++			name: "A1c: the root supplied by the caller, the leaf inside the helper",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func paramRoot442(root string) string {
++	return filepath.Join(root, "wisp-442-root-profile")
++}
++
++func mutant442() *PanelManager {
++	return NewPanelManager(nil, nil, paramRoot442(os.TempDir()))
++}
++`,
++			want:       []string{"wisp-442-root-profile"},
++			lineNeedle: `"wisp-442-root-profile"`,
++			viaNeedle:  "NewPanelManager",
++		},
++		{
++			name: "a helper that computes into a local and returns it",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func viaLocal442() string {
++	p := filepath.Join(os.TempDir(), "wisp-442-local")
++	return p
++}
++
++func mutant442() *PanelManager {
++	return NewPanelManager(nil, nil, viaLocal442())
++}
++`,
++			want:       []string{"wisp-442-local"},
++			lineNeedle: `"wisp-442-local"`,
++			viaNeedle:  "NewPanelManager",
++		},
++		{
++			name: "a helper's per-run leaf handed to the sink stays silent",
++			source: `package main
++
++import (
++	"fmt"
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func perRun442() string {
++	return filepath.Join(os.TempDir(), fmt.Sprintf("%s-%d", "wisp-442-", os.Getpid()))
++}
++
++func fine442() *PanelManager {
++	return NewPanelManager(nil, nil, perRun442())
++}
++`,
++		},
++		{
++			name: "a helper's fixed leaf that never reaches a sink stays silent",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++func base442() string {
++	return filepath.Join(os.TempDir(), "wisp-442-base")
++}
++
++func fine442() string {
++	return base442() + "/sub"
++}
++`,
++		},
++		{
++			name: "a parameter the caller cannot fill stays silent at the sink",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func opaqueRoot442(root string) string {
++	return filepath.Join(root, "wisp-442-mystery")
++}
++
++func fine442(root string) *PanelManager {
++	return NewPanelManager(nil, nil, opaqueRoot442(root))
++}
++`,
++		},
++		{
++			name: "a helper with two different returns is not one summary",
++			source: `package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func branchy442(flag bool) string {
++	if flag {
++		return filepath.Join(os.TempDir(), "wisp-442-a")
++	}
++	return filepath.Join(os.TempDir(), "wisp-442-b")
++}
++
++func fine442() *PanelManager {
++	return NewPanelManager(nil, nil, branchy442(true))
++}
++`,
++		},
+ 	}
+ 
+ 	for _, tc := range cases {
+@@ -1572,6 +2224,16 @@ func mutant() auditConfig {
+ 			if lineOf := panelProfileLineOf(t, tc.source, needle); named != lineOf {
+ 				t.Errorf("%s 的点名行错了：红句写 :%d，叶字面量其实在 :%d", tc.name, named, lineOf)
+ 			}
++			// A shape read across a function boundary must say where the sink is,
++			// or the red names a leaf and leaves the reader to find out why it
++			// matters. This is what keeps hit.via from silently emptying.
++			if tc.viaNeedle != "" {
++				if !strings.Contains(hits[0].via, tc.viaNeedle) {
++					t.Errorf("%s 的跨边界说明里没有 %q（via=%q）：红句必须把下沉点写出来", tc.name, tc.viaNeedle, hits[0].via)
++				}
++			} else if hits[0].via != "" {
++				t.Errorf("%s 是单表达式形状，却带了一句跨边界说明（via=%q）——那是把没有跨边界的事说成跨了", tc.name, hits[0].via)
++			}
+ 		})
+ 	}
+ 
+@@ -1608,15 +2270,90 @@ func mutant() auditConfig {
+ }
+ 
+ // panelProfileHitsInText runs the same census over an in-memory sample, so the
+-// matcher can be exercised without touching the tree.
++// matcher can be exercised without touching the tree. One source means one
++// world: a call in the sample can only be substituted with a function the sample
++// itself declares, which is why the cross-FILE arm has its own test below.
+ func panelProfileHitsInText(t *testing.T, display string, src []byte) []panelProfileShapeHit {
++	t.Helper()
++	sample := panelProfileShapeSourceInText(t, display, src)
++	return panelProfileHitsInSource(t, panelProfileNewWorld([]panelProfileShapeSource{sample}), sample)
++}
++
++// panelProfileShapeSourceInText parses one in-memory sample into a scan-set
++// member, fataling if the sample does not parse (a broken control is not a
++// reading).
++func panelProfileShapeSourceInText(t *testing.T, display string, src []byte) panelProfileShapeSource {
+ 	t.Helper()
+ 	fset := token.NewFileSet()
+ 	file, err := parser.ParseFile(fset, display, src, parser.SkipObjectResolution)
+ 	if err != nil {
+ 		t.Fatalf("%s 的合成样本解析失败（正控自己坏了）：%v", display, err)
+ 	}
+-	return panelProfileHitsInSource(t, panelProfileShapeSource{display: display, path: display, src: src, file: file, fset: fset})
++	return panelProfileShapeSource{display: display, path: display, src: src, file: file, fset: fset}
++}
++
++// Test442CrossFileHelperReturnReachesTheSink pins the arm the in-memory table
++// cannot: the leaf is written in one scanned file and the sink in another, which
++// is the ordinary shape once a fixture grows a helper file. It also pins the
++// negative that makes the positive mean something: with the helper's file out of
++// the scan set, the same sink source reads clean - so the hit really comes from
++// the crossing and not from the caller's text.
++func Test442CrossFileHelperReturnReachesTheSink(t *testing.T) {
++	helper := panelProfileShapeSourceInText(t, "cmd/wisp/zzz_442_cross_helper.go", []byte(`package main
++
++import (
++	"os"
++	"path/filepath"
++)
++
++// zzz442CrossDataPath is the fixed leaf, written in ITS OWN file.
++func zzz442CrossDataPath() string {
++	return filepath.Join(os.TempDir(), "wisp-442-crossfile")
++}
++`))
++	sink := panelProfileShapeSourceInText(t, "cmd/wisp/zzz_442_cross_sink.go", []byte(`package main
++
++type PanelManager struct{}
++
++func NewPanelManager(disp, assets any, dataPath string) *PanelManager { return nil }
++
++func zzz442CrossCaller() *PanelManager {
++	return NewPanelManager(nil, nil, zzz442CrossDataPath())
++}
++`))
++
++	hits := panelProfileHitsInSource(t, panelProfileNewWorld([]panelProfileShapeSource{helper, sink}), sink)
++	if len(hits) != 1 {
++		t.Fatalf("跨文件读数应为 1 处命中，实得 %d 处：%+v", len(hits), hits)
++	}
++	hit := hits[0]
++	if hit.display != helper.display {
++		t.Errorf("红句点名了 %s，叶其实写在 %s —— 跨文件时红句必须点名叶所在的文件", hit.display, helper.display)
++	}
++	if hit.leaf != "wisp-442-crossfile" {
++		t.Errorf("叶读成 %q，应读成 %q", hit.leaf, "wisp-442-crossfile")
++	}
++	wantLine := panelProfileLineOf(t, string(helper.src), `"wisp-442-crossfile"`)
++	if hit.line != wantLine {
++		t.Errorf("点名行 :%d，叶字面量其实在 %s:%d", hit.line, helper.display, wantLine)
++	}
++	if !strings.Contains(hit.code, hit.raw) {
++		t.Errorf("印出的源码行 %q 不含叶的起始字面量 %q", hit.code, hit.raw)
++	}
++	for _, want := range []string{sink.display, "NewPanelManager"} {
++		if !strings.Contains(hit.via, want) {
++			t.Errorf("跨边界说明里没有 %q（via=%q）：红句必须写明下沉点在哪", want, hit.via)
++		}
++	}
++
++	// Negative: the same caller source with the helper's file outside the scan
++	// set. The ruler cannot cross, so it must read clean - a hit here would mean
++	// the census was accusing the caller's text (the false positive ticket 320's
++	// planted-key control exists to prevent).
++	alone := panelProfileHitsInSource(t, panelProfileNewWorld([]panelProfileShapeSource{sink}), sink)
++	if len(alone) != 0 {
++		t.Fatalf("把 helper 所在文件移出扫描集后仍读出 %d 处命中（%+v）：说明这处红不是跨过程读出来的", len(alone), alone)
++	}
+ }
+ 
+ // panelProfileLineOf answers the 1-based line of needle in a synthetic sample.

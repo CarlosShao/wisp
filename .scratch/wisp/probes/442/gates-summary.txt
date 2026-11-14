@@ -1,0 +1,4 @@
+D22_RC=0
+PATH_RC=0
+VET_RC=0
+GOFUMPT_RC=0 lines=0
