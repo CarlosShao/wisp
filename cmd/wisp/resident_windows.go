@@ -547,6 +547,30 @@ func runResident() {
 	// bind happens inside, on the first line where that object exists.
 	src := startResidentTaskSource(rt, ra, panelScope)
 
+	// Ticket 228 AC#2/AC#3: the two hops this slice adds, both on the first line
+	// where the runtime (and therefore the card ledger and the answer surface)
+	// exists:
+	//
+	//   - AC#2: the tray's three answer items get their executor. It is the SAME
+	//     replySurface the console reader would use (src.answers), so allow /
+	//     reject / always are one verb table and one audit trail whichever native
+	//     face the human used. The order here is the ruling's order: the executor
+	//     is built from an assembled runtime FIRST, and only then attached to the
+	//     ball host - never a callback that has nothing behind it.
+	//   - AC#3: the runtime's waiting-state producer gets a ball projection, so the
+	//     D43 「等人」 name it already computes reaches the orb instead of only the
+	//     audit line. rb.projectWaitingState posts to the one ui-sta thread
+	//     (Ball.SetState), so D38 holds: no second UI thread, no new goroutine.
+	//
+	// Both are attached inside this `if`: a boot whose pipeline was refused has no
+	// ledger to spend a grant from and no producer to read a state off, and the
+	// tray items + the record line then say that instead of pretending.
+	if src != nil && src.run != nil {
+		ra.bindRuntime(src.run)
+		src.run.bindWaitingStateSink(rb.projectWaitingState)
+		rb.attachTrayAnswers(ra.trayAnswerExecutor(src.answers))
+	}
+
 	// Ticket 329 form 甲: the one panel host this process owns becomes the
 	// destination of the task pipeline's booked snapshot packets. This is the
 	// attach, and it is the whole of the wiring - publishPanelSnapshot pushes

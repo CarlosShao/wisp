@@ -402,6 +402,16 @@ type agentRuntime struct {
 	// the reply surface. A card leaves it when it is answered, dismissed, or
 	// handed off to execution.
 	liveCards *nativeCards
+	// waitingSink / waitingMu are ticket 228 AC#3's one bend in the wire: the
+	// ball projection of the D43 「等人」 state, bound by a leg that really hosts
+	// a ball (the resident leg, cmd/wisp/resident_windows.go) and left nil by
+	// every other caller - `wisp run` has no window, and nil there is the honest
+	// statement that the state has no place to go, not a silent failure. The
+	// producer is bookWaitingState (approval_always.go): it already computed the
+	// right D43 name from this ledger for its audit line, and AC#3 is the ticket
+	// that made the same reading drive the orb instead of only describing it.
+	waitingMu   sync.Mutex
+	waitingSink waitingStateSink
 	// reply is this run's answer side, and replyRoot/replyHandle its owner and
 	// goroutine. All three stay nil when no reply source was handed in, which is
 	// the honest statement that nobody can answer this run's cards.

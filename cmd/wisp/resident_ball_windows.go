@@ -188,6 +188,32 @@ func withStopRequest(requestStop stopRequestFunc) ballHostHook {
 	return func(h *panelHostHooks) { h.requestStop = requestStop }
 }
 
+// trayAnswerVerb names WHICH of the tray's three ANSWER items was pressed
+// (ticket 228 AC#2). It is the ball host's entire vocabulary for an answer: it
+// names the gesture and nothing else - never a decision, a card, a level or an
+// approval. The executor this host is handed owns all of that.
+type trayAnswerVerb string
+
+const (
+	trayAnswerAllowOnce   trayAnswerVerb = "allow-once"
+	trayAnswerReject      trayAnswerVerb = "reject"
+	trayAnswerAllowAlways trayAnswerVerb = "allow-always"
+)
+
+// trayAnswerFunc is the host-side executor for one answer gesture. It returns the
+// sentence this process prints and records, and it ALWAYS returns one: a press
+// that found no pending card answers with the named refusal, never "" and never a
+// success-shaped sentence (ticket 228 AC#2 supplement, orchestrator ruling F4).
+//
+// It is attached to the ball host LATE - residentBall.attachTrayAnswers, called by
+// the assembly root once the runtime that owns the card ledger exists - for the
+// same reason muteGate is (ticket 290): the ball window is up before the task
+// pipeline is assembled, so no value handed to ball.New at construction time can
+// name that runtime. Until the attach lands the three items are mounted and every
+// press is recorded as an unhosted gesture by name; that is the pre-228 shape
+// said out loud rather than a silent no-op.
+type trayAnswerFunc func(verb trayAnswerVerb) string
+
 // trayExit is the tray 退出 item's callback, mounted as Events.OnTrayExit. It is
 // a method on the hook bag for the same reason requestPanelOpen is one: the
 // closure a gesture drives has to be the one the assembly root handed over, not
@@ -288,6 +314,13 @@ type residentBall struct {
 	// the same mutex, and nil is the pre-390 shape: the click then records itself
 	// as unhosted, exactly like before.
 	voiceInterrupt func()
+	// trayAnswer is ticket 228 AC#2's executor for the tray's three ANSWER items
+	// (允许一次 / 拒绝 / 长期允许). One value covers all three because they share
+	// one ledger, one card choice and one sentence table; the verb says which
+	// item was pressed. Attached late, under muteMux, for the reason trayMuteRead
+	// and muteGate are: the ball is built before the runtime that assembles the
+	// answer side. nil is said out loud by trayAnswerGesture, never swallowed.
+	trayAnswer trayAnswerFunc
 	// voiceStates is every D43 state the voice leg (resident_voice_windows.go)
 	// projected onto this ball, oldest first. It is a record, not a flag: the
 	// projection's claim is "the orb really walked these states, in this order",
@@ -296,6 +329,13 @@ type residentBall struct {
 	// asr-infer goroutine writes it.
 	voiceStateMu sync.Mutex
 	voiceStates  []statemachine.State
+	// waitingStates is ticket 228 AC#3's record: every D43 waiting state the
+	// RUNTIME's own producer (agentRuntime.bookWaitingState) projected through this
+	// host, oldest first. It is kept apart from voiceStates on purpose - mixing the
+	// voice chain's walk with the approval layer's reading would make either
+	// snapshot a claim about a leg it did not observe. Guarded by voiceStateMu,
+	// which is the lock the projection and its readers already share.
+	waitingStates []statemachine.State
 }
 
 // ballHotkeyBridge258 carries the reloader handle the host installed. The type
@@ -466,7 +506,14 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 			// cmd/wisp/resident_windows.go); nil is the pre-AC#11 shape and is
 			// reported as such by recordTrayExit.
 			OnTrayExit: hs.trayExit(),
-			OnDragEnd:  func() { recordBallDragEnd() },
+			// Ticket 228 AC#2: the tray's three answer items. Each one hands a
+			// verb to the executor the assembly root attached after it built the
+			// card ledger (attachTrayAnswers); the closure below never composes a
+			// sentence and never decides anything.
+			OnTrayAllowOnce:   func() { rb.trayAnswerGesture(trayAnswerAllowOnce) },
+			OnTrayReject:      func() { rb.trayAnswerGesture(trayAnswerReject) },
+			OnTrayAllowAlways: func() { rb.trayAnswerGesture(trayAnswerAllowAlways) },
+			OnDragEnd:         func() { recordBallDragEnd() },
 		},
 	})
 	if err != nil {
@@ -614,7 +661,8 @@ func (rb *residentBall) stop() {
 const ballGestureWhy = "no executor was handed to this ball host for this gesture; the gestures with one are the " +
 	"cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it " +
 	"injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg " +
-	"(ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e) and the ball " +
+	"(ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e), the tray's " +
+	"three answer items once it assembled the card ledger behind them (ticket 228 AC#2) and the ball " +
 	"click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented"
 
 // attachMuteGate hands this host the executor that turns a mute gesture into a
@@ -685,6 +733,60 @@ func (rb *residentBall) attachVoiceInterrupt(fn func()) {
 	rb.muteMux.Lock()
 	defer rb.muteMux.Unlock()
 	rb.voiceInterrupt = fn
+}
+
+// attachTrayAnswers hands this host the executor for the tray's three answer
+// items (ticket 228 AC#2). The assembly root calls it exactly once, immediately
+// after the task pipeline - and therefore the card ledger the answers are spent
+// from - exists; it is the only writer.
+//
+// The order is the point, not a convention: an executor is attached here only
+// AFTER startResidentTaskSource assembled the reply surface, so no tray item can
+// ever point at a callback that has nothing behind it. A press that arrives in
+// the boot window before this line is not silent - trayAnswerGesture records it as
+// an unhosted gesture by name, which is the same honest shape the mute and
+// pause-wake items use while their own legs are still being assembled.
+func (rb *residentBall) attachTrayAnswers(fn trayAnswerFunc) {
+	if rb == nil {
+		return
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	rb.trayAnswer = fn
+}
+
+// currentTrayAnswer reads the attached executor back under the same lock, so the
+// ui-sta thread can never see a half-written handoff.
+func (rb *residentBall) currentTrayAnswer() trayAnswerFunc {
+	if rb == nil {
+		return nil
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	return rb.trayAnswer
+}
+
+// trayAnswerGesture is what each of the tray's three answer items runs (ticket
+// 228 AC#2). With an executor attached it hands the verb over and prints the
+// sentence that came back - never a sentence this file composed, because the
+// decision, the card and the refusal are all the host's. Without one it records
+// the gesture as unhosted, exactly like every other pre-executor gesture here.
+//
+// It runs ON the ui-sta thread (Ball.fire calls it inline), so the executor it
+// calls must be non-blocking. The three that exist are: Replies.Allow and
+// Replies.Reject (mutex + one channel send into the queue) and replySurface.always
+// (one print, one ledger record, one registry-owned goroutine that waits for the
+// second card off this thread - approval_always.go). None of them waits on this
+// thread, so the message pump is never parked.
+func (rb *residentBall) trayAnswerGesture(verb trayAnswerVerb) {
+	fn := rb.currentTrayAnswer()
+	if fn == nil {
+		recordBallGesture("tray-" + string(verb))
+		return
+	}
+	sentence := fn(verb)
+	slog.Info("ball: tray answer gesture executed", "verb", string(verb), "say", sentence)
+	fmt.Printf("wisp: %s\n", sentence)
 }
 
 // currentVoiceInterrupt reads the attached executor back under the same lock,
@@ -777,6 +879,46 @@ func (rb *residentBall) voiceStatesSnapshot() []statemachine.State {
 	rb.voiceStateMu.Lock()
 	defer rb.voiceStateMu.Unlock()
 	return append([]statemachine.State(nil), rb.voiceStates...)
+}
+
+// projectWaitingState is ticket 228 AC#3's hop: it takes the D43 waiting state the
+// RUNTIME's own producer computed from the card ledger (agentRuntime.
+// bookWaitingState, which until this ticket only booked an audit line) and drives
+// it onto the orb. It records first and posts second, for the same reason
+// setVoiceState does: the record is what makes "the orb really entered that state"
+// a reading a test can take back, and Ball.SetState is a non-blocking PostTask to
+// the one ui-sta thread this process already owns - no second UI thread, no new
+// goroutine (D38).
+//
+// Only the ENTERING direction is driven from here. Returning the orb to whatever
+// it should do next belongs to the surface that settles the card (ballCardUI's
+// settleOrb), which already reads the same ledger and is the one place that knows
+// what "no card left" means for THIS leg's states; a second writer for the exit
+// edge would be the two-truth-sources shape this repository keeps counting.
+//
+// nil rb is legal and means what it means everywhere in this file: a boot with no
+// window still names the state on record instead of panicking.
+func (rb *residentBall) projectWaitingState(s statemachine.State) {
+	if rb == nil || s == "" {
+		return
+	}
+	rb.voiceStateMu.Lock()
+	rb.waitingStates = append(rb.waitingStates, s)
+	rb.voiceStateMu.Unlock()
+	if rb.b != nil {
+		rb.b.SetState(s)
+	}
+}
+
+// waitingStatesSnapshot is every D43 waiting state the runtime's producer drove
+// through this host, oldest first.
+func (rb *residentBall) waitingStatesSnapshot() []statemachine.State {
+	if rb == nil {
+		return nil
+	}
+	rb.voiceStateMu.Lock()
+	defer rb.voiceStateMu.Unlock()
+	return append([]statemachine.State(nil), rb.waitingStates...)
 }
 
 // attachTrayMuteProjection hands this host the two halves of ticket 293 AC#2's

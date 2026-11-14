@@ -201,6 +201,57 @@ func (rt *agentRuntime) bookWaitingState(via string) {
 	card, _ := rt.liveCards.h.AwaitingHuman()
 	rt.auditf("approval: WAITING-STATE state=%q awaiting=true corr=%q tool=%s level=%s paths=%d producer=%q",
 		st, card.CorrelationID, card.Tool, card.Level, len(card.Paths), via)
+	// Ticket 228 AC#3: the same reading now DRIVES the orb when this process has
+	// one. Until this line the function was the producer of a name and nothing
+	// else - the ball entered Confirming/AwaitingApproval only because the card
+	// surface happened to post the state itself, so "the state was driven" had
+	// no witness a mutation could red.
+	//
+	// Order: the audit line is booked first, on purpose. The record has to exist
+	// even if the projection panics or a host's sink is the thing that fails
+	// next, which is the same reason consoleApprovalUI.Prompt books before it
+	// prints the card.
+	//
+	// Only the entering direction is projected: with nobody awaiting, this
+	// function has no state to name (the line above says so), and the orb's exit
+	// edge belongs to the surface that settles the card (ballCardUI.settleOrb
+	// reads the same ledger). A second writer for that edge would be two truth
+	// sources for "what the orb does now".
+	rt.projectWaitingState(st)
+}
+
+// waitingStateSink is ticket 228 AC#3's projection signature: the D43 name this
+// run just read, handed to a host that holds a surface able to show it. It is a
+// named type so run.go's field does not pull internal/statemachine into a file
+// that has no other business with the state vocabulary.
+type waitingStateSink func(statemachine.State)
+
+// bindWaitingStateSink hands this run the ball projection of its waiting state
+// (ticket 228 AC#3). The resident leg calls it once, immediately after the
+// runtime it assembled owns the card ledger, and it is the only writer.
+func (rt *agentRuntime) bindWaitingStateSink(fn waitingStateSink) {
+	if rt == nil {
+		return
+	}
+	rt.waitingMu.Lock()
+	defer rt.waitingMu.Unlock()
+	rt.waitingSink = fn
+}
+
+// projectWaitingState drives one D43 waiting state onto whichever surface this
+// host bound. nil sink is legal and means what it means in the rest of this
+// assembly: nobody handed this run a ball, so the state is named in the audit
+// line above and goes no further.
+func (rt *agentRuntime) projectWaitingState(s statemachine.State) {
+	if rt == nil || s == "" {
+		return
+	}
+	rt.waitingMu.Lock()
+	sink := rt.waitingSink
+	rt.waitingMu.Unlock()
+	if sink != nil {
+		sink(s)
+	}
 }
 
 // waitingStateName renders the same reading for any caller that wants the word

@@ -56,7 +56,17 @@ type Events struct {
 	OnTrayMute      func()
 	OnTrayPauseWake func()
 	OnTrayExit      func()
-	OnDragEnd       func()
+	// Ticket 228 AC#2: the tray's three ANSWER items (允许一次 / 拒绝 / 长期允许),
+	// appended so no existing key moves. They are gestures like every other one
+	// here: func(), fired inline on the ui-sta thread by fire, nil = the item is
+	// present and pressing it reaches nobody (which the host must say out loud -
+	// see cmd/wisp/resident_ball_windows.go's trayAnswerGesture). internal/ball
+	// does not learn what an approval is, which card is pending, or whether one
+	// is: the answer, its refusal and its audit line all live in the host.
+	OnTrayAllowOnce   func()
+	OnTrayReject      func()
+	OnTrayAllowAlways func()
+	OnDragEnd         func()
 }
 
 // Options configures New.
@@ -757,6 +767,17 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 				b.fire(b.opts.Events.OnTrayPauseWake)
 			case menuExit:
 				b.fire(b.opts.Events.OnTrayExit)
+			// Ticket 228 AC#2: the answer group. Same inline, non-blocking
+			// contract as every other gesture above - the host's executors post
+			// what they must and return (see cmd/wisp/resident_ball_windows.go's
+			// trayAnswerGesture, which runs on this same thread inside the same
+			// fire).
+			case menuAllowOnce:
+				b.fire(b.opts.Events.OnTrayAllowOnce)
+			case menuReject:
+				b.fire(b.opts.Events.OnTrayReject)
+			case menuAllowAlways:
+				b.fire(b.opts.Events.OnTrayAllowAlways)
 			}
 		}
 		return 0

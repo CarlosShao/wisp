@@ -158,6 +158,16 @@ type residentApproval struct {
 	// TICKET 381 R26-1: optional voice interrupt hook。当播报进行中时，Esc 键同时触发
 	// 审批取消 +TTS 中断。nil = 无播报腿装配（不常见但合法）。
 	voiceInterrupt func()
+
+	// runtime is ticket 228 AC#3's handle on the task pipeline the assembly root
+	// builds around this gate. It is bound once by bindRuntime, right after
+	// assembleRuntime returns, and it exists for ONE hop: the card surface asks that
+	// runtime to book/drive the D43 waiting state (agentRuntime.bookWaitingState)
+	// instead of this file re-deriving the state name from a ledger half it owns.
+	// nil is the no-pipeline launch shape - the panel's mode-switch card still
+	// displays and still sets the orb state, but the record line has no producer
+	// and nothing here pretends otherwise.
+	runtime *agentRuntime
 }
 
 // ---------------------------------------------------------------- the cancel key
@@ -201,6 +211,149 @@ func (ra *residentApproval) cancelKeySpelling() string {
 		return ra.cancelKeyRead()
 	}
 	return residentCancelKeySpelling(ra.ui.currentBall())
+}
+
+// ---------------------------------------------------------------- the waiting state (ticket 228 AC#3)
+
+// bindRuntime hands this gate's host the task pipeline the assembly root built
+// around it. The resident leg calls it once, immediately after assembleRuntime
+// returned and before any card can be raised, and it is the only writer.
+//
+// Why the hop goes through the runtime instead of this file computing the state
+// itself: the D43 reading already exists as ONE producer (agentRuntime.
+// bookWaitingState, ticket 201 AC#6a) and AC#3's whole point is that the same
+// reading drives the orb. Re-deriving it here from the queue would be the second
+// truth source the ticket forbids.
+func (ra *residentApproval) bindRuntime(rt *agentRuntime) {
+	if ra == nil {
+		return
+	}
+	ra.mu.Lock()
+	defer ra.mu.Unlock()
+	ra.runtime = rt
+}
+
+// currentRuntime reads the bound pipeline back under the same lock the binding
+// took, so the card surface can never see a half-written handoff.
+func (ra *residentApproval) currentRuntime() *agentRuntime {
+	if ra == nil {
+		return nil
+	}
+	ra.mu.Lock()
+	defer ra.mu.Unlock()
+	return ra.runtime
+}
+
+// bookWaitingState is the card surface's call into the runtime's one waiting-state
+// producer (ticket 228 AC#3). With no pipeline bound it does nothing and says
+// nothing: the no-pipeline shape has no audit sink to book into, and inventing a
+// line here would be this file claiming a producer it does not have.
+func (ra *residentApproval) bookWaitingState(via string) {
+	if rt := ra.currentRuntime(); rt != nil {
+		rt.bookWaitingState(via)
+	}
+}
+
+// ---------------------------------------------------------------- the tray's three answers (ticket 228 AC#2)
+
+// The two sentences a press can get when it finds nothing to answer. They are
+// DIFFERENT facts and are kept apart on purpose (ticket 228 AC#2 supplement,
+// orchestrator ruling F4): one is "there is no card", the other is "there is a card
+// this host has not displayed yet". Both name the outcome ("nothing was allowed,
+// rejected or remembered") so neither can be read as a success, and neither reuses
+// the gate's own refusal vocabulary - a button with no object is not a permission
+// decision.
+const (
+	trayAnswerNoCardWhy = "tray answer: no pending card - the three answer items act on the one card this " +
+		"process is being waited on, and there is none right now; nothing was allowed, rejected or remembered"
+	trayAnswerUndisplayedWhy = "tray answer: the approval queue holds a card this host has not displayed yet, " +
+		"so there is nothing on the orb to answer; nothing was allowed, rejected or remembered"
+	trayAnswerNoSideWhy = "tray answer: no answer side in this process - it assembled no task pipeline " +
+		"behind the card ledger, so no allow, reject or widening can be spent here; nothing was changed"
+	// trayRejectReason is what the model is told when the human used the tray's
+	// 「拒绝」 item. That item has no reason box (the panel's reject has one, the
+	// tray's does not), so the sentence says exactly that instead of inventing a
+	// reason the operator never typed.
+	trayRejectReason = "托盘菜单的「拒绝」：操作者没有填写理由（这一枚没有理由框）"
+)
+
+// trayAnswerLabel is the operator-facing name of one gesture, used in sentences
+// this file composes (never in place of the surface's own sentence).
+func trayAnswerLabel(v trayAnswerVerb) string {
+	switch v {
+	case trayAnswerAllowOnce:
+		return "允许一次"
+	case trayAnswerReject:
+		return "拒绝"
+	case trayAnswerAllowAlways:
+		return "长期允许"
+	}
+	return string(v)
+}
+
+// trayAnswerExecutor builds the function the ball host runs when one of the tray's
+// three answer items is pressed (ticket 228 AC#2). It is the ONE place that decides
+// WHICH card an answer spends - and the ruling it implements is F6's: the head card
+// somebody is being waited on (Replies.AwaitingHuman, L2 preferred), never "the card
+// the user meant". The tray has no per-card UI, so any other choice would be a
+// guess dressed as a feature.
+//
+// The three verbs go through the SAME replySurface the console reader uses, which is
+// what keeps one verb table, one refusal vocabulary and one audit trail for both
+// native faces: allow → Replies.Allow, reject → Replies.Reject, always →
+// replySurface.always (which raises its own SECOND L2 card; the tray path cannot
+// bypass that, because `always` is the only implementation there is).
+//
+// AC#5 IS UNTOUCHED HERE: every route below is the native face (the ledger's
+// single-use grant + DecideFromNative). Nothing in this file calls
+// DecideFromPanel, and the panel has no method that could reach these items - the
+// tray is a native surface of the resident process, not a panel-sourced one.
+//
+// Threading: the returned function runs ON the ui-sta thread (Ball.fire), so it
+// must not wait. `allow`/`reject` are a mutex plus one channel send; `always`
+// prints, records, and hands its second-card wait to a registry-owned goroutine
+// (approval_always.go's runWidening), so the message pump is never parked.
+func (ra *residentApproval) trayAnswerExecutor(surface *replySurface) trayAnswerFunc {
+	return func(verb trayAnswerVerb) string {
+		if ra == nil || surface == nil {
+			slog.Warn("tray answer: no answer side in this process", "verb", string(verb), "why", trayAnswerNoSideWhy)
+			fmt.Printf("wisp: %s\n", trayAnswerNoSideWhy)
+			return trayAnswerNoSideWhy
+		}
+		card, awaiting := ra.cards.AwaitingHuman()
+		if awaiting && card.CorrelationID == "" {
+			// The queue holds something the host has not finished displaying: the
+			// honest answer is that fact, not "no card" and certainly not a click
+			// that quietly does nothing.
+			slog.Warn("tray answer: the queue holds an undisplayed card", "verb", string(verb), "why", trayAnswerUndisplayedWhy)
+			fmt.Printf("wisp: %s\n", trayAnswerUndisplayedWhy)
+			return trayAnswerUndisplayedWhy
+		}
+		if !awaiting {
+			slog.Warn("tray answer: no pending card", "verb", string(verb), "why", trayAnswerNoCardWhy)
+			fmt.Printf("wisp: %s\n", trayAnswerNoCardWhy)
+			return trayAnswerNoCardWhy
+		}
+		var sentence string
+		var err error
+		switch verb {
+		case trayAnswerAllowOnce:
+			sentence, err = surface.allow(card.CorrelationID)
+		case trayAnswerReject:
+			sentence, err = surface.reject(card.CorrelationID, trayRejectReason)
+		case trayAnswerAllowAlways:
+			sentence, err = surface.always(card.CorrelationID)
+		default:
+			sentence = fmt.Sprintf("托盘答复：未知手势 %q，什么也没有发生", string(verb))
+		}
+		if err != nil {
+			// The surface has already booked its own REFUSED line against the
+			// correlation id; this is the sentence the operator reads.
+			slog.Warn("tray answer refused", "verb", string(verb), "corr", card.CorrelationID, "err", err)
+			return fmt.Sprintf("托盘「%s」没有落到卡片 %s 上：%v", trayAnswerLabel(verb), card.CorrelationID, err)
+		}
+		return sentence
+	}
 }
 
 // ---------------------------------------------------------------- the grant holder
@@ -920,6 +1073,18 @@ func (u *ballCardUI) Prompt(_ context.Context, p approval.Prompt) error {
 	u.mu.Unlock()
 
 	u.ra.cards.Record(p)
+	// Ticket 228 AC#3: the runtime's own producer reads the ledger it just
+	// received into and drives the D43 state from that reading. It is called
+	// BEFORE the two posts below on purpose: this line's projection is the
+	// ledger-backed one, and the card's own SetState/SetBadge keep their
+	// established order (state, then depth - applyStateLocked zeroes the badge on
+	// every state entry, which is the order TestTicket21S2BadgePostsAreOrdered
+	// StateThenDepth pins).
+	//
+	// With no pipeline bound (the no-console launch shape) this is a no-op and
+	// the orb still gets its state from the line below - the honest difference
+	// between "the producer drove it" and "the card surface drew it".
+	u.ra.bookWaitingState("resident-ui-prompt")
 	if p.Level == "L1" {
 		b.TakeEscForCancel()
 	}
@@ -996,6 +1161,11 @@ func (u *ballCardUI) Update(_ context.Context, e approval.Event) error {
 	switch e.Kind {
 	case approval.EventDismissed, approval.EventStarted:
 		u.ra.cards.Forget(e.CorrelationID)
+		// Ticket 228 AC#3's other half of the record: the wait is over, so the
+		// runtime books the "nobody is being waited on" reading (it drives nothing
+		// on this edge - the orb's exit edge is settleOrb's, the one place that
+		// knows what this leg's states may claim).
+		u.ra.bookWaitingState("resident-ui-" + string(e.Kind))
 		u.settleOrb()
 		// settleOrb returns the orb to Sleeping (which zeroes the badge) only
 		// when NO card is still awaiting. When one settles and another is

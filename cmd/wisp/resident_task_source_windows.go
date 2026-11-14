@@ -174,6 +174,13 @@ type residentTaskSource struct {
 	// surface is the answer side, built from approval_reply.go's own verb table.
 	// nil means nobody can type an answer, which is the no-console branch.
 	surface *replySurface
+	// answers is the SAME verb table built whether or not this process has a
+	// console (ticket 228 AC#2). The tray's three answer items need it: they are
+	// native gestures of this process and must not become conditional on a
+	// keyboard being attached. With a console it IS src.surface (one object, never
+	// a second copy); without one it is the tray's only route, and src.surface
+	// stays nil so taskPosture keeps saying "no console entry" truthfully.
+	answers *replySurface
 	// consoleStop ends the console reader's verb handling without killing the
 	// process (the `quit` verb's route).
 	consoleStop func()
@@ -341,8 +348,16 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval, ws *panel.W
 	// rebindLedger is false because ra attached its ledger to ra.gate at boot with
 	// the resident transport names. Re-attaching would restamp a resident card as
 	// a console card in the audit line.
+	//
+	// Ticket 228 AC#2: this is built for EVERY shape that has a runtime, not only
+	// the console one. The tray's three answer items are gestures of this process's
+	// ball, and a launch with no console (the shipped -H=windowsgui shape) can still
+	// be asked a card by the panel's mode switch - so tying the answer surface to a
+	// keyboard was the wrong conditional. The console branch takes the same object
+	// as its reader's verb table, so there is exactly one table either way.
+	src.answers = run.newReplySurface(src.root, ra.consoleVetoChannel(), false)
 	if console != nil {
-		src.surface = run.newReplySurface(src.root, ra.consoleVetoChannel(), false)
+		src.surface = src.answers
 		src.consoleStop = func() { src.root.Cancel() }
 	}
 

@@ -21,6 +21,23 @@ const (
 	menuMute      = 2
 	menuPauseWake = 3
 	menuExit      = 4
+
+	// Ticket 228 AC#2: the three ANSWER items. They are appended, never
+	// renumbered - ids 1..4 and the four labels below them are byte-identical
+	// to what shipped before this ticket, because a renumbering would silently
+	// re-bind a menu entry a consumer already dispatches on.
+	//
+	// What these three are, and what they are not: they carry the human's answer
+	// to the ONE card the process is being waited on (Replies.Allow /
+	// Replies.Reject / replySurface.always on the host side). internal/ball knows
+	// nothing about approvals and must keep knowing nothing - the callbacks are
+	// func(), fire() only tests them for nil (ball_windows.go's fire), and every
+	// sentence, refusal and audit line is the host's. 「本次会话内允许」 is
+	// deliberately NOT here: the Answer verb table has four words and the
+	// session-scoped grant is ticket 224's, not this ticket's (AC#2's own text).
+	menuAllowOnce   = 5
+	menuReject      = 6
+	menuAllowAlways = 7
 )
 
 type tray struct {
@@ -84,6 +101,17 @@ func showMenu(hwnd windows.HWND, muted, pausedWake bool) uint32 {
 		pAppendMenuW.Call(menu, flags, id, unsafePtr(utf16(label)))
 	}
 	appendItem(menuOpenPanel, "打开面板", false)
+	pAppendMenuW.Call(menu, mfSepart, 0, 0)
+	// Ticket 228 AC#2: the answer group. It is ALWAYS built, never hidden and
+	// never greyed - there is no "is a card waiting" input in this function, and
+	// adding one would put the ledger's depth into a package that has no business
+	// knowing it. The host's ruling on the落空 shape is "always show, say so when
+	// the press finds nothing" (ticket 228 AC#2 supplement, orchestrator F4): the
+	// item is present, and a press with no pending card produces the host's named
+	// no-pending-card line instead of a silent no-op or a fake success.
+	appendItem(menuAllowOnce, "允许一次", false)
+	appendItem(menuReject, "拒绝", false)
+	appendItem(menuAllowAlways, "长期允许", false)
 	pAppendMenuW.Call(menu, mfSepart, 0, 0)
 	appendItem(menuMute, "静音", muted)
 	appendItem(menuPauseWake, "暂停唤醒", pausedWake)

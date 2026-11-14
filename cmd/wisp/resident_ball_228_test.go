@@ -50,6 +50,12 @@ const ballImportPath228 = "github.com/CarlosShao/wisp/internal/ball"
 var ballEventCallbacks228 = []string{
 	"OnClickBall", "OnSummonHotkey", "OnMuteHotkey", "OnCancelHotkey", "OnPanelHotkey",
 	"OnTrayPanel", "OnTrayMute", "OnTrayPauseWake", "OnTrayExit", "OnDragEnd",
+	// Ticket 228 AC#2: the tray's answer group. Appended, never inserted: the three
+	// keys are mounted by the resident host to its own gestures
+	// (resident_ball_windows.go's trayAnswerGesture), and the list is what makes a
+	// future fourth answer item - or a deleted executor - go red by name instead of
+	// vanishing into a nil callback.
+	"OnTrayAllowOnce", "OnTrayReject", "OnTrayAllowAlways",
 }
 
 // ballHost228 is one production function that creates the ball.
