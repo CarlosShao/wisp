@@ -110,3 +110,19 @@
 - [2026-09-30T17:37:19+08:00] agent=245-r1 claimed=票 245（产码腿，非裁决腿） did=乙形落地：稳态不绑 cancel（`HotkeyStandby`）＋`takeEscWith`/`releaseEscWith` 接成唯一借用路径；三枚 AC#3 钉同批收紧（另加两枚票面未点名的同类计数钉）；真机探针 `escBorrowProbe` 证借还两头；M1/M2a/M2b 三发突变逐发红过并逐发还原成绿；本表末尾追加五字段残余登记与这节 log evidence=docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md（commits f91feddd／e6d6426f／本枚） skipped=none（本票无前端面） next=交非实现者对抗验收；AC 框一枚未勾（5 未勾／0 已勾，勾归编排者）；Status 那一行按编排者原文保留未改，⛔ 未新增 `DEFERRED(D-xx)` 代码标记（理由见上）
 - [2026-11-08T21:40:11+08:00] agent=cmdwisp-wording claimed=票 245 AC#6①（**复认，非实现**） did=派单点名的 main.go usage「its four global hot keys」假话**已被 245-r3（commit `9e84ae42e`）先行落地改真**：现文逐字「its three always-on global hot keys … the cancel slot is the fourth key, bound only while a confirmation card is waiting and handed back when it leaves」（main.go:26-29）；本腿现跑复认与代码事实一致（`ball_windows.go:857` idle 名册不含 cancel／`:920` cancel id 唯一注册路径／`hotkey_windows.go:13-14` HotkeyStandby＋takeEscWithAcc 借期才绑 VK_ESCAPE）；按「⛔ 为凑数改对的文字」**零改动**。⚠ 票面 Progress log 缺 245-r3 那一笔（log 止于 245-r1），判定归编排者。同面证据（含 228 AC#8 落地＋cmd/wisp 扫面清单）见 docs/evidence/s1/cmdwisp-stale-wording.md。AC 框一枚未翻；只 commit 不 push。
 - [2026-11-14T13:35:00+08:00] agent=245-r4 claimed=票 245 写腿（AC#8／260 后基线红／AC#9，非裁决腿） did=①AC#8 判据分叉：`requireIdleRoster` 先读名册（裸键在册＝硬红 `ticket 245 RED (AC#8, OUR OWN SET)`），再连问 3 次裸 Esc 探针，注册集干净＋键被外人占 ⇒ 具名 `SKIP-LOUD (ticket 245 AC#8, FOREIGN OWNER)` 带 `attempts=3` 与 `errno 1409 "Hot key is already registered."` 原文；判据本体 `classifyEscIdleOwner245` 落默认档并新增 4 控制用例（含正控变异红句逐字）；②修 260 形ⓐ 之后那枚确定性基线红：`interaction_live_test.go:231` 由写死注 `"Esc"` 改为注 `ConfiguredHotkeys().Cancel`（借哪枚注哪枚），红前逐字 `interaction_live_test.go:238: the taken-over Esc did not cancel Confirming (machine Confirming)`，修后 winlive 四例 4/4 PASS `ok … 7.875s`；③AC#9 常驻尺入库：新件 `cmd/wisp/resident_esc_delivery_245_windows_test.go` 复用仓内既有第二进程台件对**出厂 `wisp.exe`** 跑四形（基线 1／自占 0+wm_hotkey 1／常驻挂着仍 1／退出后再 1），`--- PASS … (19.78s)`，正控（两处生产变异让常驻腿真握裸 Esc）红句逐字 `ticket 245 AC#9 RED (PRODUCT): the shipped no-args process held the desktop's bare Esc while idle…` 后还原、两文件 SHA/`git status` 双空 evidence=docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r4.md skipped=AC#8 的 foreign 支按 2026-11-14 派单具名跳过（与票面字面「⛔ 不许改成跳过」冲突，已在证据 §5 具名请裁）；AC#6① 本发读数 0/4 系另一腿 `wisp-live.exe` pid 21340 占着 Q/M/P（非回归，如实记，3/4 仍欠）；AC#6② 行为半边未动（260 裁定须人工批准） next=交非实现者对抗验收；AC 框一枚未勾（顶层 4/9 勾，与进场现读同）；⛔ 未改 Status、⛔ 未新增 `DEFERRED(D-xx)`；只 commit 不 push
+
+## 编排者裁定（2026-11-14 13:4x，针对 `7f5f36b0d` 提出的两问）
+
+### 一、AC#8「票面字面写 ⛔ 不许改成跳过」vs 派单「被别人占 ⇒ 具名跳过并给数字」
+**裁定：按派单口径（两形分开），并修改本票 AC#8 的口径说明**，理由：
+- 票面那句的原意是**不许把产品缺陷藏进跳过**；而这里跳过的只有「**注册集干净 ＋ 键被外人占**」这一形，且 `Probe attempts=3` 与 `errno 1409 "Hot key is already registered."` 原文都进了跳过语。
+- **我们自己的注册集握着裸键 ⇒ 仍然硬红**（新判词 `ticket 245 RED (AC#8, OUR OWN SET)`），且**判序在前** —— 产品错不能藏在环境后面。正控已验：把 ours 支短路（`held` → `false && held`）⇒ 逐字红 `hotkey_esc_idle_owner_245_test.go:90: a claimed bare Esc that the ball's own set holds classified as owner 2, want ours (1) - the foreign-owner skip must never absorb the product's defect`；还原 SHA `3C079391…` 同串后再跑 PASS。
+- 撤销口令：「245 AC8 回硬红」＝把 `foreign` 支的 `t.Skipf` 换 `t.Fatalf`（代价：把「别的程序占着 Esc」读成我们的产品缺陷）。
+
+### 二、`internal/ball/**` 写面偏差
+**裁定：接受。** 该目录不在禁止清单枚举里，且本腿只改 `*_test.go`（我现核：`internal/ball` 四件全是 `_test.go`，**非测试文件 0 处**）。撤销口令：`git checkout 7f5f36b0d^ -- internal/ball/hotkey_live_test.go internal/ball/interaction_live_test.go internal/ball/hotkey_idle_bare_key_245_test.go` 并删 `internal/ball/hotkey_esc_idle_owner_245_test.go`。
+
+### 三、欠账登记（不勾框）
+- **AC#4 仍不勾**：阻塞于票 228（现读 `resident_ball_windows.go:426/:350/:452`，`Test245AC4ResidentChainReadsAConfiguredCancel` PASS 只证「链读得进配置」，不证「卡挂着时借的是配置值」）。
+- **AC#6① 本发 0/4 是我造成的**：我为等机主按 `Ctrl+Alt+M` 拉起的 `wisp-live.exe`（pid 21340）占着 Q/M/P 热键。**不是回归**；下一发热键腿之前我会先把它停掉。
+- 票面 `resident_ball_windows.go:86 / DefaultHotkeys()` 已过期，现读 `:452 Hotkeys: cfg,`。
