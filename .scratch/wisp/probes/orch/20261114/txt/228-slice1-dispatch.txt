@@ -1,0 +1,32 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：票 228 切片 1（写面 cmd/wisp/**，本波只此一枚写腿）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 228 的**切片 1**（⛔ 不是整票）。
+
+先读三份，按顺序：
+1. `.scratch/wisp/issues/228-*.md` **全文**（65,934 B，16 格；AC#0 的代价表已答完、AC#1/#7 已翻，别重做）
+2. `.scratch/wisp/probes/228/a1/cost-table.md`（AC#0 的代价表）
+3. `docs/PLAN.md` 的 **D38** 与 **D43 转移表**（球与面板必须在同一 STA 线程；状态机权威转移表）
+
+**你这一波要做三格（并进 AC#2，不新开 AC）**：
+- **AC#2 托盘四枚按钮各映射到现成枚举、且有一枚真执行者**：`「允许一次」→Replies.Allow`、`「拒绝」→Replies.Reject`、`「长期允许」→replySurface.always`、`「退出」→`（见下一格）。⛔ 造新枚举，用票面点名的现成那几个。
+- **AC#2 的射程补格（票 244 `A490`）**：托盘「退出」是 GUI 进程**未来的唯一停机源**。
+- **AC#11（票 244 `A493`）**：「退出」那枚的真执行者**只能长成一个形状**：**记一笔请求、立刻返回，由常驻腿自己去结束环路**。⛔ 在 WndProc 里同步拆窗口/等线程。
+- **AC#3 等待态真被驱动**：`bookWaitingState`（`cmd/wisp/approval_always.go:171-184`）今天**只写审计日志、不碰球**；把它推进 D43 的「等人」那一态。⚠ 注意票 201 的拆格口径：AC#6a「态可计算可审计」≠「态真被驱动」，别混。
+
+**硬约束（票面逐字，我复读）**：
+- **AC#5 不许松**：面板侧来源的 L2「允许」**仍然必须被判红**。正控＝从界面方法名送一发"允许"，路由必须拒；⛔ 把 `DecideFromPanel` 改宽。
+- **D38**：悬浮球绘制与面板**必须在同一 STA 线程**，⛔ 建第二条 UI 线程。
+- **AC#4（goroutine 收口）不在你这波**，但若你的改动 spawn 了 goroutine，**必须**走 `observe.Registry.Spawn`（形见 `internal/ball/ball_windows.go:170`）并在证据里点名——否则会撞红 AC#4。
+- `runSpec.replyVeto` 生产赋值点今天＝0、`run.go:446` 传空参（票面已点）——你要接的正是这一条，**说明你接上了还是没接上**，⛔ 含糊。
+- ⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 转移表；⛔ `frontend/**`／`design/**`／`internal/panel/**`／`internal/llm/**`／`internal/tools/**`／`tools/d22scan/**`；⛔ 放宽任何断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+**复跑纪律**：`go test ./cmd/wisp` **必须**走载具 `scripts/wisp-cli-staged-tests.sh`，**一次一发**（违反过 ⇒ 两条全量读数作废）。⚠ 本机整包有 2 枚已知红**不是你的**（`TestAC4FocusReturnToPriorWindowGap33r5` 前台被占／`TestAC246DevLegIgnoresTheTestTaskInjection` 因编排者的驻留球在跑，PID 49348）——具名记下，⛔ 修、⛔ 删、⛔ 跳过。
+门禁另跑：`gofumpt -l cmd/wisp` 空、`go vet -tags winlive ./cmd/wisp` rc=0、`d22scan` clean、path-length `VERDICT GREEN`（⚠ 若给票改名就同时改 `check-path-length-budget.sh` 的名册，见台账 A1871）。
+
+**判据不许是"能编译"或"看起来对"**：每格给**可判事实**（grep 前后计数／真起一次并读到某个日志行／定向突变摘掉那一行后哪枚测试红）。⛔ 用墙钟当判据。
+
+写面：`cmd/wisp/**`（本波只你一枚）、`internal/ball/**`（只当读面，若要改先停下问）、`docs/evidence/s1/228-*`、`.scratch/wisp/probes/228/**`、本票 Progress log（只追加）。
+
+回话第一行＝commit hash ＋「AC#2／AC#2 补格／AC#11／AC#3 各翻没翻（逐格）＋各自那一句可判事实」＋「AC#5 正控仍红（是/否）」。没干完写「未完成，卡在哪」。
