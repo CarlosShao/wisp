@@ -2,7 +2,7 @@
 
 **票**：`.scratch/wisp/issues/446-errno-presence-is-decided-by-an-english-error-sentence.md`
 **裁决人（本文件作者）＝实现者**（写腿）。对抗验收/缺口审计须由**另一个** agent 做（`SPEC-12 §4.3` #1/#3），本文件不代替它。
-**修复 commit**：见本文件所在 commit（`git log --format=%H -1 -- docs/evidence/s1/446-errno-presence.md`）；基线 = `447929bfe`。
+**修复 commit**：`be0f599f3`（父 `4ce5c86ff`；本腿开工时的 HEAD 是 `447929bfe`，中间另一条腿落了 `4ce5c86ff`，只碰 `scripts/d22scan.sh` ＋ `tools/d22scan/**`，与本文件无交集）
 **改动文件**：`internal/tools/system_backend_windows.go`（唯一产码文件）
 **修复后 sha256**：`8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845`（AC#3 的还原判据就是这个串）
 **时刻**：2026-11-14 18:1x–18:3x +08
@@ -153,6 +153,8 @@ pwsh -NoProfile -File .scratch/wisp/probes/446/r1/gate-446-static.ps1
 | 写面自检 | `git status --short -- internal/tools/` | 只有 `internal/tools/system_backend_windows.go` 一个 M |
 
 `d22scan` 跑的那棵树里，本文件 sha256 = `8CAD96…38845`，与最终串**相同**（突变两次都已还原，见 AC#3 C 段）。
+
+**落账后再量一遍（同一把尺，换了新版脚本）**：上面那次 d22scan 用的是 18:21 时的 `scripts/d22scan.sh`（`4ce5c86ff` 在 18:28:09 才落）。所以在本 commit 落账之后，用**落账后的树**又跑了一次同一把尺：`sh scripts/d22scan.sh` ⇒ `clean - no D22 ban violations`、`OK - control rc=0, scan rc=0`，**rc=0**（日志 `probes/446/r1/52-d22scan-post-commit.log`）。
 
 ---
 
