@@ -1,0 +1,25 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864；明示 fallback）
+# 来路：票 192 前一条腿自己点名的三步未接线（它只在 internal/panel 有写面）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 192 的 **`cmd/wisp` 三步接线**（面板侧已全建好，产品里现在**预览返回 404**）。
+
+先读 `.scratch/wisp/issues/192-*.md`（未结那一枚）与 `internal/panel/preview_192.go` 的对外形状、`docs/evidence/s1/` 里 192 那条腿的证据件。
+
+**三步（前一条腿逐字点名的，一步都不能省）**：
+1. `panelAssetLookup` 加**预览分支**，并把 `doc.Headers` **拼进响应** —— 不拼就会回落到面板那条 CSP，HTML 沙箱**等同没生效**；
+2. 组合根装配 `PreviewResolver`（生产装配路径上，⛔ 只在测试里）；
+3. message 处理器接 `QuoteForModel`（现在全仓 **0 个产码调用点**）。
+
+判据（要能判，不许"接上了"了事）：
+- **预览不再 404**：产品路径上取一次真产物，给出**响应状态与字节数**；
+- **CSP 真的生效**：HTML 预览的响应头里能看到 `sandbox; default-src 'none'`，且证明它来自 `doc.Headers` 而**不是**面板那条兜底的（可判事实，⛔ 靠"看着像"）；
+- **`QuoteForModel` 有产码调用点**：`git grep` 改前 0 枚 → 改后 ≥1 枚，且那枚在组合根/message 处理器上、不在测试里。
+
+⚠ **本机整包 `./cmd/wisp` 会有 2 枚已知红，不是你的**：`TestAC4Focus…`（前台被别的真窗口占着）、`TestAC246DevLeg…`（**驻留球正在跑**，编排者 16:23 起的）。⇒ 具名记下、⛔ 当自己的红去修，也⛔ 顺手删它们。
+⚠ `go test ./cmd/wisp` **必须走载具** `scripts/wisp-cli-staged-tests.sh`（裸跑因 DLL 出假红 `0xc0000135`），⛔ 同时跑两发。
+
+边界：写面＝`cmd/wisp/**`（装配与处理器那几处）＋`docs/evidence/s1/192-*`＋`.scratch/wisp/probes/192/**`＋本票 Progress log（只追加）。
+⛔ `internal/panel/**`（前一条腿已完工，别改它的判据）、`internal/llm/**`、`internal/tools/**`、`tools/d22scan/**`、`frontend/**`、`design/**`；⛔ 阈值/golden/契约/规格；⛔ 放宽断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+回话第一行＝commit hash ＋「三步各一行读数（404还是不是／CSP 头长什么样／QuoteForModel 产码调用点几枚）」。没干完写「未完成，卡在哪」。
