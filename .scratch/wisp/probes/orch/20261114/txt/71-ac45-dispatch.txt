@@ -1,0 +1,19 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864；明示 fallback）
+# 来路：普查腿 survey-pool 的 A 段（docs/evidence/s1/pool-triage-20261114.md）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 71 的 **AC#4 ＋ AC#5**（其余框已翻，⛔ 别重做）。
+
+先读票全文（.scratch/wisp/issues/71-*.md，未结那一枚），再读它引的证据件。
+本单要点（普查腿给的一句动作，逐字）：「派写腿做 AC#4（让 d22scan 在每个作用域里自报 examined N）＋AC#5（接进 CI 并给出一次真实的失败）」。
+
+硬要求：
+1. **AC#4 的"自报"必须可判**：每个作用域（scope）跑完要打印一行能 grep 的数（形如 `scope=xxx examined N files`），且**这个数必须真的是它看过的文件数** —— 用「故意塞一个坏文件进某作用域 ⇒ 那一行的 N 加一且当次红」来证明它不是常量、不是门面。
+2. **AC#5 的"一次真实的失败"必须有读数**：在仓外导出树里制造一发真违规 ⇒ CI 那一步红、红句点名那个文件；还原后同串 SHA256、再绿。⛔ 只写「已接进 CI」不算。
+3. 若发现 AC#4 描述的形状与盘上现状不符（比如已经有部分自报），**先报现状数字再改**，⛔ 从零重写。
+
+边界：写面＝`tools/d22scan/**`、`scripts/**`（仅 CI 接线那一处）、`docs/evidence/s1/71-*`、`.scratch/wisp/probes/71/**`、本票 Progress log（**只追加**）。
+⛔ 阈值/golden/契约/规格；⛔ 放宽既有断言；⛔ 动 `.scratch/wisp/issues/` 其它票；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+⚠ 别碰 `cmd/wisp/**`、`internal/panel/**`（别的腿在写）。
+
+回话第一行＝commit hash ＋「AC#4 的自报数在哪个 scope、红过没有（是/否）」。没干完写「未完成，卡在哪」。
