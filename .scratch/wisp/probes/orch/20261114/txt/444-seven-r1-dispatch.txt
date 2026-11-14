@@ -1,0 +1,21 @@
+# 派单存档（先存档再发）
+# 路由：agent(prompt, { provider:'magpie-high', model:'auto/glm-5.3-flash' })
+# ⛔ 不许写 auto/deepseek-v4.1-flash（2026-11-14 下午连犯 6 次，台账 A1863）
+Wisp 仓（D:\work\workspace\projects plans\Wisp）写腿。票 444：还有 7 枚竞态窗口仪器会在「弃权」时变红。
+
+先读票全文：.scratch/wisp/issues/444-seven-more-race-window-instruments-can-red-on-abstention.md（含 7 枚点名表与 AC#1–#5）。
+必读同机理已结先例：docs/evidence/s1/441-instrument-abstention.md + internal/winsec/posix_seal_window_120_other_test.go —— 票 441 已把「弃权 vs 真红」的形确立好，照它做，⛔ 另发明一套。
+
+核心机理（先记住，省你推理）：这些仪器把两件事绑在一起证——「窗口到达过」与「护栏还在」。CI 负载下窗口不开时，它把「没观测到」读成「护栏没了」⇒ 假红。正解＝拆成两个载体：到达性可弃权（具名行+数字+可 grep token，形如 AC#1 ABSTAIN(444:<shape>:<why>) attempts=... samples=...），护栏本身必须仍真红。⛔ 不许用 t.Skip（runtests.sh 把 core 档顶层 SKIP 判致命），⛔ 不许把测试藏进 build tag（那是把 flake 改成透明）。
+
+要做：
+AC#1 7 枚逐枚定性：用受控争用让窗口不开（如 WISP_120_ATTEMPTS=1 那类缩分母），读出现有那条红句。⛔ 不许写「大概率会」。票 322 那枚（openleaf_322_other_test.go:206）文件头自陈无确定性载体 ⇒ 具名说明+给「诚实射程」写法即算通过。
+AC#2 逐枚改成两载体形。
+AC#3 每枚各造一发「护栏被拆」突变（仓外导出树）⇒ 修后真红并逐字点名；还原 SHA256 同串再跑绿。⛔ 只验一枚就算。
+AC#4 ⛔ 不许钝化：7 枚原有真红断言逐条列改前/改后对照表，一条不许删或放宽。
+AC#5 门禁：bash -n（若碰）、sh scripts/d22scan.sh clean、path-length GREEN、go vet ./internal/winsec rc=0、产码 0 字节。
+
+边界：写面只许 internal/winsec/** 的 *_test.go、docs/evidence/s1/444-*、.scratch/wisp/probes/444/**、票 444 Progress log（只追加）。⛔ 产码；⛔ 阈值/golden/契约；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔ push。
+⚠ 只跑定向 go test -run '<票名>' ./internal/winsec；⛔ 同时跑多条；⛔ 跑 cmd/wisp。
+
+交付：7 枚逐枚读数表 + 突变正控 + 改前改后断言对照表 + commit（显式 pathspec）。回话第一行写 commit hash + 「7 枚各一个字结论」。没干完写「未完成，卡在哪」。
