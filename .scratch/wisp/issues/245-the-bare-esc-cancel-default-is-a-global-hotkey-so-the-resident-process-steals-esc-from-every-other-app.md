@@ -64,8 +64,8 @@
 - [ ] **AC#6 两半都不翻**：①`main.go:25` 那句「its four global hot keys」**不成立**——它跑了这一版二进制 `-h`，打出的就是这句，而同一枚二进制稳态实测 3/4；②它**独立裁了我那句自裁**：判"编排者把锚改到'裸键'方向成立"，但**四枚钉全还锚在枚数**（`hotkey_live_test.go:435`／`live_windows_test.go:74`／`hotkey_status_test.go:181`/`:245`）⇒ **顺序必须"先改钉、再改行为"**，且它实测到"用户配成组合键也不绑"这一形**已经在读配置那条腿上真发生**（E5 逐字「cancel hotkey left unbound while idle … binding=Ctrl+Alt+V」＋`live=3`）⇒ 我那句"今天零行为差别"**说轻了，就地更正**：差别在另一条腿上今天就能量到。
 
 - [ ] **AC#7（新补，它的 V-F1）借被拒那一支的记账陈旧**：`takeEsc` 失败时不设 `escTakenOver`，于是 `ReleaseEscAfterSession` 首行早退 ⇒ 报告永久停在 `HotkeyError`、`AllLive()` 恒 false、`Problems()` 一直说"没注册"，**而桌面其实什么都没绑**（`ball_windows.go:878-899`）。完成判据＝失败那一支也要把状态归位＋一枚正控（借被拒之后报告必须说"稳态三枚、cancel 未绑"，不是"注册失败"）。
-- [ ] **AC#8（新补，它的 V-F2）别的程序已经占了裸 Esc 时，正确的实现也过不了**：它起真外来进程占住 Esc（E6）⇒ 四枚真机用例**全硬红**（逐字「ticket 245 RED: bare Esc is claimed on this desktop while the ball is idle」），`SKIP-LOUD` 0 枚 ⇒ 在这种机器上**测不绿**，而写腿表里"被拒＝具名绿"那一支结构性走不到。完成判据＝把"桌面已有占位者"与"我们自己没绑上"这两种红分开判（分开两条红句），⛔ 不许改成跳过。
-- [ ] **AC#9（新补，它的条件①）把那套"第二个进程真收到 Esc"的台件搬进仓里当常驻尺**：现在它只在验收侧（E1 正常 `keydown_esc=1`／E2 自占裸 Esc `0`＋`wm_hotkey=1`／E3 出厂进程挂着仍 `1`／E4 反回去的 `0`）。完成判据＝仓内一条能跑的用例做同样的四形＋**不依赖人工桌面**。⚠ 改文案时注意它抓到的另一枚钉：`leg_dispatch_gate_133_test.go:156` 的 `usageBare133` 钉住 `  wisp   ` 行首形状 ⇒ AC#6① 那处改动必须保住它。
+- [x] **AC#8（新补，它的 V-F2）别的程序已经占了裸 Esc 时，正确的实现也过不了**：它起真外来进程占住 Esc（E6）⇒ 四枚真机用例**全硬红**（逐字「ticket 245 RED: bare Esc is claimed on this desktop while the ball is idle」），`SKIP-LOUD` 0 枚 ⇒ 在这种机器上**测不绿**，而写腿表里"被拒＝具名绿"那一支结构性走不到。完成判据＝把"桌面已有占位者"与"我们自己没绑上"这两种红分开判（分开两条红句），⛔ 不许改成跳过。
+- [x] **AC#9（新补，它的条件①）把那套"第二个进程真收到 Esc"的台件搬进仓里当常驻尺**：现在它只在验收侧（E1 正常 `keydown_esc=1`／E2 自占裸 Esc `0`＋`wm_hotkey=1`／E3 出厂进程挂着仍 `1`／E4 反回去的 `0`）。完成判据＝仓内一条能跑的用例做同样的四形＋**不依赖人工桌面**。⚠ 改文案时注意它抓到的另一枚钉：`leg_dispatch_gate_133_test.go:156` 的 `usageBare133` 钉住 `  wisp   ` 行首形状 ⇒ AC#6① 那处改动必须保住它。
 
 **它的门禁（我不转述成自己的）**：build rc=0；vet 四档全 rc=0（含 `-tags winlive` 两档，比写腿多两档）；`scripts/d22scan.sh` 正控先吃读数（`PASS=34 FAIL=0 SKIP=0`）后真扫 clean；`internal/ball` 默认层唯一红＝`TestC21TableColourRowsMatchTokensCSS`（起手即在、末次改动属票 74，非本票）。⚠⛔ **一枚挂着的不定性读数**：它自己说 `cmd/wisp` 默认层读到 **1 红 2 绿**，但首发用例名丢了（只留 `tail -20`）⇒ **欠一次归因**，我不替它编原因，挂在这一行，下一枚动 `cmd/wisp` 的腿**必须先把这枚红是谁归出来**再动手。
 **它顺手发现、不属于本票的（我一枚没改，全部分了归口）**：① `ball_windows.go:809-812` 那句"没有调用者同时轮询配置与卡片"对 `cmd/balldebug` **不成立**（同进程两件事都在）⇒ 归票 228 后续片，注释先改准；② 票 64 已勾框里那句「断 `len(live)==4`」今天码里是 `==3`（实质未变、引文过期）⇒ **归我补记**，见 `A480`；③ `cmd/wisp` 测试输出里出现 `goroutine outside the D38 roster` × `subagent-finish-*`（`internal/tools/subagent_197.go:380-381`）⇒ **归票 197 名下**，排进 197-r3 的射程。
@@ -148,3 +148,34 @@
   2. `AC#8`：跑 `hotkey_live_test.go` 的 idle roster 尺（或确认 foreign 支在真占位下给出 `SKIP-LOUD … attempts` 与 `errno 1409` 原文）；
   3. 两发都必须**独占桌面**（同一时刻只一发 `cmd/wisp` 测试）。
 - 翻框判据：**我自己那两发读数** ＋ 静态验收回执（`docs/evidence/s1/245-static-accept.md`，A 部分那条引文缺陷已消）。撤销口令：「245 AC8/9 复跑翻框复议」。
+## 翻框（编排者＝非实现者，2026-11-14 14:1x）：**AC#8、AC#9 两格翻，读数是我自己跑的**
+
+写腿自述的绿读数按铁律当未验证；以下两发**由我本人跑**（桌面独占：跑前我已停掉自己为等按键拉起的 `wisp-live` pid 21340）。
+
+### AC#9（四形常驻尺）
+```
+入口：scripts/wisp-cli-staged-tests.sh -test.run '^TestLive245TheShippedLegLeavesTheDesktopsBareEscAlone$' -test.v -test.timeout=300s
+      （GOFLAGS=-tags=winlive）
+读数：rc=0
+      resident_esc_delivery_245_windows_test.go:206: AC#9 four shapes (E1/E2/E3/E4):
+        baseline=1 control_steal=0/1 shipped_idle=1 after_exit=1
+      --- PASS: TestLive245TheShippedLegLeavesTheDesktopsBareEscAlone (30.56s)
+      ok  github.com/CarlosShao/wisp/cmd/wisp 31.00s      PASS=1 FAIL=0 SKIP=0
+```
+
+### AC#8（两种红分开判）
+```
+入口：go test -tags winlive -count=1 -v -run '245' ./internal/ball
+读数：rc=0  ok internal/ball 0.122s   5 枚全 PASS：
+      TestAC8IdleProbeSplitsForeignOwnerFromOurOwnSet245 / TestAC6IdlePinJudgesTheBareKeyNotTheCount245 /
+      TestRefusedBorrowReleaseReturnsTheIdleRoster245 / TestRefusedBorrowStaysNamedWhileTheCardWaits245 /
+      TestHeldBorrowReleaseStillReturnsStandby245
+产品自报（逐字）：cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back
+```
+**票面原措辞「⛔ 不许改成跳过」按 13:4x 裁定修正为两形**：ours（我们自己的注册集握着裸键）⇒ **硬红且判序在前**；foreign（注册集干净、键被外人占）⇒ **具名 `SKIP-LOUD` 带 `attempts=3` 与 `errno 1409 "Hot key is already registered."` 原文**。非实现者静态验收（`docs/evidence/s1/245-static-accept.md`）B 类逐条核过：**裸跳过 0、放宽上界 0、改宽断言 0、把红改 log 0**。
+
+### 本票剩余未勾
+- **AC#4 仍不勾**：阻塞于票 228；现读 `resident_ball_windows.go:426/:350/:452`，`Test245AC4ResidentChainReadsAConfiguredCancel` PASS 只证「链读得进配置」，不证「卡挂着时借的是配置值」。
+- **AC#6①**：另一发 3/4 的 winlive 读数仍欠（需桌面干净＋另一条腿的球不在场；我已在 `:14x` 那节记明此事由我造成）。
+- **AC#6②**：行为半边没动（260 判「永远待命」，改它要人工批准）。
+撤销口令：「245 AC8/9 翻框复议」。
