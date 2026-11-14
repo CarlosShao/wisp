@@ -1,0 +1,19 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864；明示 fallback）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 446（一行级真 bug）：errno 存在性拿**英文句子**判。
+
+先读票全文 .scratch/wisp/issues/446-errno-presence-is-decided-by-an-english-error-sentence.md。
+要点：`internal/tools/system_backend_windows.go:286` 与 `:426` 用 `"The operation completed successfully."` 判「有没有 errno」。`syscall.Errno(0).Error()` 恰好是这句英文 ⇒ **非英文 Windows 上永远判错**。正解 `errors.Is(e, syscall.Errno(0))`。
+
+五格 AC 都要：
+1. `git grep -n 'operation completed successfully'` 全量点名，逐条判「判存在性」还是「只打印」；
+2. 改成码判（两处都改，同形一并）；
+3. **能变红的检查**：把修好的判定临时改回字符串比较、并构造 errno=0 的路径走进去 ⇒ 必须红且点名；还原 SHA256 同串、再绿。⛔ 只写「改了」；
+4. 门禁：`go vet ./internal/tools` rc=0、gofumpt（⚠ 本机可能没装，如实记，⛔ 拿 gofmt 冒充）、`d22scan` clean、path-length GREEN；
+5. CI 那一格你没有 CI 权限 ⇒ **留白**，由编排者填，⛔ 不许自己声称 CI 绿。
+
+边界：写面只许 `internal/tools/system_backend_windows.go`（及 AC#1 点名的同形）、`docs/evidence/s1/446-*`、`.scratch/wisp/probes/446/**`、本票 Progress log（只追加）。
+⛔ `cmd/wisp/**`、`internal/panel/**`、`internal/llm/**`、`tools/d22scan/**`（别的腿在写）；⛔ 阈值/golden/契约；⛔ 放宽断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+回话第一行＝commit hash ＋「AC#1 全量命中 N 处、其中判存在性 M 处、改了 M 处」。没干完写「未完成，卡在哪」。
