@@ -62,7 +62,7 @@ helper 是既有件 `cmd/wisp/panel_host_windows_test.go` 的 `panelProfileLeaf`
 
 `cmd/wisp/panel_profile_leaf_shape_windows_test.go`，`//go:build windows`，**不建窗、纯 go/parser、0.82 s**：
 
-- 扫描集＝`cmd/wisp/*.go`（**272** 件，产码与测试都扫：字面量可以只挪一个文件）+ 具名的
+- 扫描集＝`cmd/wisp/*.go`（**273** 件，产码与测试都扫：字面量可以只挪一个文件）+ 具名的
   `../../scripts/spike/webview2-latency/main.go`（审计 §5.3 的 spike 默认名那 1 处）＝ **274**；
   空扫描集 **Fatal**（盲尺不许印绿），读不到/解析不了 **Fatal**（跳过不是豁免）。
 - 规则 **NAME**：`Join` 里同时出现 `os.TempDir()`（或它的局部/包级别名）与字符串字面量叶，且叶名含 `profile`
@@ -183,3 +183,11 @@ GOFLAGS='-tags=winlive' go test -c -o .scratch/wisp/probes/314-ruler/wisp-winliv
 2. **spike 为什么在扫描集里**：它是审计 §5.3 数出来的第 3 处固定名，且真的会开真 WebView2；把它具名进扫描集
    （而不是让它留在射程外），那处就成了豁免表里**唯一一条带 `-datapath` 覆盖证据的非测试豁免**；同时缺失即 Fatal，
    逼着「spike 搬家」与「豁免表」同一次提交。
+
+## 6 一处数字更正（不重写历史）
+
+第一枚提交 `0b28c7d98` 的 message 与本件初稿把 `cmd/wisp/*.go` 的件数写成 **272**，实测是 **273**
+（`(Get-ChildItem cmd/wisp/*.go).Count` ＝ 273；加具名的 spike 1 件 ＝ 尺子日志的 **274**）。
+274 是尺子自己打印的读数（`扫了 274 个源文件`），272 只是我手抄的加数，抄错一件。按仓规不改写已提交历史，
+本件与票 314 Progress log 已更正为 273，此段留档。
+

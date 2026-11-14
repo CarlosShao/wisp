@@ -1,0 +1,3 @@
+ticket 314 evidence: the cmd/wisp source count is 273, not 272 - the census line (274 total) was right, three prose copies of the operand were not
+
+(Get-ChildItem cmd/wisp/*.go).Count = 273; plus the named spike source = the 274 the ruler prints. The first commit message and the first draft of the evidence file said 272, which was a hand-copied addend. History is not rewritten (repo rule); the evidence file and the ticket 314 Progress log now say 273, and section 6 of the evidence file books the correction. No code, no test, no reading changed.
