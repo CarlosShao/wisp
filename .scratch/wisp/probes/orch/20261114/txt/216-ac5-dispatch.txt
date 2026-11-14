@@ -1,0 +1,21 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+# （glm 今天 agent() 15 次 0 交付，台账 A1864；这是明示 fallback，汇报首行点名，⛔ 静默降级）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 216 的**最后一格 AC#5**。
+
+先读票全文：.scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md（102 行，只剩 AC#5 一个未翻框，其余 5 格已翻）。
+再读它引的调研件第 4 题：docs/reports/survey-2026-09-28-composer-plus-menu.md 的相关段落。
+
+AC#5 要求：**错误提示按错误码分支，不许按英文错误串里有没有某个数字**。票面自己写明它只读到腿的转述、未逐字复核 ⇒ **你第一步是把反面教材原文找出来逐字读**（openchamber 的 ChatInput.tsx:2205 靠 "413" 子串决定弹哪句），核清它到底怎么错的，再对盘上我们自己的实现下判。
+
+要做：
+1. 现量：把仓里所有「按英文串/按子串决定错误文案」的地方列出来（git grep 错误串、状态码子串、statusText 等），给点名表 file:line。
+2. 逐条判：哪些是「按错误码分支」（合格）、哪些是「按字符串」（不合格）。
+3. 不合格的改成按码分支；把「没有」与「读不到」两句分开这件事在错误文案层同样落实（票的标题就要求这两句必须是两句话）。
+4. 若发现盘上已经是合格的（没有不合格项），**如实报 0 项并给判据**，⛔ 不许为凑工作量去改对的代码。
+
+边界：写面只许 docs/evidence/s1/216-*、.scratch/wisp/probes/216/**、本票 Progress log（只追加），以及**你真判定不合格的那几处产码/文案**（若碰产码，必须在回话里逐枚点名）。
+⛔ 阈值/golden/契约/规格；⛔ 放宽断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+⚠ frontend/** 与 design/** 归机主外部 agent，**零写面**；若要改前端文案，只**报告**不许改。
+
+回话第一行＝commit hash（或「0 项，无需改」＋判据）＋「不合格项 N 条」。没干完写「未完成，卡在哪」。

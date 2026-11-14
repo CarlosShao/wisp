@@ -1,0 +1,26 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+# （glm 今天 agent() 15 次 0 交付，台账 A1864；这是明示 fallback，汇报首行点名，⛔ 静默降级）
+Wisp 仓 D:\work\workspace\projects plans\Wisp **审计腿**（只读＋写证据件，⛔ 不改产码、⛔ 不改票面已翻的框）。
+
+任务：审**编排者今天结的 5 张票**，判它们是不是真该结。⛔ 信任票面的自述，**只信盘上读数**。
+
+要审的 5 张（都在 .scratch/wisp/issues/ 下，文件名以 -done.md 结尾）：
+- 441-posix120-seal-window-instrument-reds-on-abstention-under-ci-contention-done.md
+- 442-panel-profile-ruler-still-misses-two-interprocedural-shapes-done.md
+- 274-no-nail-shipped-exe-carry-page-build-step-2-comment-false-done.md
+- 443-test52-timeout-tree-instrument-reds-when-fixture-never-reports-a-pid-done.md
+- 444-seven-more-race-window-instruments-can-red-on-abstention.md（未结，AC#5 等 CI）
+
+对每一张，逐条给：AC 框数／未翻框数；它引的 commit 是否真在（git cat-file）；它引的证据件是否真在（路径＋字节）；它引的 file:line 是否真在那（打开看那一行是不是它说的东西）；**它有没有把「本地绿」说成「CI 绿」**；**它有没有把没做到的说成做到**。
+
+专门查三件事（今天我自己出过这三类错，你要独立判一遍）：
+1. **HEAD 双计数**：每张票的旧文件名是否还活在 HEAD 里（git ls-tree HEAD -- .scratch/wisp/issues | 按票号数，必须 =1）。今天 441／274 都犯过。
+2. **overclaim**：票面里凡是「全绿／已绿／CI 绿／两发连续绿」的句子，逐句核它有没有 CI run id 与 head sha 撑着；没有的在报告里命中它。
+3. **本地绿冒充**：凡只有本地 go test 读数、没有 CI 读数的，明确标「仅本地」。
+
+产出：docs/evidence/s1/audit-20261114-closures.md，一张表 ＋ 一个「结论」段：哪几张**应当保持已结**、哪几张**应当复开**（复开要给具体理由与要补的那一格）。
+若你判某张该复开，**不要自己动手改票面**，只写进证据件并在回话里点名。
+
+边界：写面只许 docs/evidence/s1/audit-20261114-closures.md ＋ .scratch/wisp/probes/audit-20261114/**。⛔ 改产码、⛔ 改票面、⛔ 动阈值/golden/契约、⛔ add -A/--amend/reset/rebase/stash/checkout .、⛔push。
+回话第一行＝commit hash ＋「应当复开 N 张」。没干完写「未完成，卡在哪」。
