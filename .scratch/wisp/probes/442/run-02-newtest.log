@@ -1,0 +1,41 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T16:06:02.858+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test442EveryDrivenConstructionPointHandsItsOwnDataPath
+time=2026-11-14T16:06:03.966+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T16:06:03.966+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T16:06:03.969+08:00 level=INFO msg="panel host: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed"
+wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+time=2026-11-14T16:06:03.971+08:00 level=INFO msg="panel host: perm: MODE-DOWNGRADE from=ask_high_risk to=ask_every_step at=2026-11-14T08:06:03.9713662Z origin=\"startup\" actor=\"process\" asked=0 card=\"\" result=downgraded-no-channel detail=\"本进程没有接入确认通道：config.toml 仍是 ask_high_risk，有效档位降为 ask_every_step（372 读侧降级，配置值不动）\""
+wisp: perm: MODE-DOWNGRADE from=ask_high_risk to=ask_every_step at=2026-11-14T08:06:03.9713662Z origin="startup" actor="process" asked=0 card="" result=downgraded-no-channel detail="本进程没有接入确认通道：config.toml 仍是 ask_high_risk，有效档位降为 ask_every_step（372 读侧降级，配置值不动）"
+time=2026-11-14T16:06:03.980+08:00 level=INFO msg="panel host: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
+wisp: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。"
+time=2026-11-14T16:06:03.980+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T16:06:03.981+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-11-14T16:06:03.984+08:00 level=INFO msg="panel host: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed"
+wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+time=2026-11-14T16:06:03.984+08:00 level=INFO msg="panel host: perm: MODE-DOWNGRADE from=ask_high_risk to=ask_every_step at=2026-11-14T08:06:03.9848849Z origin=\"startup\" actor=\"process\" asked=0 card=\"\" result=downgraded-no-channel detail=\"本进程没有接入确认通道：config.toml 仍是 ask_high_risk，有效档位降为 ask_every_step（372 读侧降级，配置值不动）\""
+wisp: perm: MODE-DOWNGRADE from=ask_high_risk to=ask_every_step at=2026-11-14T08:06:03.9848849Z origin="startup" actor="process" asked=0 card="" result=downgraded-no-channel detail="本进程没有接入确认通道：config.toml 仍是 ask_high_risk，有效档位降为 ask_every_step（372 读侧降级，配置值不动）"
+time=2026-11-14T16:06:03.987+08:00 level=INFO msg="panel host: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
+wisp: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。"
+    panel_data_path_distinct_442_windows_test.go:201: the 6 readings came from 1 distinct construction point(s), want 3: [panel_host_windows.go:336]. Either a fixture began constructing from a second place, or two fixtures collapsed onto one point.
+    panel_data_path_distinct_442_windows_test.go:216: 253r6's windowed fixture: the seam recorded 0 construction point(s) in panel_unbound_253r6_windows_test.go ([]), want exactly 1 - the value this test judges must come from that file's own constructor call, or the label above is a lie
+    panel_data_path_distinct_442_windows_test.go:216: 33r5's windowed fixture: the seam recorded 0 construction point(s) in panel_resident_windows_test.go ([]), want exactly 1 - the value this test judges must come from that file's own constructor call, or the label above is a lie
+    panel_data_path_distinct_442_windows_test.go:216: the resident boot's assembly root (the one production site): the seam recorded 0 construction point(s) in panel_resident_windows.go ([]), want exactly 1 - the value this test judges must come from that file's own constructor call, or the label above is a lie
+    panel_data_path_distinct_442_windows_test.go:225: construction point panel_host_windows.go:336 handed the host 6 value(s), want 2 (one per round): [C:\Users\swq\AppData\Local\Temp\wisp-253r6-panel-profile-37428-1794643563965838300 C:\Users\swq\AppData\Local\Temp\wisp-33r5-panel-profile-37428-1794643563966411900 C:\Users\swq\AppData\Local\Temp\Test442EveryDrivenConstructionPointHandsItsOwnDataPath4190199078\001\panel-webview2 C:\Users\swq\AppData\Local\Temp\wisp-253r6-panel-profile-37428-1794643563980775200 C:\Users\swq\AppData\Local\Temp\wisp-33r5-panel-profile-37428-1794643563981321500 C:\Users\swq\AppData\Local\Temp\Test442EveryDrivenConstructionPointHandsItsOwnDataPath4190199078\002\panel-webview2] - a point that no longer constructs on every round is a measurement gap, not a pass
+time=2026-11-14T16:06:03.987+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-11-14T16:06:03.988+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-11-14T16:06:03.988+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-11-14T16:06:03.988+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-11-14T16:06:03.991+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-11-14T16:06:03.991+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-11-14T16:06:03.991+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-11-14T16:06:03.991+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+--- FAIL: Test442EveryDrivenConstructionPointHandsItsOwnDataPath (1.13s)
+FAIL
+FAIL  github.com/CarlosShao/wisp/cmd/wisp	2.00s

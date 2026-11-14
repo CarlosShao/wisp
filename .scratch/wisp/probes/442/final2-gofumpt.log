@@ -1,0 +1,2 @@
+# gofumpt -l cmd/wisp
+GOFUMPT_RC=0 GOFUMPT_LINES=0

@@ -329,6 +329,12 @@ func withPanelKeepAlive(src func() bool) panelHostOption {
 // source and nothing else. Passing no option keeps the host at the constants in
 // this file, which is why the seven pre-AC#4 test call sites are untouched.
 func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string, opts ...panelHostOption) *PanelManager {
+	// Ticket 442's runtime observation seam (nil in production; see
+	// panel_data_path_seam_windows.go): the one send point a test reads the
+	// value the host was actually handed from, whatever spelled it.
+	if panelDataPathSeam != nil {
+		panelDataPathSeam(dataPath)
+	}
 	m := &PanelManager{disp: disp, assets: assets, dataPath: dataPath}
 	for _, opt := range opts {
 		opt(m)
