@@ -1,0 +1,10 @@
+== proof that the 3 selftest reds are a CRLF-checkout artifact, not this ticket
+-- HEAD blob is LF; the worktree copy is CRLF (1414 CR / 1414 LF), so the carrier awk mutators emit LF while the original is CRLF and diff counts every line:
+worktree CR bytes/LF bytes: 1414
+1414
+-- same awk mutation (case 18 seed) applied to LF bytes, PRE-fix:
+1
+-- same awk mutation applied to LF bytes, POST-fix:
+1
+-- and on the CRLF worktree copy (what the carrier sees here):
+1414

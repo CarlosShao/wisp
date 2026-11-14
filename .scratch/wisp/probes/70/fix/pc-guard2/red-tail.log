@@ -1,0 +1,11 @@
+winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\winsec-20261114-121232-1899 - this run's t.TempDir() family lands here; nothing deletes it.
+winsec-tests.sh: platform=windows gate=internal/winsec scope=[./internal/winsec/] package=github.com/CarlosShao/wisp/internal/winsec
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.069s
+PASS
+winsec-tests.sh: GUARD 2 (ticket 70) - the capture carries a package result line for github.com/CarlosShao/wisp/internal/winsec, but NO execution reading at all: zero '--- PASS|FAIL|SKIP:' lines and no 'portable-tests.sh: four numbers' line. A `go test -list` ROSTER TAIL prints exactly the 'ok  <pkg>  <duration>' shape this guard anchors on, so that line vouches for a run that never happened (CI run 43549905387, test-windows step 4: the step read RUN=0 and the 'result line' was the trailer of a -list whose ./cmd/wisp/ binary died at load).
+winsec-tests.sh: the reading this guard requires is an EXECUTION one: a top-level '--- PASS|FAIL|SKIP: <case>' verdict, or the delegated runner's own four-numbers line (which proves it got past its roster stage into the run). Neither is present, so this step tested github.com/CarlosShao/wisp/internal/winsec zero times and is RED - not a green with a suspicious line in the log.
+winsec-tests.sh: this is a tighter input requirement on the SAME claim, not a new assertion and not a relaxed one - see docs/evidence/s1/70-roster-gate-fix.md.
+winsec-tests.sh: winsec result line: <roster tail only: no execution reading>
+winsec-tests.sh: four numbers (all from -v output): === RUN=0  --- PASS=0  --- FAIL=0  --- SKIP=0
+winsec-tests.sh: gate is RED (rc=1) for scope=[./internal/winsec/]
+rc=1

@@ -1,0 +1,64 @@
+slo-nail-census: positive control bench=/tmp/tmp.6IQ5bf97l9 (kept on disk; this project never deletes temp artifacts)
+slo-nail-census: control 1 ok - the pristine copy is green (rc=0)
+slo-nail-census: control 2 ok - the green run names nail 1/2 - output carries [nail 1/2 Test-ScriptShapeNail]
+slo-nail-census: control 3 ok - the green run names nail 2/2 - output carries [nail 2/2 Test-ExitCodeInstrument]
+slo-nail-census: control 4 ok - the green run prints its PASS line - output carries [PASS - 2/2 nails]
+slo-nail-census: control 5 ok - deleting both nail calls turns the census red (rc=1)
+slo-nail-census: control 6 ok - the red names the call token - output carries [slo-nail-census-nail-call-missing]
+slo-nail-census: control 7 ok - the red names the shape nail and its file - output carries [the declared nail 'Test-ScriptShapeNail' has no column-0, uncommented, standalone call line in slo-check.ps1]
+slo-nail-census: control 8 ok - the red names the capability nail - output carries [the declared nail 'Test-ExitCodeInstrument' has no column-0, uncommented, standalone call line]
+slo-nail-census: control 9 ok - restoring the two call lines turns the census green again (rc=0)
+slo-nail-census: control 10 ok - the restored run carries no FAIL line - output does not carry [FAIL slo-nail-census]
+slo-nail-census: control 11 ok - deleting ONE call turns the census red (rc=1)
+slo-nail-census: control 12 ok - the red names the shape nail's missing call - output carries [the declared nail 'Test-ScriptShapeNail' has no column-0]
+slo-nail-census: control 13 ok - the red does not accuse the capability nail - output does not carry [the declared nail 'Test-ExitCodeInstrument' has no column-0]
+slo-nail-census: control 14 ok - commenting both calls out turns the census red (rc=1)
+slo-nail-census: control 15 ok - the commented-out calls are named as missing - output carries [slo-nail-census-nail-call-missing]
+slo-nail-census: control 16 ok - a block comment around both calls turns the census red (rc=1)
+slo-nail-census: control 17 ok - the block-commented calls are named as missing - output carries [slo-nail-census-nail-call-missing]
+slo-nail-census: control 18 ok - deleting a nail's definition turns the census red (rc=1)
+slo-nail-census: control 19 ok - the red names the missing definition token - output carries [slo-nail-census-nail-definition-missing]
+slo-nail-census: control 20 ok - deleting a nail's ok sentence turns the census red (rc=1)
+slo-nail-census: control 21 ok - the red names the missing ok sentence token - output carries [slo-nail-census-nail-ok-sentence-missing]
+slo-nail-census: control 22 ok - a missing target is CANNOT DECIDE (exit 2), never green (rc=2)
+slo-nail-census: control 23 ok - the refusal carries its token - output carries [slo-nail-census-cannot-decide]
+slo-nail-census: control 24 ok - the refusal says it is not a pass - output carries [NOT a pass]
+slo-nail-census: control 25 ok - an empty target is CANNOT DECIDE (exit 2) (rc=2)
+slo-nail-census: control 26 ok - the empty-file refusal carries its token - output carries [slo-nail-census-cannot-decide]
+slo-nail-census: control 27 ok - a CRLF copy of the target stays green (rc=0)
+slo-nail-census: control 28 ok - a count that no longer matches its tables turns the census red (rc=1)
+slo-nail-census: control 29 ok - the red names the drift token - output carries [slo-nail-census-declaration-drift]
+slo-nail-census: control 30 ok - calls moved below the first sample turn the census red (rc=1)
+slo-nail-census: control 31 ok - the red names the ordering token - output carries [slo-nail-census-ordering]
+slo-nail-census: control 32 ok - the red says why the position matters - output carries [not before the first sampling call]
+slo-nail-census: control 33 ok - the pristine build gate is green (rc=0)
+slo-nail-census: control 34 ok - the green run prints the build gate PASS line - output carries [build gate PASS]
+slo-nail-census: control 35 ok - deleting the roster diff turns the build-gate census red (rc=1)
+slo-nail-census: control 36 ok - the red names the missing diff token - output carries [slo-nail-census-build-diff]
+slo-nail-census: control 37 ok - commenting out the unprovenanced Fail turns the build-gate census red (rc=1)
+slo-nail-census: control 38 ok - the red names the missing redline token - output carries [slo-nail-census-build-redline]
+slo-nail-census: control 39 ok - restoring the build gate turns the census green again (rc=0)
+slo-nail-census: control 40 ok - the restored run carries no FAIL line - output does not carry [FAIL slo-nail-census]
+slo-nail-census: control 41 ok - a snapshot taken after npm turns the build-gate census red (rc=1)
+slo-nail-census: control 42 ok - the ordering red names the snapshot-after-npm cause - output carries [AFTER the npm run build call]
+slo-nail-census: control 43 ok - deleting the provenance ok sentence turns the build-gate census red (rc=1)
+slo-nail-census: control 44 ok - the red names the missing okline token - output carries [slo-nail-census-build-okline]
+slo-nail-census: control 45 ok - deleting the whole provenance gate turns the census red (rc=1)
+slo-nail-census: control 46 ok - the whole-gate red names the snapshot - output carries [slo-nail-census-build-snapshot]
+slo-nail-census: control 47 ok - the whole-gate red names the npmcall - output carries [slo-nail-census-build-npmcall]
+slo-nail-census: control 48 ok - the whole-gate red names the diff - output carries [slo-nail-census-build-diff]
+slo-nail-census: control 49 ok - the whole-gate red names the redline - output carries [slo-nail-census-build-redline]
+slo-nail-census: control 50 ok - the whole-gate red names the okline - output carries [slo-nail-census-build-okline]
+slo-nail-census: control 51 ok - reverting the array diff to the join-split shape turns the census red (rc=1)
+slo-nail-census: control 52 ok - the join-split red names the diff token - output carries [slo-nail-census-build-diff]
+slo-nail-census: positive control PASSED - 52 control(s) ran, 0 failed
+slo-nail-census: file=scripts/slo-check.ps1 (absolute /d/work/workspace/projects plans/Wisp/scripts/slo-check.ps1)
+slo-nail-census: declared nails=2 - the declaration lives in this file, not in scripts/slo-check.ps1
+slo-nail-census: sampling anchor: first line carrying [-FilePath $WispExe] is scripts/slo-check.ps1:533
+slo-nail-census: nail 1/2 Test-ScriptShapeNail - definition scripts/slo-check.ps1:233, ok sentence scripts/slo-check.ps1:258, call scripts/slo-check.ps1:291
+slo-nail-census: nail 2/2 Test-ExitCodeInstrument - definition scripts/slo-check.ps1:214, ok sentence scripts/slo-check.ps1:230, call scripts/slo-check.ps1:292
+slo-nail-census: build gate scripts/build.ps1 - declared provenance tokens: snapshot / npmcall / diff / redline / okline / buildanchor, each exactly once
+slo-nail-census: build gate PASS - snapshot:158 npmcall:165 diff:209 redline:212 okline:215 buildanchor:270 in the declared order (ticket 274)
+slo-nail-census: PASS - 2/2 nails declared here are defined once, carry their own ok sentence, are called once at column 0, and run before the first sample at scripts/slo-check.ps1:533
+slo-nail-census: NOTE - this tooth pins shape only. That those two ok lines were actually PRINTED is not asserted by any outer step yet (ticket 266 shape 2), and one commit deleting this file together with the CI step that calls it would leave nothing ringing. The build-gate half (ticket 274) pins shape only in the same way.
+rc=0

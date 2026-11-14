@@ -847,17 +847,109 @@ for entry in "${ledger[@]}"; do
     esac
 done
 
+# ---- TICKET 70 (roster gate, 2026-11-14): a test binary that cannot be LISTED
+# must not take the whole tier down before its first case.
+#
+# WHAT WAS WRONG. This block used to be ONE `go test -list '.*'` over the scope
+# plus every ledger package, and a non-zero exit was fatal ("the ledger cannot be
+# verified against a test binary that does not build", exit 1). ONE package that
+# cannot be loaded on this host therefore killed the tier BEFORE a single case
+# ran. Measured on CI (run 43549905387, test-windows steps 4 and 13; 19 of 20
+# consecutive runs): ./cmd/wisp/ has been in this ledger since 2026-11-13
+# (02939b8a2, 7386f221c) and its test binary links the sherpa tree, so a `go
+# test -list` issued from a step that has not staged the DLLs dies at LOAD time
+# with `exit status 0xc0000135` (STATUS_DLL_NOT_FOUND). The winsec step then
+# read RUN=0 PASS=0 FAIL=0 SKIP=0 and went red - an honest reading of "not one
+# case ran", with the cause sitting in a package that step never wanted to run.
+# Reading and pre-fix reproduction: docs/evidence/s1/70-roster-gate-fix.md.
+#
+# WHAT THIS DOES INSTEAD, AND WHY THIS SHAPE IS THE VALUABLE ONE (mainstream
+# harness: fault isolation per unit, name the failure, keep running). (a) the
+# fast path is unchanged - one combined listing, so a healthy host pays nothing
+# new; (b) when it fails, EVERY package is listed on its own and each failure is
+# NAMED with its exit code and loader signature; (c) a package this tier does
+# not run is not this tier's verdict: its ledger rows are DEFERRED BY NAME and
+# re-verified in the tier that does run it (cmd/wisp's rows in mode=cli, whose
+# carrier stages the DLLs first), and the run goes ahead; (d) a package that IS
+# in this tier's scope and cannot be listed is named too and cannot be dodged:
+# the run is expected to red it through GUARD B's per-package result line, and
+# the ticket-70 verdict after GUARD B reds the step if it somehow does not.
+# Nothing is skipped silently - every un-listable package is printed with a
+# count, and every deferred ledger row is printed by name.
+#
+# WHY NOT STAGE THE DLLS HERE (the other candidate). scripts/wisp-cli-staged-
+# tests.sh works because it builds ONE binary and puts the loader's first search
+# slot next to it. Reproducing that here would mean building and staging
+# ./cmd/wisp/'s binary inside a tier that never runs it, and it would only
+# answer the sherpa-DLL case: the next package that cannot be listed (a build
+# tag, a missing cgo toolchain, a genuinely broken package) would still kill the
+# tier. Per-package isolation answers the CLASS, keeps the ledger audit honest
+# by naming what it could not check, and leaves the staging carrier as the ONE
+# place that knows how to load cmd/wisp.
 universe_file=$(mktemp 2>/dev/null || echo "$root/.portable-list.$$.log")
-if ! go test -list '.*' "${scope[@]}" "${ledger_pkgs[@]}" >"$universe_file" 2>&1; then
-    cat "$universe_file"
-    echo "portable-tests.sh: go test -list failed for [${scope[*]} ${ledger_pkgs[*]}] - the ledger" \
-        "cannot be verified against a test binary that does not build." >&2
-    rm -f "$universe_file"
-    exit 1
+roster_pkgs=()
+roster_unlistable_order=()
+roster_scope_broken=()
+declare -A roster_seen=()
+declare -A roster_in_scope=()
+declare -A roster_unlistable=()
+for pkg in "${scope[@]}"; do
+    [ -n "$pkg" ] || continue
+    roster_in_scope["$pkg"]=1
+    if [ -z "${roster_seen[$pkg]:-}" ]; then
+        roster_seen["$pkg"]=1
+        roster_pkgs+=("$pkg")
+    fi
+done
+for pkg in "${ledger_pkgs[@]}"; do
+    [ -n "$pkg" ] || continue
+    if [ -z "${roster_seen[$pkg]:-}" ]; then
+        roster_seen["$pkg"]=1
+        roster_pkgs+=("$pkg")
+    fi
+done
+if ! go test -list '.*' "${roster_pkgs[@]}" >"$universe_file" 2>&1; then
+    echo "portable-tests.sh: ticket 70: the combined \`go test -list\` over this tier's scope + ledger" \
+        "packages exited non-zero. Isolating the roster PER PACKAGE so one un-listable test binary" \
+        "cannot take the tier down before its first case:" >&2
+    : >"$universe_file"
+    for pkg in "${roster_pkgs[@]}"; do
+        one_list=$(mktemp 2>/dev/null || echo "$root/.portable-list-one.$$.log")
+        one_rc=0
+        go test -list '.*' "$pkg" >"$one_list" 2>&1 || one_rc=$?
+        if [ "$one_rc" -eq 0 ]; then
+            cat "$one_list" >>"$universe_file"
+        else
+            signature=$(grep -E '0xc0000135|STATUS_DLL_NOT_FOUND|cannot open shared object file|\[build failed\]|no Go files|undefined:|cannot find package' "$one_list" | tail -n 1 || true)
+            if [ -z "$signature" ]; then
+                signature=$(grep -v '^[[:space:]]*$' "$one_list" | tail -n 1 || true)
+            fi
+            [ -n "$signature" ] || signature='(no output)'
+            roster_unlistable["$pkg"]="rc=$one_rc  $signature"
+            roster_unlistable_order+=("$pkg")
+        fi
+        rm -f "$one_list"
+    done
+    echo "portable-tests.sh: ticket 70: ${#roster_unlistable_order[@]} of ${#roster_pkgs[@]} roster package(s)" \
+        "could NOT be listed on this host (named, counted, NOT silently skipped):" >&2
+    for pkg in "${roster_unlistable_order[@]}"; do
+        echo "portable-tests.sh:   $pkg  [${roster_unlistable[$pkg]}]" >&2
+    done
+    for pkg in "${roster_unlistable_order[@]}"; do
+        [ -n "${roster_in_scope[$pkg]:-}" ] && roster_scope_broken+=("$pkg")
+    done
+    if [ "${#roster_scope_broken[@]}" -ne 0 ]; then
+        echo "portable-tests.sh: ticket 70: ${#roster_scope_broken[@]} of those IS a package this tier runs:" \
+            "${roster_scope_broken[*]}." >&2
+        echo "portable-tests.sh: ticket 70: the run below still executes every other package. GUARD B's" \
+            "per-package result line is what reds these, and the ticket-70 verdict after GUARD B refuses" \
+            "to let this step be green if it did not - the tier is NOT cut short here (that was the defect)." >&2
+    fi
 fi
 
 active=()
 stale=()
+deferred=() # ticket 70: ledger rows whose package cannot be listed on this host
 for entry in "${ledger[@]}"; do
     IFS='|' read -r name pkg platform class reason <<<"$entry"
     if [ -z "$name" ] || [ -z "$pkg" ] || [ -z "$platform" ] || [ -z "$class" ] || [ -z "$reason" ]; then
@@ -876,6 +968,15 @@ for entry in "${ledger[@]}"; do
     *) continue ;; # accounted on the other platform's job, not on this one
     esac
     active+=("$name")
+    # ticket 70: the row stays ACTIVE on this platform (so the -skip pattern is
+    # unchanged), but its name cannot be re-verified against a test binary this
+    # host cannot list. It is collected and printed by name below - never
+    # treated as stale, never dropped in silence. The tier that runs the package
+    # is where it gets re-verified (cmd/wisp -> mode=cli).
+    if [ -n "${roster_unlistable[$pkg]:-}" ]; then
+        deferred+=("$name  [$pkg  platform=$platform]")
+        continue
+    fi
     # The name must exist in the compiled test binary for the package it is
     # accounted against. Two traps here, both paid for: `grep -qx` in a pipeline
     # exits on the first match, which SIGPIPEs `go test` and - with pipefail -
@@ -897,6 +998,19 @@ for entry in "${ledger[@]}"; do
     any | "$goos") printf 'portable-tests.sh:   %-52s %s\n' "$name" "[$class] $reason" ;;
     esac
 done
+
+# ticket 70: the rows the roster could not re-verify, named. NOT stale (that is a
+# claim about the test binary's contents, which this host cannot read) and NOT
+# skipped silently (that is the disease ticket 71 AC#3 was written against).
+if [ "${#deferred[@]}" -ne 0 ]; then
+    echo "portable-tests.sh: ticket 70: ${#deferred[@]} ledger entr(ies) DEFERRED - their package's test" \
+        "binary cannot be LISTED on this host, so the name cannot be re-verified here (not stale, not" \
+        "silently dropped):"
+    printf 'portable-tests.sh:   %s\n' "${deferred[@]}"
+    echo "portable-tests.sh: ticket 70: each one is re-verified on the tier that runs its package -" \
+        "./cmd/wisp/ in mode=cli, whose carrier stages the sherpa DLLs before anything loads. If that" \
+        "tier cannot list it either, the same line appears THERE, in the step that owns the package."
+fi
 
 if [ "${#stale[@]}" -ne 0 ]; then
     echo "portable-tests.sh: these ledger entries name NO TEST in the compiled test binary for $goos:" >&2
@@ -1277,4 +1391,24 @@ fi
 
 rm -f "$capture" "$resolved"
 [ "$rc" -eq 0 ] || echo "portable-tests.sh: strict runner exited $rc for scope=[${scope[*]}]" >&2
+
+# ---- TICKET 70 (roster gate): the named verdict for a SCOPE package the roster
+# could not list. See the "TICKET 70 (roster gate)" block above the ledger for
+# what this is and why it is NOT an early exit (an early exit there is exactly
+# the defect: it red an entire tier before its first case). GUARD B is expected
+# to have redded these already - a test binary that cannot start prints no
+# per-package result line - so this normally repeats a red that exists; it bites
+# only in the case where the run somehow went green while the ledger rows this
+# tier owns could not be verified at all. It relaxes nothing: it can only set a
+# non-zero rc on bytes that are already in the log. DELIBERATELY PLACED AFTER
+# the ticket-314 anchor blocks, whose bytes this ticket must not touch.
+if [ "${#roster_scope_broken[@]}" -ne 0 ]; then
+    echo "portable-tests.sh: ticket 70 - ${#roster_scope_broken[@]} package(s) in this tier's scope could" \
+        "NOT be LISTED on this host, so their own cases must be judged by the run and their ledger rows" \
+        "could not be re-verified here: ${roster_scope_broken[*]}" >&2
+    echo "portable-tests.sh: ticket 70 - the roster gate no longer exits before the run (that was the" \
+        "defect); this line refuses to let that isolation turn into a green step." >&2
+    if [ "$rc" -eq 0 ]; then rc=1; fi
+fi
+
 exit "$rc"

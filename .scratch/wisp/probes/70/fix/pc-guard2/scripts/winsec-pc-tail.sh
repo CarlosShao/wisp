@@ -1,0 +1,317 @@
+#!/usr/bin/env bash
+# scripts/winsec-tests.sh - the CI step that runs internal/winsec's OWN tests
+# (ticket 110 AC#2).
+#
+# WHY A SEPARATE STEP EXISTS (measured, not theorized - ticket 110 AC#1):
+# in run 35591482293 the windows job's test steps were step 6 (portable-tests.sh
+# with ./internal/proc/ ./internal/secret/ ./internal/config/) and step 7
+# (runtests.sh -run TestPathResolverJunctionWindows on ./internal/risk/). Across
+# the whole run, the string `ok github.com/CarlosShao/wisp/internal/winsec`
+# appeared ZERO times: the package that decides whether a path gets a real ACL
+# was never itself tested on CI. Tickets 94/103/106 changed that code and their
+# CI "evidence" was downstream (internal/secret calls into it) - indirect cover
+# for the one package where the failure mode is the machine's own DACL, which is
+# exactly the thing a developer laptop cannot reproduce.
+#
+# WHY IT IS NOT just one more path in the existing windows step's list:
+# AC#3 asks the gate to prove it is not an empty instrument. If winsec were
+# silently appended to a list three floors up in ci.yml, deleting it from that
+# list would still be green - the same "配置里有一行 = 它跑过了" disease ticket
+# 110 exists to close (registry A54, A61). So the scope is stated HERE, once,
+# and guard 1 below makes removing it a red step rather than a shorter run.
+#
+# THE INSTRUMENT IS NOT NEWER OR WEAKER THAN THE EXISTING ONE: every test
+# verdict is delegated to scripts/portable-tests.sh, which delegates to
+# tools/d22scan/runtests.sh (ticket 71 AC#3: a non-zero `go test` exit propagates
+# unchanged, any top-level SKIP is fatal, and zero PASS *and* zero FAIL is fatal).
+# This script adds two guards and subtracts nothing:
+#   guard 1 - the package list this step was given must name ./internal/winsec/;
+#   guard 2 - the run must actually print a top-level result line for the
+#             winsec package itself (a build tag that ever excludes the whole
+#             package would otherwise read as green while testing nothing).
+set -eu -o pipefail
+
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+root="/d/work/workspace/projects plans/Wisp"
+cd "$root"
+
+target=./internal/winsec/
+portable="$here/roster-tail-only.sh"
+if [ ! -f "$portable" ]; then
+    echo "winsec-tests.sh: $portable is missing - this script is a scope-narrowing" \
+        "shell around it and refuses to become the weaker instrument it replaces." >&2
+    exit 2
+fi
+
+# ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+# entry, because this is the file CI names. portable-tests.sh (the one that really
+# starts `go test`, via tools/d22scan/runtests.sh) builds a root only while
+# GOTMPDIR is still empty, so the delegated run inherits this root instead of
+# opening a second one - one root per run, named in this step's own log line. What
+# the root is for, why GOTMPDIR rather than TMP/TEMP, why it is never under the OS
+# temp dir, why it is never deleted here and why the ubuntu leg is left alone: the
+# long note at the top of scripts/portable-tests.sh.
+#
+# The GOOS=windows + empty-LOCALAPPDATA branch is now LOUD (ticket 310 AC#1, debt
+# Q-310-orch-Q). It used to be the conjunctive form `... && [ -n LOCALAPPDATA ]`,
+# so when %LOCALAPPDATA% was empty the whole block fell through in silence - no
+# GOTMPDIR line, no DEGRADED line, nothing said that the redirection did not
+# happen. It is now a finding on stderr, still NOT a fail-closed exit and NOT a
+# refusal to run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+#
+# TICKET 317: the default root is composed with the NATIVE separator. A folded
+# `C:/...` root makes internal/risk's literal-spelling preconditions and real
+# `mklink /J` targets falsely red on the windows leg; both readings and the dev-host
+# reproduction are in the ticket 317 note of scripts/portable-tests.sh. An explicit
+# WISP_TEST_GOTMP_ROOT is still taken verbatim.
+if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+    if [ -n "${LOCALAPPDATA:-}" ]; then
+        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\winsec-$(date +%Y%m%d-%H%M%S)-$$"
+        if mkdir -p "$gotmp_run" 2>/dev/null; then
+            export GOTMPDIR="$gotmp_run"
+            echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+                "t.TempDir() family lands here; nothing deletes it."
+        else
+            echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+                "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+                "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+        fi
+    else
+        echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+            "measured-safe root to build (a root on another volume turns the winsec seal cases" \
+            "red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+    fi
+fi
+
+# The scope this step exists for, stated once. Extra packages may be appended by
+# hand while debugging; the list can never lose winsec without going red.
+scope=()
+if [ $# -eq 0 ]; then
+    scope=("$target")
+else
+    scope=("$@")
+fi
+
+# guard 1: an explicit failure beats a shorter run.
+named=0
+for p in "${scope[@]}"; do
+    [ "$p" = "$target" ] && named=1
+done
+if [ "$named" -ne 1 ]; then
+    echo "winsec-tests.sh: GUARD 1 - the package list for this step does not name" \
+        "$target; it is [${scope[*]}]." >&2
+    echo "winsec-tests.sh: this step IS the internal/winsec gate (ticket 110 AC#2/AC#3)." \
+        "Removing the package from the list must fail the step, not shorten it." >&2
+    exit 2
+fi
+
+goos=$(go env GOOS)
+if [ -z "$goos" ]; then
+    echo "winsec-tests.sh: go env GOOS came back empty" >&2
+    exit 2
+fi
+if [ "$goos" != windows ]; then
+    # The sealing assertions are //go:build windows files. Running this step on
+    # another platform would measure a different (smaller) denominator while
+    # printing the same green, so it is a mis-wired step, not a pass.
+    echo "winsec-tests.sh: GUARD - this step is the windows leg of the winsec gate," \
+        "GOOS=$goos. Fix the job it is wired into (ticket 110 AC#5); do not relax this line." >&2
+    exit 2
+fi
+
+pkgpath=$(go list "$target")
+if [ -z "$pkgpath" ]; then
+    echo "winsec-tests.sh: go list $target came back empty" >&2
+    exit 2
+fi
+
+# ---- TICKET 311 AC#1 (shape B, the orchestrator's ruling "B + C"; shape A was
+# refused): the VOLUME this run's test temp root sits on is part of this gate's
+# verdict, so a root that names a volume other than %LOCALAPPDATA%'s is REFUSED HERE,
+# on the exit code, instead of reaching the log as a gate that quietly changed colour.
+# Measured, not theorized (ticket 311 census, reproduced by leg 311-a1 and by the
+# orchestrator the same day): ONE unchanged internal/winsec tree reads
+# PASS=58 FAIL=0 rc=0 from a %LOCALAPPDATA% (C:) root and PASS=56 FAIL=2 rc=1 from a
+# D:/tmp root, and those two reds are Go's own t.TempDir cleanup failing
+# (testing.go:1617 "TempDir RemoveAll cleanup: ... Access is denied"), not an
+# assertion - which is why this is a refusal here rather than a fixture change there.
+# This block adds NO assertion, touches no threshold, golden or file under
+# internal/winsec, and none may be touched to make it green (ticket 311 forbidden
+# list; D22). Shape A is refused by that same reading: what moved between the two
+# shots was the cleanup, not the gate's judgement, so no fixture changes here.
+#
+# PLACEMENT IS LOAD-BEARING, AND MEASURED: the ticket-310 root block of this entry
+# runs BEFORE its guard chain (that is where the DEGRADED line comes from, measured
+# by the orchestrator at A862 and re-measured per entry by leg 311-r1b), so this guard
+# sits AFTER the whole guard chain above and BEFORE the run below, and one trip reads,
+# in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
+# all]. Ordering readings: .scratch/wisp/probes/311/r1b/logs/23-order-degraded-then-guard.txt
+# and .scratch/wisp/probes/311/r1b/logs/24-order-guard-after-guard1.txt - the two files
+# this comment used to name sat under probes/311/r1/ and never landed (leg 311-r1 died).
+#
+# THREE SHAPES THIS MUST NOT BREAK, each with its own reading on the ticket:
+# WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
+# different directory, and anything where `go env GOOS` is not windows or
+# %LOCALAPPDATA% is empty - that last branch is the one ticket 310 made LOUD, and this
+# guard stays silent there too (no line, no exit code). Everything else about this
+# branch is deliberately NOT that precedent: it fires on the exit code on purpose
+# (ruling B; revocation phrase "311 撤乙"). A value's volume is its drive letter, read
+# in both the Windows form (C:/x and C:\x) and the form this shell prints (/c/x); a
+# value neither form can judge (UNC, bare relative) prints an INCONCLUSIVE line and
+# leaves the exit code alone - undecided shape, registered as debt Q-311-r1-1. What
+# this guard cannot reach at all is a caller that skips these entries and runs
+# `go test` directly (leg 311-a1 did exactly that), which is why shape C stayed in
+# force beside it (.scratch/wisp/probes/orch/gate-roster-304.md section 1).
+if [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+    wisp_311_volume_of() {
+        wisp_311_arg=${1//\\//}
+        case $wisp_311_arg in
+            [A-Za-z]:*) printf '%.1s' "$wisp_311_arg" | tr 'a-z' 'A-Z' ;;
+            /[A-Za-z]/*) printf '%.1s' "${wisp_311_arg#/}" | tr 'a-z' 'A-Z' ;;
+            *) printf '' ;;
+        esac
+    }
+    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+    wisp_311_ref_vol=$(wisp_311_volume_of "$wisp_311_ref_path")
+    wisp_311_cross=''
+    for wisp_311_probe in "GOTMPDIR=${GOTMPDIR:-}" "WISP_TEST_GOTMP_ROOT=${WISP_TEST_GOTMP_ROOT:-}"; do
+        wisp_311_name=${wisp_311_probe%%=*}
+        wisp_311_value=${wisp_311_probe#*=}
+        if [ -z "$wisp_311_value" ]; then
+            continue
+        fi
+        wisp_311_vol=$(wisp_311_volume_of "$wisp_311_value")
+        if [ -z "$wisp_311_vol" ] || [ -z "$wisp_311_ref_vol" ]; then
+            echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+            continue
+        fi
+        if [ "$wisp_311_vol" != "$wisp_311_ref_vol" ]; then
+            wisp_311_cross="$wisp_311_cross $wisp_311_name=$wisp_311_value(volume $wisp_311_vol)"
+        fi
+    done
+    if [ -n "$wisp_311_cross" ]; then
+        echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+        echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+        echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+        exit 2
+    fi
+fi
+
+echo "winsec-tests.sh: platform=$goos gate=internal/winsec scope=[${scope[*]}] package=$pkgpath"
+
+capture=$(mktemp 2>/dev/null || echo "$root/.winsec-tests.$$.log")
+rc=0
+# tee keeps portable-tests.sh's own four numbers verbatim while giving this
+# script the bytes guard 2 needs.
+bash "$portable" "${scope[@]}" 2>&1 | tee "$capture" || rc=$?
+
+count() { grep -c "$1" "$capture" || true; }
+ran=$(count '^=== RUN')
+passed=$(count '^--- PASS')
+failed=$(count '^--- FAIL')
+skipped=$(count '^--- SKIP')
+
+# TICKET 70: an EXECUTION reading, as opposed to a ROSTER TAIL.
+#
+# `go test -list` prints the same `ok  <import path>  <duration>` trailer a real
+# run prints, so a capture that contains only a listing (portable-tests.sh used
+# to cat the failed combined `-list` and then exit 1 before its run stage) satisfies
+# the anchored package-result grep below with zero cases executed. Measured on CI
+# run 43549905387, test-windows step 4: `RUN=0 ... SKIP=0`, and the "result line"
+# GUARD 2 accepted was the tail of the `-list`. Two shapes count as evidence that
+# cases REALLY ran: a top-level `--- PASS|FAIL|SKIP: <case>` verdict line, or the
+# delegated runner's own four-numbers line (which it prints only after its run
+# stage, so its presence proves the roster gate was passed). Nothing is relaxed:
+# a capture with neither is a capture in which this step tested this package zero
+# times, which is what GUARD 2 exists to red.
+exec_verdicts=$((passed + failed + skipped))
+four_numbers=$(count '^portable-tests.sh: four numbers (all from -v output):')
+
+# guard 2: the package itself must have booked a top-level result.
+#
+# TICKET 111 AC#8 - R-110-3 is this line's disease, not a hypothetical. The
+# original form of the audit was a loose substring search for "winsec" over the
+# log, which counted 18 hits in a run where the package was tested 0 times: "the
+# word is in the output" and "this package ran" are different claims, and only the
+# second one belongs in a coverage denominator. Three things are pinned here:
+#   1. the line is anchored to ^ok/FAIL, the two tokens Go uses ONLY for a
+#      package-level result, so a test that merely prints the path (a log line, a
+#      t.Log of a golden path, this very script's own echo) cannot match;
+#   2. the path is regex-ESCAPED. It came from `go list` and contains dots -
+#      unescaped, `github.com/...internal/winsec` also matches
+#      `githubXcom/...internal/winsec`, i.e. the separator is a wildcard;
+#   3. the match must be followed by whitespace or end-of-line, so
+#      internal/winsecfoo or internal/winsec_extra cannot vouch for
+#      internal/winsec. A positive control that plants a package name ONLY inside
+#      a test's log output is on the ticket (AC#8), and it contributes 0 here.
+# What this guard cannot see is a package that produces a result line but no test
+# (`ok  path  [no test files]`) - that hole is closed one level down, by GUARD A
+# of scripts/portable-tests.sh, which this script delegates to.
+esc_pkgpath=$(printf '%s' "$pkgpath" | sed 's/[][\\^$.*+?(){}|]/\\&/g')
+result_line=$(grep -E "^(ok|FAIL)[[:space:]]+${esc_pkgpath}[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$" "$capture" | tail -1 || true)
+if [ -z "$result_line" ]; then
+    echo "winsec-tests.sh: GUARD 2 - the run printed NO top-level result line for" \
+        "$pkgpath, so this step tested the package it is named for zero times." >&2
+    echo "winsec-tests.sh: a build tag or a rename that empties the package is a" \
+        "red step here (ticket 110 AC#3), not a green short-circuit." >&2
+    rc=1
+    result_line='<none>'
+elif [ "$exec_verdicts" -eq 0 ] && [ "$four_numbers" -eq 0 ]; then
+    echo "winsec-tests.sh: GUARD 2 (ticket 70) - the capture carries a package result line for" \
+        "$pkgpath, but NO execution reading at all: zero '--- PASS|FAIL|SKIP:' lines and no" \
+        "'portable-tests.sh: four numbers' line. A \`go test -list\` ROSTER TAIL prints exactly the" \
+        "'ok  <pkg>  <duration>' shape this guard anchors on, so that line vouches for a run that" \
+        "never happened (CI run 43549905387, test-windows step 4: the step read RUN=0 and the" \
+        "'result line' was the trailer of a -list whose ./cmd/wisp/ binary died at load)." >&2
+    echo "winsec-tests.sh: the reading this guard requires is an EXECUTION one: a top-level" \
+        "'--- PASS|FAIL|SKIP: <case>' verdict, or the delegated runner's own four-numbers line" \
+        "(which proves it got past its roster stage into the run). Neither is present, so this" \
+        "step tested ${pkgpath} zero times and is RED - not a green with a suspicious line in the log." >&2
+    echo "winsec-tests.sh: this is a tighter input requirement on the SAME claim, not a new" \
+        "assertion and not a relaxed one - see docs/evidence/s1/70-roster-gate-fix.md." >&2
+    rc=1
+    result_line='<roster tail only: no execution reading>'
+fi
+
+# guard 3 (ticket 254 AC#1): a GREEN step must say it was AUDITED.
+#
+# GUARD C of scripts/portable-tests.sh pins the winsec tier's resolved set against
+# winsec_pin, and since ticket 251 it also recognises the explicit path this script
+# hands over (portable-tests.sh's "explicit scope ... IS the winsec tier's own
+# scope" branch). But that recognition fires ONLY when this script passes exactly
+# one path. Append a second package by hand - the affordance this script's own
+# header advertises above - and the child silently falls back to the nothing-pinned
+# branch: the step stays green, guards 1 and 2 both pass, and the denominator that
+# used to be compared against winsec_pin simply stops being compared. Measured at
+# HEAD c0aab35b (guard C bytes unchanged from 5801b91f) before this line existed:
+# rc=0, zero audit lines, with [./internal/winsec/ ./internal/agent/] as the scope
+# (.scratch/wisp/probes/254/r1/logs/before-widened.txt).
+#
+# "The scope I passed was recognised as a tier and pinned" is a claim about the
+# CHILD's output, so that is what is checked here, in two parts, both read out of
+# the captured bytes instead of re-deriving the child's logic:
+#   1. the child says it took the tier's own scope, and
+#   2. the denominator it then ran IS the tier's glob (dir form + "..."), because
+#      the directory form cannot see a package created beside it - which is the
+#      reading ticket 251's case 18 pins as load-bearing.
+# Only a run that would otherwise be GREEN is judged: when the child already went
+# red the step is red, and piling a second message on it would blame the wrong guard.
+if [ "$rc" -eq 0 ]; then
+    if ! { grep -qF "IS the winsec tier" "$capture" \
+        && grep -qF "scope=[${target}...]" "$capture"; }; then
+        echo "winsec-tests.sh: GUARD 3 - the step went green WITHOUT scripts/portable-tests.sh" \
+            "reporting that it ran scope=[${target}...] as the winsec tier against winsec_pin." >&2
+        echo "winsec-tests.sh: the delegated audit therefore did not happen: GUARD C only pins a" \
+            "one-path winsec scope, so a widened list like [${scope[*]}] ran with NOTHING to" \
+            "compare its resolved set against (ticket 254 AC#1)." >&2
+        echo "winsec-tests.sh: run the tier by its own scope, or take the extra paths out of this" \
+            "step - do not relax this line, it is what keeps this gate audited." >&2
+        rc=2
+    fi
+fi
+
+echo "winsec-tests.sh: winsec result line: $result_line"
+echo "winsec-tests.sh: four numbers (all from -v output): === RUN=$ran  --- PASS=$passed  --- FAIL=$failed  --- SKIP=$skipped"
+rm -f "$capture"
+[ "$rc" -eq 0 ] || echo "winsec-tests.sh: gate is RED (rc=$rc) for scope=[${scope[*]}]" >&2
+exit "$rc"

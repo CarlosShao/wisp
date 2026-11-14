@@ -211,6 +211,22 @@ passed=$(count '^--- PASS')
 failed=$(count '^--- FAIL')
 skipped=$(count '^--- SKIP')
 
+# TICKET 70: an EXECUTION reading, as opposed to a ROSTER TAIL.
+#
+# `go test -list` prints the same `ok  <import path>  <duration>` trailer a real
+# run prints, so a capture that contains only a listing (portable-tests.sh used
+# to cat the failed combined `-list` and then exit 1 before its run stage) satisfies
+# the anchored package-result grep below with zero cases executed. Measured on CI
+# run 43549905387, test-windows step 4: `RUN=0 ... SKIP=0`, and the "result line"
+# GUARD 2 accepted was the tail of the `-list`. Two shapes count as evidence that
+# cases REALLY ran: a top-level `--- PASS|FAIL|SKIP: <case>` verdict line, or the
+# delegated runner's own four-numbers line (which it prints only after its run
+# stage, so its presence proves the roster gate was passed). Nothing is relaxed:
+# a capture with neither is a capture in which this step tested this package zero
+# times, which is what GUARD 2 exists to red.
+exec_verdicts=$((passed + failed + skipped))
+four_numbers=$(count '^portable-tests.sh: four numbers (all from -v output):')
+
 # guard 2: the package itself must have booked a top-level result.
 #
 # TICKET 111 AC#8 - R-110-3 is this line's disease, not a hypothetical. The
@@ -240,6 +256,21 @@ if [ -z "$result_line" ]; then
         "red step here (ticket 110 AC#3), not a green short-circuit." >&2
     rc=1
     result_line='<none>'
+elif [ "$exec_verdicts" -eq 0 ] && [ "$four_numbers" -eq 0 ]; then
+    echo "winsec-tests.sh: GUARD 2 (ticket 70) - the capture carries a package result line for" \
+        "$pkgpath, but NO execution reading at all: zero '--- PASS|FAIL|SKIP:' lines and no" \
+        "'portable-tests.sh: four numbers' line. A \`go test -list\` ROSTER TAIL prints exactly the" \
+        "'ok  <pkg>  <duration>' shape this guard anchors on, so that line vouches for a run that" \
+        "never happened (CI run 43549905387, test-windows step 4: the step read RUN=0 and the" \
+        "'result line' was the trailer of a -list whose ./cmd/wisp/ binary died at load)." >&2
+    echo "winsec-tests.sh: the reading this guard requires is an EXECUTION one: a top-level" \
+        "'--- PASS|FAIL|SKIP: <case>' verdict, or the delegated runner's own four-numbers line" \
+        "(which proves it got past its roster stage into the run). Neither is present, so this" \
+        "step tested ${pkgpath} zero times and is RED - not a green with a suspicious line in the log." >&2
+    echo "winsec-tests.sh: this is a tighter input requirement on the SAME claim, not a new" \
+        "assertion and not a relaxed one - see docs/evidence/s1/70-roster-gate-fix.md." >&2
+    rc=1
+    result_line='<roster tail only: no execution reading>'
 fi
 
 # guard 3 (ticket 254 AC#1): a GREEN step must say it was AUDITED.
