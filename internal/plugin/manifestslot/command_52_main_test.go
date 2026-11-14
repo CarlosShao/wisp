@@ -41,6 +41,41 @@ const fixtureModePrefix = "wisp52:"
 // fixtureChildArg is the argument the fixture passes to its own grandchild.
 const fixtureChildArg = "--wisp52-fixture-child"
 
+// fixtureDelay443Var is ticket 443's amplification dial. The "hang" fixture
+// spends this many milliseconds before it spawns the grandchild, which is the
+// same budget a cold 90MB image (this test binary, re-executed twice) spends on
+// its own on a loaded runner. Unset - the committed default - is 0ms, so the
+// suite's own timing never depends on it; only the ticket-443 repro sets it.
+//
+// It exists because the failure ticket 443 fixes is a *scheduling* outcome: on
+// a fast bench the fixture reports its grandchild pid every time, and "ran a
+// hundred times green" would not be a reproduction of a runner that lost the
+// race. The dial moves the fixture's startup across the 500ms budget, so the
+// same red sentence CI produced can be produced here on demand.
+//
+// THE REPRO VALUE IS 1500 (WISP52_443_FIXTURE_DELAY_MS=1500): past the raced
+// 500ms budget by 3x, and far enough below the abstain path's 4000ms control
+// budget that the control still sees its pid after this 90MB image re-executes
+// itself. Measured boundary: at 3000 the control run itself starts racing its
+// own budget on a cold bench (first rep printed
+// RED(443:timeout-tree:control-no-pid)), so 3000 is too big to be a repro and a
+// value in that range fails honestly instead of silently weakening the control.
+const fixtureDelay443Var = "WISP52_443_FIXTURE_DELAY_MS"
+
+// fixtureDelay443 reads the dial. Unset, negative or unparsable is 0 (no
+// delay), so a stray variable cannot slow the committed suite.
+func fixtureDelay443() time.Duration {
+	raw := strings.TrimSpace(os.Getenv(fixtureDelay443Var))
+	if raw == "" {
+		return 0
+	}
+	ms, err := strconv.Atoi(raw)
+	if err != nil || ms <= 0 {
+		return 0
+	}
+	return time.Duration(ms) * time.Millisecond
+}
+
 // TestMain runs the fixture when the process was started as one, and the tests
 // otherwise.
 //
@@ -84,6 +119,9 @@ func runFixtureCLI(handshake string) {
 		}
 	case "hang":
 		if pidFile != "" {
+			if delay := fixtureDelay443(); delay > 0 {
+				time.Sleep(delay)
+			}
 			// The grandchild inherits the fixture's environment, which is how
 			// it learns the marker; it gets the pid path as an ARGUMENT.
 			cmd := exec.Command(os.Args[0], fixtureChildArg, pidFile)

@@ -1,0 +1,58 @@
+time=2026-11-14T16:20:16.590+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test52NoShellSpawnAndArgvVector
+time=2026-11-14T16:20:17.480+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52NoShellSpawnAndArgvVector (1.04s)
+=== RUN   Test52InjectionIsRefusedBeforeSpawn
+--- PASS: Test52InjectionIsRefusedBeforeSpawn (2.35s)
+=== RUN   Test52PinIsReverifiedEveryCall
+time=2026-11-14T16:20:20.571+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52PinIsReverifiedEveryCall (1.10s)
+=== RUN   Test52UnpinnedToolIsRefusedAndAlerted
+--- PASS: Test52UnpinnedToolIsRefusedAndAlerted (0.00s)
+=== RUN   Test52DeclarativeToolIsNotForThisRuntime
+--- PASS: Test52DeclarativeToolIsNotForThisRuntime (0.17s)
+=== RUN   Test52ChildEnvIsOnlyTheAllowlist
+time=2026-11-14T16:20:21.849+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52ChildEnvIsOnlyTheAllowlist (0.73s)
+=== RUN   Test52ExtractionOnARealCLI
+=== RUN   Test52ExtractionOnARealCLI/json_path
+time=2026-11-14T16:20:22.546+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+=== RUN   Test52ExtractionOnARealCLI/json_scalar
+time=2026-11-14T16:20:23.397+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+=== RUN   Test52ExtractionOnARealCLI/regex
+time=2026-11-14T16:20:24.395+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52ExtractionOnARealCLI (2.61s)
+    --- PASS: Test52ExtractionOnARealCLI/json_path (0.72s)
+    --- PASS: Test52ExtractionOnARealCLI/json_scalar (0.93s)
+    --- PASS: Test52ExtractionOnARealCLI/regex (0.96s)
+=== RUN   Test52OversizedExtractIsTruncated
+time=2026-11-14T16:20:25.399+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-14T16:20:25.567+08:00 level=ERROR msg=plugin_tamper kind=command-output plugin_id=com.example.fixture path=C:\Users\swq\AppData\Local\wisp52-fixture-tests\wisp52-fixture.exe expected="" actual="" reason="tool fixture.run: manifestslot: command output exceeded the stream cap (process tree killed)"
+--- PASS: Test52OversizedExtractIsTruncated (0.97s)
+=== RUN   Test52ExtractCapIsEnforcedByClamp
+--- PASS: Test52ExtractCapIsEnforcedByClamp (0.00s)
+=== RUN   Test52StdoutCapKillsAndTruncates
+time=2026-11-14T16:20:26.038+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52StdoutCapKillsAndTruncates (0.59s)
+=== RUN   Test52CapWriterStopsAtTheLimit
+--- PASS: Test52CapWriterStopsAtTheLimit (0.05s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:20:26.963+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 66260 reached the test (budget-ms=500 elapsed-ms=760 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 66260 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.24s)
+=== RUN   Test52BudgetIsMonotonicNoWallClockSubtraction
+--- PASS: Test52BudgetIsMonotonicNoWallClockSubtraction (0.00s)
+=== RUN   Test52EmptyExtractionIsEmptyNotRaw
+time=2026-11-14T16:20:28.036+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52EmptyExtractionIsEmptyNotRaw (0.78s)
+=== RUN   Test52NonZeroExitIsAnError
+time=2026-11-14T16:20:28.928+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52NonZeroExitIsAnError (0.86s)
+=== RUN   Test52TaintedOutputIsFramedAsData
+time=2026-11-14T16:20:29.588+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test52TaintedOutputIsFramedAsData (0.65s)
+=== RUN   Test52SchemaForTheModelIsNarrowed
+--- PASS: Test52SchemaForTheModelIsNarrowed (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin/manifestslot	13.233s

@@ -1,0 +1,6 @@
+time=2026-11-14T16:47:30.568+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test138TaskCancelKillsTheProcessTree
+time=2026-11-14T16:47:31.355+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test138TaskCancelKillsTheProcessTree (1.25s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin/manifestslot	1.345s

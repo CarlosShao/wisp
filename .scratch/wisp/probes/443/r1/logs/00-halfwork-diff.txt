@@ -1,0 +1,288 @@
+diff --git a/internal/plugin/manifestslot/command_52_main_test.go b/internal/plugin/manifestslot/command_52_main_test.go
+index 7c8302a8d..6ca45f878 100644
+--- a/internal/plugin/manifestslot/command_52_main_test.go
++++ b/internal/plugin/manifestslot/command_52_main_test.go
+@@ -41,6 +41,33 @@ const fixtureModePrefix = "wisp52:"
+ // fixtureChildArg is the argument the fixture passes to its own grandchild.
+ const fixtureChildArg = "--wisp52-fixture-child"
+ 
++// fixtureDelay443Var is ticket 443's amplification dial. The "hang" fixture
++// spends this many milliseconds before it spawns the grandchild, which is the
++// same budget a cold 90MB image (this test binary, re-executed twice) spends on
++// its own on a loaded runner. Unset - the committed default - is 0ms, so the
++// suite's own timing never depends on it; only the ticket-443 repro sets it.
++//
++// It exists because the failure ticket 443 fixes is a *scheduling* outcome: on
++// a fast bench the fixture reports its grandchild pid every time, and "ran a
++// hundred times green" would not be a reproduction of a runner that lost the
++// race. The dial moves the fixture's startup across the 500ms budget, so the
++// same red sentence CI produced can be produced here on demand.
++const fixtureDelay443Var = "WISP52_443_FIXTURE_DELAY_MS"
++
++// fixtureDelay443 reads the dial. Unset, negative or unparsable is 0 (no
++// delay), so a stray variable cannot slow the committed suite.
++func fixtureDelay443() time.Duration {
++	raw := strings.TrimSpace(os.Getenv(fixtureDelay443Var))
++	if raw == "" {
++		return 0
++	}
++	ms, err := strconv.Atoi(raw)
++	if err != nil || ms <= 0 {
++		return 0
++	}
++	return time.Duration(ms) * time.Millisecond
++}
++
+ // TestMain runs the fixture when the process was started as one, and the tests
+ // otherwise.
+ //
+@@ -84,6 +111,9 @@ func runFixtureCLI(handshake string) {
+ 		}
+ 	case "hang":
+ 		if pidFile != "" {
++			if delay := fixtureDelay443(); delay > 0 {
++				time.Sleep(delay)
++			}
+ 			// The grandchild inherits the fixture's environment, which is how
+ 			// it learns the marker; it gets the pid path as an ARGUMENT.
+ 			cmd := exec.Command(os.Args[0], fixtureChildArg, pidFile)
+diff --git a/internal/plugin/manifestslot/command_52_test.go b/internal/plugin/manifestslot/command_52_test.go
+index f8c79485d..4cfafe1df 100644
+--- a/internal/plugin/manifestslot/command_52_test.go
++++ b/internal/plugin/manifestslot/command_52_test.go
+@@ -14,6 +14,7 @@ import (
+ 	"encoding/json"
+ 	"errors"
+ 	"fmt"
++	"io/fs"
+ 	"os"
+ 	"os/exec"
+ 	"path/filepath"
+@@ -701,16 +702,65 @@ func Test52CapWriterStopsAtTheLimit(t *testing.T) {
+ // AC "Timeout": the hanging CLI is killed and its TREE is gone
+ // ---------------------------------------------------------------------------
+ 
++const (
++	// timeoutTree443PIDWait is how long the test keeps polling for the
++	// fixture's pid file once the call has returned. The only writers are
++	// inside the tree the budget just killed, so this window covers filesystem
++	// visibility, not a second budget: a pid that never arrived cannot be
++	// conjured by waiting longer - which is why the CONTROL below, and not a
++	// longer sleep, is what carries the kill reading.
++	timeoutTree443PIDWait = time.Second
++	// timeoutTree443ControlBudgetMS is the control run's budget: eight times
++	// the raced 500ms. Starting two 90MB images twice cannot outrun an 8x
++	// margin, so the control answers "does the timeout still kill the tree?"
++	// without inheriting the raced run's scheduling lottery.
++	timeoutTree443ControlBudgetMS = plugin.MinCommandTimeoutMS * 80
++)
++
+ // Test52TimeoutKillsTheProcessTree runs a CLI that spawns a grandchild and then
+ // hangs. The D46 budget must end the call, the result must say timed out, and
+-// BOTH pids must be gone - the grandchild is what a plain Process.Kill would
+-// leave behind.
++// the grandchild must be gone - it is what a plain Process.Kill would leave
++// behind.
++//
++// THE TWO QUESTIONS, AND WHY THEY NOW HAVE TWO CARRIERS (ticket 443). This test
++// used to ask both questions through the pid the fixture writes: when the file
++// was absent it reded with "the fixture never reported a grandchild pid", which
++// is a statement about the runner's schedule, not about the kill. The 500ms
++// budget starts before the fixture has finished starting (the fixture is this
++// package's 90MB test binary, re-executed twice), so a loaded runner can kill
++// the tree before the grandchild exists; CI runs 43567331249 and 43568581591
++// read exactly that on unchanged bytes. Same mechanism ticket 441 fixed for the
++// posix seal window, so the same shape is used here:
++//
++//  1. "did the grandchild's pid reach the test in THIS run?" - the raced run
++//     answers with numbers (budget, elapsed, waited, polls, and the last poll
++//     error when the file never appeared). A miss is NAMED, not hard-red:
++//     `AC#2 ABSTAIN(443:timeout-tree:raced-no-pid) ...` - it is a reading this
++//     run could not take, and a zero from absence is never a green.
++//  2. "does the timeout still kill the TREE?" - answered by the control below
++//     when the raced run abstained: same fixture, same runtime, same kill path,
++//     eight times the budget. No pid in the control is RED (the fixture is
++//     broken, not the runner); a pid still alive in either run is RED and names
++//     the pid. That arm is the tooth: a mutation that drops the job object reds
++//     here even on the abstain path, and the ticket-443 evidence file records
++//     that control reading.
+ func Test52TimeoutKillsTheProcessTree(t *testing.T) {
+ 	exe := installFixtureCLI(t)
+ 	pidFile := filepath.Join(stableExeDir(t), "grandchild.pid")
++	// A pid file left by an earlier run is a stale witness: its pid belongs to
++	// a process that is already gone, stillAlive() would answer "dead", and the
++	// test would go green without this run's grandchild ever being reported -
++	// the false green that a fixed path plus a previous run can produce. Clear
++	// it before the call, and require the world to be one this test built.
++	clearPIDFile443(t, pidFile)
++
+ 	def := fixtureTool(exe, "hang")
+ 	def.Extract = map[string]any{"kind": "regex", "pattern": `.+`}
+ 	def.TimeoutMs = plugin.MinCommandTimeoutMS * 10 // 500ms: a real budget, briefly
++	// Ticket 443's dial (see fixtureDelay443Var) has to cross the allowlist to
++	// reach the fixture: the child environment is the allowlist, never the
++	// parent's. Absent from the host, the name is simply absent from the child.
++	def.EnvAllowlist = append(def.EnvAllowlist, fixtureDelay443Var)
+ 
+ 	env := func(name string) (string, bool) {
+ 		switch name {
+@@ -722,6 +772,10 @@ func Test52TimeoutKillsTheProcessTree(t *testing.T) {
+ 			return "1", true
+ 		case fixtureHandshakeVar:
+ 			return fixtureModePrefix + "hang:" + pidFile, true
++		case fixtureDelay443Var:
++			if v := os.Getenv(fixtureDelay443Var); v != "" {
++				return v, true
++			}
+ 		}
+ 		return "", false
+ 	}
+@@ -743,12 +797,108 @@ func Test52TimeoutKillsTheProcessTree(t *testing.T) {
+ 		t.Fatalf("the call took %v; the budget was 500ms and the tree was not killed", elapsed)
+ 	}
+ 
+-	gcPID := readPIDFile(t, pidFile)
+-	if gcPID <= 0 {
+-		t.Fatalf("the fixture never reported a grandchild pid (%s)", pidFile)
++	raced := awaitPID443(pidFile, timeoutTree443PIDWait)
++	racedRun := fmt.Sprintf("budget-ms=%d elapsed-ms=%d waited-ms=%d polls=%d",
++		plugin.CommandTimeoutMs(def), elapsed.Milliseconds(), raced.waitedMS, raced.polls)
++	if raced.pid > 0 {
++		t.Logf("AC#2 raced run: grandchild pid %d reached the test (%s)", raced.pid, racedRun)
++		judgeTreeDead443(t, "raced run", raced.pid)
++		return
++	}
++	// The pid never reached the test. That is this runner's schedule, not the
++	// kill: name the reading with its numbers and let the control carry the
++	// question this run cannot answer. Nothing here is green on its own.
++	t.Logf("AC#2 ABSTAIN(443:timeout-tree:raced-no-pid) %s pid-seen=no pid-file=%q last-poll-error=%q - the budget expired before the fixture reported the grandchild it was supposed to be killed with, so THIS run cannot attest the tree kill from the race; the carrier is the %dms control run below, not a green from absence",
++		racedRun, pidFile, raced.lastErr, timeoutTree443ControlBudgetMS)
++	judgeTimeoutKillControl443(t, runtime, def, pidFile)
++}
++
++// judgeTimeoutKillControl443 is question 2's carrier (ticket 443): run the same
++// fixture through the same runtime and the same kill path with a budget eight
++// times the raced one, then judge the tree from the pid IT reported. It is not a
++// relaxation of the raced run - the raced run still has to time out and still
++// has to read its own pid when one arrives - it is the reading that does not
++// depend on winning a 500ms race against a 90MB process start.
++func judgeTimeoutKillControl443(t *testing.T, runtime *CommandRuntime, def plugin.ToolDef, pidFile string) {
++	t.Helper()
++	def.TimeoutMs = timeoutTree443ControlBudgetMS
++	clearPIDFile443(t, pidFile)
++	start := time.Now()
++	res, err := runtime.Exec(t.Context(), "com.example.fixture", def, []byte(`{}`))
++	elapsed := time.Since(start)
++	if err != nil {
++		t.Fatalf("AC#2 RED(443:timeout-tree:control-exec) the control run could not be executed: %v", err)
++	}
++	if !res.IsError || !res.Truncated || !strings.Contains(res.Text, "timed out") {
++		t.Fatalf("AC#2 RED(443:timeout-tree:control-no-timeout) the control run (budget-ms=%d elapsed-ms=%d) came back as %+v, want a truncated timeout: the control exists to prove the budget still ends a call, and it did not",
++			timeoutTree443ControlBudgetMS, elapsed.Milliseconds(), res)
++	}
++	ctl := awaitPID443(pidFile, timeoutTree443PIDWait)
++	ctlRun := fmt.Sprintf("budget-ms=%d elapsed-ms=%d waited-ms=%d polls=%d",
++		timeoutTree443ControlBudgetMS, elapsed.Milliseconds(), ctl.waitedMS, ctl.polls)
++	if ctl.pid <= 0 {
++		t.Fatalf("AC#2 RED(443:timeout-tree:control-no-pid) the control run could not report a grandchild pid either (%s pid-seen=no pid-file=%q last-poll-error=%q): a %dms budget is eight times the raced one, so a fixture that still cannot start its grandchild is broken, and no reading here attests the tree kill",
++			ctlRun, pidFile, ctl.lastErr, timeoutTree443ControlBudgetMS)
++	}
++	t.Logf("AC#2 control run: grandchild pid %d reached the test (%s)", ctl.pid, ctlRun)
++	judgeTreeDead443(t, "control run", ctl.pid)
++}
++
++// judgeTreeDead443 is the tooth, and it does not care which run produced the
++// pid: the process the fixture reported has to be gone. A survivor is RED with
++// its name, and it is reaped before the failure returns so this test cannot
++// park a hanging process in front of the rest of the suite.
++func judgeTreeDead443(t *testing.T, run string, pid int) {
++	t.Helper()
++	if !stillAlive(pid) {
++		t.Logf("AC#2 %s: grandchild pid %d is gone, so the kill reached the tree", run, pid)
++		return
++	}
++	_ = exec.Command("taskkill", "/T", "/F", "/PID", strconv.Itoa(pid)).Run()
++	t.Fatalf("AC#2 RED(443:timeout-tree:tree-survived) %s: grandchild pid %d is still running after the budget expired - the kill did not reach the tree", run, pid)
++}
++
++// clearPIDFile443 makes the fixture's report a thing THIS run produced: no
++// stale pid, and no silently absent pid file to mistake for a reading.
++func clearPIDFile443(t *testing.T, path string) {
++	t.Helper()
++	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
++		t.Fatalf("clear the grandchild pid file %s: %v", path, err)
+ 	}
+-	if stillAlive(gcPID) {
+-		t.Fatalf("grandchild pid %d is still running after the timeout: the kill did not reach the tree", gcPID)
++	if _, err := os.Stat(path); !errors.Is(err, fs.ErrNotExist) {
++		t.Fatalf("the grandchild pid file %s is still there after clearing it (stat err: %v): a stale pid would be read as this run's witness", path, err)
++	}
++}
++
++// pidWatch443 is one reading of "did the fixture's grandchild pid reach the
++// test", with the numbers the abstain line has to carry: how long the test
++// waited, how many polls that took, and - when it never appeared - the last
++// error the file gave, because "absent" and "written but unreadable" are
++// different findings.
++type pidWatch443 struct {
++	pid      int
++	polls    int
++	waitedMS int64
++	lastErr  string
++}
++
++// awaitPID443 polls path until it holds a pid or wait expires.
++func awaitPID443(path string, wait time.Duration) (w pidWatch443) {
++	start := time.Now()
++	defer func() { w.waitedMS = time.Since(start).Milliseconds() }()
++	deadline := start.Add(wait)
++	for {
++		w.polls++
++		pid, err := readPIDFileErr(path)
++		if err == nil {
++			w.pid = pid
++			return w
++		}
++		w.lastErr = err.Error()
++		if time.Now().After(deadline) {
++			return w
++		}
++		time.Sleep(10 * time.Millisecond)
+ 	}
+ }
+ 
+@@ -797,17 +947,31 @@ func Test52BudgetIsMonotonicNoWallClockSubtraction(t *testing.T) {
+ 	}
+ }
+ 
++// readPIDFile is the ticket-138 form: a pid, or 0 when the file is absent or
++// unreadable. Ticket 443 needs the error too (the abstain line prints whether
++// the file was absent, empty or garbage), so the parsing lives in
++// readPIDFileErr and this wrapper keeps the old reading for its caller.
+ func readPIDFile(t *testing.T, path string) int {
+ 	t.Helper()
+-	raw, err := os.ReadFile(path)
++	pid, err := readPIDFileErr(path)
+ 	if err != nil {
+ 		return 0
+ 	}
++	return pid
++}
++
++// readPIDFileErr reads the pid a fixture reported, keeping "not there yet" and
++// "there but unreadable" as errors instead of folding them into a zero.
++func readPIDFileErr(path string) (int, error) {
++	raw, err := os.ReadFile(path)
++	if err != nil {
++		return 0, err
++	}
+ 	pid, err := strconv.Atoi(strings.TrimSpace(string(raw)))
+ 	if err != nil {
+-		return 0
++		return 0, fmt.Errorf("%s holds %q, not a pid: %w", path, string(raw), err)
+ 	}
+-	return pid
++	return pid, nil
+ }
+ 
+ // stillAlive reports whether pid is a live process, from the OS's own table.

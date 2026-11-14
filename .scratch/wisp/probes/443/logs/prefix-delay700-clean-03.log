@@ -1,0 +1,7 @@
+time=2026-11-14T15:36:45.011+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-11-14T15:36:45.856+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- FAIL: Test52TimeoutKillsTheProcessTree (0.97s)
+    command_52_test.go:765: the fixture never reported a grandchild pid (C:\Users\swq\AppData\Local\wisp52-fixture-tests\grandchild.pid)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/plugin/manifestslot	1.042s
+FAIL

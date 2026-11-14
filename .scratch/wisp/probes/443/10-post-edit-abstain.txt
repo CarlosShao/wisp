@@ -1,0 +1,17 @@
+time=2026-11-14T16:45:38.695+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:45:39.967+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:811: AC#2 ABSTAIN(443:timeout-tree:raced-no-pid) budget-ms=500 elapsed-ms=1013 waited-ms=1004 polls=89 pid-seen=no pid-file="C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid" last-poll-error="open C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid: The system cannot find the file specified." - the budget expired before the fixture reported the grandchild it was supposed to be killed with, so THIS run cannot attest the tree kill from the race; the carrier is the 4000ms control run below, not a green from absence
+time=2026-11-14T16:45:45.450+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:813: AC#2 RED(443:timeout-tree:control-no-pid) the control run could not report a grandchild pid either (budget-ms=4000 elapsed-ms=5442 waited-ms=1008 polls=39 pid-seen=no pid-file="C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid" last-poll-error="open C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid: The system cannot find the file specified."): a 4000ms budget is eight times the raced one, so a fixture that still cannot start its grandchild is broken, and no reading here attests the tree kill
+--- FAIL: Test52TimeoutKillsTheProcessTree (8.91s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:45:50.786+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:811: AC#2 ABSTAIN(443:timeout-tree:raced-no-pid) budget-ms=500 elapsed-ms=1679 waited-ms=1004 polls=58 pid-seen=no pid-file="C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid" last-poll-error="open C:\\Users\\swq\\AppData\\Local\\wisp52-fixture-tests\\grandchild.pid: The system cannot find the file specified." - the budget expired before the fixture reported the grandchild it was supposed to be killed with, so THIS run cannot attest the tree kill from the race; the carrier is the 4000ms control run below, not a green from absence
+time=2026-11-14T16:45:56.648+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:813: AC#2 control run: grandchild pid 50332 reached the test (budget-ms=4000 elapsed-ms=4629 waited-ms=0 polls=1)
+    command_52_test.go:813: AC#2 control run: grandchild pid 50332 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (9.80s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/plugin/manifestslot	18.938s
+FAIL

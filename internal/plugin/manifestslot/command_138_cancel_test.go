@@ -33,6 +33,15 @@ import (
 func Test138TaskCancelKillsTheProcessTree(t *testing.T) {
 	exe := installFixtureCLI(t)
 	pidFile := filepath.Join(stableExeDir(t), "cancel-grandchild.pid")
+	// The fixture directory is FIXED (stableExeDir survives across runs), so a
+	// pid file left by an earlier run is a witness from a process that is
+	// already gone: readPIDFile would hand back its pid and the tooth below
+	// would judge a tree this run never built - the false green ticket 443's
+	// census found while fixing the same sentence in command_52_test.go. Only
+	// the stale witness is removed here; the hard red below STAYS, because this
+	// test runs a 120s budget against a 10s wait with no kill in flight, so an
+	// absent pid really is a broken fixture rather than a racing budget.
+	clearPIDFile(t, pidFile)
 	def := fixtureTool(exe, "hang")
 	def.Extract = map[string]any{"kind": "regex", "pattern": `.+`}
 	// The budget must NOT be the actor in this test: 120s of headroom means

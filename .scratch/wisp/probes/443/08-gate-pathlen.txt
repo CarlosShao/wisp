@@ -1,0 +1,12 @@
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=bytes (probe: length of the 5-byte sample "a U+25FF b" = 5; LANG=unset LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 20027 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=20027  over-budget=70  covered by roster=69  not in roster=1
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=70  of which in the 122..180 middle=66  past the old debt line(180)=4  in the wall interval=0  roster entries=69
+check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves-done.md  (relative 123 chars, name 102 chars, full path on the self-hosted runner 167 chars, budget 165)
+check-path-length-budget.sh: RED - count guard: the roster holds 69 entries, the tree has 70 over-budget tracked paths
+check-path-length-budget.sh: VERDICT RED

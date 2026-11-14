@@ -1,0 +1,128 @@
+time=2026-11-14T16:47:45.956+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:46.874+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 65400 reached the test (budget-ms=500 elapsed-ms=831 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 65400 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.41s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:48.164+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 66760 reached the test (budget-ms=500 elapsed-ms=776 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 66760 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.31s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:49.468+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 68976 reached the test (budget-ms=500 elapsed-ms=775 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 68976 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.30s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:50.817+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 7400 reached the test (budget-ms=500 elapsed-ms=796 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 7400 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.32s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:52.086+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 20736 reached the test (budget-ms=500 elapsed-ms=769 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 20736 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.24s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:53.315+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 2844 reached the test (budget-ms=500 elapsed-ms=758 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 2844 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:54.531+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 55468 reached the test (budget-ms=500 elapsed-ms=761 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 55468 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:55.752+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 15984 reached the test (budget-ms=500 elapsed-ms=757 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 15984 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:56.958+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 31864 reached the test (budget-ms=500 elapsed-ms=759 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 31864 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.38s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:58.346+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 45060 reached the test (budget-ms=500 elapsed-ms=767 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 45060 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.27s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:47:59.613+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 62376 reached the test (budget-ms=500 elapsed-ms=756 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 62376 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.28s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:00.913+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 58256 reached the test (budget-ms=500 elapsed-ms=763 waited-ms=1 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 58256 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.24s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:02.179+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 45708 reached the test (budget-ms=500 elapsed-ms=793 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 45708 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.27s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:03.396+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 41828 reached the test (budget-ms=500 elapsed-ms=764 waited-ms=1 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 41828 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:04.642+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 37528 reached the test (budget-ms=500 elapsed-ms=769 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 37528 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.24s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:05.860+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 16144 reached the test (budget-ms=500 elapsed-ms=757 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 16144 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:07.081+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 53056 reached the test (budget-ms=500 elapsed-ms=766 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 53056 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.23s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:08.303+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 68688 reached the test (budget-ms=500 elapsed-ms=762 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 68688 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.23s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:09.603+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 68992 reached the test (budget-ms=500 elapsed-ms=784 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 68992 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.32s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:10.857+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 47924 reached the test (budget-ms=500 elapsed-ms=758 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 47924 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.23s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:12.091+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 56248 reached the test (budget-ms=500 elapsed-ms=768 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 56248 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.23s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:13.307+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 13888 reached the test (budget-ms=500 elapsed-ms=760 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 13888 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:14.528+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 8168 reached the test (budget-ms=500 elapsed-ms=765 waited-ms=1 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 8168 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.22s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:15.758+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 19428 reached the test (budget-ms=500 elapsed-ms=764 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 19428 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.23s)
+=== RUN   Test52TimeoutKillsTheProcessTree
+time=2026-11-14T16:48:16.986+08:00 level=INFO msg="scope disposed" scope=plugin-command:com.example.fixture/fixture.run completed=0 failed=0 disposal_incomplete=false timed_out=false
+    command_52_test.go:804: AC#2 raced run: grandchild pid 65084 reached the test (budget-ms=500 elapsed-ms=757 waited-ms=0 polls=1)
+    command_52_test.go:805: AC#2 raced run: grandchild pid 65084 is gone, so the kill reached the tree
+--- PASS: Test52TimeoutKillsTheProcessTree (1.24s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin/manifestslot	31.583s
