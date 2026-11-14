@@ -1,0 +1,27 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：审计腿（非实现者）—— 票 71 的 AC#7 1:1 裁决表
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp **审计腿**。你是**非实现者**：票 71 的实现是另一条腿（commit `4ce5c86ff`、`5532436f1`），你只核、不改。
+
+任务：给票 71 出**AC#7 要求的 1:1 裁决表**（README 规则 6）。
+
+票 71 现在的 AC 状态（我本人核过，你**重新核**、别抄）：
+- AC#1–AC#4 已勾（AC#4＝逐作用域自报数字且"不是常量"）
+- AC#5 未勾（要求接进 CI ＋ **一次真实的红**；实现腿给的红在**仓外导出树**里）
+- AC#6 未勾（台账追加；我刚做了，见台账 A1870）
+- AC#7 未勾（＝你这一张表）
+
+裁决表要求：**每一格 AC 一行**，五列：`AC 编号` / `票面原文要求`（逐字摘） / `盘上读数`（文件:行＋数字，你自己现跑） / `我判（满足／部分／不满足）` / `依据一句话`。
+⛔ 不许出现"应该／看起来／大概"；每一行都要有**可核命令或 file:line**。
+
+必须独立核这四件（⛔ 抄票面）：
+1. 自报数字**会不会随树变**：`tools/d22scan/selfreport_delta_test.go` 在不在、跑得过吗、9 个子测试是不是各自真的塞了一个坏文件。
+2. `scripts/d22scan.sh` 的阳性对照步**在 CI 里真的会被跑到**（`ci.yml` 哪一行，先于扫描步）。
+3. 那发"红"**到底红在哪**：导出树还是 runner？⛔ 把导出树红说成 CI 红（今天已经有两起这种过度声称被推翻）。
+4. AC#2 那个"三处接进 CI"的**三处**具体是哪三处，逐处给行号。
+
+产出：`docs/evidence/s1/71-ac7-adversarial.md`（1:1 表 ＋ 结论段：这票能不能结）。
+写面：只许这一个件 ＋ `.scratch/wisp/probes/71ac7/**`。⛔ 改产码/票面/台账/阈值/golden/契约；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+⚠ `tools/d22scan` 是**独立 module**，从仓根 `go test ./tools/d22scan` 会报 `does not contain package`（那是命令错、不是包坏）。
+回话第一行＝commit hash ＋「七格闭合 N／7」＋「那发红是导出树还是 runner」。没干完写「未完成，卡在哪」。
