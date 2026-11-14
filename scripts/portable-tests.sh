@@ -994,6 +994,77 @@ if [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
     fi
 fi
 
+# ---- TICKET 314 AC#3 / ledger A976: the cli tier's END ANCHOR, computed BEFORE the run.
+#
+# WHY THIS EXISTS. cmd/wisp's whole-package run is the one run in this repository
+# that can stop before its last case and still leave a plausible-looking verdict:
+# an external kill, a -test.timeout panic, or a hang the operator ends by hand all
+# leave the four numbers present and the package result line present, so every
+# pre-existing judgement here (GUARD B's `ok <pkg>` line, the four numbers, the
+# carrier's own ok/FAIL line) reads "a run happened". Measured on 2026-11-13: a
+# full run reached === RUN=380 of a 619-name roster, ended on
+# `panic: test timed out after 10m0s`, and booked FAIL=2 - two real reds - while
+# ~239 cases, including the last enumerated one, never ran. Under A976 those four
+# numbers are NOT a coverage denominator, and nothing in this script could say so.
+#
+# WHAT IS ASSERTED. The roster of top-level cases is enumerated HERE, from the
+# compiled test binary for THIS platform, with the same `go test -list` shape the
+# ledger check above already relies on - so this adds no environment dependency:
+# if the binary cannot be listed, the ledger check has already refused. The LAST
+# name in that enumeration is the run's end anchor. Go registers top-level cases
+# in file order and runs them in that same order, so the last name printed by
+# -list is the last case the run can reach. The run must reach it AND print its
+# verdict line (`--- PASS|FAIL|SKIP: <name>`). Seeing the `=== RUN` line alone is
+# not enough: a process that dies inside the last case prints that too, and telling
+# "stopped early" from "finished" is the entire point.
+#
+# WHAT IT DOES NOT DO. It does not assert ran == roster: subtests legitimately add
+# `=== RUN` lines, the carrier's named fixture fallback (-test.skip, ticket 111
+# wave 8b) legitimately removes cases, and accounted skips legitimately remove
+# others. Both numbers are REPORTED, never equated. The anchor is the binary
+# verdict. This touches no test, no threshold, no golden, no ledger row and no rc
+# that was not already non-zero.
+cli_anchor_name=''
+cli_roster_count=0
+if [ "$mode" = cli ]; then
+    cli_roster=$(mktemp 2>/dev/null || echo "$root/.portable-cli-roster.$$.txt")
+    cli_roster_err=$(mktemp 2>/dev/null || echo "$root/.portable-cli-roster-err.$$.txt")
+    if ! go test -list '.*' "${scope[@]}" >"$cli_roster" 2>"$cli_roster_err"; then
+        {
+            echo "portable-tests.sh: END ANCHOR (ticket 314) - \`go test -list '.*' ${scope[*]}\` exited non-zero,"
+            echo "portable-tests.sh:   so the cli tier's roster cannot be enumerated and there is no end anchor to"
+            echo "portable-tests.sh:   assert against. Refusing to run: a guard that cannot name its endpoint is"
+            echo "portable-tests.sh:   the green no-op this script exists to prevent. Its stderr was:"
+            sed 's/^/portable-tests.sh:   err| /' "$cli_roster_err"
+        } >&2
+        rm -f "$cli_roster" "$cli_roster_err"
+        exit 1
+    fi
+    # `go test -list` writes the case names AND then Go's own `PASS` /
+    # `ok  <pkg> <dur>` trailer to stdout; keep only bare Test identifiers, so
+    # the anchor is always a case name and never the package result line.
+    grep -E '^Test[A-Za-z0-9_]+$' "$cli_roster" >"${cli_roster}.names" || true
+    cli_roster_count=$(grep -c . "${cli_roster}.names" || true)
+    cli_anchor_name=$(grep . "${cli_roster}.names" | tail -n 1 || true)
+    rm -f "$cli_roster" "$cli_roster_err" "${cli_roster}.names"
+    if [ "$cli_roster_count" -eq 0 ] || [ -z "$cli_anchor_name" ]; then
+        echo "portable-tests.sh: END ANCHOR (ticket 314) - the roster came back empty ($cli_roster_count names)," \
+            "so there is no last case to anchor on. Refusing to run." >&2
+        exit 2
+    fi
+    case $cli_anchor_name in
+    Test[A-Za-z0-9_]*) ;;
+    *)
+        echo "portable-tests.sh: END ANCHOR (ticket 314) - the last enumerated name '$cli_anchor_name' is not a" \
+            "bare top-level Test identifier, so it cannot be anchored on. Refusing to run." >&2
+        exit 2
+        ;;
+    esac
+    echo "portable-tests.sh: END ANCHOR (ticket 314): roster=$cli_roster_count top-level case(s) from" \
+        "\`go test -list '.*' ${scope[*]}\`; the run must reach the last one and print its verdict:" \
+        "$cli_anchor_name"
+fi
+
 capture=$(mktemp 2>/dev/null || echo "$root/.portable-tests.$$.log")
 rc=0
 # tee costs nothing and keeps the strict runner's verdict intact while giving
@@ -1142,6 +1213,66 @@ if [ "$missing" -ne 0 ]; then
     } >&2
     if [ "$rc" -eq 0 ]; then rc=1; fi
 fi
+fi
+
+# ---- TICKET 314 AC#3 / ledger A976: the cli tier's END ANCHOR verdict ----------------
+#
+# Placed AFTER GUARD B on purpose: GUARD B asks "did the package print its own
+# result line", which an early-stopped run answers YES (the carrier prints `ok` or
+# `FAIL` from the binary's real exit code and measured duration either way). This
+# block asks the only question that separates a completed suite from a cut one:
+# did the LAST enumerated case actually reach its verdict? It reports both counts,
+# the missing anchor and the last line of output, and it separates "killed by an
+# external clock/signal" from "an assertion failed" - those two have different
+# meanings and must not be filed under the same word.
+if [ "$mode" = cli ]; then
+    cli_anchor_re=$(printf '%s' "$cli_anchor_name" | sed 's/[][\\^$.*+?(){}|]/\\&/g')
+    if ! grep -Eq "^--- (PASS|FAIL|SKIP): ${cli_anchor_re}( |\$)" "$capture"; then
+        cli_last_line=$(tail -n 1 "$capture" || true)
+        # Three different things must not share one word: an external clock
+        # (timeout(1) / CI), a signal or native crash that took the whole binary
+        # down (bash spells a signal death 128+n; on this host an unhandled
+        # 0xC0000005 reaches MSYS2 as rc=139, which both
+        # cmd/wisp/panel_host_windows.go:581-586 and
+        # docs/evidence/s1/33-panel-host-c27-r7.md:99 name "the whole process
+        # down"), and Go's own -test.timeout panic. None of them is a test
+        # failure, and the first two mean the run was cut, not red.
+        cli_killed=''
+        case $rc in
+        124) cli_killed='rc=124 (external timeout(1))' ;;
+        137) cli_killed='rc=137 (SIGKILL)' ;;
+        139) cli_killed='rc=139 (SIGSEGV / 0xC0000005 - whole process down)' ;;
+        *)
+            if [ "$rc" -ge 129 ] && [ "$rc" -le 143 ]; then
+                cli_killed="rc=$rc (128+signal $((rc - 128)) - killed by a signal)"
+            fi
+            ;;
+        esac
+        if [ -z "$cli_killed" ] && grep -q 'panic: test timed out' "$capture"; then
+            cli_killed='panic: test timed out (Go -test.timeout)'
+        fi
+        {
+            echo "portable-tests.sh: END ANCHOR (ticket 314) - the cli run did NOT reach its last enumerated case."
+            echo "portable-tests.sh:   anchor    : a '--- PASS|FAIL|SKIP: $cli_anchor_name' verdict line"
+            echo "portable-tests.sh:   missing   : the anchor above never appeared in the -v output"
+            echo "portable-tests.sh:   ran       : === RUN=$ran  --- PASS=$passed  --- FAIL=$failed  --- SKIP=$skipped"
+            echo "portable-tests.sh:   roster    : $cli_roster_count top-level case(s) enumerated before the run"
+            echo "portable-tests.sh:   last line : ${cli_last_line:-<capture is empty>}"
+            if [ -n "$cli_killed" ]; then
+                echo "portable-tests.sh:   verdict   : KILLED, NOT FAILED - the run was cut by an external clock or signal"
+                echo "portable-tests.sh:               ($cli_killed). This is NOT a test failure and must not be reported as one;"
+                echo "portable-tests.sh:               it is the early-stop/hang shape ticket 314 is about."
+            else
+                echo "portable-tests.sh:   verdict   : EARLY STOP / HANG - the run ended before its last case and no external"
+                echo "portable-tests.sh:               kill signature was found. The four numbers above are NOT a coverage"
+                echo "portable-tests.sh:               denominator (ticket 314 / ledger A976)."
+            fi
+            echo "portable-tests.sh:   Do NOT read this run's four numbers as a denominator, and do NOT report a killed run"
+            echo "portable-tests.sh:   as a test failure. Re-run under the same conditions; if it stops again, the stopping"
+            echo "portable-tests.sh:   case is the last '=== RUN' name printed above."
+        } >&2
+        if [ "$rc" -eq 0 ]; then rc=1; fi
+    fi
 fi
 
 rm -f "$capture" "$resolved"
