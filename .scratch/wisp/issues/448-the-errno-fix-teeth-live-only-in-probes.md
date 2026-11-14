@@ -20,3 +20,17 @@
 
 ## 撤销口令
 「票 448 撤」＝删本票＋回退其写腿 commit（新 commit 反改，不 reset/amend）。
+
+---
+
+## Progress log（写腿，2026-11-14 18:5x–19:1x +08）
+
+- **选点**：`internal/tools/*_test.go`（**不是** d22scan 静态闸）。四条理由：这条不变量是包内的（`errnoPresent` 未导出、出包无调用者）；往 d22scan 加 ban 是动 `PLAN.md` D22 的冻结清单（需业主批准），不该为一个小活背；`internal/tools` 在 `scripts/portable-tests.sh` 的 core scope 里 ⇒ 无 tag 的那一半在两个 CI job（test-core/test-windows）都跑，d22scan 只在 lint；新 ban 还要配 `selftestsamples.go`＋`scan_test.go` 的钉子，而红本来就能从 M1/M2 拿到。全文＝新件头注释 ＋ 证据 `docs/evidence/s1/448-errno-teeth-resident.md` §1。
+- **落点**：`internal/tools/ticket448_errno_gate_test.go`（无 build tag，跨 GOOS；闸1 判定体、闸2 调用点、闸3 文本兜底 ＋ 三段种子反证）、`internal/tools/ticket448_errno_gate_windows_test.go`（`//go:build windows`；行为闸 10 行，其中 4 行是结构字段标出的「与语言无关的牙」）。
+- **两个方向都红过**（日志 `.scratch/wisp/probes/448/`）：
+  - **M1 判定体退回句子比较** → 闸1 点 `system_backend_windows.go:269`（两句）＋`:268`，闸3 点 `:269`，行为闸 **4/10 行红**（localized / wrapped / wrapped-twice / lookalike）。同一变异下 `errno-zero-raw` 在本机**仍是绿**（en-US 消息表恰好对得上）⇒ 那两行不能当牙。
+  - **M2 两处调用点退回内联句子比较** → 闸2 点 `:297`（realEnumWindows）与 `:439`（sendInputs），闸3 红，**行为闸 10/10 全绿**。这一格就是静态牙不可替代的理由：行为闸测的是「判定函数对不对」，而 M2 让判定函数正确地没人用。
+  - **M2b 调用点内联 `errors.Is` 绕过（无文本）** → 只有闸2 红（`:439`），闸3 绿 ⇒ 闸2 抓的是结构，不是一句英文的黑名单。
+- **446 的判定逻辑零字节改动**：开工前／每次还原后 sha256 都是 `8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845`，`git diff --name-only` 空。变异前的原件 Copy-Item 到 `probes/448/system_backend_windows.go.pristine`（不用 `git checkout`／`stash`）。
+- **门禁四数**：`go test ./internal/tools` rc=0 **PASS=431 FAIL=0 SKIP=1**（那 1 枚 SKIP 是本票之前就有的 `Test23LiveClipboardRoundTripThroughRealOS`，要 `WISP_T23_LIVE_CLIPBOARD=1`；本票新增 7 个条目 0 SKIP）＋ 包行 `ok … 34.556s`；`go vet ./internal/tools` rc=0；`GOOS=linux go vet ./internal/tools` rc=0；`gofumpt -l` 空；`d22scan` rc=0 clean（ban #8 internal/ 1016 个 Go 文件含新件）；path-length **VERDICT GREEN** rc=0。
+- **AC#5 留白**：⛔ 本腿不 push ⇒ `test-core`／`test-windows` 两发含本 commit 且完成的运行，由编排者推送后取（run 号＋`merge-base`＋完成时刻）。

@@ -1,0 +1,3 @@
+go vet rc=0
+go test rc=0  PASS=431 FAIL=0 SKIP=1
+ok-line: ok  	github.com/CarlosShao/wisp/internal/tools	34.556s

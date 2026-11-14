@@ -1,0 +1,6 @@
+=== restored after both M2 mutations
+restored sha256=8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845
+expected=8CAD968D67AE4F3D4795CDBDB136A6A28E48AB93B44A76FEF716D61026738845
+git diff rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	0.089s
+go test rc=0

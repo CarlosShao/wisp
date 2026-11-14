@@ -1,0 +1,46 @@
+=== M2 mutation: BOTH call sites reverted to the inline sentence comparison (errnoPresent itself untouched) ===
+mutated sha256=8F1E6A77E12EB81E31218D2010B75B7DD7877DA8DB53932830A8B85FC9391C54
+time=2026-11-14T19:04:58.368+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test448ErrnoPresentDecidesByCodeNotText
+--- PASS: Test448ErrnoPresentDecidesByCodeNotText (0.00s)
+=== RUN   Test448ErrnoCallSitesGoThroughErrnoPresent
+    ticket448_errno_gate_test.go:414: 调用点绕过 errnoPresent 了：
+          system_backend_windows.go:297: 函数 realEnumWindows 把 Proc.Call 的 errno 接进 "e" 之后拿它作了决定，却没有交给 errnoPresent -- 调用点绕过了 446 的判定（判定函数本身可能还是对的，只是没人用它）
+          system_backend_windows.go:439: 函数 sendInputs 把 Proc.Call 的 errno 接进 "e" 之后拿它作了决定，却没有交给 errnoPresent -- 调用点绕过了 446 的判定（判定函数本身可能还是对的，只是没人用它）
+--- FAIL: Test448ErrnoCallSitesGoThroughErrnoPresent (0.00s)
+=== RUN   Test448NoErrorTextIsDecidedOnInTheBackend
+    ticket448_errno_gate_test.go:424: 这个文件又在拿错误文本作决定了：
+          system_backend_windows.go:301: 错误文本被拿来做比较 -- 判据不是句子（446）
+          system_backend_windows.go:441: 错误文本被拿来做比较 -- 判据不是句子（446）
+--- FAIL: Test448NoErrorTextIsDecidedOnInTheBackend (0.00s)
+=== RUN   Test448TheStaticChecksGoRedOnTheOldShapes
+=== RUN   Test448TheStaticChecksGoRedOnTheOldShapes/446_修复前的判定体必须报红
+    ticket448_errno_gate_test.go:474: 闸1 命中 3 处:
+          seeded-old-predicate.go:4: errnoPresent 体内调了 .Error() -- 错误文本不是判据（换语言、换构建就变）
+          seeded-old-predicate.go:4: errnoPresent 体内出现字符串字面量 "The operation completed successfully." -- 判定又回到比较句子了，判据只能看码
+          seeded-old-predicate.go:3: errnoPresent 体内没有 errors.Is(<...>, syscall.Errno(...)) 形状的码判据 -- 这正是 446 修好的那半
+=== RUN   Test448TheStaticChecksGoRedOnTheOldShapes/446_修复前的调用点必须报红
+    ticket448_errno_gate_test.go:489: 闸2 命中 1 处:
+          seeded-old-callsite.go:4: 函数 sendInputs 把 Proc.Call 的 errno 接进 "e" 之后拿它作了决定，却没有交给 errnoPresent -- 调用点绕过了 446 的判定（判定函数本身可能还是对的，只是没人用它）
+=== RUN   Test448TheStaticChecksGoRedOnTheOldShapes/446_修复后的样本必须静默
+--- PASS: Test448TheStaticChecksGoRedOnTheOldShapes (0.00s)
+    --- PASS: Test448TheStaticChecksGoRedOnTheOldShapes/446_修复前的判定体必须报红 (0.00s)
+    --- PASS: Test448TheStaticChecksGoRedOnTheOldShapes/446_修复前的调用点必须报红 (0.00s)
+    --- PASS: Test448TheStaticChecksGoRedOnTheOldShapes/446_修复后的样本必须静默 (0.00s)
+=== RUN   Test448ErrnoPresenceIsDecidedByCode
+    ticket448_errno_gate_windows_test.go:87: 448 case nil                              errnoPresent=false want=false tooth=false err="<nil>"
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-zero-raw                   errnoPresent=false want=false tooth=false err="The operation completed successfully."
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-zero-via-windows-alias     errnoPresent=false want=false tooth=false err="The operation completed successfully."
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-zero-localized-text        errnoPresent=false want=false tooth=true  err="操作成功完成。"
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-zero-wrapped               errnoPresent=false want=false tooth=true  err="SendInput wrapper: The operation completed successfully."
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-zero-wrapped-twice         errnoPresent=false want=false tooth=true  err="outer: SendInput wrapper: The operation completed successfully."
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-5-access-denied            errnoPresent=true  want=true  tooth=false err="Access is denied."
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-87-bad-parameter           errnoPresent=true  want=true  tooth=false err="The parameter is incorrect."
+    ticket448_errno_gate_windows_test.go:87: 448 case errno-87-wrapped                 errnoPresent=true  want=true  tooth=false err="ctx: The parameter is incorrect."
+    ticket448_errno_gate_windows_test.go:87: 448 case lookalike-text-is-not-errno-zero errnoPresent=true  want=true  tooth=true  err="The operation completed successfully."
+    ticket448_errno_gate_windows_test.go:108: 448 行为闸：10 行全绿，其中 4 行在任何语言的 Windows 上都会红
+--- PASS: Test448ErrnoPresenceIsDecidedByCode (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.059s
+FAIL
+go test rc=1

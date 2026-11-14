@@ -1,0 +1,2 @@
+=== the untagged gate file must also compile for GOOS=linux (test-core scope) ===
+GOOS=linux go vet ./internal/tools rc=0

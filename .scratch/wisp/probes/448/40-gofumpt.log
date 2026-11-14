@@ -1,0 +1,1 @@
+gofumpt -l rc=0 (empty list above = formatted)
