@@ -1,0 +1,203 @@
+time=2026-11-14T17:54:12.527+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test180KObserveLevelGatesTheFile
+time=2026-11-14T17:54:12.576+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KObserveLevelGatesTheFile1758075466\001\logs min_level=warn config_source=C:\Users\swq\AppData\Local\Temp\Test180KObserveLevelGatesTheFile1758075466\001\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=1
+--- PASS: Test180KObserveLevelGatesTheFile (0.03s)
+=== RUN   Test180KRedactPathsMasksTheFile
+time=2026-11-14T17:54:12.594+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRedactPathsMasksTheFile1388535100\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRedactPathsMasksTheFile1388535100\001\config.toml roll_size_mb=10 roll_days=7 redact_paths=true early_records=0 early_dropped=0
+time=2026-11-14T17:54:12.611+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRedactPathsMasksTheFile1388535100\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRedactPathsMasksTheFile1388535100\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0
+--- PASS: Test180KRedactPathsMasksTheFile (0.04s)
+=== RUN   Test180KRollSizeGatesTheFile
+time=2026-11-14T17:54:12.633+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRollSizeGatesTheFile3461362072\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRollSizeGatesTheFile3461362072\001\config.toml roll_size_mb=1 roll_days=7 redact_paths=false early_records=0 early_dropped=0
+--- PASS: Test180KRollSizeGatesTheFile (0.42s)
+=== RUN   Test180KRollDaysSweepsTheFile
+time=2026-11-14T17:54:13.058+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KRollDaysSweepsTheFile1167099428\001\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KRollDaysSweepsTheFile1167099428\001\config.toml roll_size_mb=10 roll_days=2 redact_paths=false early_records=0 early_dropped=0
+--- PASS: Test180KRollDaysSweepsTheFile (0.02s)
+=== RUN   Test180KRetentionWindowHelperPicksTheSmallerNonDefault
+--- PASS: Test180KRetentionWindowHelperPicksTheSmallerNonDefault (0.00s)
+=== RUN   Test180KMemoryKnobsReachTheAssemblyRoot
+time=2026-11-14T17:54:16.529+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/14 17:54:16 mockllm: serving on http://127.0.0.1:57278 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-14T17:54:16.595+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0
+time=2026-11-14T17:54:16.673+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-14T17:54:16.690+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-14T09:54:16Z duration_ms=15
+time=2026-11-14T17:54:16.710+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-14T17:54:16.723+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-14T09:54:16Z duration_ms=12
+time=2026-11-14T17:54:16.742+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-14T17:54:16.760+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-14T09:54:16Z duration_ms=18
+time=2026-11-14T17:54:16.786+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-14T17:54:16.808+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-14T09:54:16Z duration_ms=19
+time=2026-11-14T17:54:16.808+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-14T17:54:16.827+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-14T17:54:16.836+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-14T09:54:16Z duration_ms=8
+time=2026-11-14T17:54:16.850+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test180KMemoryKnobsReachTheAssemblyRoot2318346507\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-14T17:54:16.864+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-14T09:54:16Z duration_ms=13
+time=2026-11-14T17:54:16.871+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-14T17:54:16.876+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-14T17:54:16.876+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-14T17:54:16.904+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=ca6d364d-7de0-4c2b-b930-6579bef6ada5
+time=2026-11-14T17:54:16.905+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-14T17:54:16.912+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test180KMemoryKnobsReachTheAssemblyRoot (3.88s)
+=== RUN   Test180KL1EnabledGateGatesTheAttach
+time=2026-11-14T17:54:16.945+08:00 level=INFO msg="memory: L1 extraction not attached" reason="[memory] l1_enabled=false" config_source=C:\Users\swq\AppData\Local\Temp\Test180KL1EnabledGateGatesTheAttach2293701552\001\config.toml
+wisp: 记忆抽取未接（[memory] l1_enabled=false，来源 C:\Users\swq\AppData\Local\Temp\Test180KL1EnabledGateGatesTheAttach2293701552\001\config.toml）：Warm 窗口不挂抽取管线，画像不学习
+time=2026-11-14T17:54:16.948+08:00 level=WARN msg="voice: 记忆抽取未装配：本进程没有存储，L1 抽取没有提交面"
+wisp: 语音链：记忆抽取未装配：本进程没有存储，L1 抽取没有提交面
+--- PASS: Test180KL1EnabledGateGatesTheAttach (0.01s)
+=== RUN   Test180KConversationModeReachesTheSpeakDoneRow
+time=2026-11-14T17:54:16.961+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:\\work\\workspace\\projects plans\\Wisp\\third_party\\spike-models\\silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test180KConversationModeReachesTheSpeakDoneRow4222089449\001\models
+--- PASS: Test180KConversationModeReachesTheSpeakDoneRow (0.01s)
+=== RUN   Test180KAECSwitchGatesTheMonitor
+time=2026-11-14T17:54:16.974+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:\\work\\workspace\\projects plans\\Wisp\\third_party\\spike-models\\silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test180KAECSwitchGatesTheMonitor2967332523\001\models
+time=2026-11-14T17:54:16.976+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:\\work\\workspace\\projects plans\\Wisp\\third_party\\spike-models\\silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test180KAECSwitchGatesTheMonitor2967332523\002\models
+--- PASS: Test180KAECSwitchGatesTheMonitor (0.01s)
+=== RUN   Test180KInputDeviceReachesTheCaptureConfig
+time=2026-11-14T17:54:16.989+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\Temp\Test180KInputDeviceReachesTheCaptureConfig1085650417\001\config.toml path=T
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-11-14T17:54:16.990+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: Test180KInputDeviceReachesTheCaptureConfig (0.01s)
+=== RUN   Test395r1VoiceToolTurnWalksActing
+    resident_voice_acting_395r1_windows_test.go:99: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test395r1VoiceToolTurnWalksActing2460819637\001: WISP_SPIKE_MODELS is not set
+--- FAIL: Test395r1VoiceToolTurnWalksActing (0.02s)
+=== RUN   Test381r2IdleInterruptIsInert
+--- PASS: Test381r2IdleInterruptIsInert (0.00s)
+=== RUN   Test381r2StaleTokenDoesNotKillTheNextAnnouncement
+time=2026-11-14T17:54:17.051+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.051+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="test: D43#11 Listening 到 Thinking"
+time=2026-11-14T17:54:17.054+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=load-failed:tts cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=0"
+time=2026-11-14T17:54:17.054+08:00 level=WARN msg="voice: 播报没有引擎（3.4537ms）：session: 装载引擎 tts 失败: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)"
+wisp: 语音链：播报没有引擎（3.4537ms）：session: 装载引擎 tts 失败: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+    resident_voice_interrupt_381r2_windows_test.go:262: MUTANT 381r2-M2 SHAPE: the announcement was killed by a stale interrupt token (spoken=0, chunks=0): speak() does not drain interruptCh at the entry, so a token left by an earlier idle Esc silently kills the next sentence (381-v2 §5: spoken=0, no problem row)
+time=2026-11-14T17:54:17.055+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+--- FAIL: Test381r2StaleTokenDoesNotKillTheNextAnnouncement (0.01s)
+=== RUN   Test381r2PlayingPhaseInterruptAbortsAndWalks27
+time=2026-11-14T17:54:17.056+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T17:54:17.056+08:00 level=WARN msg="voice: 语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+wisp: 语音链：语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）
+    resident_voice_interrupt_381r2_windows_test.go:301: the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+--- FAIL: Test381r2PlayingPhaseInterruptAbortsAndWalks27 (0.00s)
+=== RUN   Test381r2VetoSubstringFinalsReachTheAgent
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.057+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.058+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.059+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.059+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.059+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.059+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.059+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.059+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.060+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.060+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+time=2026-11-14T17:54:17.060+08:00 level=INFO msg="voice: D43 walked" from=Sleeping event=session.summon to=Listening why="test: D43#4 Sleeping 到 Listening"
+time=2026-11-14T17:54:17.060+08:00 level=INFO msg="voice: D43 walked" from=Listening event=asr.vad-stop to=Thinking why="判停（end）且语音 400ms 不小于 300ms：D43#11 让球走 Thinking"
+time=2026-11-14T17:54:17.060+08:00 level=INFO msg="voice: turn ended into Warm (engines stay hot)" reason=turn-end stage=Disposed loads_after_warm=0 engines_hot=0
+    resident_voice_interrupt_381r2_windows_test.go:451: VETO-GONE benign=12/12 handed=true problems=0 (false-positive rate 0/12; the 381-r1 branch measured 12/12)
+--- PASS: Test381r2VetoSubstringFinalsReachTheAgent (0.00s)
+=== RUN   Test381r2RealDevicePlayingPhaseAbortWithin400ms
+time=2026-11-14T17:54:17.384+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T17:54:17.384+08:00 level=WARN msg="voice: 语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+wisp: 语音链：语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）
+    resident_voice_interrupt_381r2_windows_test.go:486: the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+time=2026-11-14T17:54:17.385+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+    voice_announce_attenuation_388_windows_test.go:58: ATTENUATE-388 original=1.000000 attenuated=0.150000 restored=1.000000
+--- FAIL: Test381r2RealDevicePlayingPhaseAbortWithin400ms (0.34s)
+=== RUN   Test390r1BallClickPlayingInterruptAbortsAndWalks27
+time=2026-11-14T17:54:17.399+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T17:54:17.399+08:00 level=WARN msg="voice: 语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+wisp: 语音链：语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）
+    resident_voice_interrupt_390r1_windows_test.go:66: the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+time=2026-11-14T17:54:17.400+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+--- FAIL: Test390r1BallClickPlayingInterruptAbortsAndWalks27 (0.00s)
+=== RUN   Test390r1BallClickRealDeviceWithin400ms
+time=2026-11-14T17:54:17.633+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T17:54:17.633+08:00 level=WARN msg="voice: 语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+wisp: 语音链：语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）
+    resident_voice_interrupt_390r1_windows_test.go:201: the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+time=2026-11-14T17:54:17.633+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+    voice_announce_attenuation_388_windows_test.go:58: ATTENUATE-388 original=1.000000 attenuated=0.150000 restored=1.000000
+--- FAIL: Test390r1BallClickRealDeviceWithin400ms (0.24s)
+=== RUN   Test390r1IdleBallClickIsInert
+time=2026-11-14T17:54:17.644+08:00 level=INFO msg="ball: click interrupt dispatched" executed=true
+wisp: ball click: interrupt requested
+time=2026-11-14T17:54:17.644+08:00 level=WARN msg="ball gesture arrived with no executor" gesture=click why="no executor was handed to this ball host for this gesture; the gestures with one are the cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg (ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e) and the ball click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented"
+wisp: ball click: no executor was handed to this ball host for this gesture; the gestures with one are the cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg (ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e) and the ball click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented
+time=2026-11-14T17:54:17.645+08:00 level=WARN msg="ball gesture arrived with no executor" gesture=click why="no executor was handed to this ball host for this gesture; the gestures with one are the cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg (ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e) and the ball click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented"
+wisp: ball click: no executor was handed to this ball host for this gesture; the gestures with one are the cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg (ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e) and the ball click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented
+--- PASS: Test390r1IdleBallClickIsInert (0.00s)
+=== RUN   Test390r1UnattachedClickDoesNotInterrupt
+time=2026-11-14T17:54:17.646+08:00 level=INFO msg="voice: capture gate wired to the announce path" seam=audio.HalfDuplexGate.SetSpeaking path=T
+time=2026-11-14T17:54:17.646+08:00 level=WARN msg="voice: 语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+wisp: 语音链：语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）
+    resident_voice_interrupt_390r1_windows_test.go:357: the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+time=2026-11-14T17:54:17.647+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+--- FAIL: Test390r1UnattachedClickDoesNotInterrupt (0.00s)
+=== RUN   Test26R3AnnounceClosesTheCaptureGate
+    resident_voice_selfecho_26r3_windows_test.go:108: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate2708997959\001: WISP_SPIKE_MODELS is not set
+--- FAIL: Test26R3AnnounceClosesTheCaptureGate (0.01s)
+=== RUN   Test26R3GateNeedleZeroValueSafety
+    resident_voice_selfecho_26r3_windows_test.go:272: ZEROVALUE closed=0 reopened=0 stop_line_ok=1
+--- PASS: Test26R3GateNeedleZeroValueSafety (0.00s)
+=== RUN   Test26R3SilenceNeverTouchesTheGateNeedle
+    resident_voice_selfecho_26r3_windows_test.go:284: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test26R3SilenceNeverTouchesTheGateNeedle1648462088\001: WISP_SPIKE_MODELS is not set
+--- FAIL: Test26R3SilenceNeverTouchesTheGateNeedle (0.01s)
+=== RUN   TestWireR1AnnounceEndToEnd
+    resident_voice_wire_r1_windows_test.go:272: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd1706152477\001: WISP_SPIKE_MODELS is not set
+--- FAIL: TestWireR1AnnounceEndToEnd (0.01s)
+=== RUN   TestWireR1WarmSecondTurnAcquiresNothing
+    resident_voice_wire_r1_windows_test.go:431: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1WarmSecondTurnAcquiresNothing930911031\001: WISP_SPIKE_MODELS is not set
+--- FAIL: TestWireR1WarmSecondTurnAcquiresNothing (0.01s)
+=== RUN   TestWireR1PunctuationReachesTheAgent
+    resident_voice_wire_r1_windows_test.go:505: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1PunctuationReachesTheAgent3827045040\001: WISP_SPIKE_MODELS is not set
+--- FAIL: TestWireR1PunctuationReachesTheAgent (0.01s)
+=== RUN   TestWireR1AnnounceGateRefusesTaintedText
+    resident_voice_wire_r1_windows_test.go:564: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceGateRefusesTaintedText1475408972\001: WISP_SPIKE_MODELS is not set
+--- FAIL: TestWireR1AnnounceGateRefusesTaintedText (0.01s)
+=== RUN   TestWireR1SilenceAndEmptyTextNeverSpeak
+    resident_voice_wire_r1_windows_test.go:632: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1SilenceAndEmptyTextNeverSpeak2860290155\001: WISP_SPIKE_MODELS is not set
+--- FAIL: TestWireR1SilenceAndEmptyTextNeverSpeak (0.01s)
+=== RUN   TestWireR1WarmIdleDisposesOnTheOwner
+    resident_voice_wire_r1_windows_test.go:709: install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1WarmIdleDisposesOnTheOwner2165881355\001: WISP_SPIKE_MODELS is not set
+--- FAIL: TestWireR1WarmIdleDisposesOnTheOwner (0.01s)
+=== RUN   TestWireR1TheRealDeviceTakesTheAudio
+    resident_voice_wire_r1_windows_test.go:848: DEVICE rate=22050 samples=4410 ms=200 abort=0
+--- PASS: TestWireR1TheRealDeviceTakesTheAudio (0.30s)
+=== RUN   TestSpeakInterruptIsDecidedByCode216
+--- PASS: TestSpeakInterruptIsDecidedByCode216 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	5.748s
+FAIL

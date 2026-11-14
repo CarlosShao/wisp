@@ -172,16 +172,27 @@ type HTTPErrorDetail struct {
 // the body carried one) to a D37 class. The bool reports whether the class
 // allows a retry at all (mirrors observe.ErrorClass.Retryable, with the
 // rate_limit refinement handled by RetryAfter parsing, not here).
+//
+// THE BRANCH KEYS ARE CODES: the numeric HTTP status (the switch below) and the
+// upstream `code` token. d.Message - the upstream's English prose - is NEVER
+// read to pick a class, because the class picks the sentence the user sees
+// (internal/panel/error_copy_216.go) and ticket 216 AC#5 forbids that choice
+// riding on prose: the negative example is openchamber ChatInput.tsx:2205-2206
+// (`includes('payload too large') || includes('413') || includes('entity too
+// large')`), transcribed verbatim in
+// .scratch/wisp/probes/216/ac5/control/openchamber-chatinput-2205.txt.
+// A provider that wants the model/context refinement must send a code; the
+// message still travels as the human-readable cause.
 func ClassifyHTTPStatus(d HTTPErrorDetail) (observe.ErrorClass, bool) {
 	code := strings.ToLower(d.Code)
 	switch d.Status {
 	case 400, 422:
 		// Bad request: our bug or an unsupported parameter. Model-flavored
 		// rejections get their own class for actionable copy.
-		if strings.Contains(code, "model") || strings.Contains(strings.ToLower(d.Message), "model") {
+		if strings.Contains(code, "model") {
 			return observe.ClassModel, false
 		}
-		if strings.Contains(code, "context_length") || strings.Contains(strings.ToLower(d.Message), "context length") {
+		if strings.Contains(code, "context_length") {
 			return observe.ClassModel, false
 		}
 		return observe.ClassProvider, false
@@ -193,7 +204,7 @@ func ClassifyHTTPStatus(d HTTPErrorDetail) (observe.ErrorClass, bool) {
 		// Account / credit problem: distinguishable from network trouble.
 		return observe.ClassBudget, false
 	case 404:
-		if strings.Contains(code, "model") || strings.Contains(strings.ToLower(d.Message), "model") {
+		if strings.Contains(code, "model") {
 			return observe.ClassModel, false
 		}
 		return observe.ClassProvider, false

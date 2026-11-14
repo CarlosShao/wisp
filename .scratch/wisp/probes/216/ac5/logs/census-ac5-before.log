@@ -1,0 +1,194 @@
+anchor: export-tree=D:/wisp-216ac5-base2 (no git metadata; the export was git archive HEAD at the anchor named in the evidence file) date=2026-11-14T10:07:06Z
+Every ruler prints id / pat / rng / rc / hits, then an explicit expect=;
+the zero rulers carry controls so a 0 is never read as a blind zero.
+
+##### A. the forbidden shape: a user-visible sentence selected by error TEXT
+
+=== A1-error-text-predicate-lines
+pat=(Contains|HasPrefix|HasSuffix|Index|MatchString|EqualFold)\([^)]*\.Error\(\)
+rng=internal/**/*.go cmd/**/*.go tools/**/*.go :(exclude)*_test.go
+rc=0
+cmd/wisp/resident_voice_engines_windows.go:1240:		if strings.Contains(speakErr.Error(), "interrupted") {
+expect=the predicate forms on production .go: one code hit before the fix (resident_voice_engines:1240); the after log is the pair
+
+=== A2-literal-english-equality
+pat=\.Error\(\) *[!=]= *"
+rng=internal/**/*.go cmd/**/*.go tools/**/*.go :(exclude)*_test.go
+rc=0
+internal/tools/system_backend_windows.go:286:	if r == 0 && e != nil && e.Error() != "The operation completed successfully." {
+internal/tools/system_backend_windows.go:426:		if e != nil && e.Error() != "The operation completed successfully." {
+expect=exact English text equality (not copy selection; judged in the evidence file)
+
+=== A3-switch-on-error-text
+pat=switch [a-zA-Z_.]*\.Error\(\)
+rng=internal/**/*.go cmd/**/*.go tools/**/*.go :(exclude)*_test.go
+rc=1
+expect=0: nobody switches on the whole rendered error text either
+
+##### B. the forbidden shape one layer down: a copy kind selected from a string FIELD
+
+=== B1-detail-alias
+pat=:= *[a-zA-Z_.]+\.(Detail|Message|ProviderCode)\b
+rng=internal/**/*.go cmd/**/*.go tools/**/*.go :(exclude)*_test.go
+rc=0
+cmd/wisp/config_reload.go:431:		d := oe.Detail
+internal/agent/compress.go:422:		block := llm.Message{
+expect=1 hit: cmd/wisp/config_reload.go:431 d := oe.Detail (the only consumer that branches on it is B2)
+
+=== B2-detail-branch
+pat=(HasPrefix|Contains)\(d, *"
+rng=internal/**/*.go cmd/**/*.go :(exclude)*_test.go
+rc=0
+cmd/wisp/config_reload.go:433:		case strings.HasPrefix(d, "config.toml parse"):
+cmd/wisp/config_reload.go:437:		case strings.Contains(d, "unknown key"):
+cmd/wisp/config_reload.go:441:		case strings.Contains(d, "cannot migrate from schema version") ||
+cmd/wisp/config_reload.go:442:			strings.Contains(d, "no migration registered"):
+cmd/wisp/config_reload.go:460:		case strings.Contains(d, "was written by a newer build"):
+cmd/wisp/config_reload.go:471:			// strings.HasPrefix(d, "config.toml:") branch, because loader.go:122
+cmd/wisp/config_reload.go:488:		case strings.HasPrefix(d, "config.toml:"):
+internal/config/allowdirs.go:67:	if strings.Contains(d, "..") {
+expect=5 branches in cmd/wisp/config_reload.go describeReloadFailure selecting 6 operator sentences
+
+=== B3-upstream-message-branch
+pat=Contains\(strings\.ToLower\(d\.Message\)
+rng=internal/**/*.go :(exclude)*_test.go
+rc=0
+internal/llm/errors.go:181:		if strings.Contains(code, "model") || strings.Contains(strings.ToLower(d.Message), "model") {
+internal/llm/errors.go:184:		if strings.Contains(code, "context_length") || strings.Contains(strings.ToLower(d.Message), "context length") {
+internal/llm/errors.go:196:		if strings.Contains(code, "model") || strings.Contains(strings.ToLower(d.Message), "model") {
+expect=internal/llm/errors.go: upstream PROSE (d.Message) used to pick an error class -> picks the copy
+
+=== B4-upstream-code-branch
+pat=Contains\(code, *"
+rng=internal/**/*.go :(exclude)*_test.go
+rc=0
+internal/llm/errors.go:181:		if strings.Contains(code, "model") || strings.Contains(strings.ToLower(d.Message), "model") {
+internal/llm/errors.go:184:		if strings.Contains(code, "context_length") || strings.Contains(strings.ToLower(d.Message), "context length") {
+internal/llm/errors.go:196:		if strings.Contains(code, "model") || strings.Contains(strings.ToLower(d.Message), "model") {
+internal/llm/errors.go:205:		if strings.Contains(code, "context") {
+internal/llm/errors.go:213:		if strings.Contains(code, "insufficient_quota") || strings.Contains(code, "quota") ||
+internal/llm/errors.go:214:			strings.Contains(code, "balance") || strings.Contains(code, "arrears") ||
+internal/llm/errors.go:215:			strings.Contains(code, "account") {
+expect=internal/llm/errors.go: upstream CODE (machine token) matched by substring - judged a code branch, see evidence
+
+##### C. the exact negative shape: a numeric literal matched as a STRING
+
+=== C1-status-literal-as-string
+pat="(413|429|400|401|403|404|500|502|503)"
+rng=internal/**/*.go cmd/**/*.go :(exclude)*_test.go
+rc=0
+internal/panel/bridge.go:204:// a substring of the error text (the forbidden ChatInput.tsx:2205 "413"
+internal/panel/error_copy_216.go:5:// ChatInput.tsx:2205 (three-substring OR including "413" deciding which copy
+expect=0 production hits; the hits below are the two comments that NAME the forbidden shape
+
+=== C2-status-literal-as-int
+pat=case (413|429|400|401|403|404|500|502|503)[,:]
+rng=internal/**/*.go cmd/**/*.go :(exclude)*_test.go
+rc=0
+internal/llm/errors.go:178:	case 400, 422:
+internal/llm/errors.go:188:	case 401, 403:
+internal/llm/errors.go:195:	case 404:
+internal/llm/errors.go:204:	case 413:
+internal/llm/errors.go:209:	case 429:
+internal/llm/errors.go:219:	case 500, 501, 502, 503, 504:
+expect=positive control: the same numbers as INT case labels DO exist (that is the code branch AC#5 wants)
+
+##### D. frontend (READ-ONLY: frontend/** is the owner external agent)
+
+=== D1-frontend-negative-shape
+pat=includes\(['"]413['"]\)|payload too large|entity too large
+rng=frontend/src
+rc=1
+expect=0 hits: the page does not sniff the error prose either
+
+=== D2-frontend-includes-control
+pat=[.]includes\(
+count=38
+rng=frontend/src
+
+=== D3-frontend-status-branch
+pat=statusText|status *[!=]== *['"]
+rng=frontend/src
+rc=0
+frontend/src/components/ai-native/tool-chips.tsx:62:  if (status === "done") {
+frontend/src/components/ai-native/tool-chips.tsx:65:  if (status === "denied") {
+frontend/src/components/ai-native/tool-chips.tsx:142:              const denied = tool.status === "denied";
+frontend/src/components/ai-native/tool-chips.tsx:245:      {status === "running" ? <RunningLabel /> : null}
+frontend/src/components/harness/sidebar.tsx:65:      {status === "failed" ? (
+frontend/src/components/harness/sidebar.tsx:67:      ) : status === "streaming" ? (
+frontend/src/components/tasks-screen.tsx:62:  if (status !== "running") {
+expect=hits compare OUR enum strings (task/tool status), not error prose; judged per line in evidence
+
+##### E. the PASS side: copy selected by code (the branch AC#5 requires)
+
+=== E1-panel-copy-table
+pat=observe\.Class[A-Za-z]+:
+count=17
+rng=internal/panel/error_copy_216.go
+
+=== E2-panel-copy-head
+pat=func errorHead216
+rng=internal/panel/*.go
+rc=0
+internal/panel/error_copy_216.go:67:func errorHead216(err error) string {
+expect=the one branch point: class in, head out
+
+=== E3-classof-consumers
+pat=observe\.ClassOf\(
+rng=internal/**/*.go cmd/**/*.go :(exclude)*_test.go
+rc=0
+internal/agent/guard.go:272:	c, ok := observe.ClassOf(err)
+internal/llm/adaptertest/harness.go:417:	c, _ := observe.ClassOf(err)
+internal/llm/retry.go:257:	c, _ := observe.ClassOf(err)
+internal/models/downloader.go:351:			if cls, ok := observe.ClassOf(err); ok && cls == ClassModel {
+internal/models/downloader.go:444:			if cls, ok := observe.ClassOf(err); ok && cls == ClassModel {
+internal/panel/error_copy_216.go:71:	if class, ok := observe.ClassOf(err); ok {
+expect=production consumers of the class extractor (the code source the copy branch rides on)
+
+##### F. the two-sentence discipline: 没有 vs 读不到 must not share one sentence
+
+=== F1-instructions-five-states
+pat=InstructionsStatus[A-Za-z]+ *= *"
+rng=internal/panel/instructions_200.go
+rc=0
+internal/panel/instructions_200.go:27:	InstructionsStatusLoaded = "loaded"
+internal/panel/instructions_200.go:30:	InstructionsStatusNoneFound = "none_found"
+internal/panel/instructions_200.go:32:	InstructionsStatusOff = "off"
+internal/panel/instructions_200.go:37:	InstructionsStatusRefused = "refused"
+internal/panel/instructions_200.go:40:	InstructionsStatusNotRun = "not_run"
+expect=five named states; none_found and not_run are separate constants
+
+=== F2-workspace-two-sentences
+pat=workspace(NotChosen|NoReading)Reason *=
+rng=internal/panel/workspace.go
+rc=0
+internal/panel/workspace.go:77:	workspaceNotChosenReason = "未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"
+internal/panel/workspace.go:78:	workspaceNoReadingReason = "工作区这一维没有读数：本机的快照泵没有被接入工作区读数腿" +
+expect=two constants: "not chosen" vs "no reading" are two sentences
+
+##### G. controls: prove the rulers above are not blind
+
+=== G1-control-verbatim-negative-example
+pat=(the C1 pattern run against the stored verbatim transcription)
+skipped: this tree has no .scratch/ (plain git-archive export); the control was run in the repo and is in the repo log
+expect=>=1 hit: the C1 pattern DOES fire on the shape it is meant to catch
+
+=== G2-control-frontend-includes
+pat=[.]includes\(
+hits=38
+expect=>0: the frontend ruler family is not blind
+
+=== G3-control-census-dir
+skipped: .scratch/ is not part of the plain export
+
+##### H. production denominators (not a judgment: sizes, so a zero can be read against them)
+=== H1-error-call-sites
+pat=\.Error\(\)
+count=274
+rng=internal/**/*.go cmd/**/*.go tools/**/*.go :(exclude)*_test.go
+
+=== H2-errors-is-as
+pat=(errors\.Is|errors\.As)\(
+count=138
+rng=internal/**/*.go cmd/**/*.go tools/**/*.go :(exclude)*_test.go
+

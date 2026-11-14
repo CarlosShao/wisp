@@ -1208,8 +1208,10 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 		// runs - see the abort hop above.
 		select {
 		case <-rv.interruptCh:
-			// Interrupt fired: return an error that will be treated as "interrupted" not "failed".
-			return fmt.Errorf("interrupted mid-speak")
+			// Interrupt fired: return the CODE that will be treated as
+			// "interrupted" not "failed" (ticket 216 AC#5: the code, never the
+			// English text, is what the caller branches on).
+			return errSpeakInterrupted
 		default:
 			// No interrupt yet: play this chunk normally.
 		}
@@ -1237,7 +1239,13 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	if speakErr != nil {
 		// 381-r1: distinguish "interrupted" from "failed"。中断是用户意图（热键/单击/否决词），
 		// 失败是技术故障（引擎问题）。中断时只 dispatch EvInterrupt，不报 problem。
-		if strings.Contains(speakErr.Error(), "interrupted") {
+		//
+		// TICKET 216 AC#5: the split is decided by the CODE (errors.Is against
+		// errSpeakInterrupted), never by matching "interrupted" inside
+		// err.Error() - that was the openchamber ChatInput.tsx:2205 shape
+		// (a substring of the English error text picking the branch) and it also
+		// fired for an unrelated engine error that merely said "interrupted".
+		if speakFailureIsInterrupt(speakErr) {
 			if moved {
 				rv.dispatch(statemachine.EvInterrupt, nil, "播报被打断：D43#27 回到 Listening（用户触发）")
 			}
@@ -1288,6 +1296,25 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 			rv.warmTurnEnd.Add(1)
 		}
 	}
+}
+
+// errSpeakInterrupted is the CODE for "the user interrupted this utterance".
+// The chunk callback returns it when the interrupt token arrives mid-synthesis;
+// speak() and speakFailureIsInterrupt() test it with errors.Is. Its text is the
+// old literal only so log lines do not move; nothing branches on that text
+// (ticket 216 AC#5).
+var errSpeakInterrupted = errors.New("interrupted mid-speak")
+
+// speakFailureIsInterrupt is the one place the interrupted/failed split is
+// decided. It is a code test (errors.Is over the chain the speakers return:
+// MatchaTts.Speak hands the emit error back verbatim, CloudTTS.Speak documents
+// the same, and the cloud chain wraps it with %w), so an engine error whose
+// message happens to contain "interrupted" is NOT an interrupt any more.
+// Ticket 216 AC#5: the negative example is openchamber ChatInput.tsx:2205-2206
+// (three substring ORs on the English error text); a copy of that shape here
+// would answer true for the third arm of TestSpeakInterruptIsDecidedByCode216.
+func speakFailureIsInterrupt(err error) bool {
+	return errors.Is(err, errSpeakInterrupted)
 }
 
 // speakDoneFacts180K is the EvSpeakDone facts the announcement end dispatches,

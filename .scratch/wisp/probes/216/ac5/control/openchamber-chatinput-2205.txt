@@ -1,0 +1,36 @@
+VERBATIM TRANSCRIPTION of the negative example ticket 216 AC#5 names.
+Source: docs/reports/survey-2026-09-28-composer-plus-menu.md:378-381
+(section 5.4, openchamber). That survey transcribed the code; the upstream
+repository (openchamber) is NOT in this repo, so this is the only copy of the
+shape on disk. Read on 2026-11-14 by the 216-ac5 leg.
+
+  ChatInput.tsx:2205-2206
+  ```ts
+  if (normalized.includes('payload too large') || normalized.includes('413') || normalized.includes('entity too large')) {
+      toast.error(t('chat.chatInput.toast.attachmentsTooLarge'));
+  ```
+
+What it does, line by line:
+  - `normalized` is the HTTP error text (lower-cased somewhere upstream).
+  - The branch is a three-way OR of SUBSTRING tests: "payload too large",
+    "413", "entity too large".
+  - The substring decides WHICH toast sentence the user sees
+    (`attachmentsTooLarge`). The sentence is not selected by a status code
+    value, not by an error type, not by a class - only by prose that happens
+    to be in the response body.
+
+Why it is wrong (the part AC#5 copies):
+  - The server may reword: "request entity too large" still hits, but
+    "the uploaded file exceeds the maximum size" does not - the toast silently
+    never appears.
+  - "413" is matched as a DECIMAL SUBSTRING, not as a status code: any body
+    containing the digits 413 anywhere (an id, an offset, a model name) fires
+    the branch. It is the shape the ticket forbids: "英文错误串里有没有某个
+    数字".
+  - The ticket's one-line summary ("靠 413 子串决定弹哪句") is a SIMPLIFICATION:
+    the real code is a three-substring OR, of which "413" is one. This file
+    records the verbatim form so the next reader does not inherit the summary.
+
+Same repo, positive contrast (survey :385):
+  ExtensionsPage.tsx:58  if (code === 'too-large') return '...zipTooLarge';
+the correct shape: compare the CODE for EXACT equality, then select the copy.
