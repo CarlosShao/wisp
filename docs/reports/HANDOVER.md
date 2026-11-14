@@ -4321,3 +4321,16 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - **★我本轮两次违令自纠（接手必读）**：`A1715`（302 我裁甲形，票面 2026-10-10 裁定是甲/乙都⛔落；已 `git revert` → `6232efeb6`）、`A1712`（238 派单前没读 Progress，owner veto `A476`/`A1558` 已在票内）。⇒ **派任何票前必须逐格读票面全文，含所有"编排者裁"小节与 Progress log。**
 - **review 组定论**：`group/group-review-and-audit` **四次空交**（含 `magpie-max` max 档两次）⇒ 该组**只能当纯评审器（读文件+推理+写 md）**，⛔ 给它任何"跑命令/多步 agentic loop"的任务。`magpie-max` provider 本身是好的（请求头实证 `reasoningEffort: "max"`，见 `A1711`）。
 - **goal**：`goal-c3efb0f7-f911-4e6b-89d1-ed51a2ffdfe8` 保持 **active/armed**（自动轮次里 ⛔ 能暂停——`update_goal pause` 要真人回合）。**机主说"继续"即从上述欠账接。**
+### 4.0gc（2026-11-14 16:3x +08，编排者）★★ 机主更新 DSH 要重启 ⇒ 全编队停车等他发话；**我在此前刚踩了一条路由铁律并记账**
+
+- **机主原话（逐字）**：「我的dsh刚刚更新了，但是要重启生效，等你把这波派完了先停下让我重启下再说」；紧接：「你特么的子代理到底用的啥模型啊？？？为什么我看子代理好像在用deepseek啊？？？不是让你用glm 5.3 flash吗」
+- **★本节的第 0 条（接手第一件必读）**：**两个临时日（14/15）所有子代理必须** `provider:'magpie-high', model:'auto/glm-5.3-flash'`。我 15:0x–15:4x 连派 **6 条腿全写成** `auto/deepseek-v4.1-flash`（把**主会话自己的模型名**当子代理模型抄了）⇒ 属 goal 明令禁止的**静默降级**（goal 里那条 deepseek 例外要求「glm 连续 null 且必须点名」，我一次 glm 都没试）。全程记在台账 **A1863**。另**今天派单没存档**（规则 4）也已记同一笔。
+- **现状快照（现跑，接手请自己重跑）**：HEAD **`e4f5baa56`**；未推 **0**；票池 总 **430**／done **370**／未结 **60**；`cmd/wisp` 未提交 **0 行**；后台**无**在飞腿。
+- **今天已结的票**：**70**（CI 名单闸；**当天 10 发里 3 发红** ⇒ 我给它追加了「更正记」，⛔ 不作「CI 已稳绿」声明）、**441**（winsec 弃权 flake，两发连续绿＋6/6 全绿一次）、**274 的闸已进 CI 并跑绿**（`slo-smoke` step 6 `panel-assets -check`）、**245 到 8/9**（只剩 AC#4 阻塞于 228 与 AC#6② 已兑现）。
+- **★停车时已备好的下一波（先存档再发，重启后直接放）**：
+  1. `.scratch/wisp/probes/orch/20261114/txt/443-flake-r2-dispatch.txt` —— 票 443（`Test52TimeoutKillsTheProcessTree` 在 `test-windows` **3 发红 2**，红句 `command_52_test.go:748: the fixture never reported a grandchild pid`）。⚠ 该票 Progress log 末尾写着：工作树里有**被中断的 2 枚测试件**（`command_52_main_test.go`／`command_52_test.go`），**接手先读 diff，⛔ 当已修、⛔ 默默覆盖**。
+  2. `.scratch/wisp/probes/orch/20261114/txt/442-jiac-r1-dispatch.txt` —— 票 442 **裁定「甲＋落①」**：主判据＝**运行时观察点**（`NewPanelManager` 加 3–5 行接缝 + 「一发内每个构造点 dataPath 两两不同」断言）；① 那笔已经做完的静态 patch **准落但落完冻结**。撤销口令「**442 改向复议**」。
+- **★两条 flake 结论（接手别重推理）**：① `TestPOSIX120SealWindowLeafSwapIsClosed`（Linux core）已修——真因是它逼仪器同时证「窗口到达过」与「密封还封得住」，CI 上后者只是**调度抽签**（同 commit `refused=1886/2000` 而静侧 `sealed-own=0`）；② `Test52TimeoutKillsTheProcessTree`（Windows）**同一机理未修**＝票 443；③ 另有 **7 枚**同类仪器会弃权变红＝票 **444**（点名表在票内，含票 322 那枚自陈无确定性载体）。**共同机理：仪器没观测到就判红**。
+- **机主在等的 4 件事（⛔ 替他决定）**：`Q-440`（274 走 P1 改 6 处规格文字 / 不改）· 按一次 `Ctrl+Alt+M`（票 290 形状②；球已被我停掉）· 关掉任务管理器 PID 6904（票 23 300 字复跑 + 314 AC#2）· `build/mut_rvw.go` 删还是留。
+- **★我这轮自己的错（接手当教训）**：① 裸跑 `go test ./cmd/wisp` 拿到 `RC=1` 零输出 ＝ **DLL 未同置的假红**（走 `scripts/wisp-cli-staged-tests.sh` 才对）；② 票 70 改名时 `git mv` 只 commit 了新路径 ⇒ 池里**一度把同一票数了两遍**（已 `eecf7afe3` 补提交删除）；③ 我转述证据件「36 形状＋1 汇总」时照抄错数，实际 **35 形状＋1 汇总＝36**（审计腿纠正我）。
+- **重启后第一件事**：确认路由行是 `magpie-high`＋`auto/glm-5.3-flash`，再放上面两单；写腿 ≤3、审计 ≤1–2、合计 ≤5。
