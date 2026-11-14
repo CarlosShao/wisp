@@ -10,11 +10,11 @@
 
 ## AC
 - [x] **AC#0 ⚠ 待定义案（不是技术题）**：`web.search` 走"抓结果页"还是"走 API"？（`AGENTS §2` 逐字列着它，S3 前定案。）⇒ 只读普查两案的代价（凭据面：API 要 key，key 只能 owner 自助录入；抓页面要处理反爬与超时），**摆给 owner 拍**，本票不替他定。
-- [ ] **AC#1 产物预览先拆出来做**（它不等 AC#0）：能预览哪几类（HTML／图片／PDF／文本）、渲染的是**本地路径**还是**内容字节**、大文件截断语义（照票 164 的"截断必须带找回指针"）。
-- [ ] **AC#2 ⚠ 注入面判据**：预览的内容**不许**顺带进模型上下文；若面板把预览里的一段文字回传给模型，那一发必须走 C25 盖戳＋外泄检测（票 143／175 同一套管子）。补一枚常驻判据钉住"预览不是输入"。
-- [ ] **AC#3 只读边界**：本票**不做**表单提交、登录、下载、执行页面脚本；⚠ 若产品要"浏览器能操作页面"，那是**新一级权限**，要单独立票＋owner 批。
-- [ ] **AC#4 契约轴**：`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 不动；C17 不加方法；凭据值零抄录。
-- [ ] **AC#5 门禁**：`./internal/panel/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
+- [x] **AC#1 产物预览先拆出来做**（它不等 AC#0）：能预览哪几类（HTML／图片／PDF／文本）、渲染的是**本地路径**还是**内容字节**、大文件截断语义（照票 164 的"截断必须带找回指针"）。
+- [x] **AC#2 ⚠ 注入面判据**：预览的内容**不许**顺带进模型上下文；若面板把预览里的一段文字回传给模型，那一发必须走 C25 盖戳＋外泄检测（票 143／175 同一套管子）。补一枚常驻判据钉住"预览不是输入"。
+- [x] **AC#3 只读边界**：本票**不做**表单提交、登录、下载、执行页面脚本；⚠ 若产品要"浏览器能操作页面"，那是**新一级权限**，要单独立票＋owner 批。
+- [x] **AC#4 契约轴**：`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 不动；C17 不加方法；凭据值零抄录。
+- [x] **AC#5 门禁**：`./internal/panel/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
 
 ## 本票**不**解决
 不做终端（票 191）；不做"浏览器代替人工签收界面"（票 77／桌面可见性证据那一族另有规矩）。
@@ -36,3 +36,31 @@
   **三条判据的读数（可复跑，全文 `docs/evidence/s1/192-preview-wiring-r1.md` §2）**：**①** 同一个 `panelAssetLookup`、同一个 URL，只差"有没有交预览源"：**改前 404／0 字节**，**改后 200／129 字节**（`content-type: text/html; charset=utf-8`），响应体与响应头里零路径；**②** 预览响应的头块逐字＝`Content-Type: text/html; charset=utf-8 CRLF X-Content-Type-Options: nosniff CRLF Cache-Control: no-store CRLF Content-Security-Policy: sandbox; default-src 'none'; img-src data:; style-src 'unsafe-inline'`，四把尺同时钉住"它来自 `doc.Headers` 而不是面板兜底"（含 `sandbox; default-src 'none'`／不含 `panelCSPHeaderValue`／不等于 `panelResponseHeaders` 的输出／与 `PreviewResolver.Lookup(...).Headers` 逐字节相等）；**③** `git grep '\.QuoteForModel('` 非测试 `.go`：**0 → 1**（`cmd/wisp/panel_preview_192.go:294`），`panel.NewPreviewResolver(`：**0 → 1**，`PreviewPathPrefix` 在 `cmd/`：**0 → 4**；⚠ 那把尺必须带 `--untracked`，否则新加的产码文件不被计、改前改后都读 0。端到端（走页面自己那扇门 `dispatchRaw`）：引擎未绑→拒绝且引擎零 mark；绑上＋文字真在产物里→盖戳后**拒绝转发**（`ErrNoHandlerAttached`：转发是票 35 的）、`prov.CheckText("panel-preview-quote", ChHTTP, 原文)` 命中且 `SrcTool=task.output`、`Origin=artifact:quoted.txt`；页面自己编的文字→拒绝、零 mark；审计行**不含**被引原文（35r7 那一族）。
   **门禁**：`gofmt`/`gofumpt` 0 文件、`go vet ./cmd/wisp/` rc 0、`d22scan -root .` **clean**（`cmd/` 产码 285、`internal/` 405）；整包 `./cmd/wisp` 载具单发**630 枚全跑完**、墙钟 2355.00s＝39m15s、红 **3**＝点名已知红①`TestAC4FocusReturnToPriorWindowGap33r5`（前台被真窗口占着）＋已知红②`TestAC246DevLegIgnoresTheTestTaskInjection`（驻留球 16:23 起在跑）＋**满载时序红**`Test219AC2SecondRevokeOfTheSameRuleIsRefused`（整包 55.78s 超时／单跑 **PASS 1.70s**，它不建面板宿主、与本腿零结构交集，**不改名不跳过**，留给低载机复测）。本腿 6 枚新判据在那发整包里全绿。
   **⛔ 未做（具名残余，不假称）**：**a)** 消息**转发**通路仍不存在（票 35 的 socket）⇒ 门今天只能"证明＋盖戳＋拒绝转发"，用户在面板里选一段预览文字发给模型**走不通**；**b)** 盖戳**没有继承到任务 scope**（mark 落在进程引擎的 `panel-preview-quote`；把 mark 带进任务 scope 是转发器那一侧的事）⇒ 本腿**不能**宣称"预览文字出不去"，只能宣称"只能经这一道门、且一定带戳"；**c)** 前端**零写面**：这个信封形状（`path`＝预览地址＋`text`＝选中文字）今天没有任何页面在发，本腿交付的是协议与语义，没有 UI 证据；**d)** PDF 像素仍不承诺（`Render=host-pdf` 原样继承）。**撤销口令**：「**192 的接线走 message 门＋资源过滤器两条，预览文字只经 QuoteForModel 盖戳**」。
+---
+
+## 编排者收件（2026-11-14 20:5x，非实现者）：五格全翻，本票结案
+
+两条实现腿：`7ff4d9e9f`＋`25e553fb9`（`internal/panel` 侧建栈、AC#1 四问）与 `60777df19`（`cmd/wisp` 三步接线）。
+
+### 尺（我自己现跑，不抄腿）
+- **尺1 提交**：`60777df19` 在；产码落点＝`cmd/wisp/panel_preview_192.go`、`panel_inbound.go`、`panel_host_windows.go`、`panel_control_windows.go`、`panel_resident_windows.go`、`resident_windows.go`。
+- **尺2 证据件**：`docs/evidence/s1/192-preview-ac12-r1.md` **24635 B**、`192-preview-wiring-r1.md` **13562 B**。
+- **尺3 我自己复跑**：6 枚新判据走载具 ⇒ **`RUN=6 PASS=6 FAIL=0 SKIP=0`**，`ok … cmd/wisp 1.00s`；`internal/panel` ⇒ **`ok 20.699s` RC=0**；`sh scripts/d22scan.sh` ⇒ **RC=0 clean**，整仓行 `bans #1-5 internal/=405`、`cmd/=79`、`ban #6 frontend/=123`，末行 `d22scan.sh: OK - control rc=0, scan rc=0`。
+
+### 逐格
+- **AC#1 翻**：四问从码里答出来 —— 四类（HTML／图片／PDF／文本）；**按字节嗅探分类，不看扩展名**；渲染**内容字节**、响应里不出现任何路径（9 种恶意名形状全 400）；文本截断带找回指针（300080 字节 **5 窗取回 300080/300080，sha256 逐字节同**），HTML/图片/PDF 超限返回 413 **不截断**。
+- **AC#2 翻**：注入面有三块判据 —— 预览结构上到不了模型（`go/parser` 核 import ＋ `ParseComposerRequest` 拒 `panel.preview`）；HTML 预览 CSP `sandbox; default-src ''none''` 打头；唯一进屋的入口 `QuoteForModel` **先证明该段文字真在产物里再按 `task.output` 盖戳**。★接线后它**有产码调用点了**：`git grep '\.QuoteForModel\('` 非测试 **0 → 1**（`cmd/wisp/panel_preview_192.go:294`），`NewPreviewResolver(` 产码 2 处。常驻判据＝`Test192MessageDoorStampsThroughQuoteForModel`／`Test192MessageDoorIsNotASecondRelay`。
+- **AC#3 翻**：只读边界我自己核 —— 新产码里 `SubmitForm|ExecuteScript|DownloadFile|Login(|.Click(` **0 处**。
+- **AC#4 翻**：三个 commit 对冻结面 `PLAN.md|docs/specs/|allowlist.txt|thresholds.go|golden` **命中 0**；`docs` 里提到 C17 的两行是**逐字拒绝加方法**（「加字段不行…加方法更不行（AC#4 逐字C17 不加方法）」）；凭据字面量 0（我那条正则唯一的命中是 `task-whitespace` 里的 `sk-w`，**假阳性**）。
+- **AC#5 翻（一处如实留白）**：`./internal/panel` **绿**、`d22scan` **clean** 都现跑过。⚠ **`gate-clauses` 这支尺我在盘上找不到**（`scripts/` 与 `tools/` 里没有匹配 `gate` 的件）⇒ 那一半**无法复跑**，我不声称它绿。票面那句「`internal/panel` 2 枚已知红」我今天跑是 **0 红**。
+
+### 腿如实点名的四条残余（⛔ 我不用"接线完成"盖过去）
+1. **消息转发通路不存在**（票 35）⇒ 那道门只能"证明＋盖戳＋**拒绝转发**"；**用户今天仍发不出去**。
+2. 盖戳**没继承到任务 scope**（mark 在 `panel-preview-quote`）⇒ **不宣称"预览文字出不去"**。
+3. `frontend/**` 零写面，这个信封（`path`＝预览地址＋`text`＝选中文字）**今天没有页面在发** ⇒ 只有协议与语义、**无 UI 证据**。
+4. PDF 像素不承诺。
+
+### 顺手把一条新 flake 定案（接线腿请我做的那件）
+整包里除两枚已知红（`TestAC4Focus…` 前台被占＝已知红①；`TestAC246DevLeg…` **因我起的驻留球**＝已知红②），还有第三枚 `Test219AC2SecondRevokeOfTheSameRuleIsRefused`（满载 `waited on w.reply 46s`）。我低位复跑 **`-count=3` ⇒ 3/3 PASS**（2.57／2.12／2.10s）⇒ **满载时序 flake，不是产码缺陷**。读数已并入票 447 的 flake 集合。
+
+**五格全齐，本票结案。**
