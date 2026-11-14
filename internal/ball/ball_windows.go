@@ -881,12 +881,13 @@ func (b *Ball) reclampPosition() {
 // bindings in, same live set out - so a host may call it on every config
 // poll; HotkeyReloader still diffs so the Win32 churn happens once per change.
 //
-// A rebind drops an in-flight Esc borrow (escTakenOver below): the new binding
-// set is the idle set, and the idle set does not include cancel (ticket 245).
-// A host that rebinds while a card is waiting therefore has to call
-// TakeEscForCancel again on the next state sync - no caller does that today
-// because the config poll and the card live on different legs, and the residual
-// is named in ticket 245 rather than papered over.
+// A rebind drops an in-flight cancel borrow (escTakenOver below): the new
+// binding set is the idle set, and the idle set holds a cancel binding only when
+// it carries a real modifier (ticket 245 AC#6②, cancelHeldWhileIdle). A host
+// that rebinds while a card is waiting therefore has to call TakeEscForCancel
+// again on the next state sync - no caller does that today because the config
+// poll and the card live on different legs, and the residual is named in ticket
+// 245 rather than papered over.
 func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 	var rep HotkeyReport
 	b.uiRun(func() {
@@ -945,11 +946,14 @@ func cloneAccel(m map[uint32]Accelerator) map[uint32]Accelerator {
 // (see uiRun): the B1 law is exactly "take the cancel key over when the machine
 // enters Confirming", and that verdict arrives inside a gesture callback.
 //
-// Ticket 245: this is the ONLY path that registers the cancel id. An idle ball
-// leaves it standby (see registerAllWith), so the bare-Esc production default is
-// not a desktop-wide hot key except for the 2-3 seconds a card is waiting - the
-// half of the cost that form B leaves on the table is named in the ticket's
-// residual entry, not hidden here.
+// Ticket 245: for a BARE cancel binding this is the ONLY path that registers
+// that id. An idle ball leaves the bare binding standby (see registerAllWith),
+// so the bare-Esc production default is not a desktop-wide hot key except for
+// the 2-3 seconds a card is waiting - the half of the cost that form B leaves on
+// the table is named in the ticket's residual entry, not hidden here. A cancel
+// binding with a real modifier is held while idle already (AC#6② ruling), and
+// this call simply re-establishes the same accelerator for the card; the return
+// puts it back.
 //
 // Ticket 260 形ⓐ: WHICH key that borrow registers now comes from this ball's
 // configured cancel binding (b.cancelBinding, the same value the idle line
@@ -992,18 +996,26 @@ func (b *Ball) TakeEscForCancel() {
 }
 
 // ReleaseEscAfterSession hands the borrowed cancel key back to the desktop (B1:
-// "会话结束必须归还") and returns the cancel slot to standby - it is NOT re-bound
-// to the configured binding, whether that binding is the product default bare Esc
-// (ticket 245's defect) or any key the user moved it to (ticket 260 made the
-// borrow follow the config; the return still drops exactly what was borrowed).
-// Idempotent.
+// "会话结束必须归还") and returns the cancel slot to the IDLE line - it is NOT
+// left holding the borrowed accelerator, whether that binding is the product
+// default bare Esc (ticket 245's defect) or any key the user moved it to (ticket
+// 260 made the borrow follow the config). Idempotent.
+//
+// What the idle line IS depends on the binding (ticket 245 AC#6② ruling): the
+// bare Esc goes back to standby unregistered, while a binding carrying a real
+// modifier is re-registered, because that one is permanent. Dropping it here
+// without putting it back would delete the user's own combination for the rest
+// of the process - the same one-way loss the bare-Esc defect was made of, only
+// pointed at the user who configured something safer.
 //
 // Ticket 245 AC#7: a session can end without the borrow ever having been lent -
 // Win32 refused it. There is no key to drop in that case, but the report still
 // carries the refusal line, and leaving it there describes a registration that
 // never happened: AllLive() stayed false and Problems() kept saying the key "was
 // not registered" for the life of the process. escBorrowRefused is how the
-// refused branch gets the same confirmation step as the lent one.
+// refused branch gets the same confirmation step as the lent one - and the
+// restoration above runs there too, because the refused borrow had already
+// dropped whatever the slot held before it tried.
 func (b *Ball) ReleaseEscAfterSession() {
 	b.uiRun(func() {
 		if !b.escTakenOver && !b.escBorrowRefused {
@@ -1015,8 +1027,9 @@ func (b *Ball) ReleaseEscAfterSession() {
 		b.escTakenOver = false
 		b.escBorrowRefused = false
 		// Back to the idle line for whatever the user configured (standby /
-		// disabled / unparsable), so the report describes the set Win32 holds.
-		b.hotkeyReport = b.hotkeyReport.withCancel(cancelIdleLine(b.cancelBinding))
+		// disabled / unparsable for a bare key; live or a real refusal for a
+		// modifier combination), so the report describes the set Win32 holds.
+		b.hotkeyReport = b.hotkeyReport.withCancel(cancelIdleLineWith(b.hwnd, b.cancelBinding))
 		b.registeredHotkeys = b.hotkeyReport.Live()
 	})
 }

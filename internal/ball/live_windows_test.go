@@ -130,12 +130,15 @@ func TestBallLiveLifecycle(t *testing.T) {
 		t.Fatal("animation timer alive in Sleeping (zero-timer discipline broken)")
 	}
 
-	// B1 / ticket 245, both ends on one real window: Confirming borrows the bare
-	// Esc (live set goes 3 -> 4 and Win32 stops handing Esc to anybody else),
-	// and leaving Confirming hands it back (live set 4 -> 3 and Win32 says the
-	// key is free again). The old shape logged "another app holds it" and
-	// carried on whether or not the ball had even tried; that logged-skip is now
-	// only available when the attempt is on the report as refused (HotkeyError /
+	// B1 / ticket 245, both ends on one real window: Confirming borrows the
+	// configured cancel key (Win32 stops handing it to anybody else for the
+	// length of the card), and leaving Confirming hands it back. This fixture's
+	// binding is a modifier combination, so since the AC#6② ruling the idle pass
+	// holds it on both sides of the round trip and the live set does not change
+	// size: what the two rulers read is WHO holds the key and that the bare Esc
+	// is never ours. The old shape logged "another app holds it" and carried on
+	// whether or not the ball had even tried; that logged-skip is now only
+	// available when the attempt is on the report as refused (HotkeyError /
 	// HotkeyTaken), which a mutated "never borrow" cannot produce.
 	b.SetState(statemachine.StateConfirming)
 	b.TakeEscForCancel()

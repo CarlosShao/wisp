@@ -201,8 +201,11 @@ func TestLiveHotkeyRebindEndToEnd(t *testing.T) {
 	})
 
 	// 1. The registration set at boot is asserted, not assumed (registry A1:
-	// "四项默认热键全注册失败、测试仍报 PASS"). Since ticket 245 the idle set is
-	// THREE, and the missing one is the cancel slot by design.
+	// "四项默认热键全注册失败、测试仍报 PASS"). This fixture's [hotkey] cancel is a
+	// modifier combination, so since the 2026-11-14 AC#6② ruling the idle set is
+	// FOUR: the cancel slot is held like the other three. What stays forbidden on
+	// an idle ball is a BARE key, whichever slot carries it - requireIdleRoster
+	// judges that, not a count.
 	boot := b.HotkeyReport()
 	if !boot.AllLive() {
 		t.Fatalf("boot registration incomplete: %+v", boot.Bindings())
@@ -232,7 +235,10 @@ func TestLiveHotkeyRebindEndToEnd(t *testing.T) {
 	seen := waitFor(3*time.Second, func() bool {
 		r.Check()
 		live := b.RegisteredHotkeys()
-		return len(live) == 3 && live[hkSummon].VK == 'R'
+		// Four entries: the three always-on slots plus this fixture's
+		// modifier-combination cancel, which the AC#6② ruling keeps held while
+		// idle. A rebind re-registers it along with the rest.
+		return len(live) == 4 && live[hkSummon].VK == 'R'
 	})
 	if !seen {
 		live := b.RegisteredHotkeys()
@@ -331,16 +337,15 @@ func TestLiveHotkeyOccupiedVsNotAttempted(t *testing.T) {
 	cfg.Mute = ""
 	cfg.Panel = "Ctrl+Alt+NotAKey+"
 	rep2 := b.RebindHotkeys(cfg)
-	// Cancel is the slot this test used to assert as "still live after its
-	// neighbours broke". Ticket 245 moved that property to the borrow: an idle
-	// ball must NOT hold cancel, so what has to survive a broken neighbour set is
-	// the cancel path's ABILITY to take Esc when Confirming asks for it.
-	if c, _ := rep2.Binding(hkCancel); c.Status != HotkeyStandby {
-		t.Errorf("cancel line after siblings failed = %+v, want standby (present in the report, "+
-			"never bound while idle)", c)
+	// Cancel is this fixture's modifier combination, so it survives its broken
+	// neighbours as a HELD binding (AC#6② ruling) instead of falling back to
+	// standby: a rebind that dropped it would silently delete the user's own key.
+	if c, _ := rep2.Binding(hkCancel); c.Status != HotkeyLive || c.Binding != liveHotkeys().Cancel {
+		t.Errorf("cancel line after siblings failed = %+v, want live %q: a configured combination is held "+
+			"while idle and a broken neighbour set is no reason to drop it", c, liveHotkeys().Cancel)
 	}
-	if rep2.IsLive(hkCancel) {
-		t.Error("ticket 245 RED: the rebalanced idle set still holds the cancel slot")
+	if !rep2.IsLive(hkCancel) {
+		t.Error("ticket 245 AC#6② RED: the rebalanced idle set dropped the configured cancel combination")
 	}
 	if mt, _ := rep2.Binding(hkMute); mt.Status != HotkeyDisabled || mt.Status.Attempted() {
 		t.Errorf("unset mute = %q, want disabled/never-attempted", mt.Status)
@@ -349,7 +354,7 @@ func TestLiveHotkeyOccupiedVsNotAttempted(t *testing.T) {
 		t.Errorf("junk panel = %q, want unparsable/never-attempted", pn.Status)
 	}
 	if rep2.AllLive() {
-		t.Error("AllLive true while three slots are not live")
+		t.Error("AllLive true while summon is occupied, mute is disabled and panel is unparsable")
 	}
 
 	// Free the squat and the same key goes live again: rebind unregisters all
@@ -494,10 +499,11 @@ func TestLiveSleepingZeroTimerHandles(t *testing.T) {
 // bound in one of the other three slots is the same defect under a different
 // name and a count reads it green, while a user-configured modifier combination
 // held while idle is not a defect at all (it takes nothing from another
-// application). "The cancel slot is not attempted while idle" is still pinned -
-// deterministically, by the idle-pass attempt counting in hotkey_status_test.go
-// and by ticket 260's TestConfiguredCancelStillNeverBoundWhileIdle260 - so the
-// ruling moved the judgment shape, not the behaviour.
+// application) and, since the 2026-11-14 ruling, IS held - so this fixture's
+// cancel slot is one of the four live entries and the ruler judges it by the
+// missing bare key rather than by counting. The bare half is pinned
+// deterministically, attempt count included, by
+// TestConfiguredCancelIdleBindingFollowsModifierRuling245.
 func requireIdleRoster(t *testing.T, b *Ball) {
 	t.Helper()
 	rep := b.HotkeyReport()
@@ -553,15 +559,21 @@ func probeBareEsc245(t *testing.T, b *Ball, attempts int) escIdleProbe245 {
 // what lets AC#8's control run without a desktop.
 
 // requireEscReturned is AC#2's "还" half on a real window: the roster is idle
-// again AND Win32 itself reports the key that was borrowed unclaimed.
+// again AND Win32 itself reports the borrowed key back where it belongs.
 //
 // Before ticket 260 those were the same probe - the borrow was always the bare
 // Esc, so requireIdleRoster's bare-Esc reading doubled as the return check. Once
 // the borrow follows [hotkey] cancel (形ⓐ), a non-default seed needs its OWN
-// free-reading or a release that never unregistered would be invisible, which is
+// reading or a release that never unregistered would be invisible, which is
 // precisely the zero-symptom shape this ticket family exists to keep loud. For
 // the default seed the borrowed key IS the bare Esc, so this adds no second
 // probe and the default档 reading stays bit-for-bit what ticket 245 shipped.
+//
+// Since the 2026-11-14 AC#6② ruling "where it belongs" is seed-dependent too: a
+// configured modifier combination is HELD while idle, so after the session end
+// the correct reading is "claimed, by our own set" - a free combination here
+// would mean the return deleted the user's permanent binding. A seed the parser
+// refused borrows the bare Esc, so the default reading (free) applies to it.
 func requireEscReturned(t *testing.T, b *Ball) {
 	t.Helper()
 	seed := b.ConfiguredHotkeys().Cancel
@@ -570,26 +582,28 @@ func requireEscReturned(t *testing.T, b *Ball) {
 		t.Fatal("ticket 245 RED: the cancel key is still marked taken over after the session end")
 	}
 	requireIdleRoster(t, b)
-	if wish.Default {
+	if wish.Default || wish.Refused != nil {
 		return // requireIdleRoster just proved the borrowed key - the bare Esc - is free
 	}
 	free, err := hotkeyFreeProbe(t, b, wish.Acc)
 	if err != nil {
 		t.Fatalf("the probe for the key the borrow held (%q / %+v) could not run: %v", seed, wish.Acc, err)
 	}
+	ours, held := b.RegisteredHotkeys()[hkCancel]
+	if held && ours != wish.Acc {
+		t.Fatalf("after the session end the ball holds %+v for the cancel slot, want the configured %q = %+v",
+			ours, seed, wish.Acc)
+	}
 	if free {
-		return
+		t.Fatalf("ticket 245 AC#6② RED: the configured cancel combination %q (%+v) is FREE on the desktop after "+
+			"the session end while the ball holds nothing for it (%t): the return dropped the user's permanent "+
+			"binding instead of putting it back", seed, wish.Acc, held)
 	}
-	// Still claimed. If our own set names that id, the return never happened; if
-	// the set is clean, either the UnregisterHotKey did not reach Win32 or
-	// something else took the key mid-run - and neither reading is a pass.
-	if _, ours := b.RegisteredHotkeys()[hkCancel]; ours {
-		t.Fatalf("ticket 245/260 RED: the borrowed %q (%+v) is still in the ball's own registration set after the "+
-			"session end: %s", seed, wish.Acc, accelSetString(b.RegisteredHotkeys()))
+	if !held {
+		t.Fatalf("the configured cancel combination %q (%+v) reads claimed on the desktop but is not in the "+
+			"ball's own registration set: either the UnregisterHotKey came after the restore or somebody else "+
+			"took the key mid-run, and neither is a pass", seed, wish.Acc)
 	}
-	t.Errorf("the borrowed %q (%+v) is still claimed on this desktop after the session end while the ball's own "+
-		"set is clean: the return never reached Win32, or the key was taken again mid-run - this run cannot tell "+
-		"those apart and neither one is a pass", seed, wish.Acc)
 }
 
 // ------------------------------------------------------------------ helpers

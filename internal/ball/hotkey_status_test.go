@@ -332,15 +332,15 @@ func TestRegisterAllSplitsFailureFamilies(t *testing.T) {
 	rep := registerAllWith(0, cfg, reg.register)
 
 	// summon survives a neighbour's failure. Cancel used to be asserted here as
-	// "also live"; since ticket 245 an idle ball must NOT hold cancel, so the
-	// independence-of-the-cancel-path property is asserted where it now lives:
-	// after the same broken set, the borrow still gets its registration (the
-	// cancel slot does not inherit its neighbours' failures).
+	// "also live"; since ticket 245 an idle ball must NOT hold a BARE cancel key,
+	// so the independence-of-the-cancel-path property is asserted where it now
+	// lives: after the same broken set, the borrow still gets its registration
+	// (the cancel slot does not inherit its neighbours' failures).
 	if !rep.IsLive(hkSummon) {
 		t.Fatalf("one failure dropped the others: %+v", rep.Bindings())
 	}
 	if c, _ := rep.Binding(hkCancel); c.Status != HotkeyStandby {
-		t.Errorf("cancel while neighbours failed = %q, want standby (idle balls never bind it)", c.Status)
+		t.Errorf("cancel while neighbours failed = %q, want standby (an idle ball never binds the bare key)", c.Status)
 	}
 	borrowReg := &fakeRegistry{}
 	if err := takeEscWith(borrowReg.unregister, borrowReg.register); err != nil {

@@ -4,21 +4,29 @@ package ball
 
 // Global hotkeys ([hotkey]: summon / mute / cancel / panel; SPEC-03 §4).
 //
-// B1 Esc rule, as ticket 245 makes it executable: the cancel binding is
-// borrowed for the duration of Confirming and MUST be handed back at session
-// end. "Borrowed" means exactly that - RegisterHotKey is desktop-wide, so an
-// idle ball that holds the cancel slot holds the user's Esc key away from
-// every other application on the machine (the production default binding IS
-// the bare "Esc", DefaultHotkeys below). The idle registration pass therefore
-// never registers this id at all (HotkeyStandby), and takeEscWithAcc /
-// releaseEscWith are the ONLY path that binds and unbinds it. WHEN the key is
-// borrowed and the fact that it is borrowed at all are ticket 245's ruling and
-// did not move; what ticket 260 形ⓐ moved is WHERE THE ACCELERATOR COMES FROM:
-// the borrow now registers the configured [hotkey] cancel binding
-// (resolveCancelBorrow), not a hard-coded one. Tests pin three directions: with
-// the slot unset the borrowed accelerator is still bit-for-bit
-// {MOD_NOREPEAT, VK_ESCAPE}, a configured binding is the one that lands, and
-// the return drops it again.
+// B1 Esc rule, as ticket 245 makes it executable, in the shape its AC#6②
+// ruling settled on: a BARE cancel key (the production default is the bare
+// "Esc", DefaultHotkeys below) is borrowed for the duration of Confirming and
+// MUST be handed back at session end. "Borrowed" means exactly that -
+// RegisterHotKey is desktop-wide, so an idle ball that holds a bare key holds
+// it away from every other application on the machine. The idle registration
+// pass therefore never registers a bare cancel binding at all (HotkeyStandby),
+// and takeEscWithAcc / releaseEscWith are its only bind/unbind pair.
+//
+// A cancel binding that carries a real modifier (Ctrl/Alt/Shift/Win) is NOT
+// that defect: it takes nothing from another application, and a user who
+// configures one is asking for a permanent binding. The idle pass registers it
+// like the other three slots and the borrow/return round trip leaves it held
+// (cancelHeldWhileIdle). The 2026-11-14 ruling on AC#6② is this split: the
+// defect is a bare key held globally, not a slot count of three.
+//
+// WHEN the bare key is borrowed and the fact that it is borrowed at all are
+// ticket 245's ruling and did not move; what ticket 260 形ⓐ moved is WHERE THE
+// ACCELERATOR COMES FROM: the borrow registers the configured [hotkey] cancel
+// binding (resolveCancelBorrow), not a hard-coded one. Tests pin three
+// directions: with the slot unset the borrowed accelerator is still
+// bit-for-bit {MOD_NOREPEAT, VK_ESCAPE}, a configured binding is the one that
+// lands, and the return drops it again.
 
 import (
 	"errors"
@@ -124,6 +132,12 @@ const (
 	vkEscape = 0x1B
 	vkSpace  = 0x20
 )
+
+// realModifiers are the Win32 modifier bits that make a hot key a COMBINATION
+// rather than a bare key. MOD_NOREPEAT is deliberately not one of them:
+// {MOD_NOREPEAT, VK_ESCAPE} is exactly the bare Esc that RegisterHotKey takes
+// away from every other application.
+const realModifiers = modAlt | modControl | modShift | modWin
 
 // ParseAccelerator parses "Ctrl+Alt+W" / "Esc" / "F9" style bindings.
 // Parse errors name the offending part; the caller logs and disables that
@@ -254,14 +268,15 @@ const (
 	// HotkeyError: attempted and refused for any other Win32 reason.
 	HotkeyError
 	// HotkeyStandby: NOT attempted, by design - ticket 245. The slot is
-	// configured and its binding parses fine, but an idle ball must not hold
-	// it, because the cancel binding's product default is the bare "Esc" key
-	// and RegisterHotKey takes a bare key from the WHOLE desktop. The cancel
+	// configured and its binding parses fine, but the binding is a BARE key
+	// (no Ctrl/Alt/Shift/Win) whose product default is "Esc", and
+	// RegisterHotKey takes a bare key from the WHOLE desktop. Such a cancel
 	// slot is HotkeyStandby whenever no card is waiting; TakeEscForCancel
 	// promotes it to HotkeyLive for the duration of Confirming and
-	// ReleaseEscAfterSession puts it back. The other three slots are never
-	// standby: summon / mute / panel are modifier combinations by default and
-	// are meant to be live the whole time the ball exists.
+	// ReleaseEscAfterSession puts it back. A cancel binding that carries a real
+	// modifier is never standby: it is registered at idle like summon / mute /
+	// panel (the 2026-11-14 AC#6② ruling: the defect is a bare key held
+	// globally, not a count of three).
 	HotkeyStandby
 )
 
@@ -351,10 +366,12 @@ func (r HotkeyReport) IsLive(id uint32) bool {
 }
 
 // AllLive reports every binding that an idle ball MAY hold is held: live,
-// disabled by config (the user asked for no key) or standby (ticket 245: the
-// cancel slot, which no idle ball may register at all). A binding that is
+// disabled by config (the user asked for no key) or standby (ticket 245: a BARE
+// cancel key, which no idle ball may register at all). A binding that is
 // occupied or broken still reads false here - the standby exemption is about
-// the one slot the design says must not be bound, not a blanket pass.
+// the one shape the design says must not be bound, not a blanket pass. A cancel
+// binding with a real modifier is held and reads live, so it passes the first
+// way, not through this exemption.
 func (r HotkeyReport) AllLive() bool {
 	for _, b := range r.bindings {
 		if b.Status != HotkeyLive && b.Status != HotkeyDisabled && b.Status != HotkeyStandby {
@@ -434,20 +451,45 @@ func hotkeyUnregisterer(hwnd windows.HWND) unregisterFn {
 // registerAll binds every hotkey an idle ball is allowed to hold on hwnd and
 // returns the outcome per binding. Failure of one binding never blocks the
 // others, and no failure is silent: each one carries a status the caller can
-// surface to the user. The cancel slot is the exception to "binds": it is
-// classified, never registered - see cancelIdleLine.
+// surface to the user. The cancel slot is the one conditional member of "binds":
+// a BARE key is classified, never registered (see cancelIdleLine), while a
+// binding with a real modifier is registered like the other three
+// (cancelHeldWhileIdle, the AC#6② ruling).
 func registerAll(hwnd windows.HWND, cfg HotkeyConfig) HotkeyReport {
 	return registerAllWith(hwnd, cfg, hotkeyRegisterer(hwnd))
+}
+
+// cancelHeldWhileIdle reports whether the idle state may HOLD this cancel
+// binding. Only a binding carrying a real modifier (Ctrl/Alt/Shift/Win) is
+// held: RegisterHotKey is desktop-wide, so a bare key would be taken from every
+// other application, which is the defect ticket 245 is about. A combination
+// steals nothing from another application, so leaving it unbound would buy the
+// ticket's cost without its benefit - a user who configures "Ctrl+Alt+X" is
+// asking for a permanent binding, in the same direction ApplyHotkeyDefaults
+// documents for this slot.
+//
+// Empty and unparsable bindings answer false: there is no key to hold, and
+// cancelIdleLine classifies them (disabled / unparsable) exactly as it always
+// did.
+func cancelHeldWhileIdle(bind string) bool {
+	acc, err := ParseAccelerator(bind)
+	if err != nil {
+		return false
+	}
+	return acc.Mods&realModifiers != 0
 }
 
 // cancelIdleLine classifies the cancel binding for the IDLE state without
 // registering it (ticket 245). An empty binding is still "disabled by config",
 // a junk binding is still "unparsable" (a config bug must stay visible), and a
-// good binding is HotkeyStandby: known, remembered, not bound.
+// bare key is HotkeyStandby: known, remembered, not bound.
 //
 // It parses the binding even though the parse result is thrown away, because
 // the two classifications above are defined by the parse outcome and this is
-// the same rule registerAll uses for every other slot.
+// the same rule registerAll uses for every other slot. A binding with a real
+// modifier never reaches this function from the idle pass - that one is held
+// (cancelHeldWhileIdle) - but a caller may still use it to describe a slot that
+// holds nothing, and then standby is the honest reading.
 func cancelIdleLine(bind string) HotkeyBinding {
 	b := HotkeyBinding{Name: "cancel", ID: hkCancel, Binding: bind}
 	switch {
@@ -476,48 +518,74 @@ func cancelIdleLine(bind string) HotkeyBinding {
 	return b
 }
 
+// registerHeldBinding is the classify-and-register body every always-on slot has
+// always run: empty is disabled, junk is unparsable, otherwise Win32 decides
+// between live / taken / failed. Since the AC#6② ruling the idle cancel slot
+// runs it too whenever its binding carries a real modifier, so the "held" path
+// and the three fixed slots cannot drift apart.
+func registerHeldBinding(b HotkeyBinding, reg registerFn) HotkeyBinding {
+	switch {
+	case b.Binding == "":
+		b.Status = HotkeyDisabled // disabled by config: never attempted
+		slog.Info("hotkey disabled (unset in config)", "hotkey", b.Name)
+	default:
+		acc, err := ParseAccelerator(b.Binding)
+		if err != nil {
+			b.Status = HotkeyUnparsable
+			b.Err = err
+			slog.Error("hotkey not attempted (bad binding)", "hotkey", b.Name,
+				"binding", b.Binding, "err", err)
+		} else if rerr := reg(b.ID, acc); rerr != nil {
+			b.Acc, b.Err = acc, rerr
+			if errors.Is(rerr, windows.ERROR_HOTKEY_ALREADY_REGISTERED) {
+				b.Status = HotkeyTaken
+				slog.Error("hotkey occupied by another program, not registered",
+					"hotkey", b.Name, "binding", b.Binding, "err", rerr)
+			} else {
+				b.Status = HotkeyError
+				slog.Error("hotkey registration failed",
+					"hotkey", b.Name, "binding", b.Binding, "err", rerr)
+			}
+		} else {
+			b.Status = HotkeyLive
+			b.Acc = acc
+		}
+	}
+	return b
+}
+
+// cancelIdleLineWith is the idle cancel line for a host that owns a window: a
+// bare binding keeps ticket 245's standby line (classified, never registered),
+// while a binding carrying a real modifier is REGISTERED, because the ruling on
+// AC#6② says that binding is permanent. ReleaseEscAfterSession calls this so a
+// combination the user configured is still held once a card is done - a return
+// that only dropped it would erase the user's binding for the life of the
+// process, which is the same one-way loss the bare-Esc defect was made of.
+func cancelIdleLineWith(hwnd windows.HWND, bind string) HotkeyBinding {
+	if !cancelHeldWhileIdle(bind) {
+		return cancelIdleLine(bind)
+	}
+	return registerHeldBinding(HotkeyBinding{Name: "cancel", ID: hkCancel, Binding: bind},
+		hotkeyRegisterer(hwnd))
+}
+
 // registerAllWith is registerAll over an injectable registrar.
 func registerAllWith(_ windows.HWND, cfg HotkeyConfig, reg registerFn) HotkeyReport {
 	rep := HotkeyReport{bindings: make([]HotkeyBinding, 0, len(hkNames))}
 	bindings := []string{cfg.Summon, cfg.Mute, cfg.Cancel, cfg.Panel}
 	for i, p := range hkNames {
-		if p.id == hkCancel {
-			// The one slot an idle ball must not register. takeEscWith is the
-			// only caller that ever binds this id, and releaseEscWith is the
-			// only one that drops it again - the borrow/return pair the B1 rule
-			// was written as and that a desktop-wide default Esc made permanent.
+		if p.id == hkCancel && !cancelHeldWhileIdle(bindings[i]) {
+			// A bare cancel key is the one binding an idle ball must not
+			// register. takeEscWith is the only caller that ever binds this id
+			// for that shape, and releaseEscWith is the only one that drops it
+			// again - the borrow/return pair the B1 rule was written as and that
+			// a desktop-wide default Esc made permanent. A configured
+			// combination falls through to registerHeldBinding below (AC#6②).
 			rep.bindings = append(rep.bindings, cancelIdleLine(bindings[i]))
 			continue
 		}
-		b := HotkeyBinding{Name: p.name, ID: p.id, Binding: bindings[i]}
-		switch {
-		case b.Binding == "":
-			b.Status = HotkeyDisabled // disabled by config: never attempted
-			slog.Info("hotkey disabled (unset in config)", "hotkey", b.Name)
-		default:
-			acc, err := ParseAccelerator(b.Binding)
-			if err != nil {
-				b.Status = HotkeyUnparsable
-				b.Err = err
-				slog.Error("hotkey not attempted (bad binding)", "hotkey", b.Name,
-					"binding", b.Binding, "err", err)
-			} else if rerr := reg(p.id, acc); rerr != nil {
-				b.Acc, b.Err = acc, rerr
-				if errors.Is(rerr, windows.ERROR_HOTKEY_ALREADY_REGISTERED) {
-					b.Status = HotkeyTaken
-					slog.Error("hotkey occupied by another program, not registered",
-						"hotkey", b.Name, "binding", b.Binding, "err", rerr)
-				} else {
-					b.Status = HotkeyError
-					slog.Error("hotkey registration failed",
-						"hotkey", b.Name, "binding", b.Binding, "err", rerr)
-				}
-			} else {
-				b.Status = HotkeyLive
-				b.Acc = acc
-			}
-		}
-		rep.bindings = append(rep.bindings, b)
+		rep.bindings = append(rep.bindings, registerHeldBinding(
+			HotkeyBinding{Name: p.name, ID: p.id, Binding: bindings[i]}, reg))
 	}
 	return rep
 }
@@ -636,8 +704,9 @@ func takeEscBorrow(hwnd windows.HWND, b cancelBorrow) error {
 // re-bound here, and that is the point (ticket 245) - re-registering the
 // configured binding on the way out would put the production default (a bare
 // Esc) straight back on the desktop, which is the exact defect this ticket is
-// about. The idle registration pass owns the cancel slot's spelling again after
-// this returns, as a standby line.
+// about. The idle pass owns the cancel slot's spelling again after this returns:
+// a standby line for a bare key, a held one for a modifier combination (ticket
+// 245 AC#6②, cancelIdleLineWith).
 func releaseEscWith(unreg unregisterFn) { unreg(hkCancel) }
 
 // releaseEsc hands the borrowed cancel key back to the desktop (B1: "会话结束

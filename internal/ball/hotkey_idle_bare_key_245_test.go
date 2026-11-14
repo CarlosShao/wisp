@@ -23,12 +23,13 @@ package ball
 //   - a registration WITH a modifier is not that defect. Under this nail a
 //     user-configured "Ctrl+Alt+V" cancel may be held while idle.
 //
-// What this file does NOT change is behaviour: the idle pass still never
-// registers the cancel slot (registerAllWith's skip is untouched), and ticket
-// 260's TestConfiguredCancelStillNeverBoundWhileIdle260 still pins that no
-// attempt is made. The bare-key rule is the second, independent ruler: it reds
-// on the shipped default (bare Esc) whether it arrives as a cancel borrow, as a
-// configured cancel, or as a bare key in one of the other three slots.
+// What makes the rule reachable is the 2026-11-14 AC#6② ruling: the idle pass
+// never registers a BARE cancel binding (registerAllWith's skip), and it does
+// register one that carries a real modifier. Both halves are pinned with attempt
+// counts by TestConfiguredCancelIdleBindingFollowsModifierRuling245. The bare-key
+// rule is the second, independent ruler: it reds on the shipped default (bare Esc)
+// whether it arrives as a cancel borrow, as a configured cancel, or as a bare key
+// in one of the other three slots.
 
 import (
 	"fmt"

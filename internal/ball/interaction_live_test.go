@@ -172,7 +172,8 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 		},
 	})
 	// AC#1 at the interaction level: with no card waiting, this real window holds
-	// three hot keys and the desktop still has its Esc.
+	// this fixture's three always-on hot keys plus its modifier-combination cancel
+	// (held while idle since the AC#6② ruling), and the desktop still has its Esc.
 	requireIdleRoster(t, b)
 
 	// Walk D43 to Confirming: #4 summon, #11 vad-stop, #15 first token with a
@@ -213,8 +214,10 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	}
 	// AC#2, second end - the half this ticket exists for: once the card is gone
 	// the key is handed BACK, and "handed back" is read from Win32 (a foreign
-	// id can register the bare Esc again), not from our own bookkeeping. This is
-	// also why release does not re-bind the configured cancel key.
+	// id sees the key claimed again), not from our own bookkeeping. For this
+	// fixture - a modifier combination - the idle pass holds it, so the return
+	// restores that binding rather than leaving the slot empty: the ruling is
+	// "bare keys are borrowed, combinations are permanent" (AC#6②).
 	if b.EscTakenOver() {
 		t.Fatal("Esc still taken over outside Confirming: B1 return violated")
 	}
@@ -252,11 +255,10 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if b.EscTakenOver() {
 		t.Fatal("Esc not returned after the session")
 	}
-	// Ticket 245 replaced "the configured cancel binding is live again" with the
-	// opposite expectation: after the return the idle roster must be three and
-	// Win32 must report the bare Esc unclaimed. A release that re-registered the
-	// configured binding would put the production default (a bare Esc) back on
-	// the desktop, which is the defect this test now has to be able to see.
+	// The ruling this step reads (AC#6②, 2026-11-14): a BARE cancel key goes back
+	// to standby and the desktop keeps it; this fixture's modifier combination is
+	// held again by the idle pass. Either way the return never invents a binding
+	// the config did not ask for - it restores exactly what the idle pass owns.
 	requireEscReturned(t, b)
 
 	// A single click cancels too (the same veto event, the gesture table says).
@@ -279,7 +281,8 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 		t.Error("click-cancel left Esc taken over")
 	}
 	// The click end of the veto path owes the same return reading as the key
-	// end: whoever dismissed the card, the bare Esc is not ours any more.
+	// end: whoever dismissed the card, the cancel slot is back to what the idle
+	// pass holds (standby for a bare key, the configured combination here).
 	requireEscReturned(t, b)
 }
 

@@ -23,8 +23,17 @@ package ball
 // re-measures rather than assumes): a Ball whose ui-sta thread is this test
 // goroutine, b.hwnd naming a handle this process does not own, so RegisterHotKey
 // refuses with ERROR_INVALID_WINDOW_HANDLE before anything is lent. No t.Skip
-// anywhere, no desktop taken: the planted cancel binding is a modifier
-// combination, never the bare Esc.
+// anywhere, no desktop taken.
+//
+// The planted cancel binding is the BARE "Esc" (ticket 245 AC#6② ruling: the bare
+// key is the shape that is still borrowed only during Confirming, so it is the
+// shape AC#7's refused-borrow ruler is about; a modifier combination is held while
+// idle now and never reaches a refusal through this door). An earlier round used a
+// modifier combination here so that no bare key could ever leave the desktop; that
+// safety now lives in the door itself: the closure asks IsWindow first and refuses
+// to walk ANY of the borrow/return steps unless the planted handle is provably not
+// a window, so a machine where 0x001D0A5E happens to be a live window fails the
+// case without touching RegisterHotKey.
 
 import (
 	"errors"
@@ -43,9 +52,11 @@ const (
 	// 0xFFFFFFFF (HWND_MESSAGE is a real special window).
 	t245PlantHWND = uintptr(0x001D0A5E)
 
-	// t245CancelBinding is a modifier combination: even if the plant were
-	// somehow accepted, no bare key could leave the desktop.
-	t245CancelBinding = "Ctrl+Alt+F8"
+	// t245CancelBinding is the shipped bare "Esc": the one shape ticket 245 still
+	// borrows only during Confirming, and therefore the shape AC#7's refused-borrow
+	// return is about. The door below proves the plant is not a window before any
+	// RegisterHotKey call, so this value cannot reach the desktop.
+	t245CancelBinding = "Esc"
 
 	// t245WerrInvalidWindowHandle is raw Win32 1400, spelled as a number so this
 	// file's expectation does not move with the constant the code under test uses.
@@ -152,6 +163,13 @@ func t245Run(t *testing.T, mode t245Mode) t245Reading {
 
 	s.start(func(st *staThread) error {
 		o.plantIsWin, _, _ = t245IsWindow.Call(t245PlantHWND)
+		if o.plantIsWin != 0 {
+			// The plant is a live window after all. Never walk the borrow/return
+			// steps in that case: the planted binding is the bare Esc, and
+			// RegisterHotKey would hand it to that window for real. The case fails
+			// on the plantIsWin assertion, and nothing here touched the desktop.
+			return errT245NoWindowDoor
+		}
 		o.inline = windows.GetCurrentThreadId() == st.threadID()
 		b.hwnd = windows.HWND(t245PlantHWND)
 		o.entered = true

@@ -38,11 +38,12 @@ package ball
 //     same door ticket 33's sta_release_windows_test.go measures at non-winelive.
 //
 // So the rig is a ball with no window, no renderer and no tray, whose ui-sta thread
-// IS the test goroutine, whose report starts as the healthy idle one (three live
-// slots plus ticket 245's standby cancel line, built through the deterministic fake
-// registry - which is never called for the cancel slot at all), and whose b.hwnd
-// names a handle this process does not own. Then the shipped TakeEscForCancel runs
-// end to end and the refusal it meets is the real one.
+// IS the test goroutine, whose report starts as the healthy idle one - three
+// always-on slots plus the cancel slot, which the AC#6② ruling keeps held while
+// idle because this fixture's binding is a modifier combination, built through the
+// deterministic fake registry - and whose b.hwnd names a handle this process does
+// not own. Then the shipped TakeEscForCancel runs end to end and the refusal it
+// meets is the real one.
 //
 // Deliberate restraint: the planted cancel binding is a modifier combination and
 // never the bare Esc. Handle validation happens before registration, so the attempt
@@ -151,17 +152,19 @@ func t260r5RunBorrow(t *testing.T, cfg HotkeyConfig, preBorrowed bool) t260r5Rea
 
 	// The seed: the idle report production builds at boot (createOnSTA,
 	// ball_windows.go:250), through the deterministic fake registry ticket 64/245
-	// built. Nothing in it is a failure line - the only thing that can make the
-	// cancel slot stop being standby is the code under test.
+	// built. The planted binding is a modifier combination, so since the AC#6②
+	// ruling the idle pass HOLDS the cancel slot: exactly one attempt, a live line
+	// carrying that combination, nothing wrong. The only thing that may move that
+	// line is the code under test.
 	reg := &fakeRegistry{}
 	seed := registerAllWith(0, cfg, reg.register)
-	if n := reg.attemptsOf(hkCancel); n != 0 {
-		t.Fatalf("the rig's own seed registered the cancel slot (%d attempts): ticket 245's idle rule is already "+
-			"broken inside the fixture, so nothing below can tell a fixture from a wiring failure", n)
+	if n := reg.attemptsOf(hkCancel); n != 1 {
+		t.Fatalf("the rig's own seed made %d RegisterHotKey attempts for the modifier-combination cancel, want 1: "+
+			"the AC#6② ruling holds that binding while idle, so the fixture no longer matches production", n)
 	}
-	if c, ok := seed.Binding(hkCancel); !ok || c.Status != HotkeyStandby || c.Err != nil {
-		t.Fatalf("the seed cancel line = %+v (present=%t), want a standby line with no error - the failure this "+
-			"case looks for must be written by ball_windows.go:895, not already be there before the borrow", c, ok)
+	if c, ok := seed.Binding(hkCancel); !ok || c.Status != HotkeyLive || c.Err != nil {
+		t.Fatalf("the seed cancel line = %+v (present=%t), want the live line of the held combination - the failure "+
+			"this case looks for must be written by ball_windows.go:895, not already be there before the borrow", c, ok)
 	}
 	seedProbs := seed.Problems()
 
@@ -196,6 +199,13 @@ func t260r5RunBorrow(t *testing.T, cfg HotkeyConfig, preBorrowed bool) t260r5Rea
 	// runs and staThread.hwnd is never set - no window is created anywhere in here.
 	s.start(func(st *staThread) error {
 		o.plantIsWin, _, _ = t260r5IsWindow.Call(t260r5PlantHWND)
+		if o.plantIsWin != 0 {
+			// The plant turned out to be a live window. Walking the borrow anyway
+			// would hand RegisterHotKey a real target for a combination this rig
+			// does not own, so stop here: the case fails on its plantIsWin
+			// assertion, and the desktop was never touched.
+			return errT260r5NoWindowDoor
+		}
 		o.inline = windows.GetCurrentThreadId() == st.threadID()
 		b.hwnd = windows.HWND(t260r5PlantHWND)
 		o.entered = true

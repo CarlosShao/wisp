@@ -15,14 +15,16 @@ package ball
 //	  not the one borrowed;
 //	③ a configured binding the parser refuses falls back to the default AND says
 //	  so on the receipt (P6) - no swallowed parse failure;
-//	④ plus the two "借的时机与存在性一字不动" guards from ticket 245: the idle pass
-//	  still never binds the cancel slot, and the borrow still happens exactly once
-//	  per card for whatever binding the config says.
+//	④ plus the "借的时机与存在性" guards from ticket 245, in the shape the 2026-11-14
+//	  AC#6② ruling settled: the idle pass still never registers a BARE cancel
+//	  binding, a modifier-combination one is held while idle, and the borrow still
+//	  happens exactly once per card for whatever binding the config says.
 //
 // Deterministic layer: the fake registry is the one ticket 64/245 built in
 // hotkey_status_test.go, so these run in the default suite and take no desktop.
 
 import (
+	"errors"
 	"strings"
 	"syscall"
 	"testing"
@@ -286,39 +288,126 @@ func TestBorrowFailureNamesTheKeyItTried260(t *testing.T) {
 	}
 }
 
-// TestConfiguredCancelStillNeverBoundWhileIdle260 is the ticket-245 boundary guard:
-// making the borrow read the config must not have promoted the cancel slot into
-// the idle set, and the return must still drop it without re-binding.
-func TestConfiguredCancelStillNeverBoundWhileIdle260(t *testing.T) {
-	cfg := ApplyHotkeyDefaults(HotkeyConfig{Cancel: "Ctrl+Alt+K"})
+// TestConfiguredCancelIdleBindingFollowsModifierRuling245 is ticket 245 AC#6②'s
+// criterion on the idle registration pass, in the shape the 2026-11-14 ruling
+// settled. The old guard here said "a configured cancel is NEVER bound while
+// idle"; the ruling narrowed that to BARE keys, because the defect the ticket is
+// about is a bare key taken from the whole desktop, not a steady-state slot count
+// of three. So both halves are judged, each with its own reading:
+//
+//   - a cancel binding with a real modifier (Ctrl+Alt+K) is HELD while idle:
+//     attempted once, live in the very report the host prints
+//     (HotkeyReport), and free of problem lines. A user who configures a
+//     combination is asking for a permanent binding, and it steals nothing from
+//     another application - which is also the direction ApplyHotkeyDefaults
+//     documents for this slot;
+//   - a BARE key (the shipped "Esc") is still standby: never attempted, still
+//     carried on the report, and the borrow still binds it exactly once for
+//     Confirming while the return still drops it without re-binding. That half is
+//     today's behaviour, one word unchanged.
+//
+// Both halves read the seam the host consumes (HotkeyReport / EscTakenOver), not
+// only the unexported slice, because that is where AC#6② is judged.
+func TestConfiguredCancelIdleBindingFollowsModifierRuling245(t *testing.T) {
+	// (1) The ruled-in case: a modifier combination is held while idle.
+	const combo = "Ctrl+Alt+K"
+	cfg := ApplyHotkeyDefaults(HotkeyConfig{Cancel: combo})
 	reg := &fakeRegistry{}
 	rep := registerAllWith(0, cfg, reg.register)
-
-	if n := reg.attemptsOf(hkCancel); n != 0 {
-		t.Fatalf("ticket 245 RED: the idle registration pass bound the cancel slot (%d attempts, set %v) - "+
-			"ticket 260 changed where the borrow's key comes from, not when it happens", n, reg.attempted)
-	}
-	if c, _ := rep.Binding(hkCancel); c.Status != HotkeyStandby || c.Binding != cfg.Cancel {
-		t.Errorf("idle cancel line = %+v, want standby carrying the configured spelling %q", c, cfg.Cancel)
-	}
-	if len(rep.Live()) != 3 {
-		t.Errorf("idle live set = %d, want 3: %+v", len(rep.Live()), rep.Bindings())
-	}
-
-	if err := takeEscWithAcc(reg.unregister, reg.register, resolveCancelBorrow(cfg.Cancel)); err != nil {
-		t.Fatalf("the borrow itself failed: %v", err)
-	}
 	if n := reg.attemptsOf(hkCancel); n != 1 {
-		t.Fatalf("the card borrowed %d registrations, want exactly 1", n)
+		t.Fatalf("AC#6② RED: the idle pass made %d RegisterHotKey attempts for a modifier-combination cancel "+
+			"(want exactly 1: a combination is held, not borrowed): %v", n, reg.attempted)
 	}
-	releaseEscWith(reg.unregister)
-	if n := reg.attemptsOf(hkCancel); n != 1 {
+	wantAcc, err := ParseAccelerator(combo)
+	if err != nil {
+		t.Fatalf("ParseAccelerator(%q): %v", combo, err)
+	}
+	c, ok := rep.Binding(hkCancel)
+	if !ok || c.Status != HotkeyLive || c.Binding != combo || c.Acc != wantAcc {
+		t.Fatalf("AC#6② RED: idle cancel line = %+v (present=%t), want live %q / %+v", c, ok, combo, wantAcc)
+	}
+	if !rep.IsLive(hkCancel) {
+		t.Fatalf("AC#6② RED: the cancel slot is not in the idle live set: %+v", rep.Bindings())
+	}
+	if n := len(rep.Live()); n != 4 {
+		t.Errorf("idle live set = %d, want 4 while a cancel combination is held: %+v", n, rep.Bindings())
+	}
+	if p := rep.Problems(); len(p) != 0 {
+		t.Errorf("a held cancel combination reports problems: %q", p)
+	}
+	if _, held := idleBareKeyHeld245(rep); held {
+		t.Errorf("the held combination was read as a bare key: %+v", rep.Bindings())
+	}
+	if reds := idleRosterReds245(rep); len(reds) != 0 {
+		t.Errorf("the AC#6② nail reds on a held modifier combination: %v", reds)
+	}
+	live, taken := cancelIdleSeam245(t, rep, combo)
+	if !live {
+		t.Error("AC#6② RED: HotkeyReport().IsLive(cancel) is false for a configured combination")
+	}
+	if taken {
+		t.Error("EscTakenOver() reads true at steady state: nothing was borrowed")
+	}
+
+	// (2) The unchanged case: the bare Esc is standby, never attempted.
+	bare := ApplyHotkeyDefaults(HotkeyConfig{Cancel: "Esc"})
+	reg2 := &fakeRegistry{}
+	rep2 := registerAllWith(0, bare, reg2.register)
+	if n := reg2.attemptsOf(hkCancel); n != 0 {
+		t.Fatalf("ticket 245 RED: the idle pass attempted a BARE cancel key (%d attempts): %v", n, reg2.attempted)
+	}
+	if reg2.bindsEsc() {
+		t.Fatalf("ticket 245 RED: the idle pass bound the bare Esc: %v", reg2.attemptedAcc)
+	}
+	bc, _ := rep2.Binding(hkCancel)
+	if bc.Status != HotkeyStandby || bc.Binding != "Esc" || bc.Acc != (Accelerator{}) {
+		t.Fatalf("bare cancel idle line = %+v, want standby \"Esc\" with a zero accelerator", bc)
+	}
+	if n := len(rep2.Live()); n != 3 {
+		t.Errorf("idle live set with a bare cancel = %d, want 3: %+v", n, rep2.Bindings())
+	}
+	liveBare, takenBare := cancelIdleSeam245(t, rep2, "Esc")
+	if liveBare {
+		t.Error("ticket 245 RED: HotkeyReport().IsLive(cancel) is true for the bare Esc at steady state")
+	}
+	if takenBare {
+		t.Error("EscTakenOver() reads true at steady state for the bare Esc")
+	}
+	if err := takeEscWithAcc(reg2.unregister, reg2.register, resolveCancelBorrow(bare.Cancel)); err != nil {
+		t.Fatalf("the bare borrow was refused: %v", err)
+	}
+	if n := reg2.attemptsOf(hkCancel); n != 1 {
+		t.Fatalf("the card borrowed the bare Esc %d times, want exactly 1", n)
+	}
+	releaseEscWith(reg2.unregister)
+	if n := reg2.attemptsOf(hkCancel); n != 1 {
 		t.Fatalf("after the return cancel attempts = %d, want still 1 - the return must drop the slot, "+
 			"not re-bind the configured key (ticket 245)", n)
 	}
-	if n := reg.unregistersOf(hkCancel); n < 1 {
+	if n := reg2.unregistersOf(hkCancel); n < 1 {
 		t.Fatal("the return never called UnregisterHotKey for the cancel slot")
 	}
+}
+
+// cancelIdleSeam245 reads a finished idle report through the two accessors the
+// host and the acceptance use: Ball.HotkeyReport() and Ball.EscTakenOver(). The
+// ball is windowless and its ui-sta thread IS this goroutine, the same door the
+// AC#7 rig measured (hotkey_refused_borrow_release_245_test.go), so the reads run
+// inline and cost no desktop.
+func cancelIdleSeam245(t *testing.T, seed HotkeyReport, cancelBinding string) (live, taken bool) {
+	t.Helper()
+	b := &Ball{hotkeyReport: seed, cancelBinding: cancelBinding}
+	b.sta = newSTAThread(nil)
+	b.sta.start(func(*staThread) error {
+		live = b.HotkeyReport().IsLive(hkCancel)
+		taken = b.EscTakenOver()
+		return errT245NoWindowDoor
+	})
+	if err := b.sta.waitStarted(); !errors.Is(err, errT245NoWindowDoor) {
+		t.Fatalf("the windowless ui-sta door did not take its create-error exit (err=%v): the reads above "+
+			"would describe a pump that is not running", err)
+	}
+	return live, taken
 }
 
 // TestLiveBorrowHelperPremiseIsConfigDependent260 records a reading, not a fix: the
