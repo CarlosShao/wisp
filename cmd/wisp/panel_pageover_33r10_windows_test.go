@@ -294,8 +294,12 @@ func TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe(t *testing.T) {
 		}
 
 		// The bytes the final act's URL is served from: the resource filter's own
-		// lookup, asked the same question a request under panelOrigin asks.
-		data, ctype, status, reason := panelAssetLookup(assets, panelEntryURL)
+		// lookup, asked the same question a request under panelOrigin asks. nil
+		// preview = a host with no preview source, which is this ruler's shape
+		// (it builds the manager from NewPanelManager with no option) and the
+		// pre-192 shape of the lookup itself.
+		resp := panelAssetLookup(assets, nil, panelEntryURL)
+		data, ctype, status, reason := resp.Data, resp.ContentType, resp.Status, resp.Reason
 		t.Logf("AC#13 33-r10 serving seam: panelAssetLookup(%q) = status %d %q, %d byte(s), content-type %q", panelEntryURL, status, reason, len(data), ctype)
 		if status != 200 {
 			t.Errorf("the entry URL the final handover navigates to is answered %d %q by the filter's own lookup: the navigation would land on nothing", status, reason)

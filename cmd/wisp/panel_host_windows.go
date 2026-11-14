@@ -271,6 +271,13 @@ type PanelManager struct {
 	// keeps the pre-ticket posture - hide, never destroy (C27). Read through
 	// KeepAliveOnHide by the one production hide path.
 	keepAlive func() bool
+
+	// preview is the artifact preview stack the filter answers /__artifact/
+	// from (ticket 192's wiring leg, withArtifactPreview). nil is the
+	// pre-ticket shape: no preview source, so that prefix 404s through the
+	// embed like every other path the bundle does not own. It is read by
+	// bringUp's installAssetFilter call and by nothing else.
+	preview panelPreviewLookup
 }
 
 // panelHostOption is one thing the assembly root may hand the panel host at
@@ -316,6 +323,21 @@ func withPanelEnabled(src func() bool) panelHostOption {
 // from panelHolder. Nothing here invents a second teardown path.
 func withPanelKeepAlive(src func() bool) panelHostOption {
 	return func(m *PanelManager) { m.keepAlive = src }
+}
+
+// withArtifactPreview hands the host the artifact preview stack (ticket 192's
+// wiring leg). It is an option for the same reason the three above are: every
+// pre-192 construction site passes none, and "no preview source" is a real
+// state of this host (a host wired to no artifacts tree 404s that prefix
+// through the embed, which is exactly the pre-ticket behaviour).
+//
+// It is NOT a config or a path: the argument is the process's ONE preview
+// stack (cmd/wisp/panel_preview_192.go's panelPreviewSource), built by the
+// assembly root over the data root it already resolved. The host therefore
+// learns nothing about where artifacts live and cannot open a second tree -
+// the same rule ticket 214's ingest sink follows.
+func withArtifactPreview(preview panelPreviewLookup) panelHostOption {
+	return func(m *PanelManager) { m.preview = preview }
 }
 
 // NewPanelManager wires one host to the inbound router and the embedded asset
@@ -385,6 +407,28 @@ func (m *PanelManager) windowOptions() webview2.WindowOptions {
 		Title:  panelTitle,
 		Width:  uint(width),
 		Height: uint(height),
+	}
+}
+
+// BindPreviewProvenance hands the preview-quote door this process's C25 engine
+// (ticket 192's wiring leg). It is the second half of the assembly: the source
+// (and with it the door) is built by newResidentPanelManager, which runs before
+// the task pipeline exists, and the engine is src.run.c25, which the pipeline
+// creates - so the bind crosses that ordering the way ticket 186's workspace
+// holder and ticket 214's draft ledger do, on the one boot line where the
+// runtime first exists (cmd/wisp/resident_windows.go).
+//
+// nil is a no-op and a host with no preview source is a no-op too: an unbound
+// door refuses with QuoteForModel's own sentence (no engine, no stamp, no
+// model), which is the fail-closed answer, never a panic and never a silent
+// pass. A typed nil (*risk.Provenance)(nil) is the caller's to avoid - the
+// resident call site tests the field itself before calling this.
+func (m *PanelManager) BindPreviewProvenance(marker panel.TaintMarker) {
+	if m == nil || marker == nil {
+		return
+	}
+	if src, ok := m.preview.(*panelPreviewSource); ok && src != nil {
+		src.bindMarker192(marker)
 	}
 }
 
@@ -640,7 +684,13 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	// affected by it (it shows an about:blank document). Dropping this call is
 	// the measured bad world of 299-r1's counter-control: the page then cannot
 	// fetch its own js/css, because no filter matches the request.
-	c.installAssetFilter(m.assets)
+	//
+	// Ticket 192's wiring leg adds the second tree this filter answers: the
+	// preview stack handed to the host by withArtifactPreview. It rides the same
+	// filter on purpose (a preview is a resource request under the panel origin,
+	// not a C17 method), so "the page can draw a preview" and "the page can send
+	// one" stay different capabilities.
+	c.installAssetFilter(m.assets, m.preview)
 
 	// The one inbound door. JS -> Go via a bound function over the WebView2
 	// message channel; the returned string is the receipt that reaches the page.

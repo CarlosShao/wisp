@@ -1,0 +1,8 @@
+$ go vet ./cmd/wisp/
+rc=0
+$ gofmt -l <files>
+
+rc=0
+$ go run mvdan.cc/gofumpt@v0.12.0 -l <same files>
+
+rc=0

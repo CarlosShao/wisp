@@ -293,7 +293,7 @@ func panelKeepAliveSource(dataDir string) func() bool {
 // write that would race the page's own dispatch goroutine. Until the task source
 // binds it, the handler refuses by name - this process has no tree to switch to
 // yet, and saying so beats narrowing a scope nothing else uses.
-func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm) (*panel.ComposerDispatch, *config.Manager, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
+func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm, preview *panelPreviewSource) (*panel.ComposerDispatch, *config.Manager, *panel.WorkspaceScopeHolder, *attachmentDraftLedger, error) {
 	// Said once per start, same posture the CLI seam takes: name the tier that was
 	// not taken rather than leave the operator to infer it.
 	auditf("%s", residentPanelHotReloadNote)
@@ -309,7 +309,7 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm
 	// dimensions off this SAME object the settings door writes through
 	// (panel_resident_pump.go), so a read and the next write hold one config
 	// truth. No second Manager is built anywhere in this leg.
-	disp, mgr, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm, drafts)
+	disp, mgr, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm, drafts, preview)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -345,7 +345,19 @@ func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelM
 		slog.Info("panel host: " + line)
 		fmt.Printf("wisp: %s\n", line)
 	}
-	disp, cfgMgr, workspaceScope, drafts, err := newResidentComposerDispatch(dataDir, auditf, confirm)
+	// Ticket 192's wiring leg, step 2: the preview stack is assembled HERE, by
+	// the composition root, over the data root this boot already resolved - and
+	// the SAME object goes to both surfaces that need it: the chain's message
+	// door (below, so a preview quote is stamped before anything else happens to
+	// it) and the host's resource filter (the withArtifactPreview option, so the
+	// page can draw what it is quoting from). One source means one artifacts
+	// directory, one name guard and one set of preview budgets for the window
+	// and the door; two would be two answers to "what is in this artifact".
+	//
+	// It opens no database here: panelPreviewSource opens the store on the first
+	// preview request, the posture ticket 214's ingest door already takes.
+	preview := newPanelPreviewSource192(dataDir, auditf)
+	disp, cfgMgr, workspaceScope, drafts, err := newResidentComposerDispatch(dataDir, auditf, confirm, preview)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -372,6 +384,10 @@ func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelM
 		// the same reason the geometry source is one.
 		withPanelEnabled(panelEnabledSource(dataDir)),
 		withPanelKeepAlive(panelKeepAliveSource(dataDir)),
+		// Ticket 192's wiring leg: the preview stack above, so the window's own
+		// resource filter answers /__artifact/... from the artifacts tree this
+		// process already owns.
+		withArtifactPreview(preview),
 	), cfgMgr, workspaceScope, drafts, nil
 }
 

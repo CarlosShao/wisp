@@ -89,7 +89,7 @@ func Test194CostDoorEndToEndReturnsRealCostDailyRows(t *testing.T) {
 		t.Fatalf("seed store Close: %v", err)
 	}
 
-	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil)
+	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}
@@ -125,7 +125,7 @@ func Test194CostDoorEndToEndReturnsRealCostDailyRows(t *testing.T) {
 // invent rows and it does not error.
 func Test194CostDoorEmptyTableAnswersZeroRows(t *testing.T) {
 	dir := newInboundDataDir33(t, "ask_every_step")
-	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil)
+	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}
@@ -147,7 +147,7 @@ func Test194CostDoorEmptyTableAnswersZeroRows(t *testing.T) {
 // (摘注入 ⇒ 红).
 func Test194CostDoorWiringNailInProductionChain(t *testing.T) {
 	dir := newInboundDataDir33(t, "ask_every_step")
-	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil)
+	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}

@@ -1,0 +1,26 @@
+== A) QuoteForModel CALL sites ('.QuoteForModel('), non-test .go
+-- before (HEAD):
+   count=0
+-- after (worktree, untracked included):
+cmd/wisp/panel_preview_192.go:294:	if _, qerr := resolver.QuoteForModel(ctx, d.src.marker192(), panelPreviewQuoteScope, doc.Name, quoted); qerr != nil {
+   count=1
+
+== B) panel.NewPreviewResolver CALL sites, cmd/ + internal/, non-test
+-- before (HEAD):
+   count=0
+-- after (worktree, untracked included):
+cmd/wisp/panel_preview_192.go:164:		resolver, rerr := panel.NewPreviewResolver(store, memory.ValidArtifactName)
+   count=1
+
+== C) the preview BRANCH in cmd/wisp (panel.PreviewPathPrefix), non-test
+-- before (HEAD):
+   count=0
+-- after (worktree, untracked included):
+cmd/wisp/panel_control_windows.go:582:// panel.PreviewPathPrefix is answered by the artifact preview stack and never by
+cmd/wisp/panel_control_windows.go:603:	if preview != nil && strings.HasPrefix(path, panel.PreviewPathPrefix) {
+cmd/wisp/panel_preview_192.go:272:	if !strings.HasPrefix(requestPath, panel.PreviewPathPrefix) {
+cmd/wisp/panel_preview_192.go:274:			panel.ErrNoHandlerAttached, req.Method, panel.PreviewPathPrefix)
+   count=4
+
+== D) the one production file this leg adds
+?? cmd/wisp/panel_preview_192.go

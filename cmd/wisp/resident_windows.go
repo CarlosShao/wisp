@@ -571,6 +571,19 @@ func runResident() {
 	if src != nil && src.run != nil {
 		src.run.bindAttachmentDrafts(attachmentDrafts)
 	}
+	// Ticket 192's wiring leg, the second half of AC#2's third step: the panel's
+	// preview-quote door gets THIS process's C25 engine - src.run.c25, the one
+	// the tool bridge marks sources into and the egress checks consult, not a
+	// private copy (the rule resident_voice_windows.go's attachProvenance states
+	// for the announcement leg: a gate against an engine nobody marks can never
+	// fire). It sits on this line for the same reason the two binds above do -
+	// src.run is the first moment the engine exists here - and it is a no-op on
+	// every degraded branch (no pipeline, no panel host), which leaves the door
+	// refusing with QuoteForModel's own "no C25 engine, so no stamp, so not into
+	// a model" sentence rather than pretending it stamped something.
+	if rp != nil && src != nil && src.run != nil && src.run.c25 != nil {
+		rp.BindPreviewProvenance(src.run.c25)
+	}
 
 	// Ticket 65: the resync-on-show publisher - the frozen contract's half no leg
 	// had wired (PLAN.md:2982, SPEC-08 §5.1: "面板每次 show 必须发 panel.resync，

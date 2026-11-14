@@ -243,7 +243,7 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 	// this chain writes through (panel_resident_pump.go), so a read and the
 	// next write can never disagree about which object holds the truth. The
 	// CLI seam discards it - a one-shot pipe builds no snapshot pump.
-	disp, _, err := newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil, nil)
+	disp, _, err := newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil, nil, newPanelPreviewSource192(dir, auditf))
 	return disp, err
 }
 
@@ -278,7 +278,7 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 // and write halves hold one config truth per process (the rule this file's
 // header already states for the档: loading it twice is the split state
 // SPEC-03 §3.1 prevents).
-func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm, drafts *attachmentDraftLedger) (*panel.ComposerDispatch, *config.Manager, error) {
+func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm, drafts *attachmentDraftLedger, preview *panelPreviewSource) (*panel.ComposerDispatch, *config.Manager, error) {
 	cfgPath := filepath.Join(dir, configFileName)
 	mgr, err := config.NewManager(cfgPath, nil)
 	if err != nil {
@@ -364,15 +364,27 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	if ws != nil {
 		workspace = &panel.WorkspaceWriteHandler{Scope: ws, Audit: auditf, Actor: actor}
 	}
+	// Ticket 192's wiring leg: the message route gets the ONE handler this tree
+	// has for it, and that handler answers exactly one shape - a preview quote,
+	// through PreviewResolver.QuoteForModel (panel_preview_192.go). Every other
+	// message still refuses by name, because the message RELAY is ticket 35's
+	// socket and this chain does not invent it. nil preview (a chain built by a
+	// caller with no artifacts face) leaves the socket nil: the refusal then
+	// comes from the router, the same shape it had before this ticket.
+	var message panel.MessageRequestHandler
+	if preview != nil {
+		message = newPanelPreviewQuoteDoor(preview, auditf, actor)
+	}
 	return &panel.ComposerDispatch{
 		Mode: modeWrites,
 		// Workspace is ticket 186's and answers where a holder was passed in;
-		// message = ticket 35, still refused by name when it arrives.
+		// message = ticket 192's preview-quote door where a preview source was,
+		// and ticket 35's unbuilt relay behind it in every other case.
 		Workspace: workspace,
 		// Ticket 214 AC#1: the attachment door is answered by the ingest handler
 		// above - the broker's first production caller, on the assembly path.
 		Attachment: attachment,
-		Message:    nil,
+		Message:    message,
 		// Ticket 248's two settings doors are answered by the leg above.
 		Config: configWrites,
 		// Ticket 320 AC#4's read-only door is answered by the fetch leg above.

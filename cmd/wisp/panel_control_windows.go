@@ -63,6 +63,7 @@ package main
 // this is the shape D29 names instead.
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -314,6 +315,14 @@ type panelControl struct {
 	mainthread uint32
 	browser    *edge.Chromium
 	autofocus  bool
+	// preview is the artifact preview stack this window's filter answers from
+	// (ticket 192's wiring leg). nil means "this host was handed no preview
+	// source", and the filter then answers exactly what it answered before the
+	// ticket: the embedded bundle, and a 404 for everything else. It is set by
+	// installAssetFilter from the manager field of the same name, so the
+	// window and its filter cannot disagree about which stack serves
+	// /__artifact/.
+	preview panelPreviewLookup
 	// maxsz / minsz are the library's fields for HintMax / HintMin. SetSize
 	// records them (its body is the library's) but the WM_GETMINMAXINFO write
 	// that read them is the one ported arm this repo's vet gate forbids - see
@@ -461,7 +470,8 @@ func newPanelControl(options webview2.WindowOptions, dataPath string) (*panelCon
 // the WebResourceRequested EVENT handler itself (chromium.go:186-231, the
 // AddWebResourceRequested call at :211); what an application registers is the
 // filter pattern (:292) plus the callback arm (:42, checked at :286).
-func (c *panelControl) installAssetFilter(assets *panel.Assets) {
+func (c *panelControl) installAssetFilter(assets *panel.Assets, preview panelPreviewLookup) {
+	c.preview = preview
 	c.browser.WebResourceRequestedCallback = func(request *edge.ICoreWebView2WebResourceRequest, args *edge.ICoreWebView2WebResourceRequestedEventArgs) {
 		c.respondWithEmbeddedAsset(assets, request, args)
 	}
@@ -483,7 +493,7 @@ func (c *panelControl) respondWithEmbeddedAsset(assets *panel.Assets, request *e
 		// answered by a guess.
 		return
 	}
-	data, contentType, status, reason := panelAssetLookup(assets, uri)
+	resp := panelAssetLookup(assets, c.preview, uri)
 	env := c.browser.Environment()
 	if env == nil {
 		log.Printf("panel host: %s: no WebView2 environment to build a response", uri)
@@ -491,11 +501,18 @@ func (c *panelControl) respondWithEmbeddedAsset(assets *panel.Assets, request *e
 	}
 	// Ticket 33 AC#6: the CSP header is on EVERY response this filter answers,
 	// success or miss, so no document reaches the window without the policy.
-	headers := panelResponseHeaders(status, contentType)
-	response, err := panelBuildResponse(env, data, status, reason, headers)
+	// For a preview the policy is the preview stack's own, per class - see
+	// panelPreviewAssetResponse and the AC#2 note in cmd/wisp/panel_preview_192.go.
+	// Everything else (the embedded bundle, a miss, a preview refusal) keeps the
+	// panel's fallback set built here.
+	headers := resp.Headers
+	if headers == "" {
+		headers = panelResponseHeaders(resp.Status, resp.ContentType)
+	}
+	response, err := panelBuildResponse(env, resp.Data, resp.Status, resp.Reason, headers)
 	if err != nil {
 		log.Printf("panel host: %s: CreateWebResourceResponse (status %d, %d byte(s), %q): %v",
-			uri, status, len(data), reason, err)
+			uri, resp.Status, len(resp.Data), resp.Reason, err)
 		return
 	}
 	if err := args.PutResponse(response); err != nil {
@@ -554,25 +571,51 @@ func panelBuildResponse(env *edge.ICoreWebView2Environment, data []byte, status 
 	return nil, lastErr
 }
 
-// panelAssetLookup maps one intercepted URL under panelOrigin to the embedded
-// bytes: (bytes, contentType, status, reason). It is a package function, not a
-// closure, so a headless ruler can ask the filter's exact question - which is
-// what keeps the window-free AC#13 ruler (panel_pageover_33r10) able to say
+// panelAssetLookup maps one intercepted URL under panelOrigin to a response:
+// (bytes, contentType, status, reason, header block). It is a package function,
+// not a closure, so a headless ruler can ask the filter's exact question - which
+// is what keeps the window-free AC#13 ruler (panel_pageover_33r10) able to say
 // "the entry URL serves the entry's own bytes" after the entry handover became
 // a navigation.
-func panelAssetLookup(assets *panel.Assets, uri string) ([]byte, string, int, string) {
-	path := strings.TrimPrefix(uri, panelOrigin)
-	if cut := strings.IndexAny(path, "?#"); cut >= 0 {
+//
+// TWO TREES, ONE LOOKUP (ticket 192's wiring leg). A path under
+// panel.PreviewPathPrefix is answered by the artifact preview stack and never by
+// the embed: the prefix is deliberately outside everything the bundle owns, so a
+// preview can never shadow a built asset, and the two answers cannot be
+// confused. The preview half is handed the path WITH its query, because
+// ?offset=&limit= is the truncation pointer the resolver parses - while the
+// embed half keeps the pre-ticket behaviour of cutting the query off.
+//
+// A nil preview is the pre-192 shape exactly: the bundle answers, and
+// /__artifact/... falls into Assets.Resolve's "not in the bundle" branch, which
+// is the 404 this ticket was filed for. Keeping that branch reachable is what
+// lets a ruler measure "before" and "after" on the same call.
+func panelAssetLookup(assets *panel.Assets, preview panelPreviewLookup, uri string) panelAssetResponse {
+	raw := strings.TrimPrefix(uri, panelOrigin)
+	if cut := strings.IndexByte(raw, '#'); cut >= 0 {
+		// A fragment is never sent to a server; the query IS part of an address.
+		raw = raw[:cut]
+	}
+	path := raw
+	if cut := strings.IndexByte(path, '?'); cut >= 0 {
 		path = path[:cut]
 	}
+	if preview != nil && strings.HasPrefix(path, panel.PreviewPathPrefix) {
+		// The filter's callback is synchronous and carries no context of its
+		// own (WebView2 calls it with a request and an args object), so the
+		// lookup runs under Background: what it does is one Lstat and one
+		// bounded read of a file on this host, and the resolver refuses on its
+		// own terms rather than waiting for a deadline nobody could cancel.
+		return panelPreviewAssetResponse(preview.Lookup(context.Background(), raw))
+	}
 	if assets == nil {
-		return nil, "", 404, "Not Found"
+		return panelAssetResponse{Status: 404, Reason: "Not Found"}
 	}
 	data, contentType, err := assets.Resolve(path)
 	if err != nil {
-		return nil, "", 404, "Not Found"
+		return panelAssetResponse{Status: 404, Reason: "Not Found"}
 	}
-	return data, contentType, 200, "OK"
+	return panelAssetResponse{Data: data, ContentType: contentType, Status: 200, Reason: "OK"}
 }
 
 // --- webview2.WebView -----------------------------------------------------------

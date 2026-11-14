@@ -188,7 +188,7 @@ func Test323ResidentAssemblyIsTheResidentChain(t *testing.T) {
 	dir := residentSeed323(t, srv.srv.URL+"/v1", uniqueKey320(t))
 
 	sink := &auditSink323{}
-	disp, _, scope, _, err := newResidentComposerDispatch(dir, sink.fn, nil)
+	disp, _, scope, _, err := newResidentComposerDispatch(dir, sink.fn, nil, nil)
 	if err != nil {
 		t.Fatalf("the resident builder refused to assemble: %v", err)
 	}
