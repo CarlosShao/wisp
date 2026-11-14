@@ -1,0 +1,8 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864；⛔ 静默降级）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 445：点球的「停」在状态走完之前读快照 ⇒ CI 偶发红。
+先读票全文 .scratch/wisp/issues/445-ball-click-stop-reads-a-state-snapshot-before-the-walk-lands.md（含 CI 红句逐字、5 条 AC、边界）。
+最要紧的是 AC#1 那个分叉：**先量清 TriggerInterrupt 到底被调用了没有**。被调用⇒修仪器；没被调用⇒停手上报、升格产码缺陷。⛔ 不许当 flake 收掉。
+⚠ cmd/wisp 是共享编译面：本波只有你一枚碰它；测试必须走载具 scripts/wisp-cli-staged-tests.sh，⛔ 同时跑两发。
+回话第一行＝commit hash ＋「AC#1 的结论是『被调用/没被调用』」。没干完写「未完成，卡在哪」。⛔push。
