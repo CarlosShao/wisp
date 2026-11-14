@@ -37176,7 +37176,7 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 
 **实例**：274-no-nail-…-in-both-halves-done.md（102）→ 274-no-nail-shipped-exe-carry-page-build-step-2-comment-false-done.md（69），修后 VERDICT GREEN / roster equals the tree。
 
-## A'@ + $next + @' — 一条**没上界**的等待：`Test16r1PremortemModelSha256CorruptRefusesTheHandOff` 在本机挂住 10 分钟以上
+## A1867 — 一条**没上界**的等待：`Test16r1PremortemModelSha256CorruptRefusesTheHandOff` 在本机挂住 10 分钟以上
 
 **读数**：2026-11-14 17:2x 我复跑票 445 那 5 枚测试件（20 枚用例），**前 19 枚 18 PASS / 1 SKIP / 0 FAIL**；最后一枚 `Test16r1PremortemModelSha256CorruptRefusesTheHandOff` **从 17:28:33 起日志一行不动**，`wisp.test` 进程还在（145 MB、CPU 111 s），我 17:4x 杀掉。
 
@@ -37186,7 +37186,7 @@ pm run build，还带出处闸门 :211）② docker/frontend.Dockerfile **不存
 
 ⚠ 另记：`internal/models/acl_sid_121_test.go` 的 `gofumpt -l` 命中是**工作树 CRLF／HEAD 是 LF** 的检出伪影，两腿独立报到同一件事 ⇒ 不立票，记在此备查。
 
-## A'@ + $next + @' — ★独立审计推翻我**两处结案声称**：441 引了修复之前的 CI，274 把本地绿写成绿
+## A1868 — ★独立审计推翻我**两处结案声称**：441 引了修复之前的 CI，274 把本地绿写成绿
 
 **来路**：我派的审计腿（`dedb4089d`，唯一一条非实现者的独立复核）。它只信盘上读数，逐张核我今天结的 5 张票，判 **441／274 应当复开**。我随后自己用 ancestry ＋ 完成时刻复核，**它是对的**。
 
