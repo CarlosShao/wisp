@@ -26,7 +26,7 @@
 - [x] **AC#2 逐枚改法**：照票 441 已确立的形（docs/evidence/s1/441-instrument-abstention.md）——**把「条件到达过」与「护栏还在」拆成两个载体**，弃权打**具名行＋数字＋可 grep token**（AC#1 ABSTAIN(<票号>:<shape>:<why>) attempts=... samples=...）。⛔ 不用 	.Skip（untests.sh 把 core 档顶层 SKIP 判致命）。
 - [x] **AC#3 每枚都要牙**：每一枚各造一发「护栏被拆」的突变（仓外导出树）⇒ 修后**真红并逐字点名**；还原 SHA256 同串、再跑绿。⛔ 只验其中一枚就算。
 - [x] **AC#4 ⛔ 不许钝化**：7 枚各自**原有的真红断言一条不许删/放宽**；改完把这 7 个测试的断言清单列成表（改前 vs 改后逐条对照）。
-- [ ] **AC#5 门禁四数**：ash -n（若碰）；sh scripts/d22scan.sh clean；path-length GREEN；go vet ./internal/winsec rc=0；**产码 0 字节**；CI 上 	est-core 与 	est-windows 各**两发连续绿**。
+- [x] **AC#5 门禁四数**：ash -n（若碰）；sh scripts/d22scan.sh clean；path-length GREEN；go vet ./internal/winsec rc=0；**产码 0 字节**；CI 上 	est-core 与 	est-windows 各**两发连续绿**。
 
 ## 边界
 写面：internal/winsec/** 的 *_test.go、docs/evidence/s1/444-*、.scratch/wisp/probes/444/**、本票 Progress log。
@@ -58,3 +58,4 @@
 - **AC#5** ⏳ **一半已绿、一半等 CI**：`gofmt -l` 空、`go vet` 双平台 rc=0、`bash -n` OK、`d22scan` clean（482 产码文件）、**产码 0 字节**、7 条定向测试绿色（腿跑的）；**`path-length` 那条它报的红是我自己造的**（274 结票文件名 102 字符），我已改短并现跑 `VERDICT GREEN`；AC#5 还要求 **CI 上 `test-core` 与 `test-windows` 各两发连续绿** ⇒ **必须等 CI 跑完才敢勾**，⛔ 不拿本地绿冒充 CI 绿。
 
 **并行带出的两个不在它写面的红（不吸收，只记）**：`scripts/check-path-length-budget.sh` 的 274 文件名（我修的）；`internal/models/acl_sid_121_test.go` 的 gofumpt（CRLF→LF，历史件）。
+**2026-11-14 18:0x 编排者补（AC#5 的 CI 那一半，现读）**：三发 **6/6 job 全 success** —— `43578030753`（head `721a1d8a0`）、`43578127657`（head `5b56792c6`）、`43578228598`（head `c64a4fa22`）⇒ 「`test-core` 与 `test-windows` **两发连续绿**」满足（实际有三发）。⚠ 我 17:1x 写「等 CI 两发连续绿」时它们还没跑完，是**独立审计腿 `dedb4089d` 查出已经够了**才翻的 —— 不是我事后放宽标准。
