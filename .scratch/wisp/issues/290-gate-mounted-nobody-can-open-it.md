@@ -101,3 +101,11 @@
 - **形②「用户主动开门之后」在生产路径上已满足**：生产装配＋生产 `toggleMute`＋真麦 ⇒ 开门后 3s 窗 `samples=93 levels_per_s=31.00`、关回 `samples=0`、线程 1→0。球**确实**拿到电平且随门开合有无。
 - **仍欠一格（故不翻）**：**发运进程上的合成 chord 只有 1/4 成**，诊断为**本会话输入注入不可靠**（`chord ownership: held by another process`），已按 **SKIP-LOUD** 记账、⛔ 未当通过；**真手那一发仍欠机主按一次 `Ctrl+Alt+M`**。
 - 该腿自查入账：第一发形②判红是**它自己写错的断言**（`frames_dropped>frames_sent`），已改为节奏带 —— 这条诚实性记一笔。
+
+## 编排者补记（2026-11-14 13:3x）：上一发「挂着等按键」失败，已换姿势重拉
+
+- 旧产品进程 **PID 69456**（10:48:43 启动）**已退出**。日志停在 `10:53:47 retention pass done`，**既无崩溃记录也无关停记录** ⇒ 不是它自己退的（多半被外部杀掉）。
+- **整个生命周期内没有任何 `Ctrl+Alt+M` 按键记录**（日志 grep `取消静音|mute-hotkey|levels_delivered` 零命中）⇒ 形②那一发**从未得到机主的手**，因此**这条读数作废，不是失败也不是通过**。
+- **已重拉**：`Start-Process` 独立进程（脱离我这边作业生命周期），**新 PID 21340**，`WISP_ENV=dev`，日志 `D:\tmp\wisp\20261114\wisp-ball-2.log`。启动后它自报：`the floating ball window is up in this process (tray icon added, hotkeys from defaults…)`；`采集腿：门处于静音：设备未打开（[audio] mic_muted_default=true…）`。
+- **AC#3 维持「部分、框不勾」**：形①（出厂默认不开口）与形②（真机路径 `samples=93 / levels_per_s=31.00 / levels_delivered=93`）已有读数，但**「出货进程合成弦」只到 1/4、真手那一按仍缺**。
+- 撤销口令：「290 重拉作废」。
