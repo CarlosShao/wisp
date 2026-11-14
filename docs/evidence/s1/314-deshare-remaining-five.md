@@ -128,7 +128,7 @@ B(pid 55088): C:\Users\swq\AppData\Local\Temp\wisp-253r6-panel-profile-55088-179
 
 ### 4.2 反证：`-overlay` 把该处临时改回固定名（同形重跑）
 
-**做法**：跟踪文件**一字未动**；`overlay/` 下 5 份副本逐字节等于 `HEAD:cmd/wisp/<file>`（`git show` 经 cmd 重定向，字节数＝`git cat-file -s`，5/5 相等），其中 `panel_unbound_253r6_windows_test.go:73` 逐字回到：
+**做法**：跟踪文件**一字未动**；`overlay/` 下 5 份副本逐字节等于改前提交 `48457eafe:cmd/wisp/<file>`（`git show` 经 cmd 重定向；字节数＝`git cat-file -s`，5/5 相等：13101／6364／3292／11435／12668），其中 `panel_unbound_253r6_windows_test.go:73` 逐字回到：
 
 ```
 	dataPath := filepath.Join(os.TempDir(), "wisp-253r6-panel-profile")
@@ -183,7 +183,7 @@ tick=0 udf=C:\Users\swq\AppData\Local\Temp\wisp-253r6-panel-profile\EBWebView to
 2. **正控两轮都 rc=0**（A/B 各 1 PASS），但这是"每发一窗"的形状；本腿**没有**去复跑上一腿那个"两发各两窗必死一发"的形状（那是上一腿的读数与本票主题，不属本腿派单）。
 3. **反证只复现 2/3 轮**；第 3 轮如实记"没抓到共存那一瞬"。没有把 2/3 写成 3/3。
 4. **负载敏感红全部留档**（§3.1），且用改前二进制同形对照证明与本改动无关；**没有放宽任何断言、没有加 retry、没有删断言**。
-5. 开工时 HEAD 已是 `48457eafe`（编排者 12:0x 的裁定提交，不是上一腿的 `edccb3449`）；本腿在其之上只 commit 不 push。
+5. 开工时 HEAD 已是 `48457eafe`（编排者 12:0x 的裁定提交，不是上一腿的 `edccb3449`）；本腿代码/证据提交＝`b1e1a738f`（只 commit 不 push）。该提交落地后数秒，并行的票 44 腿在它之上提交了 `6f23ce632`（`internal/observe/quota_44*`＋其证据件，**不是本腿的**）；此后 `HEAD` 不再是 `b1e1a738f`，但本件引用的"改前"一律指 `48457eafe`，不受影响。
 6. ⛔ 未跑整包（只 `-test.run` 定向，最长一轮 2 枚用例）；⛔ 零产品码／`scripts/**`／`internal/**`／`frontend/**`／阈值／golden／契约改动；⛔ 未 push。
 7. 并行腿（票 44）在 `internal/observe/quota_44.go` 与 `docs/evidence/s1/44-quota-ledger-race.md` 的未提交改动**不是本腿的**，未纳入本腿 commit（显式 pathspec）。
 
