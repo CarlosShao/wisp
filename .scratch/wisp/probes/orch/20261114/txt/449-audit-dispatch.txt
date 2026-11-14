@@ -1,0 +1,23 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：审计腿（非实现者）—— 票 449 的 AC#1–AC#5 五条数字声称
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp **审计腿**。实现者是另一条腿（commit `f9b6d60f7`），你只核、不改。
+
+任务：给票 449（`.scratch/wisp/issues/449-level-ruler-dc-removal-landing.md`）的 **AC#1–AC#5 五条数字声称**出 1:1 裁决表。**五条全部自己现跑，⛔ 抄证据件**。
+
+五条要核的：
+1. **AC#1 恒定帧恰好 0**：六形 `{0,1,−1,12345,32767,−32768}` → `LevelOfSamples` 恰好 0、`FrameLevel` 恰好 `float32(0)`、**非负零**（`math.Signbit` 为 false）。另核"改前 1 LSB 帧读 `3.0517578125e-05`"这句。
+2. **AC#2 平移不变位级相等**：正弦 3000 加 `c∈{−12345,−3000,−1,1,3000,12345,20000}` ⇒ **`Float64bits`／`Float32bits` 逐位相等**（⛔ 用 `==` 了事）。
+3. **AC#3 闭式**：`DC 12345 + 正弦 6000` 读 `0.1294765192` vs 闭式 `0.1294751186`，差 `1.4e-6`；改前 `0.3983676962`。
+4. **AC#4 新顶**：最热合法帧 `+32767/−32768` 读 `0.9999847412109375`，且 `MaxLevel=1.0` **无合法帧可达**。
+5. **AC#5 守门有阳性对照**：`amplitudepair_297` 的 `meanLow<=0` 守门**不是装饰** —— 你要自己复现「`ampLow` 置 0 时，带守门＝FAIL、去掉守门＝PASS 且 `mean ratio = +Inf`」这一对读数（仓外导出树或 overlay 挂进去都行，⛔ 只读证据件）。
+
+另核三件：
+- **冻结面**：`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`docs/specs/**` 相对 `f9b6d60f7^` **一字节未动**；`internal/ball/liquid.go:30` 的 `SilenceLevelGate = 0.06` **逐字仍在**。
+- **断言没被放宽**：`SineLevelTolerance`／`SineLevelTolerance=5e-5` 与三枚正弦误差，改前改后**逐位相同**。
+- **新钉是不是牙**：4 枚新钉里，**哪几枚在改前会红**？腿自己说"第 3 枚改前其实是红的、但它不是去直流的牙" ⇒ 你判：**去直流这件事到底由哪一枚钉咬住**？点不出名字就是不合格。
+
+产出：`docs/evidence/s1/449-adversarial.md`（五条各一行五列：声称／你的读数／判满足或部分或不满足／一句依据／可核命令）＋「哪枚钉咬住去直流」一段结论。
+写面：只许这一个件 ＋ `.scratch/wisp/probes/449audit/**`。⛔ 改产码/票面/台账/阈值/golden/allowlist/契约；⛔ 放宽任何容差；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+回话第一行＝commit hash ＋「五条闭合 N／5」＋「咬住去直流的那枚钉叫什么」。没干完写「未完成，卡在哪」。
