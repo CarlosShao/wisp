@@ -1,0 +1,13 @@
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:456: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=500 of-which-refused-at-act=106 sealed-own-object=0 other=0
+    posix_seal_window_120_other_test.go:456: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=500 of-which-refused-at-act=36 sealed-own-object=0 other=0
+    posix_seal_window_120_other_test.go:456: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=500 of-which-refused-at-act=73 sealed-own-object=0 other=0
+    posix_seal_window_120_other_test.go:456: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=500 of-which-refused-at-act=31 sealed-own-object=0 other=0
+    posix_seal_window_120_other_test.go:464: AC#1 un-raced quiet control shape=leaf-swap: attempts=1 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1 of-which-refused-at-act=1 sealed-own-object=0 other=0
+    posix_seal_window_120_other_test.go:476: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=2000 of-which-refused-at-act=246 sealed-own-object=0 other=0
+    posix_seal_window_120_other_test.go:476: AC#1 RED instrument is dead shape=leaf-swap: the un-raced quiet control could not seal the tree's own object with the racer stopped (attempts=1 refused-at-check=1 of-which-refused-at-act=1 sealed-own=0 hit-foreign=0 of-which-reported-nil=0 other=0 first-other="") - the raced rows have no liveness witness when the control itself cannot seal
+    posix_seal_window_120_other_test.go:476: AC#1 ABSTAIN(441:leaf-swap:raced-quiet) attempts=2000 samples=4 attempts-per-sample=500 refused-at-check=2000 of-which-refused-at-act=246 sealed-own=0 other=0 - the raced loop reached the swapped state (refused>0) but the quiet state was starved by scheduling, so this run cannot attest the quiet side from the race; the threshold that carries it is the un-raced quiet control above (sealed-own=1), not a green from absence
+--- FAIL: TestPOSIX120SealWindowLeafSwapIsClosed (0.11s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.130s
+FAIL

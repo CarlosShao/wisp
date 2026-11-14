@@ -32,7 +32,10 @@
 // own flip must have recorded no errors. A run where the racer never raced reads as
 // dead, and dead is RED here - r1's first cut produced refused=0 and sealed-own=100
 // in every sample, which is what a dead instrument looks like and is the reason
-// these three assertions cannot be traded against each other.
+// these three assertions cannot be traded against each other. (Ticket 441 kept the
+// first and third on the raced rows and moved the second to an un-raced control, so
+// a busy runner can no longer decide the verdict; STATE OF THIS INSTRUMENT below has
+// the reading that forced it.)
 //
 // refusals are split by which leg produced them, because that is the difference
 // between "the check before the act caught it" and "the pinned act refused to be
@@ -79,6 +82,29 @@
 //     sameObjectPinned can refuse it. With that gate neutered this file is RED on
 //     shape 3 (r2's control reading); that is what makes it a gate and not a
 //     decoration.
+//
+// STATE OF THIS INSTRUMENT (2026-11-14, ticket 441): the liveness half used to be
+// satisfied by the RACED loop itself (refused>0 AND sealed-own>0), and that bundled a
+// scheduling outcome into a defect verdict. CI run 43565131755 read, on unchanged
+// bytes, `refused=1886, sealed-own=0, hit-foreign=0` and failed the run as if the
+// instrument were dead; the same tree on a slower bench reads sealed-own>=572, so the
+// counter was measuring how the runner schedules the seal loop against the racer, not
+// whether the seal works. The two questions are now carried separately, and neither is
+// loosened:
+//
+//   - "was the window reached?" stays a hard requirement of the RACED rows
+//     (refused>0). Zero refusals still means the racer never presented the swapped
+//     state and a zero-hit reading proves nothing, which is what keeps a deleted
+//     racer or a dead floor RED.
+//   - "does the seal still seal an object nobody races over?" is answered by
+//     sealWindowQuietControl120: racer stopped, real object re-planted by the case,
+//     one SealFile call, expected nil and an untouched witness. It cannot be starved
+//     by contention, and a dead seal is RED there.
+//   - when the raced loop reached the window (refused>0) but never saw the quiet state
+//     (sealed-own=0), the row is NAMED with its numbers instead of being called dead:
+//     `AC#1 ABSTAIN(441:<shape>:raced-quiet) attempts=... samples=... threshold=...`.
+//     That token is greppable on purpose: a run that never saw the quiet side is
+//     visible in the CI log, and the evidence file for ticket 441 counts it.
 package winsec_test
 
 import (
@@ -211,10 +237,64 @@ func judgeSample120(t *testing.T, sample int, r sealWindowReading120) {
 		sample, sealWindowSamples120, r.shape, r.hitForeign, r.hitAndReport)
 }
 
-// judgeRun120 is the liveness half of the same judgement: a racer that cannot flip,
-// or a run in which the floor never refused and the seal never sealed its own
-// object, proves nothing and is RED in the default form.
-func judgeRun120(t *testing.T, totals sealWindowReading120, flipErrs int, firstFlipErr string) {
+// sealWindowQuietControl120 is the un-raced half of the liveness assertion (ticket
+// 441). It exists because the old form asked the *raced* loop to prove two different
+// things at once - that the floor/gate answers (refusals) AND that the seal still
+// seals its own object (sealed-own) - and the second one is a scheduling lottery: on
+// a fast runner the racer holds the leaf in its link state for almost the whole
+// cycle, so all 2000 raced attempts can read "refused" while the counter the
+// assertion wanted (sealed-own) is 0 without anything being dead. CI run 43565131755
+// measured exactly that: refused=1886, sealed-own=0, hit-foreign=0, while the same
+// tree reads sealed-own>=572 on a slower bench.
+//
+// So the question "does the seal still seal an object nobody is racing over" is now
+// answered by an attempt nobody races over: the racer is stopped, the real object is
+// re-planted by the case's own restore closure, and SealFile is called once. That
+// reading cannot be starved by contention, and it is what the raced rows lean on when
+// the raced loop never saw the quiet state. It is NOT a relaxation: the raced loop
+// still has to reach the window (refused > 0) and still has to read zero foreign
+// hits, and a gate that is really gone still turns those rows RED.
+func sealWindowQuietControl120(t *testing.T, shape string, seal func() error, witnessMode func() os.FileMode, restore func()) sealWindowReading120 {
+	t.Helper()
+	restore()
+	r := sealWindowReading120{shape: shape + " (un-raced quiet control)"}
+	err := seal()
+	r.attempts++
+	if got := witnessMode(); got == 0o600 {
+		r.hitForeign++
+		if err == nil {
+			r.hitAndReport++
+		}
+	} else {
+		switch {
+		case err == nil:
+			r.sealedOwn++
+		case errors.Is(err, winsec.ErrUnresolvedPath):
+			r.refused++
+			if errors.Is(err, winsec.ErrNotSealable) {
+				r.refusedAct++
+			}
+		default:
+			r.note(err.Error())
+		}
+	}
+	t.Logf("AC#1 un-raced quiet control shape=%s: %s", shape, r)
+	return r
+}
+
+// judgeRun120 is the liveness half of the same judgement, in the form ticket 441
+// settled on: two questions, two carriers.
+//
+//  1. was the window REACHED in the raced loop? That is refused > 0 (the floor or the
+//     gate answered the swapped state) - and it stays RED when it is 0, because a
+//     zero-hit reading about a window nobody visited is not evidence, and making that
+//     arm green would let a deleted racer pass.
+//  2. does the SEAL still seal the tree's own object? That is the un-raced control's
+//     job (sealWindowQuietControl120), and it is RED when the control cannot do it.
+//     The raced loop's own sealed-own count is printed next to it, and when
+//     contention starves the quiet state the row says so by name with its numbers
+//     (ABSTAIN(441:...)) instead of calling a live instrument dead.
+func judgeRun120(t *testing.T, totals, control sealWindowReading120, flipErrs int, firstFlipErr string) {
 	t.Helper()
 	t.Logf("AC#1 total shape=%s: %s", totals.shape, totals)
 	if totals.firstOther != "" {
@@ -228,13 +308,25 @@ func judgeRun120(t *testing.T, totals sealWindowReading120, flipErrs int, firstF
 			t.Logf("AC#1 FLIP BROKEN shape=%s: %d recorded flip error(s) (first: %s)", totals.shape, flipErrs, firstFlipErr)
 		}
 	}
-	if totals.refused == 0 || totals.sealedOwn == 0 {
+	if totals.attempts == 0 && sealWindowAssertClosed120() {
+		t.Errorf("AC#1 RED instrument is dead shape=%s: the raced loop completed 0 attempts (samples=%d, attempts-per-sample=%d) - a zero window reading with no attempts behind it proves nothing",
+			totals.shape, sealWindowSamples120, sealWindowAttemptsFor120())
+	}
+	if totals.refused == 0 && totals.attempts > 0 {
 		if sealWindowAssertClosed120() {
-			t.Errorf("AC#1 RED instrument is dead shape=%s: refused=%d, sealed-own=%d - a zero window reading here proves nothing",
-				totals.shape, totals.refused, totals.sealedOwn)
+			t.Errorf("AC#1 RED instrument is dead shape=%s: across %d raced attempts (samples=%d, attempts-per-sample=%d) the floor/gate refused 0 and sealed-own=%d, so the racer never presented the swapped state and a zero window reading here proves nothing about a window that was never reached",
+				totals.shape, totals.attempts, sealWindowSamples120, sealWindowAttemptsFor120(), totals.sealedOwn)
 		} else {
 			t.Logf("AC#1 INSTRUMENT DEAD reading shape=%s: refused=%d, sealed-own=%d", totals.shape, totals.refused, totals.sealedOwn)
 		}
+	}
+	if (control.sealedOwn != 1 || control.hitForeign > 0) && sealWindowAssertClosed120() {
+		t.Errorf("AC#1 RED instrument is dead shape=%s: the un-raced quiet control could not seal the tree's own object with the racer stopped (attempts=%d refused-at-check=%d of-which-refused-at-act=%d sealed-own=%d hit-foreign=%d of-which-reported-nil=%d other=%d first-other=%q) - the raced rows have no liveness witness when the control itself cannot seal",
+			totals.shape, control.attempts, control.refused, control.refusedAct, control.sealedOwn, control.hitForeign, control.hitAndReport, control.other, control.firstOther)
+	}
+	if totals.refused > 0 && totals.sealedOwn == 0 {
+		t.Logf("AC#1 ABSTAIN(441:%s:raced-quiet) attempts=%d samples=%d attempts-per-sample=%d refused-at-check=%d of-which-refused-at-act=%d sealed-own=0 other=%d - the raced loop reached the swapped state (refused>0) but the quiet state was starved by scheduling, so this run cannot attest the quiet side from the race; the threshold that carries it is the un-raced quiet control above (sealed-own=1), not a green from absence",
+			totals.shape, totals.attempts, sealWindowSamples120, sealWindowAttemptsFor120(), totals.refused, totals.refusedAct, totals.other)
 	}
 	if totals.refused > 0 && totals.refusedAct == 0 {
 		t.Logf("AC#1 shape=%s: every refusal came from the check before the act (refused-at-act=0), so this run does NOT exercise the pinned identity gate", totals.shape)
@@ -367,7 +459,22 @@ func TestPOSIX120SealWindowLeafSwapIsClosed(t *testing.T) {
 	}
 	racer.stopNow() // settled before the counters below are read, so this is not a race on the reading
 	flips, firstFlip := racer.flips()
-	judgeRun120(t, totals, flips, firstFlip)
+	// ticket 441: the quiet half of liveness is measured with the racer stopped, so it
+	// cannot be starved by scheduling. The racer may have parked the leaf on either
+	// side of its swap, so the case re-plants the real object itself before the call.
+	control := sealWindowQuietControl120(t, totals.shape, func() error { return winsec.SealFile(leaf) }, witnessMode,
+		func() {
+			if info, err := os.Lstat(leaf); err == nil && info.Mode()&os.ModeSymlink != 0 {
+				if err := os.Remove(leaf); err != nil {
+					t.Fatalf("restore the leaf for the un-raced quiet control: %v", err)
+				}
+			}
+			if err := os.WriteFile(leaf, []byte("the tree's own bytes"), 0o666); err != nil {
+				t.Fatalf("restore the leaf for the un-raced quiet control: %v", err)
+			}
+			reset()
+		})
+	judgeRun120(t, totals, control, flips, firstFlip)
 }
 
 // TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed is r1's ancestor shape: a
@@ -482,5 +589,22 @@ func judgeAncestorSwap120(t *testing.T, shape, ancestor, blob, witness, target s
 	}
 	racer.stopNow() // settled before the counters below are read, so this is not a race on the reading
 	flips, firstFlip := racer.flips()
-	judgeRun120(t, totals, flips, firstFlip)
+	// ticket 441: same un-raced quiet control as the leaf shape, with the ancestor
+	// itself re-planted as the real directory (the racer may have parked it as a link).
+	control := sealWindowQuietControl120(t, shape, func() error { return winsec.SealFile(blob) }, witnessMode,
+		func() {
+			clearByKind(func(err error) {
+				if err != nil {
+					t.Fatalf("restore the ancestor for the un-raced quiet control: %v", err)
+				}
+			})
+			if err := os.Mkdir(ancestor, 0o700); err != nil {
+				t.Fatalf("restore the ancestor for the un-raced quiet control: %v", err)
+			}
+			if err := os.WriteFile(blob, []byte("the tree's own bytes"), 0o666); err != nil {
+				t.Fatalf("restore the ancestor for the un-raced quiet control: %v", err)
+			}
+			reset()
+		})
+	judgeRun120(t, totals, control, flips, firstFlip)
 }

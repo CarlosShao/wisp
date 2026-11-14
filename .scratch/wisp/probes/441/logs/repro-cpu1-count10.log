@@ -1,0 +1,110 @@
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=297 of-which-refused-at-act=1 sealed-own-object=200 other=3
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2553416513/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=443 of-which-refused-at-act=0 sealed-own-object=57 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=248 of-which-refused-at-act=0 sealed-own-object=251 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2553416513/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=389 of-which-refused-at-act=0 sealed-own-object=109 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2553416513/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1377 of-which-refused-at-act=1 sealed-own-object=617 other=6
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2553416513/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.34s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=256 of-which-refused-at-act=0 sealed-own-object=242 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2140647751/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=408 of-which-refused-at-act=0 sealed-own-object=91 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2140647751/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=350 of-which-refused-at-act=0 sealed-own-object=149 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2140647751/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=67 of-which-refused-at-act=2 sealed-own-object=433 other=0
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1081 of-which-refused-at-act=2 sealed-own-object=915 other=4
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2140647751/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.42s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=190 of-which-refused-at-act=0 sealed-own-object=309 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2189475186/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=298 of-which-refused-at-act=0 sealed-own-object=198 other=4
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2189475186/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=299 of-which-refused-at-act=1 sealed-own-object=201 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=113 of-which-refused-at-act=3 sealed-own-object=386 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2189475186/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=900 of-which-refused-at-act=4 sealed-own-object=1094 other=6
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2189475186/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.45s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=297 of-which-refused-at-act=1 sealed-own-object=203 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=118 of-which-refused-at-act=0 sealed-own-object=379 other=3
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1259853713/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=189 of-which-refused-at-act=0 sealed-own-object=311 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=60 of-which-refused-at-act=0 sealed-own-object=438 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1259853713/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=664 of-which-refused-at-act=1 sealed-own-object=1331 other=5
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1259853713/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.51s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=180 of-which-refused-at-act=0 sealed-own-object=320 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=82 of-which-refused-at-act=0 sealed-own-object=416 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2005746655/001/root/blob.bin: openat blob.bin: too many levels of symbolic links
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=135 of-which-refused-at-act=0 sealed-own-object=364 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2005746655/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=191 of-which-refused-at-act=1 sealed-own-object=307 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2005746655/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=588 of-which-refused-at-act=1 sealed-own-object=1407 other=5
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed2005746655/001/root/blob.bin: openat blob.bin: too many levels of symbolic links
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.49s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=229 of-which-refused-at-act=2 sealed-own-object=269 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3462278942/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=334 of-which-refused-at-act=1 sealed-own-object=165 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3462278942/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=383 of-which-refused-at-act=0 sealed-own-object=117 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=140 of-which-refused-at-act=1 sealed-own-object=360 other=0
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1086 of-which-refused-at-act=4 sealed-own-object=911 other=3
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3462278942/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.42s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=12 of-which-refused-at-act=1 sealed-own-object=488 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=390 of-which-refused-at-act=0 sealed-own-object=105 other=5
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3508459616/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=232 of-which-refused-at-act=0 sealed-own-object=268 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=41 of-which-refused-at-act=2 sealed-own-object=457 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3508459616/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=675 of-which-refused-at-act=3 sealed-own-object=1318 other=7
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3508459616/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.50s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=345 of-which-refused-at-act=1 sealed-own-object=152 other=3
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed4137168405/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=210 of-which-refused-at-act=1 sealed-own-object=289 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed4137168405/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=87 of-which-refused-at-act=0 sealed-own-object=411 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed4137168405/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=237 of-which-refused-at-act=0 sealed-own-object=257 other=6
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed4137168405/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=879 of-which-refused-at-act=2 sealed-own-object=1109 other=12
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed4137168405/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.45s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=319 of-which-refused-at-act=0 sealed-own-object=181 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=219 of-which-refused-at-act=1 sealed-own-object=280 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3900695079/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=296 of-which-refused-at-act=1 sealed-own-object=202 other=2
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3900695079/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=306 of-which-refused-at-act=0 sealed-own-object=193 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3900695079/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1140 of-which-refused-at-act=2 sealed-own-object=856 other=4
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed3900695079/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.32s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=328 of-which-refused-at-act=0 sealed-own-object=172 other=0
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=242 of-which-refused-at-act=1 sealed-own-object=257 other=1
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed976765711/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=299 of-which-refused-at-act=0 sealed-own-object=198 other=3
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed976765711/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=180 of-which-refused-at-act=2 sealed-own-object=317 other=3
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed976765711/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1049 of-which-refused-at-act=3 sealed-own-object=944 other=7
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed976765711/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.36s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	4.295s

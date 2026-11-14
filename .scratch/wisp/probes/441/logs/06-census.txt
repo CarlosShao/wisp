@@ -1,0 +1,46 @@
+census root: /src
+ruler: git grep -n -E 'RED instrument|instrument is dead|RED INSTRUMENT' -- internal  (only *_test.go rows are kept)
+rows: 37
+files: 13
+NOTE: the arm column is a heuristic over the guard line; the per-site verdicts are in
+      docs/evidence/s1/441-instrument-abstention.md section 4, read by hand.
+
+file:line                                                  build tag                    arm (heuristic)          guard immediately above
+------------------------------------------------------------------------------------------------------------------------------------
+internal/agent/compress_trace_test.go:108                  package agent                reached-count (CAN abstain-red) if len(tc.all()) != before+1 {
+internal/winsec/ancestoropen_342_unix_test.go:117          //go:build unix              reached-count (CAN abstain-red) if st.provedLinkCycles == 0 || st.pinnedParentLeg == 0 {
+internal/winsec/ancestoropen_342_windows_test.go:56        //go:build windows           reached-count (CAN abstain-red) if st.provedReparse == 0 || st.formRefusals == 0 {
+internal/winsec/ancestorunlink_348_unix_test.go:105        //go:build unix              reached-count (CAN abstain-red) if plantErr != "" {
+internal/winsec/ancestorunlink_348_unix_test.go:108        //go:build unix              fixture/third shape (read it) if !planted {
+internal/winsec/ancestorunlink_348_unix_test.go:111        //go:build unix              fixture/third shape (read it) if err == nil {
+internal/winsec/ancestorunlink_348_unix_test.go:153        //go:build unix              reached-count (CAN abstain-red) if st.provedLinkCycles == 0 || st.liveness == 0 {
+internal/winsec/ancestorunlink_348_windows_test.go:79      //go:build windows           fixture/third shape (read it) if err == nil {
+internal/winsec/ancestorunlink_348_windows_test.go:111     //go:build windows           reached-count (CAN abstain-red) if st.provedReparse == 0 || st.formRefusals == 0 {
+internal/winsec/ancestorunlink_348_windows_test.go:144     //go:build windows           fixture/third shape (read it) // A pin failure here would be the world, not the leg: the leaf form kee
+internal/winsec/ancestorunlink_348_windows_test.go:178     //go:build windows           reached-count (CAN abstain-red) if err := w.toFlip(); err != nil {
+internal/winsec/ancestorunlink_348_windows_test.go:181     //go:build windows           fixture/third shape (read it) if !reparseAt(w.name) {
+internal/winsec/ancestorwindow_342r2_windows_test.go:366   //go:build windows           fixture/third shape (read it) if !w.sealRun {
+internal/winsec/ancestorwindow_342r2_windows_test.go:567   //go:build windows           reached-count (CAN abstain-red) if !same || kCtrl != "absent" {
+internal/winsec/ancestorwindow_342r2_windows_test.go:662   //go:build windows           reached-count (CAN abstain-red) if moveB != nil {
+internal/winsec/ancestorwindow_342r2_windows_test.go:699   //go:build windows           fixture/third shape (read it) if _, err := os.Lstat(park); err == nil {
+internal/winsec/deleteseam_348r2_windows_test.go:126       //go:build windows           reached-count (CAN abstain-red) if calls != int32(winAncAttempts342r1) {
+internal/winsec/deleteseam_348r2_windows_test.go:131       //go:build windows           reached-count (CAN abstain-red) if landed == 0 && refused == 0 {
+internal/winsec/deleteseam_348r2_windows_test.go:141       //go:build windows           reached-count (CAN abstain-red) if landed != calls {
+internal/winsec/leafrace_342r2_windows_test.go:379         //go:build windows && wisp342probe reached-count (CAN abstain-red) if n := legs[winLeafLegs342r2[4].name]; n > 0 {
+internal/winsec/leafrace_342r2_windows_test.go:389         //go:build windows && wisp342probe reached-count (CAN abstain-red) if flipped == 0 {
+internal/winsec/leftstanding_354_windows_test.go:84        //go:build windows           reached-count (CAN abstain-red) if got := len(leftStandingForeignBody354r1); got != 64 {
+internal/winsec/leftstanding_354_windows_test.go:88        //go:build windows           fixture/third shape (read it) if len(leftStandingOwnBody354r1) == len(leftStandingForeignBody354r1) {
+internal/winsec/leftstanding_354_windows_test.go:127       //go:build windows           fixture/third shape (read it) if !w.sealRun {
+internal/winsec/leftstanding_354_windows_test.go:131       //go:build windows           reached-count (CAN abstain-red) if kSwap != "absent" {
+internal/winsec/leftstanding_354_windows_test.go:201       //go:build windows           fixture/third shape (read it) if err == nil || !errors.Is(err, ErrNotSealable) {
+internal/winsec/nametopup_353_windows_test.go:67           //go:build windows           fixture/third shape (read it) //   - ENTRY (liveness): `entered=3/3` with `realSealRanFirst=true` in t
+internal/winsec/nametopup_353_windows_test.go:124          //go:build windows           fixture/third shape (read it) if !w.sealRun {
+internal/winsec/nametopup_353_windows_test.go:128          //go:build windows           reached-count (CAN abstain-red) if kSwap != "absent" {
+internal/winsec/nametopup_353_windows_test.go:187          //go:build windows           fixture/third shape (read it) if err == nil || !errors.Is(err, ErrNotSealable) {
+internal/winsec/nametopup_353_windows_test.go:191          //go:build windows           reached-count (CAN abstain-red) if kind != "absent" {
+internal/winsec/openleaf_322_other_test.go:206             //go:build !windows          reached-count (CAN abstain-red) if liveness == 0 || flips == 0 {
+internal/winsec/posix_seal_window_120_other_test.go:305    //go:build !windows          fixture/third shape (read it) if sealWindowAssertClosed120() {
+internal/winsec/posix_seal_window_120_other_test.go:312    //go:build !windows          reached-count (CAN abstain-red) if totals.attempts == 0 && sealWindowAssertClosed120() {
+internal/winsec/posix_seal_window_120_other_test.go:317    //go:build !windows          fixture/third shape (read it) if sealWindowAssertClosed120() {
+internal/winsec/posix_seal_window_120_other_test.go:324    //go:build !windows          reached-count (CAN abstain-red) if (control.sealedOwn != 1 || control.hitForeign > 0) && sealWindowAsser
+internal/winsec/sealhandle_privateroute_120_other_test.go:212 //go:build !windows          racer-broken (real defect) if flipErrs > 0 {
