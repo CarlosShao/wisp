@@ -1,0 +1,27 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：票 291 落地腿（写面 internal/audio/**，照 AC#3 那张表施工）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 291 **落地**：电平尺不减直流 ⇒ **静音门永远开着**、球随声音呼吸真机不可达。
+
+**先读这两份，它们是施工图，别自己另发明方案**：
+1. `docs/evidence/s1/291-ac3-landing-table.md`（30.3 KB，落点 5 处＋冻结面判定＋代价）
+2. `.scratch/wisp/issues/291-*.md`（AC#4 写面与禁区）
+
+**已定的改法（AC#3 表里选的，⛔ 不要改选）**：`LevelOfSamples` 里**先减本帧均值再算 RMS**（两趟、float64、无状态、无分配、签名不变）。⛔ 一阶高通/差分（85 Hz 削 −29.5 dB，不可用）；⛔ 有状态 DC 阻断器（多一条尺、有尾、砸掉纯函数性质）。
+
+**落点（表里给的，逐处对行号）**：`level.go:96-107`（求和那段）／`level.go:17-39+89-95`（两句注释：`MinLevel` 含义变了、`MaxLevel=1.0` 变不可达）／`level_test.go:72-88`／`amplitudepair_297_windows_test.go:59-65+111-128`／`capturelevel_windows_test.go:21-24+48-54`／新建 1 枚钉。
+
+**三条表里点名必须处理的**：
+1. `capturelevel` 那枚夹具**不会红、但在空转** ⇒ 改成"恒定 DC 帧必须读**恰好 0**"当**正面见证**。
+2. `amplitudepair` 的**判据盲点**：`ratio := meanHigh/meanLow` 在 `meanLow==0` 时是 **NaN**，而 `math.Abs(NaN-ampRatio) > 0.01` 是 **false** ⇒ **静默通过**。⇒ 加 `meanLow<=0` 守门（⚠ 注意：紧随其后的 `wantLow` 断言在 `lowCounts!=0` 时会兜住，所以这是**补洞**不是当前已红 —— 别把它说成"现在就是红的"）。
+3. `MinLevel`／`MaxLevel` 那两句注释**必须同批改**，否则变假话。
+
+**判据（"直流被去掉"必须是可判事实，⛔ 拿"看起来更低"）**：恒定帧读**恰好 0**（float64/float32 位全零）＋ **平移不变位级相等** `level(s)==level(s+c)`（`Float64bits` 相同）＋ 闭式 `DC+整周期正弦 = A/√2/FS`（表里给了 `DC12345+正弦6000`：`0.398368 → 0.1294765`）。新钉**改前必须红**（表里实测 `0.0647 → 0.3823`）、改后绿。
+
+**门禁**：`go test ./internal/audio` 四数；`gofumpt -l` 空（`D:\work\base\gopath\bin\gofumpt.exe`）；`go vet`；`d22scan` clean；path-length `VERDICT GREEN`（⚠ 若你改了票名就同时改名册，见台账 A1871）。
+**⛔ 冻结面**：`thresholds.go`（含 `SilenceLevelGate=0.06`、`SineLevelTolerance=5e-5`）／golden／`allowlist.txt` **一字节不许动**。`0.06` 的**含义**会变（方向严格更低，实测最大增量 +0.000e+00）—— **在证据里写清、⛔ 改数字**。
+**⛔ 别动**：票 247 那一族台件的门槛（另一张票，另有非实现者验）；`cmd/wisp/**`；`internal/panel/**`；`internal/llm/**`；`internal/tools/**`；`tools/d22scan/**`；`frontend/**`；`design/**`。
+⛔ 放宽任何既有断言（`SineLevelTolerance=5e-5` 一字节不用动，表里实测三枚正弦误差改前改后逐位相同）；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+回话第一行＝commit hash ＋「5 处落点各改了什么（一行一处）」＋「新钉改前红/改后绿（是/否）」＋「冻结面命中 0」。没干完写「未完成，卡在哪」。
