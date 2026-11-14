@@ -1,0 +1,177 @@
+AUDIT 449 -- frozen-surface checks, run 2026-11-14 22:23:09 +08:00 at HEAD 116a2efff
+Target commit under audit: f9b6d60f7 (parent ead1ee91f)
+
+[1] git show --name-only f9b6d60f7 (13 files)
+    .scratch/wisp/probes/291/land/01-baseline.txt
+    .scratch/wisp/probes/291/land/02-newtooth-on-OLD-code.txt
+    .scratch/wisp/probes/291/land/03-after-change.txt
+    .scratch/wisp/probes/291/land/04-newtooth-after-change.txt
+    .scratch/wisp/probes/291/land/05-newtooth-on-OLD-code-all4.txt
+    .scratch/wisp/probes/291/land/06-final-audio-v.txt
+    .scratch/wisp/probes/291/land/07-guard-control-zero-amp-WITH-guard.txt
+    .scratch/wisp/probes/291/land/08-guard-control-zero-amp-WITHOUT-guard.txt
+    internal/audio/amplitudepair_297_windows_test.go
+    internal/audio/capturelevel_windows_test.go
+    internal/audio/level.go
+    internal/audio/level_dc_291_test.go
+    internal/audio/level_test.go
+[2] frozen-name grep over [1]: HITS=0
+
+[3] git diff --numstat f9b6d60f7^ f9b6d60f7 -- <frozen set> (thresholds.go, internal/ball, docs/PLAN.md, docs/specs, allowlist.txt, all golden dirs)
+    (no output) => 0 files, 0 lines changed
+
+[4] git diff --numstat f9b6d60f7 -- <same frozen set>  (worktree now vs the audited commit)
+    (no output) => 0 files, 0 lines changed since the commit
+
+[5] blob hashes (git object ids, EOL/BOM independent)
+    internal/ball/liquid.go
+      parent   854caf43a03346901d633e626a7e264b9d896365
+      commit   854caf43a03346901d633e626a7e264b9d896365
+      worktree 854caf43a03346901d633e626a7e264b9d896365
+      identical parent==commit==worktree: True
+    internal/observe/thresholds.go
+      parent   e2677b11b5a5adff8b4eb87c36d31286a274471d
+      commit   e2677b11b5a5adff8b4eb87c36d31286a274471d
+      worktree e2677b11b5a5adff8b4eb87c36d31286a274471d
+      identical parent==commit==worktree: True
+    tools/d22scan/allowlist.txt
+      parent   6b61fad57085a52a62d4ff513209a817b96a3067
+      commit   6b61fad57085a52a62d4ff513209a817b96a3067
+      worktree 6b61fad57085a52a62d4ff513209a817b96a3067
+      identical parent==commit==worktree: True
+    docs/PLAN.md
+      parent   9269066693a0161e8ec24319d5a6e68499ff9315
+      commit   9269066693a0161e8ec24319d5a6e68499ff9315
+      worktree 9269066693a0161e8ec24319d5a6e68499ff9315
+      identical parent==commit==worktree: True
+    docs/specs (14 tracked files): tree identical parent==commit: True ; count=14
+
+[6] internal/ball/liquid.go line 30, verbatim (grep -n)
+    f9b6d60f7:internal/ball/liquid.go:30:	SilenceLevelGate   = 0.06 // envelope below this counts as "nobody speaking"
+    f9b6d60f7:internal/ball/liquid.go:272:	if raw < SilenceLevelGate {
+    [+] live line 30 text = "	SilenceLevelGate   = 0.06 // envelope below this counts as "nobody speaking""
+
+[7] level.go diff lines that ADD or REMOVE a line touching SineLevelTolerance or 5e-5 (expect none)
+    (none) => the named tolerance's bytes are context only, not touched
+
+[8] full level.go diff hunk under audit (for the record)
+    diff --git a/internal/audio/level.go b/internal/audio/level.go
+    index ed10664ec..af05797ea 100644
+    --- a/internal/audio/level.go
+    +++ b/internal/audio/level.go
+    @@ -14,29 +14,42 @@ import (
+     // (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+     // This file defines the range itself, in code, in front of any consumer.
+     //
+    -// THE SCALE. level = sqrt(mean(sample^2)) / LevelFullScale over one C8 seam
+    -// frame, i.e. plain unweighted RMS of the int16 samples referenced to the
+    -// largest magnitude int16 can hold. It is a physical number, not a perceptual
+    -// one: no gain, no compression, no noise floor, no smoothing.
+    +// THE SCALE. level = sqrt(mean((sample - mean(sample))^2)) / LevelFullScale
+    +// over one C8 seam frame: the window's own mean (its DC) is removed first, then
+    +// plain unweighted RMS of what is left, referenced to the largest magnitude
+    +// int16 can hold. It is a physical number, not a perceptual one: no gain, no
+    +// compression, no noise floor, no smoothing.
+     //
+     //	endpoints
+    -//	  level 0.0  exactly: every sample of the frame is silent (all zero).
+    -//	             There is no floor offset - a frame reads 0 only when it IS 0.
+    -//	  level 1.0  exactly: every sample sits at the largest magnitude an int16
+    -//	             can carry (-32768), which is the definition of LevelFullScale.
+    +//	  level 0.0  exactly: every sample of the frame is equal, i.e. the frame is
+    +//	             pure DC (silence is the special case). There is no floor
+    +//	             offset, and since the DC is removed any frame that does not
+    +//	             change reads exactly 0 - not only the all-zero one.
+    +//	  level 1.0  is the closed upper bound of the scale and is NOT attained by
+    +//	             any legal frame. Reaching it would need every sample at the one
+    +//	             largest magnitude (-32768), and that frame is constant, so its
+    +//	             DC is removed and it reads 0. The hottest legal frame is the
+    +//	             anti-symmetric square +32767/-32768: its mean is -0.5, its RMS
+    +//	             is 32767.5 about that mean, so it reads 32767.5/32768 =
+    +//	             0.9999847412109375 = MaxLevel - LevelLSB/2 exactly.
+     //	upper bound for real symmetric signals
+     //	  FullScaleSquareLevel = 32767/32768 = 0.999969482421875: the strongest
+    -//	  square wave the seam can carry without clipping (+-32767) reads exactly
+    -//	  this, one LSB (LevelLSB) below 1.0. That one LSB is quantisation, not a
+    -//	  bug, and it is why the endpoint is stated as "1.0 or a named bound".
+    +//	  centred square wave the seam can carry without clipping (+-32767) reads
+    +//	  exactly this, one LSB (LevelLSB) below 1.0. That one LSB is quantisation,
+    +//	  not a bug.
+     //	smallest non-zero reading
+     //	  a +-1 LSB square wave reads exactly LevelLSB = 1/32768 = 3.0518e-5.
+     //	shapes
+     //	  a full-scale sine reads 1/sqrt(2) = 0.7071067812, within SineLevelTolerance.
+     //	  the scale is LINEAR in amplitude: halving the amplitude halves the level.
+    -//	  DC counts: RMS does not remove a DC offset, so a frame held at -32768
+    -//	  reads 1.0. Consumers that need "voice only" gate it themselves (the ball
+    -//	  does, with SilenceLevelGate).
+    +//	  DC does not count: an offset that is constant across one window leaves the
+    +//	  reading bit-identical (level(s) == level(s + c) for any in-range c), so a
+    +//	  frame holding a DC offset plus a small signal reads exactly that small
+    +//	  signal's RMS. The removed DC is the window's own mean, not a filtered
+    +//	  floor: ticket 291 moved this definition (a quiet mic used to read its
+    +//	  device offset instead of its noise). SilenceLevelGate = 0.06 keeps its
+    +//	  number; what its 6% is measured against is now AC content rather than
+    +//	  DC-inclusive RMS, and the AC reading is never higher for the same signal.
+     //
+     // WHAT THIS TICKET DELIBERATELY DOES NOT DECIDE. 240-c1 sec 5 registered D-1
+     // ("is the ball's envelope linear rms/full-scale, or does it want gain or
+    @@ -75,7 +88,11 @@ const FullScaleSquareLevel = 32767.0 / LevelFullScale
+     // pinned from both sides by TestLevelSineToleranceIsNamedAndBounded.
+     const SineLevelTolerance = 5e-5
+     
+    -// MinLevel and MaxLevel are the closed ends of the scale.
+    +// MinLevel and MaxLevel are the closed ends of the scale. Since ticket 291
+    +// removes the window's DC, MinLevel (0) is what every constant frame reads, and
+    +// MaxLevel (1.0) is a bound no legal frame attains (the hottest one reads
+    +// MaxLevel-LevelLSB/2, see the endpoints note above). Both stay as closed
+    +// bounds so that no consumer ever has to clamp.
+     const (
+     	MinLevel = 0.0
+     	MaxLevel = 1.0
+    @@ -86,9 +103,15 @@ const (
+     // goroutine (a level reader is called from the consumer's own thread, and D38b
+     // leaves no spare resident slot for a level-only goroutine).
+     //
+    -// The sum of squares accumulates in int64, which is exact for any seam frame
+    -// (512 * 32768^2 = 2^39, far inside int64) and for anything the seam can hold,
+    -// so the same input always produces the same bits.
+    +// Two passes over the window: the first sums the samples in int64, which is
+    +// exact for any seam window (512 * 32768 = 2^24, far inside int64), so the
+    +// removed mean is the arithmetic mean rounded once to float64; the second
+    +// accumulates the squared deviations from that mean as float64 in a fixed
+    +// order. Nothing is shared between calls, so the same input always produces the
+    +// same bits. The sum is taken as int64 rather than the algebraically shorter
+    +// E[s^2]-(E[s])^2 because that one-pass form cancels catastrophically on a
+    +// large DC with a small signal and would report a fake level for a constant
+    +// frame instead of exactly 0.
+     //
+     // An empty window has no energy to measure and reads MinLevel (0); callers that
+     // must distinguish "no frame" from "silent frame" should use FrameLevel, which
+    @@ -97,12 +120,17 @@ func LevelOfSamples(samples []int16) float64 {
+     	if len(samples) == 0 {
+     		return MinLevel
+     	}
+    -	var sumSquares int64
+    +	var sum int64
+     	for _, s := range samples {
+    -		v := int64(s)
+    -		sumSquares += v * v
+    +		sum += int64(s)
+     	}
+    -	rms := math.Sqrt(float64(sumSquares) / float64(len(samples)))
+    +	mean := float64(sum) / float64(len(samples))
+    +	var sumSquares float64
+    +	for _, s := range samples {
+    +		d := float64(s) - mean
+    +		sumSquares += d * d
+    +	}
+    +	rms := math.Sqrt(sumSquares / float64(len(samples)))
+     	return rms / LevelFullScale
+     }
+     
+
+[9] git status --porcelain over internal/ and every frozen dir (expect empty)
+    (empty)
+    note: tools/d22scan/ has one UNTRACKED file 'check_blob_417.sh' (not mine; listed here only so nothing is hidden):
+      ?? tools/d22scan/check_blob_417.sh

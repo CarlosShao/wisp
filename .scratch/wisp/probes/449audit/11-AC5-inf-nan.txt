@@ -1,0 +1,5 @@
+=== RUN   Test449InfInfIsNaN
+    zz_449_audit_test.go:244: AC#5 Inf-Inf: math.Abs(+Inf - +Inf) = NaN isNaN=true bits=7ff8000000000000 ; (diff > 0.01) = false
+--- PASS: Test449InfInfIsNaN (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.069s

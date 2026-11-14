@@ -1,0 +1,11 @@
+=== RUN   TestLevelDCFrameReadsZero
+--- PASS: TestLevelDCFrameReadsZero (0.00s)
+=== RUN   TestLevelTranslationInvariant
+--- PASS: TestLevelTranslationInvariant (0.00s)
+=== RUN   TestLevelDCPlusSineReadsClosedFormRMS
+    level_dc_291_test.go:127: DC 12345 + sine 6000 reads 0.1294765192, closed form A/sqrt(2)/FullScale = 0.1294751186 (the DC-inclusive reading was 0.3983676962)
+--- PASS: TestLevelDCPlusSineReadsClosedFormRMS (0.00s)
+=== RUN   TestLevelHottestLegalFrameStaysBelowMaxLevel
+--- PASS: TestLevelHottestLegalFrameStaysBelowMaxLevel (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.046s

@@ -1,0 +1,7 @@
+=== RUN   Test449SineToleranceErrors
+    zz_449_audit_test.go:227: SINE amp 32767: level=0.70708364928828604 bits=3fe6a06de3a7583f want=0.70710678118654757 err=2.31318982615302815e-05 bits=3ef8416bf1c70000 passes=5.0e-05=true
+    zz_449_audit_test.go:227: SINE amp 16384: level=0.3535522639041434 bits=3fd6a099acb9489e want=0.35355339059327379 err=1.12668913038183049e-06 bits=3eb2e717ccbc0000 passes=5.0e-05=true
+    zz_449_audit_test.go:227: SINE amp  8192: level=0.176778960510595 bits=3fc6a0b16701c6da want=0.17677669529663689 err=2.26521395810252990e-06 bits=3ec300828b0d0000 passes=5.0e-05=true
+--- PASS: Test449SineToleranceErrors (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.065s

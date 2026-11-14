@@ -1,0 +1,15 @@
+=== RUN   TestLevelDCFrameReadsZero
+    level_dc_291_test.go:47: constant 1 frame = 3.0517578124996788e-09, want exactly 0: a frame that does not change carries no level
+--- FAIL: TestLevelDCFrameReadsZero (0.00s)
+=== RUN   TestLevelTranslationInvariant
+    level_dc_291_test.go:82: adding a constant DC of -12345 moved the level from 0.06473924235500596 to 0.06473925331687663: the scale still counts DC
+--- FAIL: TestLevelTranslationInvariant (0.00s)
+=== RUN   TestLevelDCPlusSineReadsClosedFormRMS
+    level_dc_291_test.go:127: DC 12345 + sine 6000 reads 0.1294765247, closed form A/sqrt(2)/FullScale = 0.1294751186 (the DC-inclusive reading was 0.3983676962)
+    level_dc_291_test.go:136: the same sine read 0.1294765192419605 without the DC and 0.1294765247229794 with it
+--- FAIL: TestLevelDCPlusSineReadsClosedFormRMS (0.00s)
+=== RUN   TestLevelHottestLegalFrameStaysBelowMaxLevel
+--- PASS: TestLevelHottestLegalFrameStaysBelowMaxLevel (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.040s
+FAIL

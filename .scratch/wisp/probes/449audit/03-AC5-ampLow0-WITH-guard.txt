@@ -1,0 +1,6 @@
+=== RUN   TestAC297KnownAmplitudePairSeparates
+    amplitudepair_297_windows_test.go:139: window A mean = 0: the ruler read silence for a 0-count square, so the ratio has no denominator
+--- FAIL: TestAC297KnownAmplitudePairSeparates (0.84s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	1.042s
+FAIL

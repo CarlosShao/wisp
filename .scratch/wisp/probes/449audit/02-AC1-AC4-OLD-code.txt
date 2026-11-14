@@ -1,0 +1,64 @@
+=== RUN   Test449AC1ConstantFrameIsPositiveZero
+    zz_449_audit_test.go:36: AC#1 const      0: LevelOfSamples=0 bits=0000000000000000 ; FrameLevel=0 f32bits=00000000 signbit(f64)=false signbit(f32)=false
+    zz_449_audit_test.go:36: AC#1 const      1: LevelOfSamples=3.0517578125e-05 bits=3f00000000000000 ; FrameLevel=3.05175781e-05 f32bits=38000000 signbit(f64)=false signbit(f32)=false
+    zz_449_audit_test.go:39: AC#1 constant 1: LevelOfSamples = 3.0517578125e-05 (bits 3f00000000000000), want exactly +0
+    zz_449_audit_test.go:42: AC#1 constant 1: FrameLevel = 3.0517578e-05 (bits 38000000), want exactly +0 (float32)
+    zz_449_audit_test.go:36: AC#1 const     -1: LevelOfSamples=3.0517578125e-05 bits=3f00000000000000 ; FrameLevel=3.05175781e-05 f32bits=38000000 signbit(f64)=false signbit(f32)=false
+    zz_449_audit_test.go:39: AC#1 constant -1: LevelOfSamples = 3.0517578125e-05 (bits 3f00000000000000), want exactly +0
+    zz_449_audit_test.go:42: AC#1 constant -1: FrameLevel = 3.0517578e-05 (bits 38000000), want exactly +0 (float32)
+    zz_449_audit_test.go:36: AC#1 const  12345: LevelOfSamples=0.376739501953125 bits=3fd81c8000000000 ; FrameLevel=0.376739502 f32bits=3ec0e400 signbit(f64)=false signbit(f32)=false
+    zz_449_audit_test.go:39: AC#1 constant 12345: LevelOfSamples = 0.376739501953125 (bits 3fd81c8000000000), want exactly +0
+    zz_449_audit_test.go:42: AC#1 constant 12345: FrameLevel = 0.3767395 (bits 3ec0e400), want exactly +0 (float32)
+    zz_449_audit_test.go:36: AC#1 const  32767: LevelOfSamples=0.999969482421875 bits=3fefffc000000000 ; FrameLevel=0.999969482 f32bits=3f7ffe00 signbit(f64)=false signbit(f32)=false
+    zz_449_audit_test.go:39: AC#1 constant 32767: LevelOfSamples = 0.999969482421875 (bits 3fefffc000000000), want exactly +0
+    zz_449_audit_test.go:42: AC#1 constant 32767: FrameLevel = 0.9999695 (bits 3f7ffe00), want exactly +0 (float32)
+    zz_449_audit_test.go:36: AC#1 const -32768: LevelOfSamples=1 bits=3ff0000000000000 ; FrameLevel=1 f32bits=3f800000 signbit(f64)=false signbit(f32)=false
+    zz_449_audit_test.go:39: AC#1 constant -32768: LevelOfSamples = 1 (bits 3ff0000000000000), want exactly +0
+    zz_449_audit_test.go:42: AC#1 constant -32768: FrameLevel = 1 (bits 3f800000), want exactly +0 (float32)
+--- FAIL: Test449AC1ConstantFrameIsPositiveZero (0.00s)
+=== RUN   Test449AC2TranslationInvarianceBitExact
+    zz_449_audit_test.go:59: AC#2 base (sine 3000, 5 cycles): level=0.064739242355005958 bits=3fb092c040aebcd1
+    zz_449_audit_test.go:68: AC#2 base FrameLevel=0.06473924 bits=3d849602
+    zz_449_audit_test.go:83: AC#2 shift -12345: level=0.38226145742487416 bits=3fd876f8c28a4ff8 f64bits-equal=false ; FrameLevel=0.382261455 f32bits=3ec3b7c6 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift -12345 moved Float64bits from 3fb092c040aebcd1 to 3fd876f8c28a4ff8 (0.06473924235500596 vs 0.38226145742487416)
+    zz_449_audit_test.go:90: AC#2 shift -12345 moved Float32bits from 3d849602 to 3ec3b7c6
+    zz_449_audit_test.go:83: AC#2 shift  -3000: level=0.1121297136009876 bits=3fbcb4886cd37a83 f64bits-equal=false ; FrameLevel=0.112129711 f32bits=3de5a443 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift -3000 moved Float64bits from 3fb092c040aebcd1 to 3fbcb4886cd37a83 (0.06473924235500596 vs 0.1121297136009876)
+    zz_449_audit_test.go:90: AC#2 shift -3000 moved Float32bits from 3d849602 to 3de5a443
+    zz_449_audit_test.go:83: AC#2 shift     -1: level=0.064739249547880712 bits=3fb092c05f936312 f64bits-equal=false ; FrameLevel=0.0647392496 f32bits=3d849603 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift -1 moved Float64bits from 3fb092c040aebcd1 to 3fb092c05f936312 (0.06473924235500596 vs 0.06473924954788071)
+    zz_449_audit_test.go:90: AC#2 shift -1 moved Float32bits from 3d849602 to 3d849603
+    zz_449_audit_test.go:83: AC#2 shift     +1: level=0.064739249547880712 bits=3fb092c05f936312 f64bits-equal=false ; FrameLevel=0.0647392496 f32bits=3d849603 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift +1 moved Float64bits from 3fb092c040aebcd1 to 3fb092c05f936312 (0.06473924235500596 vs 0.06473924954788071)
+    zz_449_audit_test.go:90: AC#2 shift +1 moved Float32bits from 3d849602 to 3d849603
+    zz_449_audit_test.go:83: AC#2 shift  +3000: level=0.1121297136009876 bits=3fbcb4886cd37a83 f64bits-equal=false ; FrameLevel=0.112129711 f32bits=3de5a443 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift +3000 moved Float64bits from 3fb092c040aebcd1 to 3fbcb4886cd37a83 (0.06473924235500596 vs 0.1121297136009876)
+    zz_449_audit_test.go:90: AC#2 shift +3000 moved Float32bits from 3d849602 to 3de5a443
+    zz_449_audit_test.go:83: AC#2 shift +12345: level=0.38226145742487416 bits=3fd876f8c28a4ff8 f64bits-equal=false ; FrameLevel=0.382261455 f32bits=3ec3b7c6 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift +12345 moved Float64bits from 3fb092c040aebcd1 to 3fd876f8c28a4ff8 (0.06473924235500596 vs 0.38226145742487416)
+    zz_449_audit_test.go:90: AC#2 shift +12345 moved Float32bits from 3d849602 to 3ec3b7c6
+    zz_449_audit_test.go:83: AC#2 shift +20000: level=0.61377536554255063 bits=3fe3a40c3c430ffa f64bits-equal=false ; FrameLevel=0.613775373 f32bits=3f1d2062 f32bits-equal=false
+    zz_449_audit_test.go:86: AC#2 shift +20000 moved Float64bits from 3fb092c040aebcd1 to 3fe3a40c3c430ffa (0.06473924235500596 vs 0.6137753655425506)
+    zz_449_audit_test.go:90: AC#2 shift +20000 moved Float32bits from 3d849602 to 3f1d2062
+--- FAIL: Test449AC2TranslationInvarianceBitExact (0.00s)
+=== RUN   Test449AC3DCPlusSineClosedForm
+    zz_449_audit_test.go:111: AC#3 DC 12345 + sine 6000: read=0.3983676962 (0.39836769618896367) closed=0.1294751186 (0.12947511862546646) diff=2.689e-01 (= 192066.13 x 1.4e-6) tol=5.0e-05
+    zz_449_audit_test.go:113: AC#3 same sine without DC: 0.12947651924196049 bits=3fc092afc3df3fd1 ; with DC bits=3fd97edb38ba868f ; bit-equal=false
+    zz_449_audit_test.go:116: AC#3 old (DC-counting) reading to compare against: the ticket says 0.3983676962; this run's value for the pre-change arithmetic is in the paired OLD-code log
+    zz_449_audit_test.go:117: AC#3 distance from the old reading: |read-0.398367696| = 0.000000
+    zz_449_audit_test.go:119: AC#3 read 0.39836769618896367, want 0.12947511862546646 within 5e-05 (off by 2.689e-01)
+--- FAIL: Test449AC3DCPlusSineClosedForm (0.00s)
+=== RUN   Test449AC4Ceiling
+    zz_449_audit_test.go:140: AC#4 hottest frame: level=0.9999847413273546 want=0.9999847412109375 equal=false ; FrameLevel=0.999984741 bits=3f7fff00 ; MaxLevel=1 attained=false
+    zz_449_audit_test.go:142: AC#4 MaxLevel-LevelLSB/2 = 0.9999847412109375 ; LevelLSB = 3.0517578125e-05 ; FullScaleSquareLevel = 0.999969482421875
+    zz_449_audit_test.go:145: AC#4 hottest legal frame = 0.9999847413273546, want exactly 0.9999847412109375
+    zz_449_audit_test.go:155: AC#4 analytic bound: |s-mean| <= 32767.5 => level <= 0.9999847412109375 < 1.0 ; gap to 1.0 = 1.52587890625e-05 (= LevelLSB/2)
+    zz_449_audit_test.go:203: AC#4 search: max level over extreme families + 200000 random frames = 0.9999847413273546 (anti-symmetric +32767/-32768) ; MaxLevel attained=false
+    zz_449_audit_test.go:206: AC#4 search exceeded the analytic bound: 0.9999847413273546 > 0.9999847412109375
+--- FAIL: Test449AC4Ceiling (0.39s)
+=== RUN   Test449ToleranceReading
+    zz_449_audit_test.go:216: AC-note SineLevelTolerance = 5.0000000000000002e-05 (5e-5) ; MinLevel=0 MaxLevel=1 LevelFullScale=32768
+--- PASS: Test449ToleranceReading (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.613s
+FAIL
