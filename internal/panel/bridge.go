@@ -198,7 +198,11 @@ func knownComposerMethod(m string) bool {
 
 // RefusedEnvelopeForUser is the answer the host renders when a request never
 // made it past ParseComposerRequest: it names the id so the user's own action is
-// traceable, and it never degrades into a silent drop.
+// traceable, and it never degrades into a silent drop. The cause half goes
+// through the error-code branch (ticket 216 AC#5): a D37-classified error
+// gains its class's own leading sentence, picked by observe.ClassOf - never by
+// a substring of the error text (the forbidden ChatInput.tsx:2205 "413"
+// shape). Unclassified errors render exactly as they did before AC#5.
 func RefusedEnvelopeForUser(r ComposerRequest, err error) string {
 	id := r.RequestID
 	if id == "" {
@@ -208,5 +212,5 @@ func RefusedEnvelopeForUser(r ComposerRequest, err error) string {
 	if method == "" {
 		method = "(无 method)"
 	}
-	return fmt.Sprintf("面板请求被拒绝 [%s %s]：%v", method, id, err)
+	return fmt.Sprintf("面板请求被拒绝 [%s %s]：%s", method, id, userFacingErrorSentence216(err))
 }
