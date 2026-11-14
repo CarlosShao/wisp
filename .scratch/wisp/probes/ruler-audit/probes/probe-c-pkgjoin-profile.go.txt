@@ -1,0 +1,22 @@
+//go:build windows
+
+package main
+
+// Ticket 314 ruler audit, PROBE SET C (parse-only: never compiled). The real
+// ruler binary reads sources from disk at run time, so a file that only has to
+// PARSE can show whether a shape rings without a full package rebuild.
+//
+// X2: a fixed join parked in a PACKAGE-LEVEL variable and handed to the sink
+// from a function. Neither rule is supposed to see this: NAME wants the word
+// "profile", SINK only promotes LOCAL bindings and only walks function bodies.
+
+import (
+	"os"
+	"path/filepath"
+)
+
+var auditPkgJoin = filepath.Join(os.TempDir(), "wisp-auditx2-panel-profile")
+
+func auditPkgJoinSink() {
+	_ = NewPanelManager(nil, nil, auditPkgJoin)
+}

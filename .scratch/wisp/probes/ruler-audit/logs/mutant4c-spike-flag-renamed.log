@@ -1,0 +1,9 @@
+time=2026-11-14T14:04:11.118+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:190: 豁免 scripts/spike/webview2-latency/main.go 的理由句在源码里找不到了："flag.String(\"datapath\""
+        这条豁免的正当性是从那段注释读出来的；注释改掉后它还留着，就成了一张没有出处的通行证。重读源码、逐字重抄一句，或删掉这条豁免。
+    panel_profile_leaf_shape_windows_test.go:192: 314 形状尺：扫了 274 个源文件，2 处固定名命中（2 处具名豁免、0 处红）
+--- FAIL: Test314FixedPanelProfileLeafShapeIsRed (0.72s)
+FAIL

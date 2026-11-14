@@ -1,0 +1,20 @@
+time=2026-11-14T14:07:59.356+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditRulerProbeTable
+    zzz_ruler_audit_probe_b_windows_test.go:267: [HIT] A1a helper return, profile leaf, value to sink | leaves=["wisp-audit1a-panel-profile"] lines=["8"] want=["wisp-audit1a-panel-profile"] | the audit's attack 1 verbatim
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A1b helper return, plain leaf, value to sink | leaves=[] lines=[] want=[] | same flow, leaf avoids the word profile: only SINK could see it
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A1c param helper (header escape 1) | leaves=[] lines=[] want=[] | root inside the helper, literal at the call site
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A2a two half literals inside one Join | leaves=[] lines=[] want=[] | at the sink, the most favourable position
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A2b whole path by + concatenation | leaves=[] lines=[] want=[] | os.TempDir() + "/wisp-33r1" + "-panel-profile"
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A2c leaf by strings.Join | leaves=[] lines=[] want=[] | Join(os.TempDir(), strings.Join([]string{...}, ""))
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A2d join then suffix, outside the Join | leaves=[] lines=[] want=[] | the + sits between the Join call and the tail literal
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A2e concatenated value bound to a local, then to the sink | leaves=[] lines=[] want=[] | the binding the SINK rule does promote must be a bare Join
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A3a root os.Getenv("TEMP") | leaves=[] lines=[] want=[] | not os.TempDir()
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A3b root home directory | leaves=[] lines=[] want=[] | not os.TempDir()
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] A3c absolute literal root | leaves=[] lines=[] want=[] | no root expression at all
+    zzz_ruler_audit_probe_b_windows_test.go:267: [SILENT] X1 package-level DataPath key, plain leaf | leaves=[] lines=[] want=[] | bonus: not in the header's escape list
+    zzz_ruler_audit_probe_b_windows_test.go:267: [HIT] C1 control: inline join, plain leaf, to sink | leaves=["wisp-plain"] lines=["8"] want=["wisp-plain"] | proves SINK works at all
+    zzz_ruler_audit_probe_b_windows_test.go:267: [HIT] C2 control: NAME alone, no sink | leaves=["wisp-name-only-profile"] lines=["8"] want=["wisp-name-only-profile"] | profile leaf in a returned join
+    zzz_ruler_audit_probe_b_windows_test.go:267: [HIT] C3 control: DataPath field assignment | leaves=["wisp-field"] lines=["8"] want=["wisp-field"] | one of the four SINK forms, has no case in the 14
+    zzz_ruler_audit_probe_b_windows_test.go:267: [HIT] C4 control: DataPath key inside a function body | leaves=["wisp-key"] lines=["9"] want=["wisp-key"] | another of the four SINK forms, also has no case in the 14
+--- PASS: TestAuditRulerProbeTable (0.01s)
+PASS

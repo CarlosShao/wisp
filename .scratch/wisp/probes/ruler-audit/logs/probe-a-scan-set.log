@@ -1,0 +1,12 @@
+time=2026-11-14T14:02:11.059+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:187: cmd/wisp/zzz_ruler_audit_probe_a_windows_test.go:19 命中固定名面板 profile 形状（叶 "wisp-audit1a-panel-profile"）：
+            return filepath.Join(os.TempDir(), "wisp-audit1a-panel-profile")
+        这个形状会让两发并发互踩同一个 WebView2 user-data 夹：一个夹就是一个浏览器 profile，两个测试进程在同一条夹上各起一套顶层 browser host —— 先到的 CreateEnvironment 争同一夹会回 S_OK+NULL environment，后到的 environment 会 JOIN 一个正在退场的浏览器进程（internal/ball/orb_windows.go:432-458 的两条守卫）；票 314 的测量把同一夹同 tick 两个顶层 host 抓成过约 1.2 秒的共存读数。
+        ticket 314 的非实现者审计量过这形的牙是零：把默认档 panel_unbound_253r6_windows_test.go:71 改回固定名，go test -c rc=0、Test253r6 PASS —— 仓里没有断言读叶名唯一性，所以只有这把源码形状尺能让这种回退红。
+        改法＝panelProfileLeaf("wisp-audit1a-panel-profile")（cmd/wisp/panel_host_windows_test.go 的既有 helper，叶＝prefix-pid-纳秒）；确有理由共用同一个夹的，在 panelProfileLeafExemptions 里按「文件＋叶名」具名登记，并把源码里那句理由逐字抄进 quotes。
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:192: 314 形状尺：扫了 276 个源文件，3 处固定名命中（2 处具名豁免、1 处红）
+--- FAIL: Test314FixedPanelProfileLeafShapeIsRed (0.63s)
+FAIL
