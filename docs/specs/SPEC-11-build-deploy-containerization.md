@@ -41,8 +41,8 @@ Wisp 是 Windows 桌面常驻应用：Win32 分层窗口 + WASAPI 音频 + WebVi
 ```
 scripts/build.ps1 [-Env dev|prod] :
   1. fetch-deps.ps1        # 校验/补齐 third_party/（有缓存则秒过）
-  2. 前端产物：存在则跳过；--with-frontend 时走 docker/frontend.Dockerfile（§3.2）
-  3. go build（cgo: CGO_ENABLED=1, CC=mingw32-gcc; embed assets/web 已就位）
+  2. 前端产物：在 frontend/ 下跑 npm ci（node_modules 不存在时）＋ npm run build，产出 frontend/dist，并校验其中有本趟构建新增的页面名册；没有 node/npm 或构建失败＝整条构建失败（无跳过路径）
+  3. go build（cgo: CGO_ENABLED=1, CC=mingw32-gcc; embed frontend/dist 已就位，见 frontend/embed.go）
   4. 产物：wisp.exe + onnxruntime.dll + sherpa-onnx c dll 同目录（§7.1）
   5. 输出 SHA256SUMS
 ```
@@ -65,23 +65,6 @@ ENV CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64
 - ⚠ **诚实标注**：mingw 交叉链接 sherpa Windows 预编译库的可行性由 **S0 spike 验证**；
   不可行则交叉路径降级为「仅纯 Go 包的 lint/test」，发布产物一律走 Windows 原生构建（§6 CI 已
   按此设计，不押注交叉路径）。
-
-### 3.2 `frontend.Dockerfile`（前端构建，S5 起需要）
-
-```dockerfile
-FROM node:20-alpine AS build
-WORKDIR /src
-COPY frontend/package*.json ./
-RUN npm ci
-COPY frontend/ ./
-RUN npm run build          # 产物 /src/dist
-FROM scratch AS export
-COPY --from=build /src/dist /dist
-# 用法：docker buildx build --output type=local,dest=assets/web -f docker/frontend.Dockerfile .
-```
-
-- 产物落 `assets/web/` 供 `//go:embed`；宿主机无需 Node；版本随 `package-lock.json` 钉死。
-- S5 之前 frontend 目录可空，构建脚本跳过该步。
 
 ### 3.3 `compose.dev.yml` / `compose.test.yml`（测试依赖服务）
 
@@ -122,7 +105,7 @@ COPY --from=build /src/dist /dist
 | `lint` | ubuntu + builder 镜像 | gofumpt/vet/staticcheck + **D22 七禁令静态扫描**（grep/AST）+ 零 emoji 扫描（design/ 与 frontend/） | 阻塞 |
 | `test-core` | ubuntu + compose | 纯 Go 逻辑单测/集成（agent/tools/risk/config/memory）+ 黄金流回放 + 契约测试 | 阻塞 |
 | `test-windows` | windows-latest | PathResolver 真实 junction 用例 + cgo 构建冒烟 + 崩溃边界测试 | 阻塞 |
-| `frontend` | ubuntu + node 镜像 | tsc/lint/build + 硬编码色值/emoji 扫描 | 阻塞（S5 起） |
+| `lint-frontend` | ubuntu-latest + actions/setup-node（node 24） | tsc/lint/build（vite → frontend/dist）+ 渲染证据 + token 漂移 | 阻塞（已在跑） |
 | `slo-smoke` | windows-latest | `slo-check.ps1` 内存/句柄子集（无音频场景） | 阻塞 |
 | `slo-full` | **self-hosted Windows**（用户机器或专用机） | 六态全量 + 回落 + 延迟 + CER | 合并前必须本地/自托管跑（脚本同份） |
 | `asr-cer` | self-hosted + GPU 可选 | 双 wav 集 CER 门禁 | nightly + 模型变更触发 |

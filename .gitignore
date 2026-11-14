@@ -30,7 +30,6 @@ node_modules/
 # an "assets not built" state instead of ever rendering it.
 frontend/dist/*
 !frontend/dist/.gitkeep
-assets/web/dist/
 
 # --- Runtime data (never commit local data dirs) ---
 *.db

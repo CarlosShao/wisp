@@ -268,3 +268,27 @@ $ tr -cd '\r' < ... | wc -c      导出份＝24 ／ 工作树＝0
 - **备选落点（都没选，代价留给编排者复议）**：B＝`slo-full` 对应 build 步之后（+0.1–0.3 s，多一台机的独立性；没选：派单只点名 slo-smoke，且 slo-full 已承载"contended＝无结论"这层语义）；C＝`lint-frontend`（要新 job／跨 job 传 dist／新 artifact＝AC#2 乙形，且与出处闸门正冲；那个 job 是 ubuntu node-only，**根本没有 exe**）。
 - **纪律**：写面只有 ci.yml＋本件＋`probes/274/paci/**`（15 枚，含两枚 0 字节文件＝"重定向 0 字节"的物证）＋本节；⛔ `scripts/**`/产码/测试/规格/阈值/golden 零写入；⛔ `add -A`/amend/reset/rebase/stash/checkout .；⛔ **零 push**。本笔 commit 的 `--name-only` 逐枚可核。
 - **撤销口令**：**「274-paci 撤那一步」**＝删 ci.yml 里 `Shipped wisp.exe carries the page bundle` 整步（那 +81 行），其余文件不动即可回到 `631e9bd92` 的形状。
+
+## 收 `274-p1`（写腿：照 `Q-440` 裁定把 6 处规格文字改成今天真跑的那一形；起手锚 `6949484e1`；2026-11-14 16:2x +08；⛔ AC#8 未翻勾、⛔ 未 `-done`、⛔ 零 push）
+
+- **凭据（先读后动）**：台账 `Q-440 裁定`（`docs/reports/pending-and-issues.md:37114`）逐字「机主原话：**都按推荐**」⇒ 批 P1；逐句改文＝`docs/evidence/s1/274-c1-three-cells-verdict.md` §3.2（`:145` 起）。`SPEC-12 §4.1` 的「改契约须人工批准」这一步已由该裁定过掉 ⇒ 本腿只**照抄措辞**执行，⛔ 不自己另写一套。
+- **写面 3 枚文件／6 处落点（⛔ 无第 7 处语义改动）**：
+  1. `SPEC-11:44`（§2.2 第 2 步）→ `2. 前端产物：在 frontend/ 下跑 npm ci（node_modules 不存在时）＋ npm run build，产出 frontend/dist，并校验其中有本趟构建新增的页面名册；没有 node/npm 或构建失败＝整条构建失败（无跳过路径）`
+  2. `SPEC-11:45`（§2.2 第 3 步）→ `3. go build（cgo: CGO_ENABLED=1, CC=mingw32-gcc; embed frontend/dist 已就位，见 frontend/embed.go）`
+  3. `SPEC-11:69-84` **整节删除**（§3.2 `frontend.Dockerfile`，含代码块与两条要点；连它后面那枚空行一起删，删后 `:67` 与 `### 3.3` 之间仍留一枚空行）
+  4. `SPEC-11:125`（§6 表）→ `| lint-frontend | ubuntu-latest + actions/setup-node（node 24） | tsc/lint/build（vite → frontend/dist）+ 渲染证据 + token 漂移 | 阻塞（已在跑） |`
+  5. `SPEC-01:70`＋`:82`（目录树）→ `assets/web/embed.go` 那行改 `frontend/embed.go … //go:embed all:dist`；`frontend.Dockerfile` 那行删
+  6. `.gitignore:33` → 删死规则 `assets/web/dist/`（`frontend/dist/*` 与 `!frontend/dist/.gitkeep` 两行不动＝票 77 AC#1 的锚）
+- **一处具名偏离（我拍的；一句话可撤）**：§3.2 的 P1-5 把 `SPEC-01:70` 写成**一行**，但盘上那枚树行是**两枚物理行**（`:70` 正文 ＋ `:71` 续行 `#   不起 localhost HTTP 服务，D29）`）。①只按字面换 `:70` ⇒ 留下孤悬续行与**两个** `D29）`；②连 `:71` 一起删 ⇒ 丢掉 D29 那句真话（面板产物走 `AddWebResourceRequestedFilter`，**不起 localhost HTTP 服务**）。⇒ 我把两枚**合成一行**，并把原句真话原样留下：`├── frontend/embed.go                   # //go:embed all:dist（面板产物；AddWebResourceRequestedFilter 喂给 WebView2，不起 localhost HTTP 服务；D29）`。撤口令「**274-p1 那行按字面重做**」＝换回 §3.2 原句并删 `:71`。
+- **两处 §3.2 与盘上不符（只报，未自行发挥）**：
+  - ①P1-4 引的 `ci.yml:1535`（job 名）／`:1549`（setup-node）**行号已漂**：现量 job 名在 `:1616`、`runs-on: ubuntu-latest` 在 `:1617`、`actions/setup-node@v4` 在 `:1630`、`node-version: 24` 在 `:1634`。**断言本身逐条成立**，还多两条盘上已有而改文没写的东西：`token drift guard` 步 `:1650`、四道渲染证据步（`render:l2` `:1661`／`render:composer` `:1681`／`render:stream` `:1703`／`render:nav` `:1709`）⇒ 改文照抄；**没有**在 spec 里回填行号（spec 本来就不该引行号）。
+  - ②删掉 §3.2 后 `SPEC-11 §3` 编号留了空档（`3.1` 后直接 `3.3`）。⛔ 我没顺手把 `3.3` 改成 `3.2`（那会是第 7 处改动，且 `SPEC-11 §3.3` 可能被别处引用）⇒ 留编排者裁；若裁"重编号"，一句话即可，我或下一位腿改一行。
+- **验证读数（全部本腿现跑，⛔ 无引用别人的数）**：
+  - `git diff --stat`（3 枚文件）＝ `.gitignore` **+0/−1**、`SPEC-01` **+1/−3**、`SPEC-11` **+3/−20**，合计 **4 insertions／24 deletions**；逐块对 §3.2 六条，无第 7 处。
+  - 禁用词尺：`Select-String -Path docs/specs/*.md,.gitignore -Pattern 'with-frontend|assets/web|frontend\.Dockerfile'` ⇒ **0 命中**（改前为 **8 命中**，逐枚落在这 6 处落点内：`SPEC-01:70/:82`、`SPEC-11:44/:45/:69/:80/:83`、`.gitignore:33`）。
+  - `sh scripts/d22scan.sh` ⇒ **rc=0**，逐字 `d22scan: clean - no D22 ban violations`（`docs/**` 本不在扫描面，仍整跑一遍作自证；`ban #8 emoji` 覆盖 design 39＋frontend 123＋internal 1011＋cmd 282 文件）。
+  - `sh scripts/check-path-length-budget.sh` ⇒ **rc=0**、`VERDICT GREEN`（`tracked paths=20027 over-budget=69 covered by roster=69 not in roster=0`）；这两处改文不新增任何路径。
+  - `git diff --check` ⇒ clean（无空白错）。
+- **纪律**：⛔ **零 push**；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`；commit 走**显式 pathspec 逐枚列**（3 枚规格文件 ＋ 票面本节）。写面＝`docs/specs/SPEC-11*`／`docs/specs/SPEC-01*`／`.gitignore`／票面本节；⛔ `PLAN.md`、`C1–C32`、`D1–D47`、`thresholds.go`、golden、SLO 阈值、产码、`ci.yml` 零写入。
+- **未做（归非实现者／编排者）**：AC#8 那格**未翻**（`SPEC-12 §4.3` 裁决者≠实现者）。票面起手＝终态＝**11 勾／1 未勾**（尺＝`grep -cE '^- \[x\] \*\*AC#'`＝11、`grep -cE '^- \[ \] \*\*AC#'`＝1，唯一未勾就是 `AC#8`；`AC#0`/`AC#2` 是编排者 14:1x 翻的，本腿一枚没碰）。
+- **撤销口令**：**「274 P1 撤回」**（与 `Q-440 裁定` 同一条）＝按 `git show <改前>:<路径>` 逐字节退回这 3 枚文件，或整笔 revert 本 commit；⛔ 不用 reset/amend。

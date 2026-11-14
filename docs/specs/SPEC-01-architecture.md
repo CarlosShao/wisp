@@ -67,8 +67,7 @@ wisp/                                  # Go module: github.com/CarlosShao/wisp�
 │   └── observe/                       # slog JSONL、脱敏、诊断包、SLO 采样、CostMeter(C23) 落账
 ├── frontend/                          # React 面板（S5+；技术栈见 SPEC-08 §5）
 │   ├── src/…  └── vite.config.ts
-├── assets/web/embed.go                # //go:embed frontend 产物（AddWebResourceRequestedFilter 喂给 WebView2，
-│                                      #   不起 localhost HTTP 服务，D29）
+├── frontend/embed.go                   # //go:embed all:dist（面板产物；AddWebResourceRequestedFilter 喂给 WebView2，不起 localhost HTTP 服务；D29）
 ├── design/                            # 已有静态原型（C21 tokens.css 参考实现）
 ├── docs/                              # PLAN.md、specs/、contracts/(S1 生成)、slices/(S1 生成)、
 │                                      #   STATE_MACHINE.md、TOOLS.md、SLO.md、BUILD.md、DEFERRED.md、…
@@ -79,7 +78,6 @@ wisp/                                  # Go module: github.com/CarlosShao/wisp�
 │   └── spike/                         # S0 五项实测的测量程序（D44 S0 修订）
 ├── docker/
 │   ├── builder.Dockerfile             # Go + mingw-w64 构建镜像（SPEC-11 §3）
-│   ├── frontend.Dockerfile            # Node 20 构建镜像（输出 dist）
 │   └── compose.{dev,test}.yml         # mock-llm / mock-web / mock-search / model-mirror / ssrf-target
 ├── tools/mockllm/                     # Go 实现的 OpenAI/Anthropic 兼容 mock（SPEC-11 §4）
 ├── testdata/
