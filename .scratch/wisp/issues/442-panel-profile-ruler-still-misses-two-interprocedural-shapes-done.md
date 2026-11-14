@@ -22,7 +22,7 @@
 - [x] **AC#2 A1b 与 A1c 各一形必红**：造能编译的探针（仓外导出树），修后尺子**真红并点名**；还原后 SHA256 同串、再跑绿。
 - [x] **AC#3 不许钝化既有 36 子例**：\Test314PanelProfileShapeRulerRingsOnTheFixedNameShape\ 的 36 个形状子例＋1 汇总子例**逐条保留并仍 PASS**；豁免表仍 2 条、一字不动。
 - [x] **AC#4 性能上界**：尺子当前 0.53s（我现跑读数）。加跨过程分析后**必须在默认套件里仍是秒级**（给现跑数字）；若必须引第三方依赖，先报再动。
-- [ ] **AC#5 门禁四数**：\go vet -tags winlive ./cmd/wisp\ rc=0；\gofumpt -l cmd/wisp\ 空；\d22scan\ clean；path-length GREEN。
+- [x] **AC#5 门禁四数**：\go vet -tags winlive ./cmd/wisp\ rc=0；\gofumpt -l cmd/wisp\ 空；\d22scan\ clean；path-length GREEN。
 
 ## 边界
 写面：\cmd/wisp/panel_profile_leaf_shape_windows_test.go\（或新测试件）、\go.mod\／\go.sum\（**仅在 AC#1 选了要引依赖时，且先报**）、\docs/evidence/s1/442-*\、\.scratch/wisp/probes/442/**\、本票 Progress log。
@@ -90,6 +90,7 @@
   ⚠ **与票面字面的差异，记在此不隐去**：突变做法是**临时改仓内** `panel_unbound_253r6_windows_test.go:71` 再还原（`C9A14528…40551` 同串、`git status` 0 行、复绿），**不是票面写的「仓外导出树」**。实质（能编译的探针／真红并点名／还原后 SHA 同串）满足，字面不完全满足。是否重做由下一位读这句决定。
 - **AC#3** ✓ 我这一发 48 条子例全 PASS，其中 `Test314PanelProfileShapeRulerRingsOnTheFixedNameShape` 的子例共 **44 条（35 形＋1 汇总＋① 自带 8 条控制）**，一条没少；豁免表 23 行与 HEAD 同串（证据件 §2.1 记 `1F6424E8…3FE6388`，`SAME=True`）。**⛔ 未新增未放宽豁免。**
 - **AC#4** ✓ 秒级：`Test314FixedPanelProfileLeafShapeIsRed` **1.34 s**、`Test442EveryDrivenConstructionPointHandsItsOwnDataPath` **0.13 s**、整包 **2.00 s**（我的读数）；腿另报尺子 `0.83 s／扫 276 件`。**未引第三方依赖。**
-- **AC#5** ⏳ `go vet -tags winlive ./cmd/wisp` **rc=0**、`gofumpt -l cmd/wisp` **0 行**、`staticcheck` **rc=0**（我自己跑）；`d22scan` 与 `path-length` 两项我自己那发正在跑，落下后再勾。
+- **AC#5** ✓ **四项我自己全跑了**：`go vet -tags winlive ./cmd/wisp` **rc=0**（0 行）；`gofumpt -l cmd/wisp` **0 行**；`staticcheck -tags winlive ./cmd/wisp` **rc=0**；`sh scripts/d22scan.sh` **clean**（`examined 1010 + 282 Go files`）；`sh scripts/check-path-length-budget.sh` **VERDICT GREEN**（`tracked paths=20027 over-budget=69 covered by roster=69 not in roster=0`）。
 
 **筛出来的一个真缺陷（不是本票射程，记着别丢）**：接缝「产码恒 nil」——Go 无「仅测试构建」标签，所以那 3 行是**编译进产码**的，靠「恒 nil／零状态」保证生产行为不变。腿没把它说成「只在该构建存在」，这点是诚实的。
+
