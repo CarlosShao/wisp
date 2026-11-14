@@ -158,9 +158,9 @@ func TestPanelPageFetchesItsOwnAssets299(t *testing.T) {
 
 	// Per-run unique user-data folder (ticket 314): the fixed name here was the
 	// second half of the same shared-WebView2-user-data surface as
-	// panel_host_windows_test.go:609, and this test embeds a real window too. The
-	// root stays os.TempDir() and the folder is still never deleted by the test -
-	// see panelProfileLeaf's comment for both boundaries.
+	// panel_host_windows_test.go:706 (ticket 314's :609), and this test embeds a
+	// real window too. The root stays os.TempDir() and the folder is still never
+	// deleted by the test - see panelProfileLeaf's comment for both boundaries.
 	dataPath := panelProfileLeaf("wisp-299r1-panel-profile")
 	h := &recordingModeHandler{}
 	disp := &panel.ComposerDispatch{Mode: h}
