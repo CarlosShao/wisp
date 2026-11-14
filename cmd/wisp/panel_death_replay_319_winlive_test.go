@@ -47,7 +47,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -70,9 +69,16 @@ const (
 // under the system temp dir) behind the production panelHolder, with the eager
 // first thread already started - the assembly cmd/wisp/resident_windows.go
 // builds at boot, with the holder as the one name the gestures go through.
+//
+// The leaf is per run (panelProfileLeaf: prefix-pid-nanotime), not the fixed
+// "wisp-319r2-live-profile" this fixture used to spell: this file really
+// creates a window, and two concurrent runs on one user-data folder put two
+// browser hosts on ONE profile - the shape ticket 314's audit measured a 1.2 s
+// coexistence for, and the shape that answered S_OK with a NULL environment.
+// The helper is the same one the rest of this package's windowed fixtures use.
 func startPanelHolder319(t *testing.T) (*panelHolder, *PanelManager) {
 	t.Helper()
-	dataPath := filepath.Join(os.TempDir(), "wisp-319r2-live-profile")
+	dataPath := panelProfileLeaf("wisp-319r2-live-profile")
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 	h := newPanelHolder(observe.NewRegistry(), mgr)

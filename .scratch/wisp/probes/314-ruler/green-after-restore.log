@@ -1,0 +1,46 @@
+pwd=/d/work/workspace/projects plans/Wisp
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-14T13:46:52.690+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test314FixedPanelProfileLeafShapeIsRed
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：cmd/wisp/panel_holder_319_windows_test.go:53 叶 "wisp-319r1-holder-profile" -> 本文件一次窗都不建（headless tier 从不向 bringUp 要窗口），所以那个夹只是一个名字、从来不是 WebView2 user-data 夹；本文件内两个夹具共用它是故意的。
+    panel_profile_leaf_shape_windows_test.go:184: 豁免命中：scripts/spike/webview2-latency/main.go:307 叶 "wisp-spike-webview2-profile" -> 手工逐发跑的延迟测量工具（P11/D32 的 cold/hot 基数）的 -datapath 默认值：共用同一个夹正是它要测的 warm profile，每一次调用都由人显式串行发起、且 -datapath 可覆盖；测试套件从不启动它。
+    panel_profile_leaf_shape_windows_test.go:192: 314 形状尺：扫了 274 个源文件，2 处固定名命中（2 处具名豁免、0 处红）
+--- PASS: Test314FixedPanelProfileLeafShapeIsRed (0.82s)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape)
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction
+=== RUN   Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string
+--- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_audit's_revert,_default_tier_verbatim (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_literal_first,_the_root_second (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/wrapped_across_lines (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/local_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/package-level_alias_of_os.TempDir (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/concatenated_instead_of_joined (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_profile-shaped_leaf_behind_a_helper_return_(the_319_holder_shape) (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_leaf_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_local_binding_handed_to_the_panel_sink (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_non-profile_fixed_temp_file_for_another_purpose_stays_silent (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/per-run_leaf_through_fmt.Sprintf (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/the_panelProfileLeaf_helper (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/a_test-local_temp_dir_is_per_run_by_construction (0.00s)
+    --- PASS: Test314PanelProfileShapeRulerRingsOnTheFixedNameShape/prose_in_a_comment_and_text_in_a_quoted_string (0.00s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	1.00s
