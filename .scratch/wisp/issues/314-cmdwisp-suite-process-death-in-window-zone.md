@@ -106,3 +106,26 @@
 
 - [2026-11-14 12:24:00 +08] agent=314e 写腿 `w314-deshare-c`（实现者；⛔ 审计者；⛔ 未翻任何 AC 框）did=**补完剩 5 处固定名面板 WebView2 user-data 夹的 de-share**，提交 **`b1e1a738f`**（只 commit ⛔ push；其代码提交在 `48457eafe` 之上，落地后数秒并行的票 44 腿提交了 `6f23ce632`，**不是本腿的**）。★**5 处全部照用既有 `panelProfileLeaf(prefix)`，零新 helper**：`panel_unbound_253r6_windows_test.go:71`（**默认档**）、`panel_host_windows_budget_winlive_test.go:55`、`panel_host_windows_live_test.go:36`、`panel_reshow_255r8_winlive_test.go:125`、`panel_transport_live_35v2_windows_test.go:185`；import 只在"被替换行是最后使用点"处收窄（`os`/`path/filepath`），`panel_reshow` 的 seed 写入仍用 `os`/`filepath` 故未动。★**逐处核过"是否故意固定名"⇒ 没有**：4 处上下文注释与夹名无关；唯一相关的是 `panel_reshow_255r8_winlive_test.go:118-123`，它论证的是"根目录别用 `t.TempDir()`"（RemoveAll 与 Edge profile 落盘赛跑），`panelProfileLeaf` 保留 `os.TempDir()` 根 ⇒ **不构成保留固定名的理由**；派单要求的"理由＋文件:行"逐处写在证据件 §1.3。★★**默认档正控**（`probes/314-deshare2/concurrent.ps1`，两发背靠背同时起，采样器每 250ms 读 `msedgewebview2` 的 `--user-data-dir`）：两轮 `deshare-253r6-r1/r2`，skew **−53.2／−77.3 ms**，**两发都 rc=0、各 1 PASS**，`maxTopLevelHostsOnOneUdf=1`、**同夹共存 0 tick**、两发 UDF 路径**不同**且都含 pid＋纳秒叶（逐字路径在 `results-concurrent.jsonl`）。★**反证**：`-overlay` 把该处临时改回固定名重编（5 份副本字节级等于 `48457eafe:cmd/wisp/<file>`，编译 rc=0；跟踪文件一字未动），同形 3 轮里 **2 轮复现同一 UDF 两个顶层 host**（各 1 tick，parents 恰是两发 pid，逐字：`tick=0 udf=…\wisp-253r6-panel-profile\EBWebView topLevelHosts=2 parents=53088,18276 browsers=65520,41256`）；第 3 轮 skew 225.6ms 更大、没抓到共存那一瞬，**如实记"这一轮造不出"**，不把 2/3 说成 3/3；固定名侧两发**都 rc=0**，仍未造出致命红。★门禁：`go vet -tags winlive ./cmd/wisp` **rc=0**；`gofumpt -l cmd/wisp` **空**；`sh scripts/d22scan.sh` **clean rc=0**（首次 12:12 曾红在 `internal/observe/quota_44.go:223` 的 phantom-citation，12:15 该文件由并行票 44 腿落盘后重跑即 clean ⇒ 与本腿无关）；定向五枚最终同轮 **RUN=1/2、PASS=全部、FAIL=0、SKIP=0**（默认 253r6／2s 退出／D32 预算对／255r8 reshow／35v2 transport）。★**负载敏感红如实留档**：本机 CPU 91–100%，2s 退出条款 3 轮 A/B 里 deshare 红 2 绿 1、改前固定名构建红 1 绿 2；D32 预算负载尖峰时 hot 207.7ms 红、同一构建随后 142.1／44.0／84.1ms 绿，且改前构建也读到 cold 1352.7ms 贴近上限；35v2 teardown round2 两个构建同红（tree=8）——**均用改前二进制同形对照证明与夹名无关；⛔ 未放宽任何断言、⛔ 未加 retry、⛔ 未删断言、⛔ 未动阈值/golden/契约**。★**还原核**：反证走 overlay ⇒ 5 个跟踪件 SHA256 同串（`C9A14528…40551`／`8174EC64…C21D`／`71C9F788…94A6D`（略写见证据件）／`96A38B69…33086`／`CA478141…4D7D8`），跟踪测试件里旧固定名 `filepath.Join(os.TempDir(), …)` 现量 **0 条**，`git diff` 只有这 5 件（+5/−11）。证据件 `docs/evidence/s1/314-deshare-remaining-five.md`（新），读数根 `.scratch/wisp/probes/314-deshare2/**`。⛔ 未跑整包、⛔ 零产码／`scripts/**`／`internal/**`／`frontend/**`／阈值／golden／契约改动。next=审计腿可在 cmd/wisp 空窗后开跑（本腿已交付）；另：本腿只复跑"两发各一窗"的正控，**没有**重跑上一腿"两发各两窗必死一发"的形状（不属本腿派单）。
 
+- [2026-11-14 13:2x +08] agent=today-four-fixes-audit（非实现者，审计腿）did=审计 26e9e9e73+b1e1a738f：8/8 目标调用点已走 panelProfileLeaf，tracked 测试只 +5/-11 路径/import、零断言改动；A3 把默认档 :71 改回固定名（-c 编译 rc=0）后 Test253r6 PASS=造不出红（仓内无唯一性断言，ps1 未接门禁）；D 全仓仍有 2 处固定名 WebView2 DataPath（319 live :75 真建窗、319 holder :53 无窗）；结论=部分；AC#4 不能翻（处置未清、AC#2 静桌面缺）。证据 docs/evidence/s1/today-four-fixes-audit.md
+
+## 非实现者审计回执（2026-11-14 13:2x，`b70ea907f`）：四笔 **成立/成立/成立/部分**
+
+审计件：`docs/evidence/s1/today-four-fixes-audit.md`（原始读数 `.scratch/wisp/probes/audit/logs/**`）。**A 类突变全在 `C:\Temp\wisp-audit-20261114` 导出树做、能编译、跑完还原。**
+
+### 本票（314）相关：**停在「部分」，AC 不翻**
+审计给出三条硬读数：
+1. **A3：这一形造不出红** —— 把默认档 `panel_unbound_253r6_windows_test.go:71` 改回固定名，`go test -c` rc=0、`Test253r6…` **PASS**。**仓里没有任何断言读「叶名唯一性」**，唯一控制是 `.scratch/wisp/probes/314-deshare/concurrent.ps1`，而它**没有接进任何门禁**。
+2. **D③：固定名未清零** —— 8/8 目标调用点已每发独立，但全仓仍有 2 处固定名 WebView2 DataPath：`panel_death_replay_319_winlive_test.go:75`（**真建窗**）、`panel_holder_319_windows_test.go:53`（**无窗**，其注释自述故意共享）；另有 spike 默认名 1 处。
+3. **AC#2 静桌面读数仍缺**（机主一直在用机器 ⇒ 那一发还没跑）。
+
+⇒ **处置（我拍）**：
+- 314 的 AC#4 **不翻**，理由写清（上三条）；撤销口令＝「314 AC4 复议」。
+- **下一步两件**（待 `cmd/wisp` 写窗空出后派）：① de-share `panel_death_replay_319_winlive_test.go:75` 那处**真建窗**；② 在仓内加一枚**源码形状尺**（Go 测试，扫 `cmd/wisp/*_test.go` 里 `filepath.Join(os.TempDir(), "…-panel-profile")` 形状，命中即红，每处豁免须在测试内具名带理由）—— **这样 A3 那种回退才会红**，而不是靠一个没人跑的 ps1。⛔ 不走「改 `ci.yml`」那条路，Go 测试天然进 CI。
+`panel_holder_319_windows_test.go:53` 按它自己的注释**保留**（无窗、故意共享），但要在形状尺的豁免表里具名。
+
+### 另三笔的审计结论（供票 44／197 用）
+- `6f23ce632` 与 `756ebbcfa`+`f8e94bbd8`（票 44 配额锁）：**成立**。A1 去掉 `Spend` 锁 ⇒ `-race` rc=1、**25 条 DATA RACE ＋ 1 条 fatal**；A1b 去掉 `SeedFrom` 锁 ⇒ **8 条 DATA RACE**。B 类无放宽。
+- `d8e2f4dc8`+`0c9ff7c0c`（票 197 发布窗口）：**成立**，但**具名弱点**：把一处 `PublishSubagentInFlight` 改回裸发布时，**形状尺红而症状尺仍 PASS** ⇒ 症状尺对回退没有确定性牙；另外 `Record`/`PublishSubagent`/`AttachCancel` 仍是公开 API，形状尺只扫 `subagent_197.go`，**新文件可绕开**。
+
+### 一处小账（不另立票）
+`panel_host_windows_test.go:706` 在证据件里写作 `:711`（行号漂移，非功能问题）。
