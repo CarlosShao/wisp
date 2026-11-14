@@ -1,0 +1,148 @@
+审计腿 2026-11-14 第二波（446/71/216/192）—— 原始读数存证
+锚 HEAD c605f3ecb；本腿 ⛔ 未跑 go test ./cmd/wisp（票 447 在飞）。
+
+== 1. commit 真在 + 祖先关系 ==
+$ git cat-file -e <c>^{commit}; git merge-base --is-ancestor <c> HEAD
+be0f599f3  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:28:31 +0800
+3dedc7796  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:31:29 +0800
+4ce5c86ff  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:28:09 +0800
+5532436f1  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:37:13 +0800
+7ff4d9e9f  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:30:22 +0800
+25e553fb9  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:33:02 +0800
+096f247ed  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 11:05:24 +0800
+b06f7fa0f  catfile_rc=0  is_ancestor_of_HEAD=0   2026-11-14 18:11:06 +0800
+
+$ git branch -vv
+* dev  c605f3ecb [cnb/dev: ahead 3111]
+
+$ git rev-list --count b06f7fa0f..7ff4d9e9f      -> 6      （192 证据说「早三枚」）
+$ git rev-list --count 48527e98f..7ff4d9e9f      -> 14
+$ git log --oneline 48527e98f..7ff4d9e9f -- internal/panel   -> 只有 7ff4d9e9f 自己那一枚
+
+== 2. 证据件字节 ==
+docs/evidence/s1/446-errno-presence.md                            bytes=13554 lines=178
+docs/evidence/s1/71-ac45-selfreport-not-a-constant-and-one-real-red.md  bytes=11593 lines=136
+docs/evidence/s1/192-preview-ac12-r1.md                           bytes=24635 lines=309
+docs/evidence/s1/216-ac5-branch-by-code.md                        bytes=16725 lines=186
+docs/evidence/s1/216-ac5-rulers-have-teeth.md                     bytes=5115  lines=70
+docs/evidence/s1/216-ac5-rulers-audit.md                          bytes=3104  lines=57
+
+== 3. 446 行号 ==
+HEAD:internal/tools/system_backend_windows.go
+ 270: func errnoPresent(e error) bool {
+ 271: 	return e != nil && !errors.Is(e, syscall.Errno(0))
+ 301: 	if r == 0 && errnoPresent(e) {
+ 441: 		if errnoPresent(e) {
+$ git grep -n 'operation completed successfully' HEAD -- '*.go'
+ -> 产码 0 命中；唯一命中 .scratch/wisp/probes/446/r1/probe446_errno_presence_windows_test.go:63
+$ git grep -ln 'errnoPresent' HEAD -- '*_test.go'
+ -> 只有那枚探针文件（internal/tools 的测试面零命中）
+
+== 4. 446 AC#1 重算（修复前树 4ce5c86ff） ==
+总命中 132 行；*.go 2 行（system_backend_windows.go:2）；非 Go 130 行 / 116 文件；合计 117 文件
+
+== 5. 446 器具我自己重跑 ==
+$ go test ./internal/tools -run TestProbe446 -count=1 -v -overlay .scratch/wisp/probes/446/r1/overlay-446.json
+ zz_446_errno_probe_test.go:80: probe446 GREEN: 10 cases, 5 of them on the errno=0 path
+ --- PASS: TestProbe446ErrnoPresenceIsDecidedByCode (0.00s)
+ ok  github.com/CarlosShao/wisp/internal/tools  0.282s       RC=0
+
+$ pwsh -NoProfile -File .scratch/wisp/probes/446/r1/gate-446-static.ps1
+ readings: sentence-hits=0 text-compares=0 errnoPresent-defs=1 errnoPresent-calls=2 code-judgements=1
+   call site line 301: if r == 0 && errnoPresent(e) {
+   call site line 441: if errnoPresent(e) {
+ GREEN: no sentence decides anything in this file; both call sites use the code judgement.
+ RC=0
+
+（存档里 10-M1-mutated-judgement-RED.log 是旧版探针：:60/:63、红在 errno-zero-wrapped；
+  决定性三段在 32-ac3-sequence.log —— B 段 sha256=AE4F3236…AB74E178、红在 errno-zero-localized-text、:76）
+
+== 6. 71 的牙我自跑 ==
+$ cd tools/d22scan && go test -count=1 -run TestEveryDeclaredScopeCountsTheFileItIsGiven ./
+ ok  github.com/CarlosShao/wisp/tools/d22scan  3.656s        RC=0
+
+$ sh tools/d22scan/runtests.sh -C tools/d22scan ./...
+ runtests.sh: OK - packages=[./...] top-level: PASS=46 FAIL=0 SKIP=0, === RUN=103, '[no tests to run]'=0   RC=0
+ （注：本机 bash 解析到 WSL，报 /bin/bash not found ⇒ 用 git 的 sh 跑同一枚脚本）
+
+$ cd tools/d22scan && go run . -root "D:\work\workspace\projects plans\Wisp"
+ d22scan: examined 483 production Go files under internal/ and cmd/
+ scope bans #1-5 internal/      examined 405
+ scope bans #1-5 cmd/           examined  78
+ scope ban #6 frontend/         examined 123
+ scope ban #7 internal/tools/   examined  51
+ scope ban #10 internal/risk/   examined  21
+ scope ban #8 design/           examined  39
+ scope ban #8 frontend/         examined 123
+ scope ban #8 internal/         examined 1014
+ scope ban #8 cmd/              examined 283
+ d22scan: clean - no D22 ban violations            RC=0
+ （⇒ 71 收件段 :162 的 16 / 1 / 1 不是这棵树的读数）
+
+$ git grep -n 'export_red_proof' HEAD -- . ':!.scratch'  -> 只有它自己文件头 + 71 证据件；**零调用点**
+
+== 7. 216 行号与牙 ==
+81ba68874（改前）cmd/wisp/resident_voice_engines_windows.go
+ 1212: 			return fmt.Errorf("interrupted mid-speak")
+ 1240: 		if strings.Contains(speakErr.Error(), "interrupted") {
+HEAD（改后）
+ 1214: 			return errSpeakInterrupted
+ 1248: 		if speakFailureIsInterrupt(speakErr) {
+ 1306: var errSpeakInterrupted = errors.New("interrupted mid-speak")
+ 1316: func speakFailureIsInterrupt(err error) bool {  1317: return errors.Is(err, errSpeakInterrupted)
+
+HEAD:cmd/wisp/config_reload.go（未改那处）
+ 418: func describeReloadFailure(err error) string {
+ 420: 	case errors.Is(err, fs.ErrNotExist):
+ 424: 	case errors.Is(err, fs.ErrPermission):
+ 433: 		case strings.HasPrefix(d, "config.toml parse"):
+ 437: 		case strings.Contains(d, "unknown key"):
+ 441-442: 		case strings.Contains(d, "cannot migrate from schema version") ||
+ 			strings.Contains(d, "no migration registered"):
+ 460: 		case strings.Contains(d, "was written by a newer build"):
+ 488: 		case strings.HasPrefix(d, "config.toml:"):
+
+HEAD:internal/llm/errors.go
+ 177: // THE BRANCH KEYS ARE CODES: ... d.Message ... is NEVER
+ 186: func ClassifyHTTPStatus(d HTTPErrorDetail) (observe.ErrorClass, bool) {
+ 274-275: if d.Message != "" { ... }   （只渲染，不选类）
+
+$ go test -count=1 ./internal/panel -run 216      -> ok 0.083s   RC=0
+$ go test -count=1 ./internal/llm -run 216        -> ok 0.053s   RC=0
+$ go test -count=1 ./internal/panel               -> ok 25.518s  RC=0
+
+216 突变无存档：$ git grep -l 'A966E823\|8AAA000D' HEAD -- .scratch docs
+ -> 只命中票面与 docs/evidence/s1/216-ac5-branch-by-code.md（无 .log）
+
+== 8. 192 行号与复跑 ==
+HEAD:internal/panel/preview_192.go
+ 137-140: PreviewKindHTML / Image / PDF / Text 四常量
+ 345: full := filepath.Join(r.dir.ArtifactsDir(), name)
+ 466: if err := r.guard(name); err != nil {
+ 515: func classifyPreviewArtifact(head []byte) (PreviewKind, string, string) {
+ 516: 	for _, t := range attachmentTypes {
+HEAD:internal/panel/preview_192_test.go
+ 237: t.Fatalf("%q: status = %d (%s), want 400", ...)
+ 338: t.Fatalf("the notice shows head %d but the pointer resumes at %d", head, doc.NextOffset)
+ 512: t.Fatalf("CSP = %q: it must start with the sandbox directive, ...")
+ 618: t.Fatal("after the quote the C25 egress scan found nothing: the stamp is not live")
+ 642: t.Fatal("the quote door stamped text the artifact does not contain: ...")
+ 顶层 TestPreview192* = 19 枚；FourClasses 表 = 8 条子用例（html/image/pdf/text/svg/video/binary/utf16）
+
+$ go test -count=1 -run TestPreview192 ./internal/panel   -> ok 2.656s  RC=0
+$ go run ./.scratch/wisp/probes/192/sample
+ body bytes=5551
+ walk windows=5 recovered=300080/300080 bytes equal=true sha256=f9c1eeace35b3cf0
+ artifact sha256=f9c1eeace35b3cf0                          RC=0
+
+$ git ls-tree b06f7fa0f internal/panel/ | grep preview   -> 无（gate-clauses 归因成立）
+$ gate-clauses 末段：腿数＝14 声明与实测不符＝2；聚合退码＝2；每条 grep 带 b06f7fa0fab6…
+
+== 9. gofumpt（本机在 D:\work\base\gopath\bin\gofumpt.exe，不在 PATH） ==
+gofumpt -l internal/tools                                   -> 空 rc=0
+gofumpt -l 216 四枚 + 192 两枚                              -> 空 rc=0
+
+== 10. 生产调用点（192 的「接线未落」） ==
+PreviewResolver -> 只在 probes/192/sample/main.go 与 internal/panel/preview_192*.go
+QuoteForModel   -> 除定义外只有 preview_192_test.go 的调用
+panelAssetLookup(cmd/wisp/panel_control_windows.go:563) -> 无预览分支
