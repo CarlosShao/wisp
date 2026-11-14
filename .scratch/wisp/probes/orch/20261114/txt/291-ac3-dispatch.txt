@@ -1,0 +1,20 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 今天 15 次 null，台账 A1864）
+# 类型：**只读**腿（写面只有证据件与 probes），做票 291 的 AC#3
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读腿。读 `.scratch/wisp/issues/291-level-ruler-does-not-strip-dc.md` 全文，做它的 **AC#3（落点表，⛔ 本票不许落地）**。
+
+已完成的背景（别重做）：AC#1 已判完（这枚电平定义**不是契约面**，可自办）；AC#2 要**真麦四形读数**，那要机主在场 ⇒ **不是你的活，⛔ 不要试图跑 `WISP_LIVE_MIC=1`**。
+
+你要产出的是**一张能直接照着施工的落点表**，逐条给 `file:line` 与你读到的原文：
+1. `internal/audio/level.go` 里**求和那一段**：现在怎么算的、DC 从哪进、最小改法动哪几行（DC 阻断器／去均值窗口／一阶高通，选一个并写理由：**按主流音频前端做法**，⛔ 按"动作小"选）。
+2. `level_test.go` 里 `TestLevelSineToleranceIsNamedAndBounded` 与 `SineLevelTolerance = 5e-5` 那把双边尺：**改法会不会碰到它**、碰的话逐条列出碰了什么。
+3. `capturelevel_windows_test.go` 的 DC 夹具：期望值要不要改、改成什么（给推导）。
+4. **哪些是冻结面**：`thresholds.go`／golden／`allowlist.txt` 一字节不许动 —— 逐条说清你的改法**不碰它们**，或碰到就停手（写「未完成，卡在哪」）。
+5. **判据怎么钉**：最小改法落地后，哪几枚既有测试会红、要新增哪一枚（给形状，不写代码），以及"直流被去掉"的**可判事实**是什么（⛔ 拿"看起来更低"当判据）。
+6. **风险与代价**（按铁律 ⓪⓪⓪：只写代价，⛔ 用来选小方案）：去均值会不会吃掉真实低频（说话的低频能量）、窗口多长、对 `SilenceLevelGate=0.06` 的影响方向。
+
+⛔ 改任何产码（票面逐字「本票不许落地」）；⛔ 改票面/台账/阈值/golden/契约/规格；⛔ 跑真麦；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+写面：`docs/evidence/s1/291-ac3-landing-table.md` ＋ `.scratch/wisp/probes/291/ac3/**`。
+
+回话第一行＝commit hash ＋「落点 N 处（file:line 各一）＋ 会不会碰冻结面（会/不会）」。没干完写「未完成，卡在哪」。
