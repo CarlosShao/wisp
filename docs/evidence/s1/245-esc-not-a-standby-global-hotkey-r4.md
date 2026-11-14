@@ -34,7 +34,7 @@
 
 - `probeBareEsc245(t, b, 3)`：同一枚裸 Esc 探针连问 3 次，记下 `attempts` 与逐次 errno；
 - `classifyEscIdleOwner245(rep, p)` 三值：`free` / `ours` / `foreign`。判序有意如此：**报告里点了裸键就是 ours**，哪怕桌面同时被外来进程占着——产品错不能藏在环境后面；
-- `ours` ⇒ 硬红，判词 `ticket 245 RED (AC#8, OUR OWN SET): … the ball's own registration set names it: <槽>=<绑定> (<加速键>)`；
+- `ours` ⇒ 硬红。⚠ **引文按路径分开写（2026-11-14 引文修正）**：**live 路径实际响的红句是 `hotkey_live_test.go:505` 的 `the live ball's idle roster is not the standby one`** —— 因为 `:504` 的 `idleRosterReds245(rep)` 用的就是「裸键在册」这同一条谓词（`hotkey_idle_bare_key_245_test.go:64-68`），`ours`/`foreign` 的分类（`:507` 的探针＋`:508` 的分类器）在它**之后**才到达；所以分类那一支的判词 `ticket 245 RED (AC#8, OUR OWN SET): … the ball's own registration set names it: <槽>=<绑定> (<加速键>)`（`hotkey_live_test.go:513-516`）**只在单测路径可观察**（`hotkey_idle_bare_key_245_test.go:64` 起直调分类器的那组用例），在 live 路径**不可达**。引 `:513` 时必须同时写明「live 路径实际红句是 `:505`」，否则是"真话但误导"；
 - `foreign` ⇒ `t.Skipf`，判词 `SKIP-LOUD (ticket 245 AC#8, FOREIGN OWNER): … Probe attempts=3, each answered errno 1409 "Hot key is already registered." …`。
 
 **errno 的出处是构造性的**：`escBorrowProbe` 只把 `ERROR_HOTKEY_ALREADY_REGISTERED`（1409）映射成 `(free=false, err=nil)`，其余拒绝一律作为 error 上抛并在调用点致命 ⇒ "不 free" 这个读数按构造就是 1409，记录的不是猜测。这条写进了类型注释。
@@ -67,11 +67,11 @@ ok  	github.com/CarlosShao/wisp/internal/ball	4.640s
 
 ### 2.2 那枚确定性基线红（260 形ⓐ 之后）
 
-红在 `internal/ball/interaction_live_test.go:231` 的注入行：它写死注 `"Esc"`，而 260 形ⓐ 之后借的是 `[hotkey] cancel` 的**配置值**（本夹具 `liveHotkeys()` 写的是 `Ctrl+Alt+V`）。所以借是对的、注入是陈的。
+红在 `internal/ball/interaction_live_test.go:241-242` 的注入行（**改后行号**；`:231` 是**改前**行号，现 `:231` 已落在那段注释里）：它写死注 `"Esc"`，而 260 形ⓐ 之后借的是 `[hotkey] cancel` 的**配置值**（本夹具 `liveHotkeys()` 写的是 `Ctrl+Alt+V`）。所以借是对的、注入是陈的。
 
 改法：`borrowed := b.ConfiguredHotkeys().Cancel; injectBinding(t, borrowed)`，注释同步改准（逐字见 diff）。
 
-红前（复跑，逐字）：
+红前（复跑，逐字；`:238` 是**改前**行号，同一句话改后落在 `:249`）：
 
 ```
 interaction_live_test.go:238: the taken-over Esc did not cancel Confirming (machine Confirming)

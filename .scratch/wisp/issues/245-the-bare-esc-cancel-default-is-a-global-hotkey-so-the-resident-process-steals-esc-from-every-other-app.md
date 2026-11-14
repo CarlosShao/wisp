@@ -116,7 +116,7 @@
 ### 一、AC#8「票面字面写 ⛔ 不许改成跳过」vs 派单「被别人占 ⇒ 具名跳过并给数字」
 **裁定：按派单口径（两形分开），并修改本票 AC#8 的口径说明**，理由：
 - 票面那句的原意是**不许把产品缺陷藏进跳过**；而这里跳过的只有「**注册集干净 ＋ 键被外人占**」这一形，且 `Probe attempts=3` 与 `errno 1409 "Hot key is already registered."` 原文都进了跳过语。
-- **我们自己的注册集握着裸键 ⇒ 仍然硬红**（新判词 `ticket 245 RED (AC#8, OUR OWN SET)`），且**判序在前** —— 产品错不能藏在环境后面。正控已验：把 ours 支短路（`held` → `false && held`）⇒ 逐字红 `hotkey_esc_idle_owner_245_test.go:90: a claimed bare Esc that the ball's own set holds classified as owner 2, want ours (1) - the foreign-owner skip must never absorb the product's defect`；还原 SHA `3C079391…` 同串后再跑 PASS。
+- **我们自己的注册集握着裸键 ⇒ 仍然硬红**，且**判序在前** —— 产品错不能藏在环境后面。⚠ **引文按路径分开写（2026-11-14 引文修正）**：**live 路径实际响的红句是 `hotkey_live_test.go:505` 的 `the live ball's idle roster is not the standby one`** —— 因为 `:504` 的 `idleRosterReds245` 与分类器用的是同一条「裸键在册」谓词（`hotkey_idle_bare_key_245_test.go:64`），`ours`/`foreign` 的分类在它**之后**才到达；所以分类那一支的判词 `ticket 245 RED (AC#8, OUR OWN SET)`（`hotkey_live_test.go:513-516`）在 live 路径**不可达**，**只在单测路径（`hotkey_idle_bare_key_245_test.go:64` 起）可观察**。正控已验：把 ours 支短路（`held` → `false && held`）⇒ 逐字红 `hotkey_esc_idle_owner_245_test.go:90: a claimed bare Esc that the ball's own set holds classified as owner 2, want ours (1) - the foreign-owner skip must never absorb the product's defect`；还原 SHA `3C079391…` 同串后再跑 PASS。
 - 撤销口令：「245 AC8 回硬红」＝把 `foreign` 支的 `t.Skipf` 换 `t.Fatalf`（代价：把「别的程序占着 Esc」读成我们的产品缺陷）。
 
 ### 二、`internal/ball/**` 写面偏差
