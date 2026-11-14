@@ -26,7 +26,6 @@ package main
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -34,7 +33,7 @@ import (
 )
 
 func TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive(t *testing.T) {
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
 	h := &recordingModeHandler{}
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
 

@@ -1,0 +1,87 @@
+time=2026-11-14T12:08:41.014+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor
+    panel_transport_live_35v2_windows_test.go:176: 35v2 RENDERED FORWARDING SCRIPT (Go side, %[1]s already substituted):
+        (function () {
+          var cw = window.chrome && window.chrome.webview;
+          if (!cw || cw.__wispForwardInstalled) { return; }
+          cw.__wispForwardInstalled = true;
+          var native = cw.postMessage;
+          var inside = false;
+          var ex = window.external;
+          if (ex && typeof ex.invoke === "function") {
+            var nativeInvoke = ex.invoke;
+            ex.invoke = function (s) {
+              inside = true;
+              try { return nativeInvoke(s); } finally { inside = false; }
+            };
+          }
+          cw.postMessage = function (message) {
+            if (inside || typeof window.wispDispatch !== "function") { return native.call(cw, message); }
+            inside = true;
+            try { return window.wispDispatch(message); } finally { inside = false; }
+          };
+        })();
+        35v2 ---- end of rendered script ----
+    panel_transport_live_35v2_windows_test.go:196: 35v2 webview processes at start: tree=0 machineNamed=31 pids=0
+time=2026-11-14T12:08:41.066+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-14T12:08:41.076+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x75013ac"
+time=2026-11-14T12:08:41.076+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x18 known=true"
+time=2026-11-14T12:08:41.077+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x46 known=true"
+time=2026-11-14T12:08:41.081+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x46 known=true"
+time=2026-11-14T12:08:41.083+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x1c known=true"
+time=2026-11-14T12:08:41.084+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x86 known=true"
+time=2026-11-14T12:08:41.086+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.086+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.087+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.087+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x6 known=true"
+time=2026-11-14T12:08:41.215+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x281 known=true"
+time=2026-11-14T12:08:41.219+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x282 known=true"
+time=2026-11-14T12:08:41.220+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x3d known=true"
+time=2026-11-14T12:08:41.220+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x3d known=true"
+time=2026-11-14T12:08:41.220+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7 known=true"
+time=2026-11-14T12:08:41.220+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x85 known=true"
+time=2026-11-14T12:08:41.221+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x14 known=true"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x47 known=true"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x5 known=true"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x3 known=true"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0xf known=true"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-14T12:08:41.222+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-14T12:08:41.238+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x210 known=true"
+time=2026-11-14T12:08:41.238+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x31f known=true"
+time=2026-11-14T12:08:41.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0xc0fa known=true"
+time=2026-11-14T12:08:41.241+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0xc053 known=true"
+time=2026-11-14T12:08:41.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x288 known=true"
+time=2026-11-14T12:08:41.255+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.255+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:41.277+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x282 known=true"
+time=2026-11-14T12:08:41.969+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-14T12:08:42.151+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x14 known=true"
+time=2026-11-14T12:08:42.162+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0xf known=true"
+    panel_transport_live_35v2_windows_test.go:237: 35v2 cold bring-up measured on this box: 1114.626 ms, hwnd=0x75013ac
+time=2026-11-14T12:08:42.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+time=2026-11-14T12:08:42.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x7f known=true"
+    panel_transport_live_35v2_windows_test.go:240: 35v2 canary arrival=true after 1 post(s); door has recorded [pc-35v2-canary]
+    panel_transport_live_35v2_windows_test.go:247: 35v2 DELIVERED TO GO: method="panel.mode.request" requestId="pc-35v2-pagepost-1" source="panel-composer" to="ask_every_step" (attempt 1)
+    panel_transport_live_35v2_windows_test.go:256: 35v2 PAGE-SIDE FACTS (diagnostic lane, asserted for nothing): pc-35v2-DESC-OWN-WR-CF-HOOK-NOERR
+    panel_transport_live_35v2_windows_test.go:264: 35v2 all door recordings: [pc-35v2-canary pc-35v2-pagepost-1 pc-35v2-desc-ping pc-35v2-DESC-OWN-WR-CF-HOOK-NOERR]
+time=2026-11-14T12:08:42.541+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x10 known=true"
+time=2026-11-14T12:08:42.541+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x90 known=true"
+time=2026-11-14T12:08:42.541+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x46 known=true"
+time=2026-11-14T12:08:42.543+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x47 known=true"
+time=2026-11-14T12:08:42.545+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x288 known=true"
+time=2026-11-14T12:08:42.547+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x86 known=true"
+time=2026-11-14T12:08:42.550+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x6 known=true"
+time=2026-11-14T12:08:42.551+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x1c known=true"
+time=2026-11-14T12:08:42.551+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x8 known=true"
+time=2026-11-14T12:08:42.551+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x281 known=true"
+time=2026-11-14T12:08:42.552+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x282 known=true"
+time=2026-11-14T12:08:42.552+08:00 level=INFO msg="MARK299 wndproc hwnd=0x75013ac msg=0x2 known=true"
+    panel_transport_live_35v2_windows_test.go:276: 35v2 webview processes after teardown: tree=0 machineNamed=31 pids=0 (start tree=0 pids=0)
+--- PASS: TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor (4.62s)
+PASS

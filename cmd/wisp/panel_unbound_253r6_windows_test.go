@@ -47,8 +47,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -70,7 +68,7 @@ import (
 // 33-r5 helper builds its own dispatch and cannot carry either.
 func startPanelFor253r6(t *testing.T, disp *panel.ComposerDispatch) (*residentPanel, *PanelManager) {
 	t.Helper()
-	dataPath := filepath.Join(os.TempDir(), "wisp-253r6-panel-profile")
+	dataPath := panelProfileLeaf("wisp-253r6-panel-profile")
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 	rp := startResidentPanel(observe.NewRegistry(), mgr)
 	t.Cleanup(rp.stop)

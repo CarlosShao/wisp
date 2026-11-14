@@ -61,7 +61,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -183,7 +182,7 @@ func TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor(t *testing.T) {
 		}
 	}
 
-	dataPath := filepath.Join(os.TempDir(), "wisp-35v2-panel-profile")
+	dataPath := panelProfileLeaf("wisp-35v2-panel-profile")
 	rec := &t35v2Recorder{}
 	disp := &panel.ComposerDispatch{Mode: rec}
 	mgr := NewPanelManager(disp, nil, dataPath)

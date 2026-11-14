@@ -122,7 +122,7 @@ func TestTicket255r8RealWindowFollowsTheConfigAcrossAReshow(t *testing.T) {
 	// the panel thread had already exited cleanly). startPanelForTest uses the same
 	// shape for the same reason.
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t),
-		filepath.Join(os.TempDir(), "wisp-255r8-panel-profile"), withGeometrySource(src))
+		panelProfileLeaf("wisp-255r8-panel-profile"), withGeometrySource(src))
 	rp := startResidentPanel(observe.NewRegistry(), mgr)
 	t.Cleanup(rp.stop)
 

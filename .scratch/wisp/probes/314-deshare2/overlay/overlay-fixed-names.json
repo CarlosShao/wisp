@@ -1,0 +1,9 @@
+{
+  "Replace": {
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\panel_host_windows_live_test.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\314-deshare2\\overlay\\panel_host_windows_live_test.go",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\panel_host_windows_budget_winlive_test.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\314-deshare2\\overlay\\panel_host_windows_budget_winlive_test.go",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\panel_reshow_255r8_winlive_test.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\314-deshare2\\overlay\\panel_reshow_255r8_winlive_test.go",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\panel_transport_live_35v2_windows_test.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\314-deshare2\\overlay\\panel_transport_live_35v2_windows_test.go",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\panel_unbound_253r6_windows_test.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\314-deshare2\\overlay\\panel_unbound_253r6_windows_test.go"
+  }
+}

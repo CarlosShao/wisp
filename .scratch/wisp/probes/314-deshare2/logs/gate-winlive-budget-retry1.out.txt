@@ -1,0 +1,67 @@
+time=2026-11-14T12:11:14.276+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle_WinLive
+time=2026-11-14T12:11:14.322+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-11-14T12:11:14.332+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0xb230ee4"
+time=2026-11-14T12:11:14.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x18 known=true"
+time=2026-11-14T12:11:14.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x46 known=true"
+time=2026-11-14T12:11:14.337+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x46 known=true"
+time=2026-11-14T12:11:14.338+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x1c known=true"
+time=2026-11-14T12:11:14.339+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x86 known=true"
+time=2026-11-14T12:11:14.341+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:14.342+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:14.343+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:14.344+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x6 known=true"
+time=2026-11-14T12:11:14.441+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x281 known=true"
+time=2026-11-14T12:11:14.446+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x282 known=true"
+time=2026-11-14T12:11:14.447+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x3d known=true"
+time=2026-11-14T12:11:14.447+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x3d known=true"
+time=2026-11-14T12:11:14.447+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7 known=true"
+time=2026-11-14T12:11:14.447+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x85 known=true"
+time=2026-11-14T12:11:14.447+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x14 known=true"
+time=2026-11-14T12:11:14.448+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x47 known=true"
+time=2026-11-14T12:11:14.448+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x5 known=true"
+time=2026-11-14T12:11:14.449+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x3 known=true"
+time=2026-11-14T12:11:14.449+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-11-14T12:11:14.449+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xf known=true"
+time=2026-11-14T12:11:14.449+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-11-14T12:11:14.449+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-11-14T12:11:14.449+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-11-14T12:11:14.466+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x210 known=true"
+time=2026-11-14T12:11:14.466+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:14.467+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x31f known=true"
+time=2026-11-14T12:11:14.467+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xc0fa known=true"
+time=2026-11-14T12:11:14.469+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:14.470+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:14.472+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xc053 known=true"
+time=2026-11-14T12:11:14.472+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x288 known=true"
+time=2026-11-14T12:11:14.479+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x282 known=true"
+time=2026-11-14T12:11:15.134+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-11-14T12:11:15.254+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:15.254+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:15.353+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x14 known=true"
+time=2026-11-14T12:11:15.358+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xf known=true"
+time=2026-11-14T12:11:15.380+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x18 known=true"
+time=2026-11-14T12:11:15.393+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x46 known=true"
+time=2026-11-14T12:11:15.415+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x47 known=true"
+wisp: panel window hidden (no prior window to return focus to)
+time=2026-11-14T12:11:15.471+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x18 known=true"
+time=2026-11-14T12:11:15.518+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x46 known=true"
+time=2026-11-14T12:11:15.568+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x88 known=true"
+time=2026-11-14T12:11:15.568+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x85 known=true"
+time=2026-11-14T12:11:15.569+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x14 known=true"
+time=2026-11-14T12:11:15.569+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x47 known=true"
+time=2026-11-14T12:11:15.569+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xf known=true"
+time=2026-11-14T12:11:15.569+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xf known=true"
+    panel_host_windows_budget_winlive_test.go:92: winlive hot re-show measured on this box: 142.060 ms
+time=2026-11-14T12:11:15.607+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:15.607+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0xc0fa known=true"
+time=2026-11-14T12:11:15.627+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+time=2026-11-14T12:11:15.641+08:00 level=INFO msg="MARK299 wndproc hwnd=0xb230ee4 msg=0x7f known=true"
+--- PASS: TestPanelHostRealWindowHopAndLifecycle_WinLive (1.53s)
+=== RUN   TestPanelHostLatencyPercentilesAC2_WinLive
+    panel_host_windows_budget_winlive_test.go:118: AC#2 winlive appendix (head 48457eafe, n=1):
+    panel_host_windows_budget_winlive_test.go:120:   sample  1: cold=1062.734 ms hot=142.060 ms
+    panel_host_windows_budget_winlive_test.go:124: AC#2 winlive percentiles over 1 runs (nearest-rank): cold P50=1062.734 P95=1062.734 (budget 1500) | hot P50=142.060 P95=142.060 (budget 200)
+--- PASS: TestPanelHostLatencyPercentilesAC2_WinLive (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.773s

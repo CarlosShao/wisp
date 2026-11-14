@@ -1,0 +1,1 @@
+time=2026-11-14T12:18:50.928+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2

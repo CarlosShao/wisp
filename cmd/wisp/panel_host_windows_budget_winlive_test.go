@@ -40,8 +40,6 @@ package main
 // (panel_host_windows_test.go:1021) is untouched.
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/CarlosShao/wisp/internal/panel"
@@ -54,7 +52,7 @@ import (
 // with teeth, and it re-drives the SAME production HotShow path so the
 // recorded LastHotMs is this run's own measurement, not a stale field.
 func TestPanelHostRealWindowHopAndLifecycle_WinLive(t *testing.T) {
-	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
 	h := &recordingModeHandler{}
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
 	ctx, cancel := context.WithCancel(context.Background())
