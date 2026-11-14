@@ -17,10 +17,10 @@
 
 ## 完成判据（AC）
 
-- [ ] **AC#1 现量复核**：`git grep -n 'operation completed successfully'` 给出全部命中（含测试件），逐条判是「判存在性」还是「只是打印」。⛔ 只改报上来的两处就完事。
-- [ ] **AC#2 改成码判**：存在性判定换成 `errors.Is(e, syscall.Errno(0))`（或该 errno 的正确零值判据），**两处都改**；若同一文件还有同形，一并改并在证据里点名。
-- [ ] **AC#3 能变红**：一发**能红的检查** —— 把修好的判定临时改回字符串比较、并让该分支必须被走到（构造 errno=0 的路径）⇒ 必须红且点名；还原后 SHA256 同串、再绿。⛔ 只写「改了」。
-- [ ] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`gofumpt -l` 本包空（⚠ 本机可能没装 gofumpt，如实记，⛔ 拿 gofmt 冒充）；`d22scan` clean；path-length GREEN；**产码改动只许这两处（或 AC#1 点名的同形）**。
+- [x] **AC#1 现量复核**：`git grep -n 'operation completed successfully'` 给出全部命中（含测试件），逐条判是「判存在性」还是「只是打印」。⛔ 只改报上来的两处就完事。
+- [x] **AC#2 改成码判**：存在性判定换成 `errors.Is(e, syscall.Errno(0))`（或该 errno 的正确零值判据），**两处都改**；若同一文件还有同形，一并改并在证据里点名。
+- [x] **AC#3 能变红**：一发**能红的检查** —— 把修好的判定临时改回字符串比较、并让该分支必须被走到（构造 errno=0 的路径）⇒ 必须红且点名；还原后 SHA256 同串、再绿。⛔ 只写「改了」。
+- [x] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`gofumpt -l` 本包空（⚠ 本机可能没装 gofumpt，如实记，⛔ 拿 gofmt 冒充）；`d22scan` clean；path-length GREEN；**产码改动只许这两处（或 AC#1 点名的同形）**。
 - [ ] **AC#5 CI**：`test-core` 与 `test-windows` 各一发含本修复的**完成**运行（给 run 号 ＋ `git merge-base --is-ancestor <fix> <head>` ＋ 完成时刻）。
 
 ## 边界
@@ -41,3 +41,13 @@
 - **AC#5 CI**：**留白**（本腿无 CI 权限，不声称绿）。
 - **前提核查（票面那半句要改口径）**：`Errno.Error()` 的英文来自 `syscall_windows.go:169` **显式索要 en-US**，失败才在 `:171` 退回系统默认语言；本机界面语言 0x0409 ⇒ 旧比较**在本机碰巧成立**，bug 在一台拿不到 en-US 表的机器上才现形。本地化文本已量出：`FormatMessage(errno=0, zh-CN 0x0804) = "操作成功完成。"`。**真机复现那一支本腿做不到**（需要没有 en-US 表的机器），已在证据里单列。
 - **证据**：`docs/evidence/s1/446-errno-presence.md`；器具与日志 `.scratch/wisp/probes/446/r1/`（`32-ac3-sequence.log`、`04-locale-reading.log`、`50-d22scan.log`、`51-path-length.log`）。
+---
+
+## 编排者收件（2026-11-14 18:3x，非实现者）：AC#1–#4 翻，AC#5 等 CI
+
+- **尺1**：`be0f599f3`（改）＋`3dedc7796`（证据更正）两枚 `cat-file` rc=0。
+- **尺2**：`docs/evidence/s1/446-errno-presence.md` **13554 B**。
+- **尺3 我自己复跑**：`go test ./internal/tools` ⇒ **`ok … 41.459s`，RC=0**；`sh scripts/d22scan.sh` ⇒ **RC=0，clean**；`gofumpt -l internal/tools` ⇒ **空输出＋rc=0**（腿说本机没装、我把这格补上了）。
+- **我自己 grep**：`internal/**`＋`cmd/**` 的 `*.go` 里那句英文 **0 命中**；`errnoPresent` 定义在 `:270`、两处调用 `:301`/`:441`。
+- **腿纠正了我票面前提的一半（照记）**：`Errno.Error()` 那句英文**不是 Go 静态表**，是 Go 在 `syscall_windows.go:169` **显式索要 en-US**、失败才退回系统语言 ⇒ **本机（en-US）旧写法碰巧成立**，bug 只在拿不到 en-US 表的机器上现形。它量出 `FormatMessage(errno=0, zh-CN) = "操作成功完成。"`，并**明确不声称真机复现过**。⇒ 修它的理由因此改写为：判据不该是一句话（换语言/换构建就变），且 `errors.Is` 会**拆包**而字符串比较只看得见最外层。
+- **AC#5 留白**：等我推后 CI 的 `test-core`/`test-windows` 各一发**含 `be0f599f3` 且完成**的运行（给 run 号＋`merge-base`＋完成时刻）。

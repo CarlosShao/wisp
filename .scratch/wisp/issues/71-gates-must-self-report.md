@@ -43,7 +43,7 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
       实测见 Progress log 10:4x 条：漂移名 `-run` 裸跑 **rc=0** / 经脚本 **rc=1**，SKIP 一律 rc=1，
       真失败原样传递 rc=1，`-tags` 透传已验。CI 的三处接入：`lint` 的阳性对照步、`test-core` 的
       `TestLayoutForTestEnv`、`test-windows` 的 `TestPathResolverJunctionWindows`。
-- [ ] **AC#4**：`d22scan` **逐作用域**自报 `examined N files`（含 `frontend/` 这类子作用域），
+- [x] **AC#4**：`d22scan` **逐作用域**自报 `examined N files`（含 `frontend/` 这类子作用域），
       任何**声明了但恒为 0** 的作用域 ⇒ 致命退出；或者**删掉那个作用域**并在 allowlist 留一行说明。
       现存的 `allowlist.txt` 只允许**变短或不变**，变长需我在票面批。
 - [ ] **AC#5**：把上面三处接进 CI（`lint` 或 `test-windows`），并给出**一次真实的红**：
@@ -153,3 +153,16 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   ② **AC#5 的一次真红（仓外导出树）** `tools/d22scan/export_red_proof.sh`（新）：`git archive <rev>` 导出仓外树（zip 路线——msys GNU tar 在 Windows 丢非 ASCII 名；完整性用 `ls-tree -r` 逐条 `test -e` 校验：**20124 条 / 0 缺失**），跑 **CI 那一条命令** `sh scripts/d22scan.sh` 三发：基线 **rc=0**、9 条作用域行、整树 sha256 `14d07cc4…cb5975`；塞 `internal/zz71export/leak.go` ⇒ **rc=1**、`bans #1-5 internal/` **404→405**、红句点名 `internal/zz71export/leak.go:5: [bare-goroutine] …`（control 侧同一点名，`PASS=44 FAIL=2`＝`TestScannerSelfScanOfRealRepoIsGreen`/`TestRealRepoLedgerIsHonest`）；删掉 ⇒ **rc=0、sha256 与基线逐字相同、数回 404**。
   ③ **顺带堵了一个真洞**（`scripts/d22scan.sh`，派单允许的「CI 接线那一处」，只严不宽）：旧包装器 `set -eu` 让阳性对照一红就**结束脚本**，于是「树上有违规」的跑里**扫描步一行没跑、定位行根本不存在** —— 本票主题（第一步红了后面的步就被跳过，D22 run-away mode 6）**下沉一层**。改为两步都跑都报，control 红时打 `WARNING … read it as untrusted rather than as absent`，退出码取**第一个非零**（control 的码与改前逐字一致）⇒ 红不变绿。
   ⛔ **不声称**：没有 GitHub Actions 上的一次红（本腿被明令不得 push，那一半物理不可证）；不是对抗验收（AC#7 归编排者派非实现者）。**另一处观察未动**：`bans #1-5 internal/` 这行**也承载 ban #9 phantom-citation 的计数**（`selftest.go` 的 `selfCoverForTag`），即这行名字比它承载的 ban 少说了 #9 —— 属改文案，非仪器，交编排者。 ⇒ next=编排者：①`sh tools/d22scan/export_red_proof.sh -r 4ce5c86ff` 复核那一发红；②判 AC#4/#5 两框是否可勾；③决定上面那处口径要不要改。
+---
+
+## 编排者收件（2026-11-14 18:4x，非实现者）：AC#4 翻；AC#5 半翻（真红是**导出树**，不是 GitHub CI）；AC#7 待非实现者对抗验收
+
+- **尺1**：`4ce5c86ff`（被证明的那一发）＋`5532436f1`（只加记录）都在。**产码落点**＝`scripts/d22scan.sh`（38 行）＋`tools/d22scan/export_red_proof.sh`（新增 270 行）＋`tools/d22scan/selfreport_delta_test.go`（新增 231 行）。⚠ `tools/d22scan` 是**独立 module**（从仓根 `go test ./tools/d22scan` 会报 `does not contain package` —— 那是**我的命令错**，不是包坏；我一开始当成红上报过，当场查明）。
+- **尺2**：`docs/evidence/s1/71-ac45-selfreport-not-a-constant-and-one-real-red.md` 在。
+- **尺3 我自己跑**：`sh scripts/d22scan.sh` 现盘输出里**逐作用域自报 9 行**，我亲眼看到 `scope bans #1-5 internal/ examined 16 production Go files`、`scope bans #1-5 cmd/ examined 1`、`scope ban #6 frontend/ examined 1 text files`、`deferred-registry DENOMINATOR scope=[internal/ cmd/] examined=483`。
+- **AC#4 翻**：自报数**不是常量**——腿的 9 子测试证明「往该作用域塞一枚坏文件 ⇒ 同一行 n0→n0+1、rc 0→1、红句点名」；整包 `PASS=46 FAIL=0 SKIP=0 / RUN=103`（改前 45/93），且由 CI **已有的**阳性对照步自动跑到，无需新接线。
+- **AC#5 半翻（如实标注）**：**接进 CI** 成立（`ci.yml:119` 的阳性对照步会跑到它）；**「一次真实的红」是仓外导出树里的红**（`internal/zz71export/leak.go` ⇒ rc=1、`bans #1-5 internal/` 404→405、点名 `:5 [bare-goroutine]`；删掉后 sha256 逐字回同、数回 404），**不是 GitHub Actions 上的一发红** —— 按台账 A1868 的规矩，我不把"导出树红"说成"CI 红"。要 GitHub 上的一发红就得往 dev 推一次真违规，那是**不必要的不可逆动作**，我不做。
+- **它顺带堵的真洞（我认可，且这正是本票主题下沉一层）**：旧包装器 `set -eu` 让阳性对照一红就**结束脚本** ⇒「树上有违规」的跑里**扫描步一行没跑、定位行根本不存在**。现在两步都跑都报、control 红时打 `WARNING … read it as untrusted rather than as absent`、退出码取第一个非零（红不变绿）。
+
+### 我（编排者）对腿提的那个口径问题下的裁定
+**`bans #1-5 internal/` 那行改名**——它同时也承载 ban #9 `phantom-citation` 的计数，名字比它承载的 ban 少说 #9，属「自报行名不副实」同一族。**但**：改名会动 9 个子测试钉住的字符串，收益是口径诚实、代价是改一处文案＋跟一次测试 ⇒ **排进 71 的收尾小活**（写面 `tools/d22scan/**`，与 cmd/wisp 不冲突）。撤销口令：「71 那行不改」。
