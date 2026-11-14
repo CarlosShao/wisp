@@ -37070,7 +37070,7 @@ FAIL: TestPanelHostRealWindowHopAndLifecycle (0.37s)
 - **已执行**：goal `goal-c3efb0f7` 已 `edit` 到 **revision 13**，objective 里现在**同时**有：①★★临时覆盖（14、15 两天，全部子代理含审计类走 `magpie-high`＋`auto/glm-5.3-flash`，写明「周一机主通知后切回」）②原审计路由（`group/group-review-and-audit`，max 档，标注「周一恢复，临时令生效期间暂停」）。
 - **纪律修正**：**规则/裁定进 goal**（临时令也要进，并写到到期条件）；台账只是可核的事后记录，⛔ 不是规则的存放处；⛔ 把规则只写进 `D:\tmp`。
 
-### Q-1 ★票 274 AC#8：SPEC-11 §2.2 两步的归属 —— **等机主批（2026-11-14 14:1x 编排者登记）**
+### Q-440 ★票 274 AC#8：SPEC-11 §2.2 两步的归属（⚠ 我最初误编成 `Q-1`，那号已被 R15 明细表占用；现按台账现有最大号 439 顺延为 440——记我自己的口径错） —— **等机主批（2026-11-14 14:1x 编排者登记）**
 
 **要裁的一句**：§2.2 第 2 步今天写「前端产物：**存在则跳过**；--with-frontend 时走 docker/frontend.Dockerfile（§3.2）」，第 3 步写「embed **ssets/web** 已就位」。盘上三条事实：① --with-frontend 在 scripts/build.ps1 **0 命中**（该脚本反而**无条件**跑 
 pm ci＋
