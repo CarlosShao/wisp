@@ -52,3 +52,24 @@
 ## Progress log (append-only, newest last)
 
 - [2026-11-14 15:5x +08] 写腿 `442-r1`（实现者，非审计）交件＝**未落地，卡在裁定冲突**。派单要求「按铁律⓪⓪⓪ 选型后补 A1b/A1c」，我按候选①（自写单层有界摘要）做完全套并在仓外两棵导出树上验齐：`old`（HEAD 的尺，SHA `6E54A0B3…23F2`）对同一枚 275 件探针 **实红 0**；`new`（本腿的尺，SHA `9F976532…A4E2`）**实红 3** 并逐条点名到叶所在行（A1b `:33`、A1c-root `:42`、A1c-leaf `:55`，每句带「值在 `<sink>` 交给 `NewPanelManager`」）；删探针还原 ⇒ **274 件／2 命中／0 红／PASS** 且尺子 SHA 三处同串；既有 **35 形＋1 汇总＝36 条**子例逐条保留（`missing=0`，票面 AC#3 写的"36 形"把汇总行数了两遍，实测 35 形＋1 汇总）＋8 条新增控制全 PASS；豁免表 2 条 783 字节**逐字节同串**；同一棵树 0.68s → 0.72s（冷 1.00s → 1.23s；深度不设界且不记忆化时 3.44s）；四门禁 GREEN（vet rc=0／gofumpt 空／d22scan clean 481 件·`ban #8 cmd/=280`／长度门 GREEN tracked=19970·over=69·roster=69·not in roster=0）。**但收尾读到票尾 15:2x 改向裁定（主判据改③、源码尺「本票不再往它里面加规则」）⇒ 未提交该 Go 件，并用 `git apply -R` 把尺子还原成 HEAD 那枚（现跑 SHA `6E54A0B3…23F2`、`git status --porcelain -- cmd/wisp/` 0 行、现跑 274 件／2 命中／0 红／36 子例全 PASS／0.65s）**；① 的落地物留成 `.scratch/wisp/probes/442/option1-ruler.patch`（57796 B，post-image SHA `9F976532…A4E2`，`git apply --check` 已验可前进应用）＋同目录 post-image 全文。★③ 的可行性读数（本腿读码所得，未实现）：运行时**只有一处**可看——`PanelManager.dataPath`（`panel_host_windows.go:197`，`NewPanelManager` 只赋值 `:331-332`，真正交出去在 `:625`），而 `cmd/wisp` **无 TestMain、无包级记录器**，值只在"构造它的那段代码"手里 ⇒ 照票面字面「既有 fixture 能观测到 DataPath 的地方」只能断言 `panelProfileLeaf()` 两次不同＝**同义反复（没人会弄坏这个 helper，真出事的是某个构造点不再用它）＝没牙，按宁缺毋造⛔ 交**；逐点双跑（`startPanelFor253r6` 两遍比 `mgr.dataPath`）只在 **253r6 一个点**有牙、却要起 2 条常驻线程（该文件头 `:34-38` 自述第二个窗会间歇 mid-create 死）且要把 319/spike 两个故意固定的豁免点在运行时重抄一遍；**真主流 harness 的那形＝产码装 3-5 行观察点（`var panelDataPathSink func(string)`）＋收口断言"这一发每个构造点收到的 dataPath 互不相同"**，每点都盖、与写法无关，但要动 `cmd/wisp` 产码（本票边界明写 ⛔ 产码）。⇒ **请拍三条之一**：甲 松「⛔产码」走 ③-c（约 30-45 分钟，含把 `:71` 改回固定名 ⇒ 真红的两侧正控）／乙 「**442 改向复议**」落①（一条 `git apply`）／丙 本票收成「静态尺冻结，运行时观察点另立新票」。读数与日志＝`docs/…`（未落）→ 实为 `.scratch/wisp/probes/442/{option1-readings.md,option3-feasibility.md,probe.ps1,probe.log,repo-final.log,d22scan.log,path-budget.log,vet.log,gofumpt.log,gates-summary.txt}`；⛔ 未 push、⛔ 未改产码/阈值/golden/规格、⛔ 未加豁免。
+---
+
+## 编排者裁定（2026-11-14 15:5x）：走 **甲＋落①**，撤销口令「**442 改向复议**」
+
+写腿 `w442-interproc` 交回「未完成，卡在哪」，卡的正是我 15:2x 那条裁定造出的三角矛盾（**必做③ ／ 源码尺冻结 ／ ⛔产码** 三条不能同时成立）。它没有硬凑，也没有把 ③-a 那种同义反复交上来 —— **这是正确行为，记功**。现把三角松开：
+
+### 主判据＝**③-c**（准动产码）
+`NewPanelManager` 加 **3–5 行观察点**（收 `dataPath` 到一个只在该测试构建里可读的记录器），收口断言：**这一发里每个构造点收到的 `dataPath` 两两互不相同**。
+- 为什么它最有价值（⓪⓪⓪）：它是 ③ 三种做法里**唯一有牙且每个构造点都盖**的形；③-a 按票面字面＝同义反复（它自己量过并拒绝）；③-b 只在 `253r6` 一个点有牙，且要 2 条常驻线程把 319/spike 两个豁免点运行时重抄。
+- 为什么符合主流 harness：主流做法就是**为可观测性加接缝，然后断言行为**（不是断言源码文本）。这 3–5 行是**接缝**，不是产品逻辑改动。
+- 配套两侧正控：把 `panel_unbound_253r6_windows_test.go:71` 改回固定名 ⇒ **真红**；还原 ⇒ 绿、SHA 同串。
+
+### 次要＝**落①**（那笔 patch 准落）
+`git apply` `.scratch/wisp/probes/442/option1-ruler.patch`（57796 B，`--check` rc=0）。理由：**它在我裁定之前就做完并验齐了**（老尺 3 形全静默；新尺 3 红点名到叶所在行 `:33/:42/:55`；36 子例全 PASS；豁免表 783 B 逐字节同串；0.68→0.72s），**沉没成本已经付了、零新依赖**，退掉是浪费。
+⇒ 但它**定位为次要启发式，落完即冻结**：⛔ 此后不再往尺子里加规则（A1b/A1c 以外的新形状要么进 ③-c 的断言，要么另立票）。它与 ③-c 的分工写进各自头注释。
+
+### 顺序
+①先落 patch 并跑全门禁 → ②再做 ③-c（`cmd/wisp` 产码 ⇒ **本波唯一一枚可动 `cmd/wisp` 的写腿**，⛔ 同时开第二枚）→ ③两侧正控 → ④证据件。
+
+### 重启后派单必须注意
+子代理路由：`provider:"magpie-high"` ＋ `model:"auto/glm-5.3-flash"`（台账 `A1862`／`A1863`）。
