@@ -1,0 +1,27 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 昨天 15 次 null，台账 A1864）
+# 类型：票 228 切片 2（写面 cmd/wisp/**，本波只此一枚写腿）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 228 的**切片 2**（⛔ 不是整票）。先读 `.scratch/wisp/issues/228-*.md` 全文；切片 1 已交（`cf3050401`，AC#2／AC#2补格／AC#3／AC#11 已翻，**别重做那四格**）。
+
+**你这一波要做的四格**：
+- **AC#4 goroutine 收口先补旧账**：`rt.close()`（`run.go:676-683`）今天只 `replyRoot.Cancel()`，**不等**它 spawn 的每一枚（含 `replyHandle`，`:265`）；而 D38(c) 逐字要求"必须等所有派生 goroutine 退出"⇒ **今天已违约**。要求：close 等齐每一枚，且 GUI 腿走 `observe.Registry.Spawn`（形见 `internal/ball/ball_windows.go:170`）。
+- **AC#8**：`cmd/wisp/main.go:8` 那句 godoc 今天还是假话（逐字「// frozen D38(e) 10-step shutdown order. **The floating ball GUI is ticket 07…**」类）——现读、改成**带条件的事实句**（球已由票 228 起，不再是"ticket 07 待做"）。
+- **AC#9**：球起不来时那句实话会被**说两遍** —— `resident_ball_windows.go:96` 与 `internal/proc` 的 boot 报告各说一次，而**成功支不说第二遍** ⇒ 控制台"恰好说 1 次"这条不变式被强推的失败支撞红。⚠ 失败支今天从未被真跑过。
+- **AC#10**：票 246 AC#7 之后，球那条腿的**三处"我没有任务管线"自述**里有两处变成假话，**其中一处是运行期真打进台账的句子**（`cmd/wisp/resident_ball_windows.go` 里）——逐处现读、逐处改成事实句。
+
+**硬约束**：
+- **⛔ 只把"假话改成真话"，不许顺手改行为**：这四格里 AC#8/#9/#10 是**句子/自述**，改动必须可逐字 diff 出来；AC#4 是真改行为（等齐），要单独一枚提交并在证据里分开写。
+- **AC#5 不许松**：面板侧来源的 L2「允许」仍必须判红；`DecideFromPanel` 一字节不动（切片 1 已核：产码调用点 2 处、全在 `internal/agent/approval/replies.go`）。
+- **D38**：⛔ 第二条 UI 线程；新增 goroutine **必须**走 `observe.Registry.Spawn` 并在证据里点名。
+- ⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 转移表／`frontend/**`／`design/**`／`internal/panel/**`／`internal/llm/**`／`internal/tools/**`／`tools/d22scan/**`；⛔ 放宽/删除/跳过任何既有断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+
+**AC#6（整包终态）你可以做，且有条件做**：票 450 昨天已证**本机能跑到底**（`RUN=861 / PASS=619 / FAIL=2 / SKIP=17`，20–22 分钟）。⇒ 跑**一发**整包（载具 `scripts/wisp-cli-staged-tests.sh`，**一次一发**），给 `RUN/PASS/FAIL/SKIP` 四数 ＋ **逐名比红名册**（历史在册：`internal/ball` 1 ＋ `internal/audio` 若干 ＋ 本机两枚环境红 `TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC246DevLegIgnoresTheTestTaskInjection`）。⛔ 用"两发 FAIL 0"当覆盖证明（那是昨天的坑）。跑不完就如实写"没跑完＋跑到哪"，⛔ 报绿。
+
+**门禁**：`gofumpt -l cmd/wisp` 空／`go vet -tags winlive ./cmd/wisp` rc=0／`d22scan` clean／path-length `VERDICT GREEN`（⚠ 若给票改名就同时改 `check-path-length-budget.sh` 名册，台账 A1871）。
+
+**判据不许"能编译"**：每格给可判事实（`grep` 前后计数／定向突变摘掉改的那一行后**哪枚测试红**／整包四数）。AC#4 的判据＝**摘掉"等"那一行后哪枚测试红**，⛔ "看起来更稳了"。
+
+写面：`cmd/wisp/**`（本波只你一枚）、`docs/evidence/s1/228-*`、`.scratch/wisp/probes/228/**`、本票 Progress log（只追加）。
+
+回话第一行＝commit hash ＋「AC#4／AC#8／AC#9／AC#10／AC#6 各翻没翻（逐格）＋各自可判事实」＋「整包四数」。没干完写「未完成，卡在哪」。
