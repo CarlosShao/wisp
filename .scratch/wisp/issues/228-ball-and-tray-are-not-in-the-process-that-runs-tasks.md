@@ -211,3 +211,15 @@ M1 摘 `projectWaitingState` 行 ⇒ AC#3 用例红（`drove nothing onto the ba
 1. **一次真鼠标点托盘没跑** —— 要通知区域里一枚真图标＋人手（`winlive` 族）。替代读数是 AST 尺（菜单真建三枚、`wndproc` 三对 `menu*→OnTray*` 各恰好一枚）。⇒ **我不把这写成"点过"**；真键盘/鼠标那一发并进跑本的真机会话。
 2. **AC#11 的 ⓑ-2 真机格**仍拦在 `resident_tray_stop_live_228_windows_test.go:184`（本机开不出可注入鼠标点选的交互托盘世界）⇒ 归我约真窗。
 3. **整包两发都没跑完，但两发都不是断言红**：第 1 发 `PASS 339／FAIL 0` 死在 `Test145ArgsJSON…` 半途（416s）、第 2 发 `PASS 334／FAIL 0` 死在 `TestAC4PriorFocusSurvivesARefusedPanelSample` 半途（403s）—— 都在**真 WebView2 窗那一区整进程死亡**（`228-r3b` 记过同一族）。⇒ 覆盖改由定向一发给出（19 PASS／0 FAIL）。**这一条我另开了票 450**（见下），⛔ 当"绿"混过去。
+
+## 切片 2 写腿 Progress（2026-11-15 11:4x，实现者自陈；AC 框一枚未翻）
+
+写面：`cmd/wisp/**`（本波唯一写腿）＋ `docs/evidence/s1/228-s2-write-leg.md` ＋ `.scratch/wisp/probes/228/**`（只建不删）；`internal/**`／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`／`design/**` 一字未动。
+
+- **AC#4（行为）翻的判据**：`agentRuntime.close()` 现在真等它派生的两枚 goroutine（`approval-waiter`＝`approval_reply.go:464`、`watchdog`＝`config_reload.go:142`；**分母 1→2 一起等**），具名预算 `joinOnCloseBudget228=500ms`；答复监听用 `parkedInRead` 自报"我停在取消唤不醒的阻塞读上"，这一形**不空等而记账**（`close: GOROUTINE-JOIN … joined=false reason=parked-in-read`）。**判据＝摘掉等的那两段**：`TestAC4CloseWaitsForBothGoroutinesItSpawned` 红三条（listener 还在写行／tick 还活着／reply root 仍 1 枚 pending），只摘"具名话"那一枚 case 则 `TestAC4CloseNamesTheParkedListener…` 花满 `501.0981ms` 并红。GUI 腿不归这里 join：ui-sta 线程由 `internal/ball` 的 `Registry.Spawn("ui-sta","ball",…)` 派、`Ball.Close` 收。
+- **AC#9（句子）翻的判据**：失败支那枚重复的 `fmt.Printf("wisp: %s\n", rb.verdict)` **删掉**（`grep -c` 从 1 到 0），缺球那句话只剩启动报告一个作者 `residentLoopReport228`（两条互斥分支逐字节等于原两行）；失败支第一次能被自然走到——`panelHostHooks.newBall` 接缝（**nil 默认＝原样的 `ball.New`**，产码那一支仍在本函数里写 `ball.New`，故 AC#1 形状尺照旧认得出这枚宿主）。读数：`TestAC9BallRefusalIsSaidOnceByTheBootReport` ＝ 宿主自己 **0** 次／报告两形各 **1** 次／原因仍在句子里，0.00s；把那行放回去即红。
+- **AC#8／AC#10 的现读：盘上已经真了，本波改 0 字**。AC#8 的 `main.go:5-13` 已是条件事实句，作者 `9aaf601c8`（2026-11-08），句里指的 `startResidentBall` 定义 `resident_ball_windows.go:463`、调用点 `resident_windows.go:462`（`runResident` 体内）现核。AC#10 三处（文件头 `:21-42`、运行期 `"gestures"` 那段 `:601`、`ballGestureWhy` `:684`）都已是条件句，作者 `2327a7e7b`／`fdee536b3`；旧措辞只剩**被引用的 2 处注释**（`:22`、`:657`），产码字符串里 0 处。
+- **AC#5 未松**：`git diff cf3050401..HEAD -- internal/agent/approval` = 0 行；`DecideFromPanel` 产码真调用仍 **2** 处（`replies.go:408/:437`），本波新增 0；`TestNativeHostSeamRefusesAPanelSourcedAllow` 在整包那一发里 PASS。
+- **整包一发（载具，`1525.00s`＝25m25s，跑完）**：`RUN=864 / PASS=622 / FAIL=2 / SKIP=17`。两红**都是已知宿主环境红且只有这两枚**（`TestAC4FocusReturnToPriorWindowGap33r5`、`TestAC246DevLegIgnoresTheTestTaskInjection`）。对票 450 基线（`861/619/2/17`）逐数对撞：`RUN +3`／`PASS +3`／`FAIL ±0`／`SKIP ±0`＝本波新增的 3 枚用例，无多出来的红。名册里 `internal/ball`／`internal/audio` 两条不在本包（载具只跑 `./cmd/wisp`），⛔ 不冒充。
+- **D38 形状**：本波差分 `+.*go func(` = 0、`+.*\.Spawn(` = 0，零新协程；门上 `gofumpt -l cmd/wisp` 空／`go vet -tags winlive ./cmd/wisp` rc=0／`d22scan.sh` clean／`check-path-length-budget.sh` VERDICT GREEN。
+- 三发突变读数（M1 摘等两段／M2 只摘具名话／M3 放回重复行）与哈希对撞在 `docs/evidence/s1/228-s2-write-leg.md` §1；脚本与日志 `.scratch/wisp/probes/228/s2/mut/`。

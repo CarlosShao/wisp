@@ -158,6 +158,14 @@ type panelHostHooks struct {
 	sizePx       int
 	idleOpacity  *float64
 	clickThrough bool
+	// newBall is the ONE value in this bag that is not an executor (ticket 228
+	// AC#9): the ball factory itself, so a test can walk the REFUSED arm without
+	// needing a host that has no desktop. nil keeps the production shape exactly
+	// as it was (ball.New), and the assembly root never sets it - the hook that
+	// does lives in resident_ball_seam_228_windows.go and only a test calls it,
+	// because the refusal sentence's one-author invariant is worth an arm the
+	// suite can actually reach on a developer's desktop.
+	newBall func(ball.Options) (*ball.Ball, error)
 }
 
 // withBallSizePx hands the ball host the configured [ball] size (ticket 413).
@@ -466,7 +474,7 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 	cfg, provenance := residentBallHotkeyChain258(hotCfg)
 	rb.hotkeyProvenance = provenance
 
-	b, err := ball.New(ball.Options{
+	opts := ball.Options{
 		// Ticket 413: the configured [ball] size reaches the option it always
 		// named (internal/ball/ball_windows.go:64's SizePx) instead of the
 		// package default. The assembly root sourced the number from
@@ -515,11 +523,34 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 			OnTrayAllowAlways: func() { rb.trayAnswerGesture(trayAnswerAllowAlways) },
 			OnDragEnd:         func() { recordBallDragEnd() },
 		},
-	})
+	}
+	// Ticket 228 AC#9's seam: a test may hand in the factory (hs.newBall), so the
+	// refused arm below is reachable without a host that has no desktop. Production
+	// always takes the else branch, and that branch is spelled ball.New IN THIS
+	// FUNCTION on purpose: AC#1's shape instrument finds this leg's ball host by
+	// locating a ball.New call inside a production function body
+	// (resident_ball_228_test.go's hostsOfBall228), so hiding the factory behind a
+	// variable would make the leg look like it hosts nothing.
+	var (
+		b   *ball.Ball
+		err error
+	)
+	if hs.newBall != nil {
+		b, err = hs.newBall(opts)
+	} else {
+		b, err = ball.New(opts)
+	}
 	if err != nil {
+		// Ticket 228 AC#9: this branch sets the verdict and BOOKS the refusal, and
+		// deliberately says NOTHING on the console. The one author of the console
+		// sentence is the boot report further down runResident
+		// (residentLoopReport228 reads rb.statusLine()), which prints it exactly
+		// once whether the ball came up or not. Printing here too made the failure
+		// arm say the same true sentence twice while the success arm said it once,
+		// which is the "the console states it exactly once" invariant this ticket
+		// keeps - broken by the arm nobody had walked.
 		rb.verdict = fmt.Sprintf("this process has NO floating ball window: %v", err)
 		slog.Error("ball: the resident leg could not create the floating ball window", "err", err)
-		fmt.Printf("wisp: %s\n", rb.verdict)
 		return rb
 	}
 

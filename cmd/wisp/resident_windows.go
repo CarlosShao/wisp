@@ -883,13 +883,31 @@ func runResident() {
 	var reason string
 	if why, left := residentBootWindowExit228(rt, bootExit, bootStop); left {
 		reason = why
-		fmt.Printf("wisp: %s; %s\n", reason, rb.statusLine())
+		fmt.Println(residentLoopReport228(false, reason, src.taskPosture(), rb))
 	} else {
-		fmt.Printf("wisp: resident event loop running (task source: %s); %s (Ctrl+C and the tray's Exit item both exit cleanly)\n",
-			src.taskPosture(), rb.statusLine())
+		fmt.Println(residentLoopReport228(true, "", src.taskPosture(), rb))
 		reason = rt.RunEventLoop()
 	}
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
+}
+
+// residentLoopReport228 is the boot report's LAST line, the one that says whether
+// the event loop is being entered and what this process's ball posture is. It is a
+// function rather than two fmt.Printf calls because ticket 228 AC#9 is an
+// invariant ABOUT THAT SENTENCE: the ball's absence is stated by the boot report
+// and by nothing else, exactly once, in both arms. A claim about how many times a
+// process says something has to be checkable without a desktop, and this is the
+// unit a case can render and count.
+//
+// The bytes are the pre-ticket bytes: the two shapes below are copied from the two
+// Printf calls this replaced, so no line an operator or a test already reads has
+// moved.
+func residentLoopReport228(entered bool, reason, taskPosture string, rb *residentBall) string {
+	if !entered {
+		return fmt.Sprintf("wisp: %s; %s", reason, rb.statusLine())
+	}
+	return fmt.Sprintf("wisp: resident event loop running (task source: %s); %s (Ctrl+C and the tray's Exit item both exit cleanly)",
+		taskPosture, rb.statusLine())
 }
 
 // residentBootWindowExit228 is AC#11 ⓐ's second mount, and the whole of the
