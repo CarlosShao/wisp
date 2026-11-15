@@ -1,0 +1,14 @@
+===== git status --porcelain --untracked-files=no -- cmd/wisp internal/panel (after 7 mutation runs) =====
+(empty above = no tracked change)
+
+===== git diff --stat -- cmd/wisp internal/panel =====
+
+===== md5 of the five mutated originals (disk) =====
+6521BAFB709E636F9C8DB70EAE99BBB5  D:\work\workspace\projects plans\Wisp\cmd\wisp\panel_attachment_214.go
+35BB0F6E16480908BF815F359A106AD0  D:\work\workspace\projects plans\Wisp\internal\panel\pump.go
+F235522DE855917BDF9E76B3D31F6B98  D:\work\workspace\projects plans\Wisp\internal\panel\attachments.go
+B7D7EBC0534528EFAF3BA1B3B287B327  D:\work\workspace\projects plans\Wisp\cmd\wisp\run.go
+01DB09B43D7BF5551C422C5513F4B700  D:\work\workspace\projects plans\Wisp\cmd\wisp\panel_resident_pump.go
+
+===== HEAD =====
+cbf88954edb31e053ad9a3fe506560c169a8ac7d

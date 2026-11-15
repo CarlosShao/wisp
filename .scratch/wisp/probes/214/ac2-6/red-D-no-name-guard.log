@@ -1,0 +1,96 @@
+time=2026-11-15T15:23:12.032+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test214AttachmentAddEndToEndStoresBytesInArtifacts
+time=2026-11-15T15:23:12.083+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts1385243212\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T15:23:12.094+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T07:23:12Z duration_ms=10
+time=2026-11-15T15:23:12.103+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts1385243212\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T15:23:12.109+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T07:23:12Z duration_ms=5
+time=2026-11-15T15:23:12.118+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts1385243212\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T15:23:12.125+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.134+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts1385243212\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T15:23:12.142+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T07:23:12Z duration_ms=8
+time=2026-11-15T15:23:12.142+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T15:23:12.152+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts1385243212\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T15:23:12.160+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.171+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts1385243212\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T15:23:12.178+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T07:23:12Z duration_ms=6
+time=2026-11-15T15:23:12.183+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T15:23:12.185+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test214AttachmentAddEndToEndStoresBytesInArtifacts (0.16s)
+=== RUN   Test214AttachmentRefusalReachesTheSnapshotWithItsReason
+time=2026-11-15T15:23:12.221+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentRefusalReachesTheSnapshotWithItsReason2433961041\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T15:23:12.229+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.239+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentRefusalReachesTheSnapshotWithItsReason2433961041\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T15:23:12.248+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T07:23:12Z duration_ms=8
+time=2026-11-15T15:23:12.256+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentRefusalReachesTheSnapshotWithItsReason2433961041\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T15:23:12.263+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T07:23:12Z duration_ms=6
+time=2026-11-15T15:23:12.274+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentRefusalReachesTheSnapshotWithItsReason2433961041\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T15:23:12.303+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T07:23:12Z duration_ms=28
+time=2026-11-15T15:23:12.303+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T15:23:12.315+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentRefusalReachesTheSnapshotWithItsReason2433961041\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T15:23:12.322+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.333+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentRefusalReachesTheSnapshotWithItsReason2433961041\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T15:23:12.339+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T07:23:12Z duration_ms=5
+time=2026-11-15T15:23:12.344+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T15:23:12.347+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test214AttachmentRefusalReachesTheSnapshotWithItsReason (0.16s)
+=== RUN   Test214DisguisedExecutableIsRefusedByItsBytes
+time=2026-11-15T15:23:12.388+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214DisguisedExecutableIsRefusedByItsBytes1037539072\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T15:23:12.398+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T07:23:12Z duration_ms=9
+time=2026-11-15T15:23:12.406+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214DisguisedExecutableIsRefusedByItsBytes1037539072\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T15:23:12.413+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T07:23:12Z duration_ms=5
+time=2026-11-15T15:23:12.421+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214DisguisedExecutableIsRefusedByItsBytes1037539072\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T15:23:12.430+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T07:23:12Z duration_ms=9
+time=2026-11-15T15:23:12.443+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214DisguisedExecutableIsRefusedByItsBytes1037539072\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T15:23:12.452+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T07:23:12Z duration_ms=9
+time=2026-11-15T15:23:12.452+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T15:23:12.468+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214DisguisedExecutableIsRefusedByItsBytes1037539072\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T15:23:12.478+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T07:23:12Z duration_ms=9
+time=2026-11-15T15:23:12.493+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214DisguisedExecutableIsRefusedByItsBytes1037539072\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T15:23:12.502+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T07:23:12Z duration_ms=9
+time=2026-11-15T15:23:12.509+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T15:23:12.512+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test214DisguisedExecutableIsRefusedByItsBytes (0.16s)
+=== RUN   Test214OversizeAttachmentIsRefusedBeforeAnyRead
+time=2026-11-15T15:23:12.545+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead436905098\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T15:23:12.557+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T07:23:12Z duration_ms=11
+time=2026-11-15T15:23:12.568+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead436905098\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T15:23:12.579+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T07:23:12Z duration_ms=10
+time=2026-11-15T15:23:12.591+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead436905098\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T15:23:12.600+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.619+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead436905098\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T15:23:12.630+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T07:23:12Z duration_ms=10
+time=2026-11-15T15:23:12.630+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T15:23:12.642+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead436905098\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T15:23:12.649+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T07:23:12Z duration_ms=6
+time=2026-11-15T15:23:12.661+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead436905098\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T15:23:12.667+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T07:23:12Z duration_ms=6
+time=2026-11-15T15:23:12.674+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T15:23:12.678+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test214OversizeAttachmentIsRefusedBeforeAnyRead (0.17s)
+=== RUN   Test214PathSpellingDisplayNameIsRefusedAndNothingLands
+time=2026-11-15T15:23:12.716+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214PathSpellingDisplayNameIsRefusedAndNothingLands855188086\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T15:23:12.725+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.767+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214PathSpellingDisplayNameIsRefusedAndNothingLands855188086\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T15:23:12.774+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T07:23:12Z duration_ms=6
+time=2026-11-15T15:23:12.783+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214PathSpellingDisplayNameIsRefusedAndNothingLands855188086\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T15:23:12.790+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.801+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214PathSpellingDisplayNameIsRefusedAndNothingLands855188086\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T15:23:12.810+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T07:23:12Z duration_ms=8
+time=2026-11-15T15:23:12.810+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T15:23:12.821+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214PathSpellingDisplayNameIsRefusedAndNothingLands855188086\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T15:23:12.829+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T07:23:12Z duration_ms=7
+time=2026-11-15T15:23:12.840+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214PathSpellingDisplayNameIsRefusedAndNothingLands855188086\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T15:23:12.845+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T07:23:12Z duration_ms=5
+time=2026-11-15T15:23:12.850+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T15:23:12.853+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    panel_attachment_214_test.go:243: a path-spelling name was not refused: <nil>
+--- FAIL: Test214PathSpellingDisplayNameIsRefusedAndNothingLands (0.18s)
+=== RUN   Test214IngestRefRenderingCarriesTheArtifactPathAndRefusalsToTheAgent
+--- PASS: Test214IngestRefRenderingCarriesTheArtifactPathAndRefusalsToTheAgent (0.00s)
+=== RUN   Test214PumpAssemblyCarriesTheAttachmentReaders
+--- PASS: Test214PumpAssemblyCarriesTheAttachmentReaders (0.00s)
+=== RUN   Test214DraftLedgerDropsOldestPastItsCap
+--- PASS: Test214DraftLedgerDropsOldestPastItsCap (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.931s
+FAIL

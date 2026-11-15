@@ -1,0 +1,44 @@
+time=2026-11-15T15:22:28.968+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondIdenticalAttachmentIsDeduplicatedNotOverwritten
+--- PASS: TestSecondIdenticalAttachmentIsDeduplicatedNotOverwritten (0.00s)
+=== RUN   TestMessageCarriesAttachmentRefsAndRefusals
+    attachments_test.go:301: agent-facing text:
+        看看这个
+        [附件] name=clip.mp4 mime=video/mp4 kind=video bytes=20 path=C:\Users\swq\AppData\Local\Temp\TestMessageCarriesAttachmentRefsAndRefusals4226561656\001\attachment-a097c197ed8b9340.mp4
+        [附件未送达] evil.png: "evil.png" 的类型（可执行文件（MS-DOS/PE 头 "MZ"））不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime
+        （这些附件没有进入本轮，请用户确认后重试或改用受支持的类型）
+--- PASS: TestMessageCarriesAttachmentRefsAndRefusals (0.01s)
+=== RUN   TestAttachmentPayloadCarriesTheBytes
+=== RUN   TestAttachmentPayloadCarriesTheBytes/a_real_png_arrives_whole_through_base64
+=== RUN   TestAttachmentPayloadCarriesTheBytes/undecodable_base64_is_refused,_not_stored_as_nothing
+=== RUN   TestAttachmentPayloadCarriesTheBytes/a_truncated_payload_is_refused,_not_stored_short
+=== RUN   TestAttachmentPayloadCarriesTheBytes/an_empty_payload_is_refused
+--- PASS: TestAttachmentPayloadCarriesTheBytes (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/a_real_png_arrives_whole_through_base64 (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/undecodable_base64_is_refused,_not_stored_as_nothing (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/a_truncated_payload_is_refused,_not_stored_short (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/an_empty_payload_is_refused (0.00s)
+=== RUN   TestComposerAttachmentsTravelFromTheIngestDoorToTheWire
+    composer_test.go:1495: composer.attachmentError = "", want the reader's sentence verbatim
+--- FAIL: TestComposerAttachmentsTravelFromTheIngestDoorToTheWire (0.00s)
+=== RUN   TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow
+time=2026-11-15T15:22:29.025+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1751727008\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T15:22:29.033+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T07:22:29Z duration_ms=8
+time=2026-11-15T15:22:29.041+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1751727008\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T15:22:29.048+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T07:22:29Z duration_ms=6
+time=2026-11-15T15:22:29.055+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1751727008\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T15:22:29.061+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T07:22:29Z duration_ms=5
+time=2026-11-15T15:22:29.070+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1751727008\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T15:22:29.078+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T07:22:29Z duration_ms=8
+time=2026-11-15T15:22:29.078+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T15:22:29.089+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1751727008\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T15:22:29.097+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T07:22:29Z duration_ms=7
+time=2026-11-15T15:22:29.106+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1751727008\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T15:22:29.112+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T07:22:29Z duration_ms=5
+time=2026-11-15T15:22:29.116+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T15:22:29.119+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    display_scrub_216_test.go:167: AC#3 menu row as the page receives it: "photo\\x1b已允许.png"
+--- PASS: TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow (0.14s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.203s
+FAIL

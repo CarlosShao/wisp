@@ -1,0 +1,34 @@
+===== A1881: AC#6 is time-conditioned ("没接之前"). Re-run at the wiring anchor fc76d5d7e (2026-11-07 17:52). =====
+fc76d5d7e96664790d4d21904ce72fda6cf18883
+fc76d5d7e96664790d4d21904ce72fda6cf18883 2026-11-07 17:52:15 +0800 214: 附件接线——panel.attachment.add 挂上真受理器，附件真传到落盘与快照
+
+--- [a] file picker / attach route in frontend/src at the ANCHOR ---
+fc76d5d7e:frontend/src/components/composer.tsx:210:            type="file"
+fc76d5d7e:frontend/src/components/composer.tsx:10:   envelope - requestModeSwitch / requestWorkspaceChange / submitAttachment /
+fc76d5d7e:frontend/src/components/composer.tsx:45:  submitAttachment,
+fc76d5d7e:frontend/src/components/composer.tsx:111:        await submitAttachment(f);
+fc76d5d7e:frontend/src/lib/panel.ts:408:export function submitAttachment(file: File): Promise<void> {
+fc76d5d7e:frontend/src/lib/panel.ts:393:export function sendAttachmentBytes(
+fc76d5d7e:frontend/src/lib/panel.ts:418:      sendAttachmentBytes(file.name, file.type, buf.byteLength, toBase64(buf));
+
+--- [b] composer-row.tsx existed at the ANCHOR? (git cat-file -e) ---
+fatal: path 'frontend/src/components/composer-row.tsx' exists on disk, but not in 'fc76d5d7e'
+
+rc=128
+
+--- [c] the composer callbacks at the ANCHOR (App.tsx) ---
+fc76d5d7e:frontend/src/App.tsx:45:import { PromptBar } from "@/components/ai-native/prompt-bar";
+fc76d5d7e:frontend/src/App.tsx:474:          <PromptBar
+fc76d5d7e:frontend/src/App.tsx:332:                    onPermissionChange={() => undefined}
+fc76d5d7e:frontend/src/App.tsx:333:                    onSend={() => undefined}
+fc76d5d7e:frontend/src/App.tsx:410:  onPermissionChange,
+fc76d5d7e:frontend/src/App.tsx:415:  onSend,
+fc76d5d7e:frontend/src/App.tsx:421:  onPermissionChange: (key: string) => void;
+fc76d5d7e:frontend/src/App.tsx:426:  onSend: (text: string) => void;
+fc76d5d7e:frontend/src/App.tsx:481:            onPermissionChange={onPermissionChange}
+fc76d5d7e:frontend/src/App.tsx:482:            onSend={onSend}
+
+--- [d] today (HEAD) for contrast ---
+HEAD:frontend/src/components/composer-row.tsx:305:        type="file"
+HEAD:frontend/src/components/composer.tsx:210:            type="file"
+HEAD:frontend/src/components/composer-row.tsx:291:        onAttach={composer ? () => fileInput.current?.click() : undefined}

@@ -1,0 +1,90 @@
+===== M-A : cmd/wisp/panel_attachment_214.go =====
+diff --git a/cmd/wisp/panel_attachment_214.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-A-no-ledger-record-panel_attachment_214.go"
+index f26c72c4b..e06b72a50 100644
+--- a/cmd/wisp/panel_attachment_214.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-A-no-ledger-record-panel_attachment_214.go"
+@@ -217,3 +217,4 @@ func (h *attachmentIngestHandler214) HandleAttachmentRequest(ctx context.Context
+ 	ref, err := h.ingest(ctx, req)
+-	h.drafts.record(ref)
++	// MUT-214-A overlay: the ledger write (the snapshot row's one writer) pulled.
++	_ = ref
+ 	if h.audit != nil {
+
+===== M-B : internal/panel/pump.go =====
+diff --git a/internal/panel/pump.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-B-no-attachment-reason-pump.go"
+index e49396cef..f585626ac 100644
+--- a/internal/panel/pump.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-B-no-attachment-reason-pump.go"
+@@ -431,5 +431,3 @@ func (p *SnapshotPump) Snapshot() Snapshot {
+ 	}
+-	if p.src.AttachmentReason != nil {
+-		composer.AttachmentReason = p.src.AttachmentReason()
+-	}
++	// MUT-214-B overlay: the refusal sentence's pump hop pulled.
+ 
+
+===== M-C : internal/panel/attachments.go =====
+diff --git a/internal/panel/attachments.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-C-sniff-by-declared-attachments.go"
+index 745912faa..46150ebbf 100644
+--- a/internal/panel/attachments.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-C-sniff-by-declared-attachments.go"
+@@ -247,2 +247,7 @@ func (b *AttachmentBroker) Ingest(ctx context.Context, src AttachmentSource) (At
+ 	}
++	if !found && src.DeclaredMIME != "" {
++		// MUT-214-C overlay: the caller's declared type (the extension's claim) is
++		// believed instead of the leading bytes.
++		accepted, found = attachmentType{mime: src.DeclaredMIME, kind: "image", ext: "png"}, true
++	}
+ 	if !found {
+
+===== M-D : internal/panel/attachments.go =====
+diff --git a/internal/panel/attachments.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-D-no-name-guard-attachments.go"
+index 745912faa..3d18859bf 100644
+--- a/internal/panel/attachments.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-D-no-name-guard-attachments.go"
+@@ -206,5 +206,3 @@ func (b *AttachmentBroker) Ingest(ctx context.Context, src AttachmentSource) (At
+ 	// the source is opened, so the reject is also "nothing was written".
+-	if err := checkDisplayName(src.DisplayName, b.guard); err != nil {
+-		return b.refuse(ref, fmt.Sprintf("文件名 %q 不是一个裸文件名：%v", src.DisplayName, err))
+-	}
++	// MUT-214-D overlay: the bare-name guard pulled.
+ 	// Guard 2/3: the declared size is read before the bytes are.
+
+===== M-E : internal/panel/attachments.go =====
+diff --git a/internal/panel/attachments.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-E-no-ceiling-attachments.go"
+index 745912faa..fdfc2a487 100644
+--- a/internal/panel/attachments.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-E-no-ceiling-attachments.go"
+@@ -213,6 +213,3 @@ func (b *AttachmentBroker) Ingest(ctx context.Context, src AttachmentSource) (At
+ 	}
+-	if src.SizeBytes > b.max {
+-		return b.refuse(ref, fmt.Sprintf("%q 有 %d 字节，超过附件上限 %d 字节；未读取任何内容",
+-			src.DisplayName, src.SizeBytes, b.max))
+-	}
++	// MUT-214-E overlay: the declared-size ceiling guard pulled.
+ 	if src.Open == nil {
+
+===== M-F : cmd/wisp/run.go =====
+diff --git a/cmd/wisp/run.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-F-no-attachment-readers-run.go"
+index ad9ab9c61..a90173325 100644
+--- a/cmd/wisp/run.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-F-no-attachment-readers-run.go"
+@@ -1196,4 +1196,3 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
+ 		// field still held at assembly time.
+-		Attachments:      rt.attachmentDraftRows,
+-		AttachmentReason: rt.attachmentDraftReason,
++		// MUT-214-F overlay: the assembly root's two attachment reader lines pulled.
+ 		// ticket 200 AC#7's second hop, closed by 200-r2: the carrier existed at
+
+===== M-G : cmd/wisp/panel_resident_pump.go =====
+diff --git a/cmd/wisp/panel_resident_pump.go "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-G-no-attachment-readers-panel_resident_pump.go"
+index b99b93d27..44cef6f09 100644
+--- a/cmd/wisp/panel_resident_pump.go
++++ "b/.scratch\\wisp\\probes\\214\\ac2-6\\mut-G-no-attachment-readers-panel_resident_pump.go"
+@@ -100,4 +100,3 @@ func residentPumpSources65(gate *approval.Gate, cfg *config.Manager, disp *panel
+ 		// rows and the current refusal sentence, read - never re-shaped.
+-		Attachments:      drafts.rows,
+-		AttachmentReason: drafts.reason,
++		// MUT-214-G overlay: the resident pump's two attachment reader lines pulled.
+ 		// Ticket 213 交付 3's roster, derived from internal/command's
+

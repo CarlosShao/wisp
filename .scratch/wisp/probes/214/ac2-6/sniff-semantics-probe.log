@@ -1,0 +1,31 @@
+[01] png bytes / photo.png / declared image/png
+time=2026-11-15T15:24:53.064+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+     err=<nil>
+     stored=true mime="image/png" kind="image" artifact="attachment-1c8927715e5b55c7.png" reason=""
+[02] MZ bytes / photo.png / declared image/png
+     err=panel: attachment rejected: "photo.png" 的类型（可执行文件（MS-DOS/PE 头 "MZ"））不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime
+     stored=false mime="" kind="" artifact="" reason="\"photo.png\" 的类型（可执行文件（MS-DOS/PE 头 \"MZ\"））不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime"
+[03] png bytes / photo.exe / declared empty (extension lies LOW)
+     err=<nil>
+     stored=true mime="image/png" kind="image" artifact="attachment-1c8927715e5b55c7.png" reason=""
+[04] png bytes / photo.jpg / declared image/jpeg (declared lies)
+     err=panel: attachment rejected: "photo.jpg" 声明为 image/jpeg，但文件头表明它是 image/png
+     stored=false mime="" kind="" artifact="" reason="\"photo.jpg\" 声明为 image/jpeg，但文件头表明它是 image/png"
+[05] jpeg bytes / photo.png / declared image/png
+     err=panel: attachment rejected: "photo.png" 声明为 image/png，但文件头表明它是 image/jpeg
+     stored=false mime="" kind="" artifact="" reason="\"photo.png\" 声明为 image/png，但文件头表明它是 image/jpeg"
+[06] ISO 'qt  ' brand / clip.mov / declared video/quicktime
+     err=panel: attachment rejected: "clip.mov" 声明为 video/quicktime，但文件头表明它是 video/mp4
+     stored=false mime="" kind="" artifact="" reason="\"clip.mov\" 声明为 video/quicktime，但文件头表明它是 video/mp4"
+[07] ISO 'qt  ' brand / clip.mov / declared video/mp4
+     err=<nil>
+     stored=true mime="video/mp4" kind="video" artifact="attachment-863ab989e7250e55.mp4" reason=""
+[08] ISO 'mmp4' brand / clip.mp4 / declared empty
+     err=<nil>
+     stored=true mime="video/mp4" kind="video" artifact="attachment-26af0d446a531b8d.mp4" reason=""
+[09] ISO unknown brand 'heic' / clip.mp4 / declared video/mp4
+     err=panel: attachment rejected: "clip.mp4" 的类型（未知类型，文件头 0x0000001866747970）不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime
+     stored=false mime="" kind="" artifact="" reason="\"clip.mp4\" 的类型（未知类型，文件头 0x0000001866747970）不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime"
+[10] ISO bytes shorter than 12 / clip.mp4 / declared video/mp4
+     err=panel: attachment rejected: "clip.mp4" 的类型（未知类型，文件头 0x0000001866747970）不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime
+     stored=false mime="" kind="" artifact="" reason="\"clip.mp4\" 的类型（未知类型，文件头 0x0000001866747970）不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime"
