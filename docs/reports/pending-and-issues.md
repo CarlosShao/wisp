@@ -37355,3 +37355,12 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 1. 任何 `git show <rev>:<path>`，**rev 必须先用 `git rev-parse` 单独算成标量**（`[string]$rev = git rev-parse …`），⛔ 用 `@(...)` 的结果直接拼字符串。
 2. 读到与腿相反的结论时，**先怀疑自己的命令**：把命令原文＋输出一起贴进证据，再去否定腿。
 3. 判据：**"我读到相反" ≠ "腿错了"**。
+
+## A1879（11-15 13:4x）：**引用只写文件名会让我误判"引用错"** —— 派单要求改成全仓相对路径
+
+票 219 收件件里写 `render-task-roster.tsx:189` 与 `monitor-popover.tsx:239-246`，我按字面去找**找不到**（`frontend/src/render-task-roster.tsx` 不存在），一度准备当"引用错"退回。真身是：
+- `frontend/scripts/render-task-roster.tsx`
+- `frontend/src/components/harness/monitor-popover.tsx`
+⇒ **腿没错，是省略目录导致歧义**。同一批里我还因为 `windows map[string]*window`（两个空格）搜不到而差点判 gate.go 没有那张表。
+
+**规矩（此后写进每一张派单的证据要求）**：证据件里的每一处引用**必须是全仓相对路径**（`frontend/scripts/x.tsx:189`），⛔ 只写文件名；`grep` 判据要**贴命令原文＋输出**，⛔ 只给结论。理由：我这边的核验就是靠这些路径**再跑一遍**，路径有歧义 ⇒ 我的复核会变成假的"发现错误"。

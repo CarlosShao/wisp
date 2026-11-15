@@ -105,3 +105,39 @@
 > ⚠ **2026-11-08 15:1x 写腿（AC#6 前端半：任务监控真消费 snapshot.tasks，「等批准」成档）**：AC#6 的 Go join 已由票 220 落（`internal/panel/subagent_roster_197.go` 收 L1 窗口＋改名卡两族，实弹 `blockedOnApproval:true` 配 `pending:[]`），但字节到页后零消费——本波起手现跑 `grep -rn "\.tasks" frontend/src/`＝0 命中、`App.tsx:246` 喂死空数组。已接：`App.tsx` 新增 `monitorAgents(snapshot.tasks)` 派生喂 `MonitorPopover`，`MonitorAgentRow` 改 wire 形（逐字段照 `subagent_roster_197.go` TaskRowView 的 json 名），**等批准（blockedOnApproval）成独立显示档**（显示「等批准」＋warn 点、压过 D43 状态字），statusKnown=false 显示宿主原句，无 tasks 键与空名册分两句诚实空态；新牙 `frontend/scripts/render-task-roster.tsx`（`render:roster`）四齿＋源级接线全绿。门禁：typecheck/build/render:roster/render:receiver/lint 全 rc0、d22scan clean（导出树 e62877c60）、`go build -o wisp.exe ./cmd/wisp` rc0（bundle 嵌入）；活体证据＝同一 bundle 供真 Chromium 推一枚 blockedOnApproval 快照，弹层实文「等批准/收尾中」两态齐现（截图 `docs/evidence/s1/219-ac6-task-roster-ui-live.png`）。诚实边界：活体是页面消费跳、快照由证据程序推入，非 wisp.exe 端到端真推（WebView2 白窗环境账＝A1631 一族）；名册池号与流截断三数已到页面但界面未画，属下一张票。裁决表＝`docs/evidence/s1/219-ac6-task-roster-ui.md`；AC#6 框保持未勾等非实现者复认，Status 未动。
 
 > ⚠ **2026-11-08 19:2x 写腿（AC#6 追补：名册池号＋流截断三数的界面落点）**：上一腿具名报的两处「数据已到页面但界面无落点」本波闭合。起手三核现读 `subagent_roster_197.go`：池号＝`InFlightSlots/PoolCap`（:162-163）、行级三数＝TaskRowView `streamTruncated/streamElidedRunes/streamDropped`（:140-142）、另有 section 级整卷 `streamTruncated/streamElidedRunes/droppedCount`（:166-183），**字段全在不缺**，`lib/panel.ts:224` 七键本就声明齐（零动契约）。已画：①池号「在跑 3 / 上限 8」（子智能体组标题右侧，读 wire 计数不从行数现数——Go 注释写明槽先于行）；②行级截断标「省 N 字/流已丢」（行尾叠加，不参与状态判断）；③整卷告示「流已截断：省略 N 字，已丢 M 条」（**仅真截断时显示**，干净日志零噪音——裁定理由＝告警疲劳，同 App 头注释审批 chip 论据，主流 harness badge 只在异常点亮）；④无 tasks 键三处全不画、绝不显示假 0。牙扩四齿为九齿（`render-task-roster.tsx`）。门禁全 rc0：工作树＋导出树（`git clone --shared` @ 37df1ec64）typecheck/build/render:roster/lint＋d22scan clean（frontend 121 files）；d22scan 首跑红一枚系本腿在导出树自建 `node_modules` junction 被 Windows WalkDir 当文件数进（独立 walk 122 vs 自报 121），删链接复跑 clean，根因归仪器 Windows junction 盲区报编排者记账；`go build wisp.exe` rc0 重嵌。活体＝同一 bundle 供真 Chromium：池号/省 900 字/流已丢/整卷告示/等批准五落点一次上屏（截图 `docs/evidence/s1/219-ac6-roster-pool-truncation-live.png`），负例无 tasks 键程序化断言无假 0。诚实边界：活体仍为页面消费跳、快照由证据程序推入（A1631 一族）。裁决表＝`docs/evidence/s1/219-ac6-roster-pool-truncation.md`；AC 框与 Status 未动。
+---
+
+## AC#6 收件（2026-11-15 13:3x，`bc625d1ec`）：**实质已证，但⛔ 我不翻这一格 —— 欠一条读数**
+
+**尺1**：`bc625d1ec` 在，9 件，**产码/票面/台账/前端命中 0**。
+**尺2**：`docs/evidence/s1/219-ac6-receipt.md` **26325 B**。
+**尺3**：★它给的三处引用我逐处核过；其中两处**路径省了目录**，我查明真身后都成立：
+- `render-task-roster.tsx:189` → 真身 **`frontend/scripts/render-task-roster.tsx`**
+- `monitor-popover.tsx:239-246` → 真身 **`frontend/src/components/harness/monitor-popover.tsx`**
+- **L1 表**＝`internal/agent/approval/gate.go:108` `windows  map[string]*window`（逐字在）；**L2 表**＝`queue.go:84` `pending []*qitem`（逐字在）⇒ **两张表真的分开**
+
+### 两扇门不合流（我核到生产调用点）
+`LiveApprovals` 产码 14 处（`pending_read.go` 定义侧 ＋ `cmd/wisp/panel_pump.go:82/:109` 等）；`LiveL1Windows` 产码 9 处（`window_read.go:49/:63` ＋ `cmd/wisp/approval_reply.go:646` 等）⇒ **各自独立、不合流**，与腿的判语一致。
+
+### 「两支都修了」⇒ 没有"没修、留在 197/211"可写
+票面 `:76` 自己已把归属更正成**票 220**，而 220 五格 11-12 已清零。⇒ **两支都修了**，这一格的票面允许的"具名不修"那条路**用不上**。
+
+### 两支各有一发只打自己（这是这份收件最硬的地方）
+| 发 | 摘掉什么 | 红的 | 另一支 |
+|---|---|---|---|
+| M1 | `subagent_roster_197.go:248-252` | `TestAL1WindowInWaitingLightsItsRow`＋`TestABlockedRowKeepsItsRunningDimension` | **L2 全绿** |
+| M2 | `subagent_roster_197.go:245-247` | `TestASecondCardForTheSameTaskStillLightsItsRow`＋`TestTheClashFormIs…` | **L1 全绿** |
+
+⇒ 两发**互不串扰**，这是"真的分表"最强的证据形状（不是"两枚都绿"，是"打 A 只红 A"）。
+
+### 三数落点 3 处（A1875 两件套逐处齐）
+池号「在跑 N / 上限 M」`monitor-popover.tsx:239-246`（生产 `panel_pump.go:259/:263`→`App.tsx:266-267`）／行级「省 N 字／流已丢」`:112-116/:263-270`／整卷「流已截断：省略 N 字，已丢 M 条」`:122-134/:284-286` —— 三处都给到了生产点与会红的测试名。
+
+### ⛔ 为什么这一格我先不翻
+AC#6 唯一还欠的读数：`TestRunPacketLightsTheRosterRowOfItsLiveL1Window` **〔未跑包〕** —— `cmd/wisp` 现在躺着写腿 452 的新件（`resident_audio_device_lost_452_windows_test.go`），禁令成立。⇒ **452 一落地我就自己跑那一发**，把 `--- PASS/FAIL` 记进 `219-ac6-receipt.md` §4.1，**然后**才翻。⛔ 我不拿"单元全绿"顶掉"端到端未跑"。
+
+### 顺手量到的一枚齿缺陷（⛔ 不是我们的写面，只记）
+`frontend/scripts/render-task-roster.tsx:189` 那枚**正向齿**在自己的夹具 label「**等批准**的子任务」下**仍然绿**（I3 突变照绿）⇒ 它没有鉴别力；承重的是负向齿 `:190-193`、dot 齿 `:194` 与源级齿。⇒ 归**机主外部前端 agent**，本编队零写面，只记录。
+
+### 一件要机主一句话的（属"改契约文字"类，⛔ 不让下一条腿自行拍）
+界面要不要把 **L1 / L2 分成两个字**显示（现在界面层是单值不分）。⇒ 进 Q 队列等机主。
