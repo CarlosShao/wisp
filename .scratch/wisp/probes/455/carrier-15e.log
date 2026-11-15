@@ -1,0 +1,17 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/455/stage-cli-run/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/455/stage-cli-run/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/455/stage-cli-run/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-15T19:35:51.566+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test15eSilenceNeverCallsTheHandOff
+time=2026-11-15T19:35:53.047+08:00 level=INFO msg="voice: consumer booked on the D38b roster" name=asr-infer category="temporary (C11 scope)" ring_seconds=8 vad="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" asr_dir=C:\Users\swq\AppData\Local\Temp\Test15eSilenceNeverCallsTheHandOff2207740810\001\models\asr-streaming-paraformer-zh-en config_source=test
+    resident_voice_15e_windows_test.go:496: SILENCE drained=120 handoffs=0 finals=0 ball=[] state=Sleeping
+time=2026-11-15T19:35:53.705+08:00 level=INFO msg="scope disposed" scope=voice-15e completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-15T19:35:53.706+08:00 level=INFO msg="voice leg stopped: frames_drained=120 paused_drops=0 partials=0 finals=0 discarded=0 handed=0 handoffs=0 handoff_exit=0 asr_loaded=false punct_attached=false punctuated_finals=0 announce_asked=0 spoken=0 aborted=0 gated=0 samples=0 warm_turn_end=0 warm_wake=0 gate_closed=0 gate_reopened=0 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0"
+wisp: voice leg stopped: frames_drained=120 paused_drops=0 partials=0 finals=0 discarded=0 handed=0 handoffs=0 handoff_exit=0 asr_loaded=false punct_attached=false punctuated_finals=0 announce_asked=0 spoken=0 aborted=0 gated=0 samples=0 warm_turn_end=0 warm_wake=0 gate_closed=0 gate_reopened=0 kws_fed=0 kws_hits=0 kws_vetos=0 asr_fed=0
+--- PASS: Test15eSilenceNeverCallsTheHandOff (2.14s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	2.00s

@@ -1,0 +1,67 @@
+repo root: D:\work\workspace\projects plans\Wisp
+
+=== candidate files (size + file version) ===
+  C:\Windows\System32\onnxruntime.dll
+      10572960 B   FileVersion=1.17.260311-1434.1.os-germanium.6bcd20d
+  D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx\onnxruntime.dll
+      17799168 B   FileVersion=1.28.2
+  D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\onnxruntime.dll
+      17799168 B   FileVersion=1.28.2
+
+=== build ===
+
+=== ARM A: carrier shape (DLLs staged next to the exe), cwd=cmd/wisp ===
+== ticket 455 probe: which onnxruntime.dll is bound ==
+exe        : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\probe.exe
+exe dir    : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage
+cwd        : D:\work\workspace\projects plans\Wisp\cmd\wisp
+GetOnnxruntimeVersion(): 1.28.2
+module     : sherpa-onnx-c-api.dll      base=0x7ffd96d10000
+             path=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\sherpa-onnx-c-api.dll
+             size=4605952 B
+module     : onnxruntime.dll            base=0x7ffd6f200000
+             path=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\onnxruntime.dll
+             size=17799168 B
+
+=== ARM B: raw go-test shape (exe in a DLL-free dir, sherpa on PATH), cwd=cmd/wisp ===
+== ticket 455 probe: which onnxruntime.dll is bound ==
+exe        : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\tmp-raw\probe.exe
+exe dir    : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\tmp-raw
+cwd        : D:\work\workspace\projects plans\Wisp\cmd\wisp
+GetOnnxruntimeVersion(): 1.17.1
+module     : sherpa-onnx-c-api.dll      base=0x7ffd96d10000
+             path=D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx\sherpa-onnx-c-api.dll
+             size=4605952 B
+module     : onnxruntime.dll            base=0x7ffd6f900000
+             path=C:\Windows\SYSTEM32\onnxruntime.dll
+             size=10572960 B
+PATH sherpa: D:\work\workspace\projects plans\Wisp\third_party\sherpa-onnx
+
+=== ARM C1: explicit LoadLibraryEx(absolute other-dir sherpa), flags=0 ===
+== loadlib probe: flags=0x0 ==
+exe        : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\tmp-raw\loadlib_probe.exe
+cwd        : D:\work\workspace\projects plans\Wisp\cmd\wisp
+loading    : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\sherpa-onnx-c-api.dll
+module     : sherpa-onnx-c-api.dll      path=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\sherpa-onnx-c-api.dll
+             size=4605952 B
+module     : onnxruntime.dll            path=C:\Windows\SYSTEM32\onnxruntime.dll
+             size=10572960 B
+
+=== ARM C2: explicit LoadLibraryEx(absolute other-dir sherpa), flags=8 (LOAD_WITH_ALTERED_SEARCH_PATH) ===
+== loadlib probe: flags=0x8 ==
+exe        : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\tmp-raw\loadlib_probe.exe
+cwd        : D:\work\workspace\projects plans\Wisp\cmd\wisp
+loading    : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\sherpa-onnx-c-api.dll
+module     : sherpa-onnx-c-api.dll      path=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\sherpa-onnx-c-api.dll
+             size=4605952 B
+module     : onnxruntime.dll            path=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\onnxruntime.dll
+             size=17799168 B
+
+=== ARM C3: explicit LoadLibraryEx(absolute other-dir sherpa), flags=100 (LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR) ===
+== loadlib probe: flags=0x100 ==
+exe        : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\tmp-raw\loadlib_probe.exe
+cwd        : D:\work\workspace\projects plans\Wisp\cmd\wisp
+loading    : D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\sherpa-onnx-c-api.dll
+LoadLibraryEx error: The specified module could not be found.
+
+=== done ===

@@ -1,0 +1,11 @@
+time=2026-11-15T19:36:06.514+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test15eSilenceNeverCallsTheHandOff
+time=2026-11-15T19:36:06.527+08:00 level=WARN msg="voice: 语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+wisp: 语音链：语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）
+    resident_voice_15e_windows_test.go:462: the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+time=2026-11-15T19:36:06.528+08:00 level=INFO msg="voice leg: not assembled in this process"
+wisp: voice leg: not assembled in this process
+--- FAIL: Test15eSilenceNeverCallsTheHandOff (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.176s
+FAIL
