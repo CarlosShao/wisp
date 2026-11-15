@@ -1,0 +1,21 @@
+# 派单存档（先存档再发）—— 票 215 收件腿（只读＋裁决）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 昨天 15 次 null，台账 A1864）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 收件腿（非实现者）。读 `.scratch/wisp/issues/215-*.md` 全文。票面 `:52` 记着腿 `215-plugins-leg` 已落 **215a（插件半）Go 侧**；`:54` 记着腿 `215-assembly-leg` 已落**装配根接线**（`cmd/wisp/run.go` 的 `PumpSources` 字面量加 `Plugins: func() panel.PluginIn…`）。
+
+**任务**：出 `docs/evidence/s1/215-receipt.md`，逐格判语（五列：AC 原文逐字／判语／依据 `file:line`＋原文／可核命令／缺什么）。
+
+★**台账 A1875（硬规）**：凡判"满足"，**必须同时给出** ①**生产调用/派发点 `file:line`** ②**会因摘掉它而变红的测试名**。**缺一只能判"部分满足"**。
+
+★**台账 A1879（硬规）**：证据里每处引用**必须写全仓相对路径**（`cmd/wisp/run.go:1215`），⛔ 只写文件名；`grep` 判据要**贴命令原文＋输出**，⛔ 只给结论。
+
+**要做实的三件**：
+1. **两腿各自落了什么**：现跑 `grep` 给 `PumpSources` 里 `Plugins` 那一格的**赋值点**与 **`panel.PluginInventory`（或等价类型）的生产实现处**，逐处 `file:line`。
+2. **一枚会红的测试**：用 `go test -overlay`（⛔ 别把改动留在树上，改完给 `git status --porcelain` 空读数＋原件 md5 前后同）摘掉接线那一格 ⇒ **指名哪枚红**；不红就判"部分"。
+3. **纸面 vs 盘上**：票面记的"已落"与盘上现读**逐条对上或点名不一致**。
+
+⚠ **`cmd/wisp` 现在归写腿 452**：你**只许读**；⛔ 跑 `go test ./cmd/wisp` 全包。要跑就单枚／单组，跑前给 `git status --porcelain -- cmd/wisp` 读数；跑不了就写〔未跑包〕＋理由。⛔ 当"已证红"。
+⛔ 改产码/票面/台账/阈值/契约/`frontend/**`；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+写面：`docs/evidence/s1/215-*.md`、`.scratch/wisp/probes/215/**`。
+
+回话第一行＝commit hash ＋「满足 a／部分 b／不满足 c（总 N）」＋「摘接线后哪枚红」＋「票面记的"已落"与盘上不一致处（具名）」。没干完写「未完成，卡在哪」。
