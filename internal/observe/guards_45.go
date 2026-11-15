@@ -175,7 +175,34 @@ func NewDiskGuard(o DiskGuardOptions) (*DiskGuard, error) {
 // is always allowed. A gated class returns an error wrapping ErrDiskSpaceLow
 // when the volume is below threshold - or when the free-space reading failed,
 // which is the fail-closed direction.
-func (g *DiskGuard) Check(c WriteClass) error {
+//
+// It also TELLS: the trip and the recovery each emit one record. That is right
+// for a caller that is not itself the log writer, and wrong for the one caller
+// that is - see admit, and see why below.
+func (g *DiskGuard) Check(c WriteClass) error { return g.check(c, true) }
+
+// admit is Check's quiet half: the identical decision and the identical state
+// transitions, with no record emitted.
+//
+// WHY IT EXISTS (ticket 46's assembly, measured): diskGatedWriter.Write calls
+// the admission decision from INSIDE slog's JSONHandler.Handle, which holds the
+// handler's own mutex while it calls its writer. With Check on that path, a
+// refusal emitted slog.Warn, which re-entered the same handler and blocked
+// forever on a mutex the same goroutine already held - a 0%-CPU hang, not a
+// panic, reproduced by cmd/wisp's Test46DiskGatedWriterHoldsAndReplaysThroughInstallLogSink
+// (18 minutes in, killed: the log writer deadlocked its own pipeline the first
+// time the volume went below the threshold). So the writer asks quietly.
+//
+// The sentence is not lost: every transition still lands in g.warning / DiskStatus,
+// and the pipeline that is gated publishes it from the flusher goroutine - the
+// one goroutine that is never inside a write - where it is then HELD by this
+// same writer and replayed once the volume recovers (logging.go's
+// LogPipeline.publishDiskState).
+func (g *DiskGuard) admit(c WriteClass) error { return g.check(c, false) }
+
+// check is the one admission rule. tell selects whether this call emits the
+// operator records (see Check and admit).
+func (g *DiskGuard) check(c WriteClass, tell bool) error {
 	if c == WriteEssential {
 		return nil
 	}
@@ -207,12 +234,15 @@ func (g *DiskGuard) Check(c WriteClass) error {
 	g.mu.Unlock()
 
 	// Outside the lock: this record may travel through the log pipeline, which
-	// asks this same guard for permission.
-	if warning != "" {
-		slog.Warn(warning)
-	} else if !tripped && warned != "" {
-		slog.Warn("observe: disk-full guard recovered, gated writes allowed again",
-			"volume", g.volume, "free_bytes", free, "threshold_bytes", g.threshold)
+	// asks this same guard for permission - which is exactly why the log-class
+	// caller must pass tell=false (admit).
+	if tell {
+		if warning != "" {
+			slog.Warn(warning)
+		} else if !tripped && warned != "" {
+			slog.Warn("observe: disk-full guard recovered, gated writes allowed again",
+				"volume", g.volume, "free_bytes", free, "threshold_bytes", g.threshold)
+		}
 	}
 	if tripped {
 		return fmt.Errorf("%w: volume %s free %d < threshold %d, write class %q stopped",
@@ -303,14 +333,33 @@ type diskGatedWriter struct {
 }
 
 // NewDiskGatedWriter wraps w so writes are admitted only when the guard allows
-// the log class. Exported for the cmd wiring leg; InitLog installs it when
-// LogConfig.Disk is set.
+// the log class.
+//
+// WHO INSTALLS IT (this sentence used to name a field that did not exist -
+// "LogConfig.Disk is set" described nothing on logging.go's LogConfig, so the
+// only readers of this constructor were the two calls below it in this package,
+// both self-checks; 46-s6-acceptance.md §1 AC#2 item 2 booked that as "no
+// production assembly"). It is true as of that ticket's seam leg:
+//
+//   - LogConfig.Disk (*DiskGuard, logging.go:LogConfig) carries the guard;
+//   - InitLogWithRegistry installs this wrapper between the JSON handler and
+//     the rolling writer exactly when that field is non-nil;
+//   - cmd/wisp/logsink.go's installLogSink is the ONE production site that
+//     fills the field, with a guard over the data volume
+//     (cmd/wisp/diskfree_windows.go owns the GetDiskFreeSpaceEx probe).
+//
+// A nil LogConfig.Disk is the pre-ticket shape - the log file takes every
+// record with no admission decision - and it is what every caller except that
+// one passes.
 func NewDiskGatedWriter(w io.WriteCloser, g *DiskGuard) *diskGatedWriter {
 	return &diskGatedWriter{w: w, guard: g}
 }
 
 func (d *diskGatedWriter) Write(p []byte) (int, error) {
-	if err := d.guard.Check(WriteLog); err != nil {
+	// admit, not Check: this call is made from inside the log handler while it
+	// holds its own mutex, so the admission decision must not emit a record
+	// (see admit's doc - the alternative is a 0%-CPU self-deadlock).
+	if err := d.guard.admit(WriteLog); err != nil {
 		d.hold(append([]byte(nil), p...))
 		return len(p), nil
 	}

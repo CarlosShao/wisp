@@ -52,11 +52,24 @@ import (
 // config reads are per-use fresh reads), and the dispatch bans new config
 // keys - so the loop runs its resource-duty half only, which is exactly the
 // library's documented nil-Config shape.
-func startResidentWatchdog(rt *proc.Runtime, rv *residentVoice, panel *PanelManager) (*watchdog.Loop, *observe.Root) {
+// TICKET 46's seam leg: the loop handle is no longer constructed and thrown
+// away. The third return value is the D32 settle-row gate armed on it, and
+// attaching it HERE (rather than at the caller) is deliberate - this function is
+// the one place where the loop, the tree reader it samples with and the voice
+// leg's residency all exist at once, which is exactly what a verification needs.
+// resident_windows.go prints the gate's row and keeps the handle; a caller that
+// reverted to `_ = wd` would also have to drop that row, which is the reading
+// this ticket's acceptance names.
+func startResidentWatchdog(rt *proc.Runtime, rv *residentVoice, panel *PanelManager) (*watchdog.Loop, *observe.Root, *residentSettleGate) {
 	root := observe.NewRoot("watchdog-host")
+	// One reader for both duties: the loop's resource sample and the gate's
+	// pre-release peak. Two samplers over one Job would be two readings that can
+	// disagree about what the tree held at the same instant.
+	tree := proc.NewTreeSampler(rt.Job)
+	stateFn := func() observe.SLOState { return sloStateFromD43Machine(rv) }
 	loop := watchdog.New(watchdog.Options{
-		TreeReader: proc.NewTreeSampler(rt.Job),
-		StateFn:    func() observe.SLOState { return sloStateFromD43Machine(rv) },
+		TreeReader: tree,
+		StateFn:    stateFn,
 		Registry:   rt.Registry,
 		OnAlert:    func(a watchdog.Alert) { dispatchWatchdogAlert(rv, a) },
 	})
@@ -64,7 +77,9 @@ func startResidentWatchdog(rt *proc.Runtime, rv *residentVoice, panel *PanelMana
 		loop.Register(watchdog.ComponentPanelWebView, panelWebviewUnloadable{mgr: panel})
 	}
 	loop.Start(root.Ctx)
-	return loop, root
+	gate := newResidentSettleGate(loop, tree, rt.Registry, root, stateFn)
+	rv.attachSettleGate(gate)
+	return loop, root, gate
 }
 
 // sloStateFromD43Machine reads the resident machine's current D43 state into

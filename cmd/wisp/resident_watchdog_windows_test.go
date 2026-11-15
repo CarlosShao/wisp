@@ -364,10 +364,32 @@ func Test384StartResidentWatchdogRegistersRealLoop(t *testing.T) {
 	t.Cleanup(func() { rt.Job.Close() })
 
 	rv := &residentVoice{machine: statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})}
+	// 46: a residency object, so the attach half below is measurable. Without
+	// it attachSettleGate has nowhere to put the gate (the boot with no voice
+	// leg) and the reading would pass by vacuity.
+	rv.residency = &voiceResidency{}
 	panel := &PanelManager{} // zero value: IsCreated/IsShown answer false under the zero mutex
 
-	wd, wdRoot := startResidentWatchdog(rt, rv, panel)
+	wd, wdRoot, settleGate := startResidentWatchdog(rt, rv, panel)
 	t.Cleanup(wdRoot.Cancel)
+
+	// TICKET 46: the production assembly must hand back an ARMED settle gate.
+	// Before that ticket the loop was returned and dropped at the call site, so
+	// the D32 settle row had no production verifier at all; this reading is the
+	// assembly function's own answer to "is there one now".
+	if settleGate == nil {
+		t.Fatalf("46: startResidentWatchdog returned no settle gate, so the dispose cascade has nothing to call (line() would read: %s)", settleGate.line())
+	}
+	t.Logf("46-READ settle gate armed: %s", settleGate.line())
+
+	// ... and ARMED ON THE RESIDENCY, which is where the dispose cascade looks
+	// for it (resident_voice_engines_windows.go's scopeOptions hook reads
+	// r.settleGateNow()). A gate built and returned but never attached is the
+	// same zero-execution shape this ticket exists to end - the dispose path
+	// would ask a nil and skip the verification in silence.
+	if held := rv.residency.settleGateNow(); held != settleGate {
+		t.Fatalf("46: the residency holds settle gate %p, want the one this assembly built (%p): the dispose cascade would verify nothing", held, settleGate)
+	}
 
 	t.Logf("384-READ production assembly registered=[%s], D38b CountByName(watchdog)=%d (273 open: production machine Sink=nil)",
 		strings.Join(wd.Registered(), ","), rt.Registry.CountByName("watchdog"))

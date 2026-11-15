@@ -63,6 +63,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -127,6 +128,45 @@ func (s *logSink) logger() *slog.Logger {
 	return slog.New(s.pipeline.Handler())
 }
 
+// diskGuardForDataDir is the D42#5 guard's assembly seam: a var, and
+// newDataVolumeDiskGuard is what it holds, so a case can act AT THE INSTANT the
+// sink is installed (the shape internal/observe uses for sealLogFile). The
+// production value is the real volume probe in diskfree_windows.go.
+var diskGuardForDataDir = newDataVolumeDiskGuard
+
+// newDataVolumeDiskGuard builds the write-admission guard over the volume the
+// data root lives on. It returns (nil, note) when it cannot: an unreadable free
+// space reading is NOT a reason to stop installing the log sink (the sink is
+// the thing that records failures), but it IS a reason to say out loud that the
+// log writer went in ungated - "the guard is absent" and "the guard is healthy"
+// must not look alike in the install record.
+//
+// The guard is installed by installLogSink as observe.LogConfig.Disk, which is
+// the field that decides whether InitLogWithRegistry puts
+// observe.NewDiskGatedWriter between the JSON handler and the rolling writer.
+// This is that constructor's ONE production assembly point (ticket 46, S6
+// AC#3's disk-full row + AC#2's "no production caller" finding).
+func newDataVolumeDiskGuard(dataDir string) (*observe.DiskGuard, string) {
+	if dataDir == "" {
+		return nil, "no data dir resolved, so there is no volume to watch"
+	}
+	// Probe the data root itself: GetDiskFreeSpaceEx resolves the volume from a
+	// directory, and the log directory may not exist yet at boot.
+	free, err := dataVolumeFreeBytes(dataDir)
+	if err != nil {
+		return nil, "free-space probe failed (" + err.Error() + "); the log writer is ungated"
+	}
+	g, gerr := observe.NewDiskGuard(observe.DiskGuardOptions{
+		Volume: dataDir,
+		Probe:  dataVolumeFreeBytes,
+	})
+	if gerr != nil {
+		return nil, "guard refused (" + gerr.Error() + "); the log writer is ungated"
+	}
+	return g, fmt.Sprintf("volume %s, %d bytes free at install, threshold %d",
+		dataDir, free, observe.DiskGuardThresholdDefault)
+}
+
 // installLogSink starts the rolling JSONL pipeline over the given data root and
 // makes it the process-wide slog default, which is the one channel every
 // security notice in internal/* already writes to (they use the package-level
@@ -160,6 +200,14 @@ func installLogSink(dataDir string) (*logSink, error) {
 	}
 	dir := logSinkDir(dataDir)
 	obs, cfgSource := logSinkObserveConfig(dataDir)
+	// TICKET 46: the D42#5 disk guard on the log class. Assembled here, in the
+	// same boot act that installs the pipeline, so the writer that stops under
+	// disk pressure is the writer this process actually logs through - not a
+	// wrapper built and dropped (the shape this ticket exists to end: before
+	// this line observe.NewDiskGatedWriter had two call sites in the whole tree,
+	// both self-checks in guards_45.go).
+	guard, guardNote := diskGuardForDataDir(dataDir)
+	obs.Disk = guard
 	p, err := observe.InitLog(obs)
 	if err != nil {
 		return nil, err
@@ -200,7 +248,11 @@ func installLogSink(dataDir string) (*logSink, error) {
 	slog.Info("wisp: persistent log sink installed", "dir", dir, "min_level", obs.Level,
 		"config_source", cfgSource, "roll_size_mb", obs.RollSizeMB, "roll_days", obs.RollDays,
 		"redact_paths", obs.RedactPaths,
-		"early_records", earlyFlushed, "early_dropped", earlyDropped)
+		"early_records", earlyFlushed, "early_dropped", earlyDropped,
+		// Ticket 46: whether the log writer is gated, and on what. A nil guard
+		// and a healthy guard are two different postures and this attribute is
+		// what tells them apart in the file.
+		"disk_gated", obs.Disk != nil, "disk_guard", guardNote)
 	return &logSink{pipeline: p, dir: dir}, nil
 }
 

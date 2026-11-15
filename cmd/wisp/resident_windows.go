@@ -874,12 +874,19 @@ func runResident() {
 	// cancel is this leg's own defer - registered after the legs above, so
 	// LIFO stops the watchdog before the panel and ball teardown and before
 	// the D38(e) sequence the deferred rt.Shutdown at the top runs.
-	wd, wdRoot := startResidentWatchdog(rt, rv, rp)
+	wd, wdRoot, settleGate := startResidentWatchdog(rt, rv, rp)
 	defer wdRoot.Cancel()
-	// The loop handle's first production consumer is the dispose path's
-	// VerifySettle (ticket 42's settle gate); that dispose assembly rides the
-	// session-scope wave (ticket 28), so the handle is taken and named here.
-	_ = wd
+	// TICKET 46: `_ = wd` used to stand here, with a comment saying the loop's
+	// first production consumer (the dispose path's VerifySettle) "rides the
+	// session-scope wave (ticket 28)". Ticket 28 closed, the wave carried no such
+	// consumer, and the handle stayed a value constructed and dropped: the D32
+	// settle row ran in no product process. It runs now, and startResidentWatchdog
+	// is where the gate is armed (it is the one function holding the loop, its
+	// tree reader and the voice residency at once). The row below is the reading
+	// that the assembly happened, printed rather than asserted in a comment; the
+	// gate itself fires from the dispose cascade's third step
+	// (resident_voice_engines_windows.go's scopeOptions FreeOSMemory hook).
+	fmt.Printf("wisp: %s；安全卸载白名单组件：%v\n", settleGate.line(), wd.Registered())
 
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).

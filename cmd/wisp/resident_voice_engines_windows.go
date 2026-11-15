@@ -51,7 +51,6 @@ import (
 	"fmt"
 	"log/slog"
 	"path/filepath"
-	"runtime/debug"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -59,6 +58,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/audio"
 	"github.com/CarlosShao/wisp/internal/memory"
+	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/speech"
@@ -243,7 +243,18 @@ func (h *voiceEngineHandle) Punctuator() speech.Punctuator { return h.punct }
 // freeOSMemoryNow is the cascade's third step. It is a function value rather than
 // a direct call so the hook reads as one of the four frozen steps instead of an
 // inline import.
-func freeOSMemoryNow() { debug.FreeOSMemory() }
+//
+// TICKET 46's seam leg (was: debug.FreeOSMemory, directly): the release goes
+// through observe.ReleaseMemory, the instrumented wrapper. That is not tidying -
+// it is what makes the settle gate able to prove the release path ran. The D32
+// settle row's own evidence IS observe.FreeOSMemoryCount (sampler.go:406-423:
+// "a dispose calling debug.FreeOSMemory directly is invisible to it, which is
+// the point"), and this process was doing exactly the invisible thing: after
+// any number of session disposes the counter still read 0, so once the settle
+// gate is wired the production verification fails by contract on every settle
+// while the release has in fact happened. Same release, same ordering (the
+// caller stamps T2 immediately before this call), now counted.
+func freeOSMemoryNow() { observe.ReleaseMemory() }
 
 // Close releases the family. C11: idempotent, and the second call moves nothing.
 func (h *voiceEngineHandle) Close() error {
@@ -301,6 +312,15 @@ type voiceResidency struct {
 	// settle is ticket 12 AC#9's fall-back trace (settle_trace_12r2.go): the
 	// scope's own settling announcement and dispose cascade stamp T1/T2 here.
 	settle *settleTrace
+
+	// settleGate is ticket 46's D32 settle-row verification (resident 46's seam
+	// leg): the production consumer of watchdog.Loop.VerifySettle, armed by
+	// startResidentWatchdog once the watchdog loop exists. It is read from the
+	// dispose cascade's third step - the one place in this process where "the
+	// session just released its engines and returned its heap" becomes true -
+	// and it is nil on every boot leg that never assembled a watchdog, which is
+	// why every use below is nil-checked rather than assumed.
+	settleGate *residentSettleGate
 
 	// Counters. The two that matter are LastAcquire (0 when the warm keeps the
 	// engine) and FamilyLoads/FamilyCloses (one of each per swap).
@@ -505,8 +525,30 @@ func (r *voiceResidency) scopeOptions() session.ScopeOptions {
 		FreeOSMemory: func() {
 			// 票 12 AC#9 的 T2：级联的第三步（C11 step 4）只从 dispose 级联跑，
 			// onSettleExpired 就是 D43#32 的触发器。戳在真释放发生的那一行。
+			//
+			// 票 46 的接缝腿：这一行同时是 D32 settle 行的**生产触发器**。
+			// 为什么是这里而不是别处：D32 那一行问的是「dispose 之后 10 秒内树
+			// 回到目标态的 cap 以下且释放路径真跑过」，而这是全进程里唯一一个
+			// 「引擎已释放、堆已交回、面板即将/已经卸下」同时为真的时刻；采样
+			// 必须在它之后开始，所以请求从这里发出，测量在 watchdog 自己的
+			// 协程上跑（VerifySettle 会阻塞到窗口结束，绝不能压在级联线程上）。
+			// peak 是释放前的一次真树读：报告里的 peak_bytes 是读数，不是猜。
+			// 没装闸门的进程连这一读都不做（没有消费者的读数不是证据）。
+			gate := r.settleGateNow()
+			var peak int64
+			if gate != nil {
+				peak = gate.readPeak()
+			}
+			before := observe.FreeOSMemoryCount()
 			r.settle.markFellBack()
 			freeOSMemoryNow()
+			// released 是「这一次释放真的走了插桩包装」的**增量**读数，不是常量
+			// true：谁哪天把这里改回 debug.FreeOSMemory，闸门就会按契约判失败
+			// （sampler.go 的 release 半边），而不是替它圆谎。
+			released := observe.FreeOSMemoryCount() > before
+			if gate != nil {
+				gate.request(settleRequest{peak: peak, released: released})
+			}
 		},
 		// Ticket 29 AC#1: the Warm window is where L1 profile extraction runs.
 		// The body is a method, not a closure over a memory object, so the
@@ -543,7 +585,47 @@ func (r *voiceResidency) scopeOptions() session.ScopeOptions {
 }
 
 func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
+	// A wake reopens the session, and the settle gate's question is "did the
+	// DISPOSED tree fall back", not "is the tree small while the next session
+	// boots". A verification still measuring when a new epoch opens would read a
+	// tree that is loading engines again (90MB+ against the 25MB Sleeping cap),
+	// count that as a settle failure, and three wakes in a row would walk D43
+	// #35 on a product that did nothing wrong. So the wake cancels it - the
+	// cancel is the gate's, and a cancelled verification books no failure
+	// (watchdog/settle.go returns the ClassCancelled error before its counter).
+	r.abortSettleCheck("session reopened: " + reason)
 	return session.NewScope(r.scopeOptions())
+}
+
+// settleGateNow is the one reader of the field above: the dispose cascade's
+// release step and the wake half both go through it, so a process that assembled
+// no gate has exactly one place to be nil in.
+func (r *voiceResidency) settleGateNow() *residentSettleGate {
+	if r == nil {
+		return nil
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.settleGate
+}
+
+// attachSettleGate arms the D32 settle-row verification on this residency.
+// Called once, by startResidentWatchdog, after the loop exists: before that line
+// there is no loop to verify with, so an earlier call could only be a lie.
+func (r *voiceResidency) attachSettleGate(g *residentSettleGate) {
+	if r == nil || g == nil {
+		return
+	}
+	r.mu.Lock()
+	r.settleGate = g
+	r.mu.Unlock()
+}
+
+// abortSettleCheck cancels an in-flight verification, if any (see openScope).
+func (r *voiceResidency) abortSettleCheck(reason string) {
+	if g := r.settleGateNow(); g != nil {
+		g.abort(reason)
+	}
 }
 
 // attachL1Warm installs ticket 29 AC#1's L1 extraction entry on this residency.

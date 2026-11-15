@@ -72,15 +72,42 @@ type LogConfig struct {
 	RollDays int
 	// RedactPaths is [privacy] redact_paths.
 	RedactPaths bool
+	// Disk is the D42#5 write-admission guard for the log class (guards_45.go).
+	// Nil is the pre-ticket-45 shape: the file takes every record with no
+	// pre-write free-space verdict, which is what every caller before the cmd
+	// wiring leg passed. When it is set, InitLogWithRegistry puts
+	// NewDiskGatedWriter between the JSON handler and the rolling writer, so a
+	// refused record is HELD (bounded) and replayed instead of being dropped -
+	// the sentence guards_45.go's NewDiskGatedWriter doc used to state about a
+	// field that did not exist until this one.
+	//
+	// The guard is a caller-owned object, not built here: the free-space probe
+	// is a platform call and this package stays dependency-clean
+	// (guards_45.go's header). cmd/wisp/logsink.go is the production site that
+	// fills it.
+	Disk *DiskGuard
 }
 
 // LogPipeline owns the running log pipeline. Create with InitLog; Close
 // during shutdown (after the workers stop logging, before process exit).
 type LogPipeline struct {
-	writer    *rollingWriter
+	writer *rollingWriter
+	// sink is what the JSON handler writes through: writer itself, or - when
+	// LogConfig.Disk was set - the disk-gated wrapper around it. Flush and
+	// Close go through THIS so a held tail is replayed before the file stops
+	// being writable, instead of being dropped by closing the inner writer
+	// directly.
+	sink      io.WriteCloser
 	handler   slog.Handler
 	root      *Root
 	flushDone <-chan struct{}
+	// disk is the D42#5 guard this pipeline's writer is gated on (nil when the
+	// caller passed none). publishDiskState reads it each flusher tick.
+	disk *DiskGuard
+	// diskReported is the last posture published on the flusher's tick, so a
+	// crossing is announced once rather than per period. Only the flusher
+	// goroutine reads or writes it.
+	diskReported bool
 }
 
 // InitLog starts the log pipeline on the process registry (Default).
@@ -111,18 +138,74 @@ func InitLogWithRegistry(cfg LogConfig, reg *Registry) (*LogPipeline, error) {
 		}
 	}
 	// Redaction is non-disableable: there is no constructor switch for it.
+	//
+	// The disk guard (ticket 45's log half) sits UNDER the redactor and OVER the
+	// rolling writer, which is the only order that keeps both promises: every
+	// byte is redacted before anything may hold it in memory, and a refused byte
+	// is held by the writer that knows how to replay it (D42#5: log writes stop
+	// below the threshold, the record is not lost). A nil cfg.Disk leaves the
+	// chain exactly as it was - one writer, no admission decision.
+	var sink io.WriteCloser = w
+	if cfg.Disk != nil {
+		sink = NewDiskGatedWriter(w, cfg.Disk)
+	}
 	handler := &redactHandler{
 		red: Redactor{RedactPaths: cfg.RedactPaths},
-		next: slog.NewJSONHandler(w, &slog.HandlerOptions{
+		next: slog.NewJSONHandler(sink, &slog.HandlerOptions{
 			Level: level,
 		}),
 	}
 
-	p := &LogPipeline{writer: w, handler: handler}
+	p := &LogPipeline{writer: w, sink: sink, handler: handler, disk: cfg.Disk}
 	p.root = NewRootFrom(context.Background(), "observe-logs")
+	if p.disk != nil {
+		// The gate's own sentences are published HERE, from the flusher
+		// goroutine, and never from inside the guard's admission decision: that
+		// decision runs while slog's JSON handler holds its own mutex (it is
+		// called from the handler's Write), so a record emitted there re-enters
+		// the same handler and blocks on a mutex this goroutine already holds.
+		// Ticket 46's assembly measured exactly that as a 0%-CPU hang. The
+		// flusher is the one goroutine that is never inside a write.
+		w.eachTick = p.publishDiskState
+	}
 	h := reg.Spawn("log-flusher", "observe", p.root, w.flushLoop)
 	p.flushDone = h.Done()
 	return p, nil
+}
+
+// publishDiskState reports the disk gate's posture on the flusher's tick: one
+// record when the volume crosses below the threshold and one when it comes back.
+//
+// Transitions only, on purpose. The guard's per-call refresh (guards_45.go's
+// "still tripped" arm) is a status reading, not an event: publishing it per log
+// line would turn a full disk into a warning storm at the exact moment the disk
+// cannot take the bytes. And the record goes through this pipeline, so the
+// gated writer HOLDS it while the volume is refused and replays it after
+// recovery - the line explaining the gap lands in the file once the file can
+// take it.
+//
+// Only the flusher goroutine touches diskReported; Close joins that goroutine
+// before the writer closes.
+func (p *LogPipeline) publishDiskState() {
+	if p.disk == nil {
+		return
+	}
+	st := p.disk.Status()
+	switch {
+	case st.Tripped && !p.diskReported:
+		p.diskReported = true
+		sentence := st.Warning
+		if sentence == "" {
+			sentence = "disk-full guard: the volume is below the write threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+		}
+		slog.Warn(sentence, "volume", st.Volume, "free_bytes", st.FreeBytes,
+			"threshold_bytes", st.Threshold, "error_class", string(ClassResource))
+	case !st.Tripped && p.diskReported:
+		p.diskReported = false
+		slog.Warn("observe: disk-full guard recovered, gated writes allowed again",
+			"volume", st.Volume, "free_bytes", st.FreeBytes,
+			"threshold_bytes", st.Threshold)
+	}
 }
 
 // Handler returns the redacting JSON handler. Wire it with
@@ -151,15 +234,43 @@ func (p *LogPipeline) InstallAsDefault() {
 }
 
 // FlushNow flushes buffered log lines to the current file (no fsync; the
-// periodic flusher also runs while the pipeline is open).
-func (p *LogPipeline) FlushNow() error { return p.writer.Flush() }
+// periodic flusher also runs while the pipeline is open). It goes through the
+// sink so a disk-gated pipeline replays whatever the guard made it hold before
+// the buffer is pushed out ("a held line never waits past the next flush").
+func (p *LogPipeline) FlushNow() error {
+	if f, ok := p.sink.(interface{ Flush() error }); ok {
+		return f.Flush()
+	}
+	return p.writer.Flush()
+}
+
+// DiskHeldStats reports what the D42#5 gate is holding for this log file: the
+// bytes refused and waiting for room, the bytes lost to the bounded tail, and
+// the bytes replayed after a recovery. ok is false for a pipeline installed with
+// no guard - there is nothing holding bytes and nothing that could replay.
+//
+// It exists because "the file is empty" is not a reading (a buffered record and
+// a held record look the same from the filesystem), and because the operator
+// question under pressure is exactly this one: is the log WAITING or is it LOST.
+// Ticket 46's cmd/wisp case is its first reader; the diagnostics surface can be
+// the second.
+func (p *LogPipeline) DiskHeldStats() (held, lost, replayed int, ok bool) {
+	h, gated := p.sink.(interface {
+		HeldStats() (held, lost, replayed int)
+	})
+	if !gated {
+		return 0, 0, 0, false
+	}
+	held, lost, replayed = h.HeldStats()
+	return held, lost, replayed, true
+}
 
 // Close stops the flusher goroutine, flushes, syncs and closes the current
 // file. Logging after Close returns an error (and is dropped by slog).
 func (p *LogPipeline) Close() error {
 	p.root.Cancel()
 	<-p.flushDone
-	return p.writer.Close()
+	return p.sink.Close()
 }
 
 // redactHandler wraps a slog.Handler and forces every record through the
@@ -211,6 +322,9 @@ type rollingWriter struct {
 	bw      *bufio.Writer
 	written int64
 	closed  bool
+	// eachTick runs once per flusher period before the flush (nil = nothing to
+	// do). See flushLoop.
+	eachTick func()
 }
 
 // sealLogFile is the seal ensureFileLocked runs on a freshly created log file.
@@ -357,8 +471,11 @@ func (w *rollingWriter) Close() error {
 	return w.closeFileLocked()
 }
 
-// flushLoop is the log-flusher goroutine body: periodic buffer flush plus a
-// once-per-period retention sweep.
+// eachTick, when non-nil, runs once per flusher period BEFORE the flush. The
+// pipeline uses it to publish the disk gate's posture (publishDiskState): this
+// goroutine is never inside a write, which is what makes it safe to emit a
+// record into the very pipeline whose admission decision would otherwise
+// re-enter it.
 func (w *rollingWriter) flushLoop(ctx context.Context) {
 	t := time.NewTicker(flushInterval)
 	defer t.Stop()
@@ -369,6 +486,9 @@ func (w *rollingWriter) flushLoop(ctx context.Context) {
 			_ = w.Flush()
 			return
 		case <-t.C:
+			if w.eachTick != nil {
+				w.eachTick()
+			}
 			_ = w.Flush()
 			if w.now().Sub(lastSweep) >= retentionSweepPeriod {
 				lastSweep = w.now()
