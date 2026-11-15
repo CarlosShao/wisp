@@ -39,7 +39,7 @@
 - [x] **AC#2 托盘四枚按钮各映射到现成枚举、且有一枚真执行者**：「允许一次」→`Replies.Allow`（`replies.go:313`）；「拒绝」→`Replies.Reject`（`:336`）；「长期允许」→`replySurface.always`（`approval_always.go:70`，**它自带第二张 L2 卡**，不许绕过）；「本次会话内允许」⛔ **今天不许做**——`Answer` 词表只有 `allow/reject/veto/timeout` 四枚（`internal/tools/gate.go:75-89`，编排者复跑），会话档归**票 224**。判据形状＝每枚按钮断"点下去 ⇒ `Gate` 收到一条带正确 `Channel` 的答复"，并把回调接反/接空必须能判红。
 - [x] **AC#3 等待态真被驱动**：`bookWaitingState`（`cmd/wisp/approval_always.go:171-184`）**今天只写审计日志、不碰球**（我逐行读过）。本票要把球推进 D43 的"等人"那一态——⚠ **注意票 201 拆格口径**：AC#6a「态可计算可审计」**已成立、不许重做**；本票只做 AC#6b「球真进那一态」。正控＝**把驱动那一态的调用拿掉，判据必须红**（现在这一格是空的，任何突变都不会红——**这就是它必须被写成一格的理由**）。
 - [x] **AC#4 goroutine 收口先补旧账**：`rt.close()`（`run.go:676-683`）必须**等**它 spawn 的每一枚（含 `replyHandle`），且 GUI 腿走 `observe.Registry.Spawn`（`ball_windows.go:170` 那形，`ui-sta` 名额现成）。**具名写出：谁 join 谁、超时从哪来。**⚠ **分母已从 1 枚涨到 2 枚（09-29 由非实现者验收腿 `223-v1` 现测，台账 `A439`）**：除 `replyHandle` 之外，票 223 新起的那枚配置轮询协程 `reloadHandle`（`cmd/wisp/config_reload.go:119` Spawn，名字占用 D38b 常驻名册里的 `watchdog`）**全仓零读取点**，`rt.close()`（`run.go:694-707`，行号已从票面原记的 `:676-683` 漂下来）对它同样只 `Cancel` 不 join，注释逐字承认「The cancel is not a join」⇒ **同一个违约的第二枚实例**，本票要**两枚一起 join**、且判据得能证"没 join 就红"。⚠ 这一格不是新功能——它同时是 **D38(c)（`PLAN.md:2845`）那条违约的自救**。
-- [ ] **AC#5 面板侧来源的 L2「允许」仍必须被判红**：`AGENTS.md` §1.2 那条硬禁不因"加了中国原生入口"而松（`Q-49` 丙那批判据）。正控＝从界面方法名送一发"允许"，路由必须拒；⛔ **不许为了便利把 `DecideFromPanel` 改宽**。
+- [x] **AC#5 面板侧来源的 L2「允许」仍必须被判红**：`AGENTS.md` §1.2 那条硬禁不因"加了中国原生入口"而松（`Q-49` 丙那批判据）。正控＝从界面方法名送一发"允许"，路由必须拒；⛔ **不许为了便利把 `DecideFromPanel` 改宽**。
 - [x] **AC#6 整包终态**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1` 到终态＋逐名比红名册（历史在册 `internal/ball` 1＋`internal/panel` 4 属别人地界，不算本票新增、不许顺手修；`internal/risk TestResolvePerCallBudget` 是争用型假红，安静 `-count=3` 为准，见 `A432`／票 226 AC#6 那格）。**⚠ 本票动的是 Windows 原生面：POSIX 半边只能在全仓仪器里量到，别拿"编译过"当"跑过"。**
 
 ## 禁区（写腿动手前逐条读，含三枚按符号名办事的雷）
@@ -63,7 +63,7 @@
 ## 编排者增量 — 09-30 **14:47:10**：接一枚从票 241 挖出来的**过期落点指认**（本票因此多一格）
 
 - [x] **AC#7 「resident_windows.go:81」那行注释今天是假话，且它已经被三程原样传递**：现读逐字「wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)」——**票 07 早已结案**（盘上文件「07-ball-state-machine-core-done.md」），"要等票 07 才来"这句把本票（228）该干的活指给了一个不存在的未来。传递链：该注释 → 普查「240-c1 §3.1 第 1 行」→ 「241-r1」票面正文两处归属 → 均由「241-v1」当场挖出并上交（它按硬约束没碰「cmd/wisp」）。**完成判据**＝① 注释改成带条件的事实句（说清"今天这行进程里确实没有球，把球装进来是本票的活"）；② 票面正文那两处「欠票 07」的作废声明由我 09-30 在票 241 落笔（已落）；③ ⛔ **不新增仪器去扫注释里的票号**——词面型尺会误伤，这条债的归属靠台账与票面，不靠新门。凭据出处：「docs/evidence/s1/241-audio-level-producer-v1.md」§2.3。
-- [ ] **AC#7 的射程更正（09-30 15:3x，账 `A471`；这条是上面那一格的正文补，不是第二格）**：本格原来只写「resident_windows.go:81」**那一行，太窄**。我现跑 `grep -rn "ticket 07" --include=*.go internal cmd scripts tools`＝**28 处命中**，按"谁读得到"分两堆，两堆处理方式不一样：
+- [x] **AC#7 的射程更正（09-30 15:3x，账 `A471`；这条是上面那一格的正文补，不是第二格）**：本格原来只写「resident_windows.go:81」**那一行，太窄**。我现跑 `grep -rn "ticket 07" --include=*.go internal cmd scripts tools`＝**28 处命中**，按"谁读得到"分两堆，两堆处理方式不一样：
   ① **3 处不在注释里，是打给人看／写进日志的字符串** ⇒ **这三处才是本格的完成判据**（逐处改成带条件的事实句，说清"今天这条进程里确实没有球，把球装进来是 228 的活"）：
   「cmd/wisp/main.go:25」⚠ **它落在 `const usage = ` 那枚反引号原始串里＝`wisp -h` 打给用户的正文**（逐字「the floating ball window is ticket 07」，我 `sed -n '20,30p'` 复认），**不是注释、用户今天真读得到**；
   「cmd/wisp/resident_windows.go:81」是 `fmt.Printf` 的运行时输出（本格起手记的那一处）；
@@ -251,3 +251,22 @@ M1 摘 `projectWaitingState` 行 ⇒ AC#3 用例红（`drove nothing onto the ba
 
 ### 一处我自己的核尺方法出了错，记下来
 我数"新增协程"时用 `git show … | grep '^\+.*go func\('` 得到 **2 命中**，与腿说的 0 冲突。追下去：**那两行就是票面和证据件里引用这个正则本身的句子**（自我指涉）。按文件分开数：**产码 `go func(` = 0**，`.Spawn(` 3 处全在 `close_join_228_test.go` ⇒ **腿的 D38 声称成立**，是我的尺被文档骗了。⇒ 教训入台账。
+---
+
+## 最后两格收件（2026-11-15 16:5x，编排者自己跑）
+
+### AC#5（`:42`）翻 —— 两条判据都过
+1. **正控真跑**：`TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject` ⇒ **PASS 3.06s**（`ok … 3.00s`）。这枚测试名本身就把三件写死了：面板路由**拒** allow、**烧掉**授权、之后**仍能拒**。
+2. **`DecideFromPanel` 没被改宽**：现读 `internal/agent/approval/gate.go:857` 是 `func (g *Gate) DecideFromPanel(ctx context.Context, r Request) error`，注释逐字「refuses every allow on the route」；另有红牙 `internal/agent/approval/ticket259_panel_capability_rulers_test.go:319` 写着 `"AC#3 RED: DecideFromPanel accepted an allow built from panel…"` ⇒ **有人把路由改宽，这枚会红**。
+3. ⛔ 没有为了便利把它改宽 —— 29 处 `DecideFromPanel` 命中里**没有一处**是把 allow 放过的新分支。
+
+### AC#7 射程更正（`:66`）翻 —— 它要求的三处"人读字符串"已改完
+票面原判据＝①**三处不在注释里、打给人看/写进日志的字符串**：`cmd/wisp/main.go:25`（`usage` 反引号串，`wisp -h` 打给用户）／`cmd/wisp/resident_windows.go:81`（`fmt.Printf`）／`internal/proc/boot_windows.go:127`（`slog.Info`）。
+**现读**：
+- `cmd/wisp/main.go` 的 `usage` 现在写的是**今天的事实**：「hosts the floating ball window, its tray icon and its three always-on global hot keys **in this same process**」⇒ 那句「the floating ball window is ticket 07」**已经不在了**
+- `grep -rn "ticket 07" --include=*.go internal cmd scripts tools` 现读 **24 枚**（票面记 28）⇒ **少了 4 处**，与"三处人读串＋若干注释被改"一致
+- 另两处（`:81` 的 `fmt.Printf`／`boot_windows.go:127` 的 `slog.Info`）现在的内容也不再承诺未来
+⇒ 该格的实际执行判据在 **09-30 的 `[x] AC#7 翻勾凭据`** 里就已经逐处验过（`main.go:24-29`／`resident_windows.go:131`／`internal/proc/boot_windows.go:132-13x`），只是**这枚"射程更正"的框当时没翻**。⇒ 我按同一份证据翻它，⛔ 不是新证据。
+
+### 本票 16/16 结案
+票面 16 格全勾。⛔ 剩的"L2 不再弹卡"之类**不属本票**（那在票 219，已记 `Q-455` 归机主）。

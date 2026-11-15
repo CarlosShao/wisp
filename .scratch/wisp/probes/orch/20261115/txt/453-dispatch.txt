@@ -1,0 +1,24 @@
+# 派单存档（先存档再发）—— 票 453 附件出口（写腿，cmd/wisp）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/453-*.md` 全文并照它的 5 格 AC 做。
+
+**这张票的来路**（你要当真）：票 214 的收件腿现跑发现 —— 附件**收得进、落得下**（真 artifacts 树、名字守卫、`O_EXCL`、私有 DACL、递归配额都在，恰 1 枚、内容哈希命名），但**出口那半边不存在**：
+- `OutgoingMessage{` 生产**构造 0 处**（编排者现跑复核）
+- `ForAgent(` 产码只有 `internal/panel/composer.go:495` 一处，**是定义不是调用者**
+- **C25 名册里没有附件源**
+⇒ **文件收进来了，没有任何路径把它送进对话/模型。** 渲染形状测试有，生产链路零。
+
+**顺序**：**AC#1 先证出口不存在**（写测试断言"收进附件后，模型/下一轮 turn 的输入里看不到这个文件"），红句原文抄进证据，**然后**才建出口。⛔ 只写"没有出口"这种形容。
+
+**硬约束**：
+- 按 **A1880**：判"接线成立"必须给**行为牙**（删掉它某个**被测行为**变红），⛔ 只让断言源码字符串的测试红（那是装饰性，要返工）。
+- 按 **A1882**：`go test ./cmd/wisp` 走载具一次一发；整包读数**必须**带 ①终点锚 `TestZZ315A1` 是否命中 ②最后一条 `=== RUN` 名字 ③本波新测试在文件序截断点**前**还是**后**。⛔ 只报 `PASS=N` 或 `ok ./cmd/wisp`。
+- ⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 表／`frontend/**`／`design/**`；⛔ 改 D36 语义（附件上限沿用编译默认）；⛔ 放宽断言；⛔push。
+- 新协程走 `observe.Registry.Spawn`（形见 `internal/ball/ball_windows.go:170`）。
+- 本机已知红三枚不是你的：`TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC246DevLegIgnoresTheTestTaskInjection`／`Test320FetchLegWritesTheKeyNowhereOnDisk`（扫 `%TEMP%` 互扰，单跑绿）。
+- ⚠ 整包可能 native AV 死（`0xC0000005`，条件性）——遇到照实写"第 N 秒被 native AV 终止"＋最后一条 `RUN`，⛔ 报绿。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/panel/**`、`internal/agent/**`（**只读** loop/roster）、`docs/evidence/s1/453-*`。
+
+回话第一行＝commit hash ＋「AC#1 红句原文（建出口前）」＋「`OutgoingMessage` 生产构造点 file:line」＋「会红的行为测试名」＋「C25 名册加了什么」＋「整包终点锚命中/未命中＋最后一条 RUN」。没干完写「未完成，卡在哪」。
