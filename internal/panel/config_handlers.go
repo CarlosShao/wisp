@@ -213,6 +213,27 @@ type VoiceSettingsView struct {
 	AecEnabled  *bool
 	InputDevice *string
 	SampleRate  *int
+
+	// AecBuildAvailable is the CAPABILITY half of the voice section, and it is a
+	// SECOND field on purpose (ticket 452 AC#2, "让界面可判"). The three fields
+	// above answer "what did the user configure"; this one answers "can this
+	// binary cancel echo at all", a compile-time fact that no config value can
+	// change: the shipped build passes no `-tags webrtcap` to `go build`
+	// (scripts/build.ps1), so internal/audio/aec resolves to its stub and
+	// aec.BindingBuilt() answers false. Folding it into AecEnabled would make the
+	// page print "回声消除：开" on a binary that cannot cancel echo - the exact
+	// mismatch ticket 452 exists to stop. So the two stay separate:
+	// AecEnabled = "你想不想开" (writable), AecBuildAvailable = "这枚二进制能不能"
+	// (read-only, and the page must grey the switch out / state the absence when
+	// this is false).
+	//
+	// The POINTER is the gate, same class as the three above: nil means the
+	// assembly did not answer, and the JSON key stays off the wire. In production
+	// cmd/wisp's ReadSettings always fills it from aec.BindingBuilt() (a
+	// capability needs no config read), so absent is a leg-side defect rather
+	// than a state the page should ever see; a non-nil false is the ANSWERED
+	// "this build has no AEC".
+	AecBuildAvailable *bool
 }
 
 // ProviderSettings is one provider's row. APIKeyRef is a reference (dpapi:<id> /
@@ -638,14 +659,15 @@ func renderSettingsPayload(v SettingsView) string {
 		ChatModel:       v.ChatModel,
 		ChatModelKnown:  v.ChatModelKnown,
 		Voice: voicePayload{
-			CloudASRChain:    v.Voice.CloudASRChain,
-			CloudTTSChain:    v.Voice.CloudTTSChain,
-			RealtimeEnabled:  v.Voice.RealtimeEnabled,
-			RealtimeProvider: v.Voice.RealtimeProvider,
-			RealtimeModel:    v.Voice.RealtimeModel,
-			AecEnabled:       v.Voice.AecEnabled,
-			InputDevice:      v.Voice.InputDevice,
-			SampleRate:       v.Voice.SampleRate,
+			CloudASRChain:     v.Voice.CloudASRChain,
+			CloudTTSChain:     v.Voice.CloudTTSChain,
+			RealtimeEnabled:   v.Voice.RealtimeEnabled,
+			RealtimeProvider:  v.Voice.RealtimeProvider,
+			RealtimeModel:     v.Voice.RealtimeModel,
+			AecEnabled:        v.Voice.AecEnabled,
+			InputDevice:       v.Voice.InputDevice,
+			SampleRate:        v.Voice.SampleRate,
+			AecBuildAvailable: v.Voice.AecBuildAvailable,
 		},
 	}
 	for _, p := range v.Providers {
@@ -706,6 +728,11 @@ type voicePayload struct {
 	AecEnabled  *bool   `json:"aecEnabled,omitempty"`
 	InputDevice *string `json:"inputDevice,omitempty"`
 	SampleRate  *int    `json:"sampleRate,omitempty"`
+	// AecBuildAvailable is the capability bit (ticket 452 AC#2): true = this
+	// build really can cancel echo, false = it cannot (the shipped shape), and
+	// ABSENT = the leg did not answer. It rides beside aecEnabled and never
+	// instead of it - the page needs both to say "你想开，但这枚二进制做不到".
+	AecBuildAvailable *bool `json:"aecBuildAvailable,omitempty"`
 }
 
 func (h *ConfigWriteHandler) actor() string {

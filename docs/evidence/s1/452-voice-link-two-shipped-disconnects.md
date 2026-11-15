@@ -127,6 +127,11 @@ rc=0
   面板包（`panel packet`）里今天**没有** D43 状态字段 ⇒ 球离开 Listening 是事实，面板侧要等上面那个字段一起做。
   本文不写"面板也离开了"。
 
+> **2026-11-15 14:5x 补记（第二腿）**：上面第一条与第二条的那个"写面外"缺口**已经补上**——`SettingsView.Voice` 的
+> `AecBuildAvailable`（`*bool`，数据源 `aec.BindingBuilt()`）已落，`cmd/wisp` 组装处逐行填真值，并有**会红的线材测试**
+> 与**前端契约**（字段名/语义）。落点、突变读数、门禁与前端契约见本文 **§9**。第三条（面板包里的 D43 状态字段）
+> 仍**未做**，不因本腿而变。
+
 ---
 
 ## 3. AC#1(b)：改代码**之前**的两条红句（逐字，从载具日志抄）
@@ -284,3 +289,146 @@ wisp: 启动期这一条不推状态、也不拒绝启动：D43 的 EvAudioDevic
 - 两次都**没有被 native AV 终止**（`0xC0000005` 未出现）：整包跑到了结论行。
 - 本票两枚测试两次都是 `--- PASS`（第二次 `0.00s` / `0.52s`）。
 
+
+---
+
+## 9. AC#2 的"界面可判"那一半（第二腿，2026-11-15 14:4x–15:0x）——面板字段 + 组装接线 + 会红的线材测试 + 前端契约
+
+§2.3 与 §7 第 2 条把这一半划在写面外；这一腿把它落了，**不删不改上面那两处原文**，只在这里写落到哪儿。
+（同票面"收件"一节：这是 AC#2 剩下的第 1 件；第 2 件＝前端界面，仍归机主外部 agent，本腿**零字节**碰 `frontend/**`。）
+
+### 9.1 两个布尔，各答一件事（这三条是判据，不是描述）
+
+| 字段 | 类型 | 答什么 | 谁写 | 能不能改 |
+|---|---|---|---|---|
+| `VoiceSettingsView.AecEnabled` | `*bool`（既有） | **用户想不想开**：`[voice.aec] enabled` 的配置值 | `cmd/wisp/panel_config_store.go` 从 `cfg.Voice.AEC.Enabled` 读 | **可写**（`config.set` 的 `voice_aec_enabled`） |
+| `VoiceSettingsView.AecBuildAvailable` | `*bool`（**本腿新增**） | **这枚二进制能不能消回声**：`aec.BindingBuilt()` 的编译期事实 | 同一个 `ReadSettings`，从 `aec.BindingBuilt()` 读 | **只读**：`config.set` 名册里**没有**它，也不该有 |
+
+- **⛔ 合成一个布尔的后果**，逐字写清：出厂构建（`scripts/build.ps1` 不传 `-tags webrtcap`）**不能**消回声，而
+  `[voice.aec] enabled` 的默认值是 **on** ⇒ 只有一个布尔时页面会印"回声消除：开"，而那枚二进制一次也消不了。
+  这就是票面 AC#2 要杀的那句假话。
+- **指针仍是闸**（与同结构里三枚 `本机音频` 字段同一条口径）：`nil` ⇒ 这条腿没答，JSON 键**根本不在线上**；
+  `&false` ⇒ **答了**"本构建没有"；`&true` ⇒ 答了"有"。所以"没人问"和"问了、答案是 false"在线上不可互换。
+- **与启动印同源**：面板这一格读的就是构造期姿态与启动印那一行读的**同一个** `aec.BindingBuilt()`
+  （`cmd/wisp/resident_voice_bargein_windows.go:332-333` 构造期写 `reason`、`:349-354` `bargeinAECPosture452()`
+  答姿态行）⇒ 页面、姿态行、启动 stdout 三处**不可能分叉**：只要构建形态没变，它们说的是同一句真话。
+- `ReadSettings` 的两个早退（`mgr == nil` / `cfg == nil`）**不填**这个字段：那两条是"这条腿没有配置可读"，
+  它们的 view 里 `Readable=false`，页面整体进等待态；而那两条路径在本进程里没有可达构造（`Manager.Config()` 恒返回
+  `deepcopy(m.cur)`，`m.cur` 在 `internal/config` 里除回滚外不会被置 nil）⇒ **不写一条测不到的赋值**
+  （A1880：摘掉它 0 枚红的线＝装饰线）。这一点具名在此，不靠读者猜。
+
+### 9.2 接线点（`file:line`，现读）
+
+- **产码源头**：`cmd/wisp/panel_config_store.go:117` `aecBuildAvailable := aec.BindingBuilt()`
+  （local 与同函数三枚既有 local 同因：view 比这次调用活得久，交出去的是快照不是 per-call 的地址）
+- **赋值点（就是它）**：`cmd/wisp/panel_config_store.go:137` `AecBuildAvailable: &aecBuildAvailable,`
+  在 `ReadSettings` 的 `Voice: panel.VoiceSettingsView{...}` 组装块里（与 `AecEnabled`/`InputDevice`/`SampleRate` 并列）
+- **契约字段**：`internal/panel/config_handlers.go:236`（`AecBuildAvailable *bool`，注释在 `:217-235`）
+- **上线（JSON）**：`internal/panel/config_handlers.go:670`（view→payload 透传）＋ `:735`
+  `AecBuildAvailable *bool` 带 tag `json:"aecBuildAvailable,omitempty"`
+
+### 9.3 会红的测试：两次突变，红句逐字
+
+**测的是线上的字节，不是源码里的字符串**（A1880 的判据）：测试
+`cmd/wisp/panel_voice_aec_452_test.go:TestAC452PanelVoiceTellsThePageWhatTheBuildCanDo` 用
+`newRealSettingsLeg` 起**真**腿（真 `config.Manager` + 真 `secret.Store` + 真 `panel.ComposerDispatch`），
+走**门**发 `config.get`／`config.set`，读回页面真拿到的那行 JSON。判据是
+`voice.aecBuildAvailable` **在线上且等于 `aec.BindingBuilt()`**（⛔ 不是断言字面 `false`——零值会让它在静默里绿）。
+
+**M1：摘掉那格赋值**（`AecBuildAvailable: &aecBuildAvailable,`）。Go 不接受"局部变量/导入声明了不用"，
+所以这一发连 `:117` 的 local 与 `:43` 的 import 一起摘（三处，全在 `panel_config_store.go`），`go build ./cmd/wisp` rc=0 后才跑：
+
+```
+    panel_voice_aec_452_test.go:66: the settings payload's voice half carries NO aecBuildAvailable key: the page cannot tell that this build cannot cancel echo, so it prints the user's switch as if the capability existed - which is ticket 452 AC#2's undone half (voice = map[aecEnabled:false cloudASRChain:<nil> cloudTTSChain:<nil> inputDevice:default realtimeEnabled:false realtimeModel: realtimeProvider: sampleRate:16000])
+--- FAIL: TestAC452PanelVoiceTellsThePageWhatTheBuildCanDo (0.02s)
+FAIL  github.com/CarlosShao/wisp/cmd/wisp	0.00s
+```
+
+**M2：把能力位折进用户开关**（只改一行，`:117` 变成
+`aecBuildAvailable := cfg.Voice.AEC.Enabled || aec.BindingBuilt()`，编译 rc=0）：
+
+```
+    panel_voice_aec_452_test.go:86: voice.aecBuildAvailable = true (present=true) after the user switched AEC on, want false: the capability bit is being derived from the user's switch instead of the build, which is the one-boolean shape ticket 452 forbids
+--- FAIL: TestAC452PanelVoiceTellsThePageWhatTheBuildCanDo (0.03s)
+```
+
+⇒ 两发打的是**不同半边**：M1 打"键不在线上"（缺接线），M2 打"值跟着用户开关走"（合成一个布尔）。
+★**同时点名一件不遮的事**：`internal/panel` 侧那枚在册的键集冻结
+（`Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey`）在 M1 下**照样绿**——它直接构造 view 交给渲染器，
+看不见组装有没有接线。⇒ 光靠它＝A1880 说的"盘上字面钉"，所以**牙必须长在 `cmd/wisp` 的线材测试上**，本腿就是这么放的。
+
+两次突变都当场还原：`panel_config_store.go` 前后 sha256 同为
+`EB28195ABA18D7D755CCE160ABFCF73DBA4C1FF44849BEF6E1582C70CDB78B62`，还原后 `go build ./cmd/wisp` rc=0，
+定向两发复跑全绿（见 §9.4）。备份件 `.scratch/wisp/probes/452/panel-half/panel_config_store.go.pristine`。
+
+### 9.4 绿读数
+
+| 面 | 命令 | 读数 |
+|---|---|---|
+| 面板包全量 | `go test ./internal/panel -count=1` | `ok github.com/CarlosShao/wisp/internal/panel 28.787s` |
+| 面板侧新钉 | `go test ./internal/panel -run 'Test452\|Test313' -count=1` | `ok 0.072s` |
+| 线材测试（载具） | `bash scripts/wisp-cli-staged-tests.sh -test.run '^TestAC452PanelVoiceTellsThePageWhatTheBuildCanDo$'` | `--- PASS: … (0.04s)`，`ok github.com/CarlosShao/wisp/cmd/wisp 0.00s`，rc=0 |
+| 452 家族（载具） | `bash scripts/wisp-cli-staged-tests.sh -test.run '^TestAC452'` | 三枚全绿：`TestAC452ShippedBuildSaysItHasNoEchoCancellation` / `TestAC452LostMicWalksD43FromListeningIntoError (0.52s)` / 本腿那枚 |
+
+### 9.5 前端契约（给机主外部 agent；本腿 ⛔ 碰 `frontend/**`）
+
+前端要显示的东西，逐字如下，**照这四行做即可**：
+
+1. **字段名**：`voice.aecBuildAvailable`——JSON **布尔**，在 `config.get` 回执里
+   `wisp-config-view:` 标记行之后那串 JSON 的 `voice` 对象里（与 `voice.aecEnabled` 同一个对象）。
+2. **语义**：`true` ＝ 这枚二进制的构建里**带** AEC3 绑定（能消回声）；`false` ＝ **本构建没有**回声消除
+   （出厂形态：`scripts/build.ps1` 的 `go build` 不传 `-tags webrtcap`）；**键缺席** ＝ 这条设置腿没回答
+   （生产里不该出现：`cmd/wisp` 的 `ReadSettings` 每次都填；出现即腿侧缺陷，页面按等待态渲染，⛔ 不要当成 false）。
+3. **与 `voice.aecEnabled` 的关系**：**并列、独立、不可合并**。`aecEnabled` 是用户开关（可写；写字段
+   `config.set` 的 `voice_aec_enabled`），`aecBuildAvailable` 是二进制能力（**只读**，`config.set` 名册里没有它、
+   ⛔ 不要给它造写路）。两者可以同时是"用户要开 + 构建不能"，那正是出厂态。
+4. **页面规则一句话**：`aecBuildAvailable === false` 时，回声消除这一栏必须显示"**本构建无回声消除**"
+   并让开关表现为**打不开/无效**（⛔ 不能只显示 `aecEnabled: true` 就当能力存在）；`true` 时正常渲染开关；
+   键缺席时两样都别断言。
+
+**为什么不用改前端就能先跑起来**：`frontend/src/lib/config-view.ts:105-108` 逐字写着 unknown fields are
+ignored on purpose，且本仓 `*.ts` 里今天 `aecEnabled` 的读者是 0 命中 ⇒ 新键对页侧是**容错**的（不破 §2.3 那句
+"payload 新增键对 config-view.ts 是容错的"）。**页面那一半没做，本腿不声称做完。**
+
+### 9.6 门禁（本机现跑）
+
+| gate | 命令 | 读数 |
+|---|---|---|
+| 格式 | `gofumpt -l internal/panel cmd/wisp`（`D:\work\base\gopath\bin\gofumpt.exe`） | **空** rc=0（起手有一枚 `config_handlers.go` 对齐，`-w` 后空） |
+| vet | `go vet ./internal/panel ./cmd/wisp` | **rc=0** |
+| build | `go build ./internal/panel ./cmd/wisp` | **rc=0** |
+| D22 扫描 | `bash scripts/d22scan.sh` | `OK - control rc=0, scan rc=0`；`cmd/ 293 Go files`、`internal/ 1019`，0 违规 |
+| 路径长度 | `bash scripts/check-path-length-budget.sh` | **VERDICT GREEN**，`over the hat=68` / `roster=68` / not in roster=0 |
+| 跨平台 | `GOOS=linux go build ./internal/audio/aec ./internal/panel` | **rc=0**（新 import 不引入平台面）。`GOOS=linux go build ./cmd/wisp` **rc=1**，但红源是既有事：`github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files`（`scripts/wisp-cli-tests.sh` 头部早记过），⛔ 本腿新增 |
+
+### 9.7 整包（`./cmd/wisp`，载具一次一发，两发）
+
+命令（同一个载具，串行两发，⛔ 并行）：
+
+```
+D:\work\soft\Git\bin\bash.exe -c "cd '/d/work/workspace/projects plans/Wisp' && bash scripts/wisp-cli-staged-tests.sh"
+```
+
+| 发 | 起 / 末 | 载具判行 | 顶层 RUN | PASS | FAIL | SKIP | 没拿到结果的那一枚 |
+|---|---|---|---|---|---|---|---|
+| 1 | 14:49:25 / 14:56:41 | `FAIL … 437.00s` | 339 | 338 | 0 | 0 | `TestAC4PriorFocusSurvivesARefusedPanelSample` |
+| 2 | 14:59:49 / 15:06:13 | `FAIL … 386.00s`，exit 1 | 339 | 337 | 1 | 0 | 同上（同一枚） |
+
+**两发都死在票 450 在册的那个形状上**（整进程消失、无 `--- FAIL`、最后一条 `=== RUN` 就是
+`TestAC4PriorFocusSurvivesARefusedPanelSample`，437s／386s）：票 450 的现量表逐字记过同一枚
+（`PASS 334 / FAIL 0 / 403s`，死在同一枚用例半途）。**⛔ 不报绿**：这不是"整包绿"，是"整包在本机跑不完"。
+
+- 第 2 发那 1 枚 FAIL 是**本机已知红**：`TestAC4FocusReturnToPriorWindowGap33r5 (5.31s)`（派单点名的三枚之一，非本腿）。
+  另两枚已知红（`TestAC246DevLeg…`／`Test320Fetch…`）在死点**之后**的文件序里 ⇒ 这两发**根本没跑到**，既不算绿也不算红。
+- ★**必须点名的一条覆盖事实**：`cmd/wisp/panel_voice_aec_452_test.go` 按文件序排在那枚死点**之后**，
+  所以**两发整包对本腿这枚新测试的覆盖＝0**。本腿的绿读数是 §9.4 那一发**定向载具**（`-test.run '^TestAC452…'`，
+  同一个载具、同一份二进制构建），不是整包里的某一行。⛔ 不拿"整包 FAIL 0/1"当覆盖证明——这正是票 450
+  存在的理由（"看起来绿、实际没跑"）。
+- 原始日志（本机、未入库）：`.scratch/wisp/probes/452/panel-half/cmdwisp-full-452panel.log`（第 1 发）、
+  `…-run2.log`（第 2 发）；突变红句 `mut-m1-red.txt`／`mut-m2-red.txt`；突变说明 `notes-mutations.md`。
+
+### 9.8 本腿**没做**的（写明，不假装）
+
+1. **前端界面**：`frontend/**` 零字节改动，只有 §9.5 的契约。页面今天**仍不会**显示"本构建无回声消除"。
+2. **面板包里的 D43 状态字段**（§2.3 第三条）：仍未做，球离开 Listening 是事实、面板侧还看不见。
+3. **`ReadSettings` 两个早退路径不填能力位**：理由见 §9.1 末段（那两条在本进程里测不到，写了就是装饰线）。

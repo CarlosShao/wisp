@@ -40,6 +40,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/CarlosShao/wisp/internal/audio/aec"
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/secret"
@@ -102,6 +103,18 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 	aecOn := cfg.Voice.AEC.Enabled
 	inputDevice := cfg.Audio.InputDevice
 	sampleRate := cfg.Audio.SampleRate
+	// 票 452 AC#2 的"界面可判"那一半. The AEC CAPABILITY bit, not a config value:
+	// aec.BindingBuilt() is answered by the build shape itself (`-tags
+	// webrtcap` present or not), so this leg can state "this binary cannot
+	// cancel echo" no matter what config.toml says - and the shipped build has
+	// no binding at all (scripts/build.ps1 passes no -tags). It is deliberately
+	// its OWN field beside AecEnabled, never folded into it: one is "你想不想开"
+	// (AecEnabled, writable), the other is "这枚二进制能不能" (this), and a page
+	// that only had the first would print "AEC 开" on a build that cannot cancel
+	// anything. The local exists for the same reason as the three above: the
+	// view outlives this call, so it snapshots the answer instead of handing out
+	// an address into anything per-call.
+	aecBuildAvailable := aec.BindingBuilt()
 	view := panel.SettingsView{
 		Readable:       true,
 		ChatModel:      cfg.LLM.Roles.Chat.Model,
@@ -120,6 +133,8 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 			AecEnabled:       &aecOn,
 			InputDevice:      &inputDevice,
 			SampleRate:       &sampleRate,
+			// 票 452 AC#2: the capability half, from the build shape.
+			AecBuildAvailable: &aecBuildAvailable,
 		},
 	}
 

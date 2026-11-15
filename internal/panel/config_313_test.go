@@ -270,7 +270,9 @@ func Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts(t *testing.T) {
 	// "nobody read" can never be dressed up on the wire as "AEC off" or
 	// "device default" - delete the three reader lines in
 	// cmd/wisp/panel_config_store.go's ReadSettings and this pin is what goes
-	// red, not a silent zero-value ride.
+	// red, not a silent zero-value ride. Ticket 452's capability bit rides the
+	// same gate for the same reason: absent (nobody asked) and false (asked,
+	// this build cannot cancel echo) are different answers.
 	var silentPayload map[string]json.RawMessage
 	if err := json.Unmarshal([]byte(strings.SplitN(reply[idx+len(SettingsPayloadMarker):], "\n", 2)[0]), &silentPayload); err != nil {
 		t.Fatalf("silent leg's payload: %v", err)
@@ -279,7 +281,7 @@ func Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts(t *testing.T) {
 	if err := json.Unmarshal(silentPayload["voice"], &silentVoice); err != nil {
 		t.Fatalf("silent leg's voice payload: %v", err)
 	}
-	for _, k := range []string{"aecEnabled", "inputDevice", "sampleRate"} {
+	for _, k := range []string{"aecEnabled", "inputDevice", "sampleRate", "aecBuildAvailable"} {
 		if _, ok := silentVoice[k]; ok {
 			t.Errorf("a silent leg's voice payload carries the reader-gated key %q: a leg that never read config must not put the key on the wire at all", k)
 		}
@@ -309,6 +311,10 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	aecOn := false
 	device := "Blue Yeti"
 	rate := 16000
+	// Ticket 452: the capability bit is a fourth voice fact and is pinned in the
+	// same roster, set to the shipped build's answer (false) so its presence is
+	// visible in the byte-level pin below.
+	aecBuild := false
 	line := renderSettingsPayload(SettingsView{
 		Readable: true,
 		Providers: []ProviderSettings{{
@@ -316,6 +322,7 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		}},
 		Voice: VoiceSettingsView{
 			AecEnabled: &aecOn, InputDevice: &device, SampleRate: &rate,
+			AecBuildAvailable: &aecBuild,
 		},
 	})
 	top := `["chatModel","chatModelKnown","chatProvider","configured","configuredKnown","credential","presets","presetsKnown","providers","readable","voice"]`
@@ -358,7 +365,7 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		voiceKeys = append(voiceKeys, k)
 	}
 	sort.Strings(voiceKeys)
-	wantVoice := `["aecEnabled","cloudASRChain","cloudTTSChain","inputDevice","realtimeEnabled","realtimeModel","realtimeProvider","sampleRate"]`
+	wantVoice := `["aecBuildAvailable","aecEnabled","cloudASRChain","cloudTTSChain","inputDevice","realtimeEnabled","realtimeModel","realtimeProvider","sampleRate"]`
 	if got := `["` + strings.Join(voiceKeys, `","`) + `"]`; got != wantVoice {
 		t.Errorf("voice payload keys = %s, want %s", got, wantVoice)
 	}
@@ -378,9 +385,9 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	// The byte-level pin of the answered voice object: field order, spelling
 	// and the exact zero shapes the page codes against. A later addition to
 	// voicePayload cannot silently re-order or re-spell the half without this
-	// line going red (the silent-leg reverse - the three keys ABSENT - is
+	// line going red (the silent-leg reverse - the reader-gated keys ABSENT - is
 	// pinned in Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts).
-	wantVoiceJSON := `{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":"","aecEnabled":false,"inputDevice":"Blue Yeti","sampleRate":16000}`
+	wantVoiceJSON := `{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":"","aecEnabled":false,"inputDevice":"Blue Yeti","sampleRate":16000,"aecBuildAvailable":false}`
 	if got := string(payload["voice"]); got != wantVoiceJSON {
 		t.Errorf("the answered voice object = %s, want the byte-pinned %s", got, wantVoiceJSON)
 	}
