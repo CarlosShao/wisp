@@ -37423,3 +37423,19 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 3. **L2 聚合但每次合并成一张卡**（"同类请求合并展示"）：不动授权语义、只动展示。代价＝面板改动；收益＝不烦但仍每次要按。
 
 **⛔ 不答的代价**：219 的 AC#1 就永远只能按 L1 收（已这么收），L2 那一半在票面上留着当"设计如此"。
+
+## Q-456（11-15 17:1x · 归机主）：**`SPEC-06` 那份"敏感源"名册要不要加一条 `panel.attachment`**
+
+**背景**：票 453（附件出口）的写腿核到——附件收得进、落得下，但**污染追踪在附件这条腿上断链**：`internal/risk/provenance.go:99-103` 的 `sensitiveSourceTools` 九枚里没有附件源 ⇒ `IsSensitiveSource("panel.attachment")` 答 **false** ⇒ 一段**用户提供的不可信文本**可以不被标记地流向出网通道。
+
+**我为什么判"代码先改"**：一张附件就是用户给的文本，跟 `doc.read` 同级（主流 harness 的 taint/provenance 都这么分）。⇒ 我**已授权**写腿在 `internal/risk/provenance.go` 加 `SrcPanelAttachment = "panel.attachment"` ＋进聚合表，并把它那句"is the SPEC-06 §5 set"的注释同批改如实。⇒ **代码面已经补上，只是规格那句还是旧的**。
+
+**要你拍的只有一句话**（`docs/specs/SPEC-06-security-gatekeeping.md:72-75` 那一串逐条列举里加一条）：
+
+| 选项 | 代价 | 收益 |
+|---|---|---|
+| **1. 加 `panel.attachment`（我推荐）** | 改 specs 一行 | 规格与代码、与主流 harness 一致；污染链在附件这条腿上接上 |
+| 2. 不加，代码回退 | 附件内容天然不被标记 | 规格不动，但**留下一条已知断链** |
+| 3. 不改 specs，改代码注释说明"spec 未列、本实现补" | 无 | 短期能跑，⛔ 长期是"规格与实现各说一套"，我不推荐 |
+
+**⛔ 不答的代价**：代码与规格永久不一致（代码有第十枚、规格写九枚），下一位接手读 specs 会以为附件不算敏感源。
