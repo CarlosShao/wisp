@@ -49,7 +49,7 @@ state push making the frontend provably stateless.
 - [ ] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
       asserted), content integrity kept.
   〔**10-08 11:3x 编排者就地裁冲突，来源＝只读普查腿 `35-a6`（件 `.scratch/wisp/probes/35/a6/verdict.md`，盘上逐字我未复跑，⛔ 本框保持未勾）**：这一格三句里 **"merges" 与 "content integrity kept" 两句已被票 197 leg B 的重裁取代**——产码 `internal/panel/pump.go:397` 逐字写着 `Overflow TRUNCATES and never merges (ticket 197 leg B re-cut this rule`，且该规则有命名测试钉死（三枚既有尺反咬 merge）。⇒ 本框今天**只剩"no unbounded memory（heap cap asserted）"那半句算账**，而那一半按普查是"每面板推队列没写"＝一块没写。⛔ **任何后续程不许把 pump 改成"会合并"来迎合上面那句旧话**（那是把一枚已裁的契约规则倒回去），要改必须先落 `A##` 并经人工批准。〕
-- [ ] No secret leakage scan across bridge payloads.
+- [x] No secret leakage scan across bridge payloads.
 - [x] **Transport agreement page↔host (added 10-07 by `35-a1`, shape NOT chosen here)**: the page posts its envelope on
       `window.chrome.webview.postMessage` (`frontend/src/lib/panel.ts:141` interface, `:179`/`:218` the two senders), while Go's
       handler is reachable only through the library's own RPC pipe — `w.Bind("wispDispatch", …)` (`cmd/wisp/panel_host_windows.go:80`/`:405`)
@@ -423,3 +423,32 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 **本腿具名限制（不扩范围的边界，交后续程）**：① `record()` 把处理器/封套错误 `err` 逐字 echo 进审计行——若 `cmd/wisp` 的腿把 raw 塞进 error 字符串，本包不 scrub（腿契约「只回状态」写在 `config_handlers.go` 头注，验腿面在 `cmd/wisp`，本程写面禁）；② 普通字段的 `SettingWrite.Value` 直通写腿＝票 248 已裁的设计通道（凭据值不落 `ComposerRequest`），落盘前的值校验在腿侧，同样不在本程；③ 页面声明面未动一笔（`frontend/**` 写权未放开，本仪器亦不需要）。
 
 **给编排者的排程后果**：`:52` 残差①自此**有牙且已被三形突变验过牙**；翻勾与否不归本腿（裁决者≠实现者）。残差②随出向那一跳（`:44` 乙读法/`:47`/`:49` 共用的前置）一起做，本腿已把它从「欠仪器」改口为「欠被测物」，⛔ 别再按测试落点派。
+---
+
+## 侦察收件（2026-11-15 18:1x，`c6619285c`，件 `docs/evidence/s1/35-recon-20261115.md` **42053 B／530 行**）
+
+**尺1**：提交在。**尺2**：件在，530 行。**尺3 我复核的两处**：`TestInboundRawCredentialShapeReachesNoArtifact35r7` 我现跑 ⇒ **5 枚子测试全 PASS**（`credential-write-accepted`／`plain-write-with-key-shaped-value`／`refused-unlisted-method`／`refused-forged-source`／`refused-unattached-handler`）；`TestAC2CredentialSentinelAppearsInNoArtifact` 我读了源码（`panel_config_248_test.go:154`，真凭据写入＋六面产物扫描＋canary 正控）。⇒ `cmd/wisp` 那半我**没有**跑（写腿 `46b` 正占着 `cmd/wisp` 的测试二进制，A1882 家族：同一重包同一时刻只许一发）。
+
+### 六格判词
+| 格 | 判 | 一句话 |
+|---|---|---|
+| **①** 白名单模糊 `:42` | **有牙，没到 50 枚** | 守卫 `internal/panel/bridge.go:172`＋审计 `composer_dispatch.go:298`＋闭集名册 `inbound_roster_253_test.go:430`（钉 8 名）都在；但**最大一枚尺只枚举 11 名且绕开 `Handle`/审计**，"在册方法逐一派发"只断 **3/8**（产码 `cmd/wisp/panel_inbound.go:384-403` 已接七枚门） |
+| **②** 并发路由 `:44` | **完全没有尺** | 配对键是 RPC 帧 `id`（`cmd/wisp/panel_control_windows.go:782-826` 的 `_rpc[id].resolve`），**不是 requestId**；Go 侧**无待回复表**；零并发用例（唯一"第二发"是顺序的） |
+| **③** 伪造 allow `:45` | **有牙** | `internal/agent/approval/gate.go:857-870` 按路由拒＋烧 nonce；本腿现跑 **4/4 PASS**。**只欠浏览器上下文 e2e** |
+| **④** resync `:47` | **只有字面钉** | show 触发器那半只有 5 枚 `strings.Contains`（`panel_resident_pump_windows_test.go:224`）；329 的位对位尺只管推包；无"藏→改→显"行为尺；`render:receiver` **CI 不跑**（`ci.yml` 只有 l2/composer/stream/nav） |
+| **⑤** 背压 `:49` | **有牙，但打错被测物** | 35r8 四枚现跑全绿，量的是 **StreamLog**；**推包队列仍是库的无界 `dispatchq`**（`w.dispatchq = append(...)`，库 `webview.go:443-448` 无 cap 切片），`failedPost` 非测试读点 **0 枚** |
+| **⑥** 密钥泄漏 `:52` | ✅**已满足（本格翻）** | 六面扫描＋canary 正控（`panel_config_248_test.go:154`）＋入向 raw 5 subtest＋正控（`inbound_raw_leak_35r7_test.go:115`）—— 我现跑 5/5；**出向推包就是同一批 snapshot 字节** |
+
+⇒ **本票 5/6**（① ② ④ ⑤ 未翻）。
+
+### ★三件必须留在账上的发现
+1. **票面 `:54-55` 引的三处行号全死了**：`panel_host_windows.go:80`／`:405` 与 `panel.ts:141`／`:179`／`:218` —— 真身是 `cmd/wisp/panel_host_windows.go:1227-1236`／`:127`，前端 `frontend/src/lib/panel.ts:519-522`／`:616`／`:655`。⛔ 下一位别照着票面行号找。
+2. ★**一枚已勾框今天为假**（`:57-58`）：原文写「The page never calls `wispDispatch`（`git grep wispDispatch HEAD -- frontend` = **0**）」，**现量 3 命中**，其中 `frontend/src/lib/panel.ts:780` 是真调用 `const door = window.wispDispatch;`（票 313 的设置门加的门）。
+   **怎么记**：按 **A1881**，已勾框按**它自己那个 commit** 判 ⇒ **不摘勾**（当时是真的）；但它是**当前状态的断言**且现在为假 ⇒ **在此具名推翻**，⛔ 让下一任拿它当理由。
+3. **两笔新料（修 ⑤ 时要一起改）**：①推包队列无界**有据**（库 `webview.go:443-448` append 到无 cap 切片）②35r8 的 `heapDelta` 是 **`uint64`**，下溢后被 `overCap` 读成"远超上限"，而 `:385` **只对 m4 断言**、m1 的堆读数只打印不判。
+
+### 派单计划（我拍的，按价值）
+- **G1**＝①＋②＋⑥补尺（**零产码**，主要是把尺补到 50 枚模糊＋8 名逐一派发＋一条真并发配对尺）
+- **G3**＝⑤**动产码**（把推包队列换成有界／或给它上限＋把 `failedPost` 接上读点＋顺带修 `heapDelta` 的下溢），**单独一腿**
+- **G4**＝④ 一条"藏→改→显"行为尺 ＋ 把 `render:receiver` 加进 `ci.yml`（**这条动 CI 文件，要先问** —— 见下）
+- 两波都等 `cmd/wisp` 空；⛔ 与 46b／后续写腿并发。
