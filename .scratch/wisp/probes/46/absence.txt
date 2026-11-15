@@ -209,3 +209,9 @@ internal/observe/guards_45_test.go:514:	if _, err := EnforceArtifactsQuota("", 1
 internal/present/dispatch.go:27://     Tier 3 drives both unconditionally - Focus Assist may swallow the
 internal/present/dispatch_test.go:213:	nf.err = errors.New("toast swallowed by focus assist")
 internal/present/doc.go:19://     (D42#8: Focus Assist may swallow the toast, so the dual-channel update
+
+### NOTE: the phrase 'no production assembly sets it' is split across two lines
+# git grep for it on one line returns 0 by construction; the two lines, verbatim from cmd/wisp/resident_voice_windows.go:271-272:
+# 271: // default. Note ScopeOptions.BatterySaver overrides this when set; no
+# 272: // production assembly sets it.
+# (read with the read tool in this session; recorded 2026-11-15 12:0x +08)
