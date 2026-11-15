@@ -37334,3 +37334,15 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 ⇒ **红名册此后按 3 枚**：`TestAC4FocusReturnToPriorWindowGap33r5`（前台被占）／`TestAC246DevLegIgnoresTheTestTaskInjection`（驻留球在跑）／**`Test320FetchLegWritesTheKeyNowhereOnDisk`（整包内扫 `%TEMP%` 互扰；单跑绿）**。⛔ 前两枚是环境、第三枚是**测试自己扫共享目录**——三段成因不同，⛔ 混成一句"本机三个已知红"了事。
 
 **另一条待办（不阻塞票 451 结案）**：`l1_enabled` 键**没有闸注入** —— 在册语义是"抽取管线不挂、画像不学习"，码里不删行 ⇒ **行集即注入集**。若裁决"关掉 L1 要连使用一起关"，是同处加一个条件的一行改动＝**产品语义选择**，归我记着，等机主一句话或下一位裁决者。
+
+## A1877（11-15 13:2x）：**"进程死了"终于有了名字：native `0xC0000005`，条件性 1/2，死在收尾段**
+
+票 314 的 AC#0 取证（`cf36d8fef`）把票 450 昨天缺的那件补上了：
+- **退出码 dec `-1073741819` / hex `0xC0000005`** ⇒ **native ACCESS_VIOLATION**（⛔ panic、⛔ timeout、⛔ `os.Exit`）
+- **复现率 1/2**，死在第 554.5 s；死时**零 verdict 的那一枚**＝`TestAC4PriorFocusSurvivesARefusedPanelSample`
+- **死点在"面板线程干净退出之后、verdict 写出之前"**（`panel thread exited cleanly … disposals=0`），⛔ 不是建窗途中
+- 与昨天"Application 日志 0 条"**不矛盾**：AV 没被 WER 捕获、本机 CrashDumps 空 ⇒ 昨天的"静默退出"读数是对的，只是**当时不知道它是 AV**
+
+**规矩一（方法论，最重要）**：直跑测试二进制**必须照载具的形** —— **cwd=`cmd/wisp` ＋ 三个 pin DLL 放二进制旁 ＋ 6 个 `WISP_*` env**。腿第一发从仓根裸跑得 **121 枚假红**（71 cwd／40 env／其余收尾竞态），**把真死法完全淹掉**。⇒ **"裸跑"拿到的任何死亡读数一律当无效**，⛔ 据此派活。
+
+**规矩二（我自己的口径错，当场标注）**：`0xC0000005` 的 32 位有符号值是 **−1073741819**。我先后算成 `-5368709115` 和 `-4294967296`（PowerShell 把 `0xC0000005` 按 int32 解析后再被我塞进 int64／uint32 转换），**两次都是我算错，不是腿报错**。⇒ 教训：**PowerShell 里做十六进制→有符号十进制，先 `[int32]` 落地再加注释写明**，⛔ 直接 `[int64]0x… - 4294967296`。

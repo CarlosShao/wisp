@@ -27,7 +27,7 @@
 
 ## 要建什么（草案；落地腿定最终形）
 
-- [ ] **AC#0 死法取证**：`go test -c` 编出 cmd/wisp 测试二进制 → **直跑它**（`-test.v -test.skip='…'`），拿**进程退出码**（native 异常码 vs `os.Exit(n)` vs `-test.timeout` panic）＋stderr 全量；⛔ 只看 wrapper 汇总。
+- [x] **AC#0 死法取证**：`go test -c` 编出 cmd/wisp 测试二进制 → **直跑它**（`-test.v -test.skip='…'`），拿**进程退出码**（native 异常码 vs `os.Exit(n)` vs `-test.timeout` panic）＋stderr 全量；⛔ 只看 wrapper 汇总。
 - [ ] **AC#1 最小重现＋归因 (a)**：q5 A/B 式（fresh profile ⇄ 旧 profile 各 ≥2 发）；判"(a) 共享夹状态"是否充分；若成立 ⇒ 修法候选＝夹具改用每发独立 profile（先查它为什么是固定名：`:61` 处注释逐字）。
 - [ ] **AC#2 归因 (b)/(d)**：安静桌面（⛔ 人不用机器／⛔ 挂窗工具退场）下 1-2 发；以及 `main` 对照树 1-2 发（⛔ 动共享工作树；导出树跑）。⚠ 涉及"机主别用机器"的窗口＝要编排者约，⛔ 腿自约。
 - [ ] **AC#3 CI 暴露与推送前门**：现读 `ci.yml:601-621` 一带确认哪一跳跑它＋**推送前**按本票形状重跑并把颜色写进推送前检查（⛔ 没跑过不许推）。⚠ 首推会让 CI 见生死——先在本机把死法定性再推。
@@ -174,3 +174,31 @@
 - **攻击 6（36 子例）抓**：14 例与旧尺 `cb308abd` 逐块归一化比较**全 SAME**；断言从 `Contains(code, leaf)` 变 `raw != "" && Contains(code, raw)`＋显式 `lineNeedle`，**更强**不是更弱；总数 35 形状＋1 汇总＝36。
 - **AC#4 判读不变**：本尺仍不能单独翻 AC#4（残余 holder/spike 是登记不是清零；换根/拆字面量仍可绕；AC#2 静桌面读数仍缺）。
 - 撤销口令＝「314 形状尺二轮审计不采信」：删本节与 `docs/evidence/s1/314-ruler2-audit.md`，读数根可原样留着复跑。
+---
+
+## AC#0 取证结果（2026-11-15 13:2x，`cf36d8fef`）：**拿到退出码了 —— native `0xC0000005`**
+
+**尺1**：`cf36d8fef` 在，19 件，**产码/票面/台账命中 0**（全是证据件与读数）。
+**尺2**：`docs/evidence/s1/314-ac0-forensics.md` **18427 B**；读数根索引 `.scratch/wisp/probes/314/ac0/readings.md` **4931 B**。
+**尺3 我自己核的两件**：①载具 `scripts/wisp-cli-staged-tests.sh` 约 `:492` 现读逐字 `(cd cmd/wisp && "$abs_stage/wisp.test.exe" -test.count=1 -test.timeout=90m -test.v ...)` ⇒ **工作目录确实是 `cmd/wisp`**、`bin_rc=${PIPESTATUS[0]}` 确实取退出码 ⇒ 腿"必须照载具的形"这条方法论**成立**；②`0xC0000005` 的 32 位有符号值＝**−1073741819** ⇒ 腿报的数**对**（★**是我先算错了两次**，已记在台账）。
+
+### 读数
+**退出码：dec `-1073741819` ／ hex `0xC0000005`** ⇒ 整进程 **native ACCESS_VIOLATION**（⛔ 不是 Go panic、⛔ 不是 `-test.timeout`、⛔ 不是 `os.Exit`）。
+**复现率 1/2**（同形两发，一发死一发跑完）⇒ **条件性**。
+
+| 发 | 结果 |
+|---|---|
+| 1（canonical 形） | **死在第 554.5 s**；最后一条 `=== RUN` ＝ **`TestAC4PriorFocusSurvivesARefusedPanelSample`**（`cmd/wisp/panel_resident_windows_test.go:1203`），**该枚零 verdict**，其后零 RUN；死时 **RUN=480 / PASS=476 / FAIL=3 / SKIP=0**，`480−(476+3)=1` 正是那枚 |
+| 2（同形复验） | 同一枚 **PASS 1.30 s**，整包跑完：**RUN=892 / PASS=861 / FAIL=11 / SKIP=20**，`rc=1`，669 枚全有 verdict（11 红全是本机噪声：3 枚前台被占、8 枚驻留球占热键） |
+
+- `panic:`／`fatal error:`／`SIGSEGV/signal/exit status` 行 **0**（两流都扫过）。
+- stdout 末行 `wisp: panel window hidden (focus returned to hwnd 0x5701544)`；stderr 末行 `panel thread exited cleanly shows=1 toggles=0 disposals=0`。
+⇒ **死在面板线程干净退出之后、verdict 写出之前的收尾段**，⛔ 不是建窗途中。
+- 采样：12:58:16 活着（CPU 70.33 s、webview2 92 枚）→ 12:58:37 已无（webview2 −55）⇒ ⛔ 不是"卡住被外部杀"。
+
+### ⚠ 一条方法论（比读数更值钱，已入台账 A1877）
+直跑测试二进制**必须照载具的形**：**cwd=`cmd/wisp` ＋ 三个 pin DLL 放在二进制旁 ＋ 6 个 `WISP_*` env**。腿第一发从仓根裸跑得 **121 枚假红**（71 枚 cwd、40 枚 env、其余收尾竞态），**把真死法完全淹掉**。⇒ 我此后不许任何人"裸跑二进制"来取证。
+
+### 边界（照实）
+本机**没留 WER/dump**（Application 日志 0 命中、CrashDumps 空）⇒ **故障模块点名不了**；盘上唯一 `wisp.test.exe` 的 WER 旧档是 2026-10-22（同 `c0000005`、Fault Module＝自身 +0x95393），**仅历史旁证**。
+⇒ 要点名模块，得再开一发并在崩溃路径挂 LocalDumps/调试器 —— **那要机主同意占机**，不在本格射程。
