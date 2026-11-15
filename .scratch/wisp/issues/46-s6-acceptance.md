@@ -106,3 +106,25 @@ AC#1–#4 都是"部分满足"，AC#5 是"不满足"。按 `issues/README` 与�
 
 ### 本票仍未结（剩余＝第 4 件夹具 ＋ AC#3 三枚要机主的预演）
 
+
+---
+
+## 审计收件（2026-11-15 20:1x，审计腿 `audit46bM2`，走 `magpie/group/group-review-and-audit`；件 `docs/evidence/s1/46b-audit-20261115.md` 22089 B）
+
+**六项：成立 4／不成立 2／无法判 0。**
+
+| # | 项 | 判 |
+|---|---|---|
+| 1 | 收口闸真在跑 | **成立**（生产链 `main.go:103→resident_windows.go:877→watchdog:80-81→scope.go:682→engines:550`；摘 `:550` ⇒ FAIL 10.02s）。★带一洞见下 |
+| 2 | 磁盘门控真装上 | **成立**（`logsink.go:210`；置 nil ⇒ FAIL 0.02s）。★`diskfree_other.go` 的 `!windows` 半**今日从未被编译**（`GOOS=linux` 死在 sherpa）；★`:71` 要求"跳闸按 `ClassResource` 分类"**没做** |
+| 3 | `DiskHeldStats` 生产读者 | **不成立** —— 全仓非测试命中 2 行全在定义处（**我自己 grep 复核同数**） |
+| 4 | 三枚牙是行为牙 | **成立**（三发 `-overlay` 突变审计腿自己重做，全红且红的是行为读数） |
+| 5 | 自锁修法 | **成立**（`admit` 路径零 `slog`；审计加第 4 发突变把 `admit` 改回 `check(c,true)` ⇒ **21.00s 超时 panic，栈顶是 `commonHandler.handle` 的 mutex**，机制独立复现） |
+| 6 | 超出票面 | **不成立** —— 超出 3 项：`DiskHeldStats()`／`diskfree_other.go`／测试专用 helper |
+
+### 我的两条裁定（⛔ 摆机主，技术选择我自己拍）
+1. **`DiskHeldStats` ⇒ 补生产读者，不删**：接进 `diagnostics`（"日志被扣住 N／丢弃 N／回放 N"）。理由：它是唯一能分辨"被扣住 vs 还没写"的读数，删掉等于把自锁教训扔掉；主流 harness 的形状是诊断面。
+2. **另两条必须补（⛔ 只记成剩余项）**：①`line()` 增"已装配未挂载"分支（首装未 `models ensure` 时 `attachSettleGate` 静默 return，启动行却在放假话）②跳闸改 `Wrap(ClassResource, …)`（`:249` 今日裸 `ErrDiskSpaceLow`）。
+
+**可以留**：收口闸三件、磁盘门控三件、`admit` 修法、`LogConfig.Disk` 字段、证据件。
+**本票未结**：上面第①第②两条补完后才谈收口。

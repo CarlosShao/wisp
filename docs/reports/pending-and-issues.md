@@ -37529,3 +37529,20 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 1. 审计/测试/审查腿 **只能** `provider:"magpie", model:"group/group-review-and-audit"`；⛔ 任何 fallback。
 2. 审计路由 null ⇒ **停下来问机主**，⛔ 自己换。
 3. **路由名一律先从 `~/.dsh/settings.yaml` 抄原文，⛔ 凭记忆拼**。（今天第二次因为"凭记忆写标识"出错：上一次是 `git show` 的数组拼接。）
+
+## A1891（11-15 20:1x，来路＝审计腿 `audit46bM2` 走审计路由审 `ce993cd1e`）：**"唯一能分辨的读数"没有生产读者 —— 我自己先读到了，却没把它当缺口**
+
+审 `ce993cd1e`：**成立 4／不成立 2／无法判 0**。其中一条打在我自己的收件上：
+- 写腿在证据里说 `LogPipeline.DiskHeldStats()` 是「**『被扣住』与『还没写』在文件系统上长得一样，这是唯一能分辨的读数**」；
+- 我在票面写了「这个读数真的在」就收了；
+- **审计一查：全仓非测试命中 = 2 行，全在 `internal/observe/logging.go`（注释 + 定义本身）。生产读者 0。** 我自己 grep 复核，同数。
+
+⇒ **A1875 的原话是"满足 ⇒ 要有生产调用点"，我这轮只查了"读数存在"，没查"谁读它"。** 这是同一族错误的第三次（前两次：`Plugins:` 漏 `src.Plugins = …`；`windows map[string]*window` 漏两个空格）——**判据存在 ≠ 判据被用**。
+
+**裁定（我拍的，⛔ 摆机主）**：**补生产读者，不删**。①它确实是唯一能分辨"被扣住 vs 还没写"的读数，删掉就是把自锁那件事的教训扔掉；②主流 harness 的形状是**诊断面**（`wisp doctor` / diagnostics 里一行"日志被扣住 N 条、丢弃 N 条、回放 N 条"），这正是用户该看的。⇒ 派写腿接进 `diagnostics`，不许就这么留着。
+
+## A1892（11-15 20:1x）：**启动行在"没有常驻"的机器上说了假话**
+
+审计第 1 条（成立，但带一条洞）：收口闸确实在**生产链**上（`main.go:103 → resident_windows.go:877 → resident_watchdog_windows.go:80-81 → scopeOptions → scope.go:682 → resident_voice_engines_windows.go:550`，摘掉 `:550` ⇒ `Test46SettleGateVerifiesTheDisposeCascade` FAIL 10.02s）。
+**但**：首装未跑 `wisp models ensure` 是常态，那时 `attachSettleGate` 早静默 return，而启动行 `line()` **仍打"装配（触发＝dispose 级联第 3 步）"** ⇒ **这句话是假的**，且注释声称的"assembled-but-unread"分支**根本不存在**。⇒ A1874 家族（注释/日志断言一个不存在的状态）。
+**同族第二条**：票面 `:71` 产码件 2 后半要求「跳闸按 `ClassResource` 分类」—— `guards_45.go:249` 仍**裸 `ErrDiskSpaceLow`**（我复核：非测试零 `Wrap`）。⇒ 两条都派写腿补，⛔ 只记成"剩余项"。
