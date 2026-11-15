@@ -1,0 +1,50 @@
+# 派单存档（先存档再发）—— 1 写腿 ＋ 2 只读腿
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 昨天 15 次 null，台账 A1864）
+
+---
+
+## 腿 A（写腿）＝ 票 451 画像进 prompt
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/451-profiles-never-reach-the-prompt.md` 全文并照它的 5 格 AC 做。
+
+**这片的要害**：`agent.Config.Profiles` 全仓**零赋值**（编排者现核：`Profiles\s*[:=]` 产码命中 3 处，只有 `internal/agent/loop.go:677` 是转发，另两处无关）⇒ 画像写进库，**永远进不了 prompt**。
+
+**顺序不许倒**：**AC#1 先写那枚会红的测试**（造一份带 L1 画像的库，跑一轮对话，断言"送进 provider 的 prompt 里含那条事实"），**先让它红**，把红句原文抄进证据；**然后**才接线。
+**接线**：在**唯一装配点**把检索到的画像喂进 `agent.Config.Profiles`。要写清"谁建 Config、谁查库、预算走 D15 哪条路"。给 `grep` 前后计数：赋值点 **0 → ≥1**。
+**判据**：AC#1 那枚测试**由红转绿**；再给一枚**定向突变**（摘掉接线那一行 ⇒ 它红）。
+**⛔ 三条禁令**：①⛔ 在 `loop.go:677` 那个转发点就地造数据（那是把假数据塞进转发，不是接线）；②⛔ "把 `Profiles` 字段删掉就算修好"（那是把承诺删掉）；③⛔ 裸拼接绕过预算。
+
+**写面**：`internal/agent/**`、`internal/memory/**`、`cmd/wisp/**`（**本波只你一枚写腿**，`cmd/wisp` 归你独占）、`docs/evidence/s1/451-*`。
+⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 表／`frontend/**`／`design/**`；⛔ 放宽断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+`go test ./cmd/wisp` **走载具 `scripts/wisp-cli-staged-tests.sh`，一次一发**；本机两枚已知红**不是你的**（`TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC246DevLegIgnoresTheTestTaskInjection`，因驻留球 PID 49348 在跑）——具名记，⛔ 修/删/跳过。
+
+回话第一行＝commit hash ＋「AC#1 红句原文（接线前）」＋「赋值点 0→N」＋「AC#1 由红转绿（是/否）」＋「突变后哪枚红」。没干完写「未完成，卡在哪」。
+
+---
+
+## 腿 B（只读裁决）＝ 票 197-v2
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读裁决腿。读 `.scratch/wisp/issues/197-*.md` 全文（★注意票面 `:234` 逐字写着「**五枚未勾格里无一格欠新产码**…缺的是**非实现者裁决料**」）。
+
+**任务**：给 `197` 的五枚未勾格（AC#0／#1／#2／#3／#6）出**逐格裁决**，落到 `docs/evidence/s1/197-v2-adjudication.md`。每格五列：AC 原文逐字／裁决（满足／部分／不满足／**裁决不了）**／依据 `file:line`＋原文／**还缺什么料**。
+★**关键约束（台账 A1875 新规）**：凡判"满足"，**必须同时给出** ①**生产调用/派发点 `file:line`** ②**会因摘掉它而变红的测试名**。**两者缺一 ⇒ 只能判"部分"**。
+⛔ 只读：⛔ 改产码／票面／台账／阈值／契约；⛔ 碰 `cmd/wisp`（除读）；⛔push。
+写面：`docs/evidence/s1/197-*.md`、`.scratch/wisp/probes/197/**`。
+回话第一行＝commit hash ＋「满足 a／部分 b／不满足 c／裁决不了 d（总 5）」＋「缺料的格具名」。没干完写「未完成，卡在哪」。
+
+---
+
+## 腿 C（只读取证）＝ 票 314 的 AC#0
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读取证腿。读 `.scratch/wisp/issues/314-*.md`，**只做 AC#0**（票面逐字：`go test -c` 编出 `cmd/wisp` 测试二进制 → **直跑它**，拿**进程退出码**＋stderr 全量；⛔ 只看 wrapper 汇总）。
+
+**为什么现在做**：票 450 昨天已证「本机整包能跑到底」（`RUN=861/PASS=619/FAIL=2/SKIP=17`），但**昨天那两次 400 秒死亡没抓到退出码**（stage-cli 日志被覆盖）。票 450 的 AC#2(b) 要机主动球，**AC#0 这条路不用**——直接跑二进制就能拿到 native 异常码 vs `os.Exit(n)` vs `-test.timeout` panic 的区分。
+
+**任务**：
+1. `go test -c -tags winlive -o` 到 `D:\tmp\wisp\20261115\w314\`（⛔ 别落仓内），直跑，`-test.v`，`-test.timeout` 给足。
+2. 抓：**退出码（十进制＋十六进制）／stderr 全量／最后 40 行 stdout／是否出现 `panic:` 或 `fatal error:` 字样**。
+3. 若能复现死亡 ⇒ 给"死在哪一枚"的**具名上游**（最后一条 `=== RUN`）＋归因（native 异常码 vs timeout panic vs 静默退出）。若跑完 ⇒ 给"没复现＋四数"。
+4. ⛔ 不改任何产码/断言/票面；⛔ 不 kill 球（PID 49348 是我的，别动）。
+
+写面：`docs/evidence/s1/314-ac0-forensics.md`、`.scratch/wisp/probes/314/**`。
+回话第一行＝commit hash ＋「退出码（十/十六进制）」＋「复现了（是/否）」＋「归因一句话」。没干完写「未完成，卡在哪」。
