@@ -1,0 +1,62 @@
+time=2026-11-15T12:05:54.835+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test43SuspendSequenceVoidsDisposesAndStopsCapture
+time=2026-11-15T12:05:54.854+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=lifecycle-43-owner owner=test
+time=2026-11-15T12:05:54.854+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=lifecycle-43-ask owner=test
+time=2026-11-15T12:05:54.865+08:00 level=INFO msg="audit: approval: SUSPEND-WINDOW-VOIDED corr=corr-43-l1 tool=fs.write decision=reject reason=\"系统挂起，L1 确认窗口作废，未执行\" channel=none"
+wisp: [audit] approval: SUSPEND-WINDOW-VOIDED corr=corr-43-l1 tool=fs.write decision=reject reason="系统挂起，L1 确认窗口作废，未执行" channel=none
+time=2026-11-15T12:05:54.865+08:00 level=INFO msg="audit: lifecycle: SUSPEND-L2-VOIDED why=\"43-suspend\" refused_l2=1 voided_l1=1"
+wisp: [audit] lifecycle: SUSPEND-L2-VOIDED why="43-suspend" refused_l2=1 voided_l1=1
+time=2026-11-15T12:05:54.870+08:00 level=INFO msg="voice[scope]: session: SCOPE-DISPOSED reason=suspend:43-suspend cascade=models-unload,panel-hide,free-os-memory,grants-expire engines=1"
+time=2026-11-15T12:05:54.870+08:00 level=INFO msg="lifecycle: 挂起序列完成" why=43-suspend voided_l2=2 audio_stopped=true engines_released=true
+wisp: 错过 2 个待确认操作（系统挂起，已全部作废并按拒绝处理；恢复后不会重放）
+time=2026-11-15T12:05:54.870+08:00 level=INFO msg="lifecycle: 恢复序列完成" why=43-resume audio_reopened=true engines="已随挂起释放，下一次真实唤醒按 D43#29 冷装载" state_machine="D43 表无挂起边，保持原状态" wall_schedules=本构建无墙钟派生日程装置（提醒实现未落地），无可重算项
+--- PASS: Test43SuspendSequenceVoidsDisposesAndStopsCapture (0.02s)
+=== RUN   Test43SessionEndSetsTheFastExitFlag
+time=2026-11-15T12:05:54.871+08:00 level=WARN msg="lifecycle: 会话结束事件已接（快速关停已请求）" why=43-test
+--- PASS: Test43SessionEndSetsTheFastExitFlag (0.00s)
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/occupied
+time=2026-11-15T12:05:54.905+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+time=2026-11-15T12:05:54.905+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-11-15T12:05:54.905+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/permission_denied
+time=2026-11-15T12:05:54.922+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+time=2026-11-15T12:05:54.922+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-11-15T12:05:54.922+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/no_device
+time=2026-11-15T12:05:54.936+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)"
+time=2026-11-15T12:05:54.936+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-11-15T12:05:54.936+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss (0.06s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/occupied (0.02s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/permission_denied (0.02s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/no_device (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.282s

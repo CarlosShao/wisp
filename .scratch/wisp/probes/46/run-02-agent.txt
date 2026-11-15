@@ -1,0 +1,10 @@
+time=2026-11-15T12:04:35.646+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2ReconcilesAgainstTaskLog
+--- PASS: TestAC2ReconcilesAgainstTaskLog (0.21s)
+=== RUN   TestAC3NewTaskRefusedBeforeTheProvider
+--- PASS: TestAC3NewTaskRefusedBeforeTheProvider (0.19s)
+=== RUN   Test31ClockJumpKeepsMonotonicFire
+time=2026-11-15T12:04:36.052+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=reminder-timer owner=agent
+--- PASS: Test31ClockJumpKeepsMonotonicFire (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.682s

@@ -1,0 +1,15 @@
+time=2026-11-15T12:05:57.839+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestThreeConsecutiveSettleFailuresReachWatchdogAlertWithRestart
+--- PASS: TestThreeConsecutiveSettleFailuresReachWatchdogAlertWithRestart (0.21s)
+=== RUN   TestSleepingOverCapDropsUnloadablesThenWithinCap
+--- PASS: TestSleepingOverCapDropsUnloadablesThenWithinCap (0.00s)
+=== RUN   TestArmedOverCapRetainsKWSAndWarns
+--- PASS: TestArmedOverCapRetainsKWSAndWarns (0.00s)
+=== RUN   TestArmedWarningMapsToD43Row9
+time=2026-11-15T12:05:58.056+08:00 level=INFO msg="watchdog: memory over cap sustained; running unload pass" state=Armed metric=tree_private_bytes measured_bytes=104857600 cap_bytes=94371840 sustained_ticks=1
+time=2026-11-15T12:05:58.057+08:00 level=INFO msg="watchdog: unload pass complete" state=Armed dropped=[] before_bytes=104857600 after_bytes=104857600 cap_bytes=94371840
+--- PASS: TestArmedWarningMapsToD43Row9 (0.00s)
+=== RUN   TestLeakIndicatorsAlertWithSnapshot
+--- PASS: TestLeakIndicatorsAlertWithSnapshot (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/watchdog	0.260s

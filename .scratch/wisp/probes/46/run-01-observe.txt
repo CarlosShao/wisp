@@ -1,0 +1,16 @@
+=== RUN   TestAC2ReconcileAgreesAndDisagrees
+time=2026-11-15T12:04:31.266+08:00 level=INFO msg="cost: day aggregate refreshed" day=2026-11-02 tasks=3 micros=632
+--- PASS: TestAC2ReconcileAgreesAndDisagrees (0.00s)
+=== RUN   TestAC2ReconcileRefusesWithoutBothMouths
+--- PASS: TestAC2ReconcileRefusesWithoutBothMouths (0.00s)
+=== RUN   TestAC2DiskGuardTripsAtThresholdAndRecovers
+time=2026-11-15T12:04:31.274+08:00 level=WARN msg="disk-full guard: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2DiskGuardTripsAtThresholdAndRecovers4260949448\\001\\data has 208666624 bytes free, below the 209715200 byte threshold - log, artifact and L3 writes are stopped; the live task is unaffected"
+--- PASS: TestAC2DiskGuardTripsAtThresholdAndRecovers (0.00s)
+=== RUN   TestAC5ArtifactsQuotaEvictsOldestFirst
+time=2026-11-15T12:04:31.285+08:00 level=WARN msg="observe: artifacts quota eviction" file=a-old-1.bin bytes=100 quota_bytes=120 total_before_bytes=300 mod_utc=2026-05-28T20:26:40Z
+time=2026-11-15T12:04:31.286+08:00 level=WARN msg="observe: artifacts quota eviction" file=b-old-2.bin bytes=100 quota_bytes=120 total_before_bytes=300 mod_utc=2026-05-28T21:26:40Z
+--- PASS: TestAC5ArtifactsQuotaEvictsOldestFirst (0.01s)
+=== RUN   TestCheckSettleVerifiesReleaseCounter
+--- PASS: TestCheckSettleVerifiesReleaseCounter (0.20s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/observe	0.320s
