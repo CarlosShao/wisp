@@ -75,3 +75,34 @@ AC#1–#4 都是"部分满足"，AC#5 是"不满足"。按 `issues/README` 与�
 **机主一次会话（5 步，见证据件末节）**：起 wisp 静置 3 分钟量 Sleeping／连说三次唤醒词＋冷载一次量 Armed+Warm／手动睡眠唤醒两次中间留一张待确认卡／系统时间后拨 5 小时再拨回／先开会议软件占麦再启动 wisp 看提示。
 
 ⛔ 本票在 4 件产码与那次会话完成前**不许改名结案**。
+
+---
+
+## S6 两处空洞收件（2026-11-15 18:4x，`ce993cd1e`，13 文件 +1373/−31，件 `docs/evidence/s1/46-s6-seams-impl.md`）
+
+**尺1**：提交在。**尺2**：13 件＋证据件。**尺3 我自己复跑**：`Test46DiskGatedWriterHoldsAndReplaysThroughInstallLogSink` **PASS 0.04s**／`Test46SettleGateVerifiesTheDisposeCascade` **PASS 0.13s**；三处赋值点逐字现读核对过（`resident_voice_engines_windows.go:550 gate.request(settleRequest{peak: peak, released: released})`／`cmd/wisp/logsink.go:210 obs.Disk = guard`／`resident_watchdog_windows.go:81 rv.attachSettleGate(gate)`／`internal/observe/logging.go:257 func (p *LogPipeline) DiskHeldStats() (held, lost, replayed int, ok bool)`）。
+
+### 三处空洞的收口（三处都实拆过一次，红了，装回）
+| 拆掉什么 | 红句逐字 | 耗时 |
+|---|---|---|
+| `logsink.go:210`（`obs.Disk` 置 nil） | `46: this pipeline has no gated writer at all (LogConfig.Disk never reached InitLog): nothing is holding bytes, so the log class is ungated` | 0.03 s |
+| `resident_watchdog_windows.go:81`（`rv.attachSettleGate(gate)`） | `46: the residency holds settle gate 0x0, want the one this assembly built (0x362153830210): the dispose cascade would verify nothing` | 0.00 s |
+| `resident_voice_engines_windows.go:550`（`gate.request(...)`） | `46: the settle verification the cascade should have started never happened within 10s` | 10.00 s |
+
+### 闸门的四个决定（它拍的，我认）
+1. **触发点**＝dispose 级联第 3 步（**全进程里唯一「引擎已卸、堆已交回」同时为真的时刻**）
+2. **测量**走 `Registry.Spawn("watchdog","settle-gate")`（`VerifySettle` 阻塞整个窗口，⛔ 不能压级联线程；D38b 六枚冻结名册一字节没动）
+3. **`released` 用 `FreeOSMemoryCount` 的增量**（谁改回 `debug.FreeOSMemory` 就按契约红）
+4. **目标态读 D43 机现态**，非采样态才回落 Sleeping（Armed 90MB vs Sleeping 25MB —— 硬编码会把常驻 KWS 的机器判成每发都不过）；唤醒 `abort` **不计失败**
+
+真校验那发读数：`final_bytes=419430400 cap_bytes=26214400 back_within_cap_ms=-1 free_os_memory_count=1 consecutive_failures=1`。
+
+### ★那句假话的处理：**没改词，改成了真**
+旧句 `LogConfig.Disk is set`（当时 `Disk` 在该结构体里 **0 命中**）⇒ 现在**字段真造出来了**（`internal/observe/logging.go:88`）＋`guards_45.go:338-353` 四行可核的组装说明（谁填、谁装、唯一生产点、探针在哪，并明写「旧句描述的是一个不存在的字段」）。⇒ ⛔ 不是把人话删掉，是让那句话变成真的。
+
+### ★★它在装配里撞出一个真缺陷（已记台账 A1887）
+磁盘门控写入器**第一次真接上就自锁**：`Write` 被 slog 处理器持锁调用，旧 `Check` 拒绝时 `slog.Warn` ⇒ 记录流回同一枚处理器 ⇒ **同一 goroutine 对不可重入 mutex 自锁** ⇒ **0% CPU 静默挂死**（那枚挂 18.6 分钟的 `wisp.test.exe` 就是它）。
+**真机后果**：磁盘 <200MB ⇒ **下一次启动挂在「装日志」这一行、不留任何日志**。修法：`Check` 拆出 quiet `admit`（`guards_45.go:201`）＋警告改由 flusher 在跨越时发（`logging.go:169`／`:189`）＋`DiskHeldStats()`（`logging.go:257`，「被扣住」与「还没写」在文件系统上长得一样，这是唯一分辨读数）。
+
+### 本票仍未结（剩余＝第 4 件夹具 ＋ AC#3 三枚要机主的预演）
+

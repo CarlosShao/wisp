@@ -37473,3 +37473,16 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 现读：`PID 64600` ＝ `.scratch/wisp/stage-cli/wisp.test.exe -test.count=1 -test.timeout=90m -test.run=Test46`，起于 `17:49:14`，7.3 分钟后 `cpu_s=0.2`、`threads=6`、`responding=True`、22 MB。⇒ **它不是"在算"，是"在等"**。
 这条**不是**判它是 bug（那是写腿的活），记它是因为它落在 A1882 同一个家族：**一枚测试可以既不红也不绿地停在那儿**，而墙钟过去了没人知道。⇒ 定向跑也要给**上限**与"到点照实写"的规矩。
 ⚠ 它同时会**占住热键**（11-14 撞过 `ERROR_HOTKEY_ALREADY_REGISTERED`）⇒ **机主那 3 分钟窗口开窗前，必须先确认没有 `wisp.test`／旧 `wisp` 在跑**（旧球 `pid 49348` 起于 11-14 16:23，已 25.5 小时、CPU 1054s、74 MB，就是三枚已知红里那两枚的成因）。
+
+## A1887（11-15 18:4x，来路＝票 46 写腿 `ce993cd1e`，**今天最值钱的一条发现**）：**磁盘低于 200MB ⇒ 下一次启动挂在"装日志"这一行，而且不留任何日志**
+
+**机制（不是我猜的，是它拆出来的）**：`diskGatedWriter.Write` 是被 slog 的 JSON 处理器**持锁**调用的。旧 `Check` 在拒绝写入时调 `slog.Warn` —— 那枚记录又流回**同一个**处理器 ⇒ **同一 goroutine 对不可重入的 mutex 自锁**。
+**表现**：**0% CPU 静默挂死**（不是死循环、不是崩溃、不是报错）。我 18:1x 亲眼读到那枚 `wisp.test.exe`：18.6 分钟只走了 0.3 秒 CPU。
+**真机后果比测试大**：`installLogSink` **自己的安装记录**就足以触发第一发拒绝 ⇒ 磁盘一旦低于 200MB，**下一次启动会挂在「装日志」这一行**，而且**不留日志**（日志正是被挂住的那条链）。
+
+**修法**（已随 `ce993cd1e` 落地）：`Check` 拆出一枚 quiet 的 `admit`（`internal/observe/guards_45.go:201`）给写入器；警告改由管线 flusher **在跨越阈值时**发（`internal/observe/logging.go:169`／`:189`）——那枚记录盘满时被同一枚写入器扣住，恢复后随尾巴落盘。另加 `LogPipeline.DiskHeldStats()`（`logging.go:257`）——**「被扣住」与「还没写」在文件系统上长得一模一样**，这是唯一能分辨的读数。修后同一枚测试 **0.03 s 绿**。
+
+**为什么这条要单独记账，而不是只写在票里**：
+1. 它的**症状与 A1886 完全同形**（"既不红也不绿地停在那儿"），而根因是**锁重入**——这类缺陷用墙钟、用日志、用退出码都看不见；
+2. 它证明了一件事：**"装配死代码"不是无害的**。`obs.Disk` 从来没被赋过值 ⇒ 门控写入器从来没跑过 ⇒ 这条自锁路径在盘上躺了很久，谁都不知道。**把死装配接上，本身就是找出真 bug 的方法**（与 A1874「等票 N 的注释在票 N 结了之后就是尸体」同族）。
+3. 判据可复跑：`Test46DiskGatedWriterHoldsAndReplaysThroughInstallLogSink`，我现跑 **PASS 0.04s**。
