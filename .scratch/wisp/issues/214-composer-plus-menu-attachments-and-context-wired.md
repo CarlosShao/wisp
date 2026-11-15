@@ -34,7 +34,7 @@
 
 ## 判据
 
-- [ ] **AC#1**：受理器有**生产调用者**（现跑 `grep` 点数：改前 0 枚 ⇒ 改后 ≥1 枚，且那枚调用者在 `cmd/wisp` 的装配路径上，不在测试里）。
+- [x] **AC#1**：受理器有**生产调用者**（现跑 `grep` 点数：改前 0 枚 ⇒ 改后 ≥1 枚，且那枚调用者在 `cmd/wisp` 的装配路径上，不在测试里）。
 - [ ] **AC#2**：投一枚超限文件 ⇒ 拒、**且快照里能看到"被拒＋为什么"**；正控＝同文件放到限内 ⇒ 收。
 - [ ] **AC#3**：投一枚伪装文件（扩展名说自己是图片、字节不是）⇒ 按嗅探结果判，**不按扩展名判**（这条尺要现读 `matchesISOBaseMedia` 的语义再写死）。
 - [ ] **AC#4**：落盘位置在授权根内 ⇒ 越界那一形**必红**（票 174/175 那族判据同族）。
@@ -52,3 +52,25 @@
 
 - 2026-11-07 17:5x 腿 214-attach-wire：接线落地——`ComposerDispatch.Attachment` 在 `cmd/wisp/panel_inbound.go` 挂上真受理器（`panel_attachment_214.go`：现成 broker＋真 memory.Store artifacts 树、懒开库、上限用编译默认零新增配置键）；`pump.go` 加 `Attachments`/`AttachmentReason` 两枚 reader＋run.go 装配根两枚 method value＋resident boot 绑 ledger（票 186 holder 同款）；145 钉子按新事实改名改断言为 `TestComposerAttachmentsTravelFromTheIngestDoorToTheWire`（未删断言，理由见 docs/evidence/s1/214-attachment-wiring.md）。AC#1 census 0→2；cmd/wisp 门禁子集全绿；internal/panel 余 2 红＝既有红（契约 files 键 page 侧未声明／C21 被 ball 在飞件牵红），归属与读数见证据件 §3。AC 勾未翻。
 - 2026-11-07 18:5x 腿 214-ac5-stamp-feasibility（只读取证，零产码）：AC#5 盖戳三选一裁定＝**乙**——C25 盖戳宿主＝消息门把附件文本喂进 agent 的那一跳；现量 `OutgoingMessage.ForAgent` 生产调用者 0、`MessageRequestHandler` 产码实现 0、`panel_inbound.go:352` Message 仍 nil（按名拒绝）；且票 35 现有 AC 八枚框全是传输层、无一格认领 handler 本体 ⇒ 工单池今天没有 owner，须编排者立票。丙排除（AC#5 逐字在票面 ：41，契约没记错）；甲排除三理由（对话入口超射程／Mark 是 scope 键控、ingest 时无 task scope 可挂／本波 cmd/wisp＝188·internal/panel＝187）。正面凭据：盖戳引擎已在装配根（`run.go:330 c25`）＋附件读者与 ForAgent 渲染 214 已备好。全链引证与未来落点见 docs/evidence/s1/214-ac5-stamp-feasibility.md。门禁：零 Go 改动，无对象可扫。
+---
+
+## AC#1 收件（2026-11-15 13:5x，`b6bc1c61b`）：**满足**，翻
+
+**尺1**：`b6bc1c61b` 在，7 件，**产码/票面/台账命中 0**（证据件＋probes）。
+**尺2**：`docs/evidence/s1/214-ac1-receipt.md` **19830 B／226 行**；载具 `.scratch/wisp/probes/214/ac1/`（变异副本／overlay／三份日志／census）。
+**尺3**：★这一格我出的错和纠正都记下来 ——
+- **生产调用点我自己 grep 复核**：`Attachment: attachment` 产码**唯一**在 `cmd/wisp/panel_inbound.go:386`；`NewAttachmentBroker` 产码 3 处（`internal/panel/attachments.go:175/179` 定义侧 ＋ `cmd/wisp/panel_attachment_214.go:204` 真装配）；`newAttachmentIngestHandler214` 产码 4 处含定义与调用。
+- ★**我先读到"改前不是 0"并准备退回这一格 —— 是我错**：我那条核命令写成 `$parent+':cmd/wisp/panel_inbound.go'`，而 `$parent` 是 `@(...)` 出来的**数组**，PowerShell 把 `+` 当**数组追加**，于是 `git show` 收到两个参数，读出来的根本不是父提交那棵树。**正确读法**：父提交 `25eb216` 里是 **`Attachment: nil,`（`:317`）**，注释逐字还写着「attachment = ticket 92, message = ticket 35, both still refused by name」；`fc76d5d7e` 的 diff 正是 `nil → attachment`。⇒ **改前 0 成立，腿对**。
+
+### 口径交代（腿主动区分，我认）
+实现件写 `0→2` 是**票面原尺**（只数受理器本体两处）；收件件给 `N=4`（含装配两站）。**两个数都对，尺不同**。⇒ 票面按原尺的口径看是 `0→2`，收件按"生产调用点"看得 4 处。⛔ 我不用一个数去否另一个。
+
+### 会红的测试（这是 A1875 的第二件，有了）
+`-overlay` 把 `:386` 的槽换回 nil（**盘上原件一字节没动**，md5 前后同为 `53243FD2…`，`git status --porcelain -- cmd/wisp` 空）⇒ `--- FAIL: Test214AttachmentAddEndToEndStoresBytesInArtifacts`，红句「该方法在名册内，但本机未接入处理器」；不摘接线同一枚 `PASS`。组跑 `-run '^Test214'` ＝ **4 红／4 绿**（超限那枚对 nil 门无鉴别力，腿**自己具名不用它当正控**）。
+
+### 其余格（⛔ 未翻，照实）
+AC#2–#6 逐格写「未裁」并具名交回：AC#2 的快照半边要另立收件腿／AC#5 已知未完成指向新票／AC#6 三件仍在。
+另登记一枚**过期注释** `internal/panel/composer_dispatch.go:165-166`「Untouched by this slice」—— 腿**没拿它当证据**，也没改（对，注释不是证据）。
+
+### 〔未跑包〕如实
+`go test ./cmd/wisp` 全包未跑（该包归写腿 452），只跑 `-run` 单枚／单组，跑前 `git status --porcelain -- cmd/wisp` 为空。`go vet`/`gofumpt`/`d22scan` 未跑：本腿零 Go 改动，无对象可扫。
