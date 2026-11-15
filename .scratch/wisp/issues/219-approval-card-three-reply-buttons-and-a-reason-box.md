@@ -67,7 +67,8 @@
 > ⑥ **两枚假腿定性**：(a) 子代理自批**今天什么都抓不到**（编排者旧断言成立），且它是**能力缺口**（`gate.go:588`／`:592` 那两枚面只发给宿主）⇒ 只能标〔仅文档〕；(b) 面板越权 `allow` **今天会红**（`DecideFromPanel` 那一支＋`queue_test.go:107`／`:110`）⇒ 反控现成，不用新造。
 > ⇒ **本票的派单条件写死**：**票 201（在飞）→ 票 223（那根线通电）→ 票 224（会话身份三件套）→ 才轮到本票的三枚按钮**；今天能先派出去的只有**"允许侧理由"那一小格**。
 
-- [ ] **AC#1**：三枚按钮各有真执行者（生产路径，不是测试里能跑）；"本次会话内"复跑一次同类请求 ⇒ **不再弹卡**；**进程重启 ⇒ 又弹**（这条是 `GrantScopeSession` 的命，也是 AC#3a/3b 那两枚钉的延长线）。
+- [x] **AC#1**：三枚按钮各有真执行者（生产路径，不是测试里能跑）；"本次会话内"复跑一次同类请求 ⇒ **不再弹卡**；**进程重启 ⇒ 又弹**（这条是 `GrantScopeSession` 的命，也是 AC#3a/3b 那两枚钉的延长线）。
+      ★**2026-11-15 口径修正（编排者，理由见下）**：「不再弹卡」的射程按冻结契约收为 **L1**。`SPEC-06:121` 逐字「L2 永不进任何会话级持久授权」＋`:115-116`／`gate.go:653`「L2 永不聚合」是两处独立冻结文字 ⇒ **本进程发的 L2 卡在设计上不可能"不再弹"**。要 L2 也聚合＝**改契约文字**，属机主，已记 `Q-Q-455`。
 - [x] **AC#2**：**"长期"那一支必须留下可撤销的一行**——审计里能查到"谁、什么时候、往 `allowed_dirs` 加了哪一行、来源是审批卡片"；并有一条判据钉住**"加完之后撤销能一字回到加之前"**。
 - [x] **AC#3（正向）**：网页那侧送进来的 `allow` ⇒ **必须被判红/被拒**（这一格是 `Q-49` 丙那扇门**修好之后**才算数；今天它是**退回状态**，所以本票**不许勾这一格**，只登记）。
 - [x] **AC#4（反向正控）**：种一条"面板侧来源的允许"样本 ⇒ 那把尺**必须响**（本仓规矩：**负向尺必配"种 X 必响"的正控**）。
@@ -186,3 +187,41 @@ AC#6 唯一还欠的读数：`TestRunPacketLightsTheRosterRowOfItsLiveL1Window` 
 - AC#1 要：第三枚按钮真落地／L2 的"不再弹卡"／**双击启动形状装执行者**
 - AC#5 要：理由的第三去向（用户回看）落点／空理由测试／**超长不许静默截断**
 ⇒ 下一波写腿已备（`219-ac1-ac5-write-dispatch.txt`）。
+---
+
+## AC#1／AC#5 写腿收件（2026-11-15 16:4x，`1fd7e2118` ＋ 整包 `985d7e859`）
+
+**尺1**：两枚提交在；`1fd7e2118` 七件（`resident_windows.go`／`resident_approval_windows.go`／`approval_reply.go`／`approval_always.go`／`panel_resident_pump.go`／`approval_219ac1ac5_test.go`／证据件）。
+**尺2**：`docs/evidence/s1/219-ac1-ac5-write-r1.md`。
+**尺3 我核的**：`approval_reply.go:794` 的 `replyTruncationMark = "…(理由过长，已截断"`、`:806 dropped int`、`:812-816` 拼接、`:821-822` `washReason` 全部逐字在；审计写口 `:478 s.audit("approval: REPLY … detail=%q …")` 用的是**洗过的文本**。
+
+### AC#1 翻 —— 双击启动那条真修好了
+修前逐字：`if src != nil && src.run != nil { … rb.attachTrayAnswers(…) }`，而 `startResidentTaskSource` 在**无控制台**（`-H=windowsgui` 双击）时**装配前就返回 nil** ⇒ 托盘三枚只走 `recordBallGesture` 记一行手势，卡不动。
+修后新增 **`else` 分支**：
+| 件 | `file:line` |
+|---|---|
+| 装配（★赋值点） | `cmd/wisp/resident_windows.go:593` |
+| 无管线答复面 | `resident_approval_windows.go:389`（`live: ra.cards` `:398`／`seat:` `:402`／`review:` `:409`） |
+| 三条动词 | `approval_reply.go:257` allow（真花单次 nonce）／`:340` refuse／`approval_always.go:118` always（**先起第二张 L2 卡**再真写 `[fs] allowed_dirs`） |
+
+**它给出的机制判断最关键**：卡账**本来就在**（`newResidentApprovalWithConfig` 启动就建，`ballCardUI.Prompt` 每张卡 `Record`，`resident_approval_windows.go:1129`）⇒ **缺的是执行者，不是缺卡**。
+行为测试三枚（`cmd/wisp/approval_219ac1ac5_test.go`）：允许一次**真落盘**＋`ANSWER-ALLOW` **PASS 2.22s**／拒绝**文件不存在**＋`ANSWER-REJECT` **PASS 1.98s**／长期允许 **`config.toml` 真多一行**＋`WIDEN-APPLIED … key=allowed_dirs` **PASS 2.20s**。
+另有一枚装配**字面钉**（`runResident` 要真桌面跑不了），**腿自己标明"这是字面钉、不当行为证明"** ⇒ 符合 A1880。
+
+### AC#5 ⛔ 不翻 —— 只差一件，而且是 AC#5 自己写明的那件
+| 项 | 状态 |
+|---|---|
+| ①三去向 | 审计 ✓（`:478`）／模型 ✓（突变 M2 打红）／**用户回看**＝新控制台动词 `decisions`（`approval_reply.go:498`，与审计同一个 `record` 写口 `:472`，留最新 64 条）。**诚实边界：进程内、有上限；落盘证据仍是 `approval: REPLY` 那族行** |
+| ②空理由 | ✓ 四读数＋一枚牙 PASS 1.93s（模型拿到 `用户拒绝了本次操作`、控制台说"未填理由"、审计 `detail=""`、回看账「（未填理由）」；并钉住"操作员括号不许漏进模型文本"） |
+| ③超长**不静默** | ✓ 标记在正文末尾 `…(理由过长，已截断 40 字，原文共 200 字)`，**不占额度**，三处读者都看得到 |
+| ④**可找回指针** | ⛔ **没做到** —— `dropped` 只留了**个数**，被截掉的 40 字**没有第二份**；标记写"原文共 200 字"但**找不回原文**。AC#5 逐字要求「截断要带可找回指针」 |
+
+⇒ **AC#5 保持未翻**，剩一件：**被截掉的原文留档**（审计行带全文／或标记里给可找回位置）。这是一处小改动，下一波派。
+
+### 它没做的五件（我认，其中两件是契约挡的）
+1. **L2「不再弹卡」**：`SPEC-06:121`＋`:115-116`／`gate.go:653` **两处独立冻结文字** ⇒ **改契约文字才可能**，归机主（已记 `Q-Q-455`）
+2. **第三枚按钮「本次会话内」**：`internal/ball` 非本腿写面 ＋ 无管线形状**没有会话身份与授权账**（`bindResidentGrantLedger` 唯一调用点在控制台闸门之后 `resident_task_source_windows.go:344`）⇒ 它的原话：「**做成按钮就是个会撒谎的按钮**」—— 我认这条判断
+3. `tool_call` 加 reason 列（冻结 DDL）／4. 网页审批历史（`frontend/**` 零写面）／5. 被截原文不留档（＝AC#5 ④）
+
+### 整包一发（这次**跑到底了**，带齐 A1882 三样）
+**RUN=878 / PASS=634 / FAIL=2 / SKIP=17**，1572.00s；**终点锚 `TestZZ315A1` 命中 878/878**；最后一条 `=== RUN` ＝ `TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask`（PASS 0.24s）⇒ **本发无截断点**；它的 7 枚新测试在**第 10–16 条**（截断点之前）7/7 PASS。FAIL 仅两枚点名既有红；第三枚 `Test320Fetch…` **本发绿** ⇒ 反证互扰型。
