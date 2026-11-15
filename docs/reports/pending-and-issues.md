@@ -37546,3 +37546,13 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 审计第 1 条（成立，但带一条洞）：收口闸确实在**生产链**上（`main.go:103 → resident_windows.go:877 → resident_watchdog_windows.go:80-81 → scopeOptions → scope.go:682 → resident_voice_engines_windows.go:550`，摘掉 `:550` ⇒ `Test46SettleGateVerifiesTheDisposeCascade` FAIL 10.02s）。
 **但**：首装未跑 `wisp models ensure` 是常态，那时 `attachSettleGate` 早静默 return，而启动行 `line()` **仍打"装配（触发＝dispose 级联第 3 步）"** ⇒ **这句话是假的**，且注释声称的"assembled-but-unread"分支**根本不存在**。⇒ A1874 家族（注释/日志断言一个不存在的状态）。
 **同族第二条**：票面 `:71` 产码件 2 后半要求「跳闸按 `ClassResource` 分类」—— `guards_45.go:249` 仍**裸 `ErrDiskSpaceLow`**（我复核：非测试零 `Wrap`）。⇒ 两条都派写腿补，⛔ 只记成"剩余项"。
+
+## A1893（11-15 22:1x，来路＝票 46 审计后写腿 `d347e1659`）：**整包"无声断掉"换了个用例 —— 它是个包级环境事故，不是一个测试的 bug**
+
+同一台机器、同一天，整包无声断掉（`--- FAIL` 与 panic 都没有，进程直接没了）已经落在**不同用例**上：
+- 上一发：`Test145ArgsJSONComesFromTheBookedForensicsRow` 中途
+- 更早：票 314 的硬形态（`PASS=357／FAIL=0` 却包行 FAIL）
+- 本波写腿复量：该枚**单跑 PASS 0.16s**，与本波零交叠
+
+⇒ **判据升级**：读到"整包断在这里"**⛔ 不许记成"这个测试坏了"**。必须先单跑该枚一次；单跑绿 ⇒ 它是**包级环境事故**（多半是前几枚真窗口 panel 用例的残留），只记成"排队情报"，⛔ 当产品缺陷派活。
+**与 A1882 合并使用**：整包读数三件（终点锚／最后一条 `=== RUN`／新测试在截断点前还是后）＋本条的"单跑复量"。缺任何一样，那个整包数字不可引用。

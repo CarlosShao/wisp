@@ -128,3 +128,23 @@ AC#1–#4 都是"部分满足"，AC#5 是"不满足"。按 `issues/README` 与�
 
 **可以留**：收口闸三件、磁盘门控三件、`admit` 修法、`LogConfig.Disk` 字段、证据件。
 **本票未结**：上面第①第②两条补完后才谈收口。
+
+---
+
+## 审计后三件补齐收件（2026-11-15 22:1x，`d347e1659`，件 `docs/evidence/s1/46c-postaudit-impl.md` 9184 B）
+
+**尺1** `d347e1659` 在（10 文件）。**尺2** 件在 9184 B。**尺3 我自己复跑**：`Test46DiskHeldStatsLineChangesWhenTheGateIsAbsent` **PASS 0.03s**／`Test46BootRowSaysAssembledButUnmountedWithoutAResidency` **PASS 0.00s**（`cmd/wisp` 载具发）＋`Test46DiskGuardTripIsClassifiedResource` **PASS 0.00s**（`internal/observe` 发）；`go test ./internal/observe -count=1` **ok 4.810s**。四处落点逐字现读：`resident_windows.go:895` 生产打印点、`guards_45.go:254` 的 `Wrap(ClassResource,`。
+
+| 审计揪出的 | 现在落在哪 | 拆掉时的红句（腿做的，-overlay） |
+|---|---|---|
+| `DiskHeldStats` 没有生产读者 | `cmd/wisp/diskgate_diag_46_windows.go:43`，生产打印点 `resident_windows.go:895`（**resident 启动行、无条件打印**）；正常时原文：「日志磁盘门控读数：未被扣住（门控健康：扣住 0 条／丢弃 0 条／回放 0 条）」 | 「…want the 未被扣住 sentence: **a line that only speaks under pressure teaches no baseline** and the gate's existence is unprovable from the boot output」（FAIL 0.02s） |
+| `line()` 在无常驻机器上放假话 | 三态：①未装配「本进程没有 watchdog 循环…」②**已装配但未挂载**「语音腿未构造无常驻（〈boot 自身 verdict 具名原因〉）：dispose 级联第 3 步摸不到这枚闸…」③装配（触发＝会话 dispose 级联第 3 步 FreeOSMemory；目标态＝D43 机现态；窗口＝`SettleWithin`） | 「…want the 装配 sentence: **a real residency must not be described as unmounted or the operator stops trusting the row**」（FAIL 1.00s） |
+| 跳闸未按 `ClassResource` 分类 | `internal/observe/guards_45.go:254` `Wrap(ClassResource, …)` | 「the tripped refusal reads as class "" (ok=false), want "resource": the disk-full trip carries no D37 class at the boundary」（FAIL 0.037s，**同一发 `errors.Is(err, ErrDiskSpaceLow)` 仍命中 ⇒ 分类没买走哨兵身份**） |
+
+### 本票的 S6 五格仍全未勾（这轮只是把"接缝"补齐，⛔ 不等于 S6 验收过了）
+`:35` SLO 全行实测归档／`:36` 五个 settle 场景各 ≤10s 带计数／`:37` 七枚 pre-mortem 场景带正确错误类／`:38` 成本台账对账绿＋暂停 e2e 绿／`:39` 对抗验收报告＋缺口审计。
+⇒ 本轮产出对 `:36`／`:37` 是**前置件**（闸在跑、跳闸有 D37 类），但**五格各自还缺实测读数**。
+
+### 整包读数（⛔ 不宣称全绿，A1882＋A1893）
+RUN 502／断言红 0／SKIP 0，新三枚都在截断点**前**且 PASS，终点锚 `TestZZ315A1RootLoopFirstBridgeCall` 独立载具发 PASS 0.30s；但**整包在 `Test145ArgsJSONComesFromTheBookedForensicsRow` 中途无声断掉**（无 FAIL 无 panic），该枚**单跑复量 PASS 0.16s**、与本波零交叠 ⇒ 判**包级环境事故**，记成排队情报（台账 A1893）。
+
