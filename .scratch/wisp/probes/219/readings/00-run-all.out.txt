@@ -1,0 +1,226 @@
+
+==============================================================================
+== A. The two tables: declaration, write path, read door (grep, non-test)
+==============================================================================
+--- internal\agent\approval\gate.go
+internal\agent\approval\gate.go:108: windows  map[string]*window
+internal\agent\approval\gate.go:216: windows:  map[string]*window{},
+internal\agent\approval\gate.go:448: if _, clash := g.windows[w.corr]; clash {
+internal\agent\approval\gate.go:451: g.windows[w.corr] = w
+internal\agent\approval\gate.go:457: delete(g.windows, corr)
+internal\agent\approval\gate.go:548: w := g.windows[v.CorrelationID]
+--- internal\agent\approval\window_read.go
+internal\agent\approval\window_read.go:63: func (g *Gate) LiveL1Windows() []L1Window {
+internal\agent\approval\window_read.go:69: for _, w := range g.windows {
+--- internal\agent\approval\queue.go
+internal\agent\approval\queue.go:84: pending []*qitem
+internal\agent\approval\queue.go:162: if len(q.pending) >= q.maxPend {
+internal\agent\approval\queue.go:181: q.pending = append(q.pending, it)
+internal\agent\approval\queue.go:295: for i, p := range q.pending {
+internal\agent\approval\queue.go:306: for i, p := range q.pending {
+internal\agent\approval\queue.go:308: q.pending = append(q.pending[:i], q.pending[i+1:]...)
+--- internal\agent\approval\pending_read.go
+internal\agent\approval\pending_read.go:162: func (q *Queue) LiveApprovals() []LiveApproval {
+internal\agent\approval\pending_read.go:169: for _, it := range q.pending {
+
+==============================================================================
+== B. Production call sites of each door (non-test .go under internal/ cmd/)
+==============================================================================
+cmd\wisp\approval_reply.go:646: wins := s.gate.LiveL1Windows()
+cmd\wisp\panel_pump.go:82: items := g.Queue().LiveApprovals()
+cmd\wisp\panel_pump.go:128: wins := rt.gate.LiveL1Windows()
+PRODUCTION CALLSITES: LiveL1Windows=2  LiveApprovals=1
+
+==============================================================================
+== C. The hop: pump -> roster join (L1 and L2 stay two sources into one boolean)
+==============================================================================
+--- internal\panel\pump.go
+internal\panel\pump.go:123: // L1WindowWait is one confirmation window the host's gate reports as open right
+internal\panel\pump.go:125: // LiveL1Windows), reduced to the two ids a roster row can be joined by.
+internal\panel\pump.go:132: // move ticket 146's readings on LiveApprovals. So the window contributes id
+internal\panel\pump.go:135: type L1WindowWait struct {
+internal\panel\pump.go:147: // Verdicts reads the approvals pending right now, head first.
+internal\panel\pump.go:148: Verdicts func() []NativeVerdict
+internal\panel\pump.go:203: // L1Windows reads the confirmation windows this process is holding open right
+internal\panel\pump.go:212: L1Windows func() []L1WindowWait
+internal\panel\pump.go:354: if p.src.Verdicts != nil {
+internal\panel\pump.go:355: pending = p.src.Verdicts()
+internal\panel\pump.go:460: var waits []L1WindowWait
+internal\panel\pump.go:461: if p.src.L1Windows != nil {
+internal\panel\pump.go:462: waits = p.src.L1Windows()
+internal\panel\pump.go:464: snap.Tasks = taskRosterSectionFrom(p.src.Tasks(), cards, waits)
+--- internal\panel\subagent_roster_197.go
+internal\panel\subagent_roster_197.go:186: // TaskRosterSectionFrom renders the host's read as the packet's section, and it
+internal\panel\subagent_roster_197.go:206: // for that very task was pending. indexWaitingKey now also files the rostered task
+internal\panel\subagent_roster_197.go:211: func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+internal\panel\subagent_roster_197.go:212: return taskRosterSectionFrom(state, pending, nil)
+internal\panel\subagent_roster_197.go:215: // taskRosterSectionFrom is the whole render with one extra source: l1Windows, the
+internal\panel\subagent_roster_197.go:222: func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1Windows []L1WindowWait) *TaskRosterSection {
+internal\panel\subagent_roster_197.go:244: waiting := make(map[string]bool, len(pending)+2*len(l1Windows))
+internal\panel\subagent_roster_197.go:246: indexWaitingKey(waiting, known, card.CorrelationID)
+internal\panel\subagent_roster_197.go:248: for _, w := range l1Windows {
+internal\panel\subagent_roster_197.go:251: indexWaitingKey(waiting, known, w.CorrelationID)
+internal\panel\subagent_roster_197.go:252: indexWaitingKey(waiting, known, w.TaskID)
+internal\panel\subagent_roster_197.go:268: BlockedOnApproval: row.TaskID != "" && waiting[row.TaskID],
+internal\panel\subagent_roster_197.go:303: // indexWaitingKey files one waiting approval's id under every name a roster row
+internal\panel\subagent_roster_197.go:319: func indexWaitingKey(set map[string]bool, known map[string]bool, key string) {
+internal\panel\subagent_roster_197.go:346: // them. Those shapes are now matched by indexWaitingKey's rostered-task arm, which
+--- cmd\wisp\panel_pump.go
+cmd\wisp\panel_pump.go:28: // the live approval queue (approval.Queue.LiveApprovals), which carries the
+cmd\wisp\panel_pump.go:32: // liveVerdicts, and no constant stands in for it.
+cmd\wisp\panel_pump.go:47: // liveVerdicts reads the approvals that are pending right now, off the gate
+cmd\wisp\panel_pump.go:49: // nativeVerdictsFromGate below, which the resident leg's pump shares.
+cmd\wisp\panel_pump.go:50: func (rt *agentRuntime) liveVerdicts() []panel.NativeVerdict {
+cmd\wisp\panel_pump.go:54: return nativeVerdictsFromGate(rt.gate)
+cmd\wisp\panel_pump.go:57: // nativeVerdictsFromGate is the mapping from one gate's live approvals to the
+cmd\wisp\panel_pump.go:59: // pumps read it: the run's (rt.liveVerdicts, over the pipeline's gate) and the
+cmd\wisp\panel_pump.go:78: func nativeVerdictsFromGate(g *approval.Gate) []panel.NativeVerdict {
+cmd\wisp\panel_pump.go:82: items := g.Queue().LiveApprovals()
+cmd\wisp\panel_pump.go:98: // liveL1WindowWaits is the pump's second blockedOnApproval source (ticket 220 AC#2,
+cmd\wisp\panel_pump.go:103: // filed - Gate.LiveL1Windows (internal/agent/approval/window_read.go:63) walks
+cmd\wisp\panel_pump.go:106: // (Tool): panel.L1WindowWait carries correlation and task ids and no behaviour,
+cmd\wisp\panel_pump.go:109: // the queue's alone, so ticket 146's readings on LiveApprovals keep holding.
+cmd\wisp\panel_pump.go:124: func (rt *agentRuntime) liveL1WindowWaits() []panel.L1WindowWait {
+cmd\wisp\panel_pump.go:128: wins := rt.gate.LiveL1Windows()
+cmd\wisp\panel_pump.go:132: out := make([]panel.L1WindowWait, 0, len(wins))
+cmd\wisp\panel_pump.go:134: out = append(out, panel.L1WindowWait{CorrelationID: w.CorrelationID, TaskID: w.TaskID})
+cmd\wisp\panel_pump.go:204: // Rows come out of a map, so they are unordered here; panel.TaskRosterSectionFrom
+--- cmd\wisp\run.go
+cmd\wisp\run.go:1067: Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
+cmd\wisp\run.go:1178: Verdicts:  rt.liveVerdicts,
+cmd\wisp\run.go:1214: // off the gate itself - see panel_pump.go's liveL1WindowWaits.
+cmd\wisp\run.go:1215: L1Windows: rt.liveL1WindowWaits,
+
+==============================================================================
+== D. Go baseline: the L1 join cells and the L1/L2 separation cells
+==============================================================================
+
+=== RUN   TestASecondCardForTheSameTaskStillLightsItsRow
+--- PASS: TestASecondCardForTheSameTaskStillLightsItsRow (0.00s)
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328)
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+=== RUN   TestAL1WindowInWaitingLightsItsRow
+--- PASS: TestAL1WindowInWaitingLightsItsRow (0.00s)
+=== RUN   TestABlockedRowKeepsItsRunningDimension
+--- PASS: TestABlockedRowKeepsItsRunningDimension (0.00s)
+=== RUN   TestTheRosterReaderPutsSubagentsOnTheWire
+--- PASS: TestTheRosterReaderPutsSubagentsOnTheWire (0.00s)
+=== RUN   TestTruncationFactsRideThePacket
+--- PASS: TestTruncationFactsRideThePacket (0.00s)
+=== RUN   TestDroppedStreamsAreNamedOnTheWire
+--- PASS: TestDroppedStreamsAreNamedOnTheWire (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.089s
+[rc=0]
+=== RUN   TestLiveL1WindowsSeesAWindowInTheLoop
+--- PASS: TestLiveL1WindowsSeesAWindowInTheLoop (0.00s)
+=== RUN   TestReadingL1WindowsMovesNoGateState
+--- PASS: TestReadingL1WindowsMovesNoGateState (0.00s)
+=== RUN   TestL1WindowIsPlainDataWithNoRouteToAnAnswer
+--- PASS: TestL1WindowIsPlainDataWithNoRouteToAnAnswer (0.00s)
+=== RUN   TestStartedCallsAreNotReportedAsWaiting
+--- PASS: TestStartedCallsAreNotReportedAsWaiting (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.086s
+[rc=0]
+
+==============================================================================
+== E. M1: L1 arm removed from the roster join (go test -overlay only)
+==============================================================================
+--- FAIL: TestAL1WindowInWaitingLightsItsRow (0.00s)
+    subagent_blocked_220_test.go:160: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","c
+    subagent_blocked_220_test.go:166: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","c
+--- FAIL: TestABlockedRowKeepsItsRunningDimension (0.00s)
+    subagent_blocked_220_test.go:208: root row = {TaskID:root-1 Label:总结这份笔记 Kind:root ParentTaskID: Status:Thinking StatusKnown:true StatusReason: StreamKey:root-1 BlockedOnApproval:false StreamTruncated:false StreamElidedRunes:0 StreamDropped:false}, want blocked AND still carrying its filed state
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.072s
+FAIL
+[M1 rc=1]
+
+==============================================================================
+== F. M2: L2 card arm removed from the roster join (go test -overlay only)
+==============================================================================
+--- FAIL: TestASecondCardForTheSameTaskStillLightsItsRow (0.00s)
+    subagent_blocked_220_test.go:109: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#9","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],
+    subagent_blocked_220_test.go:113: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"},{"c
+--- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+        subagent_blocked_220_test.go:147: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#9","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native
+        subagent_blocked_220_test.go:147: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#147","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"nati
+        subagent_blocked_220_test.go:147: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#retry","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"na
+--- FAIL: TestABlockedRowKeepsItsRunningDimension (0.00s)
+    subagent_blocked_220_test.go:199: the second card is pending and the row does not say so
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.075s
+FAIL
+[M2 rc=1]
+
+==============================================================================
+== G. M3: the three numbers zeroed on the carrier (go test -overlay only)
+==============================================================================
+--- FAIL: TestTheRosterReaderPutsSubagentsOnTheWire (0.00s)
+    subagent_roster_197_test.go:174: inFlightSlots = 0, want the slot the pool is holding
+    subagent_roster_197_test.go:177: poolCap = 0, want the cap the host handed over (4) carried verbatim - this package neither reads nor re-decides that number
+--- FAIL: TestTruncationFactsRideThePacket (0.00s)
+    subagent_roster_197_test.go:397: section total = 0, want the log's own 88
+    subagent_roster_197_test.go:400: big row on the wire = elided 0/truncated false, want 88/true
+    subagent_roster_197_test.go:408: the bytes do not state the loss as a number: {"pending":[],"results":[{"correlationId":"subagent:big","text":"漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢漢
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.189s
+FAIL
+[M3 rc=1]
+
+==============================================================================
+== H. Frontend: the real tree, unmodified (the gate this leg cites)
+==============================================================================
+> vite build --ssr scripts/render-task-roster.tsx --outDir node_modules/.tmp/rosterrender --logLevel warn && node node_modules/.tmp/rosterrender/render-task-roster.js
+
+render-roster: OK, the task monitor consumes snapshot.tasks (等批准 is its own tier from blockedOnApproval, D43 words verbatim, unfiled status shows the host's sentence, absent key is an honest empty state, pool numbers and stream truncation land on the page and warn only when a bound bit)
+[render:roster rc=0]
+
+==============================================================================
+== I. Frontend mutations, run in the copy tree only (frontend/** bears zero writes)
+==============================================================================
+--- I0 copy baseline (must be OK)
+render-roster: OK, the task monitor consumes snapshot.tasks (等批准 is its own tier from blockedOnApproval, D43 words verbatim, unfiled status shows the host's sentence, absent key is an honest empty state, pool numbers and stream truncation land on the page and warn only when a bound bit)
+[i0 rc=0]
+--- I1 popover: pool span + row suffix + section line removed
+render-roster: FAIL the pool numbers must read 在跑 3 / 上限 8
+render-roster: FAIL a truncated log with drops must name both losses in one line
+render-roster: FAIL a truncated log must show the elision count
+render-roster: FAIL dropped streams must warn even when nothing was elided
+render-roster: FAIL a folded row must show its elided count beside the status word
+render-roster: FAIL a dropped row must say its page is gone, not a fake elision count
+render-roster: FAIL, 6 check(s) failed
+[i1 rc=1]
+--- I2 App: the five feed lines + the derivation stream triple removed
+render-roster: FAIL a folded row must show its elided count beside the status word
+render-roster: FAIL a dropped row must say its page is gone, not a fake elision count
+render-roster: FAIL the monitor must be fed the pool numbers straight off snapshot.tasks
+render-roster: FAIL the monitor must be fed the whole-log truncation triple straight off snapshot.tasks
+render-roster: FAIL the derivation must carry the row stream triple verbatim
+render-roster: FAIL, 5 check(s) failed
+[i2 rc=1]
+--- I3 popover: the 等批准 tier removed
+render-roster: FAIL the blocked row must NOT show the D43 status word (等批准 outranks it)
+render-roster: FAIL the blocked row's dot must be the warn tier
+render-roster: FAIL 等批准 must be derived from the wire's blockedOnApproval, not from any status word
+render-roster: FAIL, 3 check(s) failed
+[i3 rc=1]
+--- I4 App: the blockedOnApproval derivation removed
+render-roster: FAIL the derived row must carry blockedOnApproval verbatim from the wire
+render-roster: FAIL the blocked row must NOT show the D43 status word (等批准 outranks it)
+render-roster: FAIL the blocked row's dot must be the warn tier
+render-roster: FAIL, 3 check(s) failed
+[i4 rc=1]
+
+==============================================================================
+== J. Pristine check: zero writes to production code by this leg
+==============================================================================
+(empty above = zero writes)
+
