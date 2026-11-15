@@ -141,7 +141,7 @@ if src != nil && src.run != nil {
 |---|---|---|---|
 | ① 审计一行 | `cmd/wisp/approval_reply.go:339`（`s.record("ANSWERED", corr, tool, route+"/reject", reason)`）＋`:449-455` | `TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel:335` | **命中**：M2 实测红于 `:336`「the audit never booked the reason the operator typed」 |
 | ② 回给模型 | `internal/tools/bridge.go:552` `orDefault(why, "L2 审批未通过，已拒绝执行")`（L1 在 `:533`／`:536`） | 同一测试 `:320` | **命中**：M2 实测红于 `:321`「the model-visible rejection text lost the operator's reason」 |
-| ③ 用户回看的那份 | **没有落点** | 无 | `internal/memory/schema.go:81-96`：`tool_call` 十三列里**没有 reason 列**；全仓**没有任何界面/快照**读 `approval: REPLY` 行（`Select-String internal/panel/*.go -Pattern 'REPLY ANSWERED|approvalHistory'` ⇒ **0 命中**）。唯一副本是 JSONL 审计行 |
+| ③ 用户回看的那份 | **没有落点** | 无 | `internal/memory/schema.go:81-96`：`tool_call` 十三列里**没有 reason 列**；`Select-String cmd/wisp/*.go,internal/panel/*.go -Pattern 'approval: REPLY'` ⇒ 命中的**全是写点或测试**（唯一写点 `cmd/wisp/approval_reply.go:453`，其余 26 处均为 `_test.go` 断言），**生产读者 0**。唯一副本是 JSONL 审计行 |
 | ④ 空理由 | `cmd/wisp/approval_reply.go:340-341`（「（原生侧，未填理由）」） | **零测试** | `grep 未填理由` ⇒ 只命中生产那一行 |
 | ⑤ 超长理由 | `cmd/wisp/approval_reply.go:704-708`（`replyReasonMax = 160`）＋`:745-747`（到 160 就 `break`） | **零测试** | **静默截断**，探针读数见 §3.4 |
 
@@ -214,8 +214,10 @@ go test ./cmd/wisp -overlay=".scratch/wisp/probes/219/mut/ac15/m3/overlay.json" 
 
 | | 读数 |
 |---|---|
-| 基线 | `ok`（同一枚测试在 §2.1 的 PASS 之外单独复跑过） |
+| 基线（未突变，**事后补跑**） | `--- PASS: TestAC2TrayAllowAlwaysRoutesIntoTheWideningVerb (0.00s)` / `ok … 0.107s` |
 | M3 | `resident_tray_answer_228_windows_test.go:222: the 长期允许 item did not reach replySurface.always; booked lines: …` / `--- FAIL (0.00s)` |
+
+⚠ 记账：这一发基线是**先跑突变、后补基线**（首版收件把"基线 ok"写成了推断，重组时补跑并换成实测读数）。M1／M2 是先基线后突变，顺序正常。
 
 ⇒ 行为牙（审计里那条 `route="native/always"` 指纹不出现）。
 
