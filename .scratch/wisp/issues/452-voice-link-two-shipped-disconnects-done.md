@@ -19,7 +19,7 @@
 ## AC
 
 - [x] **AC#1 先把两个断点都变成可判事实**：(a) 跑 `go build -n`／读 `build.ps1` 现证**没有** `webrtcap` 标签，并给"打了标签时 `NewApm` 返回什么、没打时返回什么"两条实测；(b) 写一枚测试：把 `mic.Err()` 置成设备丢失，断言状态机**收到** `EvAudioDeviceLost` 并走到 `StateError`。⛔ 先改产码 —— **它必须先红**。
-- [ ] **AC#2 决定 barge-in 的出厂形态并落成事实**（⓪⓪⓪：按最有价值＋主流 harness 选，写理由）：三选一并写明代价 —— ①**出厂即带 `webrtcap`**（代价：体积/构建依赖）②**出厂不带，但产品明说"此构建无声学回声消除"**并让界面可判 ③**换成不依赖该标签的默认路径**。⛔ 不选"什么都不做"；⛔ 不许一边不带标签一边继续引用 ≤400ms 那些读数当成绩。
+- [x] **AC#2 决定 barge-in 的出厂形态并落成事实**（⓪⓪⓪：按最有价值＋主流 harness 选，写理由）：三选一并写明代价 —— ①**出厂即带 `webrtcap`**（代价：体积/构建依赖）②**出厂不带，但产品明说"此构建无声学回声消除"**并让界面可判 ③**换成不依赖该标签的默认路径**。⛔ 不选"什么都不做"；⛔ 不许一边不带标签一边继续引用 ≤400ms 那些读数当成绩。
 - [x] **AC#3 把 `EvAudioDeviceLost` 接上派发**：语音侧检测到设备丢失就派发该事件（走 `observe.Registry.Spawn` 若要新协程），球与面板都离开 Listening；拔麦测试由红转绿。
 - [x] **AC#4 两处注释同步**：`resident_audio_windows.go:358` 那句「这一条不推状态」必须改成事实句（接上之后就变成假的）。⇒ 这是**同一条改动里的必做项**，⛔ 留一句过期注释。
 - [x] **AC#5 门禁**：`gofumpt` 空／`go vet` rc=0／`d22scan` clean／path-length GREEN／`go test ./internal/audio ./internal/statemachine ./cmd/wisp` 全绿（整包跑不完如实写）。
@@ -88,3 +88,32 @@
 
 ### 这一张不结案
 AC#2 的界面半 ⇒ 本票**保持未结**，剩两件（`internal/panel` 字段 ＋ 前端界面），已在上面具名。
+---
+
+## AC#2 补齐（2026-11-15 15:2x，`aaa40b15d`）：**5/5，本票结案**
+
+**尺1**：`aaa40b15d` 在，6 件：`cmd/wisp/panel_config_store.go`、`cmd/wisp/panel_voice_aec_452_test.go`、`internal/panel/config_handlers.go`、`internal/panel/config_452_test.go`、`internal/panel/config_313_test.go`、证据件。
+**尺2**：证据件在（`docs/evidence/s1/452-voice-link-two-shipped-disconnects.md` 追加）。
+**尺3 我自己复跑**：`-test.run '^TestAC452'` ⇒ **`RUN=3 PASS=3 FAIL=0`**（`TestAC452PanelVoiceTellsThePageWhatTheBuildCanDo` 0.04s／`TestAC452ShippedBuildSaysItHasNoEchoCancellation` 0.00s／`TestAC452LostMicWalksD43FromListeningIntoError` 0.53s）。
+**赋值点我核**：`cmd/wisp/panel_config_store.go:137 AecBuildAvailable: &aecBuildAvailable,`，真值源 `:117 aecBuildAvailable := aec.BindingBuilt()`；面板字段 `internal/panel/config_handlers.go:236 AecBuildAvailable *bool`。
+
+### 这一格的设计（值得记）
+- **指针即闸**：`nil` ＝ 腿没答（**键不在线上**）／`&false` ＝ **答了**"本构建没有"。⛔ 没有和用户开关合成一个布尔 —— 注释 `config_handlers.go:226` 逐字写着「`AecEnabled` = 你想不想开（可写），`AecBuildAvailable` = 这枚二进制能不能」。
+- **两发突变都验，且都还原**（sha256 前后同 `EB28195A…`）：
+  - **M1 删接线** ⇒ 红句「the settings payload's voice half carries NO aecBuildAvailable key: the page cannot tell that this build cannot cancel echo…」
+  - **M2 把能力位并入用户开关** ⇒ 红句「the capability bit is being derived from the user's switch instead of the build, which is the one-boolean shape ticket 452 forbids」
+- **它自己点出的 A1880 事实**：面板侧那枚**键集冻结**测试在 M1 下**仍然通过**（它直接构造 view，看不见组装）⇒ 所以行为测试必须放在 `cmd/wisp` 的**线材**测试上。它就是这么放的。⇒ 这是"字面钉 vs 行为牙"的一个活样本。
+
+### 界面那一半的去向（⛔ 不算我们没做）
+`frontend/**` 是本编队**零写面**（机主外部 agent）。本腿交付的是**契约**：
+> **`voice.aecBuildAvailable`** —— JSON 布尔。`true`＝这枚二进制能消回声；`false`＝本构建没有；**键缺席**＝腿没答。**只读**，⛔ 永不与用户开关 `voice.aecEnabled` 合成一个。
+
+⇒ 前端要做的就是按这个键渲染，契约已写明，**交给机主外部前端 agent**。
+
+### ⚠ 整包两发：都**静默死了**（这是本票最要紧的披露）
+14:49→437s（339 起／338 PASS／0 FAIL）与 14:59→386s（337 PASS／1 FAIL）。两发**整进程消失、无 `--- FAIL`**，最后一条 `=== RUN` 都是 **`TestAC4PriorFocusSurvivesARefusedPanelSample`** ⇒ **就是票 450 在册的那个形状**。
+★**它主动点名的覆盖事实**：本票新测试按文件序排在**死点之后** ⇒ **两发整包对它覆盖＝0**，绿读数是定向那一发。
+⇒ 我把这条写成台账 A1882：**静默死不给后面的用例打 SKIP**，所以 PASS 数看着"正常"，实际**被截断**。⇒ 任何"整包绿"的读数**必须报告终点锚有没有命中**（票 314 用的 `TestZZ315A1`），⛔ 只报 PASS 数。
+
+### 本票 5/5，结案
+剩一件**不在本编队写面**的已具名交接（前端渲染 `voice.aecBuildAvailable`）。
