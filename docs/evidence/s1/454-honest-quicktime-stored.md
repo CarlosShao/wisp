@@ -1,8 +1,8 @@
 # 454 诚实的 QuickTime 文件被误拒（`.mov` 走不通）—— 修好判据表
 
 > 实现腿交件件。票：`.scratch/wisp/issues/454-an-honest-quicktime-file-is-refused-because-mov-and-mp4-share-one-sniff-predicate.md`
-> 修前锚＝`6c60148e6`（本腿起手 `git log -1` 现量；交件时远端 HEAD 已由别腿前移，本腿修复落在其上）。
-> **修复提交＝`834aae917`**（`834aae9177d44eeed34c5beefccb91ab8143abfc`，两枚件：`internal/panel/attachments.go`＋`internal/panel/attachments_454_test.go`）；本证据件是其后的单独一笔，所以修复 sha 能在这里逐字写死。
+> 修前锚＝`6c60148e6`（本腿起手 `git log -1` 现量；交件时本地 HEAD 已由别腿前移，本腿修复落在其上）。
+> **修复提交＝`834aae917`**（`834aae9177d44eeed34c5beefccb91ab8143abfc`，两枚件：`internal/panel/attachments.go`＋`internal/panel/attachments_454_test.go`）；本证据件是其后的一笔（中间夹着别腿的 `31b5a6e9`，与本腿无关），所以修复 sha 能在这里逐字写死。
 
 **一句话结论**：mp4 与 QuickTime 共用同一个嗅探谓词时，表序让 mp4 先命中，诚实的 `.mov`（主品牌 `qt  `）声明 `video/quicktime` 被按 mp4 判、再被"声明与文件头不符"拒掉。修法＝**按品牌把两枚谓词分开**（唯一一处改动，`internal/panel/attachments.go`）：`qt  ` 只归 `video/quicktime`，MP4 品牌只归 `video/mp4`。品牌集合**一个都没加**，声明-嗅探一致性那一步（`mimeAgrees`）**一字未动**。
 
@@ -35,7 +35,7 @@ go test ./internal/panel/ -run 'Test454' -count=1 -v
 
 ## 2. 修在哪一处（file:line ＋ 一句话原理）
 
-**唯一改动面**：`internal/panel/attachments.go`（表格两行＋同一处谓词拆分；`git diff --numstat` 只有这一枚生产件）。
+**唯一改动面**：`internal/panel/attachments.go`（提交 `834aae917` 的 numstat ＝ `attachments.go` 29+/10−、新测试件 117+/0−；生产件只有这一枚）。
 
 | 位置 | 修前 | 修后 | 一句话原理 |
 |---|---|---|---|
@@ -78,7 +78,7 @@ go test ./internal/panel/ -run 'Test454' -count=1 -v
 
 **判据**：删掉 §2 那处改动，响的必须是**行为**（`Ingest` 的返回/落盘），不是源码字符串断言。
 
-- 变异 M1＝把 `internal/panel/attachments.go` **整件还原成修前 HEAD 版**（`git show HEAD:internal/panel/attachments.go` 覆盖工作树；即"删掉本腿改动"的最强形），只跑 AC#1：
+- 变异 M1＝把 `internal/panel/attachments.go` **整件还原成修前版**（当时本腿还没提交，HEAD 仍是 `6c60148e6`，所以 `git show HEAD:internal/panel/attachments.go` 覆盖工作树就是"删掉本腿改动"的最强形；今天复跑要写 `git show 6c60148e6:internal/panel/attachments.go`），只跑 AC#1：
   - 结果：`--- FAIL: Test454HonestQuickTimeFileIsStored (0.01s)`，红句与 §1 逐字同（`AC#1 ... 被拒了：panel: attachment rejected: "holiday.mov" 声明为 video/quicktime，但文件头表明它是 video/mp4`）。
   - 断言对象＝`Ingest` 的返回 `AttachmentRef` 与 artifacts 目录里的字节 ⇒ **行为红**，不是字面钉。
   - 还原后 `restore-identical=True`（日志 `mut/m1-revert-ac1-red.txt`）。
@@ -114,7 +114,7 @@ go vet ./internal/panel/
 
 ## 7. 行为翻转与残余（如实登记，不粉饰）
 
-1. **同一枚 `qt  ` 字节、声明 `video/mp4`：修前"收"（票 214 探针的对照例）⇒ 修后"拒"**，理由逐字 `声明为 video/mp4，但文件头表明它是 video/quicktime`。这是本改动的**收紧**、不是放宽：品牌说了它是 QuickTime，按 mp4 入库会把 `.mov` 字节记成 `video/mp4`＋`.mp4`。已用 AC#3 子测试 4 钉住（`attachments_454_test.go:100-107`）。若编排者认为该方向也该收（族内两向互换），那是 AC#2 的另一支（改 `mimeAgrees` 接受同族互换），**本腿没有做**，按票面"修在一个地方"只选了一支。
+1. **同一枚 `qt  ` 字节、声明 `video/mp4`：修前"收"（票 214 探针的对照例）⇒ 修后"拒"**，理由逐字 `声明为 video/mp4，但文件头表明它是 video/quicktime`。这是本改动的**收紧**、不是放宽：品牌说了它是 QuickTime，按 mp4 入库会把 `.mov` 字节记成 `video/mp4`＋`.mp4`。已用 AC#3 子测试 4 钉住（`attachments_454_test.go:101-108`）。若编排者认为该方向也该收（族内两向互换），那是 AC#2 的另一支（改 `mimeAgrees` 接受同族互换），**本腿没有做**，按票面"修在一个地方"只选了一支。
 2. **反向残余（修前就存在、本腿未改）**：主品牌是 `isom` 等 MP4 品牌、却声明 `video/quicktime` 的文件，修前修后都拒（修前：mp4 先命中＋声明不符；修后：嗅探 mp4＋声明不符）。属"声明错"一侧，方向安全。
 3. 未放宽带：品牌集合逐字未增（修前 `{isom, avc1, mp42, M4V , qt  , mmp4}`，修后 mp4 五枚＋quicktime 一枚，并集相同）。
 4. 票 214 的 10 例探针里其余 9 例不在本腿写面，未重跑；本腿只对 454 的 `.mov` 一格出读数。
@@ -123,7 +123,7 @@ go vet ./internal/panel/
 
 ## 8. 边界自查（硬约束逐条）
 
-- ⛔ `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`／`design/**`：零改动（`git status --short -- internal/panel docs` 只见本腿两枚 Go 件＋本件）。
+- ⛔ `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`／`design/**`：零改动。核法＝本腿两笔提交（`git show --name-only 834aae917` 加上证据笔：`git log --format=%H -- docs/evidence/s1/454-honest-quicktime-stored.md | head -1`）只列本腿三枚件（两枚 Go＋本件）；`docs/evidence/s1/` 里另有别腿未跟踪的 evidence 件，与本腿无关。
 - ⛔ 附件上限（D36 的配置面）与 `MaxAttachmentBytes`：零改动。
 - ⛔ 放宽既有断言：既有测试一枚未改；本腿只**新增**测试件 `internal/panel/attachments_454_test.go`（5244 字节 / 117 行）。
 - ⛔ 碰 `cmd/wisp/**`：零改动（没读也没写那边的在飞件）。
