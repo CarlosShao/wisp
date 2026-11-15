@@ -1,0 +1,343 @@
+/* ============================================================================
+   Panel theme shell (fourth generation, owner pivot 2026-09-25)
+   ----------------------------------------------------------------------------
+   Rules, all machine-checked:
+
+     1. NO colour literal here. Signed by
+        TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme - the generated
+        table is the only literal home.
+     2. This file WIRES Tailwind namespaces (the library's own mapping, from
+        its globals.css) and carries the three frozen PLAN.md blocks plus the
+        keyframes the adapted beautiful-ui components reference BY NAME in
+        inline styles. No component-shape CSS lives here any more: components
+        come from the library and speak its utilities directly.
+   ============================================================================ */
+
+@import "./tokens.generated.css";
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------- Tailwind namespaces: the library's own mapping ----------------- */
+
+/* The one translucency knob (设置屏「面板背景不透明度」, ticket 128-era row).
+   It used to live on `.wisp-shell`, a class NOBODY ever mounted, so dragging
+   the slider changed one custom property and nothing on screen - the knob was
+   live in the DOM and dead to the eye. The window's own background is read
+   through the two utilities every surface actually uses (bg-page / bg-surface),
+   so one property now reaches all of them.
+
+   100% is an identity: color-mix(in srgb, C 100%, transparent) === C, so the
+   shipped look is byte-identical until the user drags the slider. Below 100%
+   the window goes translucent - but whether anything is VISIBLE through it is
+   the host's call, not this page's: WebView2 only composites a transparent
+   desktop when the Go side hands it one (ticket 33 / C27). Do not add a
+   backdrop-filter here hoping to fake it: there is nothing to blur yet. */
+@theme inline {
+  --color-page: color-mix(in srgb, var(--page) var(--panel-alpha), transparent);
+  --color-surface: color-mix(in srgb, var(--surface) var(--panel-alpha), transparent);
+  --color-canvas: var(--canvas);
+  --color-inset: var(--inset);
+  --color-hover: var(--hover);
+  --color-hover-2: var(--hover-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-field: var(--field);
+  --color-stripe: var(--stripe);
+  --color-stripe-bg: var(--stripe-bg);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-tint: var(--accent-tint);
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+  --color-orange: var(--orange);
+  --color-orange-tint: var(--orange-tint);
+  --color-red: var(--red);
+  --color-red-tint: var(--red-tint);
+  --color-tooltip-bg: var(--tooltip-bg);
+  --color-tooltip-fg: var(--tooltip-fg);
+  --color-tooltip-muted: var(--tooltip-muted);
+  --color-tooltip-border: var(--tooltip-border);
+
+  /* Wisp's frozen-row semantic names -> the library's hues */
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+  --color-danger: var(--danger);
+  --color-stop: var(--stop);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+
+  --shadow-hairline: var(--shadow-hairline);
+  --shadow-btn: var(--shadow-btn);
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+  --shadow-inset-field: var(--shadow-inset-field);
+
+  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-card: 10px;
+
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-link: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-sans: var(--font-sans-stack);
+  --font-mono: var(--font-mono-stack);
+}
+
+/* slev12397 atoms speak two names this theme lacks; aliased, not redefined.
+   --stop -> --danger is the spelling scripts/render-l2.tsx pins (the
+   instrument reads this file, not the token table). */
+:root {
+  --surface-overlay: var(--surface);
+  --edge: var(--line-strong);
+  --muted: var(--ink-3);
+  --danger: var(--red);
+  --stop: var(--danger);
+}
+
+/* ---------- the host document ----------------------------------------------
+   Normally <body> is a plain block and every app root carries h-screen, so the
+   product path is exactly as it was. The attribute is set by main.tsx for the
+   app-shaped harness ONLY (?harness=1), and it turns the document into a flex
+   column so the demo banner can be a real row instead of a position:fixed lid
+   over the top bar. Nothing here runs on the product path. */
+html[data-harness-banner="row"],
+html[data-harness-banner="row"] body {
+  height: 100%;
+}
+html[data-harness-banner="row"] body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+html[data-harness-banner="row"] #root {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------- the panel shell ------------------------------------------------
+   RETIRED 2026-09-27: `.wisp-shell` / `.wisp-window` are gone, and that is the
+   fix, not a cleanup. Both were dead - no component ever put either class on
+   anything - and the settings screen's one live control was wired to a property
+   only `.wisp-shell` read, so the transparency slider moved a number that
+   nothing consumed. The knob now rides the two utilities the window actually
+   paints with (see the @theme inline block above), so there is exactly one
+   mechanism and it cannot be unmounted again.
+
+   Minimal and solid: page behind, surface window, hairline edges. */
+
+/* ---------- keyframes the adapted library components reference by name -----
+   Verbatim names from beautiful-ui globals.css (MIT) - adapted components
+   write animation: "fade-up 300ms ..." inline, so the names must exist. */
+@keyframes shimmer-text{0%{background-position:150%}to{background-position:-50%}}
+@keyframes fade-up{0%{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-in{0%{opacity:0}to{opacity:1}}
+@keyframes eq-bounce{0%,to{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+@keyframes stream-in{0%{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur()}}
+@keyframes caret-blink{0%,to{opacity:1}50%{opacity:0}}
+@keyframes pop-in{0%{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+@keyframes spin{to{transform:rotate(1turn)}}
+@keyframes pixel-on{0%,to{opacity:.15}18%,42%{opacity:1}62%{opacity:.15}}
+
+/* ============================================================================
+   Frozen PLAN.md rows these blocks implement - not library style, not demo
+   style; they lose to nothing.
+   ============================================================================ */
+
+/* PLAN.md:3476 (the frozen SSE row): 1px x 14px in --accent, breathing
+   1 -> 0.2 -> 1 over 1s; a hard blink is named under "明确不用". The library's
+   own .stream-caret (2px, ink, step blink) loses to this row. */
+.stream-caret {
+  background: var(--accent);
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  width: 1px;
+  height: 14px;
+  margin-left: 1.5px;
+  display: inline-block;
+  translate: 0 -0.5px;
+}
+.stream-caret.is-streaming {
+  animation: caret-breathe 1s ease-in-out infinite;
+}
+@keyframes caret-breathe {
+  0%, to { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* PLAN.md:3481 动效 cell: the L2 card's 20px ball glyph ring breathes 2s.
+   Loop permitted by PLAN.md:3491 (审批等待 is a non-idle state). */
+.l2-ball-ring {
+  animation: l2-ball-ring 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes l2-ball-ring {
+  0%, to { opacity: 0.2; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* Q1 = 甲, icons per owner's 2026-09-25 demo ruling: icons only, the Chinese
+   name hidden until pointer/keyboard arrives. opacity/visibility, never
+   display:none, so the label stays in the accessibility tree and in the
+   static markup scripts/render-nav.tsx counts. */
+.nav-rail-label {
+  background: var(--tooltip-bg);
+  color: var(--tooltip-fg);
+  border: 1px solid var(--tooltip-border);
+  border-radius: var(--radius-chip);
+  font-size: 12px;
+  left: calc(100% + 6px);
+  line-height: 1;
+  opacity: 0;
+  padding: 4px 6px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  visibility: hidden;
+  white-space: nowrap;
+  z-index: 10;
+}
+.nav-rail-item:hover > .nav-rail-label,
+.nav-rail-item:focus-visible > .nav-rail-label,
+.nav-rail-item:focus > .nav-rail-label {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The rail's glide indicator (kept from the first batch - it is our own
+   addition, not demo property, and fits the minimal language). */
+.nav-glide {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-control);
+  background: var(--accent-tint);
+  transition: transform 280ms var(--ease-out-strong);
+  pointer-events: none;
+  z-index: 0;
+}
+.nav-rail-item {
+  position: relative;
+  z-index: 1;
+}
+
+/* Screen transition: fade + 6px rise, the library's fade-up curve. */
+.screen-enter {
+  animation: fade-up 300ms var(--ease-out-strong) both;
+}
+
+/* Keyboard hint chip (showcase + panels). */
+.kbd {
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  padding: 1px 5px;
+  border-radius: var(--radius-chip);
+  background: var(--field);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+}
+
+/* --- reduced-motion: D32 floor; the panel closed means nothing animates --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .nav-glide {
+    transition: none;
+  }
+  .screen-enter {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   Motion tiers (owner 2026-09-27: 动画该装就装，但要有档位，不能只有「用不用」)
+   ----------------------------------------------------------------------------
+   The vocabulary lives in src/lib/motion.ts; this is where it bites.
+
+     full  (no attribute, or data-motion="full")  everything runs. The default:
+            a panel that never moves is a screenshot, not a product.
+     lite  (data-motion="lite")  only the CPU hogs stop.
+     off   (data-motion="off")   everything stops.
+
+   WHY LITE IS "JUMP TO THE LAST FRAME" AND NOT "animation: none"
+   ------------------------------------------------------------------
+   The expensive half of this tree's motion is loops (`infinite` never lets the
+   compositor idle) and filter animations (a blur repaints every frame). Those
+   live inside vendored beautiful-ui files as inline `animation:` styles, and
+   vendored files are not hand-edited - the next re-vendor reverts them, and a
+   tier that only works until the next vendor run is not a tier.
+
+   So lite does not reach inside them. It compresses time instead: the
+   animation is 1ms long, undelayed, played once, and holds its last frame.
+   What you see is the FINISHED state of every entrance (fade-up lands fully
+   visible, stream-in lands with no blur, the spin lands a full turn) and a
+   still frame for every loop. That is strictly better than freezing: with
+   `animation: none` a loop stops wherever the clock happened to catch it, and
+   three of ours would stop in a state you cannot read - the L2 ball ring lands
+   at opacity 0.2, the pixel loaders at 0.15, the mic bars squashed to 0.35.
+   Those three are corrected immediately below.
+
+   Cost of the approach: one extra composite frame per animation, once, and
+   then nothing. Hover transitions are untouched - they only cost when they
+   fire.
+   ============================================================================ */
+
+/* tier: lite - compress time; everything lands on its final frame */
+[data-motion="lite"] *,
+[data-motion="lite"] *::before,
+[data-motion="lite"] *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+/* The three whose last frame is unreadable get a readable one instead.
+   The selector is the animation NAME inside the inline style - that is the
+   only handle these vendored elements offer, and it is greppable, so a new
+   vendored loop with the same problem is one grep away from being caught. */
+[data-motion="lite"] .l2-ball-ring {
+  opacity: 1 !important;
+  transform: none !important;
+}
+[data-motion="lite"] [style*="pixel-on"] {
+  opacity: 1 !important;
+}
+[data-motion="lite"] [style*="eq-bounce"] {
+  transform: scaleY(1) !important;
+}
+
+/* tier: off - the floor. One selector, every keyframe in the tree goes still,
+   including the two PLAN-frozen loops (the caret breath and the L2 ball ring):
+   a user preference to stop motion outranks a visual spec the same way
+   prefers-reduced-motion does. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+[data-motion="off"] .nav-glide,
+[data-motion="off"] .m-glide {
+  transition: none !important;
+}
+[data-motion="off"] .screen-enter {
+  animation: none;
+}
+
+

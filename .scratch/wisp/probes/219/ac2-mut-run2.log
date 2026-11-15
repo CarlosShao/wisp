@@ -1,0 +1,14 @@
+time=2026-11-08T09:42:23.901+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack (12.51s)
+    approval_always_219ac2_test.go:382: the mutated run did not fail on this tooth's own byte assertion - the harness is broken, not the tooth:
+        time=2026-11-08T09:42:34.774+08:00 level=ERROR msg="winsec: refusing to install a path resolver into the sealing seam" resolver=risk.c26Pipeline reason="it answered \"\\\\wisp-108-tree-ownership-probe\" with \"D:\\\\wisp-108-tree-ownership-probe\", which is neither inside the tree \"\" it answered for that path's own parent \"\" nor inside the tree that answer names once the candidate is asked about it directly (\"D:\\\\\" for \"D:\\\\\"): the seam may not be used to move a seal into another tree" consequence="the incumbent resolver, or the built-in floor, stays in place"
+        time=2026-11-08T09:42:36.290+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+        2026/11/08 09:42:36 mockllm: serving on http://127.0.0.1:65091 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+        --- FAIL: Test219AC2RevokeRoundTripByteForByte (1.54s)
+            approval_always_219ac2_test.go:220: secret: create \Test219AC2RevokeRoundTripByteForByte531595454\002\secrets: winsec: refusing to seal \Test219AC2RevokeRoundTripByteForByte531595454\002\secrets: winsec: path is not provably resolved, refusing to seal: \Test219AC2RevokeRoundTripByteForByte531595454\002\secrets is not absolute
+        FAIL
+        FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.623s
+        FAIL
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	12.653s
+FAIL

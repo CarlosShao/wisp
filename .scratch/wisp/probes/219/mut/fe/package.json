@@ -1,0 +1,47 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "oxlint",
+    "tokens": "node scripts/gen-tokens.mjs",
+    "tokens:check": "node scripts/gen-tokens.mjs --check",
+    "render:l2": "vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js",
+    "render:composer": "vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js",
+    "vendor:ainative": "node scripts/vendor.mjs",
+    "vendor:beautifului": "node scripts/vendor-beautifului.mjs",
+    "vendor:shadcn": "node scripts/vendor-shadcn.mjs",
+    "render:stream": "vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js",
+    "render:receiver": "vite build --ssr scripts/render-snapshot-receiver.tsx --outDir node_modules/.tmp/receiverrender --logLevel warn && node node_modules/.tmp/receiverrender/render-snapshot-receiver.js",
+    "render:roster": "vite build --ssr scripts/render-task-roster.tsx --outDir node_modules/.tmp/rosterrender --logLevel warn && node node_modules/.tmp/rosterrender/render-task-roster.js",
+    "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js",
+    "render:model-settings": "vite build --ssr scripts/render-model-settings.tsx --outDir node_modules/.tmp/modelrender --logLevel warn && node node_modules/.tmp/modelrender/render-model-settings.js"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "liveline": "^0.0.7",
+    "lucide-react": "^1.47.0",
+    "motion": "^13.4.4",
+    "radix-ui": "^1.6.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}

@@ -1,0 +1,138 @@
+time=2026-11-08T09:45:02.221+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test219AC2WidenAppliedAuditLineCarriesTheFourFields
+time=2026-11-08T09:45:03.719+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/08 09:45:03 mockllm: serving on http://127.0.0.1:51932 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-08T09:45:03.758+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-11-08T09:45:03.784+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-08T09:45:03.790+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-08T01:45:03Z duration_ms=6
+time=2026-11-08T09:45:03.799+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-08T09:45:03.805+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-08T01:45:03Z duration_ms=5
+time=2026-11-08T09:45:03.811+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-08T09:45:03.817+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-08T01:45:03Z duration_ms=5
+time=2026-11-08T09:45:03.825+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-08T09:45:03.833+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-08T01:45:03Z duration_ms=7
+time=2026-11-08T09:45:03.834+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-08T09:45:03.843+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-08T09:45:03.848+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-08T01:45:03Z duration_ms=5
+time=2026-11-08T09:45:03.858+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2WidenAppliedAuditLineCarriesTheFourFields3793400969\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-08T09:45:03.866+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-08T01:45:03Z duration_ms=7
+time=2026-11-08T09:45:03.869+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-08T09:45:03.873+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-08T09:45:03.889+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-11-08T09:45:03.897+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=c2aa11d2-9b60-44ab-850c-aba48b9c6861
+--- PASS: Test219AC2WidenAppliedAuditLineCarriesTheFourFields (1.69s)
+=== RUN   Test219AC2RevokeRoundTripByteForByte
+time=2026-11-08T09:45:05.444+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/08 09:45:05 mockllm: serving on http://127.0.0.1:51950 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-08T09:45:05.487+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-08T09:45:05.514+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-08T09:45:05.523+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-08T01:45:05Z duration_ms=7
+time=2026-11-08T09:45:05.531+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-08T09:45:05.538+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-08T01:45:05Z duration_ms=6
+time=2026-11-08T09:45:05.548+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-08T09:45:05.555+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-08T01:45:05Z duration_ms=7
+time=2026-11-08T09:45:05.567+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-08T09:45:05.577+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-08T01:45:05Z duration_ms=9
+time=2026-11-08T09:45:05.577+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-08T09:45:05.588+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-08T09:45:05.595+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-08T01:45:05Z duration_ms=6
+time=2026-11-08T09:45:05.606+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2RevokeRoundTripByteForByte375463710\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-08T09:45:05.614+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-08T01:45:05Z duration_ms=7
+time=2026-11-08T09:45:05.619+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-08T09:45:05.622+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-08T09:45:05.638+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-11-08T09:45:05.646+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=8f0e5af1-9d78-49f8-a602-d93dd55c05f5
+time=2026-11-08T09:45:05.646+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+--- PASS: Test219AC2RevokeRoundTripByteForByte (1.76s)
+=== RUN   Test219AC2SecondRevokeOfTheSameRuleIsRefused
+time=2026-11-08T09:45:07.279+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/08 09:45:07 mockllm: serving on http://127.0.0.1:51527 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-08T09:45:07.316+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-11-08T09:45:07.349+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-08T09:45:07.357+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-08T01:45:07Z duration_ms=7
+time=2026-11-08T09:45:07.369+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-08T09:45:07.375+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-08T01:45:07Z duration_ms=5
+time=2026-11-08T09:45:07.383+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-08T09:45:07.389+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-08T01:45:07Z duration_ms=5
+time=2026-11-08T09:45:07.399+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-08T09:45:07.406+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-08T01:45:07Z duration_ms=7
+time=2026-11-08T09:45:07.407+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-08T09:45:07.419+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-08T09:45:07.425+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-08T01:45:07Z duration_ms=6
+time=2026-11-08T09:45:07.435+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-08T09:45:07.445+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-08T01:45:07Z duration_ms=9
+time=2026-11-08T09:45:07.453+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-08T09:45:07.456+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-08T09:45:07.470+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-11-08T09:45:07.473+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=67840744-b744-4f49-9e8b-a736d23942c5
+time=2026-11-08T09:45:07.476+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+    asm_amd64.s:1264: no stream ever said "本进程账上没有" after "the revoke verb must answer on the console"
+        stdout:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；L1 确认窗口存活期间，敲任意内容或直接回车＝停（票 170）；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；revoke <规则或目录> 撤销一条长期规则（票 226，只减不加，help 看写法）；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        
+        [确认 L2 fs.write] R1: 工具声明为下界（L1）; R2: 目标路径在授权目录之外: C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\003\t219-ac2-twice.txt
+          规则 R1
+          规则 R2
+          所属任务：t219-ac2-twice
+          队列深度：1
+          完整参数（非摘要）：
+            {
+                  "path": "C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003/t219-ac2-twice.txt",
+                  "content": "long-lived answer"
+                }
+          影响路径：C:\Users\swq\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\003\t219-ac2-twice.txt
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：取消键通道：快捷键取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          窗口 40.0s
+          卡片编号：t219-ac2-twice-corr
+        wisp run: 要存的规则：把这一发存成长期规则会放宽 [fs]：[fs] allowed_dirs += "C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003"
+          这会再起一张 L2 卡（第二重确认，PLAN.md:1645-1646），卡上会印自己的编号；同意它才真写进 config.toml，不答按 C18 超时落拒绝、什么都不写。注意：写入后由下一次启动读取，本次运行仍按现有 [fs] 名单判定。
+        
+        [确认 L2 config.allow_dir] 把这一发存成长期规则会放宽 [fs]：[fs] allowed_dirs += "C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003"（这是「一直」要求的 L2 级重新确认；原来那张卡 t219-ac2-twice-corr 的答复与这张无关，各答各的）
+          所属任务：host:fs-allow-widen
+          队列深度：2
+          完整参数（非摘要）：（本次卡片未随附参数对象）
+          影响路径：C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：取消键通道：快捷键取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          窗口 40.0s
+          卡片编号：approval-2
+        [dismissed] 用户在原生侧批准了本次操作
+        wisp run: 已允许 approval-2（config.allow_dir）：调用已放行，这一发会执行
+        wisp run: 长期规则已写入 config.toml 的 [fs] allowed_dirs：C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003（下一次启动生效，本次运行仍按旧名单）
+        echo: ## scene
+        当前时间：2026-11-08 01:45 +00:00wisp run: 已撤销长期规则 "C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003"：[fs] allowed_dirs 从 2 条减为 1 条，已写回 config.toml；本次运行仍按旧名单判定（撤销与「一直」同轨，生效都在下一次启动）
+        
+        wisp run: 任务 67840744-b744-4f49-9e8b-a736d23942c5 结束（completed，1 轮，0 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+        [warning] 审批将在 30 秒后自动拒绝，请尽快确认
+        
+        stderr:
+        [audit] wisp run: SESSION-MINT id=sess_f2d427826ec02551309d8831e846608c (结束点＝本进程退出，A435 第 2 条)
+        [audit] approval: CLI-VETO-NONE reply_attached=true（票 170：本装配没有声明任何 L1 否决通道；TTY 终端由入口 cmdRun 声明回车通道，非交互支路不假装有否决）
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\\002\\config.toml"
+        [audit] risk/C25: sync-dir detection has no confirmed (env/registry/config) location — paths under the user profile fall back to sync-suspect (P12 safe default)
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\Users\\swq\\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\\002\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on reload_receipt=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效，重载档会告知事件已收到但本宿主没有可重载的子系统"
+        [audit] wisp run: 风险判定 tool=fs.write level=L2 rules=[R1 R2] reason="R1: 工具声明为下界（L1）; R2: 目标路径在授权目录之外: C:\\Users\\swq\\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\\003\\t219-ac2-twice.txt"
+        [audit] approval: queued corr=t219-ac2-twice-corr task=t219-ac2-twice tool=fs.write depth=1
+        [audit] approval: WAITING-STATE state="AwaitingApproval" awaiting=true corr="t219-ac2-twice-corr" tool=fs.write level=L2 paths=1 producer="ui-prompt"
+        [audit] approval: REPLY STAGED corr="t219-ac2-twice-corr" tool=fs.write route="native/always" detail="把这一发存成长期规则会放宽 [fs]：[fs] allowed_dirs += \"C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003\"" when=2026-11-08T09:45:07+08:00
+        [audit] approval: queued corr=approval-2 task=host:fs-allow-widen tool=config.allow_dir depth=2
+        [audit] approval: WAITING-STATE state="AwaitingApproval" awaiting=true corr="t219-ac2-twice-corr" tool=fs.write level=L2 paths=1 producer="ui-prompt"
+        [audit] wisp run: 项目说明加载器 workspace="" globalDir="C:\\Users\\swq\\Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797\\002" enabled=true budget=2300
+        [audit] approval: native route corr=approval-2 allow=true claimed_source="cmd-wisp-console-native"
+        [audit] approval: ANSWER-ALLOW corr=approval-2 tool=config.allow_dir route=native decision=allow
+        [audit] approval: REPLY ANSWERED corr="approval-2" tool=config.allow_dir route="native/allow" detail="原生侧允许" when=2026-11-08T09:45:07+08:00
+        [audit] approval: WAITING-STATE state="AwaitingApproval" awaiting=true corr="t219-ac2-twice-corr" tool=fs.write level=L2 paths=1 producer="ui-dismissed"
+        [audit] projctx: projctx: 没有找到任何项目说明文件（工作区逐级向上与数据目录都查过）
+        [audit] approval: REPLY WIDEN-APPLIED corr="t219-ac2-twice-corr" tool=config.allow_dir route="native/always" detail="dir=\"C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003\" section=fs key=allowed_dirs effect=next-start" when=2026-11-08T09:45:07+08:00
+        [audit] approval: REPLY REVOKED corr="" tool=config.allow_dir route="native/revoke" detail="dir=\"C:/Users/swq/Test219AC2SecondRevokeOfTheSameRuleIsRefused3207798797/003\" entries=2->1 key=fs.allowed_dirs effect=next-start" when=2026-11-08T09:45:07+08:00
+        [audit] tools: C25 scope closed task=67840744-b744-4f49-9e8b-a736d23942c5 was_open=true dropped=0 open_scopes=0 close_err=<nil>
+        [audit] config: HOT-RELOAD state=stopped reason=run-root-cancelled detail="轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到"
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1306.024s
+FAIL

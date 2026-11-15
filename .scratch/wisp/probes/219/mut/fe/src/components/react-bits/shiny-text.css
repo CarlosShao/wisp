@@ -1,0 +1,17 @@
+/* ============================================================================
+   Vendored file - frontend session, 2026-09-26
+   ----------------------------------------------------------------------------
+   Source repo    : github.com/DavidHDev/react-bits
+   Upstream commit: 5480708039d5fba65741802f3811097ab81e3db5 (local clone)
+   Source file    : src/content/TextAnimations/ShinyText/ShinyText.css
+   License        : MIT + Commons Clause v1.0, upstream LICENSE.md
+                    (Copyright (c) 2026 David Haz)
+   Local changes  : provenance header only - the rule below is upstream
+                    verbatim (one display rule, zero colour literals; the
+                    gradient colours ride on the component's required props).
+   Panel status   : NOT mounted - ships with the unmounted ShinyText copy.
+   ============================================================================ */
+
+.shiny-text {
+  display: inline-block;
+}
