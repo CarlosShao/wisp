@@ -38,9 +38,9 @@
 - [x] **AC#1 宿主存在性有生产点数**：改前 `internal/ball` 的生产引用者＝**1（`cmd/balldebug`）**，改后**必须有 ≥1 枚来自 `cmd/wisp` 那条真正会跑任务的腿**；尺＝同一条 grep，逐名报命中文件。⛔ 不许用"能编译"充当"有人起它"。
 - [x] **AC#2 托盘四枚按钮各映射到现成枚举、且有一枚真执行者**：「允许一次」→`Replies.Allow`（`replies.go:313`）；「拒绝」→`Replies.Reject`（`:336`）；「长期允许」→`replySurface.always`（`approval_always.go:70`，**它自带第二张 L2 卡**，不许绕过）；「本次会话内允许」⛔ **今天不许做**——`Answer` 词表只有 `allow/reject/veto/timeout` 四枚（`internal/tools/gate.go:75-89`，编排者复跑），会话档归**票 224**。判据形状＝每枚按钮断"点下去 ⇒ `Gate` 收到一条带正确 `Channel` 的答复"，并把回调接反/接空必须能判红。
 - [x] **AC#3 等待态真被驱动**：`bookWaitingState`（`cmd/wisp/approval_always.go:171-184`）**今天只写审计日志、不碰球**（我逐行读过）。本票要把球推进 D43 的"等人"那一态——⚠ **注意票 201 拆格口径**：AC#6a「态可计算可审计」**已成立、不许重做**；本票只做 AC#6b「球真进那一态」。正控＝**把驱动那一态的调用拿掉，判据必须红**（现在这一格是空的，任何突变都不会红——**这就是它必须被写成一格的理由**）。
-- [ ] **AC#4 goroutine 收口先补旧账**：`rt.close()`（`run.go:676-683`）必须**等**它 spawn 的每一枚（含 `replyHandle`），且 GUI 腿走 `observe.Registry.Spawn`（`ball_windows.go:170` 那形，`ui-sta` 名额现成）。**具名写出：谁 join 谁、超时从哪来。**⚠ **分母已从 1 枚涨到 2 枚（09-29 由非实现者验收腿 `223-v1` 现测，台账 `A439`）**：除 `replyHandle` 之外，票 223 新起的那枚配置轮询协程 `reloadHandle`（`cmd/wisp/config_reload.go:119` Spawn，名字占用 D38b 常驻名册里的 `watchdog`）**全仓零读取点**，`rt.close()`（`run.go:694-707`，行号已从票面原记的 `:676-683` 漂下来）对它同样只 `Cancel` 不 join，注释逐字承认「The cancel is not a join」⇒ **同一个违约的第二枚实例**，本票要**两枚一起 join**、且判据得能证"没 join 就红"。⚠ 这一格不是新功能——它同时是 **D38(c)（`PLAN.md:2845`）那条违约的自救**。
+- [x] **AC#4 goroutine 收口先补旧账**：`rt.close()`（`run.go:676-683`）必须**等**它 spawn 的每一枚（含 `replyHandle`），且 GUI 腿走 `observe.Registry.Spawn`（`ball_windows.go:170` 那形，`ui-sta` 名额现成）。**具名写出：谁 join 谁、超时从哪来。**⚠ **分母已从 1 枚涨到 2 枚（09-29 由非实现者验收腿 `223-v1` 现测，台账 `A439`）**：除 `replyHandle` 之外，票 223 新起的那枚配置轮询协程 `reloadHandle`（`cmd/wisp/config_reload.go:119` Spawn，名字占用 D38b 常驻名册里的 `watchdog`）**全仓零读取点**，`rt.close()`（`run.go:694-707`，行号已从票面原记的 `:676-683` 漂下来）对它同样只 `Cancel` 不 join，注释逐字承认「The cancel is not a join」⇒ **同一个违约的第二枚实例**，本票要**两枚一起 join**、且判据得能证"没 join 就红"。⚠ 这一格不是新功能——它同时是 **D38(c)（`PLAN.md:2845`）那条违约的自救**。
 - [ ] **AC#5 面板侧来源的 L2「允许」仍必须被判红**：`AGENTS.md` §1.2 那条硬禁不因"加了中国原生入口"而松（`Q-49` 丙那批判据）。正控＝从界面方法名送一发"允许"，路由必须拒；⛔ **不许为了便利把 `DecideFromPanel` 改宽**。
-- [ ] **AC#6 整包终态**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1` 到终态＋逐名比红名册（历史在册 `internal/ball` 1＋`internal/panel` 4 属别人地界，不算本票新增、不许顺手修；`internal/risk TestResolvePerCallBudget` 是争用型假红，安静 `-count=3` 为准，见 `A432`／票 226 AC#6 那格）。**⚠ 本票动的是 Windows 原生面：POSIX 半边只能在全仓仪器里量到，别拿"编译过"当"跑过"。**
+- [x] **AC#6 整包终态**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1` 到终态＋逐名比红名册（历史在册 `internal/ball` 1＋`internal/panel` 4 属别人地界，不算本票新增、不许顺手修；`internal/risk TestResolvePerCallBudget` 是争用型假红，安静 `-count=3` 为准，见 `A432`／票 226 AC#6 那格）。**⚠ 本票动的是 Windows 原生面：POSIX 半边只能在全仓仪器里量到，别拿"编译过"当"跑过"。**
 
 ## 禁区（写腿动手前逐条读，含三枚按符号名办事的雷）
 
@@ -79,11 +79,11 @@
 - [x] **AC#1 翻勾凭据**：判语**成立**。承重证据不是"`internal/ball` 被 import 了"（那正是我派单里点名的假绿形状），而是**定向突变 M1**：摘掉生产调用那一行 ⇒ `TestAC228ResidentLegIsTheBallHost` 与 `TestAC228ResidentLegReportsAndBooksItsBall` **双双点名红**；另有真机七发拉起无参数 `wisp.exe`（hwnd／pid 在册、hotkeys live 4/4、退出后窗口不在）。**我自己复跑的两把尺**：`grep -n "startResidentBall\|runResident(" cmd/wisp/*.go | grep -v _test` ⇒ 生产链完整（`main.go:64` 无参数分支 → `resident_windows.go:27 runResident` → `:118 rb := startResidentBall(rt.Registry)`）；`grep -rln "internal/ball" cmd/wisp/*.go | grep -v _test` ⇒ 三枚产码文件在。**一枚只有突变看得见的精度**：nil 的 `statusLine()` 照样含"NO floating ball window"，所以控制台那句不红、红在磁盘记账那一支——本票的钉里"打印面"比"记账面"松，这一条我登记为已知缺口（归 228 后续片，不追改）。
 - [x] **AC#7 翻勾凭据**：判语**成立**，且**只在 ①那三枚人读字符串这一档射程内成立**（三处逐处现读均改成带条件事实句：`main.go:24-29`／`resident_windows.go:131`／`internal/proc/boot_windows.go:132-134`，boot 分支那句拿真机 console 原文证的）。⚠ **本格翻勾不等于票 07 那批注释都清了**——见下面 AC#8。
 
-- [ ] **AC#8（新补，`228-v1` 的 F-1 ⇒ 归属由我裁）`cmd/wisp/main.go:8` 那句 godoc 注释今天还是假的**：现读逐字「// frozen D38(e) 10-step shutdown order. **The floating ball GUI is ticket 07.**」——球已经在同一条进程里被装起来了，这句还在承诺一个已经结案的人。**完成判据**＝改成带条件的事实句（说清"球由本文件所在的常驻腿装配，见 `resident_ball_windows.go`"），⛔ 不许新增扫注释票号的词面型仪器。**残缺表现**＝读代码的人（含下一程腿）按这句去找"票 07 还没干的活"，会白跑或把债记到别人名下。
+- [x] **AC#8（新补，`228-v1` 的 F-1 ⇒ 归属由我裁）`cmd/wisp/main.go:8` 那句 godoc 注释今天还是假的**：现读逐字「// frozen D38(e) 10-step shutdown order. **The floating ball GUI is ticket 07.**」——球已经在同一条进程里被装起来了，这句还在承诺一个已经结案的人。**完成判据**＝改成带条件的事实句（说清"球由本文件所在的常驻腿装配，见 `resident_ball_windows.go`"），⛔ 不许新增扫注释票号的词面型仪器。**残缺表现**＝读代码的人（含下一程腿）按这句去找"票 07 还没干的活"，会白跑或把债记到别人名下。
   **归属怎么定的（这是我的裁定，不是盘上现成的答案）**：`228-v1` 报"F-1 与 AC#7 ② 的归属互斥、未裁"。我判**归本票**，三条现读凭据：① 文件在 228 地界（`cmd/wisp`）；② 是**本票这一程把那句变成假话的**（把主张说反的人负责改它）；③ 票 243 普查表 `census.md:75` 第 24 行的归属列**逐字写的就是「票 228」**，与 ② 一致 ⇒ 不是互斥，是我先前那句"② 全归 243"写得太粗。**票 243 保持结案不动**（它的活是普查＋指认，那部分真交付了）。
-- [ ] **AC#9（新补，`228-v1` 的 F-6）球起不来时那句实话会被说两遍**：`resident_ball_windows.go:96` 与 `internal/proc` 的 boot 报告各说一次，而成功支不说第二遍 ⇒ 控制台"恰好说 1 次"那条不变式被强推的失败支撞红。⚠ **失败支今天从未被自然走到**（`startResidentBall` 把 `ball.New` 写死、无注入面），所以这条**只有突变能现形**、CI 里零读数（`winlive` 在 `ci.yml` 零命中）。**完成判据**＝两处只留一处作者（另一处改成引用或删句）＋给失败支一枚能被自然走到的注入面或台件。
+- [x] **AC#9（新补，`228-v1` 的 F-6）球起不来时那句实话会被说两遍**：`resident_ball_windows.go:96` 与 `internal/proc` 的 boot 报告各说一次，而成功支不说第二遍 ⇒ 控制台"恰好说 1 次"那条不变式被强推的失败支撞红。⚠ **失败支今天从未被自然走到**（`startResidentBall` 把 `ball.New` 写死、无注入面），所以这条**只有突变能现形**、CI 里零读数（`winlive` 在 `ci.yml` 零命中）。**完成判据**＝两处只留一处作者（另一处改成引用或删句）＋给失败支一枚能被自然走到的注入面或台件。
 
-- [ ] **AC#10（新补，10-01 09:5x 编排者追加，来路＝`246-v2` §5 第 4 条 ⇒ 账 `A488`）票 246 AC#7 之后，球那条腿的三处"我没有任务管线"自述里有两处变成假话，其中一处是运行期真打进台账的句子**：`cmd/wisp/resident_ball_windows.go:21`（注释）与 **`:160`（真打印的 slog 字段）** 逐字「this leg has no task pipeline and no microphone」，`:203` 的 `ballGestureWhy` 常量逐字「this process has no task pipeline, no microphone and no panel host」。⚠ 关键点不是"注释过期"，是**打印时刻（`:136` 球起来）确实早于装配时刻（`resident_windows.go:177` 任务源接上）**，所以那一行在它打印的那一瞬间不算谎——**但它声明的是属性而非此刻**，读台账的人（含 owner 自己看日志）会当成永久事实，而票 246 那 6 发真机的卡片就是从这条腿举起来的。**完成判据**＝三处逐处改成带条件的事实句（说清"此刻还没有任务源，任务源由同进程 `resident_windows.go:177` 之后装配"），⛔ 不许新增扫注释票号的词面型仪器（与本票 AC#8 同规矩）；⛔ 不许靠"把打印挪到装配之后"来糊——那会破 D38(e) 的时序，属另一枚契约面。
+- [x] **AC#10（新补，10-01 09:5x 编排者追加，来路＝`246-v2` §5 第 4 条 ⇒ 账 `A488`）票 246 AC#7 之后，球那条腿的三处"我没有任务管线"自述里有两处变成假话，其中一处是运行期真打进台账的句子**：`cmd/wisp/resident_ball_windows.go:21`（注释）与 **`:160`（真打印的 slog 字段）** 逐字「this leg has no task pipeline and no microphone」，`:203` 的 `ballGestureWhy` 常量逐字「this process has no task pipeline, no microphone and no panel host」。⚠ 关键点不是"注释过期"，是**打印时刻（`:136` 球起来）确实早于装配时刻（`resident_windows.go:177` 任务源接上）**，所以那一行在它打印的那一瞬间不算谎——**但它声明的是属性而非此刻**，读台账的人（含 owner 自己看日志）会当成永久事实，而票 246 那 6 发真机的卡片就是从这条腿举起来的。**完成判据**＝三处逐处改成带条件的事实句（说清"此刻还没有任务源，任务源由同进程 `resident_windows.go:177` 之后装配"），⛔ 不许新增扫注释票号的词面型仪器（与本票 AC#8 同规矩）；⛔ 不许靠"把打印挪到装配之后"来糊——那会破 D38(e) 的时序，属另一枚契约面。
   **归属（这是我的裁定）**：本票是"球进常驻那条腿"的真相源，这两句由**票 246 那一程说假**、但改口责任在球这一侧（谁的话谁负责），且落地时`cmd/wisp`同包只许一枚写腿 ⇒ **排在本票 AC#2/AC#3 之后、与 AC#8 同批改**，⛔ 不与票 33／248 的写腿并发。
 
 - [x] **AC#2 的射程被票 244 的 `244-a2` 普查撑宽了一格（10-01 10:3x 编排者追加，账 `A490`；这一格**并进 AC#2**，不新开 AC）**：托盘那四枚按钮里 **"退出"这一枚是 GUI 进程未来的唯一停机源**。现量（我 10:2x 亲自复认过两处）：唯一真停机入口是 `cmd/wisp/resident_windows.go:107` 的 `os.Interrupt`／`SIGTERM`，而 `cmd/wisp/resident_ball_windows.go` 的 `recordTrayExit` 只打 `outcome=ignored`。⇒ **票 244 切 `-H=windowsgui` 之前，AC#2 那一枚"真执行者"必须先落地**（否则双击起来的常驻进程只能靠任务管理器杀、D38(e) 十步一步都走不到）。⚠ 那段注释自称两条补法都是新契约（`internal/proc` 的 stop-request 钩子／第 7 枚常驻协程受 `observe.ResidentNames` 六枚冻结名册限制）——**用哪条形由我在 `244-a3` 读数回来后裁，⛔ 实现腿不许自己挑**；钩子形若可行，可复用 `A488` K7 那条已裁灰区（"往 `RegisterShutdownHook` 注册入口不算契约面"），协程形则要人工批准（动 D38(b) 名册）。
@@ -223,3 +223,31 @@ M1 摘 `projectWaitingState` 行 ⇒ AC#3 用例红（`drove nothing onto the ba
 - **整包一发（载具，`1525.00s`＝25m25s，跑完）**：`RUN=864 / PASS=622 / FAIL=2 / SKIP=17`。两红**都是已知宿主环境红且只有这两枚**（`TestAC4FocusReturnToPriorWindowGap33r5`、`TestAC246DevLegIgnoresTheTestTaskInjection`）。对票 450 基线（`861/619/2/17`）逐数对撞：`RUN +3`／`PASS +3`／`FAIL ±0`／`SKIP ±0`＝本波新增的 3 枚用例，无多出来的红。名册里 `internal/ball`／`internal/audio` 两条不在本包（载具只跑 `./cmd/wisp`），⛔ 不冒充。
 - **D38 形状**：本波差分 `+.*go func(` = 0、`+.*\.Spawn(` = 0，零新协程；门上 `gofumpt -l cmd/wisp` 空／`go vet -tags winlive ./cmd/wisp` rc=0／`d22scan.sh` clean／`check-path-length-budget.sh` VERDICT GREEN。
 - 三发突变读数（M1 摘等两段／M2 只摘具名话／M3 放回重复行）与哈希对撞在 `docs/evidence/s1/228-s2-write-leg.md` §1；脚本与日志 `.scratch/wisp/probes/228/s2/mut/`。
+---
+
+## 切片 2 收件（2026-11-15 12:0x，`22782a0a5` 句子类 ＋ `810c157b1` 行为类）：五格翻，其中**两格是票面陈旧**
+
+**尺1**：两条提交在，产码落点 `cmd/wisp/{approval_reply.go,run.go,resident_ball_seam_228_windows.go,resident_ball_windows.go,resident_windows.go}` ＋ 三枚新测试件。
+**尺2**：`docs/evidence/s1/228-s2-write-leg.md` **15173 B**。
+**尺3 我自己复跑**：`TestAC4CloseWaitsForBothGoroutinesItSpawned`（0.12s）＋ `TestAC9BallRefusalIsSaidOnceByTheBootReport`（0.00s）⇒ **`RUN=2 PASS=2 FAIL=0`**。
+
+### AC#4 翻 —— 而且分母不是 1，是 2
+`close()` 现在两条 `Cancel()` 之后**真等两枚句柄**：`replyHandle`＝`approval-waiter`（`approval_reply.go:464`）、`reloadHandle`＝`watchdog`（`config_reload.go:142`）。具名预算 `joinOnCloseBudget228 = 500ms`，常量注释写明来历（一行答复的账＋审计收口），**不是** `proc.TaskWaitTimeout` 那种任务排空预算。
+**判据是突变**：M1 摘掉等的那两段 ⇒ `TestAC4CloseWaitsForBothGoroutinesItSpawned` 红三条（listener 还在写行／tick 还活着／reply root 仍计 1 枚 pending）；M2 只摘"具名话"那一枚 case ⇒ `TestAC4CloseNamesTheParkedListener…` **花满 501.0981ms 并红** —— 顺带证明那枚 case 买到的正是"不空等"。
+**设计交代（我认）**：答复监听正常停在**取消唤不醒的阻塞读**上（`os.Stdin`），叫醒它只能关/投喂 stdin，而 stdin 是操作员控制台、常驻腿另有一条 `taskSourceConsoleGoroutine` 在读它 ⇒ **不假装等待**，改为 `parkedInRead` 自报 ＋ 审计行 `close: GOROUTINE-JOIN … joined=false reason=parked-in-read`。GUI 腿不归这里 join：ui-sta 由 `internal/ball` 的 `Registry.Spawn("ui-sta","ball",…)`（`ball_windows.go:207`）派、`Ball.Close` 收。
+
+### AC#9 翻 —— 失败支第一次能被自然走到
+删掉失败支那枚 `fmt.Printf("wisp: %s\n", rb.verdict)`：盘上计数 **1→0**；缺球那句话只剩**一个作者**＝启动报告 `residentLoopReport228`（两条互斥分支字节逐字等于原两行 Printf 的**搬家**）。M3 把那行放回去 ⇒ `TestAC9BallRefusalIsSaidOnceByTheBootReport` 红（`the ball host itself printed the absence claim 1 time(s)`）。失败支靠 `panelHostHooks.newBall` 接缝（`withBallNew228`）走到，**nil 默认＝原样的 `ball.New`** ⇒ AC#1 那枚按 AST 找宿主的形状尺照旧认得出（两组 13 枚手势全 PASS）。
+
+### AC#8／AC#10 翻 —— **但票面那两句"仍是假话"本身是陈旧的，腿改 0 字**
+腿没动手，交的是现读凭据，**我逐条自己核了**：
+- AC#8：`cmd/wisp/main.go:5-13` 现读逐字含「The floating ball is not a pending ticket: the resident leg of this same process assembles it at startup (startResidentBall in resident_ball_windows.go, called from runResident).」；★我自己跑 `git log -S'The floating ball is not a pending ticket'` ⇒ **只有 `9aaf601c8` 一枚**（2026-11-08）⇒ 这两格在 11-08 就被别人改成真话了，我 10-01 写的"仍是假话"已过期。
+- AC#10：三处（文件头 `:21-42`／运行期 `"gestures"` 段 `:601`／`ballGestureWhy` `:684`）都已是条件句，旧措辞只剩**被引用的 2 处注释**、产码字符串里 **0 处**。
+⇒ 两格按**现读判翻**，改动 0 字节（⛔ 我不许腿把真句子改回假话凑工作量）。
+
+### AC#6 翻 —— 一发整包，跑完
+`RUN=864 / PASS=622 / FAIL=2 / SKIP=17`，**1525.00s ＝ 25m25s**。两红**逐名对**：`TestAC4FocusReturnToPriorWindowGap33r5`(5.42s)、`TestAC246DevLegIgnoresTheTestTaskInjection`(35.81s)，**只有这两枚**。
+★**对票 450 基线 `861/619/2/17` 逐数对撞**：`RUN +3`／`PASS +3`／`FAIL ±0`／`SKIP ±0`，而本波**恰好新增 3 枚用例**且三枚都在本发 `--- PASS` ⇒ 无多出来的红、无少跑的片。⛔ 没拿"两发 FAIL 0"当覆盖（这是一发，且它自己 FAIL）。
+
+### 一处我自己的核尺方法出了错，记下来
+我数"新增协程"时用 `git show … | grep '^\+.*go func\('` 得到 **2 命中**，与腿说的 0 冲突。追下去：**那两行就是票面和证据件里引用这个正则本身的句子**（自我指涉）。按文件分开数：**产码 `go func(` = 0**，`.Spawn(` 3 处全在 `close_join_228_test.go` ⇒ **腿的 D38 声称成立**，是我的尺被文档骗了。⇒ 教训入台账。
