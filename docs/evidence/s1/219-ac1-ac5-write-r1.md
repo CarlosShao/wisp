@@ -244,9 +244,21 @@
 
 ## 9. 整包读数（A1882 三件套：终点锚／最后一条 `=== RUN`／本波新测试在文件序截断点前还是后）
 
-（本波整包读数由本腿在提交后跑一发填入；**若被 native AV 终止，这里写"第 N 秒被终止＋最后一条 RUN"，不写绿**。）
+- **发次**：本波唯一一发整包 —— `bash scripts/wisp-cli-staged-tests.sh`（**不带** `-test.run`），
+  **跑到底，没被 native AV 终止**（没有 `0xC0000005`）；包自报墙钟 **1572.00s**；
+  日志 `.scratch/wisp/stage-cli/wisp-cli-tests.log`。
+- **四数**：**RUN=878 ／ PASS=634 ／ FAIL=2 ／ SKIP=17**（末行 `FAIL github.com/CarlosShao/wisp/cmd/wisp 1572.00s`）。
+- **FAIL 只有两枚，都是派单点名"本机既有红、不是你的"**：
+  `TestAC4FocusReturnToPriorWindowGap33r5 (4.96s)`（前台被占）／
+  `TestAC246DevLegIgnoresTheTestTaskInjection (37.15s)`（驻留球在跑）。
+  派单点名的第三枚 `Test320FetchLegWritesTheKeyNowhereOnDisk` 本发**绿**（单跑/整包都绿）。
+- **终点锚 `TestZZ315A1` 命中**：三枚全跑（`…RootLoopFirstBridgeCall`／`…SiblingChildFirstBridgeCall`／
+  `…ProjectInstructionsSeedCannotStrandTheFirstTask`），最后一枚 **PASS 0.24s**，序号 **878/878**
+  ⇒ 这一发**跑到了最后一条**，不存在"文件序截断点"。
+- **最后一条 `=== RUN`**：`TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask`。
+- **本波 7 枚新测试的位置**：序号 **10–16 / 878**（`approval_219ac1ac5_test.go` 文件序靠前），
+  即**在截断点之前**（本发无截断点）。逐枚：`…TrayAllowOnce…` 2.22s／`…TrayReject…` 1.98s／
+  `…TrayAlwaysWrites…` 2.20s／`…TheNoPipelineExecutorIsWiredInTheShippedBoot` 0.00s／
+  `…LongReasonIsTruncatedVisibly` 0.00s／`…TheModelAndTheOperatorSeeTheTruncation` 2.04s／
+  `…EmptyReasonIsANamedState` 1.93s —— **7/7 PASS**。
 
-- 终点锚 `TestZZ315A1`：
-- 最后一条 `=== RUN`：
-- 本波 7 枚新测试（文件 `cmd/wisp/approval_219ac1ac5_test.go`）在文件序里的位置：
-- 四数（RUN／PASS／FAIL／SKIP）：
