@@ -1,0 +1,16 @@
+# 派单存档（先存档再发）—— 票 46 审计后三件补齐（写腿，cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+# ⚠ 排队：等 w455guard 收工（cmd/wisp 每波一枚写腿、载具同时只跑一发）再发
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。先读审计件 `docs/evidence/s1/46b-audit-20261115.md`（22089 B）末尾三张表，再读 `.scratch/wisp/issues/46-s6-acceptance.md` 的「审计收件」一节。**三件，全部来自审计，⛔ 自己找活**：
+
+1. **`DiskHeldStats()` 接上生产读者（⛔ 不许删）**：现在全仓非测试命中 2 行（`internal/observe/logging.go:247` 注释 + `:257` 定义），**零生产读者**。接进诊断面：`cmd/wisp/diagnostics_cmd.go`（或 `wisp doctor` 那套检查项）加一行，读 `DiskHeldStats()` 打出「日志被扣住 N 条／丢弃 N 条／回放 N 条」，并在**正常（未被扣住）**时也有一句可读的"未被扣住"（⛔ 只在异常时才有输出）。要一枚**行为牙**：把 `obs.Disk` 置 nil ⇒ 那行必须变（说"未装门控"），⛔ 只断言函数返回值。
+2. **`line()` 增"已装配未挂载"分支**：首装未跑 `wisp models ensure` 时 `attachSettleGate` 静默 return，而启动行仍打"装配（触发＝dispose 级联第 3 步）" ⇒ **假话**。改成三态：真装配 / 已装配但本机无常驻（具名原因）/ 未装配。要一枚测试让"无常驻"这一态**红**（现在它绿着骗人）。
+3. **跳闸按 `ClassResource` 分类**：`internal/observe/guards_45.go:249` 仍裸 `ErrDiskSpaceLow`（我复核：非测试零 `Wrap`）。改成 `Wrap(ClassResource, ErrDiskSpaceLow, …)`（照本仓 `risk`/错误模型既有写法），并给一枚测试断**分类读得出来**且 **`errors.Is` 仍能命中 `ErrDiskSpaceLow`**（⛔ 把身份弄丢）。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`frontend/**`／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test`，有就等（每 20 秒，最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（会绑 System32 的 onnxruntime 1.17 造成 21 枚假红，台账 A1888）。
+**A1880**：三件的牙都要**行为**，⛔ 断言源码字符串。**A1882**：整包读数带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋本波新测试在截断点前/后。**A1884**：两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`。**A1886**：cpu 不涨＝在等，停掉具名用自己的上限让它红。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/observe/**`、`docs/evidence/s1/46-*`。
+回话第一行＝commit hash ＋「`DiskHeldStats` 接在哪一行（file:line）+ 正常时那句输出原文」＋「`line()` 三态各自的原文」＋「`Wrap(ClassResource,…)` 落在哪一行」＋「三枚牙的测试名＋我拆掉时各自的红句」。
