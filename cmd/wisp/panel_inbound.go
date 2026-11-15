@@ -366,20 +366,28 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	}
 	// Ticket 192's wiring leg: the message route gets the ONE handler this tree
 	// has for it, and that handler answers exactly one shape - a preview quote,
-	// through PreviewResolver.QuoteForModel (panel_preview_192.go). Every other
-	// message still refuses by name, because the message RELAY is ticket 35's
-	// socket and this chain does not invent it. nil preview (a chain built by a
-	// caller with no artifacts face) leaves the socket nil: the refusal then
-	// comes from the router, the same shape it had before this ticket.
+	// through PreviewResolver.QuoteForModel (panel_preview_192.go). Ticket 453
+	// wraps it in panelMessageDoor453: preview requests still go to the 192 door
+	// verbatim, and a plain message now has the exit ticket 453 added (the
+	// ledger's stored rows -> OutgoingMessage.ForAgent -> the resident task
+	// slot). The relay inside is nil until the boot binds it (resident_windows.go
+	// after startResidentTaskSource), so a chain built by a caller with no
+	// pipeline still refuses plain messages by name exactly as before.
 	var message panel.MessageRequestHandler
-	if preview != nil {
-		message = newPanelPreviewQuoteDoor(preview, auditf, actor)
+	if preview != nil || drafts != nil {
+		var quote *panelPreviewQuoteDoor
+		if preview != nil {
+			quote = newPanelPreviewQuoteDoor(preview, auditf, actor)
+		}
+		message = newPanelMessageDoor453(quote, drafts, auditf, actor)
 	}
 	return &panel.ComposerDispatch{
 		Mode: modeWrites,
 		// Workspace is ticket 186's and answers where a holder was passed in;
-		// message = ticket 192's preview-quote door where a preview source was,
-		// and ticket 35's unbuilt relay behind it in every other case.
+		// message = ticket 453's door, which forwards preview requests to the
+		// 192 quote door and carries plain messages out through the relay the
+		// resident boot binds. A chain with neither a preview source nor a
+		// ledger leaves it nil, so the router keeps its pre-192 refusal.
 		Workspace: workspace,
 		// Ticket 214 AC#1: the attachment door is answered by the ingest handler
 		// above - the broker's first production caller, on the assembly path.

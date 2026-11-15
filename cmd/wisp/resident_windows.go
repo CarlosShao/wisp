@@ -547,6 +547,14 @@ func runResident() {
 	// bind happens inside, on the first line where that object exists.
 	src := startResidentTaskSource(rt, ra, panelScope)
 
+	// Ticket 453: the panel message door's relay. The chain above was assembled
+	// before the task pipeline existed, so this is the first line where both
+	// objects do exist; bindPanelMessageRelay453 walks the chain's message socket
+	// and hands it src.SubmitPanelMessage453. If either side is absent (refused
+	// panel, refused pipeline) the relay stays nil and the door keeps refusing
+	// plain messages by name - the pre-453 behaviour, not a silent drop.
+	bindPanelMessageRelay453(rp, src)
+
 	// Ticket 228 AC#2/AC#3: the two hops this slice adds, both on the first line
 	// where the runtime (and therefore the card ledger and the answer surface)
 	// exists:

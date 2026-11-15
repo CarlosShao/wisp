@@ -210,11 +210,18 @@ func Test192ResidentAssemblyWiresThePreviewStack(t *testing.T) {
 	if host.disp == nil || host.disp.Message == nil {
 		t.Fatal("the resident chain has no message handler attached, so panel.message.send would be refused by the router and QuoteForModel would have no production caller")
 	}
-	door, ok := host.disp.Message.(*panelPreviewQuoteDoor)
+	// Ticket 453 wrapped the socket: the chain's message handler is now the
+	// composite door, and its PREVIEW half must still be the 192 door over the
+	// same source. Both halves are read here so the wrapper cannot be wired to a
+	// second preview source - or drop the preview branch - without this reddening.
+	door, ok := host.disp.Message.(*panelMessageDoor453)
 	if !ok {
-		t.Fatalf("the resident chain's message socket is %T, want *panelPreviewQuoteDoor", host.disp.Message)
+		t.Fatalf("the resident chain's message socket is %T, want *panelMessageDoor453", host.disp.Message)
 	}
-	if door.src != src {
+	if door.preview == nil {
+		t.Fatal("the composite message door carries no 192 preview door: preview quotes would lose their only QuoteForModel caller")
+	}
+	if door.preview.src != src {
 		t.Error("the door and the window were handed two different preview sources: 'which artifact is that' would have two answers")
 	}
 	// The engine bind belongs to the boot line where the task pipeline appears;

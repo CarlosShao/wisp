@@ -498,6 +498,14 @@ type agentRuntime struct {
 	// the boot writes it while publishes read it.
 	attMu       sync.Mutex
 	attachments *attachmentDraftLedger
+	// msgMu / pendingMarks453 are ticket 453's one-slot handoff from the panel
+	// message door to the task boundary. The door stages the ledger rows it
+	// selected; admitTask consumes them under the task id the loop minted (the
+	// first moment that id exists) and marks each one in C25. Nothing else reads
+	// this field, and execute() clears it on the way out so a task that never
+	// reached admission cannot leave a stale mark for the next one.
+	msgMu           sync.Mutex
+	pendingMarks453 []panel.AttachmentRef
 	// lastSnap / lastSnapBytes are the most recent packet this run built, kept
 	// for the same reason consoleApprovalUI.cards is kept: the production path
 	// records what it did, and a reader asks afterwards. The ledger cannot hold
@@ -1810,6 +1818,12 @@ func (rt *agentRuntime) admitTask(taskID string) func() {
 	// failing closed as an unbound one (ticket 315).
 	rt.bridge.OpenTask(taskID)
 	revoke := rt.gate.AdmitTextTask(taskID)
+	// Ticket 453: the panel attachment's C25 stamp. The door staged the ledger
+	// rows when it accepted the message; this is the first hook that receives the
+	// task id the TEXT loop minted, so this is the only scope the mark can target
+	// that CloseTask below will also close (bridge.go:989-997 names the legs that
+	// dispatch with host-invented ids - this is deliberately not one of them).
+	rt.markPanelMessage453(taskID)
 	return func() {
 		if revoke != nil {
 			revoke()
@@ -2010,6 +2024,11 @@ func (c *gatedChainDispatch) Stream(ctx context.Context, req *llm.Request, emit 
 }
 
 func (rt *agentRuntime) execute(parent context.Context, task string) int {
+	// Ticket 453: a staged panel-message mark belongs to THIS task's admission.
+	// If assembly fails before the loop reaches admitTask, the rows must not
+	// survive into the next task's scope; admitTask consumes them on the normal
+	// path, so this defer is the no-op there and the honest cleanup here.
+	defer rt.clearPanelMessage453()
 	// The LIVE config, read per task: since ticket 223 a resident 1s tick hot-
 	// applies changed sections into the Manager, so reading the boot snapshot
 	// here (the shape before ticket 233) meant every task kept acting on the

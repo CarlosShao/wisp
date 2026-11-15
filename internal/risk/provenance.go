@@ -92,14 +92,28 @@ const (
 	// SrcTaskOutput is what a background task printed: outside content by
 	// origin, however domestic the door that reads it back is (ticket 175).
 	SrcTaskOutput = "task.output"
+	// SrcPanelAttachment is a file the USER handed the panel (ticket 453;
+	// promised by ticket 214 AC#5). It is outside content in the same sense
+	// doc.read is: the bytes came from outside the model's provenance, and a
+	// message that carries them is the point at which they enter a task's
+	// context. NOTES:
+	//   - SPEC-06 §5's enumeration (the doc line this constant's neighbours
+	//     quote) does not name it yet; adding that sentence is Q-456, the
+	//     owner's approval surface, and this constant is the code-side name the
+	//     wiring uses meanwhile.
+	//   - origin carries the artifacts coordinate ("artifact:<bare name>"), the
+	//     one string the agent's rendered message also carries.
+	SrcPanelAttachment = "panel.attachment"
 )
 
-// sensitiveSourceTools is the SPEC-06 §5 set (marker-side only; a Mark() for
-// any other tool is still honored fail-closed, just logged).
+// sensitiveSourceTools is SPEC-06 §5's list PLUS SrcPanelAttachment (ticket
+// 453: the spec sentence for that one is Q-456, pending the owner; the code-side
+// roster is what IsSensitiveSource and the fail-closed log consult). Marker-side
+// only: a Mark() for any other tool is still honored fail-closed, just logged.
 var sensitiveSourceTools = []string{
 	SrcFSRead, SrcSearchContent, SrcClipboardRead, SrcSystemGet,
 	SrcWebFetch, SrcDocRead, SrcScreenCapture, SrcTranscript,
-	SrcTaskOutput,
+	SrcTaskOutput, SrcPanelAttachment,
 }
 
 // IsSensitiveSource reports whether a tool is in the contract marking set.

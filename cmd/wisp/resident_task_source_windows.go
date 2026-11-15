@@ -510,6 +510,33 @@ func (src *residentTaskSource) submitTask(text string) error {
 	return nil
 }
 
+// SubmitPanelMessage453 is ticket 453's exit: the panel message door hands the
+// rendered message (OutgoingMessage.ForAgent) and the ledger rows it came from
+// to the ONE task slot this process owns.
+//
+// The rows are staged on the runtime BEFORE the task starts, because the task id
+// the C25 mark needs does not exist yet - the loop mints it inside RunAsync.
+// agentRuntime.admitTask consumes the staged rows on the first hook that receives
+// that id; execute() clears anything left over if assembly fails before then.
+//
+// A refused submission (slot busy, entry closed, empty text) clears the staged
+// rows in the same call: the marks belong to THIS message and must not leak into
+// whatever task the slot runs next.
+func (src *residentTaskSource) SubmitPanelMessage453(ctx context.Context, rendered string, marks []panel.AttachmentRef) error {
+	if src == nil || src.run == nil {
+		return fmt.Errorf("%w: 本进程没有任务管线（任务入口没有起来），面板消息没有送进模型", panel.ErrNoHandlerAttached)
+	}
+	if ctx != nil && ctx.Err() != nil {
+		return fmt.Errorf("%w: 这条面板消息在提交前已被取消", panel.ErrComposerRequest)
+	}
+	src.run.stagePanelMessage453(marks)
+	if err := src.submitTask(rendered); err != nil {
+		src.run.clearPanelMessage453()
+		return err
+	}
+	return nil
+}
+
 // noteTaskFinished frees the single slot. The exit code is booked, not swallowed:
 // a resident leg has no exit code of its own to carry it in.
 func (src *residentTaskSource) noteTaskFinished(code int) {
