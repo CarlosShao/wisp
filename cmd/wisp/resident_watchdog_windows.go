@@ -78,6 +78,11 @@ func startResidentWatchdog(rt *proc.Runtime, rv *residentVoice, panel *PanelMana
 	}
 	loop.Start(root.Ctx)
 	gate := newResidentSettleGate(loop, tree, rt.Registry, root, stateFn)
+	// The attach half marks the mount result on the gate (the named reason for
+	// an unmounted gate is the boot's own voice-leg verdict), and the boot row
+	// reads it back: an assembled gate that found no residency prints the
+	// assembled-but-unmounted sentence, never the assembled one (the 46b
+	// audit's ruling on the false boot claim).
 	rv.attachSettleGate(gate)
 	return loop, root, gate
 }

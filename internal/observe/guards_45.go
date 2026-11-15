@@ -245,8 +245,16 @@ func (g *DiskGuard) check(c WriteClass, tell bool) error {
 		}
 	}
 	if tripped {
-		return fmt.Errorf("%w: volume %s free %d < threshold %d, write class %q stopped",
-			ErrDiskSpaceLow, g.volume, free, g.threshold, c.String())
+		// D37 class on the trip itself (the 46b audit's "另记 2 条" #2; ticket
+		// 46's ticket face named this half and it had stayed bare): the
+		// pre-mortem disk-full row needs a readable ClassResource at the
+		// boundary, and the sentinel keeps its identity through Wrap, so every
+		// existing errors.Is(ErrDiskSpaceLow) caller reads the same answer as
+		// before - only now the class travels with it.
+		return Wrap(ClassResource,
+			fmt.Errorf("%w: volume %s free %d < threshold %d, write class %q stopped",
+				ErrDiskSpaceLow, g.volume, free, g.threshold, c.String()),
+			"disk-full guard refused a gated write")
 	}
 	return nil
 }

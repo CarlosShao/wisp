@@ -95,6 +95,15 @@ type residentSettleGate struct {
 	lastPeak   int64
 	lastBackMS int64
 	lastFinal  int64
+
+	// attached / unattachedReason are the mount half of the boot row (the 46b
+	// audit's "另记 2 条" #1): an assembled-but-unmounted gate must say so with
+	// a named reason instead of the assembled sentence, because a boot whose
+	// voice leg never materialized (first install without `wisp models ensure`
+	// is the common shape) has NO trigger in the dispose cascade - claiming
+	// "装配" there was a false statement measured by the audit.
+	attached         bool
+	unattachedReason string
 }
 
 // newResidentSettleGate arms the gate. loop and tree are required - the verdict
@@ -259,23 +268,82 @@ func (g *residentSettleGate) abort(reason string) {
 // what its evidence is. It states no window number on purpose - the window is
 // the loop's own SettleWithin (D32's 10s row, watchdog.go:225-228) and this
 // assembly does not restate a frozen default it does not own.
+//
+// Three states, per the 46b audit's ruling (the old two-state line was a false
+// claim on every boot whose voice leg never materialized: first install
+// without `wisp models ensure` is the COMMON shape, the gate sat assembled but
+// unmounted, and the row still said the dispose cascade would trigger it):
+//
+//   - 未装配 (g == nil): no watchdog loop, no verifier at all;
+//   - 已装配但未挂载 (assembled, attachSettleGate found nothing to mount on):
+//     the loop and the tree exist, but this boot built no voice residency, so
+//     the dispose cascade's third step will never reach the gate - the reason
+//     is named, taken from the boot's own voice-leg verdict;
+//   - 装配 (mounted): the cascade's third step really calls this gate.
 func (g *residentSettleGate) line() string {
 	if g == nil {
 		return "收口闸：未装配（本进程没有 watchdog 循环，D32 settle 行在这次启动里没有验证者）"
+	}
+	g.mu.Lock()
+	attached, reason := g.attached, g.unattachedReason
+	g.mu.Unlock()
+	if !attached {
+		if reason == "" {
+			reason = "startResidentWatchdog 尚未执行挂载（装配与挂载之间）"
+		}
+		return "收口闸：已装配但未挂载（" + reason +
+			"）：dispose 级联第 3 步摸不到这枚闸，D32 settle 行在这次启动里不会被触发验证"
 	}
 	return "收口闸：装配（触发＝会话 dispose 级联第 3 步 FreeOSMemory；目标态＝D43 机现态，非采样态回落 Sleeping；" +
 		"窗口＝watchdog 的 SettleWithin；证据＝watchdog settle verification 日志行＋三次连续失败升 D43#35）"
 }
 
+// markAttached / markUnattached record the mount half of line(). attachSettleGate
+// (resident_windows-side wrapper) is the only caller, so the row can only move
+// from unmounted to mounted, never the other way.
+func (g *residentSettleGate) markAttached() {
+	if g == nil {
+		return
+	}
+	g.mu.Lock()
+	g.attached = true
+	g.unattachedReason = ""
+	g.mu.Unlock()
+}
+
+func (g *residentSettleGate) markUnattached(reason string) {
+	if g == nil {
+		return
+	}
+	g.mu.Lock()
+	g.attached = false
+	g.unattachedReason = reason
+	g.mu.Unlock()
+}
+
 // attachSettleGate hands the gate to the voice leg's residency, which is what
 // the dispose cascade's third step reads. On a boot with no voice leg (or no
 // residency) there is nothing to arm and the boot row says the gate is
-// assembled-but-unread rather than pretending a trigger exists.
-func (rv *residentVoice) attachSettleGate(g *residentSettleGate) {
-	if rv == nil || rv.residency == nil {
-		return
+// assembled-but-unmounted rather than pretending a trigger exists - with the
+// named reason the boot itself produced (buildResidentVoice's verdict), so the
+// row points at the actual cause instead of a generic "no residency".
+//
+// The returned bool is the mount result the boot row reads; true means the
+// residency now holds the gate.
+func (rv *residentVoice) attachSettleGate(g *residentSettleGate) bool {
+	if rv == nil {
+		if g != nil {
+			g.markUnattached("本进程没有语音腿（residentVoice 为 nil）")
+		}
+		return false
 	}
-	rv.residency.attachSettleGate(g)
+	if rv.residency == nil {
+		if g != nil {
+			g.markUnattached("语音腿未构造无常驻（" + rv.verdict + "）")
+		}
+		return false
+	}
+	return rv.residency.attachSettleGate(g)
 }
 
 // settleGateSnapshot is the readable state (diagnostics and the evidence

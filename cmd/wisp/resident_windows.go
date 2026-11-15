@@ -887,6 +887,12 @@ func runResident() {
 	// gate itself fires from the dispose cascade's third step
 	// (resident_voice_engines_windows.go's scopeOptions FreeOSMemory hook).
 	fmt.Printf("wisp: %s；安全卸载白名单组件：%v\n", settleGate.line(), wd.Registered())
+	// TICKET 46 post-audit: the disk gate's own reading, at the one boot that
+	// owns the gated writer (see diskgate_diag_46_windows.go for why this is
+	// the resident's row and not a doctor/diagnostics line). Printed
+	// unconditionally - the healthy posture has its own sentence - so an
+	// operator who has never seen pressure still knows the gate exists.
+	fmt.Printf("wisp: %s\n", diskHeldStatsLine46(sink.pipeline46()))
 
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).

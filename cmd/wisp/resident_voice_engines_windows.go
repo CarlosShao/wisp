@@ -612,13 +612,25 @@ func (r *voiceResidency) settleGateNow() *residentSettleGate {
 // attachSettleGate arms the D32 settle-row verification on this residency.
 // Called once, by startResidentWatchdog, after the loop exists: before that line
 // there is no loop to verify with, so an earlier call could only be a lie.
-func (r *voiceResidency) attachSettleGate(g *residentSettleGate) {
-	if r == nil || g == nil {
-		return
+// The returned bool is the mount result (true = the residency now holds the
+// gate); the boot row reads it, so an assembled-but-unmounted gate names
+// itself instead of claiming the dispose cascade will trigger it (the 46b
+// audit's finding: on a boot with no residency that row was a false claim).
+func (r *voiceResidency) attachSettleGate(g *residentSettleGate) bool {
+	if r == nil {
+		return false
+	}
+	if g == nil {
+		return false
 	}
 	r.mu.Lock()
 	r.settleGate = g
 	r.mu.Unlock()
+	// The gate learns its own mount state here, so the boot row can read it
+	// back (line()'s three states; the 46b audit's ruling). Unmounted stays
+	// whatever attachSettleGate's refusal branches marked on the gate.
+	g.markAttached()
+	return true
 }
 
 // abortSettleCheck cancels an in-flight verification, if any (see openScope).

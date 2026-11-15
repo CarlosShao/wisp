@@ -235,6 +235,16 @@ func Test46SettleGateLineNamesItsTrigger(t *testing.T) {
 	root := observe.NewRoot("46-settle-line")
 	t.Cleanup(root.Cancel)
 	gate := newResidentSettleGate(settleLoop46(t, tree, reg, 50*time.Millisecond), tree, reg, root, nil)
+	// 46 post-audit (three-state boot row): an assembly that never ran the
+	// mount half is NOT the assembled posture any more - it is
+	// assembled-but-unmounted, which is exactly the state the audit found the
+	// old two-state line lying about. Reach the assembled posture the way the
+	// boot does: through the production attach half onto a real residency
+	// (the mount result is the row's own mount reading).
+	rv := &residentVoice{residency: newVoiceResidency(voicePlan{}, newVoiceOwnerQueue(), nil)}
+	if !rv.attachSettleGate(gate) {
+		t.Fatal("46: the production attach half refused to mount the gate on a real residency")
+	}
 	line := gate.line()
 	for _, want := range []string{"FreeOSMemory", "Sleeping", "SettleWithin", "D43#35"} {
 		if !strings.Contains(line, want) {
