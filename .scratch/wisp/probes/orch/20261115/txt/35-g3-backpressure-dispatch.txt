@@ -1,0 +1,30 @@
+# 派单存档（先存档再发）—— 票 35 AC#5 背压：把无界推包队列收住（写腿，cmd/wisp）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/35-panel-bridge-c17.md` 的 `:49` 那格（背压）**连同它下面 10-08 11:3x 那条就地裁定**，再读 `docs/evidence/s1/35-recon-20261115.md` 的 ⑤ 那一节（侦察腿现跑过，读数在）。
+
+**侦察给的现状（我认这份读数）**：
+1. ★**推包队列仍是无界的**：`w.dispatchq = append(...)`，而库那侧 `go-webview2` 的 `webview.go:443-448` 就是往一枚**无 cap 切片**上 append。⇒ 消费端一堵，内存无上限地涨。
+2. **`failedPost` 在非测试代码里读点 = 0 枚** ⇒ 推失败**没有任何人会知道**（既不上报也不重试）。「背压」在这一侧今天等于不存在。
+3. **现有四枚尺（35r8）量的是 StreamLog，不是推包队列** ⇒ 打错了被测物（A1880 的亲戚：不是字面钉，但**测的不是那个东西**）。
+4. **`heapDelta` 是 `uint64`**：下溢后被 `overCap` 读成"远超上限"，而 `:385` **只对 m4 断言**、m1 的堆读数**只打印不判** ⇒ 修这一格时把这两处一起修（下溢要显式判负，m1 也要有断言，⛔ 只打印）。
+
+**要做**（按价值）：
+1. **给推包队列一个有界形状**（主流 harness 的形状：有界环形 buffer／或"合并同类项 + 上限 + 丢弃最旧"，⛔ 不要"丢最新的"）。上限值与依据写清（可用 `internal/observe/thresholds.go` 的**读**，⛔ 不准改那文件一个字节）。
+2. **把 `failedPost` 接上真读点**：推失败必须有**可核的落点**（计数＋一条可读出口），且**在盘上能被测试读到**。
+3. **换尺**：把 35r8 那四枚"量 StreamLog"的断言改成**量推包队列本身**（或另立四枚并**具名说明旧的为什么不够**）。
+4. **修 `heapDelta` 下溢＋给 m1 真断言**。
+
+**AC#5 那一格已被 10-08 的裁定改过口径**：先去读那条裁定，**"merges" 与 "content integrity kept" 两句已被票 197 leg B 的重裁取代** ⇒ ⛔ 别照旧句子去实现；按裁定后的口径做，并在证据里写明"我按 10-08 那枚裁定，不按旧句"。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／SLO 阈值／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 表／`frontend/**`／`design/**`；⛔ 放宽既有断言（要有界就是**真的**有界，⛔ 把上限设成一个大到永不触发的数）；⛔push；新协程走 `observe.Registry.Spawn`。
+**A1880**：判"接线成立"必须给**行为牙**（删掉/改坏某个**被测行为**变红），⛔ 只让断言源码字符串的测试红。
+**A1882**：`go test ./cmd/wisp` 走载具一次一发；整包读数**必须**带 ①终点锚 `TestZZ315A1` 是否命中 ②最后一条 `=== RUN` ③本波新测试在截断点**前**还是**后**。⛔ 只报 `PASS=N`。
+**A1884**：两个 `sh` 门必须用 `D:\work\soft\Git\bin\bash.exe` 跑（裸 `bash` 命中 WSL 会假红）。
+**A1886**：任何一发测试若 `cpu` 长时间几乎不涨 ⇒ 它是**在等**，不是"在算"；停掉、具名、用**你自己的上限**让它红。
+本机已知红三枚不是你的：`TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC246DevLegIgnoresTheTestTaskInjection`／`Test320FetchLegWritesTheKeyNowhereOnDisk`。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/panel/**`（⛔ 只读：同波另有他腿用它）、`docs/evidence/s1/35-*`。
+⚠ `internal/panel/**` 本波**别写** —— 若你判断必须动它，**停下来在回话里说清要动哪一处、为什么**，我另派。
+
+回话第一行＝commit hash ＋「队列现在是什么形状（有界/大小/依据 file:line）」＋「`failedPost` 的读点在哪」＋「35r8 那四枚换成了什么」＋「`heapDelta` 下溢怎么修的」＋「整包终点锚命中/未命中＋最后一条 RUN」。没干完写「未完成，卡在哪」。
