@@ -1,0 +1,31 @@
+i,ts,alive,cpu_s,ws_mb,stdout_bytes,stderr_bytes,webview2,competitors,desktop,last_stdout_line
+1,12:49:07,True,0.09,21.1,57,134,37,0,Default,=== RUN   TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+2,12:49:28,True,3.11,69,2010,26050,37,0,Default,=== RUN   Test219AC2WidenAppliedAuditLineCarriesTheFourFields
+3,12:49:48,True,4.11,69.7,2369,40060,37,1,Default,=== RUN   Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack
+4,12:50:08,True,4.11,69.6,2369,40060,37,1,Default,=== RUN   Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack
+5,12:50:29,True,5.42,71.1,3704,56284,37,0,Default,=== RUN   TestUnansweredL2CardTimesOutIntoRejectNeverExecution
+6,12:50:49,True,5.42,71.1,3704,56284,37,0,Default,=== RUN   TestUnansweredL2CardTimesOutIntoRejectNeverExecution
+7,12:51:09,True,6.28,70.8,4367,70072,37,0,Default,=== RUN   TestReplyRevokeRemovesTheStoredRuleForTheNextStart
+8,12:51:29,True,6.3,70.8,4367,70072,37,1,Default,=== RUN   TestReplyRevokeRemovesTheStoredRuleForTheNextStart
+9,12:51:50,True,6.39,71,4496,70072,37,0,Default,=== RUN   TestReplyRevokeRefusesARuleTheProcessDoesNotHold
+10,12:52:10,True,8.25,71,5976,99380,37,0,Default,=== RUN   Test170AnyInputStopsTheL1Window
+11,12:52:30,True,10.03,72.7,9391,130308,47,0,Default,=== RUN   Test230AC4AnATierEntryCannotBeArmedFromConfig
+12,12:52:51,True,13.06,73.3,26622,156738,37,0,Default,=== RUN   TestTicket223RunArmsTheReloadTick
+13,12:53:11,True,14.17,73.4,27082,172924,37,0,Default,=== RUN   TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+14,12:53:31,True,15.25,74.4,27524,192809,37,0,Default,=== RUN   TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面
+15,12:53:52,True,16.19,74.8,34296,204892,37,0,Default,=== RUN   Test233HotTierAgentReachesTheNextTask
+16,12:54:12,True,20.88,97.2,43661,235690,37,0,Default,=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+17,12:54:33,True,20.88,97.2,43661,235690,37,0,Default,=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+18,12:54:53,True,22.03,159.1,52595,235690,37,0,Default,=== RUN   TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+19,12:55:13,True,25.19,97.4,74028,271351,43,0,Default,=== RUN   TestLive43QueryEndSessionExitsWithin5s
+20,12:55:34,True,25.47,98.6,74246,274291,37,0,Default,=== RUN   TestLive43KillNineMidTaskMarksInterruptedOnNextBoot
+21,12:55:54,True,30.11,121,102003,356179,52,0,Default,=== RUN   TestCleanCheckoutBuilds_AC11
+22,12:56:14,True,36.89,405.7,102003,356179,52,0,Default,=== RUN   TestCleanCheckoutBuilds_AC11
+23,12:56:35,True,55.5,399.1,102003,356179,52,0,Default,=== RUN   TestCleanCheckoutBuilds_AC11
+24,12:56:55,True,57.34,399.1,102147,356179,52,0,Default,    panel_host_gate_test.go:423: clean-checkout go build ./... ok in C:\Users\swq\AppData\Local\Temp\TestCleanCheckoutBuilds_AC113097483950\001
+25,12:57:15,True,64.73,118.9,108853,381853,62,0,Default,=== RUN   TestRunPacketLightsTheRosterRowOfItsLiveL1Window
+26,12:57:36,True,67.33,152.6,138121,410552,62,0,Default,=== RUN   TestRunBooksWithASnapshotOfItsLiveQueue
+27,12:57:56,True,67.39,152.7,138121,410552,62,0,Default,=== RUN   TestRunBooksWithASnapshotOfItsLiveQueue
+28,12:58:16,True,70.33,115.8,156116,456353,92,0,Default,=== RUN   TestPanelThreadIsSTAAndExitsCleanly
+29,12:58:37,False,,,157725,471116,37,0,Default,wisp: panel window hidden (focus returned to hwnd 0x5701544)
+END_DETECTED alive=false

@@ -1,0 +1,12 @@
+EXE=D:\tmp\wisp\20261115\w314\wisp-winlive.test.exe
+CWD=D:\work\workspace\projects plans\Wisp\cmd\wisp
+ARGS=-test.count=1 -test.timeout=90m -test.v
+PID=24016
+START=2026-11-15 12:49:06
+END=2026-11-15 12:58:21
+ELAPSED_S=554.5
+EXIT_CODE_DEC=-1073741819
+EXIT_CODE_HEX=0xC0000005
+EXIT_CODE_U32=3221225477
+STDOUT_BYTES=157725
+STDERR_BYTES=471116

@@ -1,0 +1,24 @@
+GATE_START=2026-11-15 12:41:32
+GATE_BUSY ts=12:41:33 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:41:53 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:42:13 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:42:34 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:42:54 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:43:14 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:43:35 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:43:55 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:44:16 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:44:36 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:44:56 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:45:17 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:45:37 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:45:57 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:46:17 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:46:38 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:46:58 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:47:18 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:47:39 pid=51336 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v
+GATE_BUSY ts=12:47:59 pid=7708 cl="D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe" -test.count=1 -test.timeout=90m -test.v -test.run ^Test320FetchLegWritesTheKeyNowhereOnDisk$
+GATE_FREE ts=2026-11-15 12:49:00 (60s with no test binary alive)
+GATE_LAUNCH ts=2026-11-15 12:49:05
+GATE_DONE ts=2026-11-15 12:58:21 rc=0

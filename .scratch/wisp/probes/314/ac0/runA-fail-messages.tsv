@@ -1,0 +1,121 @@
+Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack	read the pristine revoke verb: open approval_revoke.go: The system cannot find the file specified.
+TestTicket21S2BadgeWiringCensus	parse resident_approval_windows.go: open resident_approval_windows.go: The system cannot find the file specified.
+TestTicket21S2BadgePostsAreOrderedStateThenDepth	parse: open resident_approval_windows.go: The system cannot find the file specified.
+Test44R3RunGoAppliesTheWiring	open run.go: The system cannot find the file specified.
+TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128	AC#2 RED (the instrument): no .go files in .: empty instrument, and an empty instrument is red
+TestAC5RefusalSentenceHasOneWordingPoint128	AC#5 RED (the instrument): cannot list this package's sources (<nil>, 0 files)
+TestAC2RealProcessRefusesOnEveryLegWithoutAppData128	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC4Distinctness133NoTwoLegsWearTheSameRow	the census of this directory is red, so the rows below cannot be judged: [func main is not declared in this directory, so there is no dispatch to read]
+TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC321PanelHopDrivesTheHolderToggle	parsing resident_windows.go (the instrument, not the code): open resident_windows.go: The system cannot find the file specified.
+TestAC321NamedExecutorIsTheToggleRoad	this package holds no production .go file, so every claim below is an empty instrument
+TestTicket198FirstRunCallerIsTheRunEntryOnly	loading package main: no .go files in .: empty instrument, and an empty instrument is red
+TestTicket198R2AC4ReceiptNamesTheRealEntryPoints	loading package main: no .go files in .: empty instrument, and an empty instrument is red
+TestTicket257R2AC3CredentialSurfaceUntouched	open firstrun.go: The system cannot find the file specified.
+TestAC1AC2DispatchHopGate133	AC#1/#2 RED: func main is not declared in this directory, so there is no dispatch to read
+TestAC4EveryLegIsNailedOrRuled	AC#4 RED (the instrument, not the code): no .go files in .: empty instrument, and an empty instrument is red
+TestLive43QueryEndSessionExitsWithin5s	WISP_43_REPO_ROOT is not set: the staging runner must name the checkout
+TestLive43KillNineMidTaskMarksInterruptedOnNextBoot	WISP_43_REPO_ROOT is not set: the staging runner must name the checkout
+Test357VerifyTailIsStillOnThePassingPath	parsing models.go: open models.go: The system cannot find the file specified.
+TestWaveAssemblyRootsCarryTheReaders	read run.go: open run.go: The system cannot find the file specified.
+TestAC1CmdSideEmitsNoVerdictTokens	parse panel_assets.go: open panel_assets.go: The system cannot find the file specified.
+Test422AssemblyRootCarriesTheBallSizeReader	read run.go: open run.go: The system cannot find the file specified.
+Test65AssemblyRootCarriesTheBallStyleReader	read run.go: open run.go: The system cannot find the file specified.
+Test213AssemblyRootCarriesTheCommandsReader	read run.go: open run.go: The system cannot find the file specified.
+TestAC10AssemblyRootWiresBothSources	read the assembly root: open panel_resident_windows.go: The system cannot find the file specified.
+TestAC6CSPHeaderHasOneBuildSite33r14	read panel_control_windows.go: open panel_control_windows.go: The system cannot find the file specified.
+TestSecondLaunchActivationRaisesThePanel319	the prior window 0x6A51130 did not take the foreground (the foreground is 0x5701544), so 'was the panel raised' cannot be decided on this desktop; this is a failed measurement, not a product verdict
+TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319	the prior window 0xEC30862 did not take the foreground (the foreground is 0x5701544), so the foreground reading below would be about an unknown desktop; this is a failed measurement, not a product verdict
+TestTransportDoorBindingMatchesRoster253r1	253r1 census found zero .go files in .: the ruler has no subject
+TestTicket255RealWindowWidthFollowsTheConfig	REAL WINDOW 255: asked 640x400 -> GetWindowRect 640x400 (hwnd 0x861842); after dispose+show asked 900x400 -> 900x400 (hwnd 0x1B5158A); implied scale 1.0000; geometry source read 2 time(s) for 2 creates
+TestPanelHostOpensNoListeningSocketL1	parse host source panel_host_windows.go: open panel_host_windows.go: The system cannot find the file specified.
+TestAC1SessionDisposeHasAProductionTrigger_AC1	the dispose scan parsed 0 production files - the instrument is not looking at the package it claims to cover
+TestAC4FocusReturnToPriorWindowGap33r5	AC#4 focus hop (head bf4adaa7b): foreground before any panel 0x5701544 | the ruler's own editor window 0x199e0476 | foreground while hidden (prior) 0x5701544 | after Show 0x5701544 | panel hwnd 0x1b8158a | prevFocus recorded at Show 0x5701544 | after Hide 0x5701544 | Hide attempted restore to 0x5701544 (SetForegroundWindow 1, SetFocus 0)
+TestAC9ComposerDispatchHasAProductionCaller	AC#9 RED (the instrument, not the code): cannot enumerate this directory's sources: <nil>
+TestLockedSuffixNeverTakesTheLockItself33r11	the census found zero .go files in the package directory: the ruler has no subject
+TestTicket114r2TheResidentAssemblyRootHandsTheChainTheOrbLeg	cannot read the resident boot: open resident_windows.go: The system cannot find the file specified.
+Test187AssemblyRootCarriesTheModelSwitchReader	read run.go: open run.go: The system cannot find the file specified.
+Test320FetchLegWritesTheKeyNowhereOnDisk	walk D:\work\workspace\projects plans\Wisp: read D:\work\workspace\projects plans\Wisp\tools\jarvis-export\node_modules\jarvis-ai-web-animation: Incorrect function.
+Test215AssemblyRootCarriesThePluginsReader	read run.go: open run.go: The system cannot find the file specified.
+Test314FixedPanelProfileLeafShapeIsRed	扫描集为空：cmd/wisp 下没有 *.go。空扫描集不许印绿（盲尺不是干净的尺）
+Test65ResidentShowTriggersResyncPins	read panel_resident_windows.go: open panel_resident_windows.go: The system cannot find the file specified.
+Test165r2PlanWiringCallSiteCensus	台面故障（不是判据）：扫描根 "..\\..\\internal" 读不到：GetFileAttributesEx ..\..\internal: The system cannot find the file specified.
+Test44R5RunGoInstallsTheGate	open run.go: The system cannot find the file specified.
+Test44R5ChainRunnerIsNotReimplemented	open run.go: The system cannot find the file specified.
+TestAC246ShippedResidentProcessOwnsItsCancelStep	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive246ConfirmingCardBorrowsEscVetoesAndReturns	go build ./cmd/wisp/testdata/esclistener: exit status 1
+TestLive246ExitRefusesAHangingL2Card	idle live hot key set = 0 ([{Name:summon ID:1 Binding:Ctrl+Alt+Q Status:occupied by another app Acc:{Mods:16387 VK:81} Err:Hot key is already registered. Note:} {Name:mute ID:2 Binding:Ctrl+Alt+M Status:occupied by another app Acc:{Mods:16387 VK:77} Err:Hot key is already registered. Note:} {Name:cancel ID:3 Binding:Esc Status:not bound while idle (cancel is borrowed only during Confirming) Acc:{Mods:0 VK:0} Err:<nil> Note:} {Name:panel ID:4 Binding:Ctrl+Alt+P Status:occupied by another app Acc:{Mods:16387 VK:80} Err:Hot key is already registered. Note:}]), want 3 (summon/mute/panel): the cancel key was not handed back, or never handed at all
+TestLive246ExitAbandonsAHangingL1Window	idle live hot key set = 0 ([{Name:summon ID:1 Binding:Ctrl+Alt+Q Status:occupied by another app Acc:{Mods:16387 VK:81} Err:Hot key is already registered. Note:} {Name:mute ID:2 Binding:Ctrl+Alt+M Status:occupied by another app Acc:{Mods:16387 VK:77} Err:Hot key is already registered. Note:} {Name:cancel ID:3 Binding:Esc Status:not bound while idle (cancel is borrowed only during Confirming) Acc:{Mods:0 VK:0} Err:<nil> Note:} {Name:panel ID:4 Binding:Ctrl+Alt+P Status:occupied by another app Acc:{Mods:16387 VK:80} Err:Hot key is already registered. Note:}]), want 3 (summon/mute/panel): the cancel key was not handed back, or never handed at all
+TestAC228ResidentLegIsTheBallHost	this package holds no production .go file, so every claim below is an empty instrument
+TestAC228BallHostAnswersEveryGesture	this package holds no production .go file, so every claim below is an empty instrument
+TestAC228ResidentLegReportsAndBooksItsBall	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC228ExitRequestDuringBootStillLeavesThroughD38E	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive228ResidentLegOwnsABallWindowOnTheDesktop	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive245TheShippedLegLeavesTheDesktopsBareEscAlone	go build ./cmd/wisp/testdata/esclistener: exit status 1
+Test258AssemblyRootWiresTheChainAndTheBridge	parsing resident_windows.go (the instrument, not the code): open resident_windows.go: The system cannot find the file specified.
+TestLive258ResidentBootNamesProvenanceAndDefaults	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive258ResidentBootTakesConfigHotkeys	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive258ResidentRebindsWithoutRestart	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive258ResidentOccupiedCombinationNamesTheNewValue	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC294AssemblyRootAttachesTheMuteGateByShape	parsing resident_windows.go (the instrument, not the code): open resident_windows.go: The system cannot find the file specified.
+TestAC294HkMuteMirrorMatchesInternalBallSource	parsing internal/ball/hotkey_windows.go (the source of truth, not the code): open ..\..\internal\ball\hotkey_windows.go: The system cannot find the path specified.
+TestAC1ResidentLegInstallsItsLogListenerOnDisk	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC1ResidentLegOutlivesItsOwnLogFailure	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC246DevLegIgnoresTheTestTaskInjection	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestLive246ResidentPipelineRaisesACardAndEscVetoesIt	go build ./cmd/wisp/testdata/esclistener: exit status 1
+TestLive246ExitCancelsARunningTask	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestAC2TrayItemsAreMountedInTheBallPackage	parse ..\..\internal\ball\tray_windows.go: open ..\..\internal\ball\tray_windows.go: The system cannot find the path specified.
+TestAC3TheWaitingStateDriveIsWiredIntoTheShippedPath	parse resident_approval_windows.go: open resident_approval_windows.go: The system cannot find the file specified.
+TestAC11TrayExitExecutorIsMountedAtTheBallHost	parsing resident_windows.go (the instrument, not the code): open resident_windows.go: The system cannot find the file specified.
+TestLive228R3TrayExitStopsTheShippedProcessWithCodeZero	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+Test15eSpeechEndToEndHandsTheTranscriptToTheAgent	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test15eSilenceNeverCallsTheHandOff	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test15eARefusedHandOffLeavesTheAsrUnopened	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test15ePauseStopsTheListenerAndTheTrayFollows	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test15eTheProductionHandOffIsTheModelStoreWalk	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test15eTheProductionHandOffIsTheModelStoreWalk2140217396\001: WISP_SPIKE_MODELS is not set
+Test41a2r1WakeEndToEndArmedToListening	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test41a2r1WakeEndToEndArmedToListening180034430\001: WISP_SPIKE_MODELS is not set
+Test41a2r1WarmGateFeedsKwsNotTheAsr	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test41a2r1WarmGateFeedsKwsNotTheAsr2900023942\001: WISP_SPIKE_MODELS is not set
+Test41a2r1ProductionTableRejectsTheDemoWavs	the production-shaped engine refused to build: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+Test41a2r1OptInGateResolvesTheManifestSpelling	the opt-in-off note = "", want the enabled=false sentence
+Test395r1VoiceToolTurnWalksActing	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test395r1VoiceToolTurnWalksActing1099972022\001: WISP_SPIKE_MODELS is not set
+Test26PEchoNeverTriggersAndNeverTranscribes	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test26PWithoutAECTheEchoTranscribesVerbatim	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test26PMarginRetestAndGateReverse	matcha tts: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+Test26PBargeinStopsWithin400ms	matcha tts: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+Test26PFeedOnlineMatchesWindowReplay	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test392KeepalivePostureFindingsAndColdDefault	matcha tts: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+Test392AecTuningDoubleTalkSwing	matcha tts: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+Test392DisposeReleasesTheEngines	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test381r2StaleTokenDoesNotKillTheNextAnnouncement	MUTANT 381r2-M2 SHAPE: the announcement was killed by a stale interrupt token (spoken=0, chunks=0): speak() does not drain interruptCh at the entry, so a token left by an earlier idle Esc silently kills the next sentence (381-v2 §5: spoken=0, no problem row)
+Test381r2PlayingPhaseInterruptAbortsAndWalks27	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test381r2RealDevicePlayingPhaseAbortWithin400ms	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test390r1BallClickPlayingInterruptAbortsAndWalks27	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test390r1BallClickRealDeviceWithin400ms	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test390r1UnattachedClickDoesNotInterrupt	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test394R1SeamRecordsProductionMark	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test394R1SeamRecordsProductionMark2070130777\001: WISP_SPIKE_MODELS is not set
+Test394R1SeamFedRefusalRefusesClosedTaskPoison	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test394R1SeamFedRefusalRefusesClosedTaskPoison3889839299\001: WISP_SPIKE_MODELS is not set
+Test26R3AnnounceClosesTheCaptureGate	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate3882242803\001: WISP_SPIKE_MODELS is not set
+Test26R3SilenceNeverTouchesTheGateNeedle	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test26R3SilenceNeverTouchesTheGateNeedle654816518\001: WISP_SPIKE_MODELS is not set
+Test382WR2TTSInheritanceRefusesClosedTaskTaint	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test382WR2TTSInheritanceRefusesClosedTaskTaint1860407042\001: WISP_SPIKE_MODELS is not set
+Test382WR2TTSCleanSentencePlaysThroughTheGate	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test382WR2TTSCleanSentencePlaysThroughTheGate2078408507\001: WISP_SPIKE_MODELS is not set
+Test382WR2TTSOpenScopeDirectCheckStillRefuses	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test382WR2TTSOpenScopeDirectCheckStillRefuses3866250858\001: WISP_SPIKE_MODELS is not set
+TestWireR1AnnounceEndToEnd	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceEndToEnd967355548\001: WISP_SPIKE_MODELS is not set
+TestWireR1WarmSecondTurnAcquiresNothing	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1WarmSecondTurnAcquiresNothing832568674\001: WISP_SPIKE_MODELS is not set
+TestWireR1PunctuationReachesTheAgent	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1PunctuationReachesTheAgent3410473886\001: WISP_SPIKE_MODELS is not set
+TestWireR1AnnounceGateRefusesTaintedText	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1AnnounceGateRefusesTaintedText4074966053\001: WISP_SPIKE_MODELS is not set
+TestWireR1SilenceAndEmptyTextNeverSpeak	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1SilenceAndEmptyTextNeverSpeak510527712\001: WISP_SPIKE_MODELS is not set
+TestWireR1WarmIdleDisposesOnTheOwner	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\TestWireR1WarmIdleDisposesOnTheOwner3544070662\001: WISP_SPIKE_MODELS is not set
+TestSecretArgvCarriesNoSecret	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestSecretRealBinaryRefusesValueFlag	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+TestSecretFlagsAreBoolOnly	read secret.go: open secret.go: The system cannot find the file specified.
+Test12r2SettleWalkFiveSamplesEndToEnd	the leg did not start: verdict="语音链未构造：VAD 没起来（speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)）"
+Test12r2SeamCallSitesAreTheMeasurement	parse run.go: open run.go: The system cannot find the file specified.
+TestSLO136StatePassFoldReachesRunPass	read cmd/wisp/slo_windows.go: open slo_windows.go: The system cannot find the file specified. - the AC#10 instrument cannot grade a source it cannot read
+TestSLO136FalseRunPassExitsOne	read cmd/wisp/slo_windows.go: open slo_windows.go: The system cannot find the file specified. - the AC#10 instrument cannot grade a source it cannot read
+TestTicket224ProductionSessionChangesAcrossRealOSProcesses	go build ./cmd/wisp failed (is mingw on PATH?): exit status 1
+Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware183371538\001: WISP_SPIKE_MODELS is not set
+Test16r1PremortemModelSha256CorruptRefusesTheHandOff	install the streaming ASR into C:\Users\swq\AppData\Local\Temp\Test16r1PremortemModelSha256CorruptRefusesTheHandOff1476527527\001: WISP_SPIKE_MODELS is not set

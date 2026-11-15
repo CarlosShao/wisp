@@ -1,0 +1,72 @@
+i,ts,alive,cpu_s,ws_mb,stdout_bytes,stderr_bytes,webview2,competitors,last_stdout_line
+1,13:01:13,True,0.06,21.2,57,134,37,0,=== RUN   TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+2,13:01:33,True,2.91,69.6,2237,35256,37,0,=== RUN   Test219AC2SecondRevokeOfTheSameRuleIsRefused
+3,13:01:54,True,3.2,69.9,2369,40071,37,1,=== RUN   Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack
+4,13:02:14,True,3.23,69.9,2369,40071,37,1,=== RUN   Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack
+5,13:02:34,True,4.19,71,3704,56283,37,0,=== RUN   TestUnansweredL2CardTimesOutIntoRejectNeverExecution
+6,13:02:54,True,4.2,71,3704,56283,37,0,=== RUN   TestUnansweredL2CardTimesOutIntoRejectNeverExecution
+7,13:03:15,True,5.17,70.9,4495,70071,37,0,=== RUN   TestReplyRevokeRefusesARuleTheProcessDoesNotHold
+8,13:03:35,True,6.86,71.1,6068,103228,37,0,=== RUN   Test170BareEnterStopsTheL1Window
+9,13:03:55,True,10.84,75.1,19835,140625,37,0,=== RUN   TestTicket255ReceiptOmitsPanelFromTheImmediateSentence
+10,13:04:15,True,12.42,74.2,26851,168296,37,0,=== RUN   TestTicket223RefusedLooseningKeepsOldValues
+11,13:04:36,True,13.45,74,27441,186551,37,0,=== RUN   TestTicket223FailureSentencesAreDistinct/语法错
+12,13:04:56,True,14.41,74.8,34295,204849,37,0,=== RUN   Test233ReloadTierEventReachesAProductionConsumer
+13,13:05:16,True,18.5,120.8,51689,235642,37,0,=== RUN   TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord
+14,13:05:36,True,22.16,99.4,74018,271318,37,0,=== RUN   TestLive43QueryEndSessionExitsWithin5s
+15,13:05:57,True,22.44,99.6,74235,274256,37,0,=== RUN   TestLive43KillNineMidTaskMarksInterruptedOnNextBoot
+16,13:06:17,True,27.27,232.6,101990,356984,47,0,=== RUN   TestCleanCheckoutBuilds_AC11
+17,13:06:37,True,39.97,399.2,101990,356984,47,0,=== RUN   TestCleanCheckoutBuilds_AC11
+18,13:06:58,True,48.38,399.2,101990,356984,47,0,=== RUN   TestCleanCheckoutBuilds_AC11
+19,13:07:18,True,56.61,177.9,105000,378729,58,0,wisp: panel window hidden (focus returned to hwnd 0x5701544)
+20,13:07:38,True,59.22,153.7,138103,408458,57,0,=== RUN   TestRunBooksWithASnapshotOfItsLiveQueue
+21,13:07:58,True,59.53,155.1,138103,411983,57,0,=== RUN   TestRunBooksWithASnapshotOfItsLiveQueue
+22,13:08:19,True,61.61,113.4,152745,447758,78,0,=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+23,13:08:39,True,65.23,115.4,168044,494880,97,0,=== RUN   Test330DockPinsTheWireNameToTheAssembledRoster
+24,13:09:00,True,68.36,116.6,169937,533317,97,0,=== RUN   TestProvidersDiscoverListsWhatTheServerServes
+25,13:09:20,True,69.52,139.2,174765,555246,102,0,=== RUN   TestLive246ConfirmingCardBorrowsEscVetoesAndReturns
+26,13:09:41,True,70.61,147,191609,585906,97,0,=== RUN   TestAC228ExitRequestDuringBootStillLeavesThroughD38E
+27,13:10:01,True,71.12,156.3,200036,594307,97,0,=== RUN   TestLive245TheShippedLegLeavesTheDesktopsBareEscAlone
+28,13:10:22,True,71.88,160.5,205382,601150,111,0,wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+29,13:10:42,True,72.64,164,209196,608064,97,0,=== RUN   TestLive258ResidentBootTakesConfigHotkeys
+30,13:11:02,True,73.02,156.3,209560,608064,97,0,=== RUN   TestLive258ResidentOccupiedCombinationNamesTheNewValue
+31,13:11:23,True,73.7,139.3,221504,621480,103,0,=== RUN   TestAC1ResidentLegOutlivesItsOwnLogFailure
+32,13:11:43,True,74.11,155.8,221833,621480,99,0,=== RUN   TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+33,13:12:04,True,74.98,139.4,225395,639705,98,0,=== RUN   TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline
+34,13:12:24,True,75.3,156.1,225738,639705,97,0,=== RUN   TestAC246DevLegIgnoresTheTestTaskInjection
+35,13:12:45,True,75.41,156.1,225738,639705,97,0,=== RUN   TestAC246DevLegIgnoresTheTestTaskInjection
+36,13:13:05,True,75.86,156.5,227206,639705,97,0,        READING keydown_esc=1 syskeydown_esc=0 wm_hotkey=0 other_keys=0 foreground_is_mine=true steal=false
+37,13:13:25,True,76.34,156.1,229324,639705,97,0,    resident_task_source_live_246_windows_test.go:302: AC#7 LIVE (exit cancels a running task): wisp run: 任务已取消
+38,13:13:46,True,76.88,117.6,231221,647977,97,0,=== RUN   TestAC3BookWaitingStateDrivesTheBallWaitingState
+39,13:14:06,True,77.72,139,236489,664578,103,0,=== RUN   TestLive228R3TrayExitStopsTheShippedProcessWithCodeZero
+40,13:14:26,True,93.31,550.9,261191,673062,97,0,=== RUN   Test41a2r1WakeEndToEndArmedToListening
+41,13:14:47,True,105.94,409,263134,678384,97,0,=== RUN   Test41a2r1WarmGateFeedsKwsNotTheAsr
+42,13:15:07,True,121.67,402.7,264859,684892,97,0,=== RUN   Test395r1VoiceToolTurnWalksActing
+43,13:15:27,True,136.19,361.4,267759,694871,97,0,=== RUN   Test26PWithoutAECTheEchoTranscribesVerbatim
+44,13:15:48,True,150.12,317.4,269044,699768,97,0,=== RUN   Test26PMarginRetestAndGateReverse
+45,13:16:08,True,169.44,258,275415,707449,97,0,=== RUN   Test381r2StaleTokenDoesNotKillTheNextAnnouncement
+46,13:16:28,True,184.78,350.4,276608,720278,97,0,=== RUN   Test381r2RealDevicePlayingPhaseAbortWithin400ms
+47,13:16:49,True,189.09,361.2,277123,724345,97,0,    resident_voice_interrupt_381r2_windows_test.go:576: ABORT-ROUND-3 parked_to_stop=339ms unstick=39ms reset=39ms abort_returned=0
+48,13:17:09,True,201.55,351.9,278897,731769,97,0,=== RUN   Test390r1BallClickRealDeviceWithin400ms
+49,13:17:29,True,206.66,362.6,279461,736133,97,0,    resident_voice_interrupt_390r1_windows_test.go:289: CLICK-ROUND-3 unstick=46ms reset=47ms abort_returned=0
+50,13:17:50,True,217.05,626.4,283820,745508,97,0,wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.21s，store=C:\Users\swq\AppData\Local\Temp\Test26R3AnnounceClosesTheCaptureGate2183965470\001\models）
+51,13:18:10,True,236.06,660.1,287137,753618,97,0,=== RUN   Test382WR2TTSCleanSentencePlaysThroughTheGate
+52,13:18:31,True,255.09,425.9,289967,759909,97,0,=== RUN   TestWireR1WarmSecondTurnAcquiresNothing
+53,13:18:51,True,269.67,555.6,293654,769022,97,0,=== RUN   TestWireR1SilenceAndEmptyTextNeverSpeak
+54,13:19:11,True,279.88,337.1,299821,794352,97,0,=== RUN   TestTicket101UntouchedConfigRestartsAtDefault
+55,13:19:32,True,281.41,336.8,302699,819676,97,0,=== RUN   TestHostDispatchThroughTheAssembledBridge
+56,13:19:52,True,282.69,359.1,303596,836351,97,0,=== RUN   TestSecretRealBinaryRefusesValueFlag
+57,13:20:12,True,284.06,345.2,310635,856315,97,0,    settle_trace_12r2_windows_test.go:100: 12R2-SETTLE sample=3 token_to_settling=1203ms settling_to_fallback=3000ms token_to_fallback=4204ms
+58,13:20:33,True,286.23,338.8,339965,893132,97,0,=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+59,13:20:53,True,287.47,338,349783,914206,97,0,=== RUN   Test47AssemblyTaskListAnswersTheRealQueue
+60,13:21:13,True,289.48,338.1,357223,950430,97,0,=== RUN   Test365RunKeepsItsWordForTheControls/failed
+61,13:21:34,True,290.69,338.7,358747,967206,97,0,=== RUN   TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking
+62,13:21:54,True,299.22,693.8,359341,975382,97,0,wisp models ensure: asr-streaming-paraformer-zh-en 已交还（state=FirstRun，ticks=1，末次进度 100%，3.60s，store=C:\Users\swq\AppData\Local\Temp\Test16r1VoiceDemoWakeAsrAgentSpeakSettleRealHardware2172653393\001\models）
+63,13:22:14,True,311.14,728.3,362620,983048,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+64,13:22:34,True,312.67,732.3,363060,983360,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+65,13:22:55,True,313.83,732.7,363060,983360,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+66,13:23:15,True,314.77,733,363060,983360,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+67,13:23:35,True,315.61,733.3,363060,983360,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+68,13:23:56,True,316.66,733.8,363060,983360,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+69,13:24:16,True,317.95,590.4,363060,983360,97,0,    voice_e2e_demo_16r1_windows_test.go:551: CORRUPT detected verify_error=model: hand-off re-verification: model asr-streaming-paraformer-zh-en installed files no longer match the signed manifest in C:\\Users\\swq\\AppData\\Local\\Temp\\Test16r1PremortemModelSha256CorruptRefusesTheHandOff2305662847\\001\\models\\asr-streaming-paraformer-zh-en: encoder.int8.onnx: sha256 mismatch (pins 81a70226a893...; got ab9962e4c1a2...) class=model
+70,13:24:36,False,,,379522,995420,37,0,FAIL
+END_DETECTED alive=false

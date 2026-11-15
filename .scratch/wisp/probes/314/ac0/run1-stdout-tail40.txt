@@ -1,0 +1,40 @@
+    panel_resident_windows_test.go:538: AC#13 page answer (head 4ce7cdf81): "1" - 1 of 1 probe id(s) present in the live document
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.57s)
+=== RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+    panel_resident_windows_test.go:695: AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=<nil> err=<nil> created=true
+    panel_resident_windows_test.go:697: AC#13 reused-thread release: tid=17708 dispatched 3 message(s) before unlocking; windows left on that thread=0 queue head=empty
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (0.96s)
+=== RUN   TestAC13BringUpRefusesAThreadWithAQueuedClose
+    panel_resident_windows_test.go:782: AC#13 queued-close: tid=17708 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0x64191A, plantQueued=true), then bringUp#2 err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x64191A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false; the close was still queued after the refusal=true; released with windows=0 queue head=empty
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.24s)
+=== RUN   TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever
+    panel_resident_windows_test.go:902: fifth-shape plant on the panel thread: hwnd=0x3B10AC2 live=true PostMessageW(WM_CLOSE) returned=true lastErr=The operation completed successfully. | check reads queued=true names-the-live-window=true
+wisp: panel could not open (panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x3B10AC2. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message): 33r9-nail
+wisp: panel thread will take no further requests: panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x3B10AC2. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message
+    panel_resident_windows_test.go:972: refusal-to-retirement: settle=10.6016ms second RequestShow accepted=false in 0s | thread retired=true isFinished=true | the planted live window 0x3B10AC2 IsWindow=true | startUpErr=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x3B10AC2. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message | statusLine="panel thread could not start: panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x3B10AC2. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message"
+--- PASS: TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever (0.05s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+wisp: panel window is up (test-harness, cold 1063.8 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:1038: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.41s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+wisp: panel window is up (test-harness, cold 1066.3 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:1077: AC#14 push nail: the handover document settled on probe attempt 6: "https://wisp.panel/index.html|complete|Wisp"
+    panel_resident_windows_test.go:1086: AC#14 nail 2 (Eval push hop), page's own words: title="PUSHED-33R5-OK"
+--- PASS: TestAC14GoSideEvalPushReachesThePage (1.91s)
+=== RUN   TestPanelThreadIsSTAAndExitsCleanly
+wisp: panel window is up (test-harness, cold 1283.8 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:1129: panel thread up and down: hwnd 0x927125c, exits observed, shows=1
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (1.35s)
+=== RUN   TestPanelThreadNameIsNotInResidentRoster
+--- PASS: TestPanelThreadNameIsNotInResidentRoster (0.00s)
+=== RUN   TestBallPanelGesturesReachThePanelThread
+wisp: panel window is up (panel-hotkey, cold 1206.5 ms, hot path 0.0 ms)
+wisp: panel window hidden (focus returned to hwnd 0x5701544)
+--- PASS: TestBallPanelGesturesReachThePanelThread (1.40s)
+=== RUN   TestBallGestureWithoutPanelHostStillRecords
+wisp: ball panel-hotkey: no executor was handed to this ball host for this gesture; the gestures with one are the cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg (ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e), the tray's three answer items once it assembled the card ledger behind them (ticket 228 AC#2) and the ball click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented
+--- PASS: TestBallGestureWithoutPanelHostStillRecords (0.00s)
+=== RUN   TestAC4PriorFocusSurvivesARefusedPanelSample
+wisp: panel window is up (test-harness, cold 1096.2 ms, hot path 0.0 ms)
+wisp: panel window hidden (focus returned to hwnd 0x5701544)
