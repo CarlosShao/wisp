@@ -1,0 +1,27 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 昨天 15 次 null，台账 A1864）
+# 类型：票 452 写腿（写面含 cmd/wisp，本波只此一枚写腿）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/452-voice-link-two-shipped-disconnects.md` 全文并照它的 5 格 AC 做。
+
+**两个断点（都是验收腿现读现跑发现的，编排者已复核）**：
+1. **barge-in 不在出厂构建里**：`scripts/build.ps1:270` 的 `go build` **不带 `-tags webrtcap`** ⇒ 进 `aec_stub`，`NewApm` 恒 `ErrUnavailable`、monitor 不武装 ⇒ 票面引用的 ≤400ms 全是**专用构型**读数；且 26p-v2 复跑 6 窗只 1 火 ⇒「每轮必火」不成立。
+2. **拔麦不推状态**：`EvAudioDeviceLost` 产码命中 4 处，**其中 2 处是注释**（`cmd/wisp/resident_audio_windows.go:39` 与 `:358`，后者逐字「这一条不推状态、也不拒绝启动」）⇒ **零派发**，球可停在 Listening。
+
+**顺序**：**AC#1 先让两件都变成可判事实**（(a) 现证没有 `webrtcap` 标签 ＋ 给"打了标签 `NewApm` 返回什么／没打返回什么"两条实测；(b) 写一枚测试：把 `mic.Err()` 置成设备丢失，断言状态机**收到** `EvAudioDeviceLost` 并走到 `StateError`）—— **它必须先红**，红句原文抄进证据，**然后**才改。
+
+**AC#2 是裁决题，按 ⓪⓪⓪ 自己选并写理由**（三选一，⛔ 选"什么都不做"）：①出厂即带 `webrtcap`（代价：体积/构建依赖）②出厂不带，但**产品明说"此构建无回声消除"**并让界面可判 ③换不依赖该标签的默认路径。⛔ **一边不带标签、一边继续引用 ≤400ms 那些读数当成绩**。
+
+**AC#4 别忘**：`resident_audio_windows.go:358` 那句「这一条不推状态」在接上之后**就变成假话**，同一条改动里必须改掉。⛔ 留过期注释。
+
+**硬约束**：
+- **⛔ 改 D43 转移表**（表里那条边已经对：`table.go:97` `From: StateListening → To: StateError`），**只接派发**。
+- ⛔ 把 `ErrUnavailable` 改成"假装成功"。
+- 新增协程必须走 `observe.Registry.Spawn`（形见 `internal/ball/ball_windows.go:170`）。
+- ⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`／`design/**`；⛔ 放宽既有断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+- `go test ./cmd/wisp` **走载具一次一发**；本机**三枚**已知红不是你的，具名记不修：`TestAC4FocusReturnToPriorWindowGap33r5`（前台被占）／`TestAC246DevLegIgnoresTheTestTaskInjection`（驻留球 PID 49348）／`Test320FetchLegWritesTheKeyNowhereOnDisk`（**扫 `%TEMP%` 与并行测试互扰，单跑 0.16s 绿**）。
+- ⚠ **整包可能 native AV 死掉**（`0xC0000005`，条件性 1/2，死在收尾段，票 314/450 在跟）：若你遇到，**照实写"整包在第 N 秒被 native AV 终止"并给最后一条 `=== RUN`**，⛔ 报绿、⛔ 当自己的红。
+
+写面：`internal/audio/**`、`internal/speech/**`、`internal/statemachine/**`（**只读该表**）、`cmd/wisp/**`（本波独占）、`scripts/build.ps1`、`docs/evidence/s1/452-*`。
+
+回话第一行＝commit hash ＋「AC#1 两条红句原文（改前）」＋「AC#2 你选了哪条＋一句理由」＋「AC#3 拔麦测试由红转绿（是/否）」＋「突变后哪枚红」。没干完写「未完成，卡在哪」。
