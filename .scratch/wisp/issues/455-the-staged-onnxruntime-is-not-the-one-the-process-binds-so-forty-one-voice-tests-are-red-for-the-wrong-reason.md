@@ -37,3 +37,26 @@
 - ⛔ 删 System32 里的任何东西（那是机器，不是仓）
 - ⛔ 放宽任何断言来变绿；⛔ 把 41 枚标 `t.Skip` 糊过去
 - 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`（裸 `bash` 命中 WSL 会假红，台账 A1884）
+
+---
+
+## 侦察收件（2026-11-15 19:4x，`bff1bbba3`，件 `docs/evidence/s1/455-onnxruntime-binding-recon.md` 17418 B）
+
+**尺1**：提交链 `5362149f9 → 5610133e7 → bff1bbba3` 在。**尺2**：件在，17418 B；探针在 `.scratch/wisp/probes/455/`（`probe_binding.go`／`loadlib_probe/main.go`／`run-probe.ps1`／`run-probe.out.txt`）。**尺3 我自己看了 ARM A 逐行**：`stage\onnxruntime.dll` `size=17799168`、`GetOnnxruntimeVersion(): 1.28.2`、`sherpa-onnx-c-api.dll` 也来自同一 stage 目录。
+
+### ★本票的前提被推翻了（AC#2 已答，答案是"载具"，不是"绑定"）
+| 形状 | 绑到 | 字节 | 版本 | 同一枚 `Test15e…` |
+|---|---|---|---|---|
+| 载具形 | `stage\onnxruntime.dll` | 17799168 | **1.28.2** | **PASS 2.14s** |
+| 裸 `go test` | `C:\Windows\SYSTEM32\onnxruntime.dll` | 10572960 | **1.17.260311** | **FAIL 0.00s** ＋ 逐字 shadow 句 |
+
+**逐条判**：①`stage-sherpa-dlls.sh` 在那发**根本没被调**（41 红日志 0 行载具横幅、0 行 staged、19 行 `WISP_SPIKE_MODELS is not set`；`go test -x` 证明 exe 在 `%TEMP%\go-build…\b001\`）②`deps.toml` pin **就是** 17799168 B（sha256 `7f66f939…27d8a25`，三方逐位一致）⇒ **不是 deps 不一致** ③搜索序决定一切（文档＋实测 C1/C2）④进程内零 `SetDllDirectory`／`AddDllDirectory`／`Setenv("PATH")`。
+⇒ **不是 sherpa 加载器的问题，不是 deps 的问题，不是绑定代码的问题 —— 是那一发没走载具。**
+
+### 本票改口径（我改，⛔ 改契约）
+原 AC#2 问"为什么摆了 17.8 MB 却绑了 10.5 MB" —— 答案：**摆了的那枚不在 exe 旁边**（它在 `stage-cli\`，而 exe 在 `%TEMP%\go-build…`）。
+⇒ **本票的活从"修绑定"改为"让裸跑不可能发生"**（侦察给的三个候选我选了最主流的一个）：
+- [ ] **AC#1′**：载具是唯一入口 —— 在 `cmd/wisp` 加一枚 **test-only 的绑定自检**（`GetModuleHandle("onnxruntime.dll")` → `GetModuleFileName` → 版本必须是 pin 的那一版），**裸跑时它必须红**且红句说得出"绑到了 C:\Windows\SYSTEM32\… 1.17.x"。这是 fail-fast，不是文档。
+- [ ] **AC#2′**：`stage-sherpa-dlls.sh` stage 完**核 sha256** 与 `deps.toml` 的 pin 一致，不一致就**拒跑**（⛔ 只打印警告）。
+- [ ] **AC#3′**：载具头注释 `:12-18` 改成**它真正保证的东西**（"DLL 摆在 exe 旁边 ⇒ 标准序第一站命中"），并给出上面那对数字当证据。
+- [ ] **AC#4′**：**一次载具形整包**，红册按层分类（绑定层应为 **0**），终点锚命中；⚠ 那发可能仍死在票 314 的硬形态，那要**照实写**。
