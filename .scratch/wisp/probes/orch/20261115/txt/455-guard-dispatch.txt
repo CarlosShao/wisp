@@ -1,0 +1,28 @@
+# 派单存档（先存档再发）—— 票 455：让"裸跑 cmd/wisp"不可能（写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（机主 2026-11-15 令；⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/455-*.md`（已按侦察改过口径）＋侦察件 `docs/evidence/s1/455-onnxruntime-binding-recon.md`。
+
+**已证事实（⛔ 重新论证，直接用）**：
+- 载具形（DLL 摆在 exe 旁边）→ 绑 `stage\onnxruntime.dll` **17799168 B / 1.28.2**；`Test15eSilenceNeverCallsTheHandOff` **PASS 2.14s**
+- 裸 `go test ./cmd/wisp` → 绑 `C:\Windows\SYSTEM32\onnxruntime.dll` **10572960 B / 1.17.260311**；同一枚测试 **FAIL 0.00s**
+- 机制：Windows 依赖 DLL 按**模块名**走标准序 **exe 目录 → System32 → …**；`go test` 把 exe 放 `%TEMP%\go-build…\b001\` ⇒ 第一站空 ⇒ 第二站 System32 命中
+- `deps.toml` pin 的就是 17799168 B（sha256 `7f66f939…27d8a25`）
+- 探针与两臂日志在 `.scratch/wisp/probes/455/`
+
+**要做的四件（AC#1′–AC#4′，见票面）**：
+1. **AC#1′ 绑定自检（test-only，fail-fast）**：在 `cmd/wisp` 加一枚测试，用 `GetModuleHandle("onnxruntime.dll")` + `GetModuleFileName` 取**实际加载路径与字节数**，断言它＝仓里 pin 的那一枚（路径在仓内且 17799168 B）。⚠ 它是**fail-fast 探针**：**裸跑时必须红**，红句要逐字说得出「绑到了 C:\Windows\SYSTEM32\onnxruntime.dll（10572960 B）而不是仓内 17799168 B；请用 scripts/wisp-cli-staged-tests.sh 跑」。
+   - 若测试**自身**因为没加载语音链而拿不到句柄（`GetModuleHandle` 返 0），**那也算红**（"语音运行时根本没加载"），⛔ 不许当 PASS 糊过去。
+   - ⛔ 用 `os.Executable()` 的目录当代理 —— 那不是真实绑定。
+2. **AC#2′ sha256 核**：`scripts/stage-sherpa-dlls.sh`（或载具 `scripts/wisp-cli-staged-tests.sh` 里 stage 之后那一步）**核 staged 的 `onnxruntime.dll` sha256 ＝ `deps.toml` pin 的**；不一致 ⇒ **非零退出拒跑**（⛔ 只打印警告继续）。
+3. **AC#3′ 注释改如实**：`scripts/wisp-cli-staged-tests.sh:12-18` 那段现在断言"摆了 pinned DLL 就不会被抢" —— 改成它**真正保证的东西**（"DLL 摆在 **exe 旁边** ⇒ 标准序第一站命中；裸 `go test` 的 exe 在 %TEMP%，第一站是空的，第二站 System32 会命中 1.17"），并把上面那对数字写进去当证据。
+4. **AC#4′ 一次载具形整包**：红册**按层分类**（绑定层必须 0）；终点锚 `TestZZ315A1` 是否命中；⚠ 那发可能仍死在票 314 的硬形态（整进程消失），**照实写**（A1882 三件：终点锚／最后一条 `=== RUN`／本波新测试在截断点前还是后）。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`frontend/**`／`design/**`；⛔ 改 `deps.toml` 的 pin 版本；⛔ 动 System32；⛔ 放宽断言；⛔push。
+**串行**：`go test ./cmd/wisp` **只能经载具、一次一发**。跑之前先看有没有 `wisp.test.exe` 在跑（`Get-Process wisp.test`），**有就等**（每 20 秒看一次，最多等 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（那就是本票要禁的东西，你自己别犯）。
+**A1880**：AC#1′ 的牙要**行为**（换走 staged DLL ⇒ 红），不是断言别的文件里的字符串。
+**A1884**：两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`。**A1886**：cpu 长时间不涨＝在等，停掉、具名、用自己的上限让它红。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`scripts/**`、`docs/evidence/s1/455-*`。
+
+回话第一行＝commit hash ＋「自检测试名＋它在裸跑时的红句原文」＋「sha256 核在哪一行（file:line）」＋「整包：终点锚命中/未命中＋最后一条 RUN＋绑定层红数」。没干完写「未完成，卡在哪」。
