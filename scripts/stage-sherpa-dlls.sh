@@ -24,8 +24,21 @@
 # not copied here: a pin added there is required here automatically, the same
 # contract scripts/wisp-cli-tests.sh already relies on.
 #
+# TICKET 455 AC#2' (2026-11-15): the copy is now VERIFIED, not just present.
+# After each cp, the staged file's sha256 is computed and compared against the
+# same section's sha256 pin in deps.toml; ANY mismatch (a wrong source file, a
+# truncated copy, a stray System32-shaped substitute) is a named GUARD that
+# exits 1 -- refusing to run -- instead of printing a warning and continuing.
+# Before this gate the script could "stage" a wrong onnxruntime.dll and print
+# "staged onnxruntime.dll -> ..." right above a run that then bound that wrong
+# image; the pin is the whole point of staging, so a copy that does not match
+# the pin defeats the staging silently. sha256sum (Git Bash / CI) is used, with
+# shasum as the named fallback; neither present is its own GUARD, not a skip.
+#
 # Usage: scripts/stage-sherpa-dlls.sh DEST_DIR
-# Exit codes: 0 staged; 1 setup failure (named); 2 usage error.
+# Exit codes: 0 staged and sha256-verified against deps.toml; 1 setup failure
+# (named: missing tree, missing pin, copy did not land, sha256 MISMATCH);
+# 2 usage error.
 
 set -u
 
@@ -72,6 +85,27 @@ if [ -n "$missing" ]; then
     exit 1
 fi
 
+# Ticket 455 AC#2': sha256 of one file, whichever hasher this shell carries.
+# sha256sum ships with Git Bash and the CI image; shasum is the perl-based
+# fallback. Two parsing hazards are handled here, both measured 2026-11-15:
+#   - GNU sha256sum PREFIXES THE WHOLE LINE WITH A BACKSLASH when the file
+#     name contains a backslash (a Windows-style argument like D:\x\y does),
+#     so the path is normalized to forward slashes before hashing and any
+#     leading backslash is stripped from the answer anyway;
+#   - a shell with neither hasher is a GUARD (exit 1), not a soft skip --
+#     this gate must never degrade into "print a warning and continue".
+stage_sha256() {
+    hash_target=$(printf '%s' "$1" | tr '\\' '/')
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$hash_target" | sed 's/^\\//' | cut -d' ' -f1
+    elif command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "$hash_target" | sed 's/^\\//' | cut -d' ' -f1
+    else
+        echo "" >&2
+        return 1
+    fi
+}
+
 while IFS= read -r dll; do
     [ -n "$dll" ] || continue
     cp -f "$dll_dir/$dll" "$dest/$dll"
@@ -79,7 +113,35 @@ while IFS= read -r dll; do
         echo "stage-sherpa-dlls: GUARD - copy of $dll to $dest did not land" >&2
         exit 1
     fi
-    echo "stage-sherpa-dlls: staged $dll -> $dest/$dll"
+    # Ticket 455 AC#2': the staged bytes must BE the pinned bytes. The pin's
+    # sha256 is read from the SAME deps.toml section the name came from, so a
+    # pin added there is verified here automatically.
+    pin=$(awk -v dll="$dll" '
+        $0 == "[sherpa-onnx.dll.\"" dll "\"]" { insec = 1; next }
+        /^\[/ { insec = 0 }
+        insec && $1 == "sha256" {
+            gsub(/"/, "", $3); print $3; exit
+        }
+    ' "$root/deps.toml")
+    if [ -z "$pin" ]; then
+        echo "stage-sherpa-dlls: GUARD - no sha256 pin found in deps.toml for [sherpa-onnx.dll.\"$dll\"];" \
+            "staging without verifying the bytes would let a wrong DLL defeat the whole point of staging" >&2
+        exit 1
+    fi
+    got=$(stage_sha256 "$dest/$dll") || {
+        echo "stage-sherpa-dlls: GUARD - neither sha256sum nor shasum is available; the ticket 455" >&2
+        echo "stage-sherpa-dlls: AC#2' sha256 gate cannot run. Refusing to stage unverified (this is a" >&2
+        echo "stage-sherpa-dlls: named failure, not a warning-and-continue)." >&2
+        exit 1
+    }
+    if [ "$got" != "$pin" ]; then
+        echo "stage-sherpa-dlls: GUARD - $dest/$dll sha256 MISMATCH: got $got, deps.toml pins $pin" >&2
+        echo "stage-sherpa-dlls: the staged DLL is NOT the pinned image (wrong file, truncated copy, or a" >&2
+        echo "stage-sherpa-dlls: substituted build). Refusing to run: re-run scripts/fetch-deps.ps1; do not" >&2
+        echo "stage-sherpa-dlls: copy over it from System32 (that is the shadowed version this staging exists to beat)." >&2
+        exit 1
+    fi
+    echo "stage-sherpa-dlls: staged $dll -> $dest/$dll (sha256 ok)"
 done <<<"$need"
 
 exit 0

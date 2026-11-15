@@ -10,16 +10,37 @@
 #     directory of the executable -> System32 -> ... -> PATH (last)
 #
 # so a host whose C:\Windows\System32 carries an OS-provided onnxruntime.dll
-# (measured on this machine: 1.17.260311, 10,572,960 bytes) binds THAT copy no
-# matter what PATH says. The linked sherpa-onnx C API needs 1.28, so every
-# voice-backed test in cmd/wisp reports
+# binds THAT copy when the exe sits in a directory with no onnxruntime.dll
+# next to it - measured on this host, 2026-11-15 (ticket 455 recon,
+# docs/evidence/s1/455-onnxruntime-binding-recon.md):
+#
+#     staged/carrier shape  -> <stage>\onnxruntime.dll   17,799,168 B  1.28.2
+#     bare go test shape    -> C:\Windows\SYSTEM32\...   10,572,960 B  1.17.260311
+#
+# WHAT THIS CARRIER ACTUALLY GUARANTEES (ticket 455 AC#3' - the old wording
+# here claimed "staged = never shadowed", which is false as stated): staging
+# puts the pinned DLLs NEXT TO THE TEST EXECUTABLE, and the executable's own
+# directory is the standard search order's FIRST stop - so with the DLLs
+# colocated, the loader hits the pinned 1.28.2 image at the first stop and
+# never reaches System32. That is the whole guarantee, and it is about
+# POSITION: the binding follows the exe's directory, not the repo, not PATH,
+# not the stage-cli directory. Bare `go test ./cmd/wisp` gets NONE of it:
+# go test links the test exe into %TEMP%\go-buildNNN\b001\, where no DLL
+# exists, so the first stop is empty and the second stop - System32's 1.17
+# (10,572,960 B) - answers instead. The 2026-11-15 whole-package reading of
+# 41 reds was exactly that shape (21 binding-layer: the linked sherpa-onnx C
+# API needs 1.28, so every voice-backed test reports
 #
 #     onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API
 #     requires; a second onnxruntime.dll is shadowing the one on PATH
 #
-# and either fails or silently degrades. The 2026-11-12 whole-package run read
-# 39 such reds out of 52 - the single largest block of red on this host, and
-# none of it is a product defect.
+# ), and none of it is a product defect. Two guards now make the bare shape
+# impossible to mistake for a verdict: cmd/wisp's
+# a455_onnxruntime_binding_windows_test.go fails FIRST on any run whose
+# process bound an image other than the pinned one (red sentence names the
+# bound path, the bytes, and this script), and scripts/stage-sherpa-dlls.sh
+# now verifies each staged DLL's sha256 against deps.toml before running
+# anything (mismatch = refusal, not a warning).
 #
 # internal/speech already solved exactly this in ticket 409 by staging the
 # pinned DLLs NEXT TO the test binary and running that binary from the package

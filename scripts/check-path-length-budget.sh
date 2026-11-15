@@ -387,6 +387,7 @@ BEGIN {
     R[".scratch/wisp/issues/432-the-three-258-hotkey-tests-red-on-first-real-execution-because-the-old-binding-and-live-slot-count-premises-moved-done.md"] = "hist: filed before README rule 9 (100-char hat); closed earlier and -done appended; roster follows the rename (ticket 262 guard B)"
     R[".scratch/wisp/issues/433-the-246-dev-leg-test-is-stably-red-on-its-own-tempdir-cleanup-failing-because-a-handle-outlives-the-child-done.md"] = "hist: filed before README rule 9 (100-char hat); closed earlier and -done appended; roster follows the rename (ticket 262 guard B)"
     R[".scratch/wisp/issues/180-panel-width-is-a-config-field-with-zero-production-readers-so-changing-config-toml-has-no-visible-effect-done.md"] = "hist: its name was 106 chars, under the hat, until I appended -done when closing it on 2026-11-13, which pushed it to 116; the ticket itself predates README rule 9, so the debt is the rename rather than the original filing"
+    R[".scratch/wisp/issues/455-the-staged-onnxruntime-is-not-the-one-the-process-binds-so-forty-one-voice-tests-are-red-for-the-wrong-reason.md"] = "hist: filed 2026-11-15 by the orchestrator with a slug past the 100-char hat (relative 137 chars); the recon evidence and the dispatch already cite this exact path, so renaming it would orphan the citations - grandfathered by the ticket 455 leg, which read the gate red on the tree before touching anything"
 #ROSTER-AWK-END
 }
 {
