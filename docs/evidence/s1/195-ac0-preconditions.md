@@ -277,6 +277,8 @@ $ git log --oneline -S MethodModelsList --format="%h %ad %s" --date=short -- int
 272405f53 2026-10-15 320-r2（编排者亲做）：AC#4 取件端口全链落地——MethodModelsList 名册/守卫/派发/253 计数、…
 ```
 
+（上面两枚 commit 标题过长，本件按 `…` 截断：那两行的 `…` 处**不是原文**，未截断的全文在 `.scratch/wisp/probes/195/20261115-ac0/ac0-attrib.log`。）
+
 **结论：半对，按整句判「对不上」。** 尺的读数**对得上**（4 枚、位置 `internal/panel/bridge.go:42-45`、名字与锚点逐字相同）；票面括注**「无 `config.*`」对不上**：今天有 **3 枚** `config.*` 白名单常量（`:66` `config.get`、`:67` `config.set`、`:75` `config.models.list`），分别是票 248（`0d87a681b`，2026-10-02）与票 320（`272405f53`，2026-10-15）放进来的——**差 3 枚（0 → 3），值变了，位置没变**（仍在同一文件、且仍不破坏 `panel.*` 那四枚的邻接）。
 
 ## 3. 锚点复跑：这四条在票面锚 `ba65b29f` 上当时成不成立
@@ -331,5 +333,21 @@ NO-HIT
 
 - 写面＝`docs/evidence/s1/195-ac0-preconditions.md`（本件，新建）＋`.scratch/wisp/probes/195/20261115-ac0/`（五个件：`ac0-rerun.log`、`ac0-drift.log`、`ac0-drift2.log`、`ac0-attrib.log`、`ticket-table-verbatim.txt`）。⛔ 未改票面、⛔ 未改台账、⛔ 未改任何产码、⛔ 未碰 `cmd/wisp`（只读）。
 - 零产码 ⇒ `gofumpt`/`go build`/`go test` 无对象；本腿未跑任何 Go 包测试（不占 `cmd/wisp` 单发席位）。
+- 「未碰产码」的可核读数（共享树里 `git status` 会带出**别人的**脏件，所以只认本腿 commit 的文件名册，不认工作树）：
+
+```
+$ git show --name-only --format="" b104721d5
+.scratch/wisp/probes/195/20261115-ac0/ac0-attrib.log
+.scratch/wisp/probes/195/20261115-ac0/ac0-drift.log
+.scratch/wisp/probes/195/20261115-ac0/ac0-drift2.log
+.scratch/wisp/probes/195/20261115-ac0/ac0-rerun.log
+.scratch/wisp/probes/195/20261115-ac0/ticket-table-verbatim.txt
+docs/evidence/s1/195-ac0-preconditions.md
+$ git show --name-only --format="" b104721d5 | grep -cE "^(cmd/wisp|internal)/"
+0
+```
+
+  ⚠ 同一时刻工作树里另有 `cmd/wisp/panel_config_store.go`、`internal/panel/config_handlers.go` 两枚 `M`（改动内容含 `aec.BindingBuilt()`／`AecBuildAvailable`，mtime 14:42–14:43）——那是**并行的票 452 写腿**在飞的活，**不是本腿**；本腿写面只有本件与 `probes/195/20261115-ac0/` 那五个日志。
+
 - Git：只 `commit`、⛔ 未 push；commit 带显式 pathspec。
 - 复跑件全部留在 `.scratch/wisp/probes/195/20261115-ac0/`，件内命令可逐条重贴。
