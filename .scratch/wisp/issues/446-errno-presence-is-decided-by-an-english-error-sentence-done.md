@@ -21,7 +21,7 @@
 - [x] **AC#2 改成码判**：存在性判定换成 `errors.Is(e, syscall.Errno(0))`（或该 errno 的正确零值判据），**两处都改**；若同一文件还有同形，一并改并在证据里点名。
 - [x] **AC#3 能变红**：一发**能红的检查** —— 把修好的判定临时改回字符串比较、并让该分支必须被走到（构造 errno=0 的路径）⇒ 必须红且点名；还原后 SHA256 同串、再绿。⛔ 只写「改了」。
 - [x] **AC#4 门禁**：`go vet ./internal/tools` rc=0；`gofumpt -l` 本包空（⚠ 本机可能没装 gofumpt，如实记，⛔ 拿 gofmt 冒充）；`d22scan` clean；path-length GREEN；**产码改动只许这两处（或 AC#1 点名的同形）**。
-- [ ] **AC#5 CI**：`test-core` 与 `test-windows` 各一发含本修复的**完成**运行（给 run 号 ＋ `git merge-base --is-ancestor <fix> <head>` ＋ 完成时刻）。
+- [x] **AC#5 CI**：`test-core` 与 `test-windows` 各一发含本修复的**完成**运行（给 run 号 ＋ `git merge-base --is-ancestor <fix> <head>` ＋ 完成时刻）。
 
 ## 边界
 写面：`internal/tools/system_backend_windows.go`（及 AC#1 点名的同形）、`docs/evidence/s1/446-*`、`.scratch/wisp/probes/446/**`、本票 Progress log（只追加）。
@@ -51,3 +51,12 @@
 - **我自己 grep**：`internal/**`＋`cmd/**` 的 `*.go` 里那句英文 **0 命中**；`errnoPresent` 定义在 `:270`、两处调用 `:301`/`:441`。
 - **腿纠正了我票面前提的一半（照记）**：`Errno.Error()` 那句英文**不是 Go 静态表**，是 Go 在 `syscall_windows.go:169` **显式索要 en-US**、失败才退回系统语言 ⇒ **本机（en-US）旧写法碰巧成立**，bug 只在拿不到 en-US 表的机器上现形。它量出 `FormatMessage(errno=0, zh-CN) = "操作成功完成。"`，并**明确不声称真机复现过**。⇒ 修它的理由因此改写为：判据不该是一句话（换语言/换构建就变），且 `errors.Is` 会**拆包**而字符串比较只看得见最外层。
 - **AC#5 留白**：等我推后 CI 的 `test-core`/`test-windows` 各一发**含 `be0f599f3` 且完成**的运行（给 run 号＋`merge-base`＋完成时刻）。
+---
+
+## 结案凭据（2026-11-15 12:2x，编排者现查）
+
+**AC#5 满足**：run **`43669630792`**，head **`aed8467b9`**，conclusion **success**，完成时刻 **2026-11-15 03:09:07**；**六个 job 全绿**：`lint`／`slo-full`／`test-windows`／`lint-frontend`／`slo-smoke`／**`test-core`**。
+**血统**：我现跑 `git merge-base --is-ancestor be0f599f3 aed8467b9` ⇒ **rc=0**（本修复在该 head 里）。
+⇒ 本票 5/5，结案。
+
+⚠ **一处对我自己账的更正（记在票面，不藏）**：我先前说过"446 已结案（`-done`）"，**那句在盘上不成立** —— `git log --all -- '*.scratch/wisp/issues/446-*'` 从来只有非 `-done` 的名字，那枚后缀**从未进过 git**。⇒ 我的结案叙述曾领先于盘上事实一次；本票现在按**当前盘上读数**重新结案。

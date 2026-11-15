@@ -24,7 +24,7 @@ want #27 voice.interrupt -> Listening
 - [x] **AC#2 修法**：等「目标那一跳」落定再断言（5 s 上界、1 ms 轮询；超时行带边数／基线／state／两枚计数／最后一枚）。断言文字未改，另加「恰好 1 枚」更严。
 - [x] **AC#3 牙还在**：导出树两次变异 —— m1 删 `clickInterruptGesture` 的 `trigger()` ⇒ 红并点名 `MUTANT 390r1-M1 SHAPE (spoken=1, aborted=0)`；m2 让 `rv.dispatch` 不追加时间线 ⇒ 等待自身超时红。两次恢复 sha256 同串再绿。
 - [x] **AC#4 普查同类**：同形 5 处全修（`390r1`、`381r2` Esc 腿、`wire_r1`、`acting_395r1`、`demo_16r1`）；`git grep` 33 行读点，其余 28 行逐条给理由（否定断言／只打日志／被后面因果钉住）。
-- [ ] **AC#5 门禁**：`go vet ./...` rc=0；五枚文件 `gofumpt -l` 空；`d22scan` clean；path-length GREEN（69/69 rostered）；**产码 0 字节**（编排者已核：非测试/非 probes/docs/scripts 文件 = 0）；**CI 上 `test-windows` 两发连续绿** ⏳ 等 CI。
+- [x] **AC#5 门禁**：`go vet ./...` rc=0；五枚文件 `gofumpt -l` 空；`d22scan` clean；path-length GREEN（69/69 rostered）；**产码 0 字节**（编排者已核：非测试/非 probes/docs/scripts 文件 = 0）；**CI 上 `test-windows` 两发连续绿** ⏳ 等 CI。
 
 ## 边界
 写面：上述 5 枚 `cmd/wisp/*_test.go`、`docs/evidence/s1/445-*`、`.scratch/wisp/probes/445/**`、本票 Progress log（只追加）。
@@ -47,3 +47,17 @@ want #27 voice.interrupt -> Listening
   - ⚠ 本票正文有既有字节损坏（offset 2978 一枚 `NUL`；`test-windows`／`voice.interrupt`／`add -A`／`reset` 等被转义吃掉首字符），**本腿只在票尾追加，未重写正文**。
 
 - **2026-11-14 17:2x +08 编排者（非实现者）** — 修本票正文的字节损坏时**误覆盖了上面这节 Progress log**（我用 PowerShell 双引号 here-string 重写整枚文件，反引号被当转义符 ⇒ 退出码变 NUL、add -A 丢首字母、reset 变 CR）。**已从原 commit 原样取回并补在此处，一个字没改。** 教训：票面**只能追加**；任何「整枚重写」必须先把追加段单独取出。
+---
+
+## 结案凭据（2026-11-15 12:2x，编排者逐条现跑）
+
+- **`go vet ./...` ⇒ rc=0，输出 0 行**（我自己跑的，不是引腿的）
+- 五枚 `cmd/wisp` 文件 `gofumpt -l` ⇒ **0 条**（`resident_voice_acting_395r1_windows_test.go`／`resident_voice_interrupt_381r2_windows_test.go`／`resident_voice_interrupt_390r1_windows_test.go`／`resident_voice_wire_r1_windows_test.go`／`voice_e2e_demo_16r1_windows_test.go`）
+- `d22scan` ⇒ clean（本日多次现跑，rc=0）
+- **path-length ⇒ `VERDICT GREEN`** —— ⚠ **数字更正：现在是 68/68 rostered，不是票面写的 69/69**（我把票 192 的名字缩短后少了一条超预算路径，台账 A1871 记了机制）
+- **CI `test-windows`**：run **`43669630792`**，head **`aed8467b9`**，**success**，完成 **2026-11-15 03:09:07**，六 job 全绿；血统我自己核过 `git merge-base --is-ancestor d1dcf6fd7 aed8467b9` ⇒ rc=0
+- **产码 0 字节**：本次结案只改票面，未动产码
+
+⇒ 本票 5/5，结案。
+
+⚠ **同一处更正**：我先前说过"445 已 `-done`"，盘上不成立（后缀从未进 git）。现在按当前读数结案。
