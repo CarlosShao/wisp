@@ -2110,6 +2110,17 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 			MaxRounds:        cfg.Agent.MaxRounds,
 			TokenBudget:      cfg.Agent.TokenBudget,
 			RepeatThresholds: cfg.Agent.LoopGuard.RepeatThresholds,
+			// Ticket 451: the L1 profile rows the extractor already writes reach
+			// the prompt here. This composition root is the single assembly
+			// point (it builds the per-task Options for the root loop and the
+			// snapshot task.spawn derives children from), and the read is the
+			// store this boot opened in execute()'s own runtime, ONCE PER TASK:
+			// extraction lands after a turn, so the next task must see it. The
+			// lines take the D39 (3) section's D15 budget path (profileText ->
+			// clipToTokens -> enforceTotal); nothing is concatenated into the
+			// prompt at this site. Before this line production code had ZERO
+			// assignments to Config.Profiles, so the section was always empty.
+			Profiles: rt.loopProfileLines451(),
 			// The model price card, looked up (never guessed): zero = 价格未知,
 			// which the loop books as tokens-only with Priced=false (AC#4).
 			Price: card,
