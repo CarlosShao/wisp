@@ -137,6 +137,7 @@ agent_profiles_451_test.go:130: 预算路径读数：画像段保留 11/20 条�
 - 文件：`cmd/wisp/agent_profiles_451.go`（新，91 行）、`cmd/wisp/agent_profiles_451_test.go`（新，139 行）、`cmd/wisp/run.go`（+11）。
 - commit：`93a1c93da`（branch `dev`，**未 push**）；`git show --stat`：恰 3 枚文件，+241/−0。
 - 显式 pathspec：`git add -- <3 条>`、`git commit -- <3 条>`；⛔ 无 `-A`/`add .`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`，未删文件。
+- **追加一枚注释措辞 commit**（与本件同枚）：`agent_profiles_451.go` 头注释原写作 "a repo-wide grep for `Profiles:` assignments…"，会让 §① 那把尺数进**注释字面**（1→3）；改成 "a repo-wide search for assignments to that field" 后尺恢复 **1→2**，行为零变化（`git diff 93a1c93da -- cmd/wisp/agent_profiles_451.go` 只有注释）。改后重跑两枚测试仍绿（`.scratch/wisp/probes/451/r1/ac1-green-final.txt`：PASS 1.84s／1.81s＋预算读数 11/20）。
 - ⛔ 未动：`thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 表／`frontend/**`／`design/**`；⛔ 未放宽任何断言。
 
 ## ⑧ 证据日志与可重跑命令

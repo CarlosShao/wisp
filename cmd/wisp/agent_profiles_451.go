@@ -6,7 +6,7 @@ package main
 // already wired: internal/agent/loop.go's buildRequest forwards the field into
 // `PromptInput.Profiles`, and internal/agent/prompt.go renders it as the D39 (3)
 // profile section clipped to its scaled budget. What was missing was the
-// producer: a repo-wide grep for `Profiles:` assignments in production code
+// producer: a repo-wide search for assignments to that field in production code
 // found zero, so the L1 rows the extractor wrote were never read back for a
 // prompt. Measured before this file existed: `agent.Config.Profiles` = 0
 // assignments, and the AC#1 case failed with a request body that had no
