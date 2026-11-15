@@ -1,0 +1,22 @@
+# 派单存档（先存档再发）—— 票 219 AC#5 最后一寸：被截掉的原文要能找回（写腿，cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/219-approval-card-three-reply-buttons-and-a-reason-box.md` 的 AC#5（`:75`）与「AC#5 ⛔ 不翻 —— 只差一件」（`:211-219`）两节。
+
+**只差一件，⛔ 别扩大**：`washReason`（`cmd/wisp/approval_reply.go:820`）把超过 `replyReasonMax` 的部分丢掉，`replyReason.dropped`（`:806`）**只留了个数**；标记 `replyTruncationMark`（`:794`）写「原文共 N 字」，但**被截掉的那 40 字没有第二份 ⇒ 找不回**。AC#5 逐字要求「截断要带**可找回指针**」（票 147 同一族纪律）。
+
+**要做**：
+1. **被截掉的原文留第二份**，且**能从标记找回来**：标记里给出一个**可核的指针**（例如那枚决策的稳定 id／审计行序号），并且有一个**今天就能用的读取入口**把它打出来 —— 仓里已有 console verb `decisions`（`approval_reply.go:498`，`record` 在 `:472`，保留最近 64）⇒ 优先让它能显示"这条决策的原始理由全文"。
+2. **口径三条**（缺一条不算完）：
+   - 正常长度（≤上限）的理由：**不许留多余副本**（只在真截断时才有第二份，⛔ 无脑双写）。
+   - 超长理由：原文完整落第二份（若受 `internal/observe/redact.go:37 MaxLoggedString = 512` 限，则**按 512 截并在标记里说清"原文另存已到 512 上限"**，⛔ 假称全文）。
+   - **空理由**：确定行为（今天是什么就写什么，⛔ 顺手改语义）。
+3. **三枚牙（行为）**：①200 字理由进 ⇒ 标记里的指针能在 `decisions` 里取回**逐字原文**（把"取回"删掉/改坏 ⇒ 红）②未超长的理由 ⇒ **不存在**第二份（删掉"只在截断时写"的判断 ⇒ 红）③空理由 ⇒ 行为确定（现状被改掉 ⇒ 红）。
+4. **⛔ 静默截断仍然不许**：即便有了第二份，主文本里那句标记必须**仍然存在**且带 `dropped` 数（⛔ 用"反正能找回"当理由把标记去掉）。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 转移表／`frontend/**`／`design/**`；⛔ 放宽既有断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 把理由明文写进会进 CI 日志的地方（这是审批理由，属敏感面 —— 第二份落**本地审计档**，⛔ 落产品日志）。
+**串行**：`go test ./cmd/wisp` 只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发；跑前 `Get-Process wisp.test`，有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 三枚牙要行为；**A1882** 整包读数带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等，停掉具名用自己的上限让它红；**A1893** 整包若无声断掉，先单跑那一枚复量，绿就记包级环境事故。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/observe/**`（⛔ 只读）、`docs/evidence/s1/219-*`。
+回话第一行＝commit hash ＋「标记现在长什么样（原文）」＋「`decisions` 怎么取回原文（命令＋输出样例）」＋「三枚牙的测试名＋拆掉时各自红句」。没干完写「未完成，卡在哪」。
