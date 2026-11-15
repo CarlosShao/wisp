@@ -1,0 +1,160 @@
+# 票 32（S4 验收）腿 A 现跑读数底片
+# 采集时刻: 2026-11-15 12:07:50 +08:00
+# 工作目录: D:\work\workspace\projects plans\Wisp
+
+## 0. HEAD
+43702bac7eb4b290434baa8ed394d666be35deca
+
+
+## 1. go test ./internal/present -count=1
+ok  	github.com/CarlosShao/wisp/internal/present	2.623s
+rc=0
+
+## 2. go test ./internal/tools -run Test23 -count=1 -v （只留 PASS/FAIL/SKIP 行）
+
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+=== RUN   Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+=== RUN   Test23ClipboardMemoryMovesBothDirections
+--- PASS: Test23ClipboardMemoryMovesBothDirections (0.00s)
+=== RUN   Test23ClipboardReadTreatsAZeroLengthBlockAsEmpty
+--- PASS: Test23ClipboardReadTreatsAZeroLengthBlockAsEmpty (0.00s)
+=== RUN   Test23RosterCoversElevenD34Rows
+--- PASS: Test23RosterCoversElevenD34Rows (0.00s)
+=== RUN   Test23RosterDeclarationsMatchTheFrozenTable
+--- PASS: Test23RosterDeclarationsMatchTheFrozenTable (0.00s)
+=== RUN   Test23WindowManageCloseIsL2ByFacts
+--- PASS: Test23WindowManageCloseIsL2ByFacts (0.00s)
+=== RUN   Test23PowerAndClipboardWriteCarryR8Classes
+--- PASS: Test23PowerAndClipboardWriteCarryR8Classes (0.00s)
+=== RUN   Test23VerbTableMapsEveryAction
+--- PASS: Test23VerbTableMapsEveryAction (0.00s)
+=== RUN   Test23UnknownVerbIsRefusedBeforeTheBackend
+--- PASS: Test23UnknownVerbIsRefusedBeforeTheBackend (0.00s)
+=== RUN   Test23PowerShutdownRequiresTheTypedWord
+--- PASS: Test23PowerShutdownRequiresTheTypedWord (0.00s)
+=== RUN   Test23ExecuteRendersDetailReportAndBytes
+--- PASS: Test23ExecuteRendersDetailReportAndBytes (0.00s)
+=== RUN   Test23RefusalsBecomeModelActableErrors
+--- PASS: Test23RefusalsBecomeModelActableErrors (0.00s)
+=== RUN   Test23HostFaultIsNotSwallowed
+--- PASS: Test23HostFaultIsNotSwallowed (0.00s)
+=== RUN   Test23NoBridgeRefusesInsteadOfPanicking
+--- PASS: Test23NoBridgeRefusesInsteadOfPanicking (0.00s)
+=== RUN   Test23ClipboardWriteFactsFuseToL2
+--- PASS: Test23ClipboardWriteFactsFuseToL2 (0.00s)
+=== RUN   Test23ClipboardWriteIsAFrozenC25Channel
+--- PASS: Test23ClipboardWriteIsAFrozenC25Channel (0.00s)
+=== RUN   Test23WindowsZeroBridgeReachesABackend
+--- PASS: Test23WindowsZeroBridgeReachesABackend (0.01s)
+=== RUN   Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey
+--- PASS: Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey (0.02s)
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+=== RUN   Test23LiveClipboardRoundTripThroughRealOS
+--- SKIP: Test23LiveClipboardRoundTripThroughRealOS (0.00s)
+=== RUN   Test23ClipboardReadSourceFeedsR4ThroughWrite
+--- PASS: Test23ClipboardReadSourceFeedsR4ThroughWrite (0.00s)
+=== RUN   Test23ScreenCaptureCarriesPixelsOnTheImageChannel
+--- PASS: Test23ScreenCaptureCarriesPixelsOnTheImageChannel (0.00s)
+=== RUN   Test23ScreenCaptureImageCrossesTheBridge
+--- PASS: Test23ScreenCaptureImageCrossesTheBridge (0.00s)
+=== RUN   Test23CapturePixelsNeverReachRowOrLog
+--- PASS: Test23CapturePixelsNeverReachRowOrLog (0.00s)
+=== RUN   Test23NonCaptureResultsCarryNoPhantomImage
+--- PASS: Test23NonCaptureResultsCarryNoPhantomImage (0.00s)
+=== RUN   Test23CaptureAltNamesDRMBlackFrame
+--- PASS: Test23CaptureAltNamesDRMBlackFrame (0.00s)
+=== RUN   Test23UIPIPredicateRefusesElevatedTargetBeforeAnyByte
+--- PASS: Test23UIPIPredicateRefusesElevatedTargetBeforeAnyByte (0.00s)
+=== RUN   Test23UIPIPredicateLetsLiveNonElevatedTargetThrough
+--- PASS: Test23UIPIPredicateLetsLiveNonElevatedTargetThrough (0.00s)
+=== RUN   Test23IntegrityOfProcessAnchorsOnThisProcess
+--- PASS: Test23IntegrityOfProcessAnchorsOnThisProcess (0.00s)
+=== RUN   Test23ProcessNameIsTheD45BindingKey
+--- PASS: Test23ProcessNameIsTheD45BindingKey (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.152s
+rc=0
+
+## 3. go test ./internal/session -run TestTicket28Conversation -count=1 -v
+
+--- PASS: TestTicket28ConversationThirtySecondsClosesMicFirst (0.00s)
+--- PASS: TestTicket28ConversationIdleResetsOnSpeech (0.00s)
+--- PASS: TestTicket28ConversationPrivacyConfirmOnce (0.00s)
+--- PASS: TestTicket28ConversationDeniedOrUnwiredStaysOff (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	0.048s
+rc=0
+
+## 4. go test ./internal/audio -run 'TestHotplug|TestOpenOccupied|TestGateConversation' -count=1 -v
+
+--- PASS: TestGateConversationWindowOnPathT (1.38s)
+--- PASS: TestHotplugReenumerateOnce (0.28s)
+--- PASS: TestHotplugStaleHandleFailsLoudly (0.39s)
+--- PASS: TestHotplugReenumerateFailureNamesDevice (0.07s)
+--- PASS: TestOpenOccupiedAndPermissionDenied (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	2.169s
+rc=0
+
+## 5. go test ./internal/speech -run 'TestPunctuationOnThe300CharDictationFixture' -count=1 -v （本机 onnxruntime 遮蔽，整族 SKIP）
+time=2026-11-15T12:08:45.447+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPunctuationOnThe300CharDictationFixture
+    punctuate_test.go:284: punctuation stage unavailable on this host: speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)
+--- SKIP: TestPunctuationOnThe300CharDictationFixture (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/speech	0.056s
+rc=0
+
+## 6. docs/evidence/s4 是否存在
+Test-Path docs\evidence\s4 => False
+docs/evidence 子目录: precheck, s0, s1, s2, s3
+
+## 7. L1 画像注入：生产侧谁给 agent.Config.Profiles 赋值
+尺: Select-String -Path (生产 .go) -Pattern "\.Profiles\s*=|Profiles:\s"
+命中 2 行:
+  D:\work\workspace\projects plans\Wisp\internal\agent\loop.go:677  Profiles:  l.opt.Config.Profiles,
+  D:\work\workspace\projects plans\Wisp\internal\memory\dao_profile.go:130  return nil, fmt.Errorf("memory: list profiles: %w", err)
+cmd/wisp 内 "Profiles:" 命中数: 0
+全仓 ListProfiles 调用点(生产):
+  D:\work\workspace\projects plans\Wisp\internal\memory\dao_profile.go:126  func (s *Store) ListProfiles(ctx context.Context) ([]Profile, error) {
+  D:\work\workspace\projects plans\Wisp\internal\memory\privacy.go:50  rows, err := s.ListProfiles(ctx)
+  D:\work\workspace\projects plans\Wisp\internal\memory\privacy.go:202  rows, err := s.ListProfiles(ctx)
+  D:\work\workspace\projects plans\Wisp\internal\memory\undo.go:27  profiles, err := s.ListProfiles(ctx)
+（上节第 2 枚命中是 grep 假阳性：那是错误文案 list profiles:，不是赋值；真赋值只有 loop.go:677 的转发，无生产者。）
+
+## 8. EvAudioDeviceLost 在生产里有没有派发点
+  D:\work\workspace\projects plans\Wisp\cmd\wisp\resident_audio_windows.go:39  //     EvAudioDeviceLost edge starts only from Listening (internal/statemachine/
+  D:\work\workspace\projects plans\Wisp\cmd\wisp\resident_audio_windows.go:358  fmt.Printf("wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，" +
+  D:\work\workspace\projects plans\Wisp\internal\statemachine\events.go:30  EvAudioDeviceLost     Event = "audio.device-lost"      // #14
+  D:\work\workspace\projects plans\Wisp\internal\statemachine\table.go:97  D43: 14, From: StateListening, Event: EvAudioDeviceLost, To: StateError,
+  判读：events.go 只定义常量、table.go 只登记转移、resident_audio_windows.go 两处是注释/打印文案 => 生产零 dispatch。
+
+## 9. -tags webrtcap 有没有进默认/发布构建
+  Select-String -Path scripts\build.ps1 -Pattern 'webrtcap' => 0 命中
+  构建命令行原文（scripts/build.ps1:270）:
+    & $go.Source build -trimpath -ldflags $ldflags -o (Join-Path $outDir 'wisp.exe') ./cmd/wisp
+  => 唯一构建脚本不带 -tags，产物 wisp.exe 走 aec_stub（NewApm 恒 ErrUnavailable => bargein monitor 不武装）。
+
+## 10. 五轮对话日志 / S4 证据件普查
+  docs/evidence 下 mp4/webm/mkv 数: 0
+  '五轮' 或 '5-round' 在 cmd+internal（含测试）命中: 0
+
+## 11. SLO 表里的 Conversation 行
+  docs/SLO.md:51  | `Conversation`（开麦多轮） | 同 Warm + 采集缓冲 ≤20MB | 未测 | 待 S4（依赖 Warm 态口径裁定） |
+  docs/SLO.md:127  D32 16.3.3 的 D47 注：Path C 全双工下 ASR 与 TTS 必须共存，`Conversation` 预算 = Warm +
+  docs/SLO.md:129  （不含标点、AEC、音频缓冲），Path C 的 Conversation 态预算必然显著高于 Warm——S4 实测时
+  docs/SLO.md:163  栈即占 ~420 句柄。裁定：**含悬浮球窗口栈的态（Sleeping/Armed/Warm/Conversation/面板/峰值）
+  docs/SLO.md:532  | `Conversation` | 0 | true | **skeleton** | 24 / 24 | 0.0216% | 0.2801% | 4.26MB | 176 |
