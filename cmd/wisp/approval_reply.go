@@ -70,6 +70,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 	"unicode"
@@ -203,6 +204,20 @@ type replySurface struct {
 	// surface that could not name the run it answers for could not persist
 	// anything either.
 	rt *agentRuntime
+	// seat is WHO OWNS the 长期 branch's three objects (gate, config write door,
+	// stdout, and the档 the widening card is booked under) when that owner is
+	// not a run. Ticket 219 AC#1 needs exactly this: the resident process's
+	// double-click shape assembles no task pipeline at all, so there is no
+	// *agentRuntime to hand a surface - yet the two answer items that DO work
+	// there (允许一次 / 拒绝) and the third one (长期允许) all belong to the same
+	// verb table. nil means "derive it from rt", which is the console shape.
+	// See widenSeat and answerSurfaceWithoutPipeline.
+	seat *widenSeat
+	// review is the operator's own copy of what was answered, newest last
+	// (ticket 219 AC#5's third destination: 理由要能回看). A surface built by a
+	// case that does not care leaves it nil and record() then books the audit
+	// line only - no invented history.
+	review *replyReview
 	// vetoChannel is the channel this host's cancel transport really is. Empty
 	// means this assembly wired none of SPEC-06 §2's four, and Gate.Veto's own
 	// ChannelRegistry says so back.
@@ -314,7 +329,7 @@ func (s *replySurface) session(corr string) (string, error) {
 // queue hands it to the waiting call and internal/tools/bridge.go passes it back
 // to the model verbatim (orDefault(why, …) on the reject branches), which is the
 // channel 票 219's reason box is going to need.
-func (s *replySurface) reject(corr, reason string) (string, error) {
+func (s *replySurface) reject(corr string, reason replyReason) (string, error) {
 	return s.refuse(corr, reason, false)
 }
 
@@ -322,30 +337,33 @@ func (s *replySurface) reject(corr, reason string) (string, error) {
 // because the ONLY difference between them is which router the decision travels
 // through - and a second copy is how one of them grows a leniency the other does
 // not have.
-func (s *replySurface) refuse(corr, reason string, viaPanel bool) (string, error) {
+func (s *replySurface) refuse(corr string, reason replyReason, viaPanel bool) (string, error) {
 	card, _ := s.live.look(corr)
 	route, routeText := "native", "原生侧"
 	var err error
 	if viaPanel {
 		route, routeText = "panel", "面板路线"
-		err = s.live.h.PanelReject(s.ctx, corr, reason)
+		err = s.live.h.PanelReject(s.ctx, corr, reason.text)
 	} else {
-		err = s.live.h.Reject(s.ctx, corr, reason)
+		err = s.live.h.Reject(s.ctx, corr, reason.text)
 	}
 	if err != nil {
 		s.record("REFUSED", corr, card.Tool, route+"/reject", err.Error())
 		return "", err
 	}
-	s.record("ANSWERED", corr, card.Tool, route+"/reject", reason)
-	if reason == "" {
+	s.record("ANSWERED", corr, card.Tool, route+"/reject", reason.text)
+	if reason.text == "" {
 		return "已拒绝 " + corr + "（" + routeText + "，未填理由）：未执行", nil
+	}
+	if note := reason.truncationNote(); note != "" {
+		return "已拒绝 " + corr + "（" + routeText + "）：未执行，理由已随结果回给模型（" + note + "）", nil
 	}
 	return "已拒绝 " + corr + "（" + routeText + "）：未执行，理由已随结果回给模型", nil
 }
 
 // panelReject is the panel route's refusal - SPEC-06 §9 layer 3's 「拒绝」
 // button, and the only decision the page may send.
-func (s *replySurface) panelReject(corr, reason string) (string, error) {
+func (s *replySurface) panelReject(corr string, reason replyReason) (string, error) {
 	return s.refuse(corr, reason, true)
 }
 
@@ -446,12 +464,57 @@ func panelItemLine(item approval.PanelItem) string {
 // detail=) and WHICH SOURCE (route=) off one line. The durable JSONL copy was
 // already stamped by the slog handler; the console copy carries its own stamp
 // now, so both copies answer the same four questions.
+//
+// TICKET 219 AC#5's third destination hangs off THIS function, on purpose: a
+// review list filled anywhere else would be a second truth source about what was
+// answered, and the two would drift the first time a route was added. The audit
+// line stays the durable record; review is the operator's readable copy of it.
 func (s *replySurface) record(kind, corr, tool, route, detail string) {
-	if s == nil || s.audit == nil {
+	if s == nil {
 		return
 	}
-	s.audit("approval: REPLY %s corr=%q tool=%s route=%q detail=%q when=%s",
-		kind, corr, tool, route, detail, time.Now().Format(time.RFC3339))
+	when := time.Now()
+	if s.audit != nil {
+		s.audit("approval: REPLY %s corr=%q tool=%s route=%q detail=%q when=%s",
+			kind, corr, tool, route, detail, when.Format(time.RFC3339))
+	}
+	s.review.add(replyDecision{
+		when: when, kind: kind, corr: corr, tool: tool, route: route, detail: detail,
+	})
+}
+
+// decisions is the operator's own copy: what this process answered, in what
+// order, and with what reason (ticket 219 AC#5's third destination - 「今天它替
+// 我做了哪些决定」). Before this verb the reason had exactly two readers, the
+// audit sink and the model, and the human who typed it had no way back to it:
+// tool_call's thirteen frozen columns carry no reason (internal/memory/schema.go)
+// and a reply is not a tool call, so the only honest read face available in this
+// tree is the answer surface's own list.
+//
+// It says what it is and is not: the list is IN-PROCESS and bounded
+// (replyReviewKeep), the durable copy is the audit family, and it never
+// re-derives a decision from the queue - a card still waiting is not in here,
+// which is the difference between "what it decided" and "what it is asking".
+func (s *replySurface) decisions() (string, error) {
+	if s == nil || s.review == nil {
+		return "本进程没有答复回看账：这个装配没有接答复面，也就没有可回看的理由", nil
+	}
+	all := s.review.snapshot()
+	if len(all) == 0 {
+		return "本进程还没有答复过任何卡片（空账不是错误：一张都没答过）", nil
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "本进程最近 %d 条答复（新的在前；落盘的证据是日志里 approval: REPLY 那一族行）：", len(all))
+	for i := len(all) - 1; i >= 0; i-- {
+		e := all[i]
+		detail := strings.TrimSpace(e.detail)
+		if detail == "" {
+			detail = "（未填理由）"
+		}
+		fmt.Fprintf(&b, "\n  %s %s corr=%q tool=%s route=%q 理由/明细=%q",
+			e.when.Format(time.RFC3339), e.kind, e.corr, e.tool, e.route, detail)
+	}
+	return b.String(), nil
 }
 
 // attachReplyListener puts the answer side on this run. Called from
@@ -527,6 +590,7 @@ func (rt *agentRuntime) newReplySurface(root *observe.Root, vetoChannel approval
 		rt:          rt,
 		vetoChannel: vetoChannel,
 		ctx:         root.Ctx,
+		review:      newReplyReview(),
 	}
 	rt.reply = surface
 	// Bind the seam to this gate before anything can be answered: the ledger was
@@ -670,11 +734,11 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 	case "session":
 		return s.session(corr)
 	case "no":
-		return s.reject(corr, sanitizeReplyText(arg))
+		return s.reject(corr, washReason(arg))
 	case "veto":
 		return s.veto(corr)
 	case "panel-no":
-		return s.panelReject(corr, sanitizeReplyText(arg))
+		return s.panelReject(corr, washReason(arg))
 	case "panel-yes":
 		return s.panelAllow(corr)
 	case "always":
@@ -685,19 +749,24 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 		// and a rule text is full of them. Rejoin before parsing: a revocation
 		// names a line, it does not answer a card.
 		return s.revokeRule(strings.TrimSpace(corr + " " + arg))
+	case "decisions":
+		// Ticket 219 AC#5's third destination: the operator reads back what was
+		// answered and why. No correlation id - this is a list, not a decision.
+		return s.decisions()
 	case "head":
 		return s.head()
 	case "view":
 		return s.view(corr)
 	case "help":
-		return "yes/session/no/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
+		return "yes/session/no [理由]/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
 			"always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
 			"revoke <规则或目录>（撤销一条长期规则：revoke [fs] allowed_dirs += \"D:/某目录\" 或 revoke D:/某目录，" +
 			"只减不加、下一次启动生效，票 226）· " +
+			"decisions（回看本进程最近答复过的卡片与理由，票 219）· " +
 			"L1 窗口存活时任意输入（含回车）＝否决（票 170）· " +
 			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
-		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/revoke/panel-no/panel-yes/head/view/help/quit）", verb)
+		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/revoke/decisions/panel-no/panel-yes/head/view/help/quit）", verb)
 	}
 }
 
@@ -705,24 +774,85 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 // result text the model reads, so the ceiling is not a display choice; 160 runes
 // is deliberately below observe's own 512-character log bound so the ledger and
 // the model-visible text cannot disagree about how much of a sentence arrived.
+//
+// TICKET 219 AC#5: THE CEILING IS NOT ALLOWED TO BE SILENT. Until this leg the
+// wash dropped every rune past 160 with no mark anywhere: 200 typed, 160
+// delivered, and neither the model, the audit line nor the operator could tell a
+// 160-rune reason from a 200-rune one (ticket 219's 2026-11-15 收件 measured it:
+// 200 in / 160 out, zero hits for any truncation marker). The fix keeps the
+// ceiling and turns the cut into a READING - washReplyText reports how many runes
+// it dropped, replyReason carries that number, and the text itself ends with a
+// sentence naming both numbers. The marker is appended ON TOP of the 160 on
+// purpose: a mark that could itself be cut off is the same silence one layer
+// deeper.
 const replyReasonMax = 160
 
-// sanitizeReplyText washes one operator-typed reason.
+// replyTruncationMark opens that sentence. It is ONE spelling so the audit line,
+// the model-visible text and the review list cannot drift into three ways of
+// saying the same thing, and it is a sentence rather than an ellipsis because
+// "…" is a display convention a reader may miss while a count is not.
+const replyTruncationMark = "…(理由过长，已截断"
+
+// replyReason is one operator-typed reason as this surface carries it: the washed
+// text that will be relayed, plus how much of what the operator typed did NOT
+// fit. The second number is what makes 「空理由」 and 「超长理由」 two states a
+// caller can branch on instead of two strings a reader has to guess at (AC#5's
+// "空理由与超长理由各有确定行为").
+type replyReason struct {
+	text string
+	// dropped counts the runes of the operator's own sentence the ceiling
+	// removed, after whitespace collapsing. Zero means text is everything they
+	// typed.
+	dropped int
+}
+
+// truncationNote is the sentence a caller adds when the reason was cut, or ""
+// when it was not.
+func (r replyReason) truncationNote() string {
+	if r.dropped <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("理由超过 %d 字上限，已截断 %d 字（截断标记在正文末尾，模型与审计都看得到）",
+		replyReasonMax, r.dropped)
+}
+
+// washReason turns one raw argument into the value the surface answers with.
+func washReason(raw string) replyReason {
+	text, dropped := washReplyText(raw)
+	return replyReason{text: text, dropped: dropped}
+}
+
+// sanitizeReplyText is the historical name for the wash, kept because this
+// package's own comments and 216's display-scrub notes already point at it. It
+// returns the marked text; use washReason where the dropped count matters.
+func sanitizeReplyText(s string) string {
+	text, _ := washReplyText(s)
+	return text
+}
+
+// washReplyText washes one operator-typed reason and reports how many of its
+// runes the ceiling removed.
 //
 // Why wash a human's own words at all: the reason is relayed into the model's
 // tool result verbatim (bridge.go's orDefault(why, …)), and a control character
 // in that string is how a reply starts spelling things to the model that the
 // operator never typed. This is the same family as 票 216's control-character
 // wash, applied at the surface that produces the text rather than downstream.
-// Only the shape is washed: the words, their order and their length survive, so
-// 「为什么拒绝」 stays the operator's sentence rather than something this file
-// paraphrased.
-func sanitizeReplyText(s string) string {
+// Only the shape is washed - never the meaning: the words, their order and their
+// length survive, which is what keeps 「为什么拒绝」 the operator's sentence
+// rather than something this file paraphrased.
+//
+// The cut is now countable and stated (ticket 219 AC#5): a reason over the
+// ceiling comes back as the first replyReasonMax runes of the washed text plus
+// replyTruncationMark's sentence, and the second return value is the number of
+// runes dropped. The dropped runes themselves are NOT kept anywhere, and that
+// limit is said out loud in the marker rather than implied - storing a second,
+// unbounded copy of operator text was not this ticket's to add.
+func washReplyText(s string) (string, int) {
 	if s == "" {
-		return ""
+		return "", 0
 	}
-	var b strings.Builder
-	runes := 0
+	washed := make([]rune, 0, len(s))
 	pendingSpace := false
 	for _, r := range s {
 		if unicode.IsControl(r) {
@@ -732,19 +862,72 @@ func sanitizeReplyText(s string) string {
 			// A run of whitespace collapses to one separator, so a reason typed
 			// with a trailing newline cannot become a two-line string in the
 			// model's tool result.
-			pendingSpace = b.Len() > 0
+			pendingSpace = len(washed) > 0
 			continue
 		}
 		if pendingSpace {
-			b.WriteRune(' ')
-			runes++
+			washed = append(washed, ' ')
 			pendingSpace = false
 		}
-		b.WriteRune(r)
-		runes++
-		if runes >= replyReasonMax {
-			break
-		}
+		washed = append(washed, r)
 	}
-	return b.String()
+	if len(washed) <= replyReasonMax {
+		return string(washed), 0
+	}
+	dropped := len(washed) - replyReasonMax
+	text := string(washed[:replyReasonMax]) +
+		fmt.Sprintf("%s %d 字，原文共 %d 字)", replyTruncationMark, dropped, len(washed))
+	return text, dropped
 }
+
+// replyReviewKeep is how many answered replies the in-process review list holds.
+// A display window, not an SLO number: the durable record of every reply is the
+// audit line, and this exists so the operator can ask "what did it decide for me
+// just now" without opening a log file.
+const replyReviewKeep = 64
+
+// replyDecision is one line of that list.
+type replyDecision struct {
+	when   time.Time
+	kind   string
+	corr   string
+	tool   string
+	route  string
+	detail string
+}
+
+// replyReview is the bounded review list behind the `decisions` console verb -
+// ticket 219 AC#5's third destination (「今天它替我做了哪些决定」). It is a mutex
+// and not a channel because two writers reach it (the reply listener's goroutine
+// and the ui-sta tray thread) and the reader is a third.
+type replyReview struct {
+	mu      sync.Mutex
+	entries []replyDecision
+}
+
+func newReplyReview() *replyReview { return &replyReview{} }
+
+// add appends one answer and keeps only the newest replyReviewKeep of them. nil
+// is legal: a surface a case built by hand has no review list and books nothing.
+func (r *replyReview) add(d replyDecision) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.entries = append(r.entries, d)
+	if over := len(r.entries) - replyReviewKeep; over > 0 {
+		r.entries = append(r.entries[:0], r.entries[over:]...)
+	}
+}
+
+// snapshot copies the list oldest-first, so the caller never holds the lock.
+func (r *replyReview) snapshot() []replyDecision {
+	if r == nil {
+		return nil
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return append([]replyDecision(nil), r.entries...)
+}
+

@@ -54,6 +54,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -340,7 +341,7 @@ func (ra *residentApproval) trayAnswerExecutor(surface *replySurface) trayAnswer
 		case trayAnswerAllowOnce:
 			sentence, err = surface.allow(card.CorrelationID)
 		case trayAnswerReject:
-			sentence, err = surface.reject(card.CorrelationID, trayRejectReason)
+			sentence, err = surface.reject(card.CorrelationID, replyReason{text: trayRejectReason})
 		case trayAnswerAllowAlways:
 			sentence, err = surface.always(card.CorrelationID)
 		default:
@@ -353,6 +354,59 @@ func (ra *residentApproval) trayAnswerExecutor(surface *replySurface) trayAnswer
 			return fmt.Sprintf("托盘「%s」没有落到卡片 %s 上：%v", trayAnswerLabel(verb), card.CorrelationID, err)
 		}
 		return sentence
+	}
+}
+
+// answerSurfaceWithoutPipeline builds the ONE answer side this process has when
+// no task pipeline was assembled - ticket 219 AC#1's ★ finding.
+//
+// THE HOLE THIS CLOSES, measured. Until this leg the tray's three answer items
+// were attached only inside resident_windows.go's `if src != nil && src.run !=
+// nil` block, and startResidentTaskSource returns nil before assembling anything
+// whenever interactiveStdin() has no console (resident_task_source_windows.go's
+// early return). A double-clicked wisp - the launch shape D2 and ticket 228 both
+// call the process the user actually launches - therefore had a tray with three
+// answer items and NO executor behind them: a press booked one "unhosted
+// gesture" line and nothing else. Ticket 219's 2026-11-15 收件 measured exactly
+// that (`resident_windows.go:568-572`, src.run nil).
+//
+// WHY A SURFACE AND NOT A SECOND VERB TABLE. What is missing in that shape is
+// not the answer logic, it is the four handles that logic needs. The card ledger
+// (ra.cards) exists from boot - it is a field of this struct, filled by
+// ballCardUI.Prompt for every card the orb really showed - and it is already
+// Attached to this process's gate (newResidentApprovalWithConfig). So the same
+// replySurface the console leg uses can be built over it: allow/ reject are the
+// native route (Replies.Allow / Replies.Reject, single-use grant and all), and
+// 长期允许 reaches replySurface.always over a widenSeat naming this process's own
+// config Manager. No second copy of a route, a refusal vocabulary or an audit
+// sentence is created here.
+//
+// WHAT IT DOES NOT CLAIM. It is not a task pipeline and it cannot mint one: the
+// 「本会话内允许」 verb needs session identity + a grant ledger, and both are
+// minted inside assembleRuntime (ticket 265's A601 §4 refuses a second mint), so
+// that verb stays unreachable in this shape and is registered as a named ruling
+// in this leg's evidence file rather than faked here.
+func (ra *residentApproval) answerSurfaceWithoutPipeline(cfg *config.Manager, mode func() risk.Mode) *replySurface {
+	if ra == nil || ra.cards == nil || ra.gate == nil {
+		return nil
+	}
+	return &replySurface{
+		gate: ra.gate,
+		// ra.cards IS this process's ledger: the same object ballCardUI records
+		// every displayed card into. Wrapping it (rather than minting a Replies)
+		// is what keeps one truth source for "which cards can be answered".
+		live:  &nativeCards{h: ra.cards},
+		audit: ra.residentAuditf,
+		// No run, no runtime: the seat is what carries the 长期 branch instead of
+		// a *agentRuntime (approval_always.go's widenSeat).
+		seat: &widenSeat{
+			gate: ra.gate,
+			mgr:  func() *config.Manager { return cfg },
+			out:  os.Stdout,
+			mode: mode,
+		},
+		ctx:    ra.root,
+		review: newReplyReview(),
 	}
 }
 

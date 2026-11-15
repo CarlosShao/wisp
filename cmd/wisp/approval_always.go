@@ -48,7 +48,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
+	"github.com/CarlosShao/wisp/internal/agent/approval"
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/statemachine"
@@ -65,6 +68,51 @@ const (
 	allowWidenTool   = "config.allow_dir"
 )
 
+// widenSeat is everything the 长期 branch needs from whoever owns it, and the
+// reason it is a VALUE instead of a read through replySurface.rt.
+//
+// Ticket 219 AC#1: the resident process's double-click shape assembles no task
+// pipeline, so its answer surface has no *agentRuntime behind it - and until this
+// leg that also meant the tray's 长期允许 item could not reach this verb at all
+// (the tray's items were not even wired in that shape). The seat lets the SAME
+// verb body run over the objects that DO exist there: the resident gate, the
+// boot's config Manager, the process's own stdout and the档 its panel chain
+// screens under. Nothing in this struct is a route or a decision - it is four
+// handles, so a second copy of the widening logic (the thing this file's header
+// refuses) never has to be written for the second host.
+type widenSeat struct {
+	gate *approval.Gate
+	// mgr is a READER, not a value: on the run seam the Manager is assigned
+	// during assembly, after the surface exists (approval_reply.go's
+	// newReplySurface is called from the same function that builds it), so
+	// capturing it by value here would capture the nil it had at that moment.
+	mgr   func() *config.Manager
+	out   io.Writer
+	mode  func() risk.Mode
+}
+
+// widenSeatOf answers "who owns the 长期 branch for this surface": the seat a
+// host handed in, else the run this surface belongs to, else nil (a surface with
+// neither refuses the verb - see always()).
+func (s *replySurface) widenSeatOf() *widenSeat {
+	if s == nil {
+		return nil
+	}
+	if s.seat != nil {
+		return s.seat
+	}
+	if s.rt == nil {
+		return nil
+	}
+	rt := s.rt
+	return &widenSeat{
+		gate: rt.gate,
+		mgr:  func() *config.Manager { return rt.mgr },
+		out:  rt.stdout,
+		mode: rt.permissionMode,
+	}
+}
+
 // always is the 长期 verb (ticket 201 AC#4). It prints the rule text and hands the
 // re-confirmation to the widening worker; it stores nothing by itself.
 func (s *replySurface) always(corr string) (string, error) {
@@ -77,7 +125,8 @@ func (s *replySurface) always(corr string) (string, error) {
 		s.record("REFUSED", corr, card.Tool, "native/always", "该路线没有允许动作，也就没有可存的长期规则")
 		return "", fmt.Errorf("%s 是执行前阻止窗口，只有否决；「一直」是长期允许，得先有允许这一动作（SPEC-06 §2 B1）", card.Level)
 	}
-	if s.rt == nil || s.rt.mgr == nil {
+	seat := s.widenSeatOf()
+	if seat == nil || seat.gate == nil || seat.mgr == nil || seat.mgr() == nil {
 		s.record("REFUSED", corr, card.Tool, "native/always", "配置写面未装配")
 		return "", errors.New("配置写面没有装配：这一发能允许，但无处可存长期规则，所以什么都不写")
 	}
@@ -98,7 +147,7 @@ func (s *replySurface) always(corr string) (string, error) {
 	s.record("STAGED", corr, card.Tool, "native/always", rule)
 	observe.Default.Spawn("approval-waiter", "approval", root, func(ctx context.Context) {
 		defer root.Cancel()
-		s.runWidening(ctx, corr, dir, rule)
+		s.runWidening(ctx, seat, corr, dir, rule)
 	})
 	return "要存的规则：" + rule + "\n  这会再起一张 L2 卡（第二重确认，PLAN.md:1645-1646），" +
 		"卡上会印自己的编号；同意它才真写进 config.toml，" +
@@ -109,17 +158,33 @@ func (s *replySurface) always(corr string) (string, error) {
 // runWidening raises the second card, waits for it off the listener's goroutine,
 // and writes only on a native allow. Every branch books one audit line, because
 // 「存了没有」 must be a reading and not an inference.
-func (s *replySurface) runWidening(ctx context.Context, fromCorr, dir, rule string) {
-	revoke := s.rt.gate.AdmitTextTask(allowWidenTaskID)
+//
+// seat is a parameter (ticket 219 AC#1): the caller already resolved which gate,
+// write door, stdout and档 own this widening, so this body never has to know
+// whether it is running inside a task pipeline or in the resident process's
+// no-pipeline shape.
+func (s *replySurface) runWidening(ctx context.Context, seat *widenSeat, fromCorr, dir, rule string) {
+	revoke := seat.gate.AdmitTextTask(allowWidenTaskID)
 	defer revoke()
-	ans, why := s.rt.gate.PendingApproval(ctx, tools.Decision{
+	// A seat with no stdout is legal (a host that only has the audit sink): the
+	// sentences below are duplicates of the record lines, so discarding them
+	// loses no fact a reader cannot get from the ledger.
+	out := seat.out
+	if out == nil {
+		out = io.Discard
+	}
+	mode := risk.DefaultMode()
+	if seat.mode != nil {
+		mode = seat.mode()
+	}
+	ans, why := seat.gate.PendingApproval(ctx, tools.Decision{
 		TaskID: allowWidenTaskID,
 		Tool:   allowWidenTool,
 		Level:  risk.L2,
 		Reason: rule + "（这是「一直」要求的 L2 级重新确认；原来那张卡 " + fromCorr +
 			" 的答复与这张无关，各答各的）",
 		Paths: []string{dir},
-		Mode:  s.rt.permissionMode(),
+		Mode:  mode,
 	})
 	if ans != tools.AnswerAllow {
 		if why == "" {
@@ -127,19 +192,19 @@ func (s *replySurface) runWidening(ctx context.Context, fromCorr, dir, rule stri
 		}
 		s.record("WIDEN-REFUSED", fromCorr, allowWidenTool, "native/always",
 			fmt.Sprintf("answer=%s dir=%q detail=%q", ans, dir, why))
-		fmt.Fprintf(s.rt.stdout,
+		fmt.Fprintf(out,
 			"wisp run: 长期规则未存储（第二张卡的答案是 %s，最坏后果就是什么都不写）：%s\n", ans, why)
 		return
 	}
-	if err := s.rt.mgr.AddAllowedDir(dir); err != nil {
+	if err := seat.mgr().AddAllowedDir(dir); err != nil {
 		s.record("WIDEN-WRITE-FAILED", fromCorr, allowWidenTool, "native/always",
 			fmt.Sprintf("dir=%q err=%v", dir, err))
-		fmt.Fprintf(s.rt.stdout, "wisp run: 第二张卡批准了，但写盘失败，配置一个字节都没改：%v\n", err)
+		fmt.Fprintf(out, "wisp run: 第二张卡批准了，但写盘失败，配置一个字节都没改：%v\n", err)
 		return
 	}
 	s.record("WIDEN-APPLIED", fromCorr, allowWidenTool, "native/always",
 		fmt.Sprintf("dir=%q section=fs key=allowed_dirs effect=next-start", dir))
-	fmt.Fprintf(s.rt.stdout,
+	fmt.Fprintf(out,
 		"wisp run: 长期规则已写入 config.toml 的 [fs] allowed_dirs：%s（下一次启动生效，本次运行仍按旧名单）\n", dir)
 }
 

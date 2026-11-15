@@ -68,6 +68,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/panel"
+	"github.com/CarlosShao/wisp/internal/risk"
 )
 
 // residentPanelPump is the no-pipeline shape's publisher: one pump over the
@@ -153,6 +154,24 @@ func residentPumpSources65(gate *approval.Gate, cfg *config.Manager, disp *panel
 		}
 	}
 	return src
+}
+
+// residentAnswerMode is the档 reader ticket 219 AC#1's no-pipeline tray executor
+// books its widening card under: the chain's perm.Store, read through the router
+// the exact way residentPumpSources65 reads the mode row above (same type
+// assertion, same "only when the row really is the production handler" rule).
+// It is a CLOSURE because rp is the boot's holder - the panel chain may have
+// failed to assemble, and a nil disp must then answer the strictest档 rather than
+// a made-up tier (risk.DefaultMode's own posture).
+func residentAnswerMode(rp *PanelManager) func() risk.Mode {
+	return func() risk.Mode {
+		if rp != nil {
+			if mw, ok := rp.disp.Mode.(*panel.ModeWriteHandler); ok && mw.Modes != nil {
+				return mw.Modes.PermissionMode()
+			}
+		}
+		return risk.DefaultMode()
+	}
 }
 
 // publish drives one packet through the exit. Called from showOnThread after a

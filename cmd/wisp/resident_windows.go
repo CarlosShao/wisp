@@ -565,10 +565,36 @@ func runResident() {
 	// Both are attached inside this `if`: a boot whose pipeline was refused has no
 	// ledger to spend a grant from and no producer to read a state off, and the
 	// tray items + the record line then say that instead of pretending.
+	//
+	// TICKET 219 AC#1 CORRECTED THAT SENTENCE, and this is the else branch it
+	// owes. "A refused pipeline has no ledger to spend a grant from" was FALSE:
+	// the ledger (ra.cards) is built at boot by newResidentApprovalWithConfig and
+	// filled by ballCardUI.Prompt for every card the orb really showed - the
+	// pipeline is one way to REACH a card, never the reason one can be answered.
+	// What the refused-pipeline boot lacked was an EXECUTOR for the tray's three
+	// items, so a press booked one "unhosted gesture" line and stopped: the
+	// measured hole is ticket 219's 2026-11-15 收件 (`resident_windows.go:568-572`,
+	// src.run nil on the double-click shape). The else branch builds the same
+	// replySurface over the objects this shape really has - the boot's gate, the
+	// boot's card ledger, the boot's config Manager for the 长期 write door - so
+	// 允许一次 / 拒绝 / 长期允许 have a real executor in the launch shape the user
+	// actually uses. It is NOT a task pipeline: 「本会话内允许」 needs the session
+	// identity the assembly mints and stays a named ruling in this leg's evidence.
 	if src != nil && src.run != nil {
 		ra.bindRuntime(src.run)
 		src.run.bindWaitingStateSink(rb.projectWaitingState)
 		rb.attachTrayAnswers(ra.trayAnswerExecutor(src.answers))
+	} else {
+		// cfgMgr65 is the panel chain's Manager, built 209 lines above and alive in
+		// every launch shape; residentAnswerMode reads the档 the same way
+		// panel_resident_pump.go:150-154 does. A boot whose panel chain failed has
+		// both nil, and the 长期 item then refuses by name ("配置写面未装配") instead
+		// of writing somewhere nobody owns.
+		rb.attachTrayAnswers(ra.trayAnswerExecutor(ra.answerSurfaceWithoutPipeline(cfgMgr65, residentAnswerMode(rp))))
+		slog.Info("approval: 托盘三枚答复已接入无任务管线形状的执行者",
+			"shape", "no-console / double-click",
+			"config_manager", cfgMgr65 != nil,
+			"reason", "the card ledger exists from boot (ballCardUI.Prompt fills it), so allow/reject/always reach the native route without a pipeline; 「本会话内允许」 still needs the session identity the assembly mints")
 	}
 
 	// Ticket 329 form 甲: the one panel host this process owns becomes the
