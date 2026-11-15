@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）—— 票 454 诚实 QuickTime 被误拒（写腿，internal/panel）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/454-*.md` 全文并照它的 4 格 AC 做。
+
+**现象（票 214 收件腿真跑 10 例探针读到的，不是推断）**：一个**诚实的** QuickTime 文件（品牌 `qt  `）**声明** `video/quicktime` ⇒ **被拒**，拒的理由逐字是"文件头表明它是 video/mp4"。同字节内容声明 `video/mp4` ⇒ **收**。
+
+**机制**：`mp4` 与 `mov` **共用同一个 ISO 谓词**（都走 `ftyp` 那一族嗅探），判定表的**顺序让 mp4 先命中** ⇒ 声明为 `mov` 的文件被按 mp4 判，与自己的声明对不上 ⇒ 拒。
+⇒ **误拒（false negative）**，方向安全但诚实用户的 `.mov` 用不了。
+
+**要做**：**AC#1 先复现**（写测试，真 QuickTime 头品牌 `qt  ` ＋ 声明 `video/quicktime`，断言"被收"，**它必须先红**，红句原文抄进证据）→ 再修，**修在一个地方**：要么 mov 与 mp4 各自的谓词分开、要么"声明与嗅探一致"那一步接受**同一族内的互换**。⛔ 不许靠"把 mov 从允许表里删掉"或"放宽成谁都可以"来变绿。
+**AC#3 不许放宽到危险**：同一条改动后，一个**声明 mp4 但实际是别的族**的文件**仍须被拒**（给会红的测试名）。⇒ 这两条合起来才是"修对了"。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`／`design/**`；⛔ 放宽既有断言；⛔ 改附件上限（D36）；⛔push。
+**写面：`internal/panel/**`（本波 `cmd/wisp` 归另一条写腿，⛔ 你别碰）**、`docs/evidence/s1/454-*`。
+按 A1880：判"修好"必须给**行为牙**（删掉改动某枚行为测试变红），⛔ 只让字面钉红。
+
+回话第一行＝commit hash ＋「AC#1 红句原文（修前）」＋「修在哪一处（file:line＋一句话原理）」＋「mov 收了吗／别的族仍拒吗（两枚测试名）」＋「有没有放宽到危险（是/否＋判据）」。没干完写「未完成，卡在哪」。
