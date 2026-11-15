@@ -18,3 +18,7 @@ Wisp 仓 D:\work\workspace\projects plans\Wisp **只读审计腿**。⛔ 改产�
 交付 `docs/evidence/s1/46b-audit-20261115.md`：开头一行总结（**几成立／几不成立／几无法判**），然后逐条六项，末尾给"**必须回退的**"与"**可以留的**"两张清单。
 
 回话第一行＝commit hash ＋「六项：成立 a／不成立 b／无法判 c」＋「`DiskHeldStats` 有没有生产读者（有/无）」＋「必须回退的有几条（具名）」。
+---
+
+## 路由更正（20:0x，编排者）
+审计腿路由＝`provider:"magpie"`, `model:"group/group-review-and-audit"`（`~/.dsh/settings.yaml:44-51` 原文，自带 high/max 档）。⛔ `agent()` 不支持 `reasoning_effort` 参数，别传。⛔ 任何 fallback model。

@@ -37510,3 +37510,22 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 - **`w35g3`**：41 红，归因"全是 System32 onnxruntime" —— **实际 21 枚是绑定层、19 枚是夹具层、1 枚已知红**，且根因是**裸跑**
 
 **规矩**：报"整包有 N 红"之前，必须给三样：①**形状**（载具/裸跑/`-skip`）②**红册按层分类**（绑定层/夹具层/已知红/代码层）③**终点锚是否命中**。缺任何一样，那个数字⛔ 不可引用。
+
+## A1890（11-15 20:0x，机主带怒纠正）：**审计路由的准确写法写在 `~/.dsh/settings.yaml`，我自己猜前缀猜错了两次**
+
+**机主原话**：「审计必须强制走审计路由组，不允许随便换成 glm flash，难怪我积分用那么快」＋「用你自己搞的那个自定义的服务商下面的审计模型…Magpie (review/audit, max effort)」。
+
+**盘上原文**（`C:\Users\swq\.dsh\settings.yaml`）：
+- provider **`magpie`**（`apiKeyEnv: MAGPIE_GATEWAY_KEY`，`api: openai-completions`）
+- model **`id: group/group-review-and-audit`** / `name: group/review-and-audit · routing group`（`:44-45`）
+- `reasoningEfforts: { high: high, max: max }`（`:49-51`）⇒ 该路由自带 max 档
+- 干票写腿：`id: auto/glm-5.3-flash`（`:27`）✔ 我一直写对的
+
+**我犯的错**：两次都写成 `model:"group-review-and-audit"`（**漏掉开头的 `group/`**）⇒ 两次 null ⇒ 我还以为是"路由不可达"。**这不是路由的问题，是我的笔误**，而且我把它报成了"可能不被认"。
+**第二条错**：`audit46b` 的脚本里写了"审计 null 就落 glm"的兜底 —— **试图用便宜的路由替代审计**，正是机主说的烧积分。已 kill。
+**第三条错**：`agent()` 不支持 `reasoning_effort` 选项（只认 `label/phase/schema/provider/model`），我传了它 ⇒ 整个 workflow 直接 failed。
+
+**规矩（写进 goal 第 20 版）**：
+1. 审计/测试/审查腿 **只能** `provider:"magpie", model:"group/group-review-and-audit"`；⛔ 任何 fallback。
+2. 审计路由 null ⇒ **停下来问机主**，⛔ 自己换。
+3. **路由名一律先从 `~/.dsh/settings.yaml` 抄原文，⛔ 凭记忆拼**。（今天第二次因为"凭记忆写标识"出错：上一次是 `git show` 的数组拼接。）
