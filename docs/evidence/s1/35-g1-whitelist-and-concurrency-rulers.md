@@ -142,7 +142,7 @@ D:\\work\\soft\\Git\\bin\\bash.exe scripts/wisp-cli-staged-tests.sh -test.run=35
 | **最后一条 `=== RUN`** | `TestRunBooksWithASnapshotOfItsLiveQueue`（文件序 index **327/673**） |
 | **本波新测试在截断点前/后** | `:42` 两枚（index **278/279**）在**截断点前**，且**整包里已跑并 PASS**；`:44` 一枚（index **361**）在**截断点后**（327 < 361，未跑到）⇒ **整包对 `:44` 的覆盖＝0，`:44` 的绿只来自定向发**。 |
 
-- 停时 PASS/FAIL：**PASS=326，FAIL=1**。唯一 FAIL＝`TestAC4FocusReturnToPriorWindowGap33r5`（4.96s），在文件序 index **< 278**（远在我两枚 `:42` 测试之前）；它**不是我这枚文件里的测试**（我两枚是 `*35g1`，本发里均 PASS），且本腿只**新增测试文件、零改产码**，按构造不可能是它变红的成因——发跑兄弟腿的派单把它列为**本机已知红**之一。**41 枚语音红在更后面**（voice 用例文件序更后），本发窗口内**尚未出现**——即本波窗口里没有拿"41 红"当借口，也没被它掩盖。
+- 停时 PASS/FAIL：**PASS=326，FAIL=1**。唯一 FAIL＝`TestAC4FocusReturnToPriorWindowGap33r5`（4.96s，文件序 index **270**，早于我两枚 `:42` 测试的 278/279）；它**不是我这枚文件里的测试**（我两枚是 `*35g1`，本发里均 PASS），且本腿只**新增测试文件、零改产码**，按构造不可能是它变红的成因——发跑兄弟腿的派单把它列为**本机已知红**之一。**41 枚语音红在更后面**（voice 用例文件序更后），本发窗口内**尚未出现**——即本波窗口里没有拿"41 红"当借口，也没被它掩盖。
 - **文件序权威读数**（`wisp.test.exe -test.list=.*`，共 **673** 枚）：
   - `TestWhitelistFuzz50NamesAllRefusedAndAudited35g1` = **278**
   - `TestEveryRosterMethodDispatchesToItsOwnHandler35g1` = **279**
