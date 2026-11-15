@@ -18,9 +18,9 @@
 
 ## AC
 
-- [ ] **AC#1 先把"死"变成可判事实**：复现一次，抓**退出码／最后一行输出／Windows 事件日志里的 application error 条目（进程名＋模块）**。⛔ 用"卡住了"描述。
+- [x] **AC#1 先把"死"变成可判事实**：复现一次，抓**退出码／最后一行输出／Windows 事件日志里的 application error 条目（进程名＋模块）**。⛔ 用"卡住了"描述。
 - [ ] **AC#2 二分：球在跑 vs 球不在跑**：同一命令各跑 1 发 —— (a) 球在跑；(b) 球停（**由机主停，⛔ 腿自己 kill**；若机主不在，用"从未起过球的干净用户会话"替代并写明）。给两发的 `RUN/PASS/FAIL/SKIP` 与是否死亡。
-- [ ] **AC#3 二分：WebView2 窗那一区 vs 其余**：把死亡点附近那几枚用 `-test.run` 单独跑（含 `Test145ArgsJSON*`、`TestAC4PriorFocus*`），看在**没有整包负载**时是否也死。
+- [x] **AC#3 二分：WebView2 窗那一区 vs 其余**：把死亡点附近那几枚用 `-test.run` 单独跑（含 `Test145ArgsJSON*`、`TestAC4PriorFocus*`），看在**没有整包负载**时是否也死。
 - [ ] **AC#4 判归属并落成规矩**：若 (a) 死 (b) 不死 ⇒ 真因＝驻留球争用，**把"跑整包前必须停球"写进本仓的测试前置说明**（`scripts/wisp-cli-staged-tests.sh` 的注释或 `docs/evidence/` 一份具名说明，⛔ 改 `docs/specs/**`）。若不是 ⇒ 交回可判事实与最小复现，**本票不许自己猜着改产码**。
 - [ ] **AC#5 门禁**：本票若只改脚本注释/证据件，跑 `d22scan` 与 path-length 即够；若动产码，按整包 + 本机两枚已知红具名口径执行。
 
@@ -43,3 +43,36 @@
 - **AC#4 的"写进测试前置说明"没写**：它只在"球在跑死、球停不死"成立时才该写，而本波读数是"球在跑也能跑完"⇒ `scripts/wisp-cli-staged-tests.sh` **一个字未改**（连注释都未动）。
 - 证据：`docs/evidence/s1/450-fullrun-death-probe.md`；原始读数 `.scratch/wisp/probes/450/**`（`runs.txt`／`run1.out.txt`／`run2.out.txt`／`samples.csv`／`mem.csv`／`ac3-readings.txt`）。
 - ⛔ 未改任何产码；⛔ 未停／未重启球；⛔ 未 push。
+---
+
+## 探针收件（2026-11-15 11:0x，`d92e65d0a`＋`0595d4aa1`）：**死没复现**，我的第一嫌疑被推翻
+
+**尺1**：两条提交在；★**我逐条核了它们报的"未改产码"** —— `d92e65d0a` 的 15 个文件全是 `.scratch/wisp/probes/450/**` ＋本票 ＋证据件，`0595d4aa1` 只改证据件；**我另外自己跑了** `git status --porcelain -- cmd internal scripts` ⇒ **0 条脏**；`scripts/wisp-cli-staged-tests.sh` **连注释都没动**。
+**尺2**：`docs/evidence/s1/450-fullrun-death-probe.md` **15937 B**。
+**尺3 我核的一条关键推断**：它说「"死在 WebView2 区"是从文件序推出来的」—— 我现查 `Test145ArgsJSON` 定义在 `panel_run_145_test.go:217`，**该文件里 `startPanelForTest|NewWindow|webview` 命中 0** ⇒ **这枚自己根本不建窗**。判语成立。
+
+### 读数（腿跑的，两发都跑到底）
+`RUN=861 / PASS=619 / FAIL=2 / SKIP=17`，exit 1，载具判行 `FAIL … 1207.00s` 与 `1308.00s`（20–22 分钟）。两枚红是**本机具名已知红**：`TestAC4FocusReturnToPriorWindowGap33r5`（5.20/5.06s）、`TestAC246DevLegIgnoresTheTestTaskInjection`（37.63/35.74s，红句 `a dev Wisp is already running in this session`）—— 未修未删未跳。
+⇒ **`resident_*`／`ticket*`／`voice_*` 那一片今天有读数了**，昨日那个覆盖洞被填上。
+
+### ★我的第一嫌疑（驻留球争用）＝**否**
+球在跑时今天两发**都跑完**，昨晚 21:17–21:48 也跑完过一次。⇒ **不成立**。作为昨日死亡的触发因素，证据不足（AC#2(b) 未做）。
+
+### 事件日志臂（这条最有信息量，对的是**昨日那两发**）
+Application 日志覆盖 2026-07-30 起、**20,715 条**，其中提到 `wisp.test.exe` 的 **0 条**；昨日 21:50–23:45 只有 7 条无关条目（6 条 Security-SPP ＋ 1 条 igccservice）。对照：同机近 30 天**有 26 条 `Application Error`**（WebHostComponent.exe 等）⇒ **记录机制是开着的**，缺失不是"日志关了"。
+⇒ 昨日两发**不是未处理异常／访问冲突／fail-fast，是静默退出**。这同时**削弱"WebView2 不稳"**：WebView2 host 的 fail-fast 会写 WER。
+⇒ 但昨日两发的**退出码与最后一行没有留存**（stage-cli 日志被 23:31 之后的运行覆盖）⇒ **本票不猜**。
+
+### AC#3 二分（无整包负载）
+A1 `Test145ArgsJSON…` 单独 → **exit 0，PASS 0.22s**；A2 `TestAC4PriorFocus…` 单独 → **exit 0，PASS 1.27s**；A3 死亡点三枚一起 → `RUN=3 PASS=2 FAIL=1`（唯一红是已知环境红 4.98s）。⇒ 这三枚**不是死因载体**。
+
+### 我接受的一条更正（对我的判断）
+「死落在 WebView2 区」这句**是从文件序推的**，不是从"那枚测试自己开窗"来的。⇒ 票题里那个定位**我降级为待证**。
+
+### 未翻的格（照实）
+- **AC#2(b)「球不在跑」未做** —— 票面禁 kill 机主的球。腿交出 `run-balloff.ps1`（球还在就 exit 3 拒绝，本波已自测 `REFUSED … PID 49348`）。
+- **AC#4 未翻** —— 它成立的前提是二分做完；现在**死没复现**，没有"最小复现"可交。⇒ 按铁律 ⓪⓪⓪ 我不写"球争用"的规矩（读数反过来），也不让腿猜着改产码。
+- **本票当前状态**：**现象不复现、非球争用、非未处理异常**；要定性只剩"下一次复现时抓住退出码"。
+
+### 对机主的那句话作废
+我上一条让你「从托盘退出把球关掉，好让 450 的二分做完」—— **现在不需要了**。读数说球在跑不影响整包跑完。**别为了这张票去关球。**
