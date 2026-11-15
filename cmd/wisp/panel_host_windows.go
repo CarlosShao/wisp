@@ -278,6 +278,94 @@ type PanelManager struct {
 	// embed like every other path the bundle does not own. It is read by
 	// bringUp's installAssetFilter call and by nothing else.
 	preview panelPreviewLookup
+
+	// --- the bounded push queue (ticket 35 AC#5's remaining half) -----------
+	//
+	// WHAT WAS WRONG, MEASURED. Until this queue existed evalPanelJS handed every
+	// snapshot straight to the control's Dispatch, and the control appends each
+	// closure to an UNCAPPED slice (cmd/wisp/panel_control_windows.go's dispatchq,
+	// ported from the library's webview.go:443-448). A page that stops draining
+	// therefore grew that slice once per publish, forever. 35-recon's cell ⑤
+	// measured exactly that (docs/evidence/s1/35-recon-20261115.md:333), and the
+	// ticket's own code said so in so many words (cmd/wisp/panel_pump.go:502-506:
+	// "the merge/backpressure rule that decides how often a panel is pushed ...
+	// does not exist yet"). The AC half that still scores after the orchestrator's
+	// 10-08 ruling is "no unbounded memory (heap cap asserted)"; this queue is that
+	// half, and the push queue is the object it bounds - not the StreamLog, which
+	// four 35r8 rulers already measured.
+	//
+	// THE SHAPE: ONE PENDING SENTENCE, OLDEST SUPERSEDED. A push on this hop is a
+	// WHOLE-STATE packet: panelSnapshotEvalJS wraps the pump's own marshal verbatim
+	// (cmd/wisp/panel_snapshot_deliver_329.go:65-67) and the page's receiver
+	// replaces the snapshot object outright. So among any number of pushes not yet
+	// delivered, ONLY the newest can move the screen; keeping the rest would pin a
+	// full packet each and change nothing. The bound is therefore "one sentence
+	// waiting + one in flight", and the older sentence is DROPPED (oldest first,
+	// never the newest). This coalesces on the FREQUENCY axis only: two packets are
+	// never concatenated, spliced or rewritten, so it neither touches ticket 197
+	// leg B's "Overflow TRUNCATES and never merges" (that rule is about the
+	// StreamLog's rows, internal/panel/pump.go:632) nor smuggles the 10-08
+	// superseded "merges" sentence back in. The ticket's :49 cell and its 10-08
+	// 11:3x in-place ruling are the authority; see
+	// docs/evidence/s1/35-g3-backpressure-20261115.md for which sentence this
+	// implements and which two it may not.
+	//
+	// THE NUMBER, AND WHY IT IS 1. panelPushPendingCap is the bound, in sentences.
+	// Every term of it comes from the bound and none from the event rate: the unit
+	// is "one complete snapshot", whose own size the pump books, and keeping N of
+	// them multiplies that size by N. The panel row's ceiling for the WHOLE panel
+	// state is memCapPanel = 600 MiB (internal/observe/thresholds.go:23, read here,
+	// never edited); a transport that pins a copy per event can walk the process
+	// out of that row while every other number looks innocent. One pending sentence
+	// makes the queue's memory independent of the flood rate, which is the only
+	// shape that is actually bounded.
+	//
+	// THE READABLE EXIT. pushDelivered / pushCoalesced / pushSkipped are counters,
+	// exposed by PushStats() (read by the 35r9 rulers and available to any caller)
+	// and booked to the persistent log (cmd/wisp/logsink.go) twice per burst at
+	// most: one record when the queue first fills (so a consumer that never drains
+	// still leaves a trace) and one when the burst ends with the burst's own total
+	// (so a reader learns how many whole packets it superseded). Neither is per
+	// event, so the log itself is bounded too. A push that never happened is then a
+	// fact on disk rather than a silence; 35-recon measured the alternative (its
+	// cell ⑤ layer 4: failedPost had zero non-test readers).
+	//
+	// GUARDED BY pushMu, NOT m.mu: currentWindow takes m.mu, and a queue lock that
+	// could be taken while a caller holds m.mu would put the page's delivery order
+	// behind the manager's state lock for no reason.
+	pushMu              sync.Mutex
+	pushPending         []string
+	pushScheduled       bool
+	pushBurstLogged     bool
+	pushBurstSuperseded int64
+	pushDelivered       int64
+	pushCoalesced       int64
+	pushSkipped         int64
+}
+
+// panelPushPendingCap is the panel push queue's bound, in JS sentences. 1 is not a
+// placeholder and not "large enough never to fire": it is the smallest bound the
+// hop's semantics allow (see PanelManager's push-queue comment). A second pending
+// sentence COULD only ever be superseded by the third before the page read it, so
+// every number above 1 buys nothing and costs one more full snapshot of memory per
+// unit. A ruler that watches this queue (the 35r9 ruler file beside this one) fails
+// whenever the waiting count or the pinned bytes exceed it, and its positive control
+// proves the same ruler fires on an uncapped queue of the same shape.
+const panelPushPendingCap = 1
+
+// PanelPushStats is the push queue's readable face: how many sentences are waiting,
+// how many bytes they pin, and the three counters that make a loss a fact instead of
+// a silence. Delivered counts sentences handed to the page's Eval; Coalesced counts
+// pushes superseded by a newer one before the page saw them; Skipped counts pushes
+// that had no window to go to (the bytes stay booked in the run - the pre-329
+// state for that instant, counted rather than hidden).
+type PanelPushStats struct {
+	Pending      int
+	PendingBytes int
+	Cap          int
+	Delivered    int64
+	Coalesced    int64
+	Skipped      int64
 }
 
 // panelHostOption is one thing the assembly root may hand the panel host at
@@ -549,19 +637,169 @@ func (m *PanelManager) currentWindow() webview2.WebView {
 // runs is the same panelControl.Eval the four RPC receipts ride, which makes this
 // the FIFTH use of that primitive and changes none of those four.
 //
-// NO WINDOW, NO PUSH. currentWindow is nil before the first bring-up and after
-// Destroy; a snapshot published while no window exists is then simply not pushed -
-// the bytes stay booked in the run exactly as they did before ticket 329,
-// and this is a skip, never a second destination. The page-side receiver for the
-// pushed global is still missing (see probes/329/r1/page-contract.md); a push into
-// a page that has not declared the receiver is a no-op there, and neither half of
-// that sentence may be quietly read as the other.
+// BOUNDED SINCE TICKET 35 AC#5. The sentence does NOT go to Dispatch per call any
+// more; it goes into the one-slot coalescing queue described on PanelManager's
+// push fields, and the Skip/Supersede counters make both losses readable. What the
+// page sees is unchanged in kind: the newest complete packet, through Eval, on the
+// panel thread. What changed is that N publishes during one blocked consumer now
+// pin ONE sentence instead of N, and the N-1 superseded ones are counted and booked
+// to the log instead of silently growing a slice.
+//
+// NO WINDOW, NO PUSH, BUT COUNTED. currentWindow is nil before the first bring-up
+// and after Destroy; a snapshot published while no window exists is then simply not
+// pushed - the bytes stay booked in the run exactly as they did before ticket 329,
+// and this is a skip (pushSkipped), never a second destination. The page-side
+// receiver for the pushed global is still missing (see probes/329/r1/
+// page-contract.md); a push into a page that has not declared the receiver is a
+// no-op there, and neither half of that sentence may be quietly read as the other.
+//
+// THE SENTENCES ARE NEVER REWRITTEN. The queue stores whole strings and hands one
+// of them to Eval verbatim; "supersede" is a choice about WHICH whole sentence
+// waits, never an edit of one. That is the line ticket 197 leg B drew ("Overflow
+// TRUNCATES and never merges") applied to this hop's frequency axis, and it is why
+// the two halves of the 10-08 ruling cannot be confused.
 func (m *PanelManager) evalPanelJS(js string) {
 	w := m.currentWindow()
 	if w == nil {
+		m.pushMu.Lock()
+		m.pushSkipped++
+		m.pushMu.Unlock()
 		return
 	}
-	w.Dispatch(func() { w.Eval(js) })
+
+	m.pushMu.Lock()
+	superseded := len(m.pushPending) >= panelPushPendingCap
+	if superseded {
+		m.pushCoalesced++
+		m.pushBurstSuperseded++
+	}
+	m.pushPending = append(m.pushPending, js)
+	// Drop the OLDEST (never the newest) until the queue is at its bound, and clear
+	// the dropped slot so the backing array does not keep the superseded packet
+	// alive: a cap that is only "bounded on paper" is exactly what this leg exists
+	// to end.
+	if over := len(m.pushPending) - panelPushPendingCap; over > 0 {
+		for i := 0; i < over; i++ {
+			m.pushPending[i] = ""
+		}
+		m.pushPending = append(m.pushPending[:0], m.pushPending[over:]...)
+	}
+	firstSupersession := superseded && !m.pushBurstLogged
+	if superseded {
+		m.pushBurstLogged = true
+	}
+	schedule := !m.pushScheduled
+	m.pushScheduled = true
+	coalesced, delivered := m.pushCoalesced, m.pushDelivered
+	pendingBytes := 0
+	for _, s := range m.pushPending {
+		pendingBytes += len(s)
+	}
+	m.pushMu.Unlock()
+
+	if firstSupersession {
+		// ONE record per burst, not one per event: a flood must not turn its own
+		// accounting into a second queue. The counts travel in the record, so a
+		// reader on disk can tell "the queue worked and superseded 41 older packets"
+		// from "the page kept up" without re-reading the process.
+		slog.Warn("panel.push.superseded",
+			"detail", "the panel page did not drain its push queue; older snapshot packets were superseded by newer ones (whole-state packets, newest kept, none merged)",
+			"queue_cap", panelPushPendingCap,
+			"coalesced_total", coalesced,
+			"delivered_total", delivered,
+			"pending_bytes", pendingBytes)
+	}
+	if schedule {
+		w.Dispatch(func() { m.deliverPanelPush(w) })
+	}
+}
+
+// deliverPanelPush runs on the panel thread (the closure above is what Dispatch
+// queued) and hands the newest waiting sentence to the page. It is the queue's only
+// consumer, and it never blocks: an empty queue clears the "scheduled" flag so the
+// next push posts a fresh wake-up.
+//
+// THE RACE THIS ORDERING CLOSES. Reading the pending sentence, clearing it and
+// clearing pushScheduled all happen under pushMu; a push that arrives after that
+// critical section sees pushScheduled=false and posts its own delivery. A push that
+// arrives while the delivery is in Eval is therefore never stranded - it is already
+// the next pending sentence - and a delivery is never doubled (schedule is only set
+// by the push that saw no delivery in flight).
+func (m *PanelManager) deliverPanelPush(w webview2.WebView) {
+	m.pushMu.Lock()
+	if len(m.pushPending) == 0 {
+		m.pushScheduled = false
+		m.pushMu.Unlock()
+		return
+	}
+	batch := m.pushPending
+	m.pushPending = nil
+	m.pushScheduled = false
+	m.pushBurstLogged = false
+	burstSuperseded := m.pushBurstSuperseded
+	m.pushBurstSuperseded = 0
+	if w == nil {
+		m.pushSkipped += int64(len(batch))
+	} else {
+		m.pushDelivered += int64(len(batch))
+	}
+	coalesced, delivered := m.pushCoalesced, m.pushDelivered
+	m.pushMu.Unlock()
+
+	if burstSuperseded > 0 {
+		// THE BURST'S TOTAL, which the first-drop record cannot carry: at that
+		// moment the flood is still going. One record per burst, at its end, so the
+		// operator reading only the log learns how many packets this burst
+		// superseded - and, with the first-drop record, learns it even if the burst
+		// never ends (a consumer that never drains still left a trace when the
+		// queue first filled).
+		slog.Info("panel.push.burst",
+			"detail", "the push burst ended; every superseded packet in it was a whole-state packet that the newer one replaced, and none of them was merged into another",
+			"queue_cap", panelPushPendingCap,
+			"burst_superseded", burstSuperseded,
+			"coalesced_total", coalesced,
+			"delivered_total", delivered,
+			"delivered_sentences", int64(len(batch)),
+			"skipped_total", m.pushSkippedNow())
+	}
+	if w == nil {
+		return
+	}
+	// Every sentence in the batch is WHOLE and is handed over verbatim, in order;
+	// with the shipped bound the batch is one packet, and raising the bound may only
+	// lengthen this loop - never make two packets share one Eval.
+	for _, js := range batch {
+		w.Eval(js)
+	}
+}
+
+// pushSkippedNow reads the skip counter for the burst record above. It is a
+// separate read so the record can carry it without holding pushMu across slog.
+func (m *PanelManager) pushSkippedNow() int64 {
+	m.pushMu.Lock()
+	defer m.pushMu.Unlock()
+	return m.pushSkipped
+}
+
+// PushStats reports the push queue as it stands. It is the counter flume the 35r9
+// rulers read and the shape any status line can quote: pending/bytes first (the
+// bound), then the three lifetime counters (what happened). No side effects, no
+// window needed, safe from any goroutine.
+func (m *PanelManager) PushStats() PanelPushStats {
+	m.pushMu.Lock()
+	defer m.pushMu.Unlock()
+	bytes := 0
+	for _, s := range m.pushPending {
+		bytes += len(s)
+	}
+	return PanelPushStats{
+		Pending:      len(m.pushPending),
+		PendingBytes: bytes,
+		Cap:          panelPushPendingCap,
+		Delivered:    m.pushDelivered,
+		Coalesced:    m.pushCoalesced,
+		Skipped:      m.pushSkipped,
+	}
 }
 
 // bringUp creates the ONE window on the calling thread and returns once the

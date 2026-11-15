@@ -504,7 +504,21 @@ func (rp *residentPanel) post(fn func()) bool {
 		return true
 	default:
 		rp.mu.Unlock()
-		rp.failedPost.Add(1)
+		// THE READ POINT TICKET 35 AC#5 (cell :49) WAS MISSING. Until this line the
+		// counter below was written and never read anywhere outside a test
+		// (35-recon §格⑤ layer 4: failedPost, non-test readers = 0), so a refused
+		// request left a number nobody could see and no line anybody could find.
+		// The record is the readable exit: it carries the counter's new value, the
+		// queue's own cap and the reason, and it lands in <dataDir>\logs\wisp-*.jsonl
+		// through the persistent sink (cmd/wisp/logsink.go) when the resident process
+		// installed one. The value is read INSIDE the Add's result, so "counted" and
+		// "says how many" cannot drift apart.
+		refused := rp.failedPost.Add(1)
+		slog.Warn("panel.post.refused",
+			"detail", "no window yet and the panel thread's task channel is full; the request was refused, not queued",
+			"failed_posts", refused,
+			"queue_cap", cap(rp.tasks),
+			"window_live", false)
 		return false
 	}
 }
@@ -776,6 +790,12 @@ const panelNoThreadLine = "this process has NO panel thread (the panel host neve
 // It reports the thread, not a window: the window is created on first use, so a
 // booted process with no gesture yet has a thread and no HWND, and that is the
 // truth the boot line has to carry.
+//
+// IT CARRIES failedPost TOO (ticket 35 AC#5). The counter's second readable exit is
+// this sentence: the boot report prints it, so "this thread refused N requests
+// because its queue was full" is readable from the outside without attaching a
+// debugger, and post()'s own warning record is the per-event twin of it. A counter
+// with neither a boot line nor a record is exactly the silence 35-recon measured.
 func (rp *residentPanel) statusLine() string {
 	if rp == nil {
 		return panelNoThreadLine
@@ -784,6 +804,6 @@ func (rp *residentPanel) statusLine() string {
 		return "panel thread could not start: " + err.Error()
 	}
 	created := rp.mgr.IsCreated()
-	return fmt.Sprintf("panel thread up (STA, dedicated pump; window %s, %d show request(s), %d toggle(s))",
-		map[bool]string{true: "created", false: "not created yet"}[created], rp.shows.Load(), rp.toggles.Load())
+	return fmt.Sprintf("panel thread up (STA, dedicated pump; window %s, %d show request(s), %d toggle(s), %d refused post(s))",
+		map[bool]string{true: "created", false: "not created yet"}[created], rp.shows.Load(), rp.toggles.Load(), rp.failedPost.Load())
 }
