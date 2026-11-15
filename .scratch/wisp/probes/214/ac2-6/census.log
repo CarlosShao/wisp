@@ -1,1 +1,141 @@
-.scratch/wisp/probes/214/ac2-6/census.log
+===== [1] AC#2 ceiling + ledger writer + pump hop (production points) =====
+
+cmd/wisp/panel_attachment_214.go:38:// MaxAttachmentBytes) and adds NO config key - a user-tunable limit belongs to
+cmd/wisp/panel_attachment_214.go:71:	// AttachmentReason field: an old refusal hanging over a fresh success is
+cmd/wisp/panel_attachment_214.go:164:// default (max = 0 -> the broker applies MaxAttachmentBytes), ticket 214's
+cmd/wisp/panel_attachment_214.go:218:	h.drafts.record(ref)
+cmd/wisp/panel_attachment_214.go:274:// attachmentDraftReason is the pump's reader for PumpSources.AttachmentReason.
+cmd/wisp/panel_resident_pump.go:101:		Attachments:      drafts.rows,
+cmd/wisp/panel_resident_pump.go:102:		AttachmentReason: drafts.reason,
+cmd/wisp/run.go:1197:		Attachments:      rt.attachmentDraftRows,
+cmd/wisp/run.go:1198:		AttachmentReason: rt.attachmentDraftReason,
+internal/panel/attachments.go:43:// MaxAttachmentBytes is the per-attachment ceiling the composer advertises and
+internal/panel/attachments.go:47:const MaxAttachmentBytes int64 = 64 << 20 // 64 MiB
+internal/panel/attachments.go:187:		max = MaxAttachmentBytes
+internal/panel/attachments.go:214:	if src.SizeBytes > b.max {
+internal/panel/pump.go:298:	// MaxAttachmentBytes, the constant the broker itself defaults to
+internal/panel/pump.go:312:	// AttachmentReason reads the composer's current refusal sentence: the reason
+internal/panel/pump.go:320:	AttachmentReason func() string
+internal/panel/pump.go:386:		maxAttachment = MaxAttachmentBytes
+internal/panel/pump.go:432:	if p.src.AttachmentReason != nil {
+internal/panel/pump.go:433:		composer.AttachmentReason = p.src.AttachmentReason()
+
+
+===== [2] ledger creation + bind (production) =====
+
+cmd/wisp/panel_attachment_214.go:81:func newAttachmentDraftLedger() *attachmentDraftLedger {
+cmd/wisp/panel_attachment_214.go:246:// bindAttachmentDrafts is the resident boot's one write of the runtime's draft
+cmd/wisp/panel_attachment_214.go:251:func (rt *agentRuntime) bindAttachmentDrafts(l *attachmentDraftLedger) {
+cmd/wisp/panel_resident_windows.go:306:	drafts := newAttachmentDraftLedger()
+cmd/wisp/resident_windows.go:359:	rp, cfgMgr65, panelScope, attachmentDrafts, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
+cmd/wisp/resident_windows.go:596:		src.run.bindAttachmentDrafts(attachmentDrafts)
+cmd/wisp/resident_windows.go:634:			holder.setSnapshotPublish(newResidentPanelPump(ra.gate, cfgMgr65, rp.disp, attachmentDrafts, rp).publish)
+
+
+===== [3] snapshot fields (composer.go) =====
+internal/panel/composer.go:406:	// Attachments is the composer's draft rows. Ticket 214 wired the ingest
+internal/panel/composer.go:416:	Attachments     []AttachmentRef `json:"attachments"`
+internal/panel/composer.go:419:	// AttachmentReason is the composer's current refusal sentence: the reason the
+internal/panel/composer.go:425:	AttachmentReason string `json:"attachmentError"`
+internal/panel/composer.go:484:	Attachments []AttachmentRef `json:"attachments"`
+internal/panel/composer.go:500:	for _, a := range m.Attachments {
+
+===== [4] AC#3 sniff table + ISO predicate + name-only display handling =====
+internal/panel/attachments.go:115:// attachmentTypes is the whitelist. It is a table, not a switch, so AC#2's
+internal/panel/attachments.go:119:var attachmentTypes = []attachmentType{
+internal/panel/attachments.go:132:	{mime: "video/mp4", kind: "video", ext: "mp4", match: matchesISOBaseMedia},
+internal/panel/attachments.go:133:	{mime: "video/quicktime", kind: "video", ext: "mov", match: matchesISOBaseMedia},
+internal/panel/attachments.go:136:// matchesISOBaseMedia recognises the ISO base media container (mp4/mov): a
+internal/panel/attachments.go:140:func matchesISOBaseMedia(h []byte) bool {
+internal/panel/attachments.go:154:	out := make([]string, 0, len(attachmentTypes))
+internal/panel/attachments.go:155:	for _, t := range attachmentTypes {
+internal/panel/attachments.go:207:	if err := checkDisplayName(src.DisplayName, b.guard); err != nil {
+internal/panel/attachments.go:242:	for _, t := range attachmentTypes {
+internal/panel/attachments.go:250:			src.DisplayName, describeHead(data), strings.Join(AcceptedMIMETypes(), " / ")))
+internal/panel/attachments.go:252:	if src.DeclaredMIME != "" && !mimeAgrees(src.DeclaredMIME, accepted.mime) {
+internal/panel/attachments.go:256:	ref.MIME, ref.Kind, ref.Name = accepted.mime, accepted.kind, sanitizeDisplayName(src.DisplayName)
+internal/panel/attachments.go:293:// checkDisplayName applies the store's name guard to a display name, after
+internal/panel/attachments.go:297:func checkDisplayName(name string, guard NameGuard) error {
+internal/panel/attachments.go:307:// sanitizeDisplayName keeps a display name displayable: the store already
+internal/panel/attachments.go:310:func sanitizeDisplayName(name string) string {
+internal/panel/attachments.go:324:// describeHead names the bytes that were actually found, for the refusal text.
+internal/panel/attachments.go:327:func describeHead(data []byte) string {
+internal/panel/attachments.go:345:// mimeAgrees compares two mime spellsings tolerantly (parameters, case).
+internal/panel/attachments.go:346:func mimeAgrees(declared, actual string) bool {
+
+===== [5] AC#4 name guard + sink + artifacts root =====
+cmd/wisp/panel_attachment_214.go:193:// ValidArtifactName - the same function the store applies at write time,
+cmd/wisp/panel_attachment_214.go:204:		h.broker, h.openErr = panel.NewAttachmentBroker(store, memory.ValidArtifactName, 0)
+internal/memory/artifacts.go:60:// PutArtifact stores caller-supplied bytes as one artifact file inside THIS
+internal/memory/artifacts.go:71:func (s *Store) PutArtifact(ctx context.Context, name string, data []byte) error {
+internal/memory/artifacts.go:87:// ValidArtifactName is the exported half of this package's name guard, so a
+internal/memory/artifacts.go:91:func ValidArtifactName(name string) error { return validArtifactName(name) }
+internal/memory/open.go:42:	artifactsDirName = "artifacts"
+internal/memory/open.go:277:		artifactsDir: filepath.Join(abs, artifactsDirName),
+internal/panel/attachments.go:11://     at write time (memory.ValidArtifactName, ticket 76). A name that spells a
+internal/panel/attachments.go:26:// PutArtifact (injective name + real O_EXCL + recursive quota, tickets 76/79).
+internal/panel/attachments.go:57:// PutArtifact was added by this ticket so the artifacts name guard has exactly
+internal/panel/attachments.go:60:	PutArtifact(ctx context.Context, name string, data []byte) error
+internal/panel/attachments.go:162:// imported: memory.ValidArtifactName is the same function the store applies at
+internal/panel/attachments.go:207:	if err := checkDisplayName(src.DisplayName, b.guard); err != nil {
+internal/panel/attachments.go:264:	err = b.sink.PutArtifact(ctx, name, data)
+internal/panel/attachments.go:293:// checkDisplayName applies the store's name guard to a display name, after
+internal/panel/attachments.go:297:func checkDisplayName(name string, guard NameGuard) error {
+
+===== [6] AC#4/174: authorized roots come from cfg.FS.AllowedDirs only =====
+cmd/wisp/run.go:772:	allowed := make([]string, 0, len(cfg.FS.AllowedDirs))
+cmd/wisp/run.go:773:	allowed = append(allowed, cfg.FS.AllowedDirs...)
+cmd/wisp/run.go:774:	rt.paths = tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)
+
+
+cmd/wisp/approval_always.go:134:	if err := s.rt.mgr.AddAllowedDir(dir); err != nil {
+internal/config/allowdirs.go:62:func (m *Manager) AddAllowedDir(dir string) error {
+
+
+===== [7] AC#5: ForAgent / OutgoingMessage / message handler implementations =====
+
+internal/panel/composer.go:487:// ForAgent renders what the agent receives for one composed message. Every
+internal/panel/composer.go:495:func (m OutgoingMessage) ForAgent(dir string) string {
+
+
+cmd/wisp/panel_preview_192.go:253:// HandleMessageRequest is the whole door. Its outcomes, in the order they are
+cmd/wisp/panel_preview_192.go:269:func (d *panelPreviewQuoteDoor) HandleMessageRequest(ctx context.Context, req panel.ComposerRequest) error {
+internal/panel/composer_dispatch.go:95:	HandleMessageRequest(ctx context.Context, req ComposerRequest) error
+internal/panel/composer_dispatch.go:240:		return "", d.Message.HandleMessageRequest(ctx, req)
+
+===== [8] AC#5: provenance source roster (no attachment source) =====
+internal/risk/provenance.go:84:	SrcFSRead        = "fs.read" // incl. out-of-allowlist attempts
+internal/risk/provenance.go:85:	SrcSearchContent = "search.content"
+internal/risk/provenance.go:86:	SrcClipboardRead = "clipboard.read"
+internal/risk/provenance.go:87:	SrcSystemGet     = "system.get" // focused-window title (high-value leak)
+internal/risk/provenance.go:88:	SrcWebFetch      = "web.fetch"
+internal/risk/provenance.go:89:	SrcDocRead       = "doc.read"
+internal/risk/provenance.go:90:	SrcScreenCapture = "screen.capture"
+internal/risk/provenance.go:91:	SrcTranscript    = "asr.transcript"
+internal/risk/provenance.go:94:	SrcTaskOutput = "task.output"
+internal/risk/provenance.go:105:// IsSensitiveSource reports whether a tool is in the contract marking set.
+internal/risk/provenance.go:106:func IsSensitiveSource(tool string) bool {
+internal/risk/provenance.go:578:	if !IsSensitiveSource(tool) {
+internal/risk/provenance.go:690:	SrcUnboundScope     = "unbound-scope"     // Inspect on a scope that was never opened / already closed
+internal/risk/provenance.go:691:	SrcUnscannedNesting = "unscanned-nesting" // parameter nesting deeper than MaxParamDepth
+
+===== [9] AC#6: page-side attach route + picker (today) =====
+frontend/src/components/composer-row.tsx:51:     - 附件    attach -> submitAttachment (panel.attachment.add), one request
+frontend/src/components/composer-row.tsx:80:  submitAttachment,
+frontend/src/components/composer-row.tsx:216:        await submitAttachment(f);
+frontend/src/components/composer-row.tsx:291:        onAttach={composer ? () => fileInput.current?.click() : undefined}
+frontend/src/components/composer-row.tsx:305:        type="file"
+frontend/src/lib/panel.ts:703:export function sendAttachmentBytes(
+frontend/src/lib/panel.ts:718:export function submitAttachment(file: File): Promise<void> {
+frontend/src/lib/panel.ts:728:      sendAttachmentBytes(file.name, file.type, buf.byteLength, toBase64(buf));
+
+===== [10] AC#6: @-menu exists in the shared bar; the composer row passes no sources =====
+frontend/src/components/ai-native/prompt-bar.tsx:8:     - props-driven: sources / commands / models / attachments / placeholder /
+frontend/src/components/ai-native/prompt-bar.tsx:74:  sources?: readonly PromptSource[];
+frontend/src/components/ai-native/prompt-bar.tsx:115:  sources = [],
+frontend/src/components/ai-native/prompt-bar.tsx:155:    ? sources.filter((s) => s.name.toLowerCase().includes(token?.query ?? ""))
+frontend/src/components/ai-native/prompt-bar.tsx:158:      : sources.map((s) => ({ key: s.key, name: s.name, desc: s.desc }))
+
+--- git --no-pager grep -n "sources=" -- frontend/src/components/composer-row.tsx (empty = the row passes none) ---
+output: [] rc=1
+--- the pattern 'OutgoingMessage{' alone (non-test, non-probe) ⇒ hits = 0 ---
