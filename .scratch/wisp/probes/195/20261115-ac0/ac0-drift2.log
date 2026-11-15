@@ -1,0 +1,111 @@
+
+=== ROW1 count at HEAD ===
+
+$ grep -rn "^func (m \*Manager) Set" --include=*.go internal/config/ | grep -v _test.go | wc -l
+23
+[exit=0]
+
+=== ROW1 count at anchor ===
+
+$ git grep -n -E "^func \(m \*Manager\) Set" ba65b29f -- "internal/config/*.go" | grep -v _test.go | wc -l
+1
+[exit=0]
+
+=== ROW1 per-file tally at HEAD ===
+
+$ grep -rn "^func (m \*Manager) Set" --include=*.go internal/config/ | grep -v _test.go | cut -d: -f1 | sort | uniq -c | sort -rn
+      6 internal/config/settings.go
+      5 internal/config/settings_313.go
+      4 internal/config/settings_appearance_wave.go
+      2 internal/config/settings_local_audio.go
+      1 internal/config/settings_65.go
+      1 internal/config/settings_413.go
+      1 internal/config/settings_320.go
+      1 internal/config/settings_187.go
+      1 internal/config/permmode.go
+      1 internal/config/allowdirs.go
+[exit=0]
+
+=== ROW2 shape: any Set(section,key,value) ===
+
+$ grep -rnE "func .* Set\([^)]*,[^)]*,[^)]*\)" --include=*.go internal/ | grep -v _test.go
+internal/perm/store.go:350:func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) error {
+[exit=0]
+
+=== ROW2 real body ===
+
+$ sed -n "160,182p" internal/config/sectionwrite.go
+//     queued (ErrPanelLoosenRefused);
+//   - loosening with no queue wired - refused (ErrLoosenQueueUnwired), which is
+//     the fail-closed direction the reload path already takes with a nil hook.
+//
+// The verdict itself is computed with the SAME four helper functions the reload
+// path uses, so a key planLocked calls a loosening cannot be a tightening here.
+// The verdict, the validation and the file read all happen with mu released
+// (ruling N9); only the merge write and the in-memory apply run under it.
+func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
+	res := SectionWriteResult{Direction: DirNeutral}
+
+	if w.Apply == nil {
+		return res, observe.New(observe.ClassConfig,
+			"config: section write for "+w.Key+" has no value to apply; nothing was written")
+	}
+	if !w.Source.valid() {
+		return res, observe.New(observe.ClassConfig,
+			"config: section write for "+w.Key+" names no defined source ("+string(w.Source)+
+				"); nothing was written")
+	}
+	section := sectionOfKey(w.Key)
+	if w.Section == "" || w.Section != section {
+		return res, observe.New(observe.ClassConfig,
+[exit=0]
+
+=== ROW2 file birth ===
+
+$ git log --oneline --diff-filter=A -- internal/config/sectionwrite.go
+e6791e6bb 195 分节写入地基(死腿遗产代提,自验build/test/gofumpt/d22):WriteSection+SectionWrite+sectionwrite.go+195测试;writeOneKey适配
+[exit=0]
+
+=== ROW4 count panel.* ===
+
+$ grep -cE "=\s*\"panel\." internal/panel/bridge.go
+4
+[exit=0]
+
+=== ROW4 config.* constants ===
+
+$ grep -nE "^\s*Method[A-Za-z]* ?= \"config\." internal/panel/bridge.go
+66:	MethodConfigGet = "config.get"
+67:	MethodConfigSet = "config.set"
+75:	MethodModelsList = "config.models.list"
+[exit=0]
+
+=== ROW4 count config.* constants ===
+
+$ grep -cE "^\s*Method[A-Za-z]* ?= \"config\." internal/panel/bridge.go
+3
+[exit=0]
+
+=== ROW4 bridge 64-76 ===
+
+$ sed -n "64,76p" internal/panel/bridge.go
+	//     configuration is not a route that lets the page *approve* anything
+	//     (AGENTS.md §1.2 keeps panel-side L2 "allow" off the table entirely).
+	MethodConfigGet = "config.get"
+	MethodConfigSet = "config.set"
+	// MethodModelsList is ticket 320 AC#4's read-only route: "ask the host what
+	// the provider's own model endpoint reports". Like the two above it carries
+	// no `panel.` prefix (ticket 181's extractor counts those literals) and no
+	// approval vocabulary (the grant-boundary instrument's grid), and it is
+	// deliberately NOT spelled `models.list`: that name already belongs to the
+	// local signed model repository (SPEC-08 sec 5.2, ticket 29/D26), so the
+	// settings namespace is where this route belongs.
+	MethodModelsList = "config.models.list"
+	// MethodCostSummary is ticket 194's one landed roster name (batch 1): the
+[exit=0]
+
+=== ROW3 byte-exact check ===
+
+$ sed -n "168p" docs/specs/SPEC-08-ui-ball-panel.md | grep -c "安全节放宽走 L2 重新确认（SPEC-03 §4.2）"
+1
+[exit=0]

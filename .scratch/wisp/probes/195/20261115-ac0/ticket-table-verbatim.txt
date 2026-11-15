@@ -1,0 +1,6 @@
+| 事实 | 读数 | 尺 |
+|---|---|---|
+| `internal/config/` 里的导出写手 | **只有 `SetPermissionMode` 一枚** | `grep -rn "^func (m \*Manager) Set" --include=*.go internal/config/ \| grep -v _test.go` |
+| "按节写入"地基 | **不存在**（无任何 `Set(section, key, value)` 形状） | `grep -rnE "func .*(SetConfig\|WriteSection\|SetSection)" --include=*.go internal/ \| grep -v _test.go` |
+| 规格要求 | `SPEC-08:168` 逐字：「安全节放宽走 L2 重新确认（SPEC-03 §4.2）」 | `sed -n '168p' docs/specs/SPEC-08-ui-ball-panel.md` |
+| 白名单那份代码 | `bridge.go:42-45` 恰好 4 枚，**无 `config.*`** | `grep -nE '=\s*"panel\.' internal/panel/bridge.go` |

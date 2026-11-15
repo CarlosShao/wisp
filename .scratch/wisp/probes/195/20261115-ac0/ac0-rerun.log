@@ -1,0 +1,80 @@
+
+=== ENV ===
+2026-11-15 14:39:51 +0800
+05b3d9a31bbc91e1fbc3e46210c79e22766fa1b8
+dev
+grep (GNU grep) 3.0
+
+=== ROW1 writers ===
+
+$ grep -rn "^func (m \*Manager) Set" --include=*.go internal/config/ | grep -v _test.go
+internal/config/allowdirs.go:109:func (m *Manager) SetAllowedDirs(dirs []string) error {
+internal/config/permmode.go:70:func (m *Manager) SetPermissionMode(mode risk.Mode) error {
+internal/config/settings.go:100:func (m *Manager) SetProviderBaseURL(provider, url string) ([]string, error) {
+internal/config/settings.go:121:func (m *Manager) SetProviderAPIKeyRef(provider, ref string) ([]string, error) {
+internal/config/settings.go:143:func (m *Manager) SetModelContextWindow(provider, model string, tokens int) ([]string, error) {
+internal/config/settings.go:172:func (m *Manager) SetModelPriceIn(provider, model string, per1M float64) ([]string, error) {
+internal/config/settings.go:177:func (m *Manager) SetModelPriceOut(provider, model string, per1M float64) ([]string, error) {
+internal/config/settings.go:224:func (m *Manager) SetRoleChatModel(model string) ([]string, error) {
+internal/config/settings_187.go:104:func (m *Manager) SetRoleChatThinking(level string) ([]string, error) {
+internal/config/settings_313.go:56:func (m *Manager) SetVoiceCloudASRChain(chain []string) ([]string, error) {
+internal/config/settings_313.go:63:func (m *Manager) SetVoiceCloudTTSChain(chain []string) ([]string, error) {
+internal/config/settings_313.go:124:func (m *Manager) SetVoiceRealtimeProvider(provider string) ([]string, error) {
+internal/config/settings_313.go:134:func (m *Manager) SetVoiceRealtimeModel(model string) ([]string, error) {
+internal/config/settings_313.go:208:func (m *Manager) SetRoleChatPair(provider, model string) ([]string, error) {
+internal/config/settings_320.go:36:func (m *Manager) SetProviderBilling(provider, billing string) ([]string, error) {
+internal/config/settings_413.go:45:func (m *Manager) SetBallSize(size int) ([]string, error) {
+internal/config/settings_65.go:46:func (m *Manager) SetBallStyle(style string) ([]string, error) {
+internal/config/settings_appearance_wave.go:56:func (m *Manager) SetBallOpacityIdle(v float64) ([]string, error) {
+internal/config/settings_appearance_wave.go:69:func (m *Manager) SetBallClickThrough(on bool) ([]string, error) {
+internal/config/settings_appearance_wave.go:80:func (m *Manager) SetPanelWidth(px int) ([]string, error) {
+internal/config/settings_appearance_wave.go:95:func (m *Manager) SetPanelFontSize(px int) ([]string, error) {
+internal/config/settings_local_audio.go:38:func (m *Manager) SetVoiceAecEnabled(on bool) ([]string, error) {
+internal/config/settings_local_audio.go:50:func (m *Manager) SetAudioInputDevice(name string) ([]string, error) {
+[exit=0]
+
+=== ROW2 section-write ===
+
+$ grep -rnE "func .*(SetConfig|WriteSection|SetSection)" --include=*.go internal/ | grep -v _test.go
+internal/config/sectionwrite.go:168:func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
+[exit=0]
+
+=== ROW3 spec line 168 ===
+
+$ sed -n "168p" docs/specs/SPEC-08-ui-ball-panel.md
+| `config.get` / `config.set` | invoke | 安全节放宽走 L2 重新确认（SPEC-03 §4.2） |
+[exit=0]
+
+=== ROW4 bridge whitelist ===
+
+$ grep -nE "=\s*\"panel\." internal/panel/bridge.go
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+[exit=0]
+
+=== ROW4b bridge 42-45 ===
+
+$ sed -n "40,47p" internal/panel/bridge.go
+// was wrong.)
+const (
+	MethodModeRequest      = "panel.mode.request"
+	MethodWorkspaceRequest = "panel.workspace.request"
+	MethodAttachmentAdd    = "panel.attachment.add"
+	MethodMessageSend      = "panel.message.send"
+	// MethodConfigGet and MethodConfigSet are ticket 248 AC#1's two settings
+	// routes. Three facts about the naming, because each one is a decision
+[exit=0]
+
+=== ROW4c config. in bridge ===
+
+$ grep -n "config\." internal/panel/bridge.go
+62:	//     which is the whole reason "settings" is spelled `config.set` and not
+63:	//     `config.approve`/`config.grant`: a route that lets the page change
+66:	MethodConfigGet = "config.get"
+67:	MethodConfigSet = "config.set"
+75:	MethodModelsList = "config.models.list"
+143:	// names. `config.set` therefore cannot address a key this file has not
+148:	// whole of config.toml, risk.permission_mode and fs.allowed_dirs included,
+[exit=0]
