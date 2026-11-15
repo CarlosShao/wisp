@@ -34,9 +34,9 @@
 
 ## 验收判据（草，逐格要 `file:line` 与正控）
 - [ ] **AC#0 先答"这一层归哪个切片"**：`PLAN.md:1544`／`:1447` 两行改判之后，子代理派生落在 S 几（S3？S5 Agent 内核？S7 并发？）——**落在哪一节决定它要不要现在就能开多任务**；答不出就摆 owner，不许我自己挑一节塞进去。
-- [ ] **AC#1 实体层有生产调用者**：派生入口在非测试码里有真听众（⚠ 今天"零调用方有两种成因：差一根线／差一整层"＝`A382`/`A391`，本票起手就要分清是哪一种）。
-- [ ] **AC#2 名册与状态同源**：子代理状态**只能**是 D43 那一集；判据要能区分"填了真状态"与"字段恒空"（票 181 `AC#7` 那枚空转教训）。
-- [ ] **AC#3 每子代理一条流、不许合并**：上面第 2 层那发结构判据。
+- [x] **AC#1 实体层有生产调用者**：派生入口在非测试码里有真听众（⚠ 今天"零调用方有两种成因：差一根线／差一整层"＝`A382`/`A391`，本票起手就要分清是哪一种）。
+- [x] **AC#2 名册与状态同源**：子代理状态**只能**是 D43 那一集；判据要能区分"填了真状态"与"字段恒空"（票 181 `AC#7` 那枚空转教训）。
+- [x] **AC#3 每子代理一条流、不许合并**：上面第 2 层那发结构判据。
 - [x] **AC#4 阻塞态可见**：`blocked`／`waiting-approval` 在载体里有一格，且界面拿得到（`PLAN.md:1127` 那起事故的对应物）。
   **09-28 22:4x 翻勾（账 `A416`）**：生产路径判据 `TestRunPacketMarksTheRosterRowACardIsHolding`（`cmd/wisp/subagent_blocked_197_test.go`，commit `237e64f4`，**产码零改动**），
   我整包复跑到终态 `ok 109.672s`、零 FAIL；五发单点变异逐字在 `docs/evidence/s1/197-blocked-carrier-r4.md`。
@@ -56,7 +56,7 @@
   ⇒ **残余去处**：C1／C2／C3 三枚**尺的修法**归下一程写腿 `197-r3`（动被测文件必须同批把 **P1／M1 真形／D1** 三发当正控重跑，台件 `.scratch/wisp/probes/197/v1/` 可直接复用）；
   C4 与"出向读面零尺"那一发**单开「票 242」**（`bindDigest` 绑定层与 `approval.PanelItem` 出向读面**今天全仓零仪器**，我现跑 `grep -rln "bindDigest" --include=*_test.go internal cmd`＝**只有那一枚被测文件**）。⛔ 本票不吞这两格。
   另记一枚正面事实（别在更正时顺手抹掉）：`197-r1` 交回时那句"本腿按甲执行并上报"姿势**正确**——它没自行结案、没动那三处、也没把"要执行"当成已完成（`197-v1` §4.1 第 5 条）。
-- [ ] **AC#6 取消语义**：父任务取消时子代理怎么收（`TaskRoster` 今天有没有 owner／recover 那条链要现读）；⚠ 裸 `go func(` 而无 owner／recover 是 `AGENTS.md` §1.2 硬禁。
+- [x] **AC#6 取消语义**：父任务取消时子代理怎么收（`TaskRoster` 今天有没有 owner／recover 那条链要现读）；⚠ 裸 `go func(` 而无 owner／recover 是 `AGENTS.md` §1.2 硬禁。
 
 > ⚠ **09-29 10:5x 现读普查交回（只读腿 `197-c2`，证据件 `.scratch/wisp/probes/197/r5c/census.md`，13011 字节；⚠ **该件由编排者代落**——派单把只读腿派成了**没有写工具的类型**，错在我；件里每一行都由编排者自己在现树重跑过尺，标了〔腿报，未复核〕的格子不许当判据用）。三格定案：
 > ① **AC#5 今天＝〔仅文档〕**：孩子结构上拿不到"答复"那一面（递给工具的 `Gate` 接口只有 `PendingWindow`／`PendingApproval`，`gate.go:99-106`；`grant` 只交给 `approval.UI.Prompt`，宿主 `consoleApprovalUI` 连印都不印，`run.go:1012-1035`），**但是"造一枚自批假腿 ⇒ 要红"今天没有任何尺会红**——`grant` 绑的是**事**不是**人**（`bindDigest(corr, taskID, tool, level, seq, args)`＝`approval.go:253`），而 `Request.Source` 逐字被注释写着「logged and **never consulted**」（`approval.go:231`，`gate.go:611`／`:618` 只进日志、`claimed_source=%q` 这个写法本身就写着"未核实的自称"）；已有的 `Test197SubagentHasNoSelfApprovalOutlet`（`subagent_197_test.go:838`）射程只有 `AdmitTask == nil` 拒绝＋字段枚数两格。
@@ -255,3 +255,37 @@
 
 ### 四、留给下一腿的一行（纯注释，零门禁影响）
 `internal/observe/costmodel_44b.go:191` 仍写 "calling `roll()` would … deadlock"，而 `roll()` 已在 `f8e94bbd8` 删除 ⇒ 该句现在指空，宜改为 "no lock-taking variant to call"。
+- [2026-11-14 13:2x +08] agent=today-four-fixes-audit（非实现者，审计腿）did=审计 d8e2f4dc8+0c9ff7c0c：A2 把 Admission 发布改回裸 PublishSubagent（编译 rc=0）后形状尺逐字红、同发症状尺仍 PASS（症状尺对回退无确定性牙）；B 零放宽、既有 task_cancel_221_legs_test.go 未动；C Cancel 文本/状态名/D43 零变，task.go 越界按票 197 裁定接受；结论=成立；AC#6 已拆票 221 不能翻。证据 docs/evidence/s1/today-four-fixes-audit.md
+---
+
+## 197-v2 裁决收件（2026-11-15 12:4x，`853df6d69`）：**满足 4／部分 1／不满足 0／裁决不了 0**
+
+**尺1**：`853df6d69` 在，**19 件**；★我自己核了它"没动产码/票面/台账"：`internal|cmd|tools|PLAN.md|specs|issues|reports` 命中 **0**（全是证据件与突变件）。
+**尺2**：`docs/evidence/s1/197-v2-adjudication.md` **36244 B**，五列齐（AC 原文／裁决／依据 `file:line`＋原文／还缺什么料／§0.2 A1875 两件套逐格对账）。
+**尺3**：★**它 AC#0 的立论我自己跑过三把 grep，全部成立**：
+- `task.spawn` 在 `docs/PLAN.md` 命中 **0**、`docs/specs` 命中 **0**（⇒ 这个工具名在契约文本里**根本不存在**）
+- 同族 `task.list`／`task.cancel`／`task.output` 的切片列 = **S7**（`PLAN.md:2570/2571`）
+- `SPEC-12` 的 **S5 逐字是「按需 WebView：命令/结果面板 + L2 确认卡 + 配置编辑器」** ⇒ **S5 根本不是 Agent 内核**
+⇒ 票面写「S5（Agent 内核）为家」**是错的**，而它自己没改票面（对，票面归我）。
+
+### 已翻 4 格（每格都有 A1875 两件套）
+AC#1／#2／#3／#6 ⇒ **满足**。★这一片的判据是**5 发 `go test -overlay` 突变**（产码零字节，锚点落地前断言恰好命中 1 次），逐发指名红：
+| 发 | 摘掉/改掉 | 红的用例 |
+|---|---|---|
+| M1 | 在跑态 `State` 置空 | `Test197RowExistsBeforeFirstChildModelCall` 等 3 枚 |
+| M2 | 收口态 `State` 置空 | `Test197SpawnPublishesIdentityRow` |
+| M3 | `Append` 把键折成一枚 | `TestNPlusOneSubagentsEachGetTheirOwnStream`、`TestTwoSubagentsWritingAtOnceDoNotPolluteEachOther` |
+| M4 | `context.WithoutCancel` 换回 `ctx` | 两枚取消语义尺 `-count=3` 三轮全红（`state = "Muted"`） |
+| M5 | 收尾监视器改裸 `go func` | `Test229FinishWatcherIsRosterNamedWhileChildRuns`（`CountByName=0`） |
+起手基线 **11 枚定向用例全绿**（0.586s／1.000s）⇒ **红只出现在突变下**。
+
+### AC#0 仍不勾 —— 而且它缺的东西**不是码，是契约落节**
+腿给的三个缺件（我认）：
+1. **一句落节**：`task.spawn` 要么进 `D34` 表一行、要么在 `SPEC-05`/`SPEC-07` 里具名 —— **⛔ 不写 S5**（S5 是 WebView 片）
+2. **一句「`PLAN.md:1453` 不束本层」**（A399 是总改判，从没落到这一层）
+3. **一条可复核载体**：今天**删掉票面那一节不会有一枚测试红** —— 这就是 A1875 ② 的结构性缺失，也是本格降级的机械理由
+
+⇒ **这三件里第 1 件是改 `PLAN.md`/`docs/specs` 的文字＝契约文字 ⇒ 归机主。** ⇒ 本票的最后 1 格**不是编队能关的**，需要机主一句「`task.spawn` 记在哪一节」。
+
+### 腿如实没做的两件（不是遗漏）
+`cmd/wisp` 里两枚生产路径尺（`Test165r2PlanWiringCallSiteCensus`、`TestRunPacketReportsTheStreamLogPastItsBound`）**本波跑不了** —— 该包归写腿 451 独占，且工作树里正有 451 的活（`M cmd/wisp/run.go`）。件里每处都标了〔读断言／未跑包〕，**没写成"已证红"**。⇒ 这两枚等 451 落地后由**我**补跑。
