@@ -220,6 +220,8 @@ $ git status --porcelain=v1 -- frontend/src internal cmd
 (empty above = zero writes)
 ```
 
+> 收件后补一枚读数（13:4x 现跑，同一把尺）：`?? cmd/wisp/resident_audio_device_lost_452_windows_test.go` —— **写腿 452 的新件在盘上**，正好自证 §4.1 那条禁令（`cmd/wisp` 此刻真的有人在写，本腿不跑那一包不是保守）。
+
 提交面（显式 pathspec，只 commit 不 push）：`docs/evidence/s1/219-ac6-receipt.md` ＋ `.scratch/wisp/probes/219/readings/**` ＋ `.scratch/wisp/probes/219/mut/*.json` ＋ `.scratch/wisp/probes/219/mut/m*/**`（前端副本树与其构建产物不入库）。
 
 **撤销口令**：`撤 219-ac6-r1`——删 `docs/evidence/s1/219-ac6-receipt.md` 与 `.scratch/wisp/probes/219/`，票面与产码本腿一字未动，无需复原。
