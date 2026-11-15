@@ -1,0 +1,28 @@
+# 派单存档（先存档再发）—— 票 455 诊断：staged 的 17.8 MB 为什么没被绑上（只读腿）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读腿（**可以跑测试与 PowerShell 读数，但⛔改产码**）。读 `.scratch/wisp/issues/455-*.md` 全文。
+
+**事实（我现读复核过）**：
+- `C:\Windows\System32\onnxruntime.dll` **在**：10572960 B，2026-05-26
+- 仓根 `onnxruntime.dll` ＝ `third_party/sherpa-onnx/onnxruntime.dll` ＝ **17799168 B**，2026-09-11
+- `.scratch/wisp/stage-cli/onnxruntime.dll` **也是 17799168 B**（摆了正确的）
+- 载具 `scripts/wisp-cli-staged-tests.sh:230-232` 调 `scripts/stage-sherpa-dlls.sh` 摆 pinned DLL；头注释 `:12-18` 逐字说"System32 那枚会抢先"
+- 票 35 G3 的整包读数：`PASS=618／FAIL=41／SKIP=10`，41 枚红全带 `speech: onnxruntime 1.17.1 is older than the 1.28 … a second onnxruntime.dll is shadowing the one on PATH`
+
+⇒ **摆了 17.8 MB，进程却绑了 10.5 MB。** 这条连线里有一环没成立。
+
+**要做（按顺序，每条给可核读数）**：
+1. **实测绑的是哪一枚**：跑一发会加载语音链的测试（或写一枚最小 Go 探针，用 `GetModuleHandle("onnxruntime.dll")` + `GetModuleFileName` 打出**实际加载路径与文件大小**）。⛔ 用报错里的版本号当证据 —— 那是被影子那一枚的版本号，不是路径。
+2. **判那一环在哪**（逐条现读，⛔ 猜）：
+   - `scripts/stage-sherpa-dlls.sh` 在**这一发**里拒没拒？（找 `stage-cli` 的构建日志／`deps.toml` 的 pin 与 stage 出来的字节数是否一致）
+   - `deps.toml` pin 的那一枚**是不是** 17799168 B
+   - sherpa 的 `sherpa-onnx-c-api.dll` 是否用 `LoadLibrary` 按**自己的**搜索序找 onnxruntime（**`LoadLibrary` 的相对名搜索序以"加载它的模块所在目录"为起点？还是以 exe 目录？** —— 这条决定一切，去查 Windows 文档 + 实测）
+   - 测试进程里有没有人改 `PATH`／调 `SetDllDirectory`／`AddDllDirectory`
+3. **给一条最小复现**：一枚能在 30 秒内回答"绑的是哪一枚"的探针（写成 `.scratch/wisp/probes/455/` 下的脚本或 Go 文件，⛔ 不进产码树）。
+4. **结论一句话**：是**载具的问题**、**sherpa 加载器的问题**、还是**`deps.toml` 与 stage 不一致**。
+
+**交付** `docs/evidence/s1/455-onnxruntime-binding-recon.md`：开头一句结论 ＋ "实际绑到哪一枚（路径/字节/版本）" ＋ 上面第 2 条逐项判 ＋ 最小复现的位置与命令 ＋ 修法建议（按主流 harness 形状给 2–3 个候选，各写代价）。
+⛔ 改产码／票面／台账；⛔ 动 System32；⛔ push。写面只有 `docs/evidence/s1/455-*` 与 `.scratch/wisp/probes/455/`。
+
+回话第一行＝commit hash ＋「实际绑到：路径／字节／版本」＋「那一环在哪（载具/加载器/deps 不一致）」＋「修法建议一句话」。

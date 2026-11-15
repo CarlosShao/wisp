@@ -1,0 +1,23 @@
+# 派单存档（先存档再发）—— 票 35 G1：①白名单模糊 ＋ ②并发路由 补尺（写腿，cmd/wisp）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/35-panel-bridge-c17.md` 的 `:42`（白名单模糊）与 `:44`（并发路由）两格，再读 `docs/evidence/s1/35-recon-20261115.md` 的 ① ② 两节。
+
+**这两格的现状（侦察现跑读数，我认）**：
+- **`:42` 有牙但没到票面要求**：守卫 `internal/panel/bridge.go:172` ＋ 审计 `internal/panel/composer_dispatch.go:298` ＋ 闭集名册 `internal/panel/inbound_roster_253_test.go:430`（钉 8 名）都在；但**最大一枚尺只枚举 11 名且绕开 `Handle` 与审计**，"在册方法逐一派发"只断 **3/8**（产码 `cmd/wisp/panel_inbound.go:384-403` 已接七枚门）。
+- **`:44` 完全没有尺**：配对键是 **RPC 帧的 `id`**（`cmd/wisp/panel_control_windows.go:782-826` 的 `_rpc[id].resolve`），**不是 requestId**；Go 侧**没有待回复表**；盘上零并发用例（唯一"第二发"是**顺序**的）。
+
+**要做**：
+1. **`:42` 补到票面口径**：50 枚随机/禁止方法名 → **全拒 + 全记日志**（要能读到审计里那 50 条）；**在册的每一枚**（8 名）逐一派发一次并给结论（⛔ 只测 3 枚）。
+2. **`:44` 造真并发**：10 路并发 invoke、回复**乱序**、逐对配对正确。⚠ 关键判断：**配对键到底是什么** —— 现读是 RPC 帧 `id`，票面写的是 requestId。**若两者不是一回事，先把这个差异具名写进证据**，再按"今天真实的配对键"造尺（⛔ 假造一个 requestId 配对来满足票面文字）。
+3. **⛔ 不改产码** 除非某格证明产码本身不成立（那就先具名，别顺手改）。这两格票面要求的是**尺**。
+
+**硬约束**：⛔ 阈值/golden/SLO/allowlist/PLAN/specs/D43/frontend/design；⛔ 放宽既有断言；⛔push；新协程走 `observe.Registry.Spawn`。
+**A1880**：判"接线成立"必须给行为牙，⛔ 只让断言源码字符串的测试红。
+**A1882**：`go test ./cmd/wisp` 走载具一次一发；整包读数必须带终点锚 `TestZZ315A1` 是否命中 ＋ 最后一条 `=== RUN` ＋ 本波新测试在截断点前还是后。⛔ 只报 `PASS=N`。
+⚠ **整包今天有 41 枚语音红**（System32 的 onnxruntime 1.17.1 抢先，已立票 455）⇒ 那不是你的；但**⛔ 别把"41 红"当整包不绿的借口**，你要报的是**你这几枚在截断点前是否全绿**。
+**A1884**：两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`。**A1886**：cpu 长时间不涨＝它在等，停掉、具名、用你自己的上限让它红。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/panel/**`（**只读**：同波另有他腿）、`docs/evidence/s1/35-*`。
+
+回话第一行＝commit hash ＋「`:42` 现在断到几枚/几名」＋「`:44` 的配对键到底是什么（RPC id 还是 requestId，给 file:line）」＋「10 路乱序回复的测试名」＋「我这波新测试在截断点前/后」。没干完写「未完成，卡在哪」。
