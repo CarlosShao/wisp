@@ -30,3 +30,16 @@
 
 ## 撤销口令
 「450 撤」＝删本票与其证据件（不 reset/amend）。
+
+## Progress log
+
+### 2026-11-15 10:50 — 探针腿（agent-43）：AC#1／AC#2(a)／AC#3 有读数；AC#2(b) 具名留给机主
+
+- 锚点 `caccccfc6`。**代码面与死亡那两发相同**：`git diff --stat cf3050401 HEAD -- cmd internal` **空** ⇒ 下面的读数不是"代码变了"造成的。
+- **死没复现**：球（PID 49348）在跑，同一条载具命令串行两发，**都跑到底**：`RUN=861 / PASS=619 / FAIL=2 / SKIP=17`，**exit 1**，最后一行 `FAIL`，判行 `FAIL github.com/CarlosShao/wisp/cmd/wisp 1207.00s` 与 `1308.00s`。两枚 FAIL ＝ 本机具名已知红（`TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC246DevLegIgnoresTheTestTaskInjection`），**未修未删未跳过**。
+- **昨日两发的事件日志读数**：Application 日志（覆盖 2026-07-30 起、20,715 条）里 **0 条**提到 `wisp.test.exe`；对照：同机近 30 天有 **26 条** `Application Error` ⇒ 记录机制是开着的 ⇒ 昨日两发**没有 WER 记录**，即**不是**未处理异常／访问冲突／fail-fast。昨日两发的退出码与最后一行**没有留存**（stage-cli 日志已被 23:31 之后的运行覆盖），本票不猜。
+- **AC#3**：`Test145ArgsJSONComesFromTheBookedForensicsRow` 单独 **PASS 0.22 s / exit 0**；`TestAC4PriorFocusSurvivesARefusedPanelSample` 单独 **PASS 1.27 s / exit 0**；两枚＋`TestAC4FocusReturnToPriorWindowGap33r5` 一起 `RUN=3 PASS=2 FAIL=1`（红的只有那枚已知环境红）。⇒ 这三枚**不是**死因载体；另：`Test145ArgsJSON…` 函数体里**没有窗**（不调 `startPanelForTest`），"死在 WebView2 区"是从文件序 `panel_*` 推出来的。
+- **AC#2(b) 未做**（票面逐字禁止本腿 kill 球；"干净用户会话"替代本腿也拿不到）。交给机主一条命令：`.scratch\wisp\probes\450\run-balloff.ps1`（球还在就 **exit 3 拒绝**，本波已自测该拒绝支；判据写在该文件与证据 §3.3）。
+- **AC#4 的"写进测试前置说明"没写**：它只在"球在跑死、球停不死"成立时才该写，而本波读数是"球在跑也能跑完"⇒ `scripts/wisp-cli-staged-tests.sh` **一个字未改**（连注释都未动）。
+- 证据：`docs/evidence/s1/450-fullrun-death-probe.md`；原始读数 `.scratch/wisp/probes/450/**`（`runs.txt`／`run1.out.txt`／`run2.out.txt`／`samples.csv`／`mem.csv`／`ac3-readings.txt`）。
+- ⛔ 未改任何产码；⛔ 未停／未重启球；⛔ 未 push。

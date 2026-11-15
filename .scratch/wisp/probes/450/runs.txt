@@ -1,0 +1,5 @@
+RUN1 start=2026-11-15T10:01:28.6782942+08:00 pid_ball=49348
+RUN1 end=2026-11-15T10:21:49.7766368+08:00 duration_s=1221 exit=1
+RUN2 start=2026-11-15T10:22:14.4563800+08:00 pid_ball=49348 webview_baseline=37 webview_ws_mb=3433
+RUN2 end=2026-11-15T10:44:12.2236385+08:00 duration_s=1318 exit=1
+d22_rc=0 pathlen_rc=0

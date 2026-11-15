@@ -1,0 +1,28 @@
+﻿# 450 AC#3 isolated arms -- 2026-11-15T10:44:31.6110073+08:00
+ARM A1 Test145ArgsJSON alone
+  pattern    = ^Test145ArgsJSONComesFromTheBookedForensicsRow$
+  start/end  = 10:44:31 / 10:44:40  (9 s incl. build)
+  exit_code  = 0
+  RUN=1 PASS=1 FAIL=0 SKIP=0
+  verdict    = <none>
+  cases      = --- PASS: Test145ArgsJSONComesFromTheBookedForensicsRow (0.22s)
+  last_line  = PASS
+  log        = D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\450\stage-ac3-a1\wisp-cli-tests.log
+ARM A2 TestAC4PriorFocus alone
+  pattern    = ^TestAC4PriorFocusSurvivesARefusedPanelSample$
+  start/end  = 10:44:40 / 10:44:52  (12 s incl. build)
+  exit_code  = 0
+  RUN=1 PASS=1 FAIL=0 SKIP=0
+  verdict    = <none>
+  cases      = --- PASS: TestAC4PriorFocusSurvivesARefusedPanelSample (1.27s)
+  last_line  = PASS
+  log        = D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\450\stage-ac3-a2\wisp-cli-tests.log
+ARM A3 the death region together (3 cases)
+  pattern    = ^(Test145ArgsJSONComesFromTheBookedForensicsRow|TestAC4PriorFocusSurvivesARefusedPanelSample|TestAC4FocusReturnToPriorWindowGap33r5)$
+  start/end  = 10:44:52 / 10:45:06  (14 s incl. build)
+  exit_code  = 1
+  RUN=3 PASS=2 FAIL=1 SKIP=0
+  verdict    = <none>
+  cases      = --- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (4.98s) ; --- PASS: TestAC4PriorFocusSurvivesARefusedPanelSample (0.79s) ; --- PASS: Test145ArgsJSONComesFromTheBookedForensicsRow (0.18s)
+  last_line  = FAIL
+  log        = D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\450\stage-ac3-a3\wisp-cli-tests.log
