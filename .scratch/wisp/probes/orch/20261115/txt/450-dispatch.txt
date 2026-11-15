@@ -1,0 +1,20 @@
+# 派单存档（先存档再发）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 昨天 15 次 null，台账 A1864）
+# 类型：票 450 探针腿（先答"死得成不成立、死在哪"，⛔ 不许改产码）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp。票 450：**本机整包跑到约 400 秒就在真 WebView2 窗那一区整进程死亡**。先读 `.scratch/wisp/issues/450-*.md` 全文。
+
+**背景（别先入为主）**：那两次死亡时**编排者的驻留球在跑**（PID 49348，2026-11-14 16:23 起，现在还在）。已知本机专属红里有 `TestAC246DevLegIgnoresTheTestTaskInjection`（"a dev Wisp is already running"）⇒ **第一嫌疑是球在争用**，⛔ 一上来判"WebView2 不稳"。
+
+**你这一波做三条 AC**：
+- **AC#1 把"死"变成可判事实**：复现一次整包（走载具 `scripts/wisp-cli-staged-tests.sh`），抓「退出码／最后一行输出／Windows 事件日志里的 application error 条目（进程名＋模块名）」。⛔ 用"卡住了""崩了"这种描述。事件日志读法自己找（`Get-WinEvent -FilterHashtable @{LogName='Application'} -MaxEvents 80` 起手，按时间窗筛）。
+- **AC#3 二分：WebView2 窗那一区 vs 其余**：把死亡点附近那几枚用 `-test.run` **单独**跑（至少 `Test145ArgsJSON*`、`TestAC4PriorFocus*`），看在**没有整包负载**时是否也死。给逐枚 `PASS/FAIL` 与用时。
+- **AC#2(a) 只做"球在跑"那一支**：同一命令再跑 1 发，记四数与是否死亡。
+- **AC#2(b)「球不在跑」那支 ⛔ 你别做**：你必须**动我的球**才能做（kill／重启），而票面逐字「⛔ 自己 kill 机主的球」⇒ 这一支**具名留给机主**（他会从托盘退出）。你要做的是：把"球一停就该跑哪一条命令"写进证据件，让机主一句话就能让我跑。
+
+**纪律**：
+- `go test ./cmd/wisp` **走载具、一次一发**（违反过 ⇒ 两条全量读数作废）。⚠ 本机两枚已知红**不是你的**：`TestAC4FocusReturnToPriorWindowGap33r5`（前台被占）／`TestAC246DevLegIgnoresTheTestTaskInjection`（驻留球在跑）——具名记，⛔ 修/删/跳过。
+- ⛔ 改任何产码（本票是探针票）；⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`；⛔ 杀/重启球；⛔ `frontend/**`／`design/**`；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+- 写面：`docs/evidence/s1/450-*`、`.scratch/wisp/probes/450/**`、本票 Progress log（只追加）。★若你判出真因＝球争用，**可以**改 `scripts/wisp-cli-staged-tests.sh` 的**注释**（只注释，不改变行为），并在证据里写清改了什么。
+
+回话第一行＝commit hash ＋「死没复现（是/否）＋退出码＋最后一行」＋「二分结论：球争用（是/否/证据不足）」＋「AC#2(b) 留给机主的那条命令是什么」。没干完写「未完成，卡在哪」。
