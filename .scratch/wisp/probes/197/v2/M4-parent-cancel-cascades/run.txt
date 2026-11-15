@@ -1,0 +1,28 @@
+time=2026-11-15T12:22:56.758+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197CancelIsPerRowAndNeverCascades
+    subagent_197_test.go:770: 父取消后孩子的 State = "Muted", want "Thinking"（级联会正好体现在这一维上）
+    subagent_197_test.go:775: 停这一枚子代理没成功：任务 064428cf-297e-42e6-a635-de655c5221b2 没有在跑（kind=subagent，state=Muted），没有可停的句柄
+--- FAIL: Test197CancelIsPerRowAndNeverCascades (0.00s)
+=== RUN   Test221ParentCancellationStillDoesNotCascade
+    task_cancel_221_legs_test.go:519: 父取消把孩子也停了：state = "Muted", want "Thinking"（级联会正好体现在这一维上）
+    task_cancel_221_legs_test.go:526: 父任务事后停它被拒：没能停掉 fb9a609b-fe7b-4844-a78b-f6fdac054e43：任务 fb9a609b-fe7b-4844-a78b-f6fdac054e43 没有在跑（kind=subagent，state=Muted），没有可停的句柄（这一行没有被改动，别的孩子也没被牵连）
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.00s)
+=== RUN   Test197CancelIsPerRowAndNeverCascades
+    subagent_197_test.go:770: 父取消后孩子的 State = "Muted", want "Thinking"（级联会正好体现在这一维上）
+    subagent_197_test.go:775: 停这一枚子代理没成功：任务 c5cb012f-8a8b-429a-ba5c-e60db59ed0ef 没有在跑（kind=subagent，state=Muted），没有可停的句柄
+--- FAIL: Test197CancelIsPerRowAndNeverCascades (0.00s)
+=== RUN   Test221ParentCancellationStillDoesNotCascade
+    task_cancel_221_legs_test.go:519: 父取消把孩子也停了：state = "Muted", want "Thinking"（级联会正好体现在这一维上）
+    task_cancel_221_legs_test.go:526: 父任务事后停它被拒：没能停掉 b4e973b7-aeaa-4c94-8f1d-41c7eefff32d：任务 b4e973b7-aeaa-4c94-8f1d-41c7eefff32d 没有在跑（kind=subagent，state=Muted），没有可停的句柄（这一行没有被改动，别的孩子也没被牵连）
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.01s)
+=== RUN   Test197CancelIsPerRowAndNeverCascades
+    subagent_197_test.go:770: 父取消后孩子的 State = "Muted", want "Thinking"（级联会正好体现在这一维上）
+    subagent_197_test.go:775: 停这一枚子代理没成功：任务 ff747986-af44-4a85-b7a0-4d94e04daa5f 没有在跑（kind=subagent，state=Muted），没有可停的句柄
+--- FAIL: Test197CancelIsPerRowAndNeverCascades (0.00s)
+=== RUN   Test221ParentCancellationStillDoesNotCascade
+    task_cancel_221_legs_test.go:519: 父取消把孩子也停了：state = "Muted", want "Thinking"（级联会正好体现在这一维上）
+    task_cancel_221_legs_test.go:526: 父任务事后停它被拒：没能停掉 41894fcd-6f69-4b11-82a8-3ff69ebb7f81：任务 41894fcd-6f69-4b11-82a8-3ff69ebb7f81 没有在跑（kind=subagent，state=Muted），没有可停的句柄（这一行没有被改动，别的孩子也没被牵连）
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.206s
+FAIL

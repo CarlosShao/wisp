@@ -1,0 +1,26 @@
+evidence(197-v2) 五枚未勾格逐格裁决：满足 4／部分 1／不满足 0／裁决不了 0
+
+票 197 的五枚未勾格（AC#0／#1／#2／#3／#6）由非实现者逐格裁到
+docs/evidence/s1/197-v2-adjudication.md：五列（原文逐字／裁决／file:line
+依据／还缺什么料），按台账 A1875 的两件套——凡判满足必须同时给生产调用
+点与"摘掉它会红"的测试名。
+
+判语：AC#1／#2／#3／#6 = 满足；AC#0 = 部分（唯一缺料的格）。
+AC#0 的对不上是名字不是方向：票面说"S5（Agent 内核）为家"，而
+SPEC-12 §2 的 S5 是"按需 WebView"，task.spawn 在 D34 表里零行，同族的
+task.output／task.cancel 切片列都写 S7；"不用先开多任务"那一半复核为真
+（派生只取自己的池位，不经 TaskScheduler）。缺的料＝一句落节＋一句
+"PLAN.md:1453 不束本层"，不是产码。
+
+"会红"这半边是现跑的，不是读注释：5 发 go test -overlay 突变（产码零字节
+改动，锚点落地前断言恰好命中 1 次），逐发指名红——
+M1 在跑态置空 ⇒ Test197RowExistsBeforeFirstChildModelCall 等三枚红；
+M2 收口态置空 ⇒ Test197SpawnPublishesIdentityRow 红；
+M3 Append 折成一枚键 ⇒ TestNPlusOneSubagentsEachGetTheirOwnStream 等两枚红；
+M4 摘掉 context.WithoutCancel ⇒ 两枚取消语义尺 -count=3 三轮全红；
+M5 收尾监视器改裸 go func ⇒ Test229FinishWatcherIsRosterNamedWhileChildRuns 红。
+起手基线 11 枚定向用例全绿（红只出现在突变下，不是本来就红）。
+
+只读：未改产码／票面／台账／阈值／契约，未碰 cmd/wisp（除读），未 push。
+cmd/wisp 那两枚生产路径尺（接线计数、33 枚真派生）本波跑不了（该包归
+写腿 451 独占），件里逐处标了〔读断言／未跑包〕。

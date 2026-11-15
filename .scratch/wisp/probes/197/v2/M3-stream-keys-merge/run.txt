@@ -1,0 +1,10 @@
+time=2026-11-15T12:22:40.339+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestNPlusOneSubagentsEachGetTheirOwnStream
+    subagent_stream_197_test.go:70: rows = 5 for 4 subagents, want one row per agent -  {"subagent:merged" text="[alpha step1] [alpha ste<...>lta step1] [delta step2]" done=false} {"subagent:alpha" text="" done=true} {"subagent:bravo" text="" done=true} {"subagent:charlie" text="" done=true} {"subagent:delta" text="" done=true}
+--- FAIL: TestNPlusOneSubagentsEachGetTheirOwnStream (0.00s)
+=== RUN   TestTwoSubagentsWritingAtOnceDoNotPolluteEachOther
+    subagent_stream_197_test.go:184: rows = 4, want 3 -  {"subagent:merged" text="R1 R2 R3 A1 A2 A3 B1 B2 B3 " done=false} {"task-root" text="" done=true} {"subagent:a1" text="" done=true} {"subagent:b2" text="" done=true}
+--- FAIL: TestTwoSubagentsWritingAtOnceDoNotPolluteEachOther (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.109s
+FAIL

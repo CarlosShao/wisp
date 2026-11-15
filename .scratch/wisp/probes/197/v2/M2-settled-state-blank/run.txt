@@ -1,0 +1,11 @@
+time=2026-11-15T12:22:31.289+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SpawnPublishesIdentityRow
+    subagent_197_test.go:318: State 维不可读：宿主没有登记这一维（fail-closed：不替任务编一个状态）（state=""）
+    subagent_197_test.go:321: State = "", want "Settling"（跑完的孩子落在 D43 的 Settling 上）
+    subagent_197_test.go:324: State "" 不在 D43 的 20 枚名字上
+--- FAIL: Test197SpawnPublishesIdentityRow (0.00s)
+=== RUN   Test197RowExistsBeforeFirstChildModelCall
+--- PASS: Test197RowExistsBeforeFirstChildModelCall (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.333s
+FAIL

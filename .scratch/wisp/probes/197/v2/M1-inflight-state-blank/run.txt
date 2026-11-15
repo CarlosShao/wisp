@@ -1,0 +1,15 @@
+time=2026-11-15T12:22:07.788+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SpawnPublishesIdentityRow
+--- PASS: Test197SpawnPublishesIdentityRow (0.00s)
+=== RUN   Test197RowExistsBeforeFirstChildModelCall
+    subagent_197_test.go:380: 在跑的行 State = "", want "Thinking"
+--- FAIL: Test197RowExistsBeforeFirstChildModelCall (0.00s)
+=== RUN   Test197CancelIsPerRowAndNeverCascades
+    subagent_197_test.go:770: 父取消后孩子的 State = "", want "Thinking"（级联会正好体现在这一维上）
+--- FAIL: Test197CancelIsPerRowAndNeverCascades (0.00s)
+=== RUN   Test221ParentCancellationStillDoesNotCascade
+    task_cancel_221_legs_test.go:519: 父取消把孩子也停了：state = "", want "Thinking"（级联会正好体现在这一维上）
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.264s
+FAIL

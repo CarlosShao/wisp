@@ -1,0 +1,7 @@
+time=2026-11-15T12:23:44.007+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test229FinishWatcherIsRosterNamedWhileChildRuns
+    spawn_finish_watcher_229_test.go:70: 收尾协程不在册：CountByName("agent-task-b5e7d13a-c8ba-403b-9e48-2d8a35cca90b")=0；此刻 observe.Default：Total=0 PerTask=0 Unknown=[]；旧名 "subagent-finish-b5e7d13a-c8ba-403b-9e48-2d8a35cca90b" 的 CountByName=0（AC#2 没落地，或名册判定被改）
+--- FAIL: Test229FinishWatcherIsRosterNamedWhileChildRuns (5.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	5.174s
+FAIL
