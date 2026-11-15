@@ -2,7 +2,7 @@
 
 **结论一句话：41 枚红不是"摆了 17.8 MB 还被抢"，而是那一发根本没走载具——裸 `go test ./cmd/wisp` 的测试 exe 落在 `%TEMP%\go-buildXXXX\b001\wisp.test.exe`（旁边没有 DLL，也没导出夹具环境）；System32 的 10.5 MB 版按文档顺序先命中。载具本身是对的：同一枚测试经载具 `PASS 2.14s` 并绑到 staged 的 17.8 MB / 1.28.2。那一环＝载具（准确说：载具没有被用上、也不是唯一入口）；不是 sherpa 加载器（它按文档行为工作），也不是 `deps.toml` 与 stage 不一致（sha256 与字节逐位一致）。**
 
-> **对票面一句读数的更正（实测，见 §2.1）**：那 41 红**不是全部**带 `onnxruntime 1.17.1 … shadowing` 句——逐块实测是 **20 枚带该句（绑定层）、20 枚是 `WISP_SPIKE_MODELS is not set`（夹具层）、1 枚是派单已具名的 `TestAC246`**（37.74s）。两层的共同根因都是"这一发没走载具"：载具既 stage DLL，也导出五个夹具变量；裸 `go test` 两样都没有。onnxruntime 那一半（20 枚）才是"绑错版本"的直接受害者。
+> **对票面一句读数的更正（实测，见 §2.1）**：那 41 红**不是全部**带 `onnxruntime 1.17.1 … shadowing` 句——逐块实测是 **21 枚绑定层（20 枚直接带该句 + 1 枚因语音链未构造而断言空串，载具下 PASS 0.04s）、19 枚是 `WISP_SPIKE_MODELS is not set`（夹具层）、1 枚是派单已具名的 `TestAC246`**（37.74s）。绑定层与夹具层的共同根因都是"这一发没走载具"：载具既 stage DLL，也导出五个夹具变量；裸 `go test` 两样都没有。
 
 - 实测绑到：载具形 → `D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\455\stage\onnxruntime.dll`，**17799168 B**，FileVersion **1.28.2**；裸 `go test` 形 → `C:\Windows\SYSTEM32\onnxruntime.dll`，**10572960 B**，FileVersion **1.17.260311-1434.1**（同一台机、同一条测试、同一个 cwd，只有 exe 所在目录不同）。
 - 探针：`.scratch/wisp/probes/455/`（`probe_binding.go`、`loadlib_probe/main.go`、`run-probe.ps1`），一次跑完 A/B/C1/C2/C3 五臂，读数落 `.scratch/wisp/probes/455/run-probe.out.txt`。
@@ -40,7 +40,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .scratch\wisp\probes\455\run
 | 载具 | `WISP_CLI_STAGE_DIR=<probes/455/stage-cli-run> scripts/wisp-cli-staged-tests.sh '-test.run' '^Test15eSilenceNeverCallsTheHandOff$'` | `--- PASS: … (2.14s)`；`ok github.com/CarlosShao/wisp/cmd/wisp 2.00s`；语音链真起来（silero VAD 装上了、`consumer booked on the D38b roster`）。日志 `probes/455/carrier-15e.log` |
 | 裸 `go test` | `$env:PATH="<root>\third_party\sherpa-onnx;"+$env:PATH; go test ./cmd/wisp -run '^Test15eSilenceNeverCallsTheHandOff$' -count=1 -v` | `--- FAIL: … (0.00s)`，逐字 `speech: onnxruntime 1.17.1 is older than the 1.28 … a second onnxruntime.dll is shadowing the one on PATH`。日志 `probes/455/raw-go-test-15e.log` |
 
-⇒ **AC#1 的那一对数字**：staged/钉版是 **17799168 B**；裸 `go test` 形（41 红那一发里的**绑定层 20 枚**）实际绑的是 **10572960 B**（`C:\Windows\SYSTEM32`）。
+⇒ **AC#1 的那一对数字**：staged/钉版是 **17799168 B**；裸 `go test` 形（41 红那一发里的**绑定层 21 枚**＝20 直接 + 1 间接）实际绑的是 **10572960 B**（`C:\Windows\SYSTEM32`）。
 
 ---
 
@@ -61,12 +61,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .scratch\wisp\probes\455\run
 
 | 层 | 枚数 | 逐字签名 | 归因 |
 |---|---|---|---|
-| 绑定层（onnxruntime） | **20** | `speech: onnxruntime 1.17.1 is older than the 1.28 … shadowing the one on PATH` | 裸跑无 staging → 绑 System32 的 10572960 |
-| 夹具层 | **20** | `install the streaming ASR into <tmp>: WISP_SPIKE_MODELS is not set` | 裸跑没导出五个夹具变量（载具会导） |
+| 绑定层（onnxruntime，直接） | **20** | `speech: onnxruntime 1.17.1 is older than the 1.28 … shadowing the one on PATH` | 裸跑无 staging → 绑 System32 的 10572960 |
+| 绑定层（间接：语音链未构造 ⇒ 断言拿到空串） | **1** | `Test41a2r1OptInGateResolvesTheManifestSpelling`：`the opt-in-off note = "", want the enabled=false sentence`；**载具形单跑 PASS 0.04s**（`probes/455/carrier-41a2r1optin.log`）⇒ 同一根因，只是它的失败信息不带遮蔽句 | 裸跑无 staging |
+| 夹具层 | **19** | `install the streaming ASR into <tmp>: WISP_SPIKE_MODELS is not set`（该句在 41 红日志里 19 行） | 裸跑没导出五个夹具变量（载具会导） |
 | 他因已知红 | **1** | `TestAC246DevLegIgnoresTheTestTaskInjection`（37.74s） | 派单已具名，与本票无关 |
 | **合计** | **41** | — | — |
 
-⇒ "摆了 17.8 MB 却绑了 10.5 MB"这一对数字，直接落在**绑定层的 20 枚**上；另 20 枚连绑定都还没轮到就先死在夹具层。两者都因为这一发不是载具形。
+⇒ "摆了 17.8 MB 却绑了 10.5 MB"这一对数字，直接落在**绑定层 21 枚**上；另 19 枚连绑定都还没轮到就先死在夹具层，剩 1 枚是他因已知红。绑定层与夹具层都因为这一发不是载具形。
 
 票 35 G3 证据件自己写明的命令（`docs/evidence/s1/35-g3-backpressure-20261115.md:166-171`）：
 
@@ -128,7 +129,7 @@ Microsoft 官方《Dynamic-link library search order》逐字（2023-02-09 版�
 | `probes/451/r1/cmdwisp-full.txt`（11-14 整包，载具） | 载具 | 866 | 623 | 3 | 17 | **0** | 4 | 3 |
 | `probes/452/cmdwisp-full.log`（11-14 整包，载具） | 载具 | 868 | 626 | 2 | 17 | **0** | 4 | 3 |
 | `probes/452/cmdwisp-full-run2.log`（同上第二发） | 载具 | 868 | 626 | 2 | 17 | **0** | 4 | 3 |
-| `.scratch/35g3-wholepkg-skip-death.log`（11-15 41 红） | **裸 `go test`** | 894 | 618 | **41** | 10 | **50 行**（按 FAIL 块归因 20 枚，见 §2.1） | **0** | **0** |
+| `.scratch/35g3-wholepkg-skip-death.log`（11-15 41 红） | **裸 `go test`** | 894 | 618 | **41** | 10 | **50 行**（按 FAIL 块归因 21 枚绑定层，见 §2.1） | **0** | **0** |
 
 ⇒ 载具形整包**跨三发、0 条遮蔽红**；41 红那一发是唯一没有载具横幅、没有 staged 行、却出现 19 行"夹具未导出"的整包发。
 

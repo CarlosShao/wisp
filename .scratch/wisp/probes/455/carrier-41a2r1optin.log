@@ -1,0 +1,14 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/455/stage-cli-run/onnxruntime.dll
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/455/stage-cli-run/sherpa-onnx-c-api.dll
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/455/stage-cli-run/sherpa-onnx-cxx-api.dll
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-15T19:40:54.519+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test41a2r1OptInGateResolvesTheManifestSpelling
+time=2026-11-15T19:40:54.550+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test41a2r1OptInGateResolvesTheManifestSpelling4208371170\001\models
+time=2026-11-15T19:40:54.561+08:00 level=INFO msg="voice: the store carries no VAD model; using WISP_SILERO_MODEL" path="D:/work/workspace/projects plans/Wisp/third_party/spike-models/silero_vad.onnx" store=C:\Users\swq\AppData\Local\Temp\Test41a2r1OptInGateResolvesTheManifestSpelling4208371170\001\models
+--- PASS: Test41a2r1OptInGateResolvesTheManifestSpelling (0.04s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	0.00s
