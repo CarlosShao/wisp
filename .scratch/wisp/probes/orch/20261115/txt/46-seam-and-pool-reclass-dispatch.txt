@@ -1,0 +1,40 @@
+# 派单存档（先存档再发）—— 票 46 的 S6 两处空洞：装配死线（写腿，cmd/wisp）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/46-*.md` 的 **S6 验收**那一节，以及 `docs/evidence/s1/46-s6-acceptance.md`。
+
+**背景（我现读复核过的三件，与那份验收件一致）**：
+1. ★**收口闸从来没跑过**：`cmd/wisp/resident_windows.go:882` 是 **`_ = wd`** —— 一个构造好就扔掉的值。旁边那条注释写着"等票 28"，而**票 28 已经 `-done`**（A1874：这类"等票 N"的注释在票 N 结了之后就成了尸体）。⇒ **settle gate 在生产路径上零执行**。
+2. **磁盘门控写入器没装配**：`NewDiskGatedWriter` 产码命中 **2 处**，两处都在 `internal/observe/guards_45.go:305` 与 `:308`（同一函数内的自测/对照），**没有任何生产装配点**。
+3. **一句描述不存在的字段**：`guards_45.go:307` 那句 `LogConfig.Disk is set` 说的是 `type LogConfig struct`（`internal/observe/logging.go:64`）上**没有的字段**（现读：`Dir/Level/RollSizeMB/RollDays/RedactPaths`，`Disk` 命中 **0**）。
+
+**要做**（按价值排序，⛔ 不许只做第 3 件就收）：
+1. **把收口闸真接上**：让 `wd` 不再是 `_`，而是在它该跑的地方跑（并说明"该跑的地方"是哪儿、为什么）。给赋值点 `file:line` ＋ **会红的行为测试**（A1880：⛔ 只让断言源码字符串的测试红）。
+2. **给 `NewDiskGatedWriter` 一个真生产装配点**，或**具名裁决"不装配、理由是 X"**（后者也算交付，但必须写成票面可复核的句子，⛔ 散文）。
+3. **把那句假话改掉**：`guards_45.go:307` 要么改字段名，要么改成如实的句子。⛔ 留一句描述不存在字段的注释。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／SLO 阈值／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 表／`frontend/**`／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`。
+`go test ./cmd/wisp` 走载具一次一发；**整包读数必须带 A1882 三样**（终点锚 `TestZZ315A1` 是否命中／最后一条 `=== RUN`／本波新测试在截断点前还是后）。本机已知红三枚不是你的。
+⚠ 整包可能 native AV 死 —— 遇到照实写"第 N 秒被 native AV 终止"＋最后一条 `RUN`，⛔ 报绿。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/observe/**`（**⛔ 不得改 `thresholds.go`**）、`docs/evidence/s1/46-*`。
+
+回话第一行＝commit hash ＋「收口闸现在跑在哪（赋值点 file:line）」＋「磁盘门控：装配了/具名不装配（哪句）」＋「那句假话改成什么」＋「哪枚测试会红」。没干完写「未完成，卡在哪」。
+
+---
+
+## 腿 B ＝ 未结池**重新分档**（只读，为下一波派单用）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读腿。**不发散**，只做分档。
+
+读 `.scratch/wisp/issues/` 下**全部未结票**（`*.md` 且名字**不以 `-done.md` 结尾**，共 54 张），对每张给**四列**：
+`票号 | 一句话它要什么 | 档位 | 判据`
+- 档位只有五种：**可派**（有明确产码活、写面在我们手里、无外部阻塞）／**等机主**（要真机/真麦/真按/一句话裁定）／**等票**（前置票未结，写清哪张）／**规格票**（要改契约文字）／**非本队**（`frontend/**`／`design/**` 归机主外部 agent）
+- 判据列写**可核的一句话或命令**（⛔ 写"看情况"）
+
+**规则**：①每张票都必须去读正文（⛔ 只看标题就分档）；②`Blocked by` 里点的票**现读它现在是不是 `-done`**（今天已经发现过两次"等票"其实早就结了）；③已有 `-done` 前缀/后缀变体的一律当已结；④票面里写着「⛔ 不许落地」「本票只收件」的，档位按它自己说的。
+
+交付：`docs/evidence/s1/open-pool-reclass-20261115-eve.md`，开头给**五档计数**，末尾给「**可派**那几张按价值排序」并给**每张一句为什么它最有价值**。
+
+⛔ 改任何票面/产码/台账；⛔push。写面：`docs/evidence/s1/open-pool-reclass-*`。
+回话第一行＝commit hash ＋「可派 a／等机主 b／等票 c／规格票 d／非本队 e（总 54）」＋「可派里最值钱的三张（票号＋一句）」。没干完写「未完成，卡在哪」。
