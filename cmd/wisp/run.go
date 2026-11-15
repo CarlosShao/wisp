@@ -1626,14 +1626,74 @@ func (rt *agentRuntime) windowCount() int {
 	return 0
 }
 
-// close releases the store and stands the reply listener down.
+// joinOnCloseBudget228 is how long close() waits for one spawned goroutine that
+// can still be in the middle of a line when the run ends.
 //
-// The cancel is not a join: a listener parked in a blocking Read on the
-// operator's stream does not observe a context, so the root's Cancel is what
-// stops it from taking any further reply (runReplyLoop checks ctx.Err() per line
-// and refuses to act on one after that). For a CLI process that is the whole
-// requirement - the goroutine dies with the process, and a pipe an end-to-end
-// test closed returns EOF on its own.
+// WHERE THE NUMBER COMES FROM: it is this leg's own size, deliberately NOT
+// D38(e) step 3's proc.TaskWaitTimeout (3s, a TASK's drain budget). The work that
+// can still be in flight at this point is ONE line of work - a single-use grant
+// spent through approval.Replies, one ledger row, one audit append - or one
+// config-reload tick already past its card. Half a second is that line's grace. A
+// task-sized budget would be wrong twice over: it is not the same work, and the
+// answer listener spends its life inside a BLOCKING read that a cancel cannot
+// wake at all (runReplyLoop only refuses the NEXT line it sees), so a longer wait
+// ends in exactly the same place - the process exiting under a parked goroutine -
+// while charging every run that ends mid-line for it.
+const joinOnCloseBudget228 = 500 * time.Millisecond
+
+// joinedWithin228 reports whether h finished within budget. A nil handle means
+// this run never spawned that goroutine, which counts as joined: there is nothing
+// left behind. nil is the honest value for a `wisp run` with no reply source and
+// for any assembly that never reached the reply listener or a config.Manager.
+func joinedWithin228(h *observe.Handle, budget time.Duration) bool {
+	if h == nil {
+		return true
+	}
+	tm := time.NewTimer(budget)
+	defer tm.Stop()
+	select {
+	case <-h.Done():
+		return true
+	case <-tm.C:
+		return false
+	}
+}
+
+// close releases the store and stands the two goroutines this run spawned down.
+//
+// D38(c) (PLAN.md:2845, "任务完成必须等所有派生 goroutine 退出") IS THE
+// REQUIREMENT, and until ticket 228 AC#4 this function did not meet it: both
+// roots below were only CANCELLED, so the run declared itself finished while two
+// goroutines it had started were still alive. That was not a style choice - the
+// comment here said as much in as many words ("The cancel is not a join") - and
+// the ticket counts it as a live violation, not as an accepted CLI posture.
+//
+// WHO JOINS WHOM, named:
+//
+//	close() (the defer run() registers over the assembled runtime)
+//	  joins rt.replyHandle   "approval-waiter", spawned by attachReplyListener
+//	  joins rt.reloadHandle  "watchdog",         spawned by startConfigReload
+//
+// Both go through observe.Registry.Spawn (D22 ban #1; both names are D38(b)
+// roster names), which is what makes them joinable here by handle at all. The
+// ball's GUI thread is NOT this function's to join: it is internal/ball's
+// "ui-sta" handle, also spawned through the registry, and Ball.Close joins it
+// before the D38(e) order walks (residentBall.stop).
+//
+// THE HONEST CASE IS THE PARKED ONE. runReplyLoop spends its life inside a
+// blocking read on the operator's stream, and a cancel cannot wake it: the loop
+// only refuses the next line it sees. So the listener itself is asked where it is
+// (replySurface.parkedInRead - a fact only the loop has) and:
+//
+//   - parked: nothing is in flight, no wake-up can arrive, and the join says so
+//     in one audit line instead of spending the budget on a wait that cannot end.
+//   - not parked: a line really is being handled, so the budget is spent letting
+//     that line finish (its ledger spend and its audit append) before the exit
+//     cuts it; if it still has not finished, that is booked by name too.
+//
+// Either way the fact is RECORDED instead of assumed: this is the shape the
+// repository's own "the cancel is not a join" sentence asked for, with the
+// reading behind it.
 func (rt *agentRuntime) close() {
 	if rt.replyRoot != nil {
 		rt.replyRoot.Cancel()
@@ -1643,6 +1703,26 @@ func (rt *agentRuntime) close() {
 	// a deny, so shutting down can never be the moment a loosening slips in.
 	if rt.reloadRoot != nil {
 		rt.reloadRoot.Cancel()
+	}
+	// The join itself (ticket 228 AC#4), in the order the two goroutines were
+	// started: the answer side first (assembleRuntime attaches it before the
+	// tick), then the tick. Both roots are cancelled above, so what is left is
+	// waiting for work already in flight - never for new work.
+	if rt.replyHandle != nil {
+		switch {
+		case rt.reply != nil && rt.reply.parkedInRead():
+			rt.auditf("close: GOROUTINE-JOIN goroutine=approval-waiter joined=false reason=parked-in-read "+
+				"detail=%q", "答复监听停在阻塞读上，取消唤不醒它；进程退出是它的终点，此刻没有处理中的答复被切断")
+		case !joinedWithin228(rt.replyHandle, joinOnCloseBudget228):
+			rt.auditf("close: GOROUTINE-JOIN goroutine=approval-waiter joined=false reason=budget-expired "+
+				"budget=%s detail=%q", joinOnCloseBudget228,
+				"一行答复在预算内没有收口：它的账与审计可能没写完，进程退出会切断它")
+		}
+	}
+	if !joinedWithin228(rt.reloadHandle, joinOnCloseBudget228) {
+		rt.auditf("close: GOROUTINE-JOIN goroutine=watchdog joined=false reason=budget-expired "+
+			"budget=%s detail=%q", joinOnCloseBudget228,
+			"配置轮询在预算内没有收口：它可能正停在一张等人回答的卡上，进程退出会切断它")
 	}
 	// Shut the C20 scheduler's door (ticket 47, D38e step 1): after Close,
 	// Submit answers ErrClosed, so the shutdown sequence can never be followed

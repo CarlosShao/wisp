@@ -70,6 +70,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync/atomic"
 	"time"
 	"unicode"
 
@@ -208,6 +209,31 @@ type replySurface struct {
 	vetoChannel approval.Channel
 	// ctx is the listener's own context; it carries no authority.
 	ctx context.Context
+	// parked is the listener's own statement of WHERE it is (ticket 228 AC#4):
+	// true while it sits inside its blocking read on the operator's stream, where
+	// a cancelled context cannot reach it, and false while it is handling a line.
+	// It exists so the run's teardown (agentRuntime.close) can tell "nothing is in
+	// flight, no cancel can arrive" from "a line is being handled" - the pre-ticket
+	// comment asserted the first case from outside and nothing measured it.
+	parked atomic.Bool
+}
+
+// noteParked is the listener telling its owner where it is. Called on both sides
+// of every read by runReplyLoop and nowhere else: the loop is the only thing that
+// knows, so a second writer would be a second truth source.
+func (s *replySurface) noteParked(p bool) {
+	if s == nil {
+		return
+	}
+	s.parked.Store(p)
+}
+
+// parkedInRead reports whether the listener is inside its blocking read right
+// now. false also covers "this surface has no listener" (a host that only built
+// the verb table, e.g. the resident leg's tray answers), which is honest: there
+// is then nothing parked to name.
+func (s *replySurface) parkedInRead() bool {
+	return s != nil && s.parked.Load()
 }
 
 // allow spends this card's native grant through the native router, via the seam
@@ -544,10 +570,22 @@ func splitReplyLine(line string) (verb, corr, arg string) {
 
 // runReplyLoop reads the operator's answers until the stream ends or the run's
 // reply root is cancelled.
+//
+// Ticket 228 AC#4: the loop also reports WHERE it is (noteParked on both sides of
+// every read), because its owner's teardown must join it and this is the one fact
+// that decides whether a join can accomplish anything. The read itself is
+// unchanged - same scanner, same buffer, same per-line ctx check - so the grammar
+// and the refusals below are byte-for-byte what they were.
 func runReplyLoop(ctx context.Context, s *replySurface, in io.Reader, out io.Writer) {
 	sc := bufio.NewScanner(in)
 	sc.Buffer(make([]byte, 0, 4096), 1<<16)
-	for sc.Scan() {
+	for {
+		s.noteParked(true)
+		more := sc.Scan()
+		s.noteParked(false)
+		if !more {
+			break
+		}
 		if ctx.Err() != nil {
 			return
 		}
