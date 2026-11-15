@@ -129,21 +129,40 @@ var attachmentTypes = []attachmentType{
 	{mime: "image/webp", kind: "image", ext: "webp", match: func(h []byte) bool {
 		return len(h) >= 12 && bytes.Equal(h[:4], []byte("RIFF")) && bytes.Equal(h[8:12], []byte("WEBP"))
 	}},
-	{mime: "video/mp4", kind: "video", ext: "mp4", match: matchesISOBaseMedia},
-	{mime: "video/quicktime", kind: "video", ext: "mov", match: matchesISOBaseMedia},
+	{mime: "video/mp4", kind: "video", ext: "mp4", match: matchesMP4},
+	{mime: "video/quicktime", kind: "video", ext: "mov", match: matchesQuickTime},
 }
 
-// matchesISOBaseMedia recognises the ISO base media container (mp4/mov): a
-// 4-byte size, the literal "ftyp", then a compatible brand from the small set
-// the composer claims to read. A brand outside the set is an unsupported type,
-// which is a refusal - not a guess.
-func matchesISOBaseMedia(h []byte) bool {
+// matchesMP4 recognises the MP4 side of the ISO base media container: a 4-byte
+// size, the literal "ftyp", then a major brand from the MP4 set the composer
+// claims to read.
+func matchesMP4(h []byte) bool {
+	return matchesISOBaseMedia(h, "isom", "avc1", "mp42", "M4V ", "mmp4")
+}
+
+// matchesQuickTime recognises the QuickTime side: the same container carrying
+// the "qt  " major brand. The brand is the ONLY thing that tells the two
+// whitelisted types apart, which is why each row owns its own predicate: giving
+// both rows one predicate let the table's order pick the verdict, and an honest
+// .mov declared video/quicktime was then refused for "disagreeing" with a
+// declaration that was right (ticket 454).
+func matchesQuickTime(h []byte) bool {
+	return matchesISOBaseMedia(h, "qt  ")
+}
+
+// matchesISOBaseMedia checks the shared ISO base media container shape (a 4-byte
+// size, the literal "ftyp", then a major brand) and then the brand against the
+// caller's set. A brand outside the set is an unsupported type, which is a
+// refusal - not a guess.
+func matchesISOBaseMedia(h []byte, brands ...string) bool {
 	if len(h) < 12 || !bytes.Equal(h[4:8], []byte("ftyp")) {
 		return false
 	}
-	switch string(h[8:12]) {
-	case "isom", "avc1", "mp42", "M4V ", "qt  ", "mmp4":
-		return true
+	major := string(h[8:12])
+	for _, brand := range brands {
+		if major == brand {
+			return true
+		}
 	}
 	return false
 }
