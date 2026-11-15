@@ -1,0 +1,39 @@
+time=2026-11-15T13:31:29.062+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test214AttachmentAddEndToEndStoresBytesInArtifacts
+    panel_attachment_214_test.go:88: an accepted attachment came back refused: panel: 该方法在名册内，但本机未接入处理器: 方法 "panel.attachment.add" 的处理器未接入（requestId="r-214-accept"），档位/工作区/附件/消息/设置均未变化
+--- FAIL: Test214AttachmentAddEndToEndStoresBytesInArtifacts (0.01s)
+=== RUN   Test214AttachmentRefusalReachesTheSnapshotWithItsReason
+    panel_attachment_214_test.go:137: a non-image payload was not refused with the sentinel: panel: 该方法在名册内，但本机未接入处理器: 方法 "panel.attachment.add" 的处理器未接入（requestId="r-214-refuse"），档位/工作区/附件/消息/设置均未变化
+--- FAIL: Test214AttachmentRefusalReachesTheSnapshotWithItsReason (0.01s)
+=== RUN   Test214DisguisedExecutableIsRefusedByItsBytes
+    panel_attachment_214_test.go:181: an executable named .png was not refused: panel: 该方法在名册内，但本机未接入处理器: 方法 "panel.attachment.add" 的处理器未接入（requestId="r-214-disguise"），档位/工作区/附件/消息/设置均未变化
+--- FAIL: Test214DisguisedExecutableIsRefusedByItsBytes (0.01s)
+=== RUN   Test214OversizeAttachmentIsRefusedBeforeAnyRead
+time=2026-11-15T13:31:29.125+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead4236309733\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T13:31:29.134+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T05:31:29Z duration_ms=8
+time=2026-11-15T13:31:29.143+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead4236309733\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T13:31:29.148+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T05:31:29Z duration_ms=5
+time=2026-11-15T13:31:29.162+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead4236309733\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T13:31:29.170+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T05:31:29Z duration_ms=8
+time=2026-11-15T13:31:29.183+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead4236309733\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T13:31:29.192+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T05:31:29Z duration_ms=8
+time=2026-11-15T13:31:29.192+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T13:31:29.201+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead4236309733\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T13:31:29.206+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T05:31:29Z duration_ms=4
+time=2026-11-15T13:31:29.214+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214OversizeAttachmentIsRefusedBeforeAnyRead4236309733\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T13:31:29.221+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T05:31:29Z duration_ms=6
+time=2026-11-15T13:31:29.226+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T13:31:29.230+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test214OversizeAttachmentIsRefusedBeforeAnyRead (0.13s)
+=== RUN   Test214PathSpellingDisplayNameIsRefusedAndNothingLands
+    panel_attachment_214_test.go:243: a path-spelling name was not refused: panel: 该方法在名册内，但本机未接入处理器: 方法 "panel.attachment.add" 的处理器未接入（requestId="r-214-traverse"），档位/工作区/附件/消息/设置均未变化
+--- FAIL: Test214PathSpellingDisplayNameIsRefusedAndNothingLands (0.01s)
+=== RUN   Test214IngestRefRenderingCarriesTheArtifactPathAndRefusalsToTheAgent
+--- PASS: Test214IngestRefRenderingCarriesTheArtifactPathAndRefusalsToTheAgent (0.00s)
+=== RUN   Test214PumpAssemblyCarriesTheAttachmentReaders
+--- PASS: Test214PumpAssemblyCarriesTheAttachmentReaders (0.00s)
+=== RUN   Test214DraftLedgerDropsOldestPastItsCap
+--- PASS: Test214DraftLedgerDropsOldestPastItsCap (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.279s
+FAIL

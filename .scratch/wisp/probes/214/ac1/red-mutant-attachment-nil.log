@@ -1,0 +1,7 @@
+time=2026-11-15T13:31:09.931+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test214AttachmentAddEndToEndStoresBytesInArtifacts
+    panel_attachment_214_test.go:88: an accepted attachment came back refused: panel: 该方法在名册内，但本机未接入处理器: 方法 "panel.attachment.add" 的处理器未接入（requestId="r-214-accept"），档位/工作区/附件/消息/设置均未变化
+--- FAIL: Test214AttachmentAddEndToEndStoresBytesInArtifacts (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.130s
+FAIL

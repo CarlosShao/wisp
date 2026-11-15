@@ -1,0 +1,29 @@
+=== C1 ticket-own scale on BEFORE tree (25eb216) ===
+=== C1 ticket-own scale on HEAD ===
+HEAD:cmd/wisp/panel_attachment_214.go:68:	items []panel.AttachmentRef
+HEAD:cmd/wisp/panel_attachment_214.go:82:	return &attachmentDraftLedger{items: []panel.AttachmentRef{}}
+HEAD:cmd/wisp/panel_attachment_214.go:88:func (l *attachmentDraftLedger) record(ref panel.AttachmentRef) {
+HEAD:cmd/wisp/panel_attachment_214.go:108:func (l *attachmentDraftLedger) rows() []panel.AttachmentRef {
+HEAD:cmd/wisp/panel_attachment_214.go:114:	out := make([]panel.AttachmentRef, len(l.items))
+HEAD:cmd/wisp/panel_attachment_214.go:187:	broker  *panel.AttachmentBroker
+HEAD:cmd/wisp/panel_attachment_214.go:197:func (h *attachmentIngestHandler214) brokerOnce() (*panel.AttachmentBroker, error) {
+HEAD:cmd/wisp/panel_attachment_214.go:231:func (h *attachmentIngestHandler214) ingest(ctx context.Context, req panel.ComposerRequest) (panel.AttachmentRef, error) {
+HEAD:cmd/wisp/panel_attachment_214.go:237:		return panel.AttachmentRef{ID: req.RequestID, Name: req.AttachmentPayload.Name, Reason: err.Error()}, err
+HEAD:cmd/wisp/panel_attachment_214.go:241:		return panel.AttachmentRef{ID: req.RequestID, Name: src.DisplayName, Reason: err.Error()}, err
+HEAD:cmd/wisp/panel_attachment_214.go:264:func (rt *agentRuntime) attachmentDraftRows() []panel.AttachmentRef {
+HEAD:cmd/wisp/panel_attachment_214_test.go:206:	src := panel.AttachmentSource{DisplayName: "big.png", DeclaredMIME: "image/png", SizeBytes: panel.MaxAttachmentBytes + 1}
+HEAD:cmd/wisp/panel_attachment_214_test.go:263:		Attachments: []panel.AttachmentRef{
+HEAD:cmd/wisp/panel_attachment_214_test.go:317:		l.record(panel.AttachmentRef{ID: strconv.Itoa(i), Stored: true})
+HEAD:internal/panel/pump.go:427:		composer.Attachments = p.src.Attachments()
+=== C2 NewAttachmentBroker|.Ingest non-test BEFORE ===
+25eb216aa8a9b71c216bb19f5111bd80459fe328:internal/panel/attachments.go:175:// NewAttachmentBroker wires the broker to the artifacts face. A nil sink or a
+25eb216aa8a9b71c216bb19f5111bd80459fe328:internal/panel/attachments.go:179:func NewAttachmentBroker(sink ArtifactSink, guard NameGuard, max int64) (*AttachmentBroker, error) {
+=== C2 NewAttachmentBroker|.Ingest non-test HEAD ===
+HEAD:cmd/wisp/panel_attachment_214.go:204:		h.broker, h.openErr = panel.NewAttachmentBroker(store, memory.ValidArtifactName, 0)
+HEAD:cmd/wisp/panel_attachment_214.go:243:	return broker.Ingest(ctx, src)
+HEAD:internal/panel/attachments.go:175:// NewAttachmentBroker wires the broker to the artifacts face. A nil sink or a
+HEAD:internal/panel/attachments.go:179:func NewAttachmentBroker(sink ArtifactSink, guard NameGuard, max int64) (*AttachmentBroker, error) {
+=== C3 Attachment: field non-test BEFORE ===
+25eb216aa8a9b71c216bb19f5111bd80459fe328:cmd/wisp/panel_inbound.go:331:		Attachment: nil,
+=== C3 Attachment: field non-test HEAD ===
+HEAD:cmd/wisp/panel_inbound.go:386:		Attachment: attachment,

@@ -1,0 +1,20 @@
+time=2026-11-15T13:30:44.570+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test214AttachmentAddEndToEndStoresBytesInArtifacts
+time=2026-11-15T13:30:44.654+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts4032924828\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-15T13:30:44.666+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-15T05:30:44Z duration_ms=12
+time=2026-11-15T13:30:44.679+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts4032924828\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-15T13:30:44.688+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-15T05:30:44Z duration_ms=8
+time=2026-11-15T13:30:44.702+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts4032924828\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-15T13:30:44.712+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-15T05:30:44Z duration_ms=10
+time=2026-11-15T13:30:44.730+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts4032924828\001\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-15T13:30:44.742+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-15T05:30:44Z duration_ms=12
+time=2026-11-15T13:30:44.742+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-15T13:30:44.762+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts4032924828\001\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-15T13:30:44.774+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-15T05:30:44Z duration_ms=11
+time=2026-11-15T13:30:44.792+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test214AttachmentAddEndToEndStoresBytesInArtifacts4032924828\001\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-15T13:30:44.804+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-15T05:30:44Z duration_ms=10
+time=2026-11-15T13:30:44.815+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-15T13:30:44.820+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test214AttachmentAddEndToEndStoresBytesInArtifacts (0.26s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.417s
