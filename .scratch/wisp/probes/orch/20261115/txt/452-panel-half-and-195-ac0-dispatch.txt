@@ -1,0 +1,31 @@
+# 派单存档（先存档再发）—— 票 452 的 AC#2 界面半（写腿）
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/452-*.md` 与 `docs/evidence/s1/452-voice-link-two-shipped-disconnects.md` 的 §2.3。
+
+**背景**：票 452 已翻 4 格，**AC#2 只翻一半** —— 出厂形态选了 ②（不带 `webrtcap`，产品明说无回声消除），后端已落 `aec.BindingBuilt()` 能力位 ＋ 构造期姿态 ＋ 启动印一行。**缺的是"界面可判"那一半**，而上一波我把 `internal/panel/**` 从写面划掉了 ⇒ **是我的划法问题，这波补上**。
+
+**要做**：
+1. `internal/panel` 的 `SettingsView.Voice` 增 `AecBuildAvailable bool`（数据源 `aec.BindingBuilt()`），**与用户可改的 `AecEnabled` 并列分开** —— 一个是"这个构建有没有这个能力"，一个是"用户要不要用"，⛔ 合成一个布尔。
+2. 在 `cmd/wisp` 的 voice section 组装处把真值填进去（给赋值点 `file:line`）。
+3. **一枚会红的测试**：摘掉赋值那行 ⇒ 哪枚红（给名字与红句）。按台账 A1880：**只让"断言源码字符串"的测试红 ⇒ 判装饰性，返工重做**。
+4. ⛔ 改 `frontend/**`（那是机主外部 agent）；前端要显示什么，你在证据里**写清契约字段名与语义**，好让前端 agent 照做。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43 表／`frontend/**`／`design/**`；⛔ 放宽断言；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+`go test ./cmd/wisp` 走载具一次一发；本机**三枚**已知红不是你的（`TestAC4Focus…`／`TestAC246DevLeg…`／`Test320Fetch…` 扫 `%TEMP%` 单跑绿）；⚠ 整包可能 native AV（`0xC0000005`，条件性 1/2）——遇到照实写"第 N 秒被 native AV 终止"＋最后一条 `=== RUN`，⛔ 报绿。
+写面：`internal/panel/**`、`cmd/wisp/**`（本波只你一枚写腿）、`docs/evidence/s1/452-*`。
+
+回话第一行＝commit hash ＋「`AecBuildAvailable` 赋值点 file:line」＋「摘掉它哪枚红＋红句」＋「前端契约字段名与语义一句话」。没干完写「未完成，卡在哪」。
+
+---
+
+## 腿 B ＝ 票 195 AC#0（只读取证）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 只读腿。读 `.scratch/wisp/issues/195-*.md`。本票 **6/7 格已勾**，只剩 `:23` 的 **AC#0 前提现量对得上**：票面那张表里**四条读数**要在"实现程起手时逐字复跑"，任何一条不符 ⇒ 停下报回（⛔ 按票面硬改）。
+
+**任务**：出 `docs/evidence/s1/195-ac0-preconditions.md`：
+1. 把票面那**四条读数原文逐字抄出**（⛔ 改写），逐条给：**现在复跑的命令原文／输出／结论（对得上／对不上）**。
+2. 末尾给「四条里对上 N 条」＋若有不符，**逐条写不符在哪**（数字差多少、路径变了还是值变了）。
+3. ⛔ 改产码/票面/台账；⛔ 碰 `cmd/wisp`（除读）；⛔push。写面：`docs/evidence/s1/195-*.md`、`.scratch/wisp/probes/195/**`。
+
+回话第一行＝commit hash ＋「四条里对上 N 条」＋「不符的是哪条（具名）」。没干完写「未完成，卡在哪」。
