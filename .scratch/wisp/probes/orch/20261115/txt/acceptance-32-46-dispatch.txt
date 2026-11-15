@@ -1,0 +1,32 @@
+# 派单存档（先存档再发）—— 两条验收腿
+# 路由：provider:'magpie', model:'auto/deepseek-v4.1-flash'（glm 昨天 15 次 null，台账 A1864）
+# 类型：验收腿（只读＋判语），写面只有 docs/evidence/s1/<票号>-*.md
+
+---
+
+## 腿 A ＝ 票 32（S4 切片验收）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp。读 `.scratch/wisp/issues/32-*.md` 全文（票头逐字「**Blocked by:** 27,29,30,31」，而四枚**今天都已 `-done`**）。
+
+**任务**：给 S4 切片出**逐格判语**，落到 `docs/evidence/s1/32-s4-acceptance.md`。
+- 每一格 AC 一行五列：**AC 原文（逐字）／判语（满足／部分满足／不满足）／依据（`file:line` ＋你读到的原文）／可核命令／若部分满足，缺什么**。
+- ⛔ 抄票面已有的判语，全部自己现读产码与测试。⛔ 用"应该没问题""看起来对"这类话。
+- 末尾两段：①「满足 N／总 M」；② **前置四票（27/29/30/31）各自在本切片里承担哪一格**，逐票一行 —— 这是验收票最该说清的东西。
+- ⚠ 若发现某格**环境上不可验**（缺硬件/要真麦克风/要外部服务），**具名写"不可验＋缺什么"**，⛔ 记为满足、⛔ 记为失败。
+
+⛔ 改任何产码／票面／台账／阈值／golden／契约／`docs/specs/**`；⛔ 碰 `cmd/wisp`（除非只是**读**）；⛔ add -A/--amend/reset/rebase/stash/checkout .；⛔push。
+写面：`docs/evidence/s1/32-*.md`、`.scratch/wisp/probes/32/**`。
+
+回话第一行＝commit hash ＋「满足 N／总 M」＋「不可验 K 格（具名）」。没干完写「未完成，卡在哪」。
+
+---
+
+## 腿 B ＝ 票 46（S6 切片验收）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp。读 `.scratch/wisp/issues/46-*.md` 全文（票头逐字「**Blocked by:** 41–45」，而五枚 `41-kws-wake-word-done.md`／`42-watchdog-done.md`／`43-power-lifecycle-events-done.md`／`44-costmeter-c23-done.md`／`45-diagnostics-guards-done.md` **今天全在盘**）。
+
+**任务**：给 S6 切片出**逐格判语**，落到 `docs/evidence/s1/46-s6-acceptance.md`。格式与腿 A 完全一致（五列＋两段＋不可验具名）。
+**额外一句**：S6 里有若干格是**常驻/唤醒/看门狗**这类**真机行为** —— 凡要真机才能判的，**具名写"要机主一次真机会话"**并归到那一格，⛔ 自己假装验过。
+
+⛔ 同腿 A 的全部禁令。写面：`docs/evidence/s1/46-*.md`、`.scratch/wisp/probes/46/**`。
+回话第一行＝commit hash ＋「满足 N／总 M」＋「要机主的 K 格（具名）」。没干完写「未完成，卡在哪」。
