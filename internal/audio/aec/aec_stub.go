@@ -8,6 +8,14 @@ package aec
 // binding so callers compile everywhere; NewApm fails first, so the methods
 // are unreachable in this configuration.
 
+// BindingBuilt answers the compile-time capability question (ticket 452):
+// false here, because this file is the shape every build without `-tags
+// webrtcap` (or without cgo, or on a non-Windows GOOS) resolves. It answers
+// "can this binary cancel echo at all" without constructing an engine, so a
+// product surface can state the absence instead of discovering it at the first
+// announcement.
+func BindingBuilt() bool { return false }
+
 // NewApm always fails with ErrUnavailable in this build configuration.
 func NewApm(rate int) (*Apm, error) { return nil, ErrUnavailable }
 

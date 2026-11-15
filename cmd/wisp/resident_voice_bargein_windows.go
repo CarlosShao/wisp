@@ -324,7 +324,33 @@ func newVoiceBargeinMonitor(frames <-chan []byte, vadModel string, scope *plugin
 		keepalive:  true, // the 401 flip: the cleared warm posture IS the default
 		aecEnabled: true,
 	}
+	// TICKET 452 AC#2 (form ②): a build without the AEC3 binding cannot judge
+	// barge-in at all, and that fact belongs on the record BEFORE the first
+	// announcement - not on the first arm's refusal, which only a user who
+	// already tried to interrupt would ever see. The reason is the product's
+	// sentence (bargeinShippedPosture452) and the boot report prints it.
+	if !aec.BindingBuilt() {
+		m.reason = bargeinShippedPosture452
+	}
 	return m
+}
+
+// bargeinShippedPosture452 is the product's own sentence for a build without
+// the AEC3 binding (ticket 452 AC#2 form ②: ship without the capability, say
+// so, and stop presenting the dedicated staging's readings as the shipped
+// product's). It is a constant so the monitor's posture, the boot line and the
+// test that pins them cannot drift into three different claims.
+const bargeinShippedPosture452 = "本构建无回声消除（没有 -tags webrtcap 的 AEC3 绑定）：说话即插话（Path C barge-in）不可用，公告期间麦克风按 D16 半双工关闭；D47 的 400ms 以内插话读数只属于专用构型，不是出厂成绩"
+
+// bargeinAECPosture452 answers the barge-in capability question in one
+// sentence for the boot report. unavailable=true is the shipped shape (form
+// ②); false means this binary carries the binding, and the sentence says that
+// instead of leaving a blank where a capability question belongs.
+func bargeinAECPosture452() (sentence string, unavailable bool) {
+	if aec.BindingBuilt() {
+		return "可用（本构建带 AEC3 绑定：Windows + cgo + -tags webrtcap）", false
+	}
+	return bargeinShippedPosture452, true
 }
 
 // setAECEnabled carries [voice] aec.enabled (the 180-census follow-up's feed)

@@ -35,11 +35,19 @@ package main
 //     means the collector is not built at all. No default value moved.
 //   - degraded device (P5 甲): an occupied / denied / absent device is said out
 //     loud with its observe error class and the guidance text the audio package
-//     already carries, and the boot continues. It pushes NO state: D43's
-//     EvAudioDeviceLost edge starts only from Listening (internal/statemachine/
-//     table.go:97), so a boot-time failure has no legal edge, and inventing one
-//     would be a contract change. It also does not refuse to start: ticket 128
-//     settled exactly one refusal condition (no data root).
+//     already carries, and the boot continues. A BOOT-TIME failure pushes no
+//     state: D43's EvAudioDeviceLost edge starts only from Listening
+//     (internal/statemachine/table.go:97) and the machine is still Sleeping at
+//     boot, so there is no legal edge and inventing one would be a contract
+//     change. It also does not refuse to start: ticket 128 settled exactly one
+//     refusal condition (no data root).
+//
+//     The RUNTIME half exists since ticket 452 and this paragraph used to
+//     predate it: a device that dies AFTER the handover is detected by the
+//     voice chain's health probe (captureErr below is its read;
+//     resident_voice_windows.go's checkAudioDevice walks the edge), and
+//     Listening is that edge's only From state. The boot sentence and the
+//     runtime walk are two different facts, not two versions of one.
 //   - stop (AC#5): the hook slot proc.StepStopAudio already exists in the
 //     frozen D38(e) order at step 4; this registers into it. Ten steps, one
 //     order, nothing new. WASAPIMicrophone.Stop carries its own bounded 2s join.
@@ -80,6 +88,7 @@ import (
 	"fmt"
 	"log/slog"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 
 	"github.com/CarlosShao/wisp/internal/audio"
@@ -136,6 +145,16 @@ type residentAudio struct {
 	levels atomic.Uint64
 
 	verdict string
+
+	// TICKET 452: the sticky terminal-error read. The source answers Err()
+	// once (its own one-slot channel, consumed by the receive), so the first
+	// read that finds a loss is cached here and every later reader - the voice
+	// chain's health probe, the mute gesture's sentence, the boot switch -
+	// answers with the same fact instead of nil. Guarded because the probe
+	// reads it on the consumer goroutine while the boot/gesture readers run on
+	// theirs.
+	deviceErrMu sync.Mutex
+	deviceErr   error
 }
 
 // levelOut is the one crossing this leg performs into the ball: a count, then
@@ -163,6 +182,30 @@ func (rb *residentBall) setAudioLevel(level float32) {
 		return
 	}
 	rb.b.SetAudioLevel(level)
+}
+
+// captureErr is the capture leg's terminal-error read (ticket 452 AC#3). It is
+// the seam the voice chain's health probe asks, and it is made STICKY here
+// because the source's Err() is a one-slot channel: a destructive read by the
+// probe would leave the mute gesture and the exit line answering nil about a
+// device that is still gone. The first non-nil answer is cached for the life of
+// the process; a healthy device keeps answering nil (nothing is cached).
+//
+// A nil receiver/lane (no capture leg built, [voice] enabled=false) answers
+// nil: "nothing to ask" is not a loss.
+func (ra *residentAudio) captureErr() error {
+	if ra == nil || ra.mic == nil {
+		return nil
+	}
+	ra.deviceErrMu.Lock()
+	defer ra.deviceErrMu.Unlock()
+	if ra.deviceErr != nil {
+		return ra.deviceErr
+	}
+	if err := ra.mic.Err(); err != nil {
+		ra.deviceErr = err
+	}
+	return ra.deviceErr
 }
 
 // toggleMute is the gate-side executor the ball host's mute gestures call
@@ -213,7 +256,7 @@ func (ra *residentAudio) toggleMute() (string, bool) {
 		// two reads the boot switch above uses - never print a success here.
 		class := string(observe.ClassAudioDevice)
 		detail := ra.mic.Stats().LastError
-		if devErr := ra.mic.Err(); devErr != nil {
+		if devErr := ra.captureErr(); devErr != nil {
 			var oe *observe.Error
 			if errors.As(devErr, &oe) {
 				class = string(oe.Class)
@@ -344,7 +387,7 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 		// (WASAPIMicrophone.Err), not off the meter's string: the string is the
 		// guidance the operator reads, the class is what D37 says it is.
 		class := string(observe.ClassAudioDevice)
-		if devErr := mic.Err(); devErr != nil {
+		if devErr := ra.captureErr(); devErr != nil {
 			var oe *observe.Error
 			if errors.As(devErr, &oe) {
 				class = string(oe.Class)
@@ -355,8 +398,15 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 		slog.Error("audio: capture device unavailable",
 			"class", class, "err", lastErr, "posture", "boot continues, no state pushed")
 		fmt.Printf("wisp: 麦克风不可用（错误分类 %s）：%s\n", class, lastErr)
-		fmt.Printf("wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，" +
-			"启动期没有；票 128 只定了「没有数据根」这一种拒绝启动\n")
+		// TICKET 452 rewrote this sentence: it used to say "这一条不推状态" as a
+		// claim about the product, which stopped being true the moment the
+		// runtime walk was wired. What is true is narrower - the BOOT-time
+		// failure has no legal edge, because the machine is still Sleeping and
+		// #14 starts from Listening - and the runtime half is said in its own
+		// words so a reader cannot mistake the two.
+		fmt.Printf("wisp: 启动期这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，" +
+			"而启动期的机器还在 Sleeping（票 128 只定了「没有数据根」这一种拒绝启动）；" +
+			"运行期的设备丢失已接派发（票 452：设备交接之后丢失，语音链的健康探针走 D43#14 Listening → Error，球离开 Listening）\n")
 	case !gate.Open():
 		ra.verdict = "采集腿在跑但设备未交接（gate 未 open）：球不会收到电平"
 		slog.Warn("audio: gate reports not open without a device error", "posture", ra.verdict)

@@ -186,6 +186,16 @@ const voiceRingSamples = voiceRingSeconds * audio.TargetRate
 // DisposalScope below, which is what makes it released rather than resident.
 const voiceGoroutineName = "asr-infer"
 
+// voiceDeviceHealthInterval is how often the voice consumer asks the capture
+// leg whether the device it was handed is still alive (ticket 452 AC#3). It is
+// a POLL, not a timeout: the source answers with the terminal error its one
+// D42#2 reopen attempt already posted, and the owner goroutine needs a
+// periodic wake-up because a dead device stops producing frames - the very
+// event this loop is normally parked on. It rides the goroutine that already
+// exists (no new D38b roster name, no new thread), and 250ms is the most the
+// ball's state may trail the unplug by.
+const voiceDeviceHealthInterval = 250 * time.Millisecond
+
 // voiceHandOffGoroutine is the roster entry the hand-off walk runs on. Like
 // asr-infer it is a frozen temporary-roster name (internal/observe/goroutine.go's
 // TemporaryNames), and it is the RIGHT one: this is a model operation, and it must
@@ -481,6 +491,17 @@ type residentVoice struct {
 	// Nil-safe everywhere; inert without the AEC3 binding (-tags webrtcap),
 	// in which case the announcement window keeps today's exact D16 shape.
 	bargein *voiceBargeinMonitor
+
+	// TICKET 452: the runtime half of the capture posture. deviceErr is the
+	// capture leg's sticky terminal-error read (residentAudio.captureErr),
+	// wired by startResidentVoice BEFORE the consumer is booked; nil on a boot
+	// that built no capture leg, and the health probe then does nothing.
+	// deviceLostNoted/Delivered are owned by the consumer goroutine - the same
+	// owner that walks every other D43 edge in this leg, so no second truth
+	// source and no second thread appear.
+	deviceErr           func() error
+	deviceLostNoted     bool
+	deviceLostDelivered bool
 
 	// Counters, all atomic: the asr-infer goroutine writes them, the boot report
 	// and the tray gesture read them.
@@ -865,6 +886,14 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 
 	ring := make([]float32, 0, voiceRingSamples)
 	pausedClosed := false
+	// TICKET 452: the capture leg's health probe (see checkAudioDevice). The
+	// ticker lives as long as the consumer; a boot with no capture leg has no
+	// deviceErr and every tick is one nil check. It is created unconditionally
+	// so the loop's shape does not depend on boot order: the seam is wired at
+	// the assembly root just before start(), and a lazily armed ticker would be
+	// one reordering away from never firing.
+	health := time.NewTicker(voiceDeviceHealthInterval)
+	defer health.Stop()
 	for {
 		// The family swap. An announcement loads the TTS through the slot, and the
 		// slot releases the ASR BEFORE it does (D32 16.3.3: one family resident, so
@@ -945,6 +974,8 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 				return
 			case <-rv.queue.wakeChan():
 				rv.queue.run()
+			case <-health.C:
+				rv.checkAudioDevice()
 			case r := <-rv.chainReady:
 				var adoptErr error
 				tr, asr, adoptErr = rv.adopt(r)
@@ -997,6 +1028,8 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 			return
 		case <-rv.queue.wakeChan():
 			rv.queue.run()
+		case <-health.C:
+			rv.checkAudioDevice()
 		case frame, ok := <-rv.frames:
 			if !ok {
 				outs = tr.Finalize(outs[:0])
@@ -1456,6 +1489,48 @@ func (rv *residentVoice) dispatch(ev statemachine.Event, facts *statemachine.Fac
 	return true
 }
 
+// checkAudioDevice is ticket 452 AC#3's runtime half of the capture posture.
+// It asks the leg that owns the source whether the device it was handed is
+// still alive, and walks D43#14 the moment the answer is the terminal error the
+// source's one D42#2 reopen attempt already posted.
+//
+// Why a poll and not an event: the source's only loss surface is Err()
+// (a one-slot terminal-error channel, wasapimic_windows.go:129), and a dead
+// device stops producing frames - the event this loop is otherwise parked on.
+// The ticker therefore rides the consumer that already exists; no observe
+// roster name and no goroutine are added.
+//
+// The walk is guarded by the table, not by this function: #14 has exactly one
+// From state (Listening, table.go:97). In any other state the fact is said once
+// and the probe keeps asking, so a device that dies while the announcement is
+// still playing is walked as soon as the machine reaches Listening rather than
+// being lost with the frame stream.
+func (rv *residentVoice) checkAudioDevice() {
+	if rv == nil || rv.machine == nil || rv.deviceErr == nil || rv.deviceLostDelivered {
+		return
+	}
+	err := rv.deviceErr()
+	if err == nil {
+		return
+	}
+	from := rv.machine.State()
+	if !rv.deviceLostNoted {
+		rv.deviceLostNoted = true
+		slog.Error("voice: the capture device died after the handover", "err", err.Error(), "state", string(from))
+	}
+	if from != statemachine.StateListening {
+		// Undefined = stop (D22 gate 3): no edge is invented from a state the
+		// table does not name, and the next tick asks again.
+		return
+	}
+	if rv.dispatch(statemachine.EvAudioDeviceLost, nil,
+		"麦克风在设备交接之后丢失（"+err.Error()+"）：D43#14 Listening → Error，球离开 Listening") {
+		rv.deviceLostDelivered = true
+		rv.noteProblem("采集设备在交接之后丢失：" +
+			"D43#14 已走（Listening → Error）；重新插回／换设备之后的恢复路径不在本片，球的 Error 等 EvErrorAck（D43#38）")
+	}
+}
+
 // kwsLoaded is the truth source behind the Facts.KwsLoaded guard (rows #10 and
 // #32): an engine object is resident or it is not. Before ticket 41 the fact was
 // assigned nowhere in production; this is the one producer every dispatch that
@@ -1695,16 +1770,19 @@ func (rv *residentVoice) posture() string {
 		}
 		return "语音链未装配：本进程没有任何语音路径"
 	}
+	// TICKET 452 AC#2: the barge-in capability is a fact of the BINARY, not of
+	// the config file, so the boot line answers it from the build itself.
+	bargeinPosture, _ := bargeinAECPosture452()
 	return fmt.Sprintf("C8 帧通道已接上 1 个消费者（D38b 名册名 %s，C11 作用域 %q）；"+
 		"VAD=%s；ASR 模型 id=%s，字节只在第一次开句时由模型交还通过后从 %s 打开；"+
 		"目前排空 %d 帧／部分结果 %d 条／判停 %d 句／交给文本路 %d 句／模型交还 %d 次（exit=%d）；"+
-		"标点=%s（带标点的 final %d 条）；唤醒词=%s；播报=%s；%s；配置来源 %s",
+		"标点=%s（带标点的 final %d 条）；唤醒词=%s；播报=%s；插话=%s；%s；配置来源 %s",
 		voiceGoroutineName, "voice-15e", rv.plan.VadModelPath, voiceAsrModelID, rv.plan.AsrDir,
 		rv.drained.Load(), rv.partials.Load(), rv.finals.Load(), rv.handed.Load(),
 		rv.handOffs.Load(), rv.handOffExit.Load(),
 		punctState(rv.plan.PunctModelPath, rv.punctAttached.Load()), rv.punctFinals.Load(),
 		rv.kwsReading(),
-		rv.announceReading(), rv.residency.reading(), rv.plan.Source)
+		rv.announceReading(), bargeinPosture, rv.residency.reading(), rv.plan.Source)
 }
 
 // kwsReading is the wake-word half of the posture line, spelled so the three
@@ -1804,6 +1882,20 @@ func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, t
 	}
 	rv := buildResidentVoice(rt.Layout.DataDir, ra, rb, tasks, voiceAudit)
 	rv.applyConversationPrivacyGate180P(rt.Layout.DataDir, conversationPrivacyConfirm)
+	// TICKET 452 AC#3: the health seam is wired BEFORE rv.start books the
+	// consumer. That ordering is load-bearing twice: it is the
+	// happens-before edge that makes the plain field safe (the consumer only
+	// reads it), and it is what lets the first tick already know whether this
+	// boot handed a device over. ra is nil on a boot with no capture leg, and
+	// captureErr's own nil receiver is the honest "nothing to ask" answer.
+	rv.deviceErr = ra.captureErr
+	// TICKET 452 AC#2 form ②: this build cannot cancel echo, so it cannot
+	// barge in. The product says it once, out loud, at boot - before any
+	// announcement asks the question and fails it - instead of letting the
+	// settings toggle imply a capability the binary does not have.
+	if line, unavailable := bargeinAECPosture452(); unavailable {
+		fmt.Printf("wisp: %s\n", line)
+	}
 	rv.start(rt.Registry)
 	if rb != nil {
 		// Both ends of the tray's pause-wake hop, attached here because this leg

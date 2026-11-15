@@ -1,0 +1,22 @@
+# 452 AC#1(a) measurements
+
+## 1) go list (untagged): which aec files compile
+GoFiles=[aec.go aec_stub.go]; CgoFiles=[]
+
+## 2) go list -tags webrtcap
+GoFiles=[aec.go]; CgoFiles=[aec_webrtc_windows.go]; Ignored=[aec_stub.go]
+
+## 3) go build -tags webrtcap ./internal/audio/aec (cgo on)
+# github.com/CarlosShao/wisp/internal/audio/aec
+wap_shim.cpp:23:10: fatal error: api/scoped_refptr.h: No such file or directory
+   23 | #include "api/scoped_refptr.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+rc=1
+
+## 4) CGO_ENABLED=0 go build -tags webrtcap ./internal/audio/aec (tag alone, no cgo)
+rc=0
+
+## 5) the shipped build line in scripts/build.ps1
+build.ps1:270: & $go.Source build -trimpath -ldflags $ldflags -o (Join-Path $outDir 'wisp.exe') ./cmd/wisp
+webrtcap hits in scripts/build.ps1: 0

@@ -1,0 +1,25 @@
+# 452 AC#5 整包（./cmd/wisp）经载具的两次读数
+
+## 第一次：2026-11-15 13:47 起的树（本轮代码，注释修订前）
+--- FAIL 行：
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.29s)
+--- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (36.07s)
+PASS=626 SKIP=17
+末行：FAIL | FAIL  github.com/CarlosShao/wisp/cmd/wisp	1341.00s
+
+## 第二次：2026-11-15 14:14 起（最终树，含两处注释修订）
+--- FAIL 行：
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (4.87s)
+--- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (37.20s)
+PASS=626 SKIP=17
+末行：FAIL | FAIL  github.com/CarlosShao/wisp/cmd/wisp	1190.00s
+
+## 本票两枚测试（两次都绿）
+=== RUN   TestAC452ShippedBuildSaysItHasNoEchoCancellation
+--- PASS: TestAC452ShippedBuildSaysItHasNoEchoCancellation (0.00s)
+=== RUN   TestAC452LostMicWalksD43FromListeningIntoError
+--- PASS: TestAC452LostMicWalksD43FromListeningIntoError (0.52s)
+
+## 三条已知本机红的原文（第二次）
+panel_host_windows_test.go:1124: the panel did not take the foreground on Show: foreground 0x5701544, panel hwnd 0x76207cc (AC#4 says only the panel takes focus when shown)
+resident_task_source_246_windows_test.go:484: AC#7 RED (desktop state, not our code): a dev Wisp is already running in this session, so this leg handed its activation over and exited. Stop it and re-run.

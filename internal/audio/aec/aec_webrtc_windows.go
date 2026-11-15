@@ -21,6 +21,13 @@ import (
 	"unsafe"
 )
 
+// BindingBuilt answers the compile-time capability question (ticket 452): true
+// in the only shape that can answer an engine - Windows, cgo, and `-tags
+// webrtcap` with the pinned webrtc-audio-processing tree on the CGO flags. It
+// is the counterpart of aec_stub.go's false, so callers ask one name and never
+// have to call NewApm just to learn whether the capability exists.
+func BindingBuilt() bool { return true }
+
 // NewApm creates the mono AEC3 pipeline at rate (10ms frames). Only the
 // echo canceller is enabled: AGC/NS/HPF stay off so the rig measures the
 // engine's own residual, not a gain-controlled rescale of it.

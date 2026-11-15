@@ -32,4 +32,20 @@
 「452 撤」＝删本票与其证据件（不 reset/amend）。
 
 ## Progress
-- （待派）
+- 2026-11-15 写腿（agent-51，`cmd/wisp` 本波唯一写腿）：
+  - AC#1(a) 现跑：`scripts/build.ps1:270` 的 `go build -trimpath -ldflags …` 无 `-tags`，全脚本 `webrtcap` 命中 0；
+    `go list ./internal/audio/aec` = `GoFiles=[aec.go aec_stub.go]` ⇒ `NewApm` 恒 `nil, ErrUnavailable`（已由 `internal/audio/aec/aec_shape_452_test.go` 钉住）。
+    带标签：`go build -tags webrtcap ./internal/audio/aec` **编不过**（`api/scoped_refptr.h: No such file or directory`，本机没有 webrtc 树/meson）；
+    `CGO_ENABLED=0 go build -tags webrtcap` rc=0（标签单独不给能力）。读数原文 `.scratch/wisp/probes/452/ac1-a-measure.txt`。
+  - AC#1(b) 先红：两枚测试写在 `cmd/wisp/resident_audio_device_lost_452_windows_test.go`，改产码**之前**跑出
+    「姿态是空串 `""`」与「拔麦 3s 后仍 Listening、球投影 `[]`」两条红句（逐字抄进证据 §3）。
+  - AC#2 裁定 **②**（出厂不带标签 + 产品明说 + 界面判得了）：`aec.BindingBuilt()` 能力位、`bargeinShippedPosture452` 常量在
+    **构造期**就写进 `reason`、启动印一次、`posture()` 增 `插话=`。①的代价＝整条原生构建流水线（本机无树、无 meson/ninja、`fetch-deps.ps1` 无此路），
+    ③的代价＝重做 389/392/401 三轮读数；面板能力字段出写面 ⇒ 已写明落点移交（证据 §2.3）。
+  - AC#3 已接：`residentAudio.captureErr()`（粘性，源头 `Err()` 是破坏性一次读）+ `rv.checkAudioDevice()` +
+    `rv.run()` 两个 select 各一条 ticker case（**不新增协程**，骑既有 owner/`asr-infer` 线程）+ 仅从 `StateListening` 派发 D43#14（表未动）。
+    接线 `rv.deviceErr = ra.captureErr` 在 `rv.start()` 之前；测试对该生产行做存在性断言。
+  - AC#4 已改：`resident_audio_windows.go` 启动分支的「这一条不推状态…」与文件头 "It pushes NO state" 改成「启动期/运行期」两句。
+  - 突变：M1 关掉派发 ⇒ 行为测试红；M2 删掉生产接线行 ⇒ 接线断言红。两次都还原。
+  - 证据：`docs/evidence/s1/452-voice-link-two-shipped-disconnects.md`。
+  - 未做：重新插回/换设备后的恢复（球停 Error 等 `EvErrorAck`，D43#38）；面板能力字段（出写面，已列落点）。
