@@ -39,14 +39,16 @@ state push making the frontend provably stateless.
 - Page implementations (36–40); native card UI (21 already built).
 
 ## Acceptance criteria
-- [ ] Whitelist fuzz: 50 random/forbidden method names → all rejected + logged; each listed
+- [x] Whitelist fuzz: 50 random/forbidden method names → all rejected + logged; each listed
       method dispatches.
-- [ ] Concurrency routing: 10 parallel invokes with shuffled replies → correct pairing.
+      〔11-15 收件 `541c4eaba`（`64259b818` 订正证据）＋**我自己复跑 3/3 PASS**｜`:42` 两枚尺：`TestWhitelistFuzz50NamesAllRefusedAndAudited35g1`／`TestEveryRosterMethodDispatchesToItsOwnHandler35g1`。50 名**逐个经生产入口 `panel.ComposerDispatch.Handle`**（⛔ 不是直接调守卫）断「必错＋`errors.Is(ErrComposerRequest)`＋回句非空带自己 requestId＋mode 槽 0 次＋**审计恰 50 条且第 i 条含 `method=<该名>`**」；正控一在册名必受理、处理器恰 1 次。在册 8 名逐一 `Handle`，断「本槽 +1、其余六槽 +0」（config.get/config.set 共用槽各记 delta），并经 `ParseComposerRequest` 复核仍是运行中守卫受理。〕
+- [x] Concurrency routing: 10 parallel invokes with shuffled replies → correct pairing.
+      〔11-15 收件 `541c4eaba`＋**我自己复跑 PASS（0.00s）**｜尺＝`TestRPCReplyPairsByFrameIDUnder10WayOutOfOrder35g1`：真异步 `_rpc[seq]` 槽表 10 槽先全开 × `g1Pipe.msgcb`（逐行照 `panel_control_windows.go:782-826`，含 `id := strconv.Itoa(d.ID)`、`_rpc[id]`）× **真答案走生产 `Handle`**（`panel.bogus.<id>` 拒句自带 `rid-k<id>`，每条自证身份）；10 帧回执按乱序 `[7,2,9,1,10,4,6,3,8,5]` 落槽，断「每槽只叫自己的 `rid-k<id>`、恰 settle 一次」。**反证**：`byArrival` 9/10 槽错、`singleSlot` 10/10 槽错，都被捕获 ⇒ 不是同步桩下的恒真尺。★**诚实边界**：这是 **headless 模型尺**（页面槽表＋照抄产码的 `msgcb` 支＋真 `Handle` 答案），**不是真窗端到端**——具体 `*panelControl` 的 `Eval` 是 `*edge.Chromium` COM 调用、无注入接缝（加接缝＝改产码），开第二个真窗又撞本包已量到的"连续开窗必抖"。模型↔产码的系绳 `assertProductionPairsByFrameID35g1` 读 `panel_control_windows.go`，**它是字面钉、已在码注 `:55-58` 明标"不是行为牙"**。〕
 - [ ] Forged panel allow: direct bridge call `approval.decide{allow:true}` from the webview
       context → server rejects (decision test at Go boundary + browser-context e2e).
 - [ ] Resync: hide → tool state changes → show → UI reflects fresh state; SDK forbids cross-show
       caches (architecture test/lint).
-- [ ] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
+- [x] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
       asserted), content integrity kept.
   〔**10-08 11:3x 编排者就地裁冲突，来源＝只读普查腿 `35-a6`（件 `.scratch/wisp/probes/35/a6/verdict.md`，盘上逐字我未复跑，⛔ 本框保持未勾）**：这一格三句里 **"merges" 与 "content integrity kept" 两句已被票 197 leg B 的重裁取代**——产码 `internal/panel/pump.go:397` 逐字写着 `Overflow TRUNCATES and never merges (ticket 197 leg B re-cut this rule`，且该规则有命名测试钉死（三枚既有尺反咬 merge）。⇒ 本框今天**只剩"no unbounded memory（heap cap asserted）"那半句算账**，而那一半按普查是"每面板推队列没写"＝一块没写。⛔ **任何后续程不许把 pump 改成"会合并"来迎合上面那句旧话**（那是把一枚已裁的契约规则倒回去），要改必须先落 `A##` 并经人工批准。〕
 - [x] No secret leakage scan across bridge payloads.
@@ -452,3 +454,24 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 - **G3**＝⑤**动产码**（把推包队列换成有界／或给它上限＋把 `failedPost` 接上读点＋顺带修 `heapDelta` 的下溢），**单独一腿**
 - **G4**＝④ 一条"藏→改→显"行为尺 ＋ 把 `render:receiver` 加进 `ci.yml`（**这条动 CI 文件，要先问** —— 见下）
 - 两波都等 `cmd/wisp` 空；⛔ 与 46b／后续写腿并发。
+
+---
+
+## 收件：`:42`／`:44`／`:49` 三格翻勾（2026-11-15 20:3x，编排者）
+
+**注意**：这三格的实现腿是在机主 11-15 19:5x「停用 deepseek」令**之前**派出的（`w35g1`／`w35g3` 走 `magpie/auto/deepseek-v4.1-flash`），**如实记在这里**，之后的写腿一律 `auto/glm-5.3-flash`。
+
+### 尺1／尺2／尺3 都过
+| 格 | 提交 | 证据件 | 我自己复跑 |
+|---|---|---|---|
+| `:42` 白名单模糊 | `541c4eaba`（＋`64259b818` 证据订正） | `docs/evidence/s1/35-g1-whitelist-and-concurrency-rulers.md` 14204 B | `-test.run '35g1$'` ⇒ **3/3 PASS** |
+| `:44` 并发路由 | 同上 | 同上 | 同上（`TestRPCReplyPairsByFrameIDUnder10WayOutOfOrder35g1` PASS 0.00s） |
+| `:49` 背压 | `3a8e776ac` | `docs/evidence/s1/35-g3-backpressure-20261115.md` 18995 B | `-test.run '35r9$'` ⇒ **6/6 PASS** |
+
+### `:49` 按 10-08 那枚就地裁定的口径结（**只结存活的半句**）
+裁定（本文件 `:51`）写明：旧三句里 **"merges"／"content integrity kept" 已被票 197 leg B 重裁取代**，今天只剩 **"no unbounded memory（heap cap asserted）"** 算账，且⛔ 不许把 pump 改成"会合并"去迎合旧话。
+⇒ `3a8e776ac` 正是这么做的：**`panelPushPendingCap = 1`**（`cmd/wisp/panel_host_windows.go:352`；依据＝推的是整状态快照、页面整包替换），上限是**载荷**（裁剪循环 `:674-682` 真读它，m5 突变 1→64 撞红 4 枚）；`internal/panel/**` **一字未改**（`pump.go:632` 的 `Overflow TRUNCATES and never merges` 原样）；`failedPost` 接上真读点（`panel_resident_windows.go:517` 每条拒绝记 `panel.post.refused`＋`:807` 状态行 `%d refused post(s)`）。**不认领** "content integrity kept" —— 推队列按设计丢中间整包并计数（`pushCoalesced`），只保证「交出去的是一整包、字节不动、最新那个」。
+
+### 本票仍开着的两格（都缺同一类东西：真窗/CI 面）
+- **`:45` 伪造面板 allow**：Go 边界那半**已有牙**（`TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject`，我 11-15 复跑 PASS 3.06s），缺的是括号里要求的 **browser-context e2e**。
+- **`:47` resync**：只有 5 个 `strings.Contains` 字面钉；`render:receiver` **CI 不跑**，要把它加进 `ci.yml`（**改 CI 文件需先问机主**）。
