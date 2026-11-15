@@ -25,11 +25,11 @@
 
 ## Acceptance criteria
 
-- [ ] **AC#1 先证"绑的是哪一枚"**：跑一发能打印实际加载的 `onnxruntime.dll` **路径与版本**的读数（⛔ 不许用"看报错说 1.17.1"当证据 —— 那只是被影子那一枚的**版本号**，不是路径）。红句原文抄进证据：至少给出「`stage-cli/onnxruntime.dll` 是 17799168 B 而进程绑到 10572960 B」这一对数字。
-- [ ] **AC#2 找到那一环**：说清为什么"应用目录里有 17.8 MB 却绑了 System32 的 10.5 MB"。候选（**逐条现读判，⛔ 猜**）：①`stage-sherpa-dlls.sh` 当发**拒了**（如模型缺失）但载具继续跑 ②sherpa 的 c-api DLL 用 `LoadLibrary` 按**自己的**搜索序找 onnxruntime（不是测试二进制所在目录优先）③`deps.toml` 里 pin 的与 stage 的不是同一枚 ④Windows 的 `SafeDllSearchMode`／`SetDllDirectory` 被某处改过 ⑤测试里有人 `os.Setenv("PATH", …)` 或 `LoadLibrary` 绝对路径写错。
-- [ ] **AC#3 修**（按主流 harness 的形状：显式搜索路径 / `LoadLibraryEx` + `LOAD_LIBRARY_SEARCH_APPLICATION_DIR` / 版本前置检查 fail-fast 三者择一，**写明为什么选它**），并给**会红的测试**（把 pinned DLL 挪走 ⇒ 必须红，且红句说得出"绑错版本"而不是"崩了"）。
-- [ ] **AC#4 载具那段注释改如实**：`scripts/wisp-cli-staged-tests.sh:12-18` 现在断言"摆了就不会被抢"—— 修好后要么它变成真的（并给读数），要么改成它真正保证的东西。
-- [ ] **AC#5 门禁**：`d22scan` rc=0 clean／path-length GREEN／`go vet` rc=0；**⛔ 动 `deps.toml` 里 pin 的版本号**（那不是本票的活）；**⛔ 动 System32**（不改机器，改我们这一侧）。
+- [x] **AC#1 先证"绑的是哪一枚"**：跑一发能打印实际加载的 `onnxruntime.dll` **路径与版本**的读数（⛔ 不许用"看报错说 1.17.1"当证据 —— 那只是被影子那一枚的**版本号**，不是路径）。红句原文抄进证据：至少给出「`stage-cli/onnxruntime.dll` 是 17799168 B 而进程绑到 10572960 B」这一对数字。
+- [x] **AC#2 找到那一环**：说清为什么"应用目录里有 17.8 MB 却绑了 System32 的 10.5 MB"。候选（**逐条现读判，⛔ 猜**）：①`stage-sherpa-dlls.sh` 当发**拒了**（如模型缺失）但载具继续跑 ②sherpa 的 c-api DLL 用 `LoadLibrary` 按**自己的**搜索序找 onnxruntime（不是测试二进制所在目录优先）③`deps.toml` 里 pin 的与 stage 的不是同一枚 ④Windows 的 `SafeDllSearchMode`／`SetDllDirectory` 被某处改过 ⑤测试里有人 `os.Setenv("PATH", …)` 或 `LoadLibrary` 绝对路径写错。
+- [x] **AC#3 修**（按主流 harness 的形状：显式搜索路径 / `LoadLibraryEx` + `LOAD_LIBRARY_SEARCH_APPLICATION_DIR` / 版本前置检查 fail-fast 三者择一，**写明为什么选它**），并给**会红的测试**（把 pinned DLL 挪走 ⇒ 必须红，且红句说得出"绑错版本"而不是"崩了"）。
+- [x] **AC#4 载具那段注释改如实**：`scripts/wisp-cli-staged-tests.sh:12-18` 现在断言"摆了就不会被抢"—— 修好后要么它变成真的（并给读数），要么改成它真正保证的东西。
+- [x] **AC#5 门禁**：`d22scan` rc=0 clean／path-length GREEN／`go vet` rc=0；**⛔ 动 `deps.toml` 里 pin 的版本号**（那不是本票的活）；**⛔ 动 System32**（不改机器，改我们这一侧）。
 
 ## Hard constraints
 
@@ -56,7 +56,24 @@
 ### 本票改口径（我改，⛔ 改契约）
 原 AC#2 问"为什么摆了 17.8 MB 却绑了 10.5 MB" —— 答案：**摆了的那枚不在 exe 旁边**（它在 `stage-cli\`，而 exe 在 `%TEMP%\go-build…`）。
 ⇒ **本票的活从"修绑定"改为"让裸跑不可能发生"**（侦察给的三个候选我选了最主流的一个）：
-- [ ] **AC#1′**：载具是唯一入口 —— 在 `cmd/wisp` 加一枚 **test-only 的绑定自检**（`GetModuleHandle("onnxruntime.dll")` → `GetModuleFileName` → 版本必须是 pin 的那一版），**裸跑时它必须红**且红句说得出"绑到了 C:\Windows\SYSTEM32\… 1.17.x"。这是 fail-fast，不是文档。
-- [ ] **AC#2′**：`stage-sherpa-dlls.sh` stage 完**核 sha256** 与 `deps.toml` 的 pin 一致，不一致就**拒跑**（⛔ 只打印警告）。
-- [ ] **AC#3′**：载具头注释 `:12-18` 改成**它真正保证的东西**（"DLL 摆在 exe 旁边 ⇒ 标准序第一站命中"），并给出上面那对数字当证据。
+- [x] **AC#1′**：载具是唯一入口 —— 在 `cmd/wisp` 加一枚 **test-only 的绑定自检**（`GetModuleHandle("onnxruntime.dll")` → `GetModuleFileName` → 版本必须是 pin 的那一版），**裸跑时它必须红**且红句说得出"绑到了 C:\Windows\SYSTEM32\… 1.17.x"。这是 fail-fast，不是文档。
+- [x] **AC#2′**：`stage-sherpa-dlls.sh` stage 完**核 sha256** 与 `deps.toml` 的 pin 一致，不一致就**拒跑**（⛔ 只打印警告）。
+- [x] **AC#3′**：载具头注释 `:12-18` 改成**它真正保证的东西**（"DLL 摆在 exe 旁边 ⇒ 标准序第一站命中"），并给出上面那对数字当证据。
 - [ ] **AC#4′**：**一次载具形整包**，红册按层分类（绑定层应为 **0**），终点锚命中；⚠ 那发可能仍死在票 314 的硬形态，那要**照实写**。
+
+---
+
+## 收件（2026-11-15 21:2x，`e5eb6a064`，件 `docs/evidence/s1/455-binding-guard-impl.md` 10455 B）
+
+**尺1**：`e5eb6a064` 在（5 文件：`cmd/wisp/a455_onnxruntime_binding_windows_test.go`／`scripts/stage-sherpa-dlls.sh`／`scripts/wisp-cli-staged-tests.sh`／`scripts/check-path-length-budget.sh`／证据件）。**尺2**：件在 10455 B。**尺3 我自己经载具复跑**：`-test.run '^(Test455|TestZZ315A1)'` ⇒ **4/4 PASS，rc=0**（`Test455OnnxruntimeBindingIsThePinnedImage` 0.00s ＋ 锚三枚 0.26/0.30/0.23s）。
+
+### 四件的落点
+1. **绑定自检** `cmd/wisp/a455_onnxruntime_binding_windows_test.go:84` `Test455OnnxruntimeBindingIsThePinnedImage`（test-only，零产码；`GetModuleHandleEx(0,"onnxruntime.dll")+GetModuleFileName+os.Stat`，断言字节＝pin 的 17799168 且**从绑定路径向上找 deps.toml 仓根**、⛔ 不信 cwd；句柄拿不到＝红）。裸跑红句原文（`probes/455/tmp-455-bare/bare2.out`）：『本进程实际绑定的是 `C:\Windows\SYSTEM32\onnxruntime.dll`（10572960 B），而不是仓里 pin 的那一枚（17799168 B，onnxruntime 1.28.2）……请用 scripts/wisp-cli-staged-tests.sh 跑 ./cmd/wisp』。
+   **A1880 行为牙（腿自己做的）**：同一 exe 旁把 pinned DLL 换成 System32 那枚真件 ⇒ 即刻红；换回 ⇒ 绿。
+2. **sha256 门** `scripts/stage-sherpa-dlls.sh:137-144`（`:137` 比对、`:138` MISMATCH GUARD、`:144` `(sha256 ok)`；pin 读 `:117-127` 锁同一节 `deps.toml`）；**不一致 exit 1 拒跑**（腿实测换错源件：got `98e8288f…` vs pin `7f66f939…27d8a25` ⇒ rc=1）。顺带修了 GNU `sha256sum` 反斜杠路径 escape 前缀坑（否则绿形假红）。
+3. **载具注释** `scripts/wisp-cli-staged-tests.sh:10-56` 改成真正保证的东西（位置保证＋那对数字 `17,799,168/1.28.2` vs `10,572,960/1.17.260311`）。
+4. **门禁（AC#5）我自己复跑**：`d22scan.sh` **rc=0 clean**（`internal/=405`、`cmd/=86`、`frontend/=123`）；`check-path-length-budget.sh` **GREEN**（over=69，roster 69=69，字节视图与字符视图选同 69 条）；`go vet` rc=0（腿报）。腿顺手修了一处 **pre-existing** path-length RED（名册补本票面那条）。
+
+### `AC#4′` 仍开着（唯一未勾）
+载具形整包一发 **1487 s／896 RUN／651 PASS／2 FAIL（`TestAC4Focus…` 本机红＋`TestAC246…` 他因红）／17 SKIP**，**绑定层红数 0**（全日志 `shadowing the one on PATH` **0 行**）。但**终点锚未命中** —— 包死在 `Test16r1PremortemModelSha256CorruptRefusesTheHandOff`（单条 `ESTABLISHED 198.18.0.109:443`、CPU 20 s 内只涨 0.3 s ⇒ 按 A1886 具名停掉）。锚**另发单验**：`-test.run '^TestZZ315A1'` 载具形三枚全 PASS（我上面复跑同样是 3/3）。
+⇒ **AC#4′ 要的是"整包＋锚命中"同一次读数**，这一发没拿到（卡在一条等网络的用例）。⛔ 不拿"锚另发绿"冒充同一次读数。留下：等 `Test16r1` 那条网络等待被修/被具名跳过，再跑一次干净整包。
