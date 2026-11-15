@@ -1,0 +1,5 @@
+time=2026-11-15T13:48:54.178+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test215AssemblyRootCarriesThePluginsReader
+    panel_plugins_215_test.go:88: run.go's PumpSources literal no longer carries the plugins reader: the snapshot's plugins key would silently vanish from every packet this process pushes (ticket 215a)
+--- FAIL: Test215AssemblyRootCarriesThePluginsReader (0.00s)
+FAIL

@@ -1,0 +1,8 @@
+{
+  "Replace": {
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\resident_audio_device_lost_452_windows_test.go": "",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\resident_voice_bargein_windows.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\215\\receipt\\head\\resident_voice_bargein_windows.go",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\resident_audio_windows.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\215\\receipt\\head\\resident_audio_windows.go",
+    "D:\\work\\workspace\\projects plans\\Wisp\\cmd\\wisp\\resident_voice_windows.go": "D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\215\\receipt\\head\\resident_voice_windows.go"
+  }
+}

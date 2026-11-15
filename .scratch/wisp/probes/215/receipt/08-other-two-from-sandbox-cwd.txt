@@ -1,0 +1,6 @@
+time=2026-11-15T13:48:54.431+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test215WiredPluginsReaderSendsTheLiveValues
+--- PASS: Test215WiredPluginsReaderSendsTheLiveValues (0.01s)
+=== RUN   Test215MutationReaderRemovedSendsNoPluginsKeyAtAll
+--- PASS: Test215MutationReaderRemovedSendsNoPluginsKeyAtAll (0.00s)
+PASS

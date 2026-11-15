@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+.\.scratch\wisp\probes\215\receipt\mut-run-go-bad-ident.go:1307:3: unknown field PluginsZzz in struct literal of type panel.PumpSources
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL

@@ -37364,3 +37364,17 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 ⇒ **腿没错，是省略目录导致歧义**。同一批里我还因为 `windows map[string]*window`（两个空格）搜不到而差点判 gate.go 没有那张表。
 
 **规矩（此后写进每一张派单的证据要求）**：证据件里的每一处引用**必须是全仓相对路径**（`frontend/scripts/x.tsx:189`），⛔ 只写文件名；`grep` 判据要**贴命令原文＋输出**，⛔ 只给结论。理由：我这边的核验就是靠这些路径**再跑一遍**，路径有歧义 ⇒ 我的复核会变成假的"发现错误"。
+
+## A1880（11-15 14:0x）：**"盘上字面钉"不是"行为牙"** —— 一条接线删掉后 0 枚红，就不算接线
+
+票 215 的收件腿做了我要求的那一发：**overlay 摘掉 `cmd/wisp/run.go:1307` 那格 ⇒ `0 枚红`（3/3 PASS）**。那格只有一枚测试 `Test215AssemblyRootCarriesThePluginsReader`，它断言的对象是**源码里的字符串**。⇒ **删掉这行，没有任何行为测试会响。**
+对照同票另一处 `cmd/wisp/panel_resident_pump.go:144`（`src.Plugins = …`）：**摘掉就红**（`Test65ResidentPumpCarriesConfigTruth`）⇒ 那处真承重。
+
+**规矩（A1875 的补丁，两者配套用）**：
+- **A1875 ①** 生产调用/派发点 `file:line`
+- **A1875 ②** 会红测试名 —— ★但必须**区分两种"红"**：
+  - **行为牙**＝删掉它，某个**被测行为**变红（可判据）
+  - **字面钉**＝删掉它，某个**断言源码字符串**的测试变红（⛔ 不算）
+- 判据一句话：**"删掉它有什么会响？响的是行为还是字符串？"** 只响字符串 ⇒ 记"装饰性接线"，⛔ 写成"已接线"。
+
+**顺带两处我自己的搜法漏**：`panel_resident_pump.go:144` 是 `src.Plugins = …`（**赋值语句**），我用 `Plugins:` 搜不到；`windows  map[string]*window` 有两个空格，我用单空格也搜不到。⇒ **搜产码用宽模式（`Plugin`），⛔ 用 `Plugin:`**。

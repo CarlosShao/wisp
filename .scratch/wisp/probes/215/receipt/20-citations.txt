@@ -1,0 +1,114 @@
+$ git grep -n 'Plugins: func() panel.PluginInventorySection' -- 'cmd/wisp/*.go'
+cmd/wisp/panel_plugins_215_test.go:87:	if !strings.Contains(string(runGo), "Plugins: func() panel.PluginInventorySection") {
+cmd/wisp/panel_plugins_215_test.go:141:		Plugins: func() panel.PluginInventorySection { return pluginsSection215(mgr) },
+cmd/wisp/run.go:1307:		Plugins: func() panel.PluginInventorySection {
+
+$ git grep -n 'PluginInventorySection' -- 'cmd/wisp/*.go' 'internal/panel/*.go'
+cmd/wisp/panel_plugins_215_test.go:87:	if !strings.Contains(string(runGo), "Plugins: func() panel.PluginInventorySection") {
+cmd/wisp/panel_plugins_215_test.go:93:// (mgr.Config()'s [plugins] section into panel.PluginInventorySection, the
+cmd/wisp/panel_plugins_215_test.go:100:func pluginsSection215(m *config.Manager) panel.PluginInventorySection {
+cmd/wisp/panel_plugins_215_test.go:102:	sec := panel.PluginInventorySection{
+cmd/wisp/panel_plugins_215_test.go:141:		Plugins: func() panel.PluginInventorySection { return pluginsSection215(mgr) },
+cmd/wisp/panel_plugins_215_test.go:147:		Plugins *panel.PluginInventorySection `json:"plugins"`
+cmd/wisp/panel_resident_pump.go:144:		src.Plugins = func() panel.PluginInventorySection { return pluginsSectionFromConfig(cfg) }
+cmd/wisp/panel_resident_pump.go:248:func pluginsSectionFromConfig(m *config.Manager) panel.PluginInventorySection {
+cmd/wisp/panel_resident_pump.go:250:	sec := panel.PluginInventorySection{
+cmd/wisp/panel_resident_pump_windows_test.go:136:	var pl panel.PluginInventorySection
+cmd/wisp/run.go:1307:		Plugins: func() panel.PluginInventorySection {
+cmd/wisp/run.go:1309:			sec := panel.PluginInventorySection{
+internal/panel/composer.go:223:	Plugins *PluginInventorySection `json:"plugins,omitempty"`
+internal/panel/composer_test.go:181:		"PluginInventorySection":  "PluginsSection",
+internal/panel/plugins_inventory_215.go:106:// PluginInventorySection is the snapshot's plugins key (ticket 215a).
+internal/panel/plugins_inventory_215.go:107:type PluginInventorySection struct {
+internal/panel/plugins_inventory_215_test.go:63:	reader := PluginInventorySection{
+internal/panel/plugins_inventory_215_test.go:72:	pump := NewSnapshotPump(PumpSources{Plugins: func() PluginInventorySection { return reader }})
+internal/panel/plugins_inventory_215_test.go:84:	var got PluginInventorySection
+internal/panel/plugins_inventory_215_test.go:116:		Plugins: func() PluginInventorySection {
+internal/panel/plugins_inventory_215_test.go:117:			return PluginInventorySection{EngineState: PluginEngineNotWired215, SkillState: SkillsNotInConfigModel215}
+internal/panel/plugins_inventory_215_test.go:134:		sec := PluginInventorySection{
+internal/panel/plugins_inventory_215_test.go:145:		pump = NewSnapshotPump(PumpSources{Plugins: func() PluginInventorySection { return sec }})
+internal/panel/plugins_inventory_215_test.go:157:		var probe PluginInventorySection
+internal/panel/plugins_inventory_215_test.go:177:	sec := PluginInventorySection{
+internal/panel/plugins_inventory_215_test.go:189:	data, err := NewSnapshotPump(PumpSources{Plugins: func() PluginInventorySection { return sec }}).Marshal()
+internal/panel/plugins_inventory_215_test.go:210:	reader := PluginInventorySection{
+internal/panel/plugins_inventory_215_test.go:219:	pump := NewSnapshotPump(PumpSources{Plugins: func() PluginInventorySection { return reader }})
+internal/panel/plugins_inventory_215_test.go:235:	var got PluginInventorySection
+internal/panel/pump.go:296:	Plugins func() PluginInventorySection
+
+$ git grep -n 'Plugins' -- 'internal/panel/pump.go' 'internal/panel/composer.go'
+internal/panel/composer.go:210:	// Plugins is ticket 215a's carrier: the Tier-2 plugin inventory the live
+internal/panel/composer.go:223:	Plugins *PluginInventorySection `json:"plugins,omitempty"`
+internal/panel/pump.go:283:	// Plugins reads the Tier-2 plugin inventory the live config holds (ticket
+internal/panel/pump.go:296:	Plugins func() PluginInventorySection
+internal/panel/pump.go:540:	if p.src.Plugins != nil {
+internal/panel/pump.go:552:		sec := p.src.Plugins()
+internal/panel/pump.go:562:		snap.Plugins = &sec
+
+$ git grep -n 'PluginEngineNotWired215\|SkillsNotInConfigModel215' -- '*.go' ':!*_test.go'
+cmd/wisp/panel_resident_pump.go:252:		EngineState:  panel.PluginEngineNotWired215,
+cmd/wisp/panel_resident_pump.go:253:		SkillState:   panel.SkillsNotInConfigModel215,
+cmd/wisp/run.go:1311:				EngineState:  panel.PluginEngineNotWired215,
+cmd/wisp/run.go:1312:				SkillState:   panel.SkillsNotInConfigModel215,
+internal/panel/plugins_inventory_215.go:71:	// PluginEngineNotWired215 is EngineState's canonical sentence: no consumer
+internal/panel/plugins_inventory_215.go:74:	PluginEngineNotWired215 = "插件引擎未装配（票 50/51）：[plugins] 各键今天没有任何读者，enabled=true 只表示已配置、不表示在跑"
+internal/panel/plugins_inventory_215.go:75:	// SkillsNotInConfigModel215 is SkillState's canonical sentence: the config
+internal/panel/plugins_inventory_215.go:79:	SkillsNotInConfigModel215 = "技能维今天没有配置键，无清单可枚举；补技能清单要先动 D36 配置模型（契约面，待批），本清单不列空表"
+
+$ git grep -n 'c.Plugins\|cfg.Plugins' -- 'cmd/*.go' 'internal/**/*.go' ':!*_test.go'
+cmd/wisp/panel_resident_pump.go:144:		src.Plugins = func() panel.PluginInventorySection { return pluginsSectionFromConfig(cfg) }
+cmd/wisp/panel_resident_pump.go:251:		Tier2Enabled: c.Plugins.Tier2Enabled,
+cmd/wisp/panel_resident_pump.go:255:	for id, e := range c.Plugins.Entries {
+cmd/wisp/run.go:1310:				Tier2Enabled: c.Plugins.Tier2Enabled,
+cmd/wisp/run.go:1314:			for id, e := range c.Plugins.Entries {
+internal/config/parse.go:172:	tail, err := marshalPlugins(c.Plugins)
+internal/panel/pump.go:540:	if p.src.Plugins != nil {
+internal/panel/pump.go:552:		sec := p.src.Plugins()
+
+$ git grep -n 'func (m \*Manager) Config()' -- 'internal/config/*.go'
+internal/config/manager.go:127:func (m *Manager) Config() *Config {
+
+$ git grep -n 'func (m \*Manager) Set' -- 'internal/config/*.go'
+internal/config/allowdirs.go:109:func (m *Manager) SetAllowedDirs(dirs []string) error {
+internal/config/permmode.go:70:func (m *Manager) SetPermissionMode(mode risk.Mode) error {
+internal/config/settings.go:100:func (m *Manager) SetProviderBaseURL(provider, url string) ([]string, error) {
+internal/config/settings.go:121:func (m *Manager) SetProviderAPIKeyRef(provider, ref string) ([]string, error) {
+internal/config/settings.go:143:func (m *Manager) SetModelContextWindow(provider, model string, tokens int) ([]string, error) {
+internal/config/settings.go:172:func (m *Manager) SetModelPriceIn(provider, model string, per1M float64) ([]string, error) {
+internal/config/settings.go:177:func (m *Manager) SetModelPriceOut(provider, model string, per1M float64) ([]string, error) {
+internal/config/settings.go:224:func (m *Manager) SetRoleChatModel(model string) ([]string, error) {
+internal/config/settings_187.go:104:func (m *Manager) SetRoleChatThinking(level string) ([]string, error) {
+internal/config/settings_313.go:56:func (m *Manager) SetVoiceCloudASRChain(chain []string) ([]string, error) {
+internal/config/settings_313.go:63:func (m *Manager) SetVoiceCloudTTSChain(chain []string) ([]string, error) {
+internal/config/settings_313.go:124:func (m *Manager) SetVoiceRealtimeProvider(provider string) ([]string, error) {
+internal/config/settings_313.go:134:func (m *Manager) SetVoiceRealtimeModel(model string) ([]string, error) {
+internal/config/settings_313.go:208:func (m *Manager) SetRoleChatPair(provider, model string) ([]string, error) {
+internal/config/settings_320.go:36:func (m *Manager) SetProviderBilling(provider, billing string) ([]string, error) {
+internal/config/settings_413.go:45:func (m *Manager) SetBallSize(size int) ([]string, error) {
+internal/config/settings_65.go:46:func (m *Manager) SetBallStyle(style string) ([]string, error) {
+internal/config/settings_appearance_wave.go:56:func (m *Manager) SetBallOpacityIdle(v float64) ([]string, error) {
+internal/config/settings_appearance_wave.go:69:func (m *Manager) SetBallClickThrough(on bool) ([]string, error) {
+internal/config/settings_appearance_wave.go:80:func (m *Manager) SetPanelWidth(px int) ([]string, error) {
+internal/config/settings_appearance_wave.go:95:func (m *Manager) SetPanelFontSize(px int) ([]string, error) {
+internal/config/settings_local_audio.go:38:func (m *Manager) SetVoiceAecEnabled(on bool) ([]string, error) {
+internal/config/settings_local_audio.go:50:func (m *Manager) SetAudioInputDevice(name string) ([]string, error) {
+
+$ git grep -n 'internal/plugin/manifestslot' -- '*.go' ':!internal/plugin/manifestslot/**' ':!*_test.go'
+internal/plugin/command.go:16://     in internal/plugin/manifestslot calls this on every call; the test leg
+
+$ git grep -n 'KindManifest' -- '*.go' ':!*_test.go'
+internal/plugin/manifestslot/manifestslot.go:17:// (Tool + Decl), tools.KindManifest and the Decl sidecar are the shape
+internal/plugin/manifestslot/manifestslot.go:84:func (p *Provider) Kind() tools.Kind { return tools.KindManifest }
+internal/plugin/manifestslot/manifestslot.go:134:			Provider:     tools.KindManifest,
+internal/tools/registry.go:21:	KindManifest Kind = "manifest"
+internal/tools/registry.go:175:	case KindBuiltin, KindManifest:
+internal/tools/registry.go:190:		if p.Kind() == KindManifest && e.Decl.PluginID == "" {
+
+=== counts ===
+$ (count of lines matching ^\s+path:\s+" in git show <ref>:internal/config/unwired.go)
+5341ead7a^ unwiredKeys rows = 5
+5341ead7a unwiredKeys rows = 5
+8d49dc562e unwiredKeys rows = 5
+HEAD unwiredKeys rows = 3
+HEAD schema.go lines matching Plugin = 19
+HEAD schema.go lines matching Skill = 0
+c1fa2e1d4 schema.go lines matching Plugin = 18

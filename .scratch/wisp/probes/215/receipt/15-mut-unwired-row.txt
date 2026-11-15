@@ -1,0 +1,8 @@
+time=2026-11-15T13:53:17.777+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestEveryLockedSectionKeyIsAccountedFor
+    unwired_test.go:372: locked key "net.allowlist" has no disposition in lockedKeyDisposition (ticket 83 AC#1: every locked key needs a verdict)
+    unwired_test.go:389: unwiredKeys guards "net.allowlist" but no locked-section key points at it
+--- FAIL: TestEveryLockedSectionKeyIsAccountedFor (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.088s
+FAIL

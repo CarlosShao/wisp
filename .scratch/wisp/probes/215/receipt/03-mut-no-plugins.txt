@@ -1,0 +1,9 @@
+time=2026-11-15T13:47:39.175+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test215AssemblyRootCarriesThePluginsReader
+--- PASS: Test215AssemblyRootCarriesThePluginsReader (0.00s)
+=== RUN   Test215WiredPluginsReaderSendsTheLiveValues
+--- PASS: Test215WiredPluginsReaderSendsTheLiveValues (0.01s)
+=== RUN   Test215MutationReaderRemovedSendsNoPluginsKeyAtAll
+--- PASS: Test215MutationReaderRemovedSendsNoPluginsKeyAtAll (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.262s

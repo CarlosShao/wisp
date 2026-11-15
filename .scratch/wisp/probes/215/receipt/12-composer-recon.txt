@@ -1,0 +1,14 @@
+time=2026-11-15T13:51:26.165+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestComposerContractTypesMatchFrontend
+    composer_test.go:98: Snapshot <-> PanelSnapshot: 16 JSON keys reconciled
+    composer_test.go:98: ComposerState <-> ComposerState: 12 JSON keys reconciled
+    composer_test.go:98: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:98: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:98: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:98: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+=== RUN   TestComposerContractTypesMatchFrontend/the_ruler_reaches_the_nested_sections_(ticket_415,_R-145-2)
+    composer_test.go:122: nested contract held: 31 Go view-model types translated and walked against panel.ts, 11 judged page-side gap(s) pinned by exact set
+--- PASS: TestComposerContractTypesMatchFrontend (0.08s)
+    --- PASS: TestComposerContractTypesMatchFrontend/the_ruler_reaches_the_nested_sections_(ticket_415,_R-145-2) (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.149s
