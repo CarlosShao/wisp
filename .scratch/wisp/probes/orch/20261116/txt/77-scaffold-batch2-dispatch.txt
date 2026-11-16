@@ -1,0 +1,14 @@
+# 派单存档（先存档再发）—— 票 77 第二批：AC#11（深浅色对比度）＋AC#3（L2 卡真数据）（写腿，本波唯一 frontend 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/77-*.md` 全文（余 6 格：AC#1/3/6/8/9/11）。**本轮只打 AC#11 与 AC#3**，⛔ 做其它格。
+
+1. **AC#11（深浅色渲染＋对比度 ≥AA）**：
+   - 用现成渲染仪器（`frontend/scripts/` 下已有 `render-model-settings.tsx` 一类；没有就照它的形状新写 `render-shell-77.mjs`，⛔ 引入新重依赖）在**深色**与**浅色**两种主题下各渲染**外壳**（主界面框）＋**一枚样例屏**；
+   - 对**文字/背景配对**做**对比度实测**：给**具体数值**（WCAG 比值，如 `4.83:1`），逐对列出（正文/次要文字/按钮/标签/禁用态），**逐对判 ≥AA（正文 ≥4.5:1，大字 ≥3:1）**；
+   - 判据：**任一对 <AA ⇒ 报具体是哪一对、多少比**，⛔ 不"整体达标"这种形容词；能小改 token 就改并复量，⛔ 大改视觉。
+2. **AC#3（L2 确认卡渲染真数据）**：L2 确认卡的数据必须由 `internal/risk` 的**真决策对象**驱动（⛔ 组件库 demo 假 props）。先 `grep -rn "L2\|ConfirmCard\|confirmation" frontend/src | head` 找到卡；再看它现在吃哪份 props、来源在哪（`internal/panel` 哪个 wire 字段）。**判据**：①给 file:line 证"数据来自 `internal/risk` 真对象 → 面板 wire → 卡"整条；②一枚行为牙：喂一份真决策对象（含 risk level／理由／路径）⇒ 卡上逐字段显示**同一份值**；喂不到 ⇒ 显式"未判"而不是空白或假值。若卡不存在或链断在 Go 侧，**具名写断在哪一跳**，⛔ 前端造假 props 充数。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；⛔ UI emoji（d22scan 扫）；`npm --prefix frontend run build` rc=0（node 在 `D:\work\server\node24`）＋`typecheck` rc=0＋`lint` rc=0；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）。
+写面：`frontend/**`（本波唯一写腿）、`docs/evidence/s1/77-*`。若需 Go 侧读面改动，**先停下来具名报断跳**（本波 cmd/wisp 不派）。
+回话第一行＝commit hash ＋「深浅色对比度逐对数值（最少 6 对）」＋「AC#3 链路 file:line 或断在哪一跳」＋「两枚牙名」＋npm build/typecheck/lint rc。没干完写「未完成，卡在哪」。
