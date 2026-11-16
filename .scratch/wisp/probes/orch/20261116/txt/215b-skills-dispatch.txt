@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 票 215b 技能清单（机主 2026-11-16 19:5x 全权批准，契约面已放行）（写腿，cmd/wisp 一波一腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/215b-skills-inventory-needs-a-config-face.md` 全文，五格全做。**机主已批准**给 `config.toml` 增加 `[skills]` section（2026-11-16 19:5x 原话"全部同意、权限放开"）——但**批准只落台账 `A##`，⛔ 改 `docs/PLAN.md`／`docs/specs/**` 一字**（D36 契约文字不动，只在实现里加 section 并写台账说明）。
+照 215a 插件的形状（`cmd/wisp/plugins_inventory_215a.go`／`internal/config/settings_plugins_215.go`／`frontend/src/components/plugins-screen.tsx`）做技能侧：
+1. **AC#1**：`[skills]` section 落 schema（每枚 skill：`enabled`＋可选 `path`）；⛔ 拆 `internal/config/unwired.go` 的"未接线键响亮拒收"。
+2. **AC#2**：技能清单可枚举（名字／开没开／**这一轮真装配了没有**），每枚 ≥1 生产读者（改前 grep 0 ⇒ 改后 ≥1，给 file:line）。
+3. **AC#3**："配置 true 但没人读"必须能看出来（正控假项必红，行为牙）。
+4. **AC#4**：菜单开关走现成 `config.set` 受保护 setter＋审计三档；需重启的在清单写明。
+5. **AC#5**：外部技能说明文字按不可信处理（票 200 形），⛔ 改权限档位/`allowed_dirs`。
+硬约束：⛔thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、新协程走 observe.Registry.Spawn、⛔提交 dist 字节、⛔UI emoji。串行：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等）；⛔裸跑（A1888）。A1880 牙要行为；A1882 整包带终点锚 `TestZZ315A1`。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/config/**`、`internal/panel/**`、`frontend/src/**`、`docs/evidence/s1/215b-*`。
+回话第一行＝commit hash ＋「[skills] 字段集」＋「每枚 skill 的装配读者 file:line」＋「正控红句」＋「三态标签」＋npm build/typecheck rc。

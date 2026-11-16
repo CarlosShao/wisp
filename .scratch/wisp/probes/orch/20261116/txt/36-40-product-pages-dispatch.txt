@@ -1,0 +1,19 @@
+# 派单存档（先存档再发）—— 票 36/37/38/39/40 五张产品页（前端舰队；每条腿自己读自己的票全文，逐格打）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+# 串行约束：frontend 同一时刻只有一腿（npm build / dist 互斥）⇒ 五腿**顺序**跑，不要并行。
+
+【通用腿指令（每条腿都照这段）】
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**先读你自己的票全文**：`.scratch/wisp/issues/<你的票号>-*.md`，把票面每一格 AC 当成验收清单，逐格做；票面的"现量"行号**当历史**，⛔ 照抄行号，先 grep 现读符号。
+**前端归本编队**（机主 2026-11-16 铁律 4）：`frontend/**` 就是你的写面，⛔ 以"归外部 agent"推掉任何一格。
+**每格必须有行为牙**（⛔ 源码字符串断言）：喂真数据 ⇒ 显示同一份值；喂不到 ⇒ 显式"未判"，⛔ 假值/空白。
+**页面上的「未接线」标签**（`frontend/src/components/config-screen.tsx:178`）：你碰到的每一枚 dormancy 要么**真接上**（有生产读者，给 file:line），要么**保持"未接线"并具名缺哪台引擎**——⛔ 把标签改成"即时"却没有读者（那就是假话）。
+**硬约束**：⛔ 动 thresholds/golden/allowlist/PLAN/specs/D43/design；⛔ 放宽断言；⛔push；⛔ UI emoji（d22scan 扫）；`npm --prefix frontend run build` rc=0（node 在 `D:\work\server\node24`）＋`typecheck` rc=0＋`lint` rc=0；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）。
+**若需要 Go 侧读面/写面**（`cmd/wisp`／`internal/panel`）：**先停下**，把"要加哪个字段/file:line"写进回话，别硬在前端造数据。cmd/wisp 一波一腿由编排者调度。
+**回话第一行**＝commit hash ＋「逐格：勾了几格/几格留白及原因（file:line）」＋「新牙名」＋npm build/typecheck/lint rc。没干完写「未完成，卡在哪」。
+
+【本批五票（顺序跑）】
+1. 36 — 结果历史面板（`36-result-history-panel.md`）
+2. 37 — 审批 UI L2（`37-approval-ui-l2.md`）
+3. 38 — 命令面板/任务（`38-command-palette-tasks.md`）
+4. 39 — 配置编辑器 GUI（`39-config-editor-gui.md`）
+5. 40 — 安全/隐私/成本页（`40-security-privacy-cost-pages.md`）
