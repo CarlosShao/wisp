@@ -37586,3 +37586,15 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 票 33 真实现状：**2 勾／12 未勾**，剩下的是**更窄的 AC**（冷/热延迟 SLO 实测、CSP、焦点往返、运行时缺失夹具、`[panel]` 五字段生产者、`AC#7/8/9/10/12/13/14`），**不是"窗口不存在"**。
 ⇒ **四张卡的真缺口**（这才是对的归口）：① `NewCloudChain` **全仓调用 0**（云端语音链从未装配）② **票 248** 无设置写入路由 ③ **票 313**＝机主 10-13 的产品决定「默认 stepfun＋**全部在界面上配**＋语音模型也走 API（audio3）」，未做。
 **教训（写死）**：报"某票没人做"前，先 grep 产码文件数；**"票开着的" ≠ "东西不存在"**。
+
+## A1897（11-16 11:1x，我第三次把"票面原文/老注释"当现状）：**248 的设置路由早就在树上，我却对机主说"没有保存的路"**
+
+我 11:0x 对机主说「入向白名单 4 枚方法、0 枚 config/凭据 ⇒ 页面保存到不了磁盘」。**现状是错的**（我照抄了票面 2026-09-30 的立票原文＋`panel_inbound.go:64` 一句过时注释）：
+- `internal/panel/bridge.go:66` `MethodConfigGet = "config.get"`／`:67` `MethodConfigSet = "config.set"`，名册在 `:193`；
+- `cmd/wisp/panel_inbound.go:321` `secret.NewStore(dir)`（DPAPI）、`:325-329`／`:397` 派发表接线、`panel_config_store.go:450 StoreCredential`（值只进 DPAPI blob，config.toml 只落 `api_key_ref = 'dpapi:<id>'`）。
+⇒ **A1896 的严格执行版**：报"某票缺什么"前，①grep **符号**（不是注释、不是票面自述）②看 file:line 现读。**票面立票原文与老注释都算"历史"，⛔ 当现状。**
+
+## A1898（11-16 11:1x，票 248 收件）：10 勾／2 未勾
+
+我自己复跑：`TestAC2CredentialSentinelAppearsInNoArtifact` **PASS 0.03s**；重建 dist 后 `TestBuiltinBundleIsCompleteOrAbsentNeverHalf` **PASS**，判语逐字 `bundle complete - entry 1044 bytes, 2 asset refs, 4 embedded files`（跑完 dist 已清回 .gitkeep，零 dist 字节）。AC#10 复核：`newResidentApprovalWithConfig`（`resident_approval_windows.go:601`）真读 [risk] 两项。
+**仍开 2 格**：`AC#4`＝真机"点设置→填参数凭据→保存→下一任务真用上"（要机主点，依赖票 33 链）；`AC#8`＝文案"不许出现保存即生效"（生产面已 0 命中，整格还卡票面 §8 两道外部前置）。
