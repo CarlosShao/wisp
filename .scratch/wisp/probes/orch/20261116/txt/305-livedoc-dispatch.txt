@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）—— 票 305 活文档缺陷收口（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/305-after-the-channel-fix-the-live-document-is-...md` 全文（AC#0 已勾，剩 AC#1-AC#5）。
+
+**起手先复量（⛔ 别照票面 10-10 的行号当今天）**：三枚钉 `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14AwaitedBindingReplyReachesThePage`／`TestAC14GoSideEvalPushReachesThePage`。**今天已有两枚在我这儿 PASS**（AC13 1.37s、AC14Awaited 1.03s，均在 dist 已构建的台面）——所以**症状①很可能已经被票 33 的 lane2/lane3 修掉了**；你的活儿是**判死**，不是重造。
+
+**逐条**：
+1. **AC#1／AC#2**：在**能判死的台面**（母仓、`npm run build` 后有真页面）上把两枚症状各跑一遍，给**逐字红/绿句**。哪枚已绿就**具名写"已由哪个提交绿"**（`git log -S` 找引入者），⛔ 假装修了一遍。哪枚仍红就修，并给具名红句（⛔ 放宽那句判据）。
+2. **AC#3（反恒真成对）**：每枚症状一对——(a) 撤掉修复 ⇒ 目标用例按预期红，**红句逐字**；(b) `git checkout` 逐字节还原（用 `git stash`? ⛔ 禁 stash；用 `git show <commit>:<path> > file` 覆盖再还原，或 `git apply -R` 一枚补丁）⇒ 复绿。⚠ ⛔ `reset`/`rebase`/`checkout .`/`clean`。
+3. **AC#4**：`go vet ./cmd/wisp/` 与 `go vet -tags winlive ./cmd/wisp/ ./internal/ball/...` 各 rc；越界检查（⛔ 碰 thresholds/golden/allowlist/PLAN/specs/D43/design）。
+4. **AC#5 与票 33 对账**：写明本票收的两枚症状**对应票 33 的 AC#13／AC#14 哪几格**，逐枚写「⛔ 两本账同时记」——即**只在本票记，票 33 那格不再重复翻**（票 33 的 AC#13/AC#14 我已翻，见 `A1900`）。请给一张三行对账表。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 是环境红，别当自己弄坏、别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`、`docs/evidence/s1/305-*`。
+回话第一行＝commit hash ＋「三枚钉今天逐行读数（PASS/FAIL＋秒）」＋「哪枚是本来就好、由哪提交绿；哪枚真修了、修在哪 file:line」＋「AC#3 两对突变红句」＋「AC#4 两条 vet rc」＋「AC#5 三行对账表」＋哪些没打完卡在哪。没干完写「未完成，卡在哪」。
