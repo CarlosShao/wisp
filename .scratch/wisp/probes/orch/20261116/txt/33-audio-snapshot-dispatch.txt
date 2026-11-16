@@ -1,0 +1,20 @@
+# 派单存档（先存档再发）—— 票 33 面板宿主收尾：让「本机音频」卡显示真值（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/33-panel-host-c27.md` 的 AC#10（`:245`）、AC#12（`:37`）、AC#13（`:39`）三格＋「编排者收件」节。**宿主早已存在**（`panel_host` 13 生产文件、`PanelManager`、`serveNotBuiltNotice`）——⛔ 不要重造宿主。
+
+**背景（现量，别自己重查一遍结论）**：票 313 已把听写/朗读两张卡接真（`NewCloudASRChain`/`NewCloudTTSChain` 有生产调用点）；**「本机音频」卡仍写**「后端读者/守卫已接真，但配置读口的快照还没有它们的当前值，写入路由也未接」；「实时语音」归票 60（被机主的 key 闸住，⛔ 本轮不动）。
+
+**本轮按序做（打不完照实说打到哪）**：
+1. **【主目标】本机音频三键进配置快照＋可写**：`voice.aec.enabled`、`audio.input_device`、`audio.sample_rate` 三枚 —— ①出向快照里带上**当前值**（⛔ 只出"已接真"标签不出值）②走票 248 已有的 `config.set` 受保护 setter 写入（⛔ 另造新路）③`audio.sample_rate` 受采集端 16000 的既有限制（如与守卫冲突，**如实拒绝并给具名原因**，⛔ 静默写坏值）。**前端**（前端归本编队，可改）：三行从「等快照」改成显示**真当前值**＋可改可存；改完 `npm --prefix frontend run build`（node 在 `D:\work\server\node24`）rc=0＋`typecheck` rc=0。
+2. **AC#10**：`[panel]` 五枚字段生产者（`width`/`height`/`scale` 真去设窗口边界，其余按票面）—— 有生产者给读数，没有的**具名写清**卡在哪。
+3. **AC#12**：`//go:embed all:dist` 匹配真页面产物的**能力型**读数（先 `npm run build`，Go 侧数 `frontend.Dist()` 条目＋关键入口文件；跑完删回 `.gitkeep`，⛔ 提交 dist 字节）。
+4. **AC#13**：冷启动"往返探测"不许把真页面盖掉 —— 能修则修＋会给响的用例（真页面 `await window.<binding>(...)` 断言回话**真到页面**，⛔ 用"Dispatch 被调用过"/"Eval 没报错"当凭据）；修不动就**具名上报卡在哪**。
+5. **AC#14**：⛔ 本轮不重写消息环。只交**只读结论＋三种形的取舍表**（票面 ⓐ/ⓑ/ⓒ），给下一波我裁。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 每枚牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ 机器上有一颗 **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 会因桌面态红，**那两枚是环境红，别当自己弄坏的、别杀机主进程**。
+
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`、`internal/config/**`（只读优先）、`frontend/src/**`（本机音频三行＋必要小改）、`docs/evidence/s1/33-*`。
+回话第一行＝commit hash ＋「三键在快照里的字段名＋当前值样例」＋「前端三行改成什么原文」＋「npm build/typecheck rc」＋「AC#10/12/13 各勾没勾、AC#14 三种形取舍表」＋「哪些没打完卡在哪」。没干完写「未完成，卡在哪」。
