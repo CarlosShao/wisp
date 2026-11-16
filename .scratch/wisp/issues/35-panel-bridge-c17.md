@@ -3,7 +3,7 @@
 **Status:** ready-for-agent
 **Claimed by:** —
 **Last update:** 2026-09-19
-**Blocked by:** 33-panel-host-c27, 34-frontend-scaffold
+**Blocked by:** ~~33-panel-host-c27, 34-frontend-scaffold~~ ⇒ **2026-11-16 19:5x 编排者裁：两把锁都松了** —— 34 已并入 77 关（superseded）；33 余 3 格全是**环境/机主在场**门（`:74` 冷拉起 P95 要安静桌面、`:76` 焦点要无抢占、AC#10 要 fork `PutZoomFactor` 的 Go 包装），宿主 13 生产文件早在跑 ⇒ **本票余 2 格可派，不再等**。
 **Parallel slots:** ≤2 sub-agents (A: bridge transport + dispatch + whitelist; B: resync model +
 event stream + frontend client SDK)
 **Spec refs:** SPEC-08 §5.2, C17, D31 routing, F2 server-side allow rule, D38(d) backpressure

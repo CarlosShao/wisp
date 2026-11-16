@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 票 35 PanelBridge(C17) 余 2 格：伪 allow 必拒＋resync 无态（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/35-panel-bridge-c17.md` 全文（8 格已勾，余 2 格就是本单）。**先现读**桥白名单与调度（`internal/panel/bridge.go` 的 `Method*` 常量与 roster、`cmd/wisp/panel_inbound.go` 的 dispatch），⛔ 照票面 9-19 的行号当今天。
+
+1. **AC「伪 allow 必拒」**：从 webview 直接发 `approval.decide{allow:true}`（**面板侧来源的 L2 允许**）必须被**结构性拒绝**（不是靠前端自觉）。判据（行为牙）：①一枚测试从**桥调用面**注入 `allow:true` ⇒ 得到**具名拒绝**（红句逐字，⛔ 静默丢弃）；②把"拒"临时改成"放"（局部突变）⇒ 该测试**必红**，还原复绿；③**L1/L2 的合法路径不受影响**（原生二次确认那条路仍通，给一枚 PASS 佐证）。
+2. **AC「resync 无态」**：hide → 工具状态变化 → show ⇒ UI 拿到**新鲜状态**；SDK **禁止跨 show 复用旧态**。判据（行为牙）：①一枚测试走**真桥**（不是 mock 内部函数）：hide 后改快照、再 show ⇒ 页面收到的载荷是**新值**（逐字段）；②反向牙：把 resync 的"重新取快照"摘掉（返回缓存）⇒ 测试**必红**，还原复绿；③SDK 侧若已有客户端代码（`frontend/src/lib/panel.ts` 一族），给 file:line 证它**不缓存跨 show**。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单（**加**白名单要附理由，**不许**为了测试方便开口子）；⛔ 提交 `frontend/dist` 字节。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸跑（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 是环境红，别当自己弄坏、别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`、`docs/evidence/s1/35-*`；若需前端 SDK 改动（`frontend/src/lib/panel.ts`）**先报**，本波前端有另一腿在跑。
+回话第一行＝commit hash ＋「伪 allow 拒绝红句逐字＋突变红/还原绿两读数」＋「resync 新旧值逐字段＋反向牙红句」＋「C17 白名单是否新增（如有，理由）」＋「哪格没打完卡在哪」。没干完写「未完成，卡在哪」。
