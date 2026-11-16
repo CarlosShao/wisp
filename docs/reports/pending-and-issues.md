@@ -37571,3 +37571,18 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 **⇒ 结论（对机主的话）**：不是"几十张票都没接线"，是**这条链的头（33）没人做**，后面三环都被它按着。我今天/昨天做的 35（桥）、46（日志门控）、453/454（附件）、455（运行时绑定）都是**这条链前面的路**，不是这条链本身。机主的感觉是对的。
 
 **即刻纠正（我拍的）**：**下一波写腿＝票 33**（`cmd/wisp/panel_host_windows.go` + `internal/panel`），然后 248，然后云端链装配（`NewCloudChain` 的真调用点），再到 32（S4 验收）。⛔ 不再从池子里挑"顺手可派"的边角。
+
+## A1895（11-16 10:5x，我自己的口径错，当场改）：**"前端产物我入库"这句是错的 —— `frontend/dist` 是**故意**不入库的**
+
+我 10:3x 对机主说「`frontend/dist` 的构建产物要我自己产出并入库」。**核实后：错**。
+- `frontend/.gitignore` ＋ `frontend/embed.go` 注释 ＋ `frontend/vite.config.ts` 的 `keepDistAnchor` 三处一致：**`dist/*` 除 `.gitkeep` 外一律 gitignore**，理由（票 77 AC#1）：干净 checkout 里 `//go:embed all:dist` 要能解析，未构建时 `panel.Assets.Built()` 报 false、宿主显示"未构建"，**绝不静默发一张占位页**。
+- 真正该在库里的是**构建步骤**，不是字节：`scripts/build.ps1:86-88` 已有（`npm ci` 缺 `node_modules` 时＋`npm run build`，并核"dist 里真有页面"，票 274 防 stub）。
+- **我实测**：`npm run build` **rc=0，1.27s** ⇒ `dist/index.html 1044 B`＋`assets/index-CZoXrb9N.css 65264 B`＋`assets/index-QUtCIbHm.js 640318 B`；`go test ./internal/panel -run 'Built|Assets'` 四枚全 PASS（含 `TestAnchorOnlyBundleIsNotBuiltAndFailsClosed`、`TestBuiltinBundleIsCompleteOrAbsentNeverHalf`）。
+⇒ **改口径**：入的是**构建步骤**；dist 产物**只在打包时由 `build.ps1` 生成并嵌入 exe**。⛔ 提交 dist 字节（会漂移＋违 D29/票 77 设计）。
+
+## A1896（11-16 10:5x，我上一轮对机主说错了一半，必须更正）：**票 33 不是"空了两个月没人做" —— 面板宿主早就在跑**
+
+上一轮我说「票 33 空了两个月、无人认领」⇒ **不准确**。现读：`cmd/wisp/**` 里 `panel_host` 生产文件 **13 个**、`PanelManager` 在、`serveNotBuiltNotice` 在（`panel_host_windows.go:993`）⇒ **宿主已实现并在跑**（机主截图里那扇窗就是它）。
+票 33 真实现状：**2 勾／12 未勾**，剩下的是**更窄的 AC**（冷/热延迟 SLO 实测、CSP、焦点往返、运行时缺失夹具、`[panel]` 五字段生产者、`AC#7/8/9/10/12/13/14`），**不是"窗口不存在"**。
+⇒ **四张卡的真缺口**（这才是对的归口）：① `NewCloudChain` **全仓调用 0**（云端语音链从未装配）② **票 248** 无设置写入路由 ③ **票 313**＝机主 10-13 的产品决定「默认 stepfun＋**全部在界面上配**＋语音模型也走 API（audio3）」，未做。
+**教训（写死）**：报"某票没人做"前，先 grep 产码文件数；**"票开着的" ≠ "东西不存在"**。
