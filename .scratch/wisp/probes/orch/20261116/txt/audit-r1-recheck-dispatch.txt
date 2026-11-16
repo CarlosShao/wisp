@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 复审 R1：两张链卡现在是否"真能跑"（审计路由，只读）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何 fallback model）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 审计腿（**只读**）。复审你上一轮判的 R1/P1/P2/P3 是否真被 `77abb659b` 修掉。**⛔ 只看提交信息当结论**，逐条给 file:line＋命令读数：
+1. **R1 用户路径走通没有**：默认 false 时装配拒绝（红句 `lacks capabilities.audio_in`）——从**界面**（`frontend/src/components/model-settings.tsx:680/695` 的两枚 Switch）→ `config.set` 的 `model_audio_in`（`internal/panel/config_write_313.go:111`）→ `internal/config/settings_313.go:207` → 落盘 `capabilities.audio_in=true` → **boot 装配成功**。逐跳证；**有没有断跳**（例如读面出不出能力位、reload 是否真读到新值）。⛔ 拿测试名当结论，跑那两枚并看红句。
+2. **R1 文案还有没有假话**：`frontend/src/components/voice-settings.tsx` 听写/朗读两卡——"已接入"是否**始终**带门槛句？四态标签（能装配/缺位/快照没答/空链）是否都可达？⛔ 有没有一条路径会显示"已接入"却没有门槛。
+3. **P1 255 牙真不真**：`cmd/wisp/config_receipt_255_test.go:970` 是否按 go/parser 活调用图（⛔ 字符串）；你自己 `-overlay` 或临时改动删 `ResolveCloudChain` 调用点，看它红不红（红完还原）。
+4. **P2 SLO 附录 E** 三句是否写全、数字与 10 发一致、⛔ 未改阈值。
+5. **越界**：`77abb659b` 有没有动 thresholds/golden/allowlist/PLAN/specs/D43/design/dist 字节。
+
+**⛔ 硬约束**：只读，⛔ 改产码/票面（证据件可写 `docs/evidence/s1/…`）；⛔ 现在**没有**其它写腿在跑，你可以跑 `go test ./cmd/wisp` 但**必须经载具** `scripts/wisp-cli-staged-tests.sh`、一次一发、跑前 `Get-Process wisp.test`＝0；⛔ 裸跑（A1888）；⛔push。⚠ 球 PID 49348 在跑 ⇒ AC4Focus/AC246 环境红。
+回话第一行＝「R1 修好／仍假／无法判；P1 有牙／无牙；P2 合规／缺句；P3 可达／不可达」＋每条 file:line 或命令读数。

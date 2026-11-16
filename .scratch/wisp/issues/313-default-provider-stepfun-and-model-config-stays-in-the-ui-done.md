@@ -69,3 +69,15 @@
 
 ### 边界
 实时语音（票 60/C32）与本机音频快照仍占位 —— 归它们的票，不在本票 AC 内。⛔ 拿「听写朗读通了」冒充「四张卡全通」。
+
+---
+
+## 审计修正收件（2026-11-16 16:4x，`77abb659b`，件 `docs/evidence/s1/313-audit-r1-p1p2p3-fix.md` 10318 B）
+
+审计腿 `auditTodaysCards` 判 R1（反向假话）＋P1（255 无牙）＋P2（SLO 取样态）＋P3（能力位不可达）成立，本枚一次修完。
+**尺1** `77abb659b` 在（13 件）。**尺2** 件在 10318 B。**尺3 我自己复跑**（载具一发）：`Test313CapabilityBitFlipsAssemblyOutcome` **PASS 0.03s**／`Test313CapabilityWritesRefuseByNameAndMoveNoByte` **PASS 0.01s**／`TestTicket255CloudChainAssemblyCallPointIsAlive` **PASS 0.04s** ⇒ **3/3，rc=0**。
+**能力位三面**：写 `internal/config/settings_313.go:207 SetModelAudioIn`／`:213 SetModelAudioOut`（走票 248 `writeOneKey`）；名册 `internal/panel/config_write_313.go:111-112`（`model_audio_in`/`model_audio_out`）；读 `internal/panel/config_handlers.go:291 ModelCapabilityBits`；前端 `frontend/src/components/model-settings.tsx:680/695`（每模型行 audio in / audio out 各一枚 Switch）。
+**牙**：默认 false ⇒ 装配红句 `lacks capabilities.audio_in`（TTS `lacks capabilities.audio_out`）；经真 settings 腿写 `model_audio_in=true` 落盘 reload 后**同一链装配成功**。
+**两卡文案改条件式**（摘原文）：听写卡「…门槛：链里每个模型都要在能力位里勾上 audio in（「模型」页的模型行），保存后重启生效。」标签四态：能装配＝已接入·重启生效／缺位＝**装配不了·缺能力位**＋点名／快照没答＝装配未判／空链＝未设置。
+**255 新牙**＝`go/parser` 活调用图（`config_receipt_255_test.go:970`），删装配点红句「…no longer calls speech.ResolveCloudChain anywhere…」。
+**SLO 附录 E** 补三句（负载态 CPU 57%＋三个进程在跑／安静态 815.826ms＝2.07 倍差／⛔ 不得合并成一个冷启 P95），阈值零改。

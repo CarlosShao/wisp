@@ -37662,3 +37662,9 @@ AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean
 **我自己复跑** -run '^Test215A' **7/7 PASS rc=0**；internal/config ok 2.772s／internal/panel ok 17.853s。
 **诚实边界（腿自陈、我认可）**：面板侧「开」插件**结构性拒绝**（R20 冻结形状，收据告知走原生二次确认）；原生「开」config 层已通（queued 到 L2 卡）。
 **215b**＝技能半，schema.go 里 Skill 命中 **0** ⇒ 要补 [skills] section＝**D36 契约面**⇒ 单立票 215b-… **blocked-on-owner**，⛔ 悄悄消失。
+
+## A1908（11-16 16:4x）：**R1 反向假话已修成"条件式＋门槛"，能力位从界面可达；我复跑 3/3 绿**
+
+77abb659b：能力位三面（写 settings_313.go:207/213→writeOneKey；名册 config_write_313.go:111-112；读 config_handlers.go:291；前端 model-settings.tsx:680/695 两枚 Switch）。牙 Test313CapabilityBitFlipsAssemblyOutcome：默认 false ⇒ lacks capabilities.audio_in；写入 true 后**同链装配成功**。255 新牙＝go/parser 活调用图（config_receipt_255_test.go:970）。SLO 附录 E 补三句取样态。
+**我自己复跑 3/3 PASS rc=0**。
+**教训（本轮第 4 次同族）**：我上一轮说"两张卡真接上了"——链路真、**用户路径假**。审计一拆就破。⇒ 报"能用了"必须**走一遍用户路径**（界面能不能声明前提），不是"拆了会红"。
