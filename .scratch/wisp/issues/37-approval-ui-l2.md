@@ -62,3 +62,42 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 > **本票 AC 的真数据 e2e 格仍等票 145/35/33 的字段与宿主，一格未勾、不由本程
 > 勾**；可视壳的 commit 链见票 77 进度追记（`424ac84`…`5e23d99`）与
 > `docs/reports/frontend-session-log-zcode.md` §1–§7。
+
+- 2026-11-16 22:5x（票 37 写腿，前端本编队铁律 4；只追加不勾框）：
+  队列读面接线（面板侧半张票）。生产行进链已核现量：
+  `internal/agent/approval/pending_read.go:162` `Queue.LiveApprovals()`（队头在先 FIFO，
+  `Position` 是 1-based 队位）→ `cmd/wisp/panel_pump.go:78` `nativeVerdictsFromGate`
+  （"copy, not a judgement"；CallChain 生产恒空、注释点名票 37 证据文件）→
+  `internal/panel/pump.go:106` `CardView()` → `Snapshot.pending`
+  （`internal/panel/composer.go:58`）→ 页面收包 `frontend/src/panel-root.tsx:37`。
+  本次改动（全部前端，未动 Go 一字节）：
+  1. `l2-approval-card.tsx`：卡上加 correlationId 原文一行（title 挂全文）——票面
+     "correlationId shown for forensics" 的面板卡半格；
+  2. `approval-screen.tsx` 重写：FIFO 序号（1..n 按线上顺序）+「队头在先（FIFO），悬浮球
+     只答队头」+ 容量句改 `QUEUE_CAPACITY=8`（= `internal/agent/approval/queue.go:130`
+     DefaultMaxPending，原来写 10 是没产读者的假数）+ 每行「等待于：」走快照任务名册
+     `blockedOnApproval` join（= Go `TaskRosterSectionFrom` 的 indexWaitingKey 配对，
+     `subagent_roster_197.go:186-247`）；
+  3. 新组件 `approval-queue.tsx`：审批队列条（深度 + 队头 + 每卡 corr/等待于），挂
+     `App.tsx` 卡片上方每一视图（D31 队列常显的面板半格）；空队列零渲染（不再摆常驻
+     零件训练忽略）；
+  4. 新牙 `scripts/render-approval-37.tsx` + `npm run render:approval37`：喂线上形状真值
+     ⇒ 断言同一份值上屏（corr/规则/argv/原因/深度 2/队头/等待于/容量 8），并钉三枚
+     "具名缺席"：D45-1 批量摘要（`BatchView` 只走原生 Prompt 面 `ui.go:193`，卡线无
+     字段）、270s/300s 倒计时（线无 deadline 字段，倒计时在原生卡 `cardrender.go`）、
+     每卡深度戳（Prompt.Depth 走球角标，页面不画）——面板 L2 批量聚合过 R7 的
+     升级守卫继续由 Go 侧 `gate.go:317-324` 钉住；无 allow 控件断言对两处新面重申。
+  未勾格与原因（真数据 e2e 仍缺宿主，与 2026-09-26 追记同因）：
+  - AC#1（两卡顺序 1→2、badge 同步 <100ms、correlationId 路由）：球角标走原生
+    `approvalDepthBadge`（`resident_approval_windows.go:1266`），非面板；100ms 同步与
+    decide-by-corr 的 e2e 要真宿主，本轮以 `render-approval-37` 的深度 2/队头/corr 断言
+    覆盖面板半格（`internal/agent/approval/ticket48_c18_full_test.go:135` 是 Go 侧
+    FIFO/corr 路由真 e2e）。
+  - AC#2（270s 警告→300s 自动拒→重放）：线无 deadline 字段（具名缺席见上）；Go 侧
+    时梯已在 `ticket48_c18_full_test.go:310` 钉住；重放 `Gate.Replay`
+    （`gate.go:885`）面板无路由，一键重放按钮属未接线（缺：把 replay 暴露进 C17 白名单
+    ——改契约须人工批）。
+  - AC#3（面板遮蔽时原生卡可批）：C27 原生卡是 `resident_approval_windows.go` 的
+    320×140 卡，非面板写面；本腿零涉及。
+  - AC#4（面板卡无 allow）：本轮重申 + `render-l2` 原有断言继续钉。
+  - AC#6（人工签收）：等编排者排屏（`?harness=1` 可看新队列条与卡 corr 行）。

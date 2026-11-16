@@ -292,6 +292,15 @@ export function L2ApprovalCard({
                 <span className="truncate font-mono">{view.tool}</span>
                 <LevelBadge level={view.level} />
               </CardTitle>
+              {/* 票 37 的取证要求：correlationId 必须在卡上可见 —— 决定是按这枚
+                  键路由的（panel.approval.request 的 correlationId），一张不署键的卡
+                  没法对账。值 = view.correlationId 原文，零加工；title 挂全文供悬停。 */}
+              <p
+                className="mt-1 truncate font-mono text-[10.5px] text-ink-3"
+                title={`correlationId：${view.correlationId}`}
+              >
+                {`corr ${view.correlationId}`}
+              </p>
             </div>
           </div>
           {/* The demo's pagination-dots slot lives here; hidden on purpose -

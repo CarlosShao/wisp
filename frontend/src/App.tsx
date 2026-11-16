@@ -37,6 +37,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Activity, Command, Moon, PanelLeft, PanelRight, PanelRightClose, Sun } from "lucide-react";
+import { ApprovalQueueSection } from "@/components/approval-queue";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { ComposerRow } from "@/components/composer-row";
 import { GitBranchChip, GitBranchUnread } from "@/components/git-branch";
@@ -402,6 +403,14 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               {/* The L2 cards live here, ABOVE everything and on every view. A
                   strong-confirmation card that vanished because you clicked
                   elsewhere would be a safety change smuggled into navigation. */}
+              {/* Ticket 37 (D31): the queue depth + head ride WITH the cards on
+                  every view, off the same pushed pending list - a queue you
+                  cannot see is a queue you cannot answer. Zero cards = no
+                  strip at all (a permanent zero widget trains you to ignore
+                  it, the same argument the header count makes). */}
+              {snapshot.pending.length > 0 ? (
+                <ApprovalQueueSection snapshot={snapshot} />
+              ) : null}
               {snapshot.pending.map((v) => (
                 <L2ApprovalCard key={v.correlationId} view={v} />
               ))}
