@@ -16,9 +16,9 @@
      - 实时语音 stays a PLACEHOLDER card, exactly as v2 graded it: the
        RealtimeEngine seam is Reserved with no implementation, so its writes
        are still real-save/no-effect and keep the warn receipt.
-     - 本机音频 keeps the WAITING state (snapshot keys and write fields still
-       absent backend-side; the v2 STATE ALIGNMENT note below names the three
-       keys); unchanged by this leg.
+     - 本机音频 graduates from the WAITING state (the snapshot keys and write fields landed Go-side 2026-11-11 (leg R); wired by this leg
+       the two writable keys use real controls below, and the null reads still
+       render the waiting tag per row (the pointer gate survived the wiring).
 
    A chain element must name a provider AND a model the config already lists
    (checkChainElement at load and on write), so the model control lists the
@@ -31,16 +31,17 @@
    the read's saved value always wins, nothing writes until the user saves,
    and the name is only offered because a provider row actually carries it.
 
-   STATE ALIGNMENT kept from v2 (2026-11-11, still true): the 本机音频 keys -
-   voice.aec.enabled feeds the barge-in monitor
+   STATE ALIGNMENT history (kept so the next leg does not re-litigate): the
+   本机音频 keys - voice.aec.enabled feeds the barge-in monitor
    (cmd/wisp/resident_voice_windows.go:1992 -> :2010), audio.input_device
    resolves per capture open and hotplug reopen
    (cmd/wisp/resident_audio_windows.go:307), and audio.sample_rate is a
    load-time guard pinned to 16000 (internal/config/validate.go) - all have
-   real backend readers, but the config.get snapshot's voice payload carries
-   five keys only (pinned in config_313_test.go) and the config.set whitelist
-   has no write field for any of the three. So that card renders the WAITING
-   state; drawing switchable controls now would re-open the C-class lie.
+   real backend readers. The v2 WAITING state was honest because the snapshot
+   carried no values and the write face had no fields; leg R (2026-11-11)
+   landed both halves on the Go side (snapshot pointers + the two flat write
+   fields), and this leg wires the page to them. A null in the read payload
+   still renders the waiting tag per row - never a guessed value.
 
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
@@ -48,6 +49,7 @@
 import { useState } from "react";
 import { Plus, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
+import { Switch } from "@/components/ai-native/switch";
 import { ConfigReadGate } from "@/components/config-read-state";
 import { COPY, configStatus, type Feedback } from "@/lib/config-feedback";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
@@ -87,7 +89,7 @@ function placeholderReceipt(feedback: Feedback): Feedback {
 
 export function VoiceSettings({
   heading = "语音",
-  lede = "云端听写链与云端朗读链已接入常驻语音的装配（保存后重启生效，链尽回退本地引擎）；实时语音的引擎尚未实现仍是占位；本机音频的后端读者已接真，面板先等快照。",
+  lede = "云端听写链与云端朗读链已接入常驻语音的装配（保存后重启生效，链尽回退本地引擎）；实时语音的引擎尚未实现仍是占位；本机音频三项显示真当前值，回声消除与输入设备可改可存。",
 }: {
   heading?: string;
   lede?: string;
@@ -177,7 +179,7 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
             run={run}
             view={view}
           />
-          <LocalAudioCard />
+          <LocalAudioCard busy={busy} performWrite={performWrite} run={run} view={view} />
         </>
       )}
     </div>
@@ -320,51 +322,159 @@ function ChainEditor({
    本机音频 (voice.aec.enabled / audio.input_device / audio.sample_rate).
    --------------------------------------------------------------------------- */
 
-/** One row of the local-audio card: the key as the config spells it, the
-    backend fact (why it is real today), and the waiting state. */
-const LOCAL_AUDIO_ROWS: readonly { key: string; name: string; fact: string }[] = [
-  {
-    key: "voice.aec.enabled",
-    name: "回声消除",
-    fact: "后端已接：喂给打断监测的回声消除开关（重启后生效）",
-  },
-  {
-    key: "audio.input_device",
-    name: "输入设备",
-    fact: "后端已接：每次开麦与热插拔重开都按这个名字解析设备",
-  },
-  {
-    key: "audio.sample_rate",
-    name: "采样率",
-    fact: "后端守卫：采集链只跑 16000，配置里写别的值会被拒",
-  },
-];
+/** The 本机音频 card, wired (this leg, 2026-11-16): the read payload's three
+    current values render verbatim, and the two keys the write face owns
+    (voice_aec_enabled / audio_input_device, config_write_313.go) become real
+    controls riding the same performConfigWrite path as every other settings
+    field - the ticket-248 protected config.set setter, no second route.
+    The third key stays a read-only fact on purpose: audio.sample_rate is a
+    load-time 16000 guard (internal/config/validate.go refuses every other
+    value before a byte is written), so a control here would be ticket 83's
+    lie wearing a slider - the current number shows, the guard reason is
+    said, and nothing saves. AEC adds the capability dimension (ticket 452
+    AC#2): aecBuildAvailable=false greys the switch out and says so, because
+    "你想不想开" and "这枚二进制能不能" are two facts, not one. */
+function LocalAudioCard({
+  view,
+  busy,
+  run,
+  performWrite,
+}: {
+  view: ConfigView;
+  busy: string | null;
+  run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
+  performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
+}) {
+  // Draft state, seeded from the read's answered values. A null read renders
+  // the waiting rows below and keeps the controls out of the tree entirely.
+  const [aecDraft, setAecDraft] = useState<boolean>(view.voice.aecEnabled ?? false);
+  const [deviceDraft, setDeviceDraft] = useState<string>(view.voice.inputDevice ?? "");
+  const [aecFeedback, setAecFeedback] = useState<Feedback | null>(null);
+  const [deviceFeedback, setDeviceFeedback] = useState<Feedback | null>(null);
 
-/** The three local-audio keys the backend already reads for real, but the
-    panel cannot show or change yet: the config.get snapshot's voice payload
-    carries five keys only (pinned in config_313_test.go), none of them these
-    three, and the config.set whitelist has no write field for them either.
-    So this card is the honest WAITING state - the backend fact as words plus
-    "等快照" - never a guessed value, never a control that looks switchable.
-    When Go adds the snapshot keys and the write fields, this card graduates
-    to real controls; drawing them now would re-open the C-class lie. */
-function LocalAudioCard() {
+  const aecKnown = view.voice.aecEnabled !== null;
+  const deviceKnown = view.voice.inputDevice !== null;
+  const rateKnown = view.voice.sampleRate !== null;
+  // null = the leg did not answer the capability bit: keep the control rather
+  // than pretend an absence that was never measured. false = answered absence.
+  const aecBuildable = view.voice.aecBuildAvailable !== false;
+  const deviceShown =
+    view.voice.inputDevice === "" || view.voice.inputDevice === "default"
+      ? "default（跟随系统默认）"
+      : (view.voice.inputDevice ?? "");
+
+  function saveAec() {
+    void run("voice_aec_enabled", () =>
+      performWrite({ field: "voice_aec_enabled", value: aecDraft ? "true" : "false" }),
+    ).then(setAecFeedback);
+  }
+
+  function saveDevice() {
+    const v = deviceDraft.trim();
+    if (v === "") {
+      setDeviceFeedback({ tone: "error", text: "输入设备名不能为空；跟随系统默认请填 default" });
+      return;
+    }
+    void run("audio_input_device", () =>
+      performWrite({ field: "audio_input_device", value: v }),
+    ).then(setDeviceFeedback);
+  }
+
   return (
     <SettingsCard
       title="本机音频"
-      description="这三项的后端读者/守卫已接（真），但配置读口的快照还没有它们的当前值，写入路由也未接。快照补上之前这里显示等待态，不画能点但改不动的控件。"
+      description="三项显示配置里的真当前值；回声消除与输入设备可改可存（保存后重启生效），采样率是采集链的加载期守卫（只跑 16000），只显示不提供修改。"
     >
-      <div className="flex flex-col gap-1.5">
-        {LOCAL_AUDIO_ROWS.map((row) => (
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5" key={row.key}>
-            <span className="text-[12px] font-medium text-ink">{row.name}</span>
-            <span className="font-mono text-[10.5px] text-ink-3">{row.key}</span>
-            <span className="min-w-0 flex-1 basis-40 text-[11.5px] leading-[1.6] text-ink-2">
-              {row.fact}
-            </span>
+      <div className="flex flex-col gap-2.5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[12px] font-medium text-ink">回声消除</span>
+          <span className="font-mono text-[10.5px] text-ink-3">voice.aec.enabled</span>
+          <span className="min-w-0 flex-1" />
+          {aecKnown ? (
+            <>
+              <span className="text-[11.5px] text-ink-2">
+                当前：{view.voice.aecEnabled ? "开" : "关"}
+              </span>
+              {aecBuildable ? (
+                <Switch checked={aecDraft} label="回声消除开关" onChange={setAecDraft} />
+              ) : (
+                <StateTag text="本包无 AEC" tone="warn" />
+              )}
+              <Button
+                disabled={busy !== null || !aecBuildable}
+                onClick={saveAec}
+                size="sm"
+                variant="primary"
+              >
+                {busy === "voice_aec_enabled" ? COPY.saving : COPY.save}
+              </Button>
+            </>
+          ) : (
             <StateTag text="等快照" tone="neutral" />
+          )}
+        </div>
+        {!aecKnown ? (
+          <p className="text-[11.5px] leading-[1.6] text-ink-2">
+            后端已接：喂给打断监测的回声消除开关（重启后生效）。
+          </p>
+        ) : aecBuildable ? (
+          <p className="text-[11.5px] leading-[1.6] text-ink-3">
+            喂给打断监测的回声消除开关；写入走 config.set 的受保护写路径，重启后生效。
+          </p>
+        ) : (
+          <p className="text-[11.5px] leading-[1.6] text-orange">
+            这枚二进制没有编译回声消除（缺 webrtcap 构建标签），开关只能保存配置意图，当前不会生效。
+          </p>
+        )}
+        <FeedbackLine feedback={aecFeedback} />
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[12px] font-medium text-ink">输入设备</span>
+          <span className="font-mono text-[10.5px] text-ink-3">audio.input_device</span>
+          <span className="min-w-0 flex-1" />
+          {deviceKnown ? (
+            <span className="text-[11.5px] text-ink-2">当前：{deviceShown}</span>
+          ) : (
+            <StateTag text="等快照" tone="neutral" />
+          )}
+        </div>
+        {deviceKnown ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              aria-label="输入设备名"
+              className="h-[30px] w-[240px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
+              onChange={(e) => setDeviceDraft(e.currentTarget.value)}
+              placeholder="设备名（default = 跟随系统默认）"
+              value={deviceDraft}
+            />
+            <Button disabled={busy !== null} onClick={saveDevice} size="sm" variant="primary">
+              {busy === "audio_input_device" ? COPY.saving : COPY.save}
+            </Button>
+            <span className="min-w-0 flex-1 basis-40 text-[11px] leading-[1.6] text-ink-3">
+              每次开麦与热插拔重开都按这个名字解析设备；解析不到会在开麦时按名拒绝并列出在场端点。
+            </span>
           </div>
-        ))}
+        ) : (
+          <p className="text-[11.5px] leading-[1.6] text-ink-2">
+            后端已接：每次开麦与热插拔重开都按这个名字解析设备。
+          </p>
+        )}
+        <FeedbackLine feedback={deviceFeedback} />
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[12px] font-medium text-ink">采样率</span>
+          <span className="font-mono text-[10.5px] text-ink-3">audio.sample_rate</span>
+          <span className="min-w-0 flex-1" />
+          {rateKnown ? (
+            <span className="text-[11.5px] text-ink-2">当前：{view.voice.sampleRate} Hz</span>
+          ) : (
+            <StateTag text="等快照" tone="neutral" />
+          )}
+          <StateTag text="守卫·只读" tone="neutral" />
+        </div>
+        <p className="text-[11.5px] leading-[1.6] text-ink-3">
+          后端守卫：采集链只跑 16000，配置里写别的值会被加载闸按名拒绝；本页不提供修改，也不写坏值。
+        </p>
       </div>
     </SettingsCard>
   );

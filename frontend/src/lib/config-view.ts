@@ -30,7 +30,13 @@
                        source, null = not answered), credentialSet,
                        credentialError.
      voice             cloudASRChain / cloudTTSChain (null = not answered),
-                       realtimeEnabled / realtimeProvider / realtimeModel.
+                       realtimeEnabled / realtimeProvider / realtimeModel, and
+                       the 本机音频 half (aecEnabled / aecBuildAvailable /
+                       inputDevice / sampleRate). Those four are reader-gated
+                       on the Go side (nil pointer = the key stays OFF the
+                       wire), so null here means "the leg did not answer" - a
+                       state the page renders as 等快照, never folded into a
+                       zero value like "AEC off" or "device default".
 
    WHAT NEVER ARRIVES: no credential value and no redacted tail of one - the
    reference name is the whole of what a page may see.
@@ -65,13 +71,31 @@ export interface ConfigViewProvider {
   credentialError: string;
 }
 
-/** The voice half: chains and the realtime head. Names and ids only. */
+/** The voice half: chains, the realtime head, and the 本机音频 half. Names and
+    ids only. The four 本机音频 keys mirror Go's voicePayload (config_handlers.go):
+    a nil pointer there stays OFF the JSON wire, so `null` here is "the leg did
+    not answer" - the page renders that as the waiting state and never as a
+    zero value dressed up as a fact. sampleRate rides as a FACT (the load-time
+    16000 guard), not a control: the write face deliberately has no field for
+    it (config_write_313.go's header), and the page must not offer one. */
 export interface ConfigViewVoice {
   cloudASRChain: string[] | null;
   cloudTTSChain: string[] | null;
   realtimeEnabled: boolean;
   realtimeProvider: string;
   realtimeModel: string;
+  /** voice.aec.enabled's answered value, or null = not answered. */
+  aecEnabled: boolean | null;
+  /** The compile-time capability bit (ticket 452 AC#2): true = this binary
+      really can cancel echo, false = it cannot (the shipped shape). Rides
+      beside aecEnabled and never instead of it - the page needs both to say
+      "你想开，但这枚二进制做不到" and must grey the switch out when false. */
+  aecBuildAvailable: boolean | null;
+  /** audio.input_device's answered value, or null = not answered. */
+  inputDevice: string | null;
+  /** audio.sample_rate's answered value (the chain's 16000), or null = not
+      answered. A fact, not a control. */
+  sampleRate: number | null;
 }
 
 export interface ConfigView {

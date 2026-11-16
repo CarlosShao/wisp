@@ -64,6 +64,12 @@ const UNCONFIGURED: ConfigView = {
     realtimeEnabled: false,
     realtimeProvider: "",
     realtimeModel: "",
+    // 本机音频: null = the leg did not answer (the wire omits the key) - the
+    // waiting rows, the same state a fresh config.get with no leg produces.
+    aecEnabled: null,
+    aecBuildAvailable: null,
+    inputDevice: null,
+    sampleRate: null,
   },
 };
 
@@ -109,6 +115,12 @@ const CONFIGURED: ConfigView = {
     realtimeEnabled: false,
     realtimeProvider: "stepfun",
     realtimeModel: "示例模型-1",
+    // 本机音频: answered values, in the shapes the Go leg sends
+    // (aecBuildAvailable=false is the shipped build's truth - no webrtcap tag).
+    aecEnabled: false,
+    aecBuildAvailable: false,
+    inputDevice: "default",
+    sampleRate: 16000,
   },
 };
 

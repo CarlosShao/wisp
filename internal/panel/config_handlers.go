@@ -122,6 +122,14 @@ func refusedLockedFamily(field string) (family string, why string) {
 				return f, "档位与放宽类键只由带原生二次确认的那条路写：权限档位走 panel.mode.request（变宽要那张 L2 卡）"
 			case "fs.":
 				return f, "可读写根的放宽欠同一张 L2 卡，由那条确认腿落盘，不走设置页的写入腿"
+			case "audio.":
+				// The audio family is NOT a security-locked family; its flat leaf
+				// audio_input_device IS on the write face (config_write_313.go).
+				// The dotted spelling is refused with the route's own truth, so
+				// the page is told where the writes live and why sample_rate has
+				// no field at all, instead of a security sentence that would lie
+				// about both.
+				return f, "audio 段不走点路径：可写的只有设置页的平面字段 audio_input_device；audio.sample_rate 是加载期守卫（采集链只跑 16000，写别的值会被配置加载按名拒绝），没有也不设写入字段"
 			default:
 				return f, "该段属于安全锁定族，放宽必须走带原生二次确认的那条路，不走设置页"
 			}
