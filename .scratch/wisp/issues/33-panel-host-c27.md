@@ -76,7 +76,7 @@ declaration consumed by 37's native card.
 - [ ] Focus round-trip: editor → panel → hide → focus back in editor (automated + manual).
 - [x] Runtime-missing fixture (rename/mask loader) → fallback event, app alive, native L2 flag on.
 - [x] CSP present on served documents (response inspection) with connect-src 'none'.
-- [ ] **AC#7（从票 35 快照泵 r1 验收转入，2026-09-25，来源 `35-panel-snapshot-pump-r1-accept-r1.md` F-PUMP-4）**：
+- [x] **AC#7（从票 35 快照泵 r1 验收转入，2026-09-25，来源 `35-panel-snapshot-pump-r1-accept-r1.md` F-PUMP-4）**：
       面板真的能看到快照之后，`SnapshotPump.Snapshot()` 那份包**跨两个瞬间**的形状要有一条会响的检——
       它不持泵锁地先后读 `Verdicts()` 与 `Results()`（`internal/panel/pump.go`），而今天四个读数点各自有锁、
       `SnapshotPump.mu` 只护计数器，所以 `-race` 两包全跑**是干净的**（实测 `ok 4.809s`／`ok 75.715s`、0 DATA RACE）。
@@ -84,7 +84,7 @@ declaration consumed by 37's native card.
       它要有 hook 的时刻，正是"有人在生产里读这份包的全量字节"那天——也就是本票把窗口接上的那天。
       判据：本票落地 `Marshal()` 的第一枚**生产**调用者之后，造一发"两个触发点之间状态变了"的用例，
       它必须能红（把 `Snapshot()` 改成持锁一次性快照 ⇒ 该发由红转绿）。
-- [ ] **AC#8（从同一份验收转入，来源 §7 第 3 条 ＋ F-PUMP-6）**：本票接上出站通道时，**顺手量一次
+- [x] **AC#8（从同一份验收转入，来源 §7 第 3 条 ＋ F-PUMP-6）**：本票接上出站通道时，**顺手量一次
       "哪些泵里的分支今天零执行"**并给它们用例或删掉。今天已知的两枚：
       ⓐ `cmd/wisp/panel_pump.go:186-192` 那条"摘要超过 440 字符就丢 ids"的分支，在 13 发变异＋工作树那发里
       **从未被走到**（落盘记录的 `pending=` 字段只出现过一枚值）；
@@ -441,3 +441,12 @@ CI／新鲜检出里 embed 只有 `.gitkeep` ⇒ 走 not-built 分支，那一�
 **我的处置**：`:74` 记 `A1901` 留开；**冷 P95 这次是「机器上那颗 Wisp 球 PID 49348 在跑」的干扰态读数** ⇒ 等机主关球后在安静桌面复量再裁（⛔ 拿干扰态数字当定论，也⛔ 拿它当"已达标"）。
 
 - [2026-11-16 13:4x +08] agent=`33-lane3`（写腿；只 commit 不 push；基线 `d28826829`；`cmd/wisp` 终态净 0 行）did=**`:76`／AC#7／AC#8 三格读数＋牙，AC 框一枚未碰**。① **`:76` automated 半＝环境红具名跳过**：尺 `TestAC4FocusReturnToPriorWindowGap33r5` 一字未改，FAIL 5.26s，读数（逐字）＝foreground before 0x94e0122｜editor 0x8aa0cf6｜prior 0x94e0122｜after Show 0x94e0122｜panel hwnd 0x115705d8｜prevFocus 0x94e0122｜after Hide 0x94e0122（SetForegroundWindow 1，SetFocus 0）——采样时前台属**外进程 Weixin pid 44296**（球 49348 在跑但没占前台），editor 的 SetForegroundWindow 被拒 ⇒ 往返第一环无 subject，断言 1 红＝前台锁环境红；断言 2（prevFocus≠面板）与断言 3（Hide 后回 prior，还原成功）**实测 PASS**。与 `:74` 同队等安静桌面复量；manual 半留机主（具名写在证据件 §1）。② **AC#7 能力链**（判据按派单改能力型，⛔ 不数 Marshal() 调用者，现量仍 0）：全量包字节生产链＝publishPanelSnapshot（`run.go:1347`/`:2071`/`resident_windows.go:666` 装配）→ `panel_pump.go:511` Publish（`internal/panel/pump.go:572` Marshal）→ `run.go:1337` Out=bookPanelSnapshotBlocking 留存（`panel_pump.go:409-412`）→ **`panel_pump.go:523` → `panel_snapshot_deliver_329.go:95` lastPanelSnapshot()＝生产读者** → `:105` evalPanelJS 逐字嵌字节 → `panel_host_windows.go:661`→`:728`→`:772` w.Eval → 页面 `window.wispOnPanelSnapshot`；常驻接线 `resident_windows.go:618-620`。能力尺 `TestBookedSnapshotReachesHostBitForBit329` 两发 PASS（2.98s/2.24s）；**MUTANT-A**（摘生产读者）⇒ RED 双点（宿主收 `""`），marshal 侧与 state-pin 保持绿＝归因干净；F-PUMP-4 撕裂三发全 PASS（发现维持：泵锁关不掉撕裂）。③ **AC#8**：ⓐ clamp 分支绿尺 4/4 PASS＋**MUTANT-C** RED 双牙且短包负控同发 GREEN＝负控分得开（r14 M1 独立复量）；ⓑ **EvToolStart 首个生产发射者复核在位**＝`internal/agent/loop.go:651-662`（llm.EvToolCallStart→EvToolStart），消费者 `run.go:2747-2754`，红尺 `Test145RunningUsageAndDoneTravelTheWire` PASS、**MUTANT-B**（摘整支 case）⇒ RED `:174` running=[]；**整包普查一次**（internal/panel 86.6%，ok 25.3s）新钉两枚零执行真行为分支并各补会响用例：`pump.go:830-836` Close 未知键（MUTANT-D RED）＋`pump.go:414-419` credential 空答→unknown（MUTANT-E RED），新件 `internal/panel/ac8_zero_branch_33lane3_test.go`；守卫块逐枚分类留置。④ 门禁：载具三发（每发前 wisp.test＝空）、`ok 3.00s` 7/7 复认发、internal/panel 整包 ok、vet rc=0、d22scan rc=0、gofmt 新件净（⚠ `approval_always.go` 的 gofmt flag＝HEAD 既存，未碰）；仪器坑一枚已记（PowerShell 把 `-test.run` 在点号拆开，走 `bash -c` 整条）。未完＝`:76` 决定性绿（等安静桌面）、三格不勾（勾归非实现者）、`:74`/AC#10-scale 未动。文件=`docs/evidence/s1/33-lane3-focus-ac78.md` ＋ `internal/panel/ac8_zero_branch_33lane3_test.go` ＋ 本票面本行
+
+---
+
+## lane-3 收件（2026-11-16 13:4x，`84d588cdb`，件 `docs/evidence/s1/33-lane3-focus-ac78.md` 10831 B）
+
+**尺1** `84d588cdb` 在（票面进度＋证据件＋`internal/panel/ac8_zero_branch_33lane3_test.go`）。**尺2** 件在 10831 B。**尺3 我自己复跑**：`TestBookedSnapshotReachesHostBitForBit329` **PASS 2.71s**（载具）；`TestAC7TornPacketIsObservable`／`TestAC7PumpLockDoesNotCloseTheTear`／`TestAC7PumpLockGuardsOnlyTheCounters` **三枚全 PASS**（`internal/panel`，0.09s）；`TestAC8CloseUnknownKeyStillRecordsADoneChunk33lane3`／`TestAC8EmptyCredentialReaderAnswersUnknownNotSilent33lane3` **两枚 PASS**（`internal/panel`）。
+
+**本波翻**：AC#7（全量包字节生产链逐字：`publishPanelSnapshot`→`panel_pump.go:511 Publish`→`pump.go:572 Marshal`→`panel_pump.go:523`→`panel_snapshot_deliver_329.go:95 lastPanelSnapshot()`→`:105 evalPanelJS`→`panel_host_windows.go:661/728/772 w.Eval`→页面 `window.wispOnPanelSnapshot`；**MUTANT-A 摘生产读者⇒RED 双点**）、AC#8（ⓐ clamp 4/4＋MUTANT-C RED；ⓑ `EvToolStart` 发射者在位 `loop.go:651-662`→`run.go:2747`，MUTANT-B 摘 case⇒RED `running=[]`；整包 `-coverprofile` 落实"量一次"，两枚零执行真分支各补会响用例＋MUTANT-D/E 各自 RED）。
+**⛔ `:76` 不翻（环境红，具名跳过）**：采样时前台属**外进程 Weixin pid 44296** ⇒ editor 的 `SetForegroundWindow` 被拒，往返第一环无 subject。可判事实仍到手：`prevFocus≠面板`（宿主没把自己记成来处）＋`Hide 后回前台回 prior`（跨进程还原成功）两枚 PASS。**留 `:74` 与 `:76` 同队，等机主关球/安静桌面复量**；AC#10-scale 仍缺生产者。
