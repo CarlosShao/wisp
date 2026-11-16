@@ -1,0 +1,17 @@
+# 派单存档（先存档再发）—— 票 49 Session grants(D45-2) 六格（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/49-session-grants-d45-2.md` 全文（6 格全做）。**先现读**：`grep -rn "grant\|Grant" internal/agent internal/panel internal/store --include=*.go | head -30`（⛔ 照票面 9-19 行号当今天）。
+逐格（**行为牙**，⛔ 源码字符串断言）：
+1. **Gant lifecycle**：create → 后续同类调用**静默通过**（每条都写审计行）→ session 结束失效。给逐调用审计行读数。
+2. **Revoke 立即生效**：撤grant 后下一次受门控调用**重新弹卡**（给红/绿两读数）。
+3. **Limits**：①**L2 永不被 grant 自动放行**（给一枚"有 grant 也仍弹卡"的牙）②**tainted exfil 无视 grant 反而升级**③config 层限制（若票面有具体项，逐项给）。
+4. **input.type**：按进程隔离；"all-apps"选项的危险流程；目标切换需重新确认（三支各一枚牙）。
+5. **Batch＋grant**：10 操作批量＋opt-in grant ⇒ **一张卡** ⇒ 整个 pattern 一次授予（给卡数＝1、授权生效读数的牙）。
+6. **Audit**：每笔 grant-backed 执行，`tool_call` 行里有 `grant_id` 关联（给 SQL 读数）。
+**硬约束**：⛔ `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 dist 字节。**若某格要改 C-## 契约文字 ⇒ 停下具名报**（如 D45 语义），⛔ 自己改契约。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等。⛔ 裸跑（A1888）。
+⚠ **整包已知死法**：`./cmd/wisp` 会在 WebView2 区段 **exit 139**（＝票 450 既定未完成项，非你引入）⇒ 按 **A1893**：截断点那枚单跑复量；**A1882** 判读＝锚整包未命中时改用载具单跑三枚锚并如实写。
+**A1880** 牙要行为；**A1884** `sh` 门用 `D:\work\soft\Git\bin\bash.exe`。⚠ 球 PID 49348 在跑 ⇒ AC4Focus/AC246 环境红，别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/agent/**`、`internal/store/**`、`internal/panel/**`、`docs/evidence/s1/49-*`。
+回话第一行＝commit hash ＋「六格各自最硬的那条读数」＋「哪格要改契约/没打完卡在哪」。
