@@ -1,0 +1,79 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll (sha256 ok)
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll (sha256 ok)
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll (sha256 ok)
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-16T11:01:40.221+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+flag provided but not defined: -test
+Usage of D:\work\workspace\projects plans\Wisp\.scratch\wisp\stage-cli\wisp.test.exe:
+  -test.artifacts
+    	store test artifacts in test.,outputdir
+  -test.bench regexp
+    	run only benchmarks matching regexp
+  -test.benchmem
+    	print memory allocations for benchmarks
+  -test.benchtime d
+    	run each benchmark for duration d or N times if `d` is of the form Nx (default 1s)
+  -test.blockprofile file
+    	write a goroutine blocking profile to file
+  -test.blockprofilerate rate
+    	set blocking profile rate (see runtime.SetBlockProfileRate) (default 1)
+  -test.count n
+    	run tests and benchmarks n times (default 1)
+  -test.coverprofile file
+    	write a coverage profile to file
+  -test.cpu list
+    	comma-separated list of cpu counts to run each test with
+  -test.cpuprofile file
+    	write a cpu profile to file
+  -test.failfast
+    	do not start new tests after the first test failure
+  -test.fullpath
+    	show full file names in error messages
+  -test.fuzz regexp
+    	run the fuzz test matching regexp
+  -test.fuzzcachedir string
+    	directory where interesting fuzzing inputs are stored (for use only by cmd/go)
+  -test.fuzzminimizetime value
+    	time to spend minimizing a value after finding a failing input (default 1m0s)
+  -test.fuzztime value
+    	time to spend fuzzing; default is to run indefinitely
+  -test.fuzzworker
+    	coordinate with the parent process to fuzz random values (for use only by cmd/go)
+  -test.gocoverdir string
+    	write coverage intermediate files to this directory
+  -test.list regexp
+    	list tests, examples, and benchmarks matching regexp then exit
+  -test.memprofile file
+    	write an allocation profile to file
+  -test.memprofilerate rate
+    	set memory allocation profiling rate (see runtime.MemProfileRate)
+  -test.mutexprofile string
+    	write a mutex contention profile to the named file after execution
+  -test.mutexprofilefraction int
+    	if >= 0, calls runtime.SetMutexProfileFraction() (default 1)
+  -test.outputdir dir
+    	write profiles to dir
+  -test.paniconexit0
+    	panic on call to os.Exit(0)
+  -test.parallel n
+    	run at most n tests in parallel (default 12)
+  -test.run regexp
+    	run only tests and examples matching regexp
+  -test.short
+    	run smaller test suite to save time
+  -test.shuffle string
+    	randomize the execution order of tests and benchmarks (default "off")
+  -test.skip regexp
+    	do not list or run tests matching regexp
+  -test.testlogfile file
+    	write test action log to file (for use only by cmd/go)
+  -test.timeout d
+    	panic test binary after duration d (default 0, timeout disabled)
+  -test.trace file
+    	write an execution trace to file
+  -test.v
+    	verbose: print additional output
+FAIL  github.com/CarlosShao/wisp/cmd/wisp	0.00s

@@ -1,0 +1,31 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll (sha256 ok)
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll (sha256 ok)
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll (sha256 ok)
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-16T11:03:18.319+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2CredentialSentinelAppearsInNoArtifact
+--- PASS: TestAC2CredentialSentinelAppearsInNoArtifact (0.04s)
+=== RUN   TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere
+--- PASS: TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere (0.01s)
+=== RUN   TestAC3CredentialLivesInOneStoreAndConfigKeepsOnlyARef
+time=2026-11-16T11:03:18.397+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestAC3CredentialLivesInOneStoreAndConfigKeepsOnlyARef (0.03s)
+=== RUN   TestAC2SharedEnvelopeCannotCarryTheCredentialValue
+--- PASS: TestAC2SharedEnvelopeCannotCarryTheCredentialValue (0.00s)
+=== RUN   TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope
+--- PASS: TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope (0.00s)
+=== RUN   TestAC1InboundLegAnswersSettingsRouteEndToEnd
+time=2026-11-16T11:03:18.463+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+--- PASS: TestAC1InboundLegAnswersSettingsRouteEndToEnd (0.06s)
+=== RUN   TestAC1OtherDoorsStillRefuseByNameAfterTheSettingsSocket
+--- PASS: TestAC1OtherDoorsStillRefuseByNameAfterTheSettingsSocket (0.01s)
+=== RUN   TestAC7InvalidSettingsValueIsRefusedBeforeTheFile
+--- PASS: TestAC7InvalidSettingsValueIsRefusedBeforeTheFile (0.01s)
+=== RUN   TestAC2SnapshotReportsRefWithoutBlobAsAPartState
+time=2026-11-16T11:03:18.507+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestAC2SnapshotReportsRefWithoutBlobAsAPartState (0.02s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	0.00s
