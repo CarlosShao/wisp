@@ -64,6 +64,6 @@
 
 ## 7. 本件 commit 越界自核
 
-`git show --name-only --format=<hash>` ＝ 仅 `docs/evidence/s1/305-livedoc-verdict.md` 一行（提交后现量回填）。
+本件首笔＝`f7909e628e14534e14ef2f3c3f9147819272de2f`；`git show --name-only --format=f7909e628` 现量＝**仅 `docs/evidence/s1/305-livedoc-verdict.md` 一行**。本节回填是第二笔（追加，⛔ amend），pathspec 同一枚件。
 
-—— 305-r1（agent-84），commit hash 见首行回话。
+—— 305-r1（agent-84），commit `f7909e628`。
