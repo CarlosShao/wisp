@@ -1,0 +1,20 @@
+# 派单存档（先存档再发）—— 票 248 设置写入路由（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md` 全文（含「编排者登记」若有）。**现量**：票 7 勾／5 未勾；未勾＝AC#2、AC#4、AC#8、AC#9、AC#10。
+
+**为什么这票是四张语音卡的头**：机主 10-13 产品决定（票 313）「默认 stepfun＋**全部在界面上配**＋语音模型走 API」；而入向白名单今天**零枚** config/凭据方法 ⇒ 页面上「保存」到不了磁盘。⛔ 别只做一半。
+
+**本轮要做（按序，打不完照实说打到哪）**：
+1. **设置写入路由（主体）**：`cmd/wisp/panel_inbound.go` 的派发表加 `config.get`／`config.set`（或本仓既有命名；照 `internal/panel` 的既有 method 风格）。写 `config.toml` 走 **D36 三档生效级别**，⛔ 自造第五档。**凭据（api key）单独走既有 secret 存储**（`cmd/wisp/secret.go` 那套），⛔ 明文进 config.toml、⛔ 明文进日志。
+2. **AC#9（现在可做）**：`frontend/dist` 是**故意不入库**的（票 77 AC#1，`frontend/embed.go` 注释），入的是构建步骤 `scripts/build.ps1:86-88`。判据＝**能力型**：先 `npm --prefix frontend run build`（node 在 `D:\work\server\node24`，我实测 rc=0／1.27s），再在 Go 侧打开 `frontend.Dist()` 数条目＋核关键入口文件（`index.html`、`assets/*.js`、`assets/*.css` 都在），⛔ 问构建退出码、⛔ 问文案。跑完**删掉本地产物**（只 `dist/*` 非 .gitkeep，⛔ 提交 dist 字节）。
+3. **AC#2**：把一枚可识别哨兵值喂进写路径，然后 `grep -R` 全仓日志与快照产物 ⇒ **0 命中**（⛔ 只断言函数返回值）。
+4. **AC#8**：票面与回执文案⛔ 出现"保存即生效"（`[llm]`／endpoint 类字段同一次运行内不重建，只按"重启后生效"判）。
+5. **AC#10**：常驻那条腿吃不到 `[risk]` 两项配置 —— 按票面判据补/或具名写清归口。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 改 C17 白名单形状（那是票 35 已收口的，⛔ 反向动它）。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 每枚牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/panel/**`（method 表那一半）、`internal/config/**`（只读优先）、`docs/evidence/s1/248-*`。⛔ `frontend/**` 源码本轮不动（只跑构建）。
+回话第一行＝commit hash ＋「新增 method 各落在 file:line」＋「写 config.toml 的档位与凭据落点」＋「AC#9 的条目数读数＋关键文件清单」＋「哨兵 grep 0 命中的命令与输出」＋「哪些 AC 勾了/哪条没打完结」。没干完写「未完成，卡在哪」。
