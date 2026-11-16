@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）—— 票 215a 插件清单／开关／生效与否（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+# ⚠ 只做 215a（插件半）。215b（技能）要先补配置面＝动 D36 section 树＝契约面，须机主批准，本轮⛔ 不碰。
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/215-composer-plus-menu-skills-plugins-inventory...md` 全文（第 5 行起的「现量」更正那节务必读：**插件 8 处配置键、技能 0 处**；本轮只做**插件半 215a**）。
+
+**要交付（AC#1-AC#4 全按票面判据）**：
+1. **AC#1 可枚举清单＋真装配读者**：给出一份插件清单（名字／版本／开没开／**这一轮到底装配没装配**）。判据＝**改前 grep 某键零读者 ⇒ 改后 ≥1 个生产读者**（file:line 给点）。⛔ 拿"配置里写着 true"当"生效"。
+2. **AC#2 正控（必须有）**：塞一条「配置 true、装配里没人读」的假项 ⇒ 判据**必红**（这一形＝`A408` 的"文案说在跑、其实没人读"）。牙要行为，⛔ 源码字符串断言。
+3. **AC#3 开关跨档位一致**：菜单里开关 ⇒ 走**现成配置写路径**（票 248 的 `config.set` 受保护 setter，⛔ 另造新路）；hot 档立即生效，需要重启的**在清单上写明"这一枚要重启"**，⛔ 静默假装生效。**开关动作本身要进审计（三档都写）**。
+4. **AC#4 外部文本不可信**：插件说明里写"以后都允许"⇒ 档位与 `allowed_dirs` **不变**（复用票 200 hostile-file 判据形状）。
+5. **前端**（前端归本编队，可改）：加号菜单第三类＝插件清单页（列名＋开/关＋"本轮生效/需重启/未生效"三态标签），⛔ UI emoji（d22scan 扫）；改完 `npm --prefix frontend run build` rc=0（node 在 `D:\work\server\node24`）＋`typecheck` rc=0。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ **拆掉 `internal/config/unwired.go` 那套"未接线键响亮拒收"**（本仓强项，`A408`）；⛔ 接 MCP（那是 D13 取舍）；⛔ 做 215b（技能配置面要机主批准）；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 是环境红，别当自己弄坏、别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`、`internal/plugin/**`（只读优先，缺读者才补）、`frontend/src/**`、`docs/evidence/s1/215-*`。
+回话第一行＝commit hash ＋「清单枚举出几枚插件、每枚的装配读者 file:line」＋「AC#2 假项正控红句逐字」＋「开关走哪条写路径 file:line＋审计落点」＋「前端清单页三态标签原文」＋「npm build/typecheck rc」＋「AC#1-4 哪些勾了/哪条没打完」。没干完写「未完成，卡在哪」。
