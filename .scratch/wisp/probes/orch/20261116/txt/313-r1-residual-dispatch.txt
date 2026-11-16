@@ -1,0 +1,21 @@
+# 派单存档（先存档再发）—— R1 复审残留两条：undefined 崩页＋boot 三条阈值只建模一条（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**复审腿 `auditR1recheck` 判 R1 用户路径六跳全通（修好）、P1 有牙（M1/M2 实测红）、P2 合规、P3 可达**；但抓到**两条残留**，本单只修这两条，⛔ 回退已修好的东西。
+
+**残留①（可致崩，P0）**：`frontend/src/components/model-settings.tsx:672` 与 `frontend/src/components/voice-settings.tsx:122` 只判 `=== null`；而 Go 侧 `internal/panel/config_handlers.go:765` 用 `omitempty` ⇒「腿没答」是**键缺席（undefined）**不是 null。复审实测：`PROBE-WIRE-ROW name=emptyprov modelCapabilities present=false`，Node 24.21.0 跑原式 **THROWS: Cannot read properties of undefined**；且零模型 provider 行出厂可达（`internal/config/settings_313.go:154` 建行可不带模型 id）⇒ **「等快照」态不可达＋两页会崩**。
+**要修**：把两处判据改成**同时认 null 与 undefined/键缺席**（三态：有值／腿没答／真空），并给一枚**行为牙**：喂一枚「provider 行存在但 modelCapabilities 键缺席」的载荷 ⇒ 页面渲染「装配未判（等快照）」且**不抛**；喂正常值 ⇒ 两枚位正确显示。（⛔ 用 `any` 吞掉——要有判据）
+
+**残留②（会说假话）**：boot 装配有**三条**阈值，页面只建模了一条（能力位）。复审实测两条：`PROBE-KEYREF err=auth: … resolving api_key_ref for provider "stepfun" failed (Unconfigured)`、`PROBE-DISABLED err=config: … names a model disabled in the catalog (enabled=false)`。
+**要修**：卡片状态/回执**把这三条都建模**：
+- 能力位缺 ⇒ `装配不了·缺能力位`（已有）
+- `api_key_ref` 未配 ⇒ `装配不了·缺 API Key`（点名哪枚 provider；语音卡**要渲染 credentialError**，现在没渲染）
+- 模型 `enabled=false` ⇒ `装配不了·模型已停用`（点名哪枚）
+- 三条都过 ⇒ `已接入·重启生效`；快照没答 ⇒ 装配未判
+**判据（行为牙）**：三种"能装配的假象"各喂一次 ⇒ 标签都**不许**是「已接入」；三条全过才允许。⛔ 只在前端猜 —— 若某条判据 Go 侧读面没有，**先补读面**（file:line 交回），⛔ 编个前端常量了事。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽已有断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）；⛔ UI emoji（d22scan 扫）；`npm --prefix frontend run build` rc=0（node 在 `D:\work\server\node24`）＋`typecheck` rc=0。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 是环境红，别当自己弄坏、别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`（读面若缺）、`frontend/src/**`、`docs/evidence/s1/313-*`。
+回话第一行＝commit hash ＋「undefined/null 三态改在哪 file:line＋崩页牙名」＋「三条阈值各自的读面 file:line（新补的点名）＋三枚假象红句」＋「四态标签最终文案」＋npm build/typecheck rc。没干完写「未完成，卡在哪」。

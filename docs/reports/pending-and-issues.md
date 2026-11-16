@@ -37668,3 +37668,9 @@ AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean
 77abb659b：能力位三面（写 settings_313.go:207/213→writeOneKey；名册 config_write_313.go:111-112；读 config_handlers.go:291；前端 model-settings.tsx:680/695 两枚 Switch）。牙 Test313CapabilityBitFlipsAssemblyOutcome：默认 false ⇒ lacks capabilities.audio_in；写入 true 后**同链装配成功**。255 新牙＝go/parser 活调用图（config_receipt_255_test.go:970）。SLO 附录 E 补三句取样态。
 **我自己复跑 3/3 PASS rc=0**。
 **教训（本轮第 4 次同族）**：我上一轮说"两张卡真接上了"——链路真、**用户路径假**。审计一拆就破。⇒ 报"能用了"必须**走一遍用户路径**（界面能不能声明前提），不是"拆了会红"。
+
+## A1909（11-16 17:2x）：**复审：R1 六跳全通＝修好；但抓出两条残留（一条会崩页）**
+
+uditR1recheck（审计路由）判 **R1 修好／P1 有牙（M1 删装配点 FAIL、M2 孤立点 FAIL，go/parser AST 非字符串）／P2 合规／P3 可达**。它逐跳给了 file:line（界面 Switch model-settings.tsx:679-707 → 名册 config_write_313.go:111-112 → 门 config_handlers.go:453 → 落盘 panel_config_store.go:340-355 → setter settings_313.go:207/213 → 读面 :168-182 → boot cloudcatalog.go:95-102），并实测三枚牙 PASS。
+**两条残留**：①model-settings.tsx:672／oice-settings.tsx:122 只判 === null，Go 用 omitempty ⇒ 腿没答是 **undefined** ⇒ Node 实测 **THROWS**，且「等快照」态不可达（零模型 provider 行出厂可达）。②boot 有**三条**阈值（能力位／pi_key_ref 未配／模型 nabled=false），页面只建模一条 ⇒ 另两条会报「能装配」而 boot 拒（PROBE-KEYREF／PROBE-DISABLED 实测红句）。
+**处置**：派单 .scratch/wisp/probes/orch/20261116/txt/313-r1-residual-dispatch.txt 已存档即发。**这不是文案事**——①会让页面崩，②会让卡片再说一次假话。
