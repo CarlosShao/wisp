@@ -21,17 +21,22 @@
     "render:roster": "vite build --ssr scripts/render-task-roster.tsx --outDir node_modules/.tmp/rosterrender --logLevel warn && node node_modules/.tmp/rosterrender/render-task-roster.js",
     "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js",
     "render:model-settings": "vite build --ssr scripts/render-model-settings.tsx --outDir node_modules/.tmp/modelrender --logLevel warn && node node_modules/.tmp/modelrender/render-model-settings.js",
-    "render:shell77": "vite build --ssr scripts/render-shell-77.tsx --outDir node_modules/.tmp/shell77render --logLevel warn && node node_modules/.tmp/shell77render/render-shell-77.js"
+    "render:shell77": "vite build --ssr scripts/render-shell-77.tsx --outDir node_modules/.tmp/shell77render --logLevel warn && node node_modules/.tmp/shell77render/render-shell-77.js",
+    "render:history36": "vite build --ssr scripts/render-history-36.tsx --outDir node_modules/.tmp/history36render --logLevel warn && node node_modules/.tmp/history36render/render-history-36.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hast-util-sanitize": "^5.0.2",
     "liveline": "^0.0.7",
     "lucide-react": "^1.47.0",
     "motion": "^13.4.4",
     "radix-ui": "^1.6.7",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {

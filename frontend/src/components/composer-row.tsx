@@ -290,6 +290,15 @@ export function ComposerRow({
           </button>
         </div>
       ) : null}
+      {/* Dormancy, named (ticket 36): the usage triple rides the contract
+          ruler's REGISTERED Go-only keys - RunSection.usage exists on the Go
+          wire (run_feed_145.go:171, the EvUsage accumulator) but panel.ts
+          declares no interface for it (composer_test.go:233 registers the
+          gap; declaring it is red until the Go leg deletes the ledger row in
+          the same commit). Feeding ContextMeter from it would mean declaring
+          the key - the move that belongs to the Go wave, per this dispatch.
+          The meter stays fed with the empty object, which renders the named
+          "还没收到数据" sentence (context-meter.tsx), never zeros. */}
       <ContextMeter usage={{}} className="mb-1.5" />
       <PromptBar
         attachments={stored.map((a) => ({ key: a.id, name: a.name }))}

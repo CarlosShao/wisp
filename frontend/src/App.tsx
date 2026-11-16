@@ -39,16 +39,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Activity, Command, Moon, PanelLeft, PanelRight, PanelRightClose, Sun } from "lucide-react";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { ComposerRow } from "@/components/composer-row";
-import { GitBranchChip } from "@/components/git-branch";
+import { GitBranchChip, GitBranchUnread } from "@/components/git-branch";
 import { MonitorPopover, type MonitorAgentRow } from "@/components/harness/monitor-popover";
 import { PaletteScreen } from "@/components/palette-screen";
 import { LineSidebar } from "@/components/react-bits/line-sidebar";
+import { ResultHistory } from "@/components/result-history";
 import { RightRail } from "@/components/harness/right-rail";
 import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
-import type { ComposerState, PanelSnapshot, TaskRosterSection } from "@/lib/panel";
+import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
   mode: { current: "unknown", names: [], l2ConfirmNames: [] },
@@ -109,6 +110,40 @@ export function monitorAgents(tasks: TaskRosterSection | undefined): MonitorAgen
     collapses to its icon rail. 640px is the DEFAULT panel width, not an edge
     case - see the header. */
 const SIDEBAR_COLLAPSE_BELOW = 860;
+
+/** Whether the run feed (ticket 145) carries anything renderable: ended tool
+    rows, reasoning text, the classified error or the stuck sentence. The
+    running/usage/done dimensions are the contract ruler's registered Go-only
+    keys (internal/panel/composer_test.go:233) - they are NOT consulted here;
+    naming the gap in the report is this wave's honest answer, not a fake
+    empty. */
+function runHasContent(run?: RunSection): boolean {
+  if (run === undefined) return false;
+  return run.tools.length > 0 || Boolean(run.reasoning) || run.error != null || run.stuck != null;
+}
+
+/** lib/panel's GitView is the declared wire shape (tickets 181/189/190;
+    internal/panel/git.go ReadGitForWorkspace fills it on the pipeline leg).
+    This projection is the chip's feed: kind/branch/worktrees/branches
+    verbatim, no second mapping. Before this existed the chip was fed a bare
+    empty object and every pushed git row died unseen (the same defect the
+    monitor feed's comment records for tasks). The chip's two write callbacks
+    stay no-ops on purpose: a checkout/new-worktree WRITE has no route - what
+    ticket 186 landed is panel.workspace.request, a scope narrowing, not a git
+    operation - and a button wired to a door that does not exist is the lie
+    the render-nav gate names. */
+function gitChipView(git: GitView): {
+  view: { current: string; isRepo: boolean; local: readonly string[]; worktrees: readonly { branch: string; path: string }[] };
+} {
+  return {
+    view: {
+      current: git.isDetached ? git.detachedSha : git.branch,
+      isRepo: git.kind === "repo",
+      local: git.branches,
+      worktrees: git.worktrees.map((w) => ({ branch: w.detached ? w.sha : w.branch, path: w.path })),
+    },
+  };
+}
 
 export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) {
   const composer = snapshot.composer ?? EMPTY_COMPOSER;
@@ -229,13 +264,20 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          {/* git branch. Reads its strings from the snapshot; a workspace that
-              is not a repo renders nothing at all rather than a chip. */}
-          <GitBranchChip
-            view={{ current: "", isRepo: false, local: [], worktrees: [] }}
-            onCheckout={() => undefined}
-            onNewWorktree={() => undefined}
-          />
+          {/* git branch. Ticket 181/190's composer.git section is the feed:
+              a repo shows its real branch; a non-repo shows nothing (the
+              chip's own rule); a snapshot with no composer.git (the
+              no-pipeline resident shape) shows the unread chip instead of a
+              fake empty - three states, never a guessed branch name. */}
+          {composer.git === undefined ? (
+            <GitBranchUnread />
+          ) : (
+            <GitBranchChip
+              view={gitChipView(composer.git).view}
+              onCheckout={() => undefined}
+              onNewWorktree={() => undefined}
+            />
+          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-0.5">
@@ -316,6 +358,15 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
           >
             <PanelSidebar
               activeSessionId={local.sessionId}
+              /* Dormancy, named (ticket 36): the 30-day history tree the
+                 ticket's history browser would feed has no engine on the
+                 wire - the snapshot carries no task-history section
+                 (internal/panel has no history reader; the SQLite
+                 task/transcript tables have no panel read face), and a
+                 panel.view.request route to ask for one is BANNED (Q-50 = 甲,
+                 lib/panel.ts's comment; reopening C17's whitelist needs human
+                 approval). So the groups stay an honest empty, not rows fed
+                 from nothing. */
               historyGroups={[]}
               onNewTask={() => setLocal((c) => ({ ...c, sessionId: null, view: "chat" }))}
               onOpenSettings={() => setLocal((c) => ({ ...c, settingsOpen: true }))}
@@ -325,6 +376,9 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               theme={local.dark ? "dark" : "light"}
               workspaceName="一缕"
               workspacePath={composer.workspace.set ? composer.workspace.canonical : "尚未收到工作区"}
+              /* Same engine gap as historyGroups: no session-list reader
+                 exists on the snapshot (ticket 166 owns the feed per
+                 panel-sidebar.tsx's own prop doc). */
               workspaceSessions={[]}
             />
           </div>
@@ -470,17 +524,18 @@ function Conversation({
           </div>
         ) : null}
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="mx-auto flex w-full max-w-[720px] flex-1 flex-col px-6">
-            {snapshot.results.length === 0 ? (
+          <div className="mx-auto flex w-full max-w-[720px] flex-1 flex-col px-6 py-5">
+            {/* Ticket 36's region. The placeholder stays the empty state of the
+                conversation column (the render-nav gate pins its sentences);
+                ResultHistory takes over the moment anything arrives - chunks
+                (sanitized markdown / caret) or run-feed rows (tools, error,
+                stuck, reasoning). runHasContent distinguishes "run key present
+                but nothing recorded" from content, so a fresh pipeline with
+                zero events still shows the placeholder, not a bare region. */}
+            {snapshot.results.length === 0 && !runHasContent(snapshot.run) ? (
               <ConversationPlaceholder />
             ) : (
-              <div className="flex flex-col gap-5 py-5">
-                {snapshot.results.map((chunk) => (
-                  <p className="text-[13px] leading-relaxed text-ink" key={chunk.correlationId}>
-                    {chunk.text}
-                  </p>
-                ))}
-              </div>
+              <ResultHistory results={snapshot.results} run={snapshot.run} />
             )}
           </div>
         </div>

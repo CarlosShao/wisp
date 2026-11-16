@@ -54,3 +54,16 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 > **本票 AC 的真数据 e2e 格仍等票 145/35/33 的字段与宿主，一格未勾、不由本程
 > 勾**；可视壳的 commit 链见票 77 进度追记（`424ac84`…`5e23d99`）与
 > `docs/reports/frontend-session-log-zcode.md` §1–§7。
+
+> **2026-11-16 22:1x 腿 1（agent-95，GLM 舰队五票顺序跑第 1 票；铁律 4 前端归本编队）**：
+> 工作状态面真接上了：`snapshot.run`（票 145 生产读面，cmd/wisp/run.go:1184/1281 装配、
+> :2729-2792 喂值）第一次有 UI 读者（`frontend/src/components/result-history.tsx`）；
+> 结果流完成态过 F2 白名单消毒（react-markdown+remark-gfm+rehype-sanitize，schema 收紧：
+> 减 img/div/input、href 协议收窄、class 全剥）；git chip 从喂死空对象改真读 `composer.git`。
+> 合同尺注册的 6 枚 Go-only 键（`internal/panel/composer_test.go:231-233`）**零造值**，
+> 摘注册→panel.ts 补声明的同 commit 流程写在
+> `docs/evidence/s1/36-result-history-panel-leg1.md` §4，归 Go 腿。
+> 新牙 `npm run render:history36`（四族 XSS 过产码消毒、真数据回显、注册键零造值、
+> 缺 reader 具名、git chip 走线）OK 0 失败；build/typecheck/lint/tokens:check rc=0，
+> render 仪器 8 枚全绿，d22scan clean。AC 勾框一律留给非实现者；留白格与具名缺引擎
+> 清单见证据件 §1/§3。
