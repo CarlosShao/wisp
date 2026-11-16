@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）—— 票 33 面板宿主 C27（写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/33-panel-host-c27.md` 全文（含我刚加的「编排者登记」），再读 `docs/specs/SPEC-08 §5.1`、D29、C27、D32 panel rows、D42#11。
+
+**为什么你是这一波的头**：`NewCloudChain` 全仓调用点 **0**；票 248（面板设置路由）票面 AC#4 逐字「在票 33 的宿主真起来之前这一格不许勾」。⇒ **33 不起来，机主设置页那四张卡永远是「占位·当前不生效」**。它的两个阻塞票 `07`／`12` 都已 `-done`。
+
+**要做**（按票面 AC 逐条，⛔ 自己发明范围）：
+1. C27 `PanelManager` 单例 + WebView2 窗口 + `embed.FS` 服务 `frontend/dist`。**注意**：`git ls-files frontend/dist` ＝ **1 个文件（`.gitkeep`）** ⇒ 今天 embed 匹配不到页面。⇒ **必须让"页面产物缺失"成为一条可判的红/具名跳过**（票 248 AC#9 的形状：能力型判据、不问文案、不问构建退出码、看 embed 后的文件系统条目数与关键入口文件），⛔ 拿"构建成功"当证据，⛔ 自己伪造页面（`frontend/**` 归机主外部 agent，本编队零写面）。
+2. 窗口生命周期与单例语义：第二次 create 返回同一个、关闭后可重建、进程退出不留悬挂窗口。
+3. **每一条 AC 都要行为牙**（A1880）：删掉/改坏被测行为要红，⛔ 只断言源码字符串。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`frontend/**`／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 改 C17 白名单（那是 248 的活）。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test`，有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888：会绑 System32 的 onnxruntime 1.17，21 枚假红）。
+**A1882** 整包读数带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等，停掉具名用自己的上限让它红；**A1893** 整包无声断掉先单跑那一枚复量。
+
+写面：`cmd/wisp/**`（本波只你一枚写腿）、`internal/panel/**`、`docs/evidence/s1/33-*`。
+回话第一行＝commit hash ＋「C27 单例/窗口/embed 三件各自的落点 file:line」＋「页面产物缺失那一条判据的红句原文」＋「窗口生命周期三发突变各自的红句」。没干完写「未完成，卡在哪」。
