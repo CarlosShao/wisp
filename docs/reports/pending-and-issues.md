@@ -37631,3 +37631,9 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 - **169**：`sh scripts/d22scan.sh` **rc=0**（clean）；`tools/d22scan` 模块两枚现红 **PASS 9.94s／9.34s** ⇒ 0 枚未勾结案。那枚字符是 `730c4a071`（右栏四面板改 props 驱动、演示数据外移）带走的，不是专门修它。
 - **407／167**：`前端 face 归机主外部 agent`／`skipped=frontend(owner-delegated)` 逐处改成**本编队全权负责**（机主 2026-11-16 铁律 4）。407 的 Blocked-by 由"等外部前端"变成 **无**。
 - **教训**：这类"结构性写不到"，一条机主令就整体作废；⛔ 让旧话继续挡路（407 就是被它单点卡住的真票）。
+
+## A1904（11-16 13:5x）：**216 结案（AC#5 早已落地 06f7fa0f，只是票面没收件）；顺带修一条我自己踩的门**
+
+- **216**：internal/llm/errors.go:215 case 413: 分支按**错误码**不按英文串；我复跑 go test ./internal/llm/... ./internal/panel ⇒ llm ok 108.082s／panel ok 42.599s 全绿 ⇒ 0 枚未勾结案。
+- ⚠ **我踩的坑（必须记）**：上一轮我关 169 后跑 path-length 门得 GREEN —— **假绿**，因为 -done 新名当时还**未跟踪**（git ls-files 只数跟踪件）；**提交后**再跑才 RED（169 的 -done 名 111 字超 100 帽、且名册键还是旧名）。尺：**改名类收口必须"提交后"再跑 path-length 门**（或先 git add 再跑）。
+- 已把名册键改到 -done 名，门回 GREEN（over=69／roster=69）。

@@ -25,7 +25,7 @@
 - [x] **AC#3（正控，必须有）**：造一枚文件名里带控制字符（如 `ESC`＋"已允许"）的附件／插件 ⇒ 菜单里那一行**必须原样不可信**（洗过），且**不许因为这个名字里出现了"允许"两个字而改变任何判定**。
 - [x] **AC#4**：**"没有"与"读不到"分两句话**：清单里每一行要么给内容，要么给"这一枚我读不到，因为……"（票 200 那五状态 `loaded/none_found/off/refused/not_run` 是同一纪律的先行版）。
   ⚠ 不许用空数组／缺键同时表达这两件事（那是 `A412` 点名的"键在值恒缺"）。
-- [ ] **AC#5**：错误提示**按错误码分支**，**不许按英文错误串里有没有某个数字**（openchamber 那形 `ChatInput.tsx:2205` 靠 `413` 子串决定弹哪句＝反面教材，我 22:3x 只读到腿的转述、**未逐字复核**，落地前自己再看原文）。
+- [x] **AC#5**：错误提示**按错误码分支**，**不许按英文错误串里有没有某个数字**（openchamber 那形 `ChatInput.tsx:2205` 靠 `413` 子串决定弹哪句＝反面教材，我 22:3x 只读到腿的转述、**未逐字复核**，落地前自己再看原文）。
 - [x] **AC#6（新补，10-17 09:5x 编排者追加，来路＝非实现者裁决腿 `216-v2` §4＋我自己复跑的两把尺；账 `A1010`）：AC#3 那半句"⛔ 因名字里出现『允许』二字而改变判定"今天必须有两枚会响的仪器，⛔ 再让它只有文字承诺。** 现量前提（逐枚我自己复跑，锚 `0e944d93`）：`attachment` 一词进 `internal/risk internal/perm internal/tools internal/agent`（⛔`_test`）＝**rc=1、0 个文件**；正控 `params` 同尺 3 枚在场（`internal/risk/assessor.go:8`／`provenance.go:23`／`rules_gateway.go:1`）；`internal/perm` 目录非空（`store.go`＋3 枚测试）⇒ **附件显示名今天进不了判级链**，把正控架在它上面＝恒绿装饰（`216-v2` 具名反对，我采纳）。
   **两枚必做的钉（缺一格不算落地）**：
   ⓐ **算子钉**＝对 ALLOW 侧三处（`internal/risk/rules_shell.go` 的 shell 名单、`rules_network.go` 的 host 名单、`blacklist.go` 的覆盖键）**按函数名取行窗**，断言窗内 `strings.(Contains|ContainsAny|ContainsRune|Index|IndexAny)` 恒 **0**；今天现量＝`0 / 0 / 0`；★**⛔ 按绝对行号锚**（本仓 `327`／`329` 两波就把行号改过）；⚠ 变异正控必做＝把那里的 `EqualFold` 换成 `Contains` 后同一把尺必须回 **1**。
@@ -34,7 +34,7 @@
 
 ## 禁区
 
-不改权限判定链路（本票纯显示层）；不新增 C17 方法名；`frontend/**`、`design/**` 零写（**界面侧那份由 owner 带给界面那支**，本票只管 Go 侧给出去的字已经洗过）；
+不改权限判定链路（本票纯显示层）；不新增 C17 方法名；`frontend/**`、`design/**` **归本编队**（机主 2026-11-16 铁律 4；旧"界面侧由 owner 带给界面那支"作废），界面侧要我洗过再显示的字同样由本编队落；
 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt` 一字不动；只 commit 不 push、显式 pathspec、禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；仓内不删东西。
 — 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
 - **AC#1 现量普查已交（只读腿 `216-a1`，`2026-10-16`，尺读提交树快照 `71002d0`）**：名册见 `docs/evidence/s1/216-census.md`。三句头条——① **无"显示前统一洗"底座，且自家已长出两份互不相同的控制字符处理**（`sanitizeReplyText` 换空格 vs `findMetachars` 只转 `\n\r\0` 三字符可见转义），`unicode.IsPrint`／ANSI `\x1b`／`\p{C}` 全仓 0；② 今天真出向又裸奔的菜单字段＝**附件名 `AttachmentRef.Name`**（上游拒绝 `ContainsAny(name,"\x00\r\n\t")` 只挡 4 字符、**ESC/C1 穿过不洗**）与**目录名 `WorkspaceView.Canonical`**；插件/技能/命令说明三枚零源零出向（票 213/215 待派）。③ **"没有 vs 读不到"在显示段已是两句话**（先例五态是 `internal/panel/instructions_200.go` 真代码，非仅票面），但**派单把第五枚状态写成 `na`、盘上真值是 `not_run`**——实现腿按 `not_run` 走；产码里**按错误子串分支 0 枚**（`Contains/Index/HasPrefix/regexp/switch on Error()` 实测 0，票面 `ChatInput.tsx:2205`/`413` 属外部 openchamber、我方无此文件）。⛔ 本腿未做 AC#2/3/4/5、未翻任何框、未改任何产码。
@@ -111,3 +111,10 @@
   ⑧ 证据件 `docs/evidence/s1/216-ac5-branch-by-code.md`（含 §8 可复跑清单）。框不翻理由：3 处不合格里 1 处未改且修法越契约线。
 
 **行号更正（2026-11-14 18:5x，审计腿 `fc580501b` 查出）**：本票引的 `:1212`／`:1240` 是**改前**行号；改后真身在 **`:1214`／`:1248`**。读数与结论不变，仅行号更正。
+
+---
+
+## 编排者收件（2026-11-16 13:5x，06f7fa0f，件 docs/evidence/s1/216-ac5-branch-by-code.md 16725 B）
+
+**尺1** 06f7fa0f 在；产码＝internal/llm/errors.go（＋cmd/wisp/resident_voice_engines_windows.go），测试＝internal/llm/errors_216_test.go／cmd/wisp/speak_interrupt_code_216_windows_test.go。**尺2** 件在 16725 B。**尺3 我自己复跑**：go test ./internal/llm/... ./internal/panel -count=1 ⇒ llm **ok 108.082s**（adaptertest/golden/openai 各 ok）＋ panel **ok 42.599s**，全绿。
+**判据现读**：internal/llm/errors.go:215 case 413: —— 分支按**错误码**，不按英文串子串；rrors.Is 一族在 :98/:101/:156。⇒ AC#5 达成，0 枚未勾，**本票可结**。
