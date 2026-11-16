@@ -81,3 +81,12 @@
 **两卡文案改条件式**（摘原文）：听写卡「…门槛：链里每个模型都要在能力位里勾上 audio in（「模型」页的模型行），保存后重启生效。」标签四态：能装配＝已接入·重启生效／缺位＝**装配不了·缺能力位**＋点名／快照没答＝装配未判／空链＝未设置。
 **255 新牙**＝`go/parser` 活调用图（`config_receipt_255_test.go:970`），删装配点红句「…no longer calls speech.ResolveCloudChain anywhere…」。
 **SLO 附录 E** 补三句（负载态 CPU 57%＋三个进程在跑／安静态 815.826ms＝2.07 倍差／⛔ 不得合并成一个冷启 P95），阈值零改。
+
+---
+
+## 复审残留修复收件（2026-11-16 18:4x，`43bf68b51`，件 `docs/evidence/s1/313-r1-residual-two-fixes.md` 12552 B）
+
+**尺1** `43bf68b51` 在（10 件）。**尺2** 件在 12552 B。**尺3 我自己复跑**：`Test313ModelsEnabledReadFaceAnswersTheDisabledGate` **PASS 0.01s**／`Test313CredentialReadFaceNamesTheUnresolvableKeyRef` **PASS 0.00s**／`Test313CapabilityBitFlipsAssemblyOutcome` **PASS 0.03s** ⇒ **3/3 rc=0**；`npm --prefix frontend run render:model-settings` **rc=0**（崩页仪器：键真缺席的 wire 行 ⇒ 渲染「等快照」、不挂开关、不抛；修前同仪器 rc=1 在 ProviderEdit 抛 TypeError）。
+**残留①（崩页）**：`model-settings.tsx:682-683` `row.modelCapabilities ?? null` 三态归一＋`voice-settings.tsx:124-138`（LocalAudioCard 四枚指针键一并）。
+**残留②（三条门槛）**：能力位＝`config_handlers.go:776`；api_key_ref＝`:764/:786/:787`（含 `credentialError`）；模型停用＝**新读面** `ProviderSettings.ModelsEnabled`（`:274-283`）＋wire `modelsEnabled,omitempty`（`:777-785`）＋填充 `panel_config_store.go:180-190`。
+**四态标签**：已接入·重启生效（唯一入口 assembles）／装配不了·模型已停用（点名 enabled=false）／装配不了·缺 API Key（点名 provider）／装配不了·缺能力位；快照没答＝已接入·装配未判（等快照）；空链＝未设置。

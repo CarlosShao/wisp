@@ -37674,3 +37674,9 @@ AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean
 uditR1recheck（审计路由）判 **R1 修好／P1 有牙（M1 删装配点 FAIL、M2 孤立点 FAIL，go/parser AST 非字符串）／P2 合规／P3 可达**。它逐跳给了 file:line（界面 Switch model-settings.tsx:679-707 → 名册 config_write_313.go:111-112 → 门 config_handlers.go:453 → 落盘 panel_config_store.go:340-355 → setter settings_313.go:207/213 → 读面 :168-182 → boot cloudcatalog.go:95-102），并实测三枚牙 PASS。
 **两条残留**：①model-settings.tsx:672／oice-settings.tsx:122 只判 === null，Go 用 omitempty ⇒ 腿没答是 **undefined** ⇒ Node 实测 **THROWS**，且「等快照」态不可达（零模型 provider 行出厂可达）。②boot 有**三条**阈值（能力位／pi_key_ref 未配／模型 nabled=false），页面只建模一条 ⇒ 另两条会报「能装配」而 boot 拒（PROBE-KEYREF／PROBE-DISABLED 实测红句）。
 **处置**：派单 .scratch/wisp/probes/orch/20261116/txt/313-r1-residual-dispatch.txt 已存档即发。**这不是文案事**——①会让页面崩，②会让卡片再说一次假话。
+
+## A1910（11-16 18:4x）：**两条残留修完，我复跑 3/3＋崩页仪器 rc=0；四张语音卡这条线到此"人可验"**
+
+43bf68b51：①?? null 三态归一（model-settings.tsx:682-683／oice-settings.tsx:124-138＋LocalAudioCard 四枚指针键）——键真缺席不再抛、走「等快照」；②三条门槛全建模（能力位／pi_key_ref＋credentialError／**新读面** ModelsEnabled），四态标签各自点名。
+**我自己复跑 3/3 PASS rc=0；ender:model-settings rc=0**（修前同仪器 rc=1 TypeError）。
+**结论（可对机主复述的口径）**：云端语音链＝**六跳全通＋三条门槛都会如实报**，但**还没人按过那一次按钮**。⛔ 再说"能用了"，只说"人可验"。
