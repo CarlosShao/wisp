@@ -987,9 +987,19 @@ func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) 
 }
 
 // serveNotBuiltNotice replaces the page with an explicit offline notice when the
-// embed carries no bundle: a SetHtml this host writes, so the user never ends on
-// the round-trip probe page, and it opens no socket and loads nothing from the network.
+// embed carries no bundle: a NAVIGATION to the notice route the resource filter
+// answers out of memory (panelNotBuiltURL), so the user never ends on the
+// round-trip probe page, and it opens no socket and loads nothing from the network.
 // It takes m.mu itself, so callers must not hold it (33-r11 dropped the Locked suffix).
+//
+// WHY A NAVIGATION AND NOT SetHtml (ticket 33's CSP row, lane 2, 2026-11-16):
+// the CSP travels as a response HEADER (panelCSPHeader, on every response the
+// filter answers), and a SetHtml document has no response to carry a header -
+// its base is about:blank and no filter request is ever issued, so the notice
+// page was the ONE served document without the policy. Navigating the notice
+// through the filter gives it the same response-header CSP as the entry and
+// every asset, which is what the AC's "CSP present on served documents" row
+// demands of both delivery paths. The notice bytes are unchanged.
 func (m *PanelManager) serveNotBuiltNotice() {
 	m.mu.Lock()
 	w := m.w
@@ -997,8 +1007,7 @@ func (m *PanelManager) serveNotBuiltNotice() {
 	if w == nil {
 		return
 	}
-	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
-		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`)
+	w.Navigate(panelNotBuiltURL)
 }
 
 // serveEntry hands the control the entry of the embedded bundle. Since ticket

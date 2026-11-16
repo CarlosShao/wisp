@@ -90,6 +90,21 @@ const (
 	panelOrigin             = "https://wisp.panel"
 	panelAssetFilterPattern = panelOrigin + "/*"
 	panelEntryURL           = panelOrigin + "/" + panel.EntryFile
+
+	// panelNotBuiltPath is the notice route: the one URL the filter answers with
+	// the offline notice document (panel_assetUnavailable below) instead of the
+	// embed. serveNotBuiltNotice navigates here when the embed carries no bundle,
+	// so the notice - like the entry and every asset - is delivered as a real
+	// filtered RESPONSE that carries the response-header CSP (panelCSPHeader).
+	// The path is a fixed synthetic route, always answered, regardless of the
+	// bundle's state; nothing navigates to it in a built tree.
+	panelNotBuiltPath = "/__notbuilt__"
+	panelNotBuiltURL  = panelOrigin + panelNotBuiltPath
+
+	// panelNotBuiltDocument is the notice document's own bytes. Same text the
+	// pre-lane-2 SetHtml wrote, now delivered by the filter.
+	panelNotBuiltDocument = `<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`
 )
 
 // panelCSPHeaderValue is the policy every document this filter serves carries
@@ -607,6 +622,12 @@ func panelAssetLookup(assets *panel.Assets, preview panelPreviewLookup, uri stri
 		// bounded read of a file on this host, and the resolver refuses on its
 		// own terms rather than waiting for a deadline nobody could cancel.
 		return panelPreviewAssetResponse(preview.Lookup(context.Background(), raw))
+	}
+	if path == panelNotBuiltPath {
+		// The notice route: serveNotBuiltNotice's document, answered like any
+		// other filtered response so the response-header CSP rides on it (the
+		// CSP build site stays the one in respondWithEmbeddedAsset).
+		return panelAssetResponse{Data: []byte(panelNotBuiltDocument), ContentType: "text/html; charset=utf-8", Status: 200, Reason: "OK"}
 	}
 	if assets == nil {
 		return panelAssetResponse{Status: 404, Reason: "Not Found"}
