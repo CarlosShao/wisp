@@ -23,7 +23,8 @@
     "render:model-settings": "vite build --ssr scripts/render-model-settings.tsx --outDir node_modules/.tmp/modelrender --logLevel warn && node node_modules/.tmp/modelrender/render-model-settings.js",
     "render:shell77": "vite build --ssr scripts/render-shell-77.tsx --outDir node_modules/.tmp/shell77render --logLevel warn && node node_modules/.tmp/shell77render/render-shell-77.js",
     "render:history36": "vite build --ssr scripts/render-history-36.tsx --outDir node_modules/.tmp/history36render --logLevel warn && node node_modules/.tmp/history36render/render-history-36.js",
-    "render:approval37": "vite build --ssr scripts/render-approval-37.tsx --outDir node_modules/.tmp/approval37render --logLevel warn && node node_modules/.tmp/approval37render/render-approval-37.js"
+    "render:approval37": "vite build --ssr scripts/render-approval-37.tsx --outDir node_modules/.tmp/approval37render --logLevel warn && node node_modules/.tmp/approval37render/render-approval-37.js",
+    "render:palette38": "vite build --ssr scripts/render-palette-38.tsx --outDir node_modules/.tmp/palette38render --logLevel warn && node node_modules/.tmp/palette38render/render-palette-38.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

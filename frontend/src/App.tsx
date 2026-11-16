@@ -42,7 +42,13 @@ import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { ComposerRow } from "@/components/composer-row";
 import { GitBranchChip, GitBranchUnread } from "@/components/git-branch";
 import { MonitorPopover, type MonitorAgentRow } from "@/components/harness/monitor-popover";
-import { PaletteScreen } from "@/components/palette-screen";
+import {
+  PaletteScreen,
+  type PaletteGroup,
+  type PaletteItem,
+  type PaletteNote,
+  type PaletteRosterRow,
+} from "@/components/palette-screen";
 import { LineSidebar } from "@/components/react-bits/line-sidebar";
 import { ResultHistory } from "@/components/result-history";
 import { RightRail } from "@/components/harness/right-rail";
@@ -50,6 +56,7 @@ import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
+import { sendMessage } from "@/lib/panel";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
@@ -160,6 +167,15 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     dark: boolean;
     monitorOpen: boolean;
     paletteOpen: boolean;
+    /** Ticket 38: the palette's free text. An ephemeral view preference of
+        the same class as monitorOpen - it dies with the document and the
+        only thing it ever feeds is the send row's own submit. */
+    paletteQuery: string;
+    /** The send row's failure line (lib/panel's sendRequest throws when no
+        host is attached). Rendered inside the palette modal, never
+        swallowed - a request that never left would otherwise look like a
+        palette that worked. */
+    paletteError: string;
     sessionId: string | null;
     activeTurn: string | null;
   }>({
@@ -170,6 +186,8 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     dark: false,
     monitorOpen: false,
     paletteOpen: false,
+    paletteQuery: "",
+    paletteError: "",
     sessionId: null,
     activeTurn: null,
   });
@@ -233,6 +251,117 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   // The permission tiers come from the snapshot's own vocabulary. The panel
   // asks; it never records the answer, so nothing here is optimistic.
   const tiers = composer.mode.names.length > 0 ? composer.mode.names : ["unknown"];
+
+  /* ---------------------------------------------------------------------------
+     Ticket 38: the palette's content, all of it fed, none of it remembered.
+     --------------------------------------------------------------------------- */
+  const paletteQueryTrim = local.paletteQuery.trim();
+
+  // The free-text send row (D9's noise-environment fallback): the query, one
+  // row, always first when there is text. Its select handler dispatches the
+  // SAME envelope the composer's send button uses (panel.message.send via
+  // lib/panel's sendMessage), so palette text reaches the agent exactly the
+  // way composer text does - no second path, no bypass.
+  const paletteGroups: PaletteGroup[] = [];
+  if (paletteQueryTrim !== "") {
+    paletteGroups.push({
+      name: "发送任务",
+      items: [
+        { label: `以任务发送：${paletteQueryTrim}`, icon: "terminal", hint: "Enter", action: "send" },
+      ],
+    });
+  }
+  paletteGroups.push({
+    name: "面板",
+    items: [
+      { label: "打开设置", icon: "settings", action: "settings" },
+      { label: local.dark ? "切到浅色主题" : "切到深色主题", icon: local.dark ? "sun" : "moon", action: "theme" },
+      { label: "任务监控", icon: "activity", action: "monitor" },
+      { label: "新建会话", icon: "message-square-plus", action: "new-task" },
+      { label: local.railOpen ? "收起右侧栏" : "展开右侧栏", icon: "panel-right", action: "rail" },
+    ],
+  });
+
+  // The command roster: the snapshot's commands section (ticket 213 交付 3),
+  // read verbatim - until this wiring existed every pushed roster row died
+  // unseen (lib/panel.ts declared the shape; nothing on the page consumed
+  // it). The three states lib/panel.ts's optionality rule separates stay
+  // separate: key absent (no reader), reason set (the roster table refused
+  // to assemble), rows present (the real menu).
+  const commands = snapshot.commands;
+  const paletteRoster: readonly PaletteRosterRow[] = commands?.rows ?? [];
+  const paletteNotes: PaletteNote[] = [];
+  if (commands === undefined) {
+    paletteNotes.push({
+      word: "命令名册 未接线",
+      reason:
+        "快照没有 commands 键：面板装配没接名册读取器（PumpSources.Commands，internal/panel/pump.go:221）",
+    });
+  } else if ((commands.reason ?? "") !== "") {
+    paletteNotes.push({ word: "命令名册 装配拒绝", reason: commands.reason ?? "" });
+  }
+  paletteNotes.push(
+    {
+      word: "命令执行 未接线",
+      reason:
+        "名册只承载不执行（internal/panel/commands_roster_213.go:21-26），C17 名册（internal/panel/bridge.go:41-107）没有执行通路，名册行不可点",
+    },
+    {
+      word: "取消任务 未接线",
+      reason:
+        "C17 名册（internal/panel/bridge.go:41-107）没有取消通路；接 task.cancel 要 Go 侧在 internal/panel/composer_dispatch.go 的派发表加处理器，前端不造",
+    },
+    {
+      word: "模式强制 未接线",
+      reason:
+        "D11③ force_tool/force_chat 规则表未实现（DEFERRED(D11-3)，internal/agent/control.go:13-15）：快照无读取面，C17 无写入路由",
+    },
+    {
+      word: "第三方工具清单",
+      reason:
+        "走 composer 加号菜单的插件清单（snapshot.plugins，internal/panel/plugins_inventory_215.go 的读取面，composer-row.tsx 已接）",
+    },
+  );
+
+  // The palette's one execution face. Everything except "send" is a view
+  // preference this document owns; "send" is the single bridge request, and
+  // its failure lands on the palette's error line instead of vanishing.
+  function runPaletteItem(item: PaletteItem) {
+    switch (item.action) {
+      case "send": {
+        const body = paletteQueryTrim;
+        if (body === "") return;
+        try {
+          sendMessage(body, []);
+        } catch (err) {
+          const detail = err instanceof Error ? err.message : String(err);
+          setLocal((c) => ({ ...c, paletteError: `消息没有发出去：${detail}` }));
+          return;
+        }
+        setLocal((c) => ({ ...c, paletteOpen: false, paletteQuery: "", paletteError: "" }));
+        return;
+      }
+      case "settings":
+        setLocal((c) => ({ ...c, paletteOpen: false, settingsOpen: true }));
+        return;
+      // Theme stays open on purpose: the palette overlays the page, so the
+      // change is visible the moment it lands.
+      case "theme":
+        toggleTheme();
+        return;
+      case "monitor":
+        setLocal((c) => ({ ...c, paletteOpen: false, monitorOpen: true }));
+        return;
+      case "new-task":
+        setLocal((c) => ({ ...c, paletteOpen: false, sessionId: null, view: "chat" }));
+        return;
+      case "rail":
+        setLocal((c) => ({ ...c, railOpen: !c.railOpen }));
+        return;
+      default:
+        return;
+    }
+  }
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-page text-ink">
@@ -453,11 +582,18 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
             className="w-[560px] overflow-hidden rounded-card border border-line bg-surface shadow-overlay"
             style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}
           >
+            {local.paletteError !== "" ? (
+              <p className="border-b border-line bg-red-tint px-3.5 py-2 text-[12px] leading-[1.6] text-red" role="alert">
+                {local.paletteError}
+              </p>
+            ) : null}
             <PaletteScreen
-              groups={[]}
-              onQueryChange={() => undefined}
-              onSelect={() => setLocal((c) => ({ ...c, paletteOpen: false }))}
-              query=""
+              groups={paletteGroups}
+              notes={paletteNotes}
+              onQueryChange={(next) => setLocal((c) => ({ ...c, paletteQuery: next, paletteError: "" }))}
+              onSelect={runPaletteItem}
+              query={local.paletteQuery}
+              roster={paletteRoster}
             />
           </div>
         </div>

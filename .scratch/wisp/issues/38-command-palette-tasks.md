@@ -49,3 +49,35 @@ view (task.list/cancel tools backing it).
 > **本票 AC 的真数据 e2e 格仍等票 145/35/33 的字段与宿主，一格未勾、不由本程
 > 勾**；可视壳的 commit 链见票 77 进度追记（`424ac84`…`5e23d99`）与
 > `docs/reports/frontend-session-log-zcode.md` §1–§7。
+
+> **2026-11-16 23:0x 腿（agent-99，GLM 舰队五票顺序跑第 3 票；铁律 4 前端归本编队）**：
+> 命令面板从死壳接成三面真面（`frontend/src/App.tsx` + `palette-screen.tsx`）：
+> ① 自由文本行 → `panel.message.send`（composer 同一封套，`lib/panel.ts:748`；
+>   生产读者 `cmd/wisp/panel_message_453.go:102` → relay → admitTask → agent.Loop），
+>   结果照旧走 `snapshot.results` 流进 36 的结果面——无第二通道、无旁路；
+> ② 命令名册（票 213 交付 3）第一次有 UI 读者：`snapshot.commands`
+>   （读面 `internal/panel/commands_roster_213.go:45-51`，装配 `pump.go:466-476`）
+>   按查询过滤展示 name/summary/approval/door/args，行只读不执行（名册只承载
+>   不执行，`commands_roster_213.go:21-26`）；
+> ③ 中文 IME 组合守卫（AC#2）：compositionstart/end + `isComposing` 双保险，
+>   组合期 Enter 交给输入法，只提交选字后的终文；输入框挂载即聚焦（AC#6）。
+> **未接线 dormancy 全部具名（面板 notes 区，保持未接线、不改"即时"）**：
+> 命令执行（C17 名册 `internal/panel/bridge.go:41-107` 八法之外无执行通路）、
+> 取消任务（无 task.cancel 路由；要接须 Go 侧在 `internal/panel/composer_dispatch.go`
+> 派发表加处理器——注意 `internal/tools` 票 188 task-axis 扫描会红 task.* 路由名，
+> 归 Go 腿）、模式强制 force_tool/force_chat（**DEFERRED(D11-3)**，
+> `internal/agent/control.go:13-15`：规则表未实现，快照无读取面、C17 无写入路由）、
+> 命令名册无 reader 形（快照无 commands 键 → 具名 `PumpSources.Commands`，
+> `internal/panel/pump.go:221`）。
+> 任务视图半格：活状态转移走任务监控浮层既有真接（`App.tsx:103` monitorAgents ←
+> `snapshot.tasks`，读面 `internal/panel/subagent_roster_197.go:111-183`，等批准 join、
+> 流截断三元组照线显示）；**卡片三字段 started/cost-to-date/current step 线上无此字段**
+> （`TaskRowView:111-142` 不带），零造值，要加字段归 Go 腿（申请：TaskRowView 增
+> startedAt/costToDate/currentStep 三字段 + 名册 reader 填充，`subagent_roster_197.go`）。
+> 新牙 `npm run render:palette38`（send 行逐字回显、名册四事实真数据往返、只读断言、
+> IME/聚焦/方向键源级断言、dormancy 具名断言、started/cost/step 零造值、双线形 App 不炸）
+> OK 0 失败；build/typecheck/lint rc=0；render 仪器回归（nav/approval37/history36/
+> shell77/receiver/stream/composer）全绿；`render:l2` 裸跑 rc=2 是其自带的"需 JSON 参数"
+> usage 退出（既有行为，与本腿无关）。d22scan 对 frontend/ 零命中；仅有的两枚红
+> （`cmd/wisp/approval_reply.go:379/464`）在本波 cmd/wisp 另一腿的未提交 +186 行里，
+> 非本腿写面，已如实转报。AC 勾框一律留给非实现者。

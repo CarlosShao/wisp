@@ -1,5 +1,5 @@
 /* ============================================================================
-   Command palette screen (showcase-only, 2026-09-25)
+   Command palette screen (ticket 38's surface; showcase + panel dual-mount)
    ----------------------------------------------------------------------------
    Cut from the library's search blueprint (TurboKach's search.tsx): one big
    input row on a raised surface, live filtering, grouped results, an honest
@@ -8,19 +8,47 @@
 
    STATE RULE: this component holds none. The query is a prop with a change
    callback, so whoever mounts it owns the text - the showcase holds it today,
-   a future Go-fed screen would hold the same shape. Nothing is remembered
-   across a restart, and nothing here decides anything: the panel palette is
-   PRESENTATION ONLY until C17 grows the routes behind these rows (the rail's
-   命令 row is fed:false for exactly that reason).
+   and the panel's App holds the same shape (ticket 38: the query text is an
+   ephemeral view preference, it dies with the document and feeds nothing
+   back to the host until the user submits it). Nothing is remembered across
+   a restart, and nothing here decides anything: the three wire-fed pieces
+   below are DISPLAY faces, and the one execution face is the send row.
+
+     - groups  : rows the OWNER wires (App wires panel navigation and the
+                 free-text send row; the showcase wires demo rows). Enter or
+                 click fires onSelect for the highlighted row only.
+     - roster  : ticket 213's command roster off the snapshot (App reads
+                 snapshot.commands, the wire face internal/panel/
+                 commands_roster_213.go fills). These rows are READ-ONLY
+                 deliberately: the roster carries its rows' facts and names
+                 doors but opens none (commands_roster_213.go:21-26), so a
+                 click here would be an execution the host never gave the
+                 page. They render as plain rows, never as buttons.
+     - notes   : the palette's dormancy sentences (ticket 38's 未接线
+                 labels). Each names the missing engine verbatim instead of
+                 leaving an empty region to guess at.
+
+   IME RULE (ticket 38 AC#2): while a Chinese composition is open, Enter is
+   the IME's commit key, not the palette's select key. The key handler
+   returns early while composing (tracked by compositionstart/end and the
+   DOM event's own isComposing flag), so pinyin -> 选字 -> commit submits
+   only the FINAL text; the keydown that commits the candidate never
+   selects a row.
    ============================================================================ */
 
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
+  Activity,
+  Command,
   FilePen,
   FolderInput,
+  ListChecks,
+  MessageSquarePlus,
   Moon,
+  PanelRight,
   Settings,
   ShieldCheck,
+  Sun,
   Terminal,
   Trash,
   type LucideIcon,
@@ -33,6 +61,11 @@ export interface PaletteItem {
   /** A lucide icon name from the fixtures; unknown names draw a plain dot. */
   icon?: string;
   hint?: string;
+  /** The owner's discriminant for what selecting this row does (App's
+      switch reads it). The palette itself dispatches nothing - a row without
+      an owner behind its action is a read-only row, and this field staying
+      undefined is how the component knows that. */
+  action?: string;
 }
 
 export interface PaletteGroup {
@@ -40,16 +73,44 @@ export interface PaletteGroup {
   items: PaletteItem[];
 }
 
-/** A tiny name table for the icons the fixtures actually use; a name outside
-    it falls back to a neutral dot rather than a guessed glyph. */
+/** One dormancy sentence: the label says what is not wired, the reason names
+    the missing engine (and the file:line that would carry it) verbatim. The
+    palette renders these as plain notes - never as rows that look clickable. */
+export interface PaletteNote {
+  word: string;
+  reason: string;
+}
+
+/** One row of ticket 213's command roster (internal/panel/
+    commands_roster_213.go CommandRow, the JSON keys CommandsSection
+    declares in lib/panel.ts). Carried verbatim: approval and door are the
+    row's own sentences, shared with the console leg - the palette re-words
+    none of them and executes none of them. */
+export interface PaletteRosterRow {
+  name: string;
+  summary: string;
+  args: string;
+  approval: string;
+  door: string;
+}
+
+/** A tiny name table for the icons the fixtures and App's wired rows
+    actually use; a name outside it falls back to a neutral dot rather than
+    a guessed glyph. */
 const ITEM_ICONS: Record<string, LucideIcon> = {
   "shield-check": ShieldCheck,
   settings: Settings,
   moon: Moon,
+  sun: Sun,
   terminal: Terminal,
   trash: Trash,
   "folder-input": FolderInput,
   "file-pen": FilePen,
+  activity: Activity,
+  command: Command,
+  "list-checks": ListChecks,
+  "message-square-plus": MessageSquarePlus,
+  "panel-right": PanelRight,
 };
 
 function ItemIcon({ icon }: { icon?: string }) {
@@ -65,6 +126,8 @@ export function PaletteScreen({
   onQueryChange,
   groups,
   onSelect,
+  roster = [],
+  notes = [],
 }: {
   query: string;
   onQueryChange: (next: string) => void;
@@ -73,6 +136,14 @@ export function PaletteScreen({
       is a read-only browser: the keyboard model still works and the highlighted
       row still moves, but nothing is dispatched. */
   onSelect?: (item: PaletteItem) => void;
+  /** Ticket 213's command roster (App feeds snapshot.commands). Searched with
+      the same query the groups get; rows are display-only by design - see the
+      header comment. Undefined rows simply render no section. */
+  roster?: readonly PaletteRosterRow[];
+  /** The palette's dormancy sentences, rendered verbatim under the results.
+      Each names its missing engine; none is clickable, none is a status the
+      page invented. */
+  notes?: readonly PaletteNote[];
 }) {
   const q = query.trim().toLowerCase();
   const shown = groups
@@ -84,6 +155,34 @@ export function PaletteScreen({
     }))
     .filter((group) => group.items.length > 0);
   const empty = q.length > 0 && shown.length === 0;
+
+  // The roster searches with the same query, across name and summary - the
+  // discovery role ("我到底装了什么") is a search over what the host
+  // executed, not a static dump. An empty MATCH is said in its own sentence;
+  // the section itself stays so the reader can tell "no match" from "no
+  // roster on the wire" (an absent snapshot.commands renders no rows AND the
+  // App-provided note that names the missing reader).
+  const rosterShown = q
+    ? roster.filter(
+        (row) =>
+          row.name.toLowerCase().includes(q) || row.summary.toLowerCase().includes(q),
+      )
+    : roster;
+  const rosterEmpty = q.length > 0 && roster.length > 0 && rosterShown.length === 0;
+
+  // Keyboard-first means the input takes focus the moment the palette mounts;
+  // whoever opens it with Ctrl+K should be typing immediately, not reaching
+  // for the mouse (ticket 38 AC#6).
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // The IME composition guard (ticket 38 AC#2): between compositionstart and
+  // compositionend the Enter/arrow keys belong to the IME, not the palette.
+  // The DOM event's own isComposing flag covers the browsers that fire the
+  // keydown before compositionend lands.
+  const [composing, setComposing] = useState(false);
 
   // One flat list behind the grouped render, so the keyboard can walk it
   // without re-deriving a position per group. The footer used to promise
@@ -100,6 +199,10 @@ export function PaletteScreen({
   }, [flat.length]);
 
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
+    // Composition open: every key here is the IME's. Returning early means
+    // the Enter that commits 选字 never selects a row - only the committed
+    // text reaches the query, and only the NEXT Enter dispatches it.
+    if (composing || e.nativeEvent.isComposing) return;
     if (flat.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -142,8 +245,11 @@ export function PaletteScreen({
             aria-activedescendant={flat.length > 0 ? `palette-row-${cursor}` : undefined}
             className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-3"
             onChange={(event) => onQueryChange(event.target.value)}
+            onCompositionEnd={() => setComposing(false)}
+            onCompositionStart={() => setComposing(true)}
             onKeyDown={onKey}
             placeholder="输入命令或问题…"
+            ref={inputRef}
             value={query}
           />
           {query && (
@@ -244,6 +350,50 @@ export function PaletteScreen({
             ))}
           </GlideMenu>
         )}
+
+        {/* the command roster: read-only discovery rows (ticket 213's wire
+            face). Plain rows, no buttons - the roster names doors and opens
+            none (internal/panel/commands_roster_213.go:21-26), and a button
+            that executes nothing is the lie App's header comment names. */}
+        {roster.length > 0 ? (
+          <div className="border-t border-line px-2 py-1.5">
+            <p className="px-2 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
+              命令名册
+            </p>
+            {rosterEmpty ? (
+              <p className="px-2 py-1.5 text-[12px] text-ink-3">名册里没有匹配的命令</p>
+            ) : (
+              rosterShown.map((row) => (
+                <div
+                  className="flex items-baseline gap-2 rounded-[6px] px-2 py-1.5"
+                  data-roster-row
+                  key={row.name}
+                  title={`参数 ${row.args || "（无）"}；${row.approval}；${row.door}`}
+                >
+                  <span className="shrink-0 font-mono text-[12.5px] text-ink">{row.name}</span>
+                  <span className="min-w-0 flex-1 truncate text-[12px] text-ink-2" title={row.summary}>
+                    {row.summary}
+                  </span>
+                  <span className="shrink-0 text-[11px] text-ink-3">{row.approval}</span>
+                </div>
+              ))
+            )}
+          </div>
+        ) : null}
+
+        {/* the palette's dormancy sentences: what is NOT wired and which
+            engine is missing, verbatim from the owner of the wiring. */}
+        {notes.length > 0 ? (
+          <div className="border-t border-line px-3.5 py-2" role="note">
+            {notes.map((note) => (
+              <p className="py-0.5 text-[11px] leading-[1.6] text-ink-3" key={note.word}>
+                <span className="font-medium text-ink-2">{note.word}</span>
+                <span className="mx-1.5">——</span>
+                {note.reason}
+              </p>
+            ))}
+          </div>
+        ) : null}
 
         {/* the palette's keyboard vocabulary, as kbd hints */}
         <div className="flex items-center gap-3 border-t border-line bg-inset px-3.5 py-2 text-[11px] text-ink-3">
