@@ -46,6 +46,9 @@ package main
 
 import (
 	"context"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -940,4 +943,106 @@ func lastLineWith(haystack, needle string) string {
 		}
 	}
 	return ""
+}
+
+// TestTicket255CloudChainAssemblyCallPointIsAlive is the tooth the audit found
+// missing (audit-R1/P1, 2026-11-16): the two roster cases above pin the VERDICT
+// STRINGS and the file-list scan records readers by file existence, so deleting
+// the ResolveCloudChain call point left this file's rc at 0 - the roster kept
+// saying "已接入" about a chain nothing assembles. The ruler below judges the
+// LIVE CALL GRAPH instead, per the dispatch's own shape (⛔断字符串；按真调用路径):
+//
+//  1. production cmd/wisp must contain at least one call to
+//     speech.ResolveCloudChain (the assembly point itself), and
+//  2. the function that contains that call must itself be CALLED from at
+//     least one other production function in this package.
+//
+// Delete the ResolveCloudChain call inside resolveVoiceCloudChains and ruler 1
+// reddens with the assembly point named; delete the resolveVoiceCloudChains
+// call in buildResidentVoice and ruler 2 reddens with the caller named. The
+// behaviour half of the same property is the windows fixture family's
+// Test313CloudVoiceChainAssemblesIntoTheResidentLoaders / ...FollowsTheConfig,
+// which drive buildResidentVoice end to end and die the moment the loaders
+// stop receiving resolved endpoints; this AST ruler is the cross-platform half
+// that runs everywhere the roster runs, on the real source tree (go/parser, no
+// string match on a verdict), so the two spellings of "the chain is wired"
+// cannot drift apart silently again.
+func TestTicket255CloudChainAssemblyCallPointIsAlive(t *testing.T) {
+	root := repoRootForRoster(t)
+	cmdWisp := filepath.Join(root, "cmd", "wisp")
+
+	fset := token.NewFileSet()
+	var files []*ast.File
+	err := filepath.WalkDir(cmdWisp, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			if d.Name() == "testdata" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		f, perr := parser.ParseFile(fset, path, nil, parser.SkipObjectResolution)
+		if perr != nil {
+			return perr
+		}
+		files = append(files, f)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk cmd/wisp production sources: %v", err)
+	}
+	if len(files) == 0 {
+		t.Fatal("the walk found no production files in cmd/wisp: the ruler's own eyes broke")
+	}
+
+	// Call edges, collected once: funcDecl -> the selector calls inside it
+	// (speech.ResolveCloudChain) and the plain identifier calls (the callers
+	// of whatever function holds the assembly point).
+	resolveCallers := map[string][]string{} // enclosing func name -> file:line
+	identCalls := map[string]int{}          // callee func name -> call-site count
+	for _, f := range files {
+		file := fset.Position(f.Pos()).Filename
+		ast.Inspect(f, func(n ast.Node) bool {
+			decl, ok := n.(*ast.FuncDecl)
+			if !ok || decl.Body == nil {
+				return true
+			}
+			owner := decl.Name.Name
+			ast.Inspect(decl.Body, func(m ast.Node) bool {
+				call, ok := m.(*ast.CallExpr)
+				if !ok {
+					return true
+				}
+				switch fn := call.Fun.(type) {
+				case *ast.SelectorExpr:
+					if x, ok := fn.X.(*ast.Ident); ok && fn.Sel.Name == "ResolveCloudChain" && x.Name == "speech" {
+						resolveCallers[owner] = append(resolveCallers[owner],
+							filepath.Base(file)+":"+strconv.Itoa(fset.Position(call.Pos()).Line))
+					}
+				case *ast.Ident:
+					identCalls[fn.Name]++
+				}
+				return true
+			})
+			return false
+		})
+	}
+
+	if len(resolveCallers) == 0 {
+		t.Fatal("拆掉装配点会红：production cmd/wisp no longer calls speech.ResolveCloudChain anywhere - " +
+			"the voice cloud chains are savable values read by no assembly path (the exact state the roster's 已接入 verdicts deny)")
+	}
+	for fn, sites := range resolveCallers {
+		if identCalls[fn] == 0 {
+			t.Fatalf("拆掉装配点会红：%s calls speech.ResolveCloudChain (%v) but nothing in production cmd/wisp calls %s any more - "+
+				"the assembly point is orphaned and the boot will never resolve the chains the settings page saved",
+				fn, strings.Join(sites, ", "), fn)
+		}
+	}
+	t.Logf("ASSEMBLY CALL POINTS: %v (caller counts: %v)", resolveCallers, identCalls)
 }

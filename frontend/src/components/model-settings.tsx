@@ -29,6 +29,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
+import { Switch } from "@/components/ai-native/switch";
 import { ConfigReadGate } from "@/components/config-read-state";
 import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { COPY, configStatus, keyLabel, type Feedback } from "@/lib/config-feedback";
@@ -660,31 +661,78 @@ function ProviderEdit({
 
       <div className="flex flex-col gap-2">
         <span className="text-[11.5px] text-ink-3">模型目录</span>
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-col gap-1">
           {row.models !== null && row.models.length > 0 ? (
-            row.models.map((id) => (
-              <span
-                className="inline-flex h-5 items-center gap-1 rounded-chip bg-inset pl-2 pr-1 font-mono text-[11px] text-ink-2"
-                key={id}
-              >
-                {id}
-                <button
-                  aria-label={`删除模型 ${id}`}
-                  className="rounded-full px-1 text-[13px] leading-none text-ink-3 hover:text-ink disabled:opacity-40"
-                  disabled={busy !== null}
-                  onClick={() => removeOneModel(id)}
-                  type="button"
-                >
-                  ×
-                </button>
-              </span>
-            ))
+            row.models.map((id) => {
+              // The read face's capability bits (audit R1/P3): null record =
+              // the leg did not answer -> 等快照, never a guessed false. Each
+              // switch is one write through the ticket-248 door
+              // (model_audio_in / model_audio_out); the reload after it brings
+              // back the new read, and the receipt line is the door's own.
+              const bits = row.modelCapabilities === null ? undefined : row.modelCapabilities[id];
+              return (
+                <div className="flex flex-wrap items-center gap-2" key={id}>
+                  <span className="font-mono text-[11px] text-ink-2">{id}</span>
+                  {bits ? (
+                    <>
+                      <span className="text-[10.5px] text-ink-3">能力位</span>
+                      <Switch
+                        checked={bits.audioIn}
+                        label={`${id} 的 audio in 能力位`}
+                        onChange={(next) => {
+                          void run(`caps:${row.name}:${id}:in`, () =>
+                            performWrite({
+                              field: "model_audio_in",
+                              provider: row.name,
+                              model: id,
+                              value: next ? "true" : "false",
+                            }),
+                          ).then(onFeedback);
+                        }}
+                      />
+                      <span className="font-mono text-[10.5px] text-ink-3">audio in</span>
+                      <Switch
+                        checked={bits.audioOut}
+                        label={`${id} 的 audio out 能力位`}
+                        onChange={(next) => {
+                          void run(`caps:${row.name}:${id}:out`, () =>
+                            performWrite({
+                              field: "model_audio_out",
+                              provider: row.name,
+                              model: id,
+                              value: next ? "true" : "false",
+                            }),
+                          ).then(onFeedback);
+                        }}
+                      />
+                      <span className="font-mono text-[10.5px] text-ink-3">audio out</span>
+                    </>
+                  ) : (
+                    <StateTag text="等快照" tone="neutral" />
+                  )}
+                  <span className="min-w-0 flex-1" />
+                  <button
+                    aria-label={`删除模型 ${id}`}
+                    className="rounded-full px-1 text-[13px] leading-none text-ink-3 hover:text-ink disabled:opacity-40"
+                    disabled={busy !== null}
+                    onClick={() => removeOneModel(id)}
+                    type="button"
+                  >
+                    ×
+                  </button>
+                </div>
+              );
+            })
           ) : (
             <span className="text-[11.5px] text-ink-3">
               {row.models === null ? "暂时读不到模型清单" : "暂无模型"}
             </span>
           )}
         </div>
+        <p className="text-[11.5px] leading-[1.6] text-ink-3">
+          能力位 audio in / audio out 是语音装配的门槛：听写链要求该模型勾上 audio in，朗读链要求
+          audio out（默认关，保存后重启生效）。
+        </p>
 
         {fetch.phase === "loading" ? (
           <p className="flex items-center gap-1.5 text-[11.5px] text-ink-3">

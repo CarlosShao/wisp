@@ -27,7 +27,9 @@
      providers[]       one row per DECLARED provider: name, apiKeyRef (a
                        reference name, never a value), hasBaseURL, modelCount,
                        models (the model-name list, the model picker's data
-                       source, null = not answered), credentialSet,
+                       source, null = not answered), modelCapabilities (the
+                       per-model audio bits the voice assembly refuses on,
+                       null = not answered), credentialSet,
                        credentialError.
      voice             cloudASRChain / cloudTTSChain (null = not answered),
                        realtimeEnabled / realtimeProvider / realtimeModel, and
@@ -67,6 +69,15 @@ export interface ConfigViewProvider {
   billing: string;
   modelCount: number;
   models: string[] | null;
+  /** The per-model capability bits (audit R1/P3), keyed by model id: the two
+      audio bits the voice assembly refuses on (cloudcatalog.go's "lacks
+      capabilities.audio_in / audio_out"). Go's own json tag is
+      `modelCapabilities`; nil there = the leg did not answer, and the key
+      stays OFF the wire, so `null` here is "等快照" - never folded into
+      "everything is false". A non-null record answers BOTH bits for every
+      listed model (probe-first default false is a real answer, not an
+      absence). */
+  modelCapabilities: Record<string, { audioIn: boolean; audioOut: boolean }> | null;
   credentialSet: boolean;
   credentialError: string;
 }

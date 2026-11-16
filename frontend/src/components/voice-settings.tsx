@@ -1,9 +1,20 @@
 /* ============================================================================
-   语音 settings page - v3 (ticket 313's wiring leg, 2026-11-16).
+   语音 settings page - v4 (audit R1 fix, 2026-11-16).
    ----------------------------------------------------------------------------
    Same interface as v1 (313-panel-ask.md §3): two cloud fallback chains and the
    realtime head. v2 made it a product surface (chain editors, plain language,
-   pair rule at save time); v3 makes the honest copy follow the backend truth:
+   pair rule at save time); v3 made the honest copy follow the backend truth.
+   v4 is the audit-R1 fix: the two cards used to print a static 「已接入·重启
+   生效」while the boot assembly refuses any chain whose models never declared
+   capabilities.audio_in / audio_out - the read face did not even carry the
+   bits, so the page had no way to know. Now the read face carries them
+   (ConfigViewProvider.modelCapabilities), the card's tag and copy are
+   CONDITIONAL on that verdict (缺能力位 = named, 醒目), the copy names the
+   threshold (「需该模型在能力位里勾上 audio in/out」), and the save receipt
+   branches on "can this chain assemble now" - the same ruler the boot runs,
+   computed from the same read face. The capability bits themselves are
+   switchable on the model page's model rows (model_audio_in / model_audio_out
+   through the ticket-248 door).
 
      - 听写 / 朗读 are now WIRED: the assembly root resolves the two chains at
        boot (cmd/wisp/voice_cloudchain_313_windows.go) and the resident voice
@@ -63,6 +74,64 @@ import {
   StateTag,
 } from "@/components/settings-controls";
 
+/** The chain directions and the capability bit each one consumes. The boot
+    assembly refuses an ASR element whose model lacks capabilities.audio_in and
+    a TTS element whose model lacks capabilities.audio_out
+    (cloudcatalog.go:97/:101); the read face's modelCapabilities carries the
+    same two bits (audit R1/P3), so the page can judge a chain against the same
+    ruler the boot will run instead of printing a static 已接入. */
+type Direction = "asr" | "tts";
+
+const DIRECTION_BIT: Record<Direction, "audioIn" | "audioOut"> = {
+  asr: "audioIn",
+  tts: "audioOut",
+};
+const DIRECTION_CONFIG_KEY: Record<Direction, "audio_in" | "audio_out"> = {
+  asr: "audio_in",
+  tts: "audio_out",
+};
+
+/** The assembly verdict for one SAVED chain, judged off the read face:
+    "assembles" = every element's model declared the direction's bit;
+    "lacks" = the boot would refuse, with each failing element named (the same
+    element-first vocabulary cloudcatalog.go refuses with); "unknown" = a
+    snapshot half was never answered, so no judgement is invented. A model id
+    the catalog does not list is also a refusal the boot names - it counts as
+    lacks, with its own wording. */
+type ChainAssembly =
+  | { kind: "assembles" }
+  | { kind: "unknown" }
+  | { kind: "lacks"; missing: string[] };
+
+function chainAssembly(
+  chain: string[] | null,
+  providers: readonly ConfigViewProvider[],
+  direction: Direction,
+): ChainAssembly {
+  const missing: string[] = [];
+  let allAnswered = true;
+  for (const el of chain ?? []) {
+    const cut = el.indexOf("/");
+    const provider = cut < 0 ? el : el.slice(0, cut);
+    const model = cut < 0 ? "" : el.slice(cut + 1);
+    const row = providers.find((p) => p.name === provider);
+    if (provider === "" || model === "" || !row || row.models === null || !row.models.includes(model)) {
+      missing.push(`${el}：目录里没有这一行`);
+      continue;
+    }
+    const bits = row.modelCapabilities === null ? null : (row.modelCapabilities[model] ?? null);
+    if (bits === null) {
+      allAnswered = false;
+      continue;
+    }
+    if (!bits[DIRECTION_BIT[direction]]) {
+      missing.push(`${el} 缺 capabilities.${DIRECTION_CONFIG_KEY[direction]}`);
+    }
+  }
+  if (missing.length > 0) return { kind: "lacks", missing };
+  return allAnswered ? { kind: "assembles" } : { kind: "unknown" };
+}
+
 /** 票 313 AC#1 的语音半边：机主点名的默认供应商，与 model-settings.tsx 的
     OWNER_DEFAULT_PROVIDER 是同一个常量（一处定义，两页引用，不许漂）。
     语音卡上的用法比模型页更窄：它只是「未设置字段的草稿初值」——链条为空时
@@ -89,7 +158,7 @@ function placeholderReceipt(feedback: Feedback): Feedback {
 
 export function VoiceSettings({
   heading = "语音",
-  lede = "云端听写链与云端朗读链已接入常驻语音的装配（保存后重启生效，链尽回退本地引擎）；实时语音的引擎尚未实现仍是占位；本机音频三项显示真当前值，回声消除与输入设备可改可存。",
+  lede = "云端听写链与云端朗读链已接入常驻语音的装配——门槛：链里每个模型都要在能力位里勾上对应的 audio in / audio out（「模型」页的模型行），保存后重启生效，链尽回退本地引擎；实时语音的引擎尚未实现仍是占位；本机音频三项显示真当前值，回声消除与输入设备可改可存。",
 }: {
   heading?: string;
   lede?: string;
@@ -153,7 +222,8 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
-            description="已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎；保存后重启生效。"
+            description="已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎。门槛：链里每个模型都要在能力位里勾上 audio in（「模型」页的模型行），保存后重启生效。"
+            direction="asr"
             field="voice_cloud_asr_chain"
             initial={view.voice.cloudASRChain}
             performWrite={performWrite}
@@ -164,7 +234,8 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
-            description="已接入：常驻语音启动时按这条链的顺序装配云端朗读，链尽回退本地引擎；保存后重启生效。"
+            description="已接入：常驻语音启动时按这条链的顺序装配云端朗读，链尽回退本地引擎。门槛：链里每个模型都要在能力位里勾上 audio out（「模型」页的模型行），保存后重启生效。"
+            direction="tts"
             field="voice_cloud_tts_chain"
             initial={view.voice.cloudTTSChain}
             performWrite={performWrite}
@@ -214,6 +285,7 @@ function chainText(chain: string[] | null): string {
 function ChainEditor({
   title,
   description,
+  direction,
   field,
   initial,
   providers,
@@ -224,6 +296,9 @@ function ChainEditor({
 }: {
   title: string;
   description: string;
+  /** Which direction this card assembles; picks the capability bit the boot
+      refuses on (the audit-R1 conditional copy's 点名门槛). */
+  direction: Direction;
   field: string;
   initial: string[] | null;
   providers: readonly ConfigViewProvider[];
@@ -242,6 +317,22 @@ function ChainEditor({
     return [{ provider: defaultProvider, model: "" }];
   });
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  // The saved chain's assembly verdict, judged off the read face's capability
+  // bits (audit R1): the tag stops being a static 已接入 and states what is
+  // actually true about THIS chain against the ruler the boot will run.
+  const savedVerdict = chainAssembly(initial, providers, direction);
+  const savedTag = ((): { text: string; tone: "ok" | "warn" | "neutral" | "error" } => {
+    if (initial === null || initial.length === 0) return { text: "未设置", tone: "neutral" };
+    switch (savedVerdict.kind) {
+      case "lacks":
+        return { text: "装配不了·缺能力位", tone: "warn" };
+      case "unknown":
+        return { text: "已接入·装配未判（等快照）", tone: "neutral" };
+      default:
+        return { text: "已接入·重启生效", tone: "ok" };
+    }
+  })();
 
   function update(index: number, next: Partial<ChainSegment>) {
     setSegments((all) => all.map((seg, i) => (i === index ? { ...seg, ...next } : seg)));
@@ -263,10 +354,29 @@ function ChainEditor({
         return;
       }
     }
+    const savedChain = segments.map((seg) => `${seg.provider}/${seg.model}`);
     void run(`${field}`, () =>
       performWrite({
         field,
-        value: segments.map((seg) => `${seg.provider}/${seg.model}`).join(","),
+        value: savedChain.join(","),
+      }).then((feedback) => {
+        if (feedback.tone !== "ok") return feedback;
+        // The receipt branches on "can this chain assemble NOW" (audit R1):
+        // the same verdict the boot will compute, from the read face's bits.
+        const verdict = chainAssembly(savedChain, providers, direction);
+        if (verdict.kind === "lacks") {
+          return {
+            tone: "error",
+            text: `已写入配置文件，但这条链现在装配不了：${verdict.missing.join("；")}。在「模型」页把缺的那一位打开并保存，再回来存这条链，重启生效。`,
+          };
+        }
+        if (verdict.kind === "unknown") {
+          return {
+            tone: "warn",
+            text: "已保存，重启后生效；这条链现在能不能装配判不了（能力位快照还没读到）。",
+          };
+        }
+        return { tone: "ok", text: "已接入：保存后重启生效" };
       }),
     ).then((feedback) => setFeedback(feedback));
   }
@@ -274,7 +384,14 @@ function ChainEditor({
   return (
     <SettingsCard title={title} description={description}>
       <div className="flex flex-col gap-2">
-        <StateTag text="已接入·重启生效" tone="ok" />
+        <div className="flex flex-wrap items-center gap-2">
+          <StateTag text={savedTag.text} tone={savedTag.tone} />
+          {savedVerdict.kind === "lacks" ? (
+            <span className="text-[11.5px] text-orange">
+              现在装配不了：{savedVerdict.missing.join("；")}
+            </span>
+          ) : null}
+        </div>
         <div className="flex flex-col gap-1.5">
           {segments.map((seg, index) => (
             <div className="flex flex-wrap items-center gap-2" key={`${index}-${seg.provider}`}>

@@ -262,6 +262,15 @@ type ProviderSettings struct {
 	// page's model picker needs the names, 248's ModelCount could only say how
 	// many there were). nil = the leg did not answer this half.
 	Models []string
+	// ModelCapabilities is the read face of the model capability bits (audit
+	// R1/P3): one entry per catalog model, carrying the two audio bits the
+	// voice assembly refuses on. It is a separate map keyed by model id
+	// (never folded into Models) so a page that only wants names keeps the
+	// shape it already parsed, and a page that renders the bits asks one map
+	// lookup per model row. nil = the leg did not answer this half; a
+	// non-nil map answers EVERY listed model (both bits ride as plain bools,
+	// the schema's own probe-first defaults included).
+	ModelCapabilities map[string]ModelCapabilityBits
 	// BaseURL / Protocol / Billing are the row's own identity, read back so the
 	// page can SHOW what a row is instead of only that it exists. They came in
 	// with the operator's second-billing-entry work: with two rows of one vendor
@@ -272,6 +281,16 @@ type ProviderSettings struct {
 	BaseURL  string
 	Protocol string
 	Billing  string
+}
+
+// ModelCapabilityBits is one catalog model's two audio capability bits, as the
+// read face carries them (audit R1/P3). Plain bools: the leg that answers the
+// map answers both bits for every model in it - there is no per-bit nil gate
+// here because the schema itself has no "unknown" state for a declared bit
+// (probe-first means default false, which is a real answer, not a missing one).
+type ModelCapabilityBits struct {
+	AudioIn  bool `json:"audioIn"`
+	AudioOut bool `json:"audioOut"`
 }
 
 // CredentialState is the read side's whole vocabulary about credentials.
@@ -692,17 +711,22 @@ func renderSettingsPayload(v SettingsView) string {
 		},
 	}
 	for _, p := range v.Providers {
+		caps := make(map[string]modelCapsPayload, len(p.ModelCapabilities))
+		for id, bits := range p.ModelCapabilities {
+			caps[id] = modelCapsPayload{AudioIn: bits.AudioIn, AudioOut: bits.AudioOut}
+		}
 		payload.Providers = append(payload.Providers, providerPayload{
-			Name:            p.Name,
-			APIKeyRef:       p.APIKeyRef,
-			HasBaseURL:      p.HasBaseURL,
-			BaseURL:         p.BaseURL,
-			Protocol:        p.Protocol,
-			Billing:         p.Billing,
-			ModelCount:      p.ModelCount,
-			Models:          p.Models,
-			CredentialSet:   p.CredentialSet,
-			CredentialError: p.CredentialError,
+			Name:              p.Name,
+			APIKeyRef:         p.APIKeyRef,
+			HasBaseURL:        p.HasBaseURL,
+			BaseURL:           p.BaseURL,
+			Protocol:          p.Protocol,
+			Billing:           p.Billing,
+			ModelCount:        p.ModelCount,
+			Models:            p.Models,
+			ModelCapabilities: caps,
+			CredentialSet:     p.CredentialSet,
+			CredentialError:   p.CredentialError,
 		})
 	}
 	if payload.Providers == nil {
@@ -725,16 +749,30 @@ func renderSettingsPayload(v SettingsView) string {
 // voice half. They are separate types from the read view so a field added to
 // ProviderSettings does not silently change the page's JSON contract.
 type providerPayload struct {
-	Name            string   `json:"name"`
-	APIKeyRef       string   `json:"apiKeyRef"`
-	HasBaseURL      bool     `json:"hasBaseURL"`
-	BaseURL         string   `json:"baseURL"`
-	Protocol        string   `json:"protocol"`
-	Billing         string   `json:"billing"`
-	ModelCount      int      `json:"modelCount"`
-	Models          []string `json:"models"`
-	CredentialSet   bool     `json:"credentialSet"`
-	CredentialError string   `json:"credentialError"`
+	Name       string   `json:"name"`
+	APIKeyRef  string   `json:"apiKeyRef"`
+	HasBaseURL bool     `json:"hasBaseURL"`
+	BaseURL    string   `json:"baseURL"`
+	Protocol   string   `json:"protocol"`
+	Billing    string   `json:"billing"`
+	ModelCount int      `json:"modelCount"`
+	Models     []string `json:"models"`
+	// ModelCapabilities is the audit-R1/P3 read face: one entry per catalog
+	// model, the two audio bits the voice assembly refuses on. A leg that
+	// never answered it leaves the map empty, and omitempty keeps the key OFF
+	// the wire (the same absent = "the leg did not answer" class the voice
+	// payload's pointer-gated half uses; here the map's presence is the gate).
+	ModelCapabilities map[string]modelCapsPayload `json:"modelCapabilities,omitempty"`
+	CredentialSet     bool                        `json:"credentialSet"`
+	CredentialError   string                      `json:"credentialError"`
+}
+
+// modelCapsPayload is the wire shape of one model's two audio bits; separate
+// from ModelCapabilityBits so the view type can grow without silently moving
+// the page's JSON.
+type modelCapsPayload struct {
+	AudioIn  bool `json:"audioIn"`
+	AudioOut bool `json:"audioOut"`
 }
 
 type voicePayload struct {

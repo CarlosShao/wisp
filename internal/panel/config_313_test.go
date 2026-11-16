@@ -39,6 +39,8 @@ func fields313Cases() []fields313Case {
 			"configProvider": "local-gw", "configValue": "openai-chat,http://127.0.0.1:8080/v1",
 		}},
 		{field: FieldModelRowCreate, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
+		{field: FieldModelAudioIn, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313", "configValue": "true"}},
+		{field: FieldModelAudioOut, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313", "configValue": "false"}},
 		{field: FieldModelRowDelete, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
 		{field: FieldProviderRowDelete, extra: map[string]any{"configProvider": "stepfun"}},
 		{field: FieldRoleChatPair, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
@@ -131,6 +133,18 @@ func Test313SelectorRefusalsOnTheAdditionalRoster(t *testing.T) {
 		}},
 		{"model_row_create without a model", map[string]any{
 			"configField": FieldModelRowCreate, "configProvider": "stepfun",
+		}},
+		{"model_audio_in without a provider", map[string]any{
+			"configField": FieldModelAudioIn, "configModel": "m-313", "configValue": "true",
+		}},
+		{"model_audio_in without a model", map[string]any{
+			"configField": FieldModelAudioIn, "configProvider": "stepfun", "configValue": "true",
+		}},
+		{"model_audio_in with an empty value", map[string]any{
+			"configField": FieldModelAudioIn, "configProvider": "stepfun", "configModel": "m-313", "configValue": "   ",
+		}},
+		{"model_audio_out with an empty value", map[string]any{
+			"configField": FieldModelAudioOut, "configProvider": "stepfun", "configModel": "m-313", "configValue": "   ",
 		}},
 	}
 	for _, tc := range cases {
@@ -319,6 +333,10 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		Readable: true,
 		Providers: []ProviderSettings{{
 			Name: "stepfun", APIKeyRef: "env:DEEPSEEK_KEY", Models: []string{"m"},
+			// Audit R1/P3: the read face answers the bits, so the pin sees the
+			// key in its wire spelling. audio_in true, audio_out false: the
+			// two shapes the page codes against (declared on, declared off).
+			ModelCapabilities: map[string]ModelCapabilityBits{"m": {AudioIn: true}},
 		}},
 		Voice: VoiceSettingsView{
 			AecEnabled: &aecOn, InputDevice: &device, SampleRate: &rate,
@@ -352,7 +370,14 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		rowKeys = append(rowKeys, k)
 	}
 	sort.Strings(rowKeys)
-	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCount","models","name","protocol"]`
+	// The audit-R1/P3 addition (2026-11-16): modelCapabilities joined the row on
+	// purpose - the capability bits the voice assembly refuses on were readable
+	// by nothing, and this payload key is the page's one channel to them. The
+	// pin still byte-pins the key set, so this is a re-adjudication to the new
+	// true state with the addition named, not a loosening: the key set is still
+	// exact-match, and the no-value-bearing-keys property is re-checked below
+	// over the grown set.
+	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCapabilities","modelCount","models","name","protocol"]`
 	if got := `["` + strings.Join(rowKeys, `","`) + `"]`; got != wantRow {
 		t.Errorf("provider row keys = %s, want %s", got, wantRow)
 	}
@@ -390,6 +415,12 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	wantVoiceJSON := `{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":"","aecEnabled":false,"inputDevice":"Blue Yeti","sampleRate":16000,"aecBuildAvailable":false}`
 	if got := string(payload["voice"]); got != wantVoiceJSON {
 		t.Errorf("the answered voice object = %s, want the byte-pinned %s", got, wantVoiceJSON)
+	}
+	// Audit R1/P3: the answered capability map rides the row with its own byte
+	// shape - one entry per model, two plain-bool keys, the ASR bit true and
+	// the TTS bit false exactly as the fixture set them.
+	if got := string(rows[0]["modelCapabilities"]); got != `{"m":{"audioIn":true,"audioOut":false}}` {
+		t.Errorf("the provider row's modelCapabilities = %s, want the byte-pinned map", got)
 	}
 	// No travelled key is a value-bearing name (exact match: apiKeyRef is the
 	// reference the schema writes, and it is a different name from any value key).

@@ -56,6 +56,14 @@ package panel
 //	  it seeds (context_window, price) already have their own single-key
 //	  fields, and one key per guarded write is the discipline this roster
 //	  keeps.
+//
+// AUDIT-R1/P3's ADDITIONS (2026-11-16) follow the same two rules:
+//
+//	model_audio_in / model_audio_out  the model capability bits the voice
+//	  assembly refuses on (internal/speech/cloudcatalog.go's "lacks
+//	  capabilities.audio_in/audio_out"). Value = true/false, provider+model
+//	  selectors; internal/config's SetModelAudioIn/SetModelAudioOut own the
+//	  row-existence ruler and the guarded leaf write.
 
 import "sort"
 
@@ -91,6 +99,17 @@ const (
 	FieldProviderRowDelete = "provider_row_delete"
 	// FieldRoleChatPair is llm.roles.chat's provider+model, written together.
 	FieldRoleChatPair = "role_chat_pair"
+	// FieldModelAudioIn / FieldModelAudioOut are the capability bits the voice
+	// assembly consumes (audit-R1/P3): internal/speech/cloudcatalog.go refuses a
+	// chain element whose model lacks capabilities.audio_in (ASR) or
+	// capabilities.audio_out (TTS), and until now the page could save such a
+	// chain but could not declare either bit anywhere. Provider and model name
+	// the catalog entry, value = "true"/"false"; the bits default false
+	// (schema.go's probe-first ModelSpec), so flipping one ON is the loosening
+	// that lets a saved chain assemble, and the write stays inside [llm] - no
+	// locked family, no approval vocabulary, no credential.
+	FieldModelAudioIn  = "model_audio_in"
+	FieldModelAudioOut = "model_audio_out"
 	// FieldVoiceAecEnabled / FieldAudioInputDevice are the 本机音频 half of the
 	// write face (the 2026-11-11 S-leg alignment): voice.aec.enabled is the
 	// barge-in monitor's config switch and audio.input_device is the capture
@@ -113,6 +132,8 @@ const (
 // apart from config_handlers.go's allWritableFields on purpose (see the header).
 var fields313 = []string{
 	FieldAudioInputDevice,
+	FieldModelAudioIn,
+	FieldModelAudioOut,
 	FieldModelRowCreate,
 	FieldModelRowDelete,
 	FieldProviderBilling,
@@ -131,16 +152,19 @@ var fields313 = []string{
 // maps so the gate can ask one question per column across both tables.
 var (
 	fields313NeedsProvider = map[string]bool{
+		FieldModelAudioIn: true, FieldModelAudioOut: true,
 		FieldModelRowCreate: true, FieldModelRowDelete: true, FieldProviderBilling: true,
 		FieldProviderRowCreate: true, FieldProviderRowCreateCustom: true,
 		FieldProviderRowDelete: true,
 		FieldRoleChatPair:      true,
 	}
 	fields313NeedsModel = map[string]bool{
+		FieldModelAudioIn: true, FieldModelAudioOut: true,
 		FieldModelRowCreate: true, FieldModelRowDelete: true, FieldRoleChatPair: true,
 	}
 	fields313TakesValue = map[string]bool{
-		FieldAudioInputDevice: true, FieldProviderBilling: true,
+		FieldAudioInputDevice: true, FieldModelAudioIn: true, FieldModelAudioOut: true,
+		FieldProviderBilling:         true,
 		FieldProviderRowCreateCustom: true,
 		FieldVoiceAecEnabled:         true,
 		FieldVoiceCloudASRChain:      true, FieldVoiceCloudTTSChain: true,

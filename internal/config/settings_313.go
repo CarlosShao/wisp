@@ -192,6 +192,51 @@ func (m *Manager) CreateProviderRow(provider, model string) ([]string, error) {
 	})
 }
 
+// SetModelAudioIn writes llm.providers.<provider>.models.<model>.capabilities.audio_in
+// (the audit-R1/P3 fix: the capability bit the voice assembly refuses on -
+// internal/speech/cloudcatalog.go's "lacks capabilities.audio_in" - was read
+// everywhere but writable nowhere, so a page that declared a cloud ASR chain
+// was writing a value the boot could never honour). One leaf, one guarded
+// write, the same shape the two price leaves and context_window ride: the
+// pre-write check is requireCatalogEntry (reason 2 names the row that must
+// exist first), and validate() runs on the base the write would produce. The
+// bits are NOT chain-write refusals on purpose: the chain write still checks
+// existence only, because a chain whose model has not declared the bit yet is
+// a legal save whose assembly outcome the page now renders truthfully (the
+// voice settings card's conditional copy), not a refusal this layer invents.
+func (m *Manager) SetModelAudioIn(provider, model string, on bool) ([]string, error) {
+	return m.setModelAudioBit(provider, model, "audio_in", func(c *Capabilities) { c.AudioIn = on })
+}
+
+// SetModelAudioOut writes capabilities.audio_out; the rules are SetModelAudioIn's,
+// with the TTS direction's bit.
+func (m *Manager) SetModelAudioOut(provider, model string, on bool) ([]string, error) {
+	return m.setModelAudioBit(provider, model, "audio_out", func(c *Capabilities) { c.AudioOut = on })
+}
+
+// setModelAudioBit is the one guarded leaf write both direction setters ride.
+// No enum exists for a bool, so the caller parses the word and this function
+// owns nothing but the key and the row-existence ruler.
+func (m *Manager) setModelAudioBit(provider, model, bit string, set func(*Capabilities)) ([]string, error) {
+	return m.writeOneKey(keyPathProviderModelField(provider, model, "capabilities."+bit),
+		func(base *Config) bool {
+			p, ok := base.LLM.Providers[provider]
+			if !ok {
+				return false
+			}
+			spec, ok := p.Models[model]
+			if !ok {
+				return false
+			}
+			set(&spec.Capabilities)
+			p.Models[model] = spec
+			base.LLM.Providers[provider] = p
+			return true
+		}, func(base *Config) error {
+			return requireCatalogEntry(base, provider, model)
+		})
+}
+
 // SetRoleChatPair writes llm.roles.chat's provider AND model in one guarded
 // write. It exists because there is no other way to reach the pair: validateRoles
 // refuses BOTH half states ("provider set without model", "model set without

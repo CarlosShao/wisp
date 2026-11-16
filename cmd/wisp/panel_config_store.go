@@ -165,6 +165,21 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 		sort.Strings(modelNames)
 		row.ModelCount = len(modelNames)
 		row.Models = modelNames
+		// Audit R1/P3's read face: each catalog model's two audio bits, read
+		// off the same specs the names above come from. A model the voice
+		// assembly refuses (cloudcatalog.go's lacks capabilities.audio_in/out)
+		// is now visible to the page that let the chain be saved, and the
+		// model page's switches have a real "当前" to show instead of a guess.
+		if len(p.Models) > 0 {
+			caps := make(map[string]panel.ModelCapabilityBits, len(p.Models))
+			for id, spec := range p.Models {
+				caps[id] = panel.ModelCapabilityBits{
+					AudioIn:  spec.Capabilities.AudioIn,
+					AudioOut: spec.Capabilities.AudioOut,
+				}
+			}
+			row.ModelCapabilities = caps
+		}
 		ref := strings.TrimSpace(p.APIKeyRef)
 		if ref != "" {
 			declared++
@@ -322,6 +337,22 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		// 票 320 AC#3: provider and model are the two selectors, no value - the
 		// entry's window and price leaves keep their own fields.
 		written, err = s.mgr.CreateModelRow(w.Provider, w.Model)
+	case panel.FieldModelAudioIn, panel.FieldModelAudioOut:
+		// Audit R1/P3: the capability bits the voice assembly refuses on, now
+		// writable from the page. Value = true/false; the leg's only job is
+		// the word shape (the gate already refused an empty one) - the row
+		// existence ruler and the guarded leaf write live in internal/config's
+		// SetModelAudioIn/SetModelAudioOut, exactly like the price leaves.
+		on, perr := strconv.ParseBool(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 true/false，收到的值解析不了", w.Field)
+		}
+		if w.Field == panel.FieldModelAudioIn {
+			written, err = s.mgr.SetModelAudioIn(w.Provider, w.Model, on)
+		} else {
+			written, err = s.mgr.SetModelAudioOut(w.Provider, w.Model, on)
+		}
 	case panel.FieldModelRowDelete:
 		// The taking-back twin of the line above (owner follow-up): provider+model
 		// deletes one catalog entry. The setter refuses by name when the entry is
