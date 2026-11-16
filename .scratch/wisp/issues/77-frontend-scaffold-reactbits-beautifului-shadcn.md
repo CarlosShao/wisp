@@ -82,7 +82,7 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 - [x] **AC#2** token 四方对账用例落地 + 一次"只改前端一处颜色 ⇒ 用例红"的变异（grep 证落盘 → 跑 → 还原 → 证还原）。
 - [ ] **AC#3** L2 确认卡渲染真数据：由 `internal/risk` 的真实决策对象驱动，**不是**组件库 demo 的假 props。
       ⚠ 能力类判据：**说清生产调用者是谁**（哪个装配根、什么事件流），否则按 A33 只能记 PARTIAL。
-- [ ] **AC#4** `ban #6` 与 `ban #8` 对真实 `frontend/` 的作用域台账：贴出扫描器自报的**逐作用域文件数**（>0），
+- [x] **AC#4** `ban #6` 与 `ban #8` 对真实 `frontend/` 的作用域台账：贴出扫描器自报的**逐作用域文件数**（>0），
       并给出一次故意在前端写 `approval.decide` ⇒ **rc=1 且点名文件** 的真红。
 - [x] **AC#5** 前端无任何本地持久化；重启 WebView 后一切从 Go 侧恢复到同一状态（一条真机或半真机用例证明）。
 - [ ] **AC#6** CI 新 job 有真实 run id + 结论（见前提 6）；**不允许用"本地跑过了"替代**。
@@ -404,3 +404,13 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   - **AC#10**：**具名事实＝design/assets/tokens.css 不在仓**（72b65c614 删除；git 未跟踪）。以哪份为准：第一代代表＝`internal/ball/testdata/tokens_c21.css`（出处头 pin 原件 sha256；本次 `git show 72b65c614^:` 与留档 diff 实测 header-only、正文逐字节＝原件）；第四代真相源＝`frontend/scripts/gen-tokens.mjs` TOKENS 表（c21-native-tokens.md 头部背书）。**脚本化 diff**＝新工具 `frontend/scripts/token-diff-77.mjs`（复跑 `node scripts/token-diff-77.mjs`）：A＝129 名 / B＝43 名 / 双边同名 8 / 仅 A＝121 / 仅 B＝35 / 同名异值 8 / 完全一致 0；逐条全文 510 行落证据。独立第二道 `npm run tokens:check` rc=0（43 tokens，生成件＝生成器）。**能补则补裁定＝不补**：164 条差集全部是世代更替（owner 2026-09-25 pivot，一代玻璃配色退役），非同代漂移；补＝推翻 owner 裁定。同代一致性由 tokens:check＋`TestC21DesignTokensFourWayAgree` 守。
   - **门禁复读**：typecheck rc=0 / build rc=0 / lint rc=0（36 warnings 0 errors，新文件 0 新增）/ tokens:check rc=0 / go build ./cmd/wisp rc=0 / `go test -count=1 ./internal/panel` 全包 ok rc=0（21.9s）/ d22scan 双门 rc=0。硬约束遵守：未动 thresholds/golden/allowlist/PLAN/specs/D43/design；未 push；未放宽断言；零 emoji（新文件实测在 ban#8 分母内通过）；零 dist 字节。
   - `next=` 非实现者按证据文件出裁决表与勾框；AC#1 真窗口半格等票 33；AC#3/AC#6/AC#8/9/11 另波。
+---
+
+## 编排者收件（2026-11-16 19:1x，`fad36cd75`，件 `docs/evidence/s1/77-scaffold-batch1-ac1-ac4-ac10-ac12.md` 9272 B ＋两个读数件）
+
+**尺1** `fad36cd75` 在。**尺2** 三件在（证据 9272 B／`77-scaffold-batch1-d22scan.log`／`77-scaffold-batch1-token-diff.txt`）。**尺3 我自己复跑**：`npm --prefix frontend run build` **rc=0**（dist 条目实测 5 枚：`index.html 1044B`＋`assets/index-CLdPDwCM.js 500879B`＋`assets/showcase-1wn9e3sF.js 155086B`＋`assets/index-Cw4ODNoI.css 65368B`＋`.gitkeep`）；`go test ./internal/panel -run 'Built|Assets'` **ok 0.243s**；`node frontend/scripts/token-diff-77.mjs` **rc=0**。dist 已删回 `.gitkeep`。
+
+- **AC#4 勾**：d22scan 双门 rc=0（对照 PASS=46/FAIL=0/RUN=103）；逐作用域文件数 ban#8＝design 39／frontend 126／internal 1027／cmd 316（另有 bans#1-5 internal 407＋cmd 90、ban#7 tools 51、ban#10 risk 21）；**未覆盖范围具名**＝tools/（自检树）、根 scripts/、docs/、.github/、.scratch/，node_modules＋dist 产物按 gitignore 出分母。
+- **AC#10 勾**：`design/assets/tokens.css` 具名不在仓（`72b65c614` 删）⇒ 以 `internal/ball/testdata/tokens_c21.css`（第一代代表）＋`gen-tokens.mjs` TOKENS 表为准；脚本化 diff 出**164 条逐条具名**（仅 A 121／仅 B 35／同名异值 8／完全一致 0），全部为**世代更替**（owner 2026-09-25 pivot），**非同代漂移**；同代一致性由 `tokens:check` rc=0＋`TestC21DesignTokensFourWayAgree` 守。⇒ 符合本票判据「空或逐条具名差异」。
+- **AC#12 勾**：首屏 JS gz **146273 B（node zlib-9）／147.70 kB（vite 自报）**，≤400KB 达标超 0；懒载真做（`showcase-lazy.tsx` `lazy()+Suspense`，motion 四处静态 import 移出首屏，197.21→147.70 kB gz）；Shiki 零引用。**未删产品代码**。
+- **AC#1 不勾**（诚实）：命令级全绿（build→embed→Built=true→5 条目），但「真 WebView2 窗口」半格归票 33，留 `[ ]`。

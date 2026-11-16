@@ -37686,3 +37686,10 @@ AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean
 34 与 77 是同一件事（前端脚手架），77 是活票。**34 的 5 格具名并入 77 AC#8–AC#12**（docker→真窗／CI job／token parity／深浅色对比度／bundle 预算），34 标 superseded 并改名 -done（接手名字＝票 77，⛔ 悄悄消失）。
 **77 解冻**：09-23 冻结理由"想让别的 agent 干前端"按机主 2026-11-16 铁律 4 **作废**（原文留档不删）。
 首批派单＝AC#1／AC#4／AC#10／AC#12（存档 .scratch/wisp/probes/orch/20261116/txt/77-scaffold-batch1-dispatch.txt）。
+
+## A1912（11-16 19:1x）：**77 首批四格交（AC#4/AC#10/AC#12 我复跑后勾；AC#1 只到命令级）**
+
+ad36cd75。我复跑：build rc=0（dist 5 条目）／internal/panel -run 'Built|Assets' ok 0.243s／	oken-diff-77.mjs rc=0。
+AC#4 d22scan 逐作用域数字齐（ban#8: design 39/frontend 126/internal 1027/cmd 316）＋未覆盖范围具名；AC#10 164 条差异全为世代更替（owner pivot），符合"逐条具名"判据；AC#12 首屏 JS gz **146273 B**（≤400KB，超 0），懒载真做（motion 四处移出首屏，省 49.5 kB）**未删产品代码**。
+AC#1 命令级绿但真窗口半格归票 33 ⇒ 不勾。
+**77 余 6 格**：AC#1（真窗口半）／AC#3（L2 卡真数据）／AC#6（CI run id）／AC#8（docker→真窗）／AC#9（CI job 种子违规）／AC#11（深浅色对比度）。
