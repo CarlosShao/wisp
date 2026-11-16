@@ -158,6 +158,12 @@ type ComposerRequest struct {
 	ConfigProvider string `json:"configProvider,omitempty"`
 	ConfigModel    string `json:"configModel,omitempty"`
 	ConfigValue    string `json:"configValue,omitempty"`
+	// ConfigPlugin is ticket 215a's selector: the plugin id a plugin_enabled
+	// write addresses. Same non-value selector class as the three above - a
+	// name, never a key path - and it is carried by the config_write_215.go
+	// roster's gate exactly like the provider/model selectors are carried by
+	// theirs.
+	ConfigPlugin string `json:"configPlugin,omitempty"`
 }
 
 // ParseComposerRequest reads one postMessage string. Every refusal is an error

@@ -250,6 +250,10 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 	want = append(want, panel.WritableFields187()...)
 	want = append(want, panel.WritableFields65()...)
 	want = append(want, panel.WritableFieldsWave()...)
+	// Ticket 215a: the sixth roster joined the union the same way every
+	// roster before it did - one append here, the door's own report read
+	// live above, so a one-sided drop still moves this test.
+	want = append(want, panel.WritableFields215()...)
 	sort.Strings(want)
 	if !reflect.DeepEqual(reported, want) {
 		t.Errorf("the door reports the union %v; the two rosters say %v (A881: union == table1 + table2)", reported, want)
@@ -258,7 +262,15 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 	// Half 2: every union member really reaches the leg through the door, once.
 	for _, field := range want {
 		spy.calls = 0
-		reply, herr := disp.Handle(context.Background(), set313Env("r-313-union-"+field, field, "stepfun", "m-313", "x"))
+		env := set313Env("r-313-union-"+field, field, "stepfun", "m-313", "x")
+		if field == panel.FieldPluginEnabled {
+			// Ticket 215a: the door refuses a plugin-shaped write with no
+			// plugin id (needsPluginFor), so the one selector-carrying field
+			// gets its selector - the same "every selector the field can
+			// need is present" rule set313Env's header states.
+			env = set215Env("r-313-union-"+field, field, "clip", "x")
+		}
+		reply, herr := disp.Handle(context.Background(), env)
 		if herr != nil {
 			t.Errorf("union member %q was refused by the door: %v", field, herr)
 			continue
@@ -267,6 +279,19 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 			t.Errorf("union member %q reached the leg %d time(s), want exactly 1 (reply %q)", field, spy.calls, reply)
 		}
 	}
+}
+
+// set215Env is set313Env's one-selector twin: the plugin_enabled field needs
+// configPlugin and refuses a provider/model-shaped write without it.
+func set215Env(id, field, plugin, value string) string {
+	raw, err := json.Marshal(map[string]string{
+		"method": "config.set", "requestId": id, "source": "panel-composer", "configField": field,
+		"configPlugin": plugin, "configValue": value,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return string(raw)
 }
 
 // 313-r3: the comma split of a chain value, pinned at the seam that performs it.

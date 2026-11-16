@@ -28,24 +28,26 @@ package panel
 // to stop: the schema has no version field (measured: no Version field on
 // PluginEntry), and no engine exists to load one.
 //
-// AC#2 LIVES IN THE SHAPE, NOT IN A LABEL. "配置开着但没生效" is the default
-// state of every row on this wire, stated once by EngineState rather than
-// hidden behind an enabled=true that would read as "running". The sentence is
-// the reader's to produce (internal/config's own knowledge of its consumers)
-// and the pump's to carry verbatim; neither side derives an "effective" bit,
-// because there is no assembly to be effective IN. When the engine lands
-// (50/51), its leg updates unwired.go's disposition rows and this sentence in
-// the same commit - a load-time honest sentence must not outlive the
-// capability that justified it, same rule the guard table itself follows.
+// AC#2 LIVES IN THE SHAPE AND NOW IN A PER-ROW BIT. "配置开着但没生效" is the
+// state of every row until the engine lands, and since the 215a write leg it
+// is carried TWICE: once by EngineState (the section-level sentence) and once
+// by each row's State (the three-state label the menu renders). The State bit
+// is DERIVED BY THE READER from the assembly probe the composition root hands
+// in - never from Enabled - so "enabled=true" alone can never render as
+// effective; the derivation lives in cmd/wisp (the only place that can know
+// what this process actually assembled) and its teeth are there.
 //
-// THE FLIP HALF IS REGISTERED, NOT BUILT. Ticket 交付 2 (从菜单里开关) needs a
-// config write route (internal/config's Manager + the locked-section audit +
-// 三档审计), and no write field arrives with this carrier: panel carries no
-// config writer beyond the known fields (config_write_*.go's rosters), adding
-// one is a C17-adjacent contract move, and the ticket's own 判据 #3 (开关跨档
-// 一致) cannot be measured against an engine that does not exist. Registered
-// as the third not-wired dimension in docs/evidence/s1/215-skills-plugins-inventory.md;
-// the carrier invents no toggle to dress that gap up.
+// THE FLIP HALF RIDES THE EXISTING SETTINGS DOOR. Ticket 交付 2 (从菜单里开关)
+// landed in the 215a write leg: the write is the settings route ticket 248
+// opened (config.set), carrying ONE named field (plugin_enabled, roster
+// config_write_215.go) whose selector names the plugin id; the leg it reaches
+// is internal/config's own protected section-write entry (Manager.
+// SetPluginEnabled over WriteSection), so the D36 direction verdict runs
+// before any byte moves: switching OFF is a tighten and writes immediately,
+// switching ON from the panel is a loosening and is REFUSED there (the panel
+// is a permission input, not an authority - sectionwrite.go's structural
+// rule), with the audit line written either way. No new method arrives with
+// this ticket and no C17 method name changes.
 //
 // READER-GATED, THE 213/187/65 PATTERN, NO SECOND PARADIGM. A pump assembled
 // without the reader sends no "plugins" key at all - the shape the four-key
@@ -64,19 +66,45 @@ package panel
 // finally wires this key has ONE canonical sentence per dimension instead of
 // forked prose, and so the carrier tests can pin the wire against these very
 // constants. Both sentences share unwired.go's lifecycle: when the engine
-// (50/51) or the skills config model (215b, D36) lands, the landing leg
-// rewrites the sentence in the same commit - an honest sentence must not
-// outlive the absence it describes.
+// assembly (50/51) or the skills config model (215b, D36) lands, the landing
+// leg rewrites the sentence in the same commit - an honest sentence must not
+// outlive the absence it describes. PluginEngineNotWired215's spelling was
+// rewritten in the 215a write leg: the old text said the [plugins] keys have
+// NO readers, which stopped being true when the inventory itself and the
+// settings route started reading them - what is still true, and what the
+// sentence now says, is that the ENGINE is not wired at the assembly root.
 const (
-	// PluginEngineNotWired215 is EngineState's canonical sentence: no consumer
-	// of the [plugins] keys exists today, so enabled=true means configured,
-	// never running.
-	PluginEngineNotWired215 = "插件引擎未装配（票 50/51）：[plugins] 各键今天没有任何读者，enabled=true 只表示已配置、不表示在跑"
+	// PluginEngineNotWired215 is EngineState's canonical sentence: the Tier-2
+	// engine components exist in the tree but no assembly root wires them, so
+	// enabled=true means configured, never running, and each row's State is
+	// the assembly probe's answer, not the boolean's.
+	PluginEngineNotWired215 = "插件引擎未在装配根接线（票 50/51 组件已在库、装配根未接）：enabled=true 只表示已配置；每行的生效位由装配探针判，探针上没有这枚＝未生效"
 	// SkillsNotInConfigModel215 is SkillState's canonical sentence: the config
 	// model has no skills dimension to enumerate, and adding one is the D36
 	// contract move ticket 215b waits on - registered, not rendered as an
 	// empty list that would read as "no skills configured".
 	SkillsNotInConfigModel215 = "技能维今天没有配置键，无清单可枚举；补技能清单要先动 D36 配置模型（契约面，待批），本清单不列空表"
+)
+
+// The three states a row can honestly carry, in exactly the spelling the
+// menu renders them (the page shows the wire value verbatim - one spelling,
+// no per-page copy that can drift). The derivation is the composition
+// root's, from its own assembly probe; these constants only fix the words.
+const (
+	// PluginRowLive215: this round's assembly actually carries the plugin -
+	// the probe answered with this id AND the current config still matches
+	// what was assembled.
+	PluginRowLive215 = "本轮生效"
+	// PluginRowRestart215: the probe carries this id but the config has moved
+	// away from what was assembled (e.g. switched off after assembly), and
+	// the consumer only re-reads config at restart - the row says so instead
+	// of pretending the old state already ended.
+	PluginRowRestart215 = "需重启"
+	// PluginRowNotLive215: enabled=true on the config and the probe has
+	// nothing for this id - the exact "配置开着但没生效" shape A408 names
+	// (and the honest state of every row until the engine lands), plus the
+	// plain "switched off" rows.
+	PluginRowNotLive215 = "未生效"
 )
 
 // PluginRow is one [plugins.<id>] entry on the wire.
@@ -85,13 +113,38 @@ type PluginRow struct {
 	// [plugins.<id>] - because the flip half (when a later ticket builds it)
 	// must be able to name the same entry the config layer would write.
 	ID string `json:"id"`
+	// Name is the installed plugin's manifest name (plugins\<id>\manifest.toml,
+	// read by the composition root's manifest reader). Empty means "no
+	// install on disk for this id" - a measured fact, never invented: the
+	// installer (manifestslot) has no production caller yet, so a config row
+	// without an install is the NORMAL state and must not be dressed up with
+	// a made-up name (宁缺毋造, the rule the carrier's header states).
+	Name string `json:"name"`
+	// Version is the manifest's version string, read with Name from the same
+	// manifest bytes and empty for the same reason. Both come from the
+	// manifest's PARSED fields only - the reader extracts two typed strings
+	// and nothing else, so manifest prose can never ride the wire as config.
+	Version string `json:"version"`
+	// Note is the manifest reader's refusal line for a plugin whose manifest
+	// exists on disk but refused to load (unreadable, C14-refused, or an id
+	// that does not match its directory). Empty means either "no install on
+	// disk" (Name/Version empty too) or "manifest parsed clean" (Name/
+	// Version filled): the row never dresses a refusal up as an identity.
+	Note string `json:"note,omitempty"`
 	// Enabled is plugins.<id>.enabled as the live config holds it - the
-	// switch's own words. true is a configuration fact, NOT "running": no
-	// engine reads this key today (unwired.go:142 names the row), so an
-	// enabled row is precisely ticket 215 AC#2's "配置开着但没生效" and
-	// EngineState says so on the same packet instead of letting the boolean
-	// dress itself up.
+	// switch's own words. true is a configuration fact, NOT "running": the
+	// engine is not wired at the assembly root, so an enabled row is
+	// precisely ticket 215 AC#2's "配置开着但没生效" and BOTH the State bit
+	// below and EngineState say so on the same packet instead of letting the
+	// boolean dress itself up.
 	Enabled bool `json:"enabled"`
+	// State is the row's honest 生效与否 label, one of the three constants
+	// above, derived by the reader from the composition root's assembly
+	// probe - never from Enabled alone. A packet whose State contradicts
+	// Enabled without a probe behind it is the A408 family; the cmd/wisp
+	// tests pin the derivation in both directions (probe empty => not live
+	// even when enabled; probe present => live).
+	State string `json:"state"`
 	// Capabilities is plugins.<id>.capabilities, verbatim, in file order -
 	// the grant names the user wrote, which nothing consumes today.
 	Capabilities []string `json:"capabilities"`

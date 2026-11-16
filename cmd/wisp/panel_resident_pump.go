@@ -260,25 +260,11 @@ func modelSwitchSectionFromConfig(m *config.Manager) panel.ModelSwitchSection {
 }
 
 // pluginsSectionFromConfig is the config->panel mapping for ticket 215a's
-// inventory, over the same Manager. The two sentences are the carrier's own
-// constants (internal/panel must not import internal/config, so the section
-// arrives pre-shaped exactly like Commands/ModelSwitch/BallStyle). Same
-// convergence note as above.
+// inventory, over the same Manager. The mapping itself is
+// plugins_inventory_215a.go's pluginInventorySection215 - the ONE reader both
+// assembly roots call (run.go's PumpSources literal is the other), so the two
+// sites cannot drift. The root is this shape's env-resolved plugins
+// directory; the probe and the manifest reader are the same production ones.
 func pluginsSectionFromConfig(m *config.Manager) panel.PluginInventorySection {
-	c := m.Config()
-	sec := panel.PluginInventorySection{
-		Tier2Enabled: c.Plugins.Tier2Enabled,
-		EngineState:  panel.PluginEngineNotWired215,
-		SkillState:   panel.SkillsNotInConfigModel215,
-	}
-	for id, e := range c.Plugins.Entries {
-		sec.Rows = append(sec.Rows, panel.PluginRow{
-			ID:           id,
-			Enabled:      e.Enabled,
-			Capabilities: e.Capabilities,
-			NetAllowlist: e.NetAllowlist,
-			HostAPI:      e.HostAPI,
-		})
-	}
-	return sec
+	return pluginInventorySection215(m.Config(), assembledTier2Plugins215(), residentPluginsRoot215())
 }

@@ -348,9 +348,14 @@ type ConfigStore interface {
 // SettingWrite is one accepted, already-routed field write. The credential value
 // is deliberately absent from this type as well: it never leaves the raw bytes.
 type SettingWrite struct {
-	Field     string
-	Provider  string
-	Model     string
+	Field    string
+	Provider string
+	Model    string
+	// Plugin is ticket 215a's selector: the plugin id a plugin_enabled write
+	// addresses, verbatim from the envelope's configPlugin. Empty for every
+	// other field - the gate refuses a plugin-shaped field without one
+	// before the leg is reached.
+	Plugin    string
 	Value     string
 	RequestID string
 	Actor     string
@@ -444,6 +449,13 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 		h.record(req, err, "no-model")
 		return "", err
 	}
+	pluginID := strings.TrimSpace(req.ConfigPlugin)
+	if needsPluginFor(field) && pluginID == "" {
+		err := fmt.Errorf("%w: 字段 %q 必须指名插件 id（configPlugin＝[plugins.<id>] 的 <id>；requestId=%q）",
+			ErrConfigFieldRefused, field, req.RequestID)
+		h.record(req, err, "no-plugin")
+		return "", err
+	}
 	if field == FieldProviderCredential {
 		res, err := h.Store.StoreCredential(ctx, raw)
 		if err != nil {
@@ -461,7 +473,7 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 		return "", err
 	}
 	res, err := h.Store.ApplySetting(ctx, SettingWrite{
-		Field: field, Provider: provider, Model: model, Value: value,
+		Field: field, Provider: provider, Model: model, Plugin: pluginID, Value: value,
 		RequestID: req.RequestID, Actor: h.actor(),
 	})
 	if err != nil {
@@ -487,14 +499,15 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 // knownWritableField asks the rosters, not a copy of them. Since ticket 313
 // there are two rosters (the ticket-248 table here and the 313 additions in
 // config_write_313.go), since ticket 187 a third (config_write_187.go), since
-// ticket 65 a fourth (config_write_65.go), and since the appearance wave a
-// fifth (config_write_wave.go); this is the one place the door asks all five:
-// a field is writable when any roster carries it, and the frozen 248 pin
-// keeps describing the 248 table alone.
+// ticket 65 a fourth (config_write_65.go), since the appearance wave a fifth
+// (config_write_wave.go), and since ticket 215a a sixth (config_write_215.go);
+// this is the one place the door asks all six: a field is writable when any
+// roster carries it, and the frozen 248 pin keeps describing the 248 table
+// alone.
 func knownWritableField(field string) bool {
 	return listedWritableField(field) || additionalWritableField(field) ||
 		writableField187(field) || writableField65(field) ||
-		writableFieldWave(field)
+		writableFieldWave(field) || writableField215(field)
 }
 
 // listedWritableField is the ticket-248 table's own lookup, unchanged in shape.

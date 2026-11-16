@@ -435,11 +435,20 @@ export interface RunSection {
 
 /** One plugin inventory row (internal/panel/plugins_inventory_215.go
     PluginRow): one [plugins.<id>] entry as the live config holds it. enabled
-    is a configuration fact, NOT "running" - engineState on the section says
-    what it means on this wire. */
+    is a configuration fact, NOT "running" - state is the row's honest
+    生效与否 label derived from the composition root's assembly probe
+    (never from enabled), and engineState on the section says what the
+    boolean means on this wire. name/version come from the installed
+    plugin's manifest (empty = no install on disk - measured absence); note
+    carries the manifest reader's refusal when a manifest exists but failed
+    to load (omitempty = absent, never a made-up empty). */
 export interface PluginRowView {
   id: string;
+  name: string;
+  version: string;
   enabled: boolean;
+  state: string;
+  note?: string;
   capabilities: string[];
   netAllowlist: string[];
   hostApi: string[];
@@ -511,8 +520,11 @@ export interface PanelSnapshot {
       and the loop's stuck sentence. */
   run?: RunSection;
   /** The Tier-2 plugin inventory the config declares (ticket 215), with the
-      engine/skill honest-state sentences carried verbatim. Display data:
-      no toggle arrives with this key. */
+      engine/skill honest-state sentences carried verbatim and each row's
+      three-state 生效与否 label (本轮生效/需重启/未生效) from the assembly
+      probe. Display data plus the switch: the toggle rides config.set's
+      plugin_enabled field (configPlugin names the row) - the settings door,
+      not a new route. */
   plugins?: PluginsSection;
 }
 
@@ -801,6 +813,9 @@ export function requestConfigWrite(write: {
   field: string;
   provider?: string;
   model?: string;
+  /** Ticket 215a's selector: the plugin id a plugin_enabled write addresses
+      (rides the envelope's configPlugin key). */
+  plugin?: string;
   value?: string;
 }): Promise<string | null> {
   const envelope: Record<string, unknown> = {
@@ -811,6 +826,7 @@ export function requestConfigWrite(write: {
   };
   if (write.provider !== undefined) envelope.configProvider = write.provider;
   if (write.model !== undefined) envelope.configModel = write.model;
+  if (write.plugin !== undefined) envelope.configPlugin = write.plugin;
   if (write.value !== undefined) envelope.configValue = write.value;
   return requestHostAnswer(envelope);
 }

@@ -67,6 +67,7 @@ import { useRef, useState } from "react";
 import { ChevronRight, FolderCog } from "lucide-react";
 import { PromptBar, type PromptEffort, type PromptModel, type PromptPermission } from "@/components/ai-native/prompt-bar";
 import { ContextMeter } from "@/components/context-meter";
+import { PluginsScreen } from "@/components/plugins-screen";
 import { FeedbackLine } from "@/components/settings-controls";
 import {
   performComposerModelWrite,
@@ -80,6 +81,7 @@ import {
   submitAttachment,
   type ComposerState,
   type ModelSwitchSection,
+  type PluginsSection,
 } from "@/lib/panel";
 
 /** The one error sentence shape for a request the envelope refused to carry
@@ -104,6 +106,7 @@ export function ComposerRow({
   composer,
   permission,
   permissions,
+  plugins,
 }: {
   /** The snapshot's modelSwitch section; undefined (key absent) draws no
       picker - a read the pump never assembled is not a picker with nothing
@@ -116,10 +119,16 @@ export function ComposerRow({
   composer?: ComposerState;
   permission: string;
   permissions: readonly PromptPermission[];
+  /** The snapshot's plugins section (ticket 215a). Undefined (a pump without
+      the reader) draws no 插件 row in the plus menu - the menu entry needs a
+      page with a real section behind it, and a page with nothing behind it
+      would be the 文案在、控件不在 shape the ticket exists to stop. */
+  plugins?: PluginsSection;
 }) {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [workspaceDraft, setWorkspaceDraft] = useState("");
   const [attaching, setAttaching] = useState(false);
+  const [pluginsOpen, setPluginsOpen] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   // The native verdicts, split the way the retired composer split them: stored
@@ -291,11 +300,34 @@ export function ComposerRow({
         onAttach={composer ? () => fileInput.current?.click() : undefined}
         onEffortChange={(key) => void switchThinking(key)}
         onModelChange={(key) => void switchModel(key)}
+        onOpenPlugins={plugins !== undefined ? () => setPluginsOpen(true) : undefined}
         onPermissionChange={askMode}
         onSend={send}
         permission={permission}
         permissions={permissions}
       />
+      {/* Ticket 215a's inventory page, opened from the plus menu's 插件 row.
+          Rendered only while the section is on the wire (the same rule the
+          menu row obeys): an opened page with no section behind it would be
+          the honest-absence violation the ticket names. */}
+      {pluginsOpen && plugins !== undefined ? (
+        <div
+          aria-label="插件清单"
+          aria-modal="true"
+          className="fixed inset-0 z-40 flex items-start justify-center bg-black/35 pt-[10vh]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setPluginsOpen(false);
+          }}
+          role="dialog"
+        >
+          <div
+            className="w-[560px] max-w-[92vw] overflow-hidden rounded-card border border-line bg-surface shadow-overlay"
+            style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}
+          >
+            <PluginsScreen section={plugins} onClose={() => setPluginsOpen(false)} />
+          </div>
+        </div>
+      ) : null}
       <input
         accept={composer && composer.acceptedAttachmentMimes.length > 0 ? composer.acceptedAttachmentMimes.join(",") : undefined}
         className="hidden"

@@ -32,6 +32,8 @@ export interface ConfigWireWrite {
   field: string;
   provider?: string;
   model?: string;
+  /** Ticket 215a's selector: the plugin id a plugin_enabled write addresses. */
+  plugin?: string;
   value?: string;
 }
 
@@ -63,6 +65,17 @@ export async function performComposerModelWrite(provider: string, model: string)
 export async function performComposerThinkingWrite(level: string): Promise<Feedback> {
   return translateTieredWriteReply(
     await requestConfigWrite({ field: "role_chat_thinking", value: level }),
+  );
+}
+
+/** The plugin inventory's switch (ticket 215a): one row, addressed by the
+    plugin id, written as the plugin_enabled field through the same settings
+    door. The receipt keeps the host's own tier sentence and its honest note
+    (配置层已生效；引擎未接线；面板侧只能关不能开) - nothing here is optimistic,
+    the row's state is the NEXT snapshot's, exactly like every other write. */
+export async function performPluginToggleWrite(id: string, on: boolean): Promise<Feedback> {
+  return translateTieredWriteReply(
+    await requestConfigWrite({ field: "plugin_enabled", plugin: id, value: on ? "true" : "false" }),
   );
 }
 

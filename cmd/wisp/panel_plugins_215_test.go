@@ -89,31 +89,14 @@ func Test215AssemblyRootCarriesThePluginsReader(t *testing.T) {
 	}
 }
 
-// pluginsSection215 mirrors run.go's PumpSources literal mapping verbatim
-// (mgr.Config()'s [plugins] section into panel.PluginInventorySection, the
-// carrier's own two sentences). The byte-nail above pins the literal's
-// presence; this helper lets tooth 2 exercise the same read chain against a
-// real Manager. If the literal's mapping ever diverges from this helper,
-// tooth 2's hardcoded content still holds for the helper - the divergence
-// itself is what the evidence doc asks a reviewer to diff by eye, one loop
-// plus four fields.
-func pluginsSection215(m *config.Manager) panel.PluginInventorySection {
-	c := m.Config()
-	sec := panel.PluginInventorySection{
-		Tier2Enabled: c.Plugins.Tier2Enabled,
-		EngineState:  panel.PluginEngineNotWired215,
-		SkillState:   panel.SkillsNotInConfigModel215,
-	}
-	for id, e := range c.Plugins.Entries {
-		sec.Rows = append(sec.Rows, panel.PluginRow{
-			ID:           id,
-			Enabled:      e.Enabled,
-			Capabilities: e.Capabilities,
-			NetAllowlist: e.NetAllowlist,
-			HostAPI:      e.HostAPI,
-		})
-	}
-	return sec
+// pluginsSection215 calls the production mapping (plugins_inventory_215a.go's
+// pluginInventorySection215 - the ONE reader both assembly roots use) over a
+// real Manager, with the empty assembly probe and a root that holds no
+// manifests, so the rows below carry the honest absence (name/version empty,
+// state 未生效). The byte-nail above pins the literal's presence; this helper
+// exercises the same read chain the literal runs.
+func pluginsSection215(m *config.Manager, root string) panel.PluginInventorySection {
+	return pluginInventorySection215(m.Config(), assembledTier2Plugins215(), root)
 }
 
 // Test215WiredPluginsReaderSendsTheLiveValues: the reader chain the assembly
@@ -133,12 +116,13 @@ func Test215WiredPluginsReaderSendsTheLiveValues(t *testing.T) {
 	if err != nil {
 		t.Fatalf("manager: %v", err)
 	}
-	if live := pluginsSection215(mgr); len(live.Rows) != 2 || !live.Tier2Enabled {
+	if live := pluginsSection215(mgr, t.TempDir()); len(live.Rows) != 2 || !live.Tier2Enabled {
 		t.Fatalf("the loaded config does not carry the [plugins] section the reader must read: tier2Enabled=%v rows=%+v", live.Tier2Enabled, live.Rows)
 	}
 
+	root := t.TempDir()
 	data, err := panel.NewSnapshotPump(panel.PumpSources{
-		Plugins: func() panel.PluginInventorySection { return pluginsSection215(mgr) },
+		Plugins: func() panel.PluginInventorySection { return pluginsSection215(mgr, root) },
 	}).Marshal()
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
@@ -156,6 +140,10 @@ func Test215WiredPluginsReaderSendsTheLiveValues(t *testing.T) {
 
 	// Hardcoded from plugins215Base. The map the config layer holds has no
 	// order, so the ID order on the wire is the pump's sort doing its job.
+	// Name/Version are the manifest reader's honest absence (this test's
+	// root holds no manifests) and State is the assembly probe's answer -
+	// the probe is empty until the 50/51 engine is wired at a root, so even
+	// an enabled row renders 未生效, never the boolean dressed up.
 	if !got.Tier2Enabled {
 		t.Errorf("plugins.tier2Enabled = false, want the config's true verbatim")
 	}
@@ -164,7 +152,10 @@ func Test215WiredPluginsReaderSendsTheLiveValues(t *testing.T) {
 	}
 	wantClip := panel.PluginRow{
 		ID:           "clip",
+		Name:         "",
+		Version:      "",
 		Enabled:      true,
+		State:        panel.PluginRowNotLive215,
 		Capabilities: []string{"fs.read", "net.fetch"},
 		NetAllowlist: []string{"example.com"},
 		HostAPI:      []string{"storage"},
@@ -175,6 +166,7 @@ func Test215WiredPluginsReaderSendsTheLiveValues(t *testing.T) {
 	wantZed := panel.PluginRow{
 		ID:           "zed",
 		Enabled:      false,
+		State:        panel.PluginRowNotLive215,
 		Capabilities: []string{"fs.write"},
 	}
 	if !reflect.DeepEqual(got.Rows[1], wantZed) {

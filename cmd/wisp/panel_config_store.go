@@ -399,6 +399,20 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 				fmt.Errorf("字段 %q 要的是正整数（px 字号），收到的值解析不了", w.Field)
 		}
 		written, err = s.mgr.SetPanelFontSize(v)
+	case panel.FieldPluginEnabled:
+		// 票 215a：插件开关。值＝"true"/"false"，插件 id 在 w.Plugin（门已
+		// 拒空值）；布尔形状在这里替它答一句形状话（上面布尔字段的同款）。
+		// 写入走 internal/config 的受保护分节写（SetPluginEnabled over
+		// WriteSection，票 248/195 的现成写路径，⛔ 不另造新路）：关＝收紧，
+		// 立即落盘；开＝锁定段放宽，面板来源被结构性拒绝（R20：面板是权限
+		// 输入口，不是权限当局）——拒绝句原样上屏。审计两处都落：这一层的
+		// CONFIG-ROUTE 行＋internal/config 的 SECTION-WRITE／PLUGIN-TOGGLE 行。
+		on, perr := strconv.ParseBool(strings.TrimSpace(w.Value))
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 true/false，收到的值解析不了", w.Field)
+		}
+		written, err = s.mgr.SetPluginEnabled(w.Plugin, on, config.SourcePanel, "panel.config.set")
 	case panel.FieldProviderCredential:
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
 			fmt.Errorf("凭据值不走这条写入路径（它只写不回显，必须走 StoreCredential），字段 %q 未落盘", w.Field)
@@ -410,6 +424,19 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 	}
 	res.Written = written
 	res.Tier = panel.EffectiveRestart
+	if w.Field == panel.FieldPluginEnabled {
+		// 票 215a 的档位与真话：配置层立即生效（[plugins] 锁定段的收紧在
+		// manager.go 走同一条「hot-applied」路），但 Note 必须把「谁消费它」
+		// 写明——插件引擎未在装配根接线（票 50/51 组件已在库、装配根未接），
+		// 没有任何运行中的东西随这枚开关变化；清单上该行的生效位由装配探针
+		// 判（cmd/wisp plugins_inventory_215a.go），探针没有这枚＝未生效。
+		// 静默假装生效是票 215 点名禁止的那一种；面板侧也开不了（开＝放宽，
+		// 被拒）——这句话是收据上的，不是装饰。
+		res.Tier = panel.EffectiveNow
+		res.Note = "开关已写入配置层并立即生效（locked 段收紧走同一条热路）。" +
+			"插件引擎未在装配根接线：没有引擎消费这枚开关，清单上该行的生效位由装配探针判，探针上没有这枚＝未生效。" +
+			"面板侧只能关不能开：开启是 [plugins] 锁定段的放宽，要走原生二次确认那条路。"
+	}
 	if w.Field == panel.FieldBallStyle {
 		// 票 65：档位是这一写实测出来的，不是盖出来的（187 的 fieldTier187 能
 		// 静态标是因为它的读者行为固定；ball_style 的读者＝本进程有没有球）。

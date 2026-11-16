@@ -17,6 +17,11 @@
        (the measured-row choreography bought polish, not behaviour).
      - TS6 strict interfaces for the props; runtime statements otherwise kept.
      - IME note kept from upstream: Enter never sends while composing.
+     - ticket 215a: the attach (plus) menu gains its third category - one
+       插件清单 row, rendered only when the parent passes onOpenPlugins (no
+       route = no row, the same discipline as the attachment remove button
+       below). It opens the plugin inventory page; it is not a source row
+       and never reaches pick().
 
    What survives verbatim: the grid (attach | textarea | model | mic | send)
    and its expanded full-width mode, the auto-grow measure logic, the @ /slash
@@ -25,7 +30,7 @@
    ============================================================================ */
 
 import { useLayoutEffect, useRef, useState } from "react";
-import { ArrowUp, Check, ChevronDown, FileText, Mic, Paperclip, Plus, Square, X } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, FileText, Mic, Paperclip, Plus, Puzzle, Square, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 export interface PromptSource {
@@ -88,6 +93,9 @@ export interface PromptBarProps {
   attachments?: readonly PromptAttachment[];
   onRemoveAttachment?: (key: string) => void;
   onAttach?: () => void;
+  /** Ticket 215a: opens the plugin inventory page. Absent = the plus menu
+      draws no 插件 row (the no-route-no-control rule). */
+  onOpenPlugins?: () => void;
   onMicToggle?: (listening: boolean) => void;
   onSend?: (text: string) => void;
   streaming?: boolean;
@@ -126,6 +134,7 @@ export function PromptBar({
   attachments = [],
   onRemoveAttachment,
   onAttach,
+  onOpenPlugins,
   onMicToggle,
   onSend,
   streaming = false,
@@ -255,6 +264,31 @@ export function PromptBar({
           ))}
           {rows.length === 0 && (
             <div className="flex h-9 items-center px-2 text-[12px] text-ink-3">没有匹配项</div>
+          )}
+          {/* Ticket 215a: the plus menu's third category - the plugin
+              inventory page. A CATEGORY row, not a source row: it opens a
+              page instead of inserting a token, so it never reaches pick()
+              and is drawn only when the parent has a page to open. */}
+          {menuKind === "attach" && onOpenPlugins && (
+            <div className="mt-1 border-t border-line pt-1">
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  setMenu(null);
+                  onOpenPlugins();
+                }}
+                className="flex h-9 w-full items-center gap-2.5 rounded-chip px-2 text-left hover:bg-hover"
+              >
+                <span className="flex size-5.5 shrink-0 items-center justify-center text-ink-2">
+                  <Puzzle aria-hidden="true" size={14} />
+                </span>
+                <span className="shrink-0 text-[12.5px] font-medium text-ink">插件</span>
+                <span className="min-w-0 flex-1 truncate text-[12px] text-ink-3">
+                  已装插件清单与生效状态
+                </span>
+              </button>
+            </div>
           )}
           <div className="mt-1 border-t border-line px-2 pb-1 pt-1.5 text-[11px] text-ink-3">
             {menuKind === "at" ? "输入以搜索来源与文件" : menuKind === "slash" ? "输入以搜索命令" : "附加来源与文件"}

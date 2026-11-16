@@ -502,6 +502,7 @@ function Conversation({
               name: TIER_NAMES[t] ?? t,
               gated: composer.mode.l2ConfirmNames.includes(t),
             }))}
+            plugins={snapshot.plugins}
           />
         </div>
       </div>
