@@ -37655,3 +37655,10 @@ AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean
 - **P3**：能力位不可达（无写口、无读口）＝R1 的根因。
 **处置**：已存档派单 .scratch/wisp/probes/orch/20261116/txt/313-audit-r1-p1p2p3-dispatch.txt，等 w215aplugins 收腿后（cmd/wisp 一波一腿）发。**判据**：默认 false 时装配拒、界面勾上 audio_in 后装配成功——这才叫"真接"。
 **给机主的话**：我上两条汇报说"两张卡真接上了"——**说过头了**。物理链路是通的（拆了会红），但**用户从界面上没法让它跑起来**。修完再报。
+
+## A1907（11-16 15:5x）：**票 215（插件半）结案**；技能半单立 215b 等机主批 D36
+
+0496932f（25 件）：插件清单四真读者（plugins_inventory_215a.go:137 清单映射／:100 manifest 名版／:63 装配探针／:84 状态位），开关走 SetPluginEnabled（settings_plugins_215.go:57→WriteSection），审计 PLUGIN-TOGGLE 四路＋SECTION-WRITE，前端三态「本轮生效/需重启/未生效」。
+**我自己复跑** -run '^Test215A' **7/7 PASS rc=0**；internal/config ok 2.772s／internal/panel ok 17.853s。
+**诚实边界（腿自陈、我认可）**：面板侧「开」插件**结构性拒绝**（R20 冻结形状，收据告知走原生二次确认）；原生「开」config 层已通（queued 到 L2 卡）。
+**215b**＝技能半，schema.go 里 Skill 命中 **0** ⇒ 要补 [skills] section＝**D36 契约面**⇒ 单立票 215b-… **blocked-on-owner**，⛔ 悄悄消失。

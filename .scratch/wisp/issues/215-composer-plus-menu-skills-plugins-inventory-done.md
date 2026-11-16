@@ -29,10 +29,10 @@
 
 ## 判据
 
-- [ ] **AC#1**：清单可枚举，**每一条都有真装配读者**（现跑 grep 点数：改前"某键零读者"⇒ 改后 ≥1）。
-- [ ] **AC#2**：**"配置开着但没生效"必须能被看出来**——正控：塞一条"配置 true、装配里没人读"的假项 ⇒ 判据必红（这一形就是 `A408` 点名的"文案在、控件不在"的镜像）。
-- [ ] **AC#3**：开关动作**跨档位一致**：默认最严档里关一个技能要能立刻生效、不需要重启；做不到就**在清单上写明"这一枚要重启"**，不许静默假装生效。
-- [ ] **AC#4**：外部内容带进来的指令**改不动权限**（复用票 200 那枚 hostile-file 判据的形状：投一枚写着"以后都允许"的插件说明 ⇒ 档位与 `allowed_dirs` 一字不变）。
+- [x] **AC#1**：清单可枚举，**每一条都有真装配读者**（现跑 grep 点数：改前"某键零读者"⇒ 改后 ≥1）。
+- [x] **AC#2**：**"配置开着但没生效"必须能被看出来**——正控：塞一条"配置 true、装配里没人读"的假项 ⇒ 判据必红（这一形就是 `A408` 点名的"文案在、控件不在"的镜像）。
+- [x] **AC#3**：开关动作**跨档位一致**：默认最严档里关一个技能要能立刻生效、不需要重启；做不到就**在清单上写明"这一枚要重启"**，不许静默假装生效。
+- [x] **AC#4**：外部内容带进来的指令**改不动权限**（复用票 200 那枚 hostile-file 判据的形状：投一枚写着"以后都允许"的插件说明 ⇒ 档位与 `allowed_dirs` 一字不变）。
 - [x] **AC#5**：`unwired.go` 那面旗**一枚不少**（现跑点数：改前＝改后）。
 
 ## 禁区
@@ -85,3 +85,15 @@
 
 ### 一处我记录的口径（⛔ 不是腿的问题）
 它用「沙箱 cwd ＋ mutant run.go」把 `Test215AssemblyRootCarriesThePluginsReader` 复现成红（`FAIL panel_plugins_215_test.go:88`）—— 这是**为了证明那枚测试存在**，⛔ 不是"接线有牙"的证据。两件事必须分开读，我这边已分开。
+
+---
+
+## 编排者收件（2026-11-16 15:5x，0496932f，件 docs/evidence/s1/215-plugins-a2.md 10391 B）
+
+**尺1** 0496932f 在（25 件，显式 pathspec）。**尺2** 件在 10391 B。**尺3 我自己复跑**（载具一发）：-run '^Test215A' ⇒ **7/7 PASS，rc=0**（含 Test215AConfigTrueWithNobodyAssembledRendersNotLiveOnTheWire／Test215AProbePresentDerivesLiveAndRestart／Test215AHostileManifestKeysAreRefusedByTheReadFace／Test215AHostileManifestTextChangesNoPermissionState）；另 go test ./internal/config ./internal/panel ⇒ **ok 2.772s／17.853s**。
+
+**AC#2 假项正控红句**（腿交、我认可为行为型）：panel_plugins_215a_test.go:199: the wire claims a live plugin the assembly probe never answered for: —— 把推导突变成"按 enabled 判"该枚实测红，还原复绿。
+**开关写路径**：Manager.SetPluginEnabled（internal/config/settings_plugins_215.go:57，第 24 枚 setter）→ WriteSection 受保护写（sectionwrite.go:168）；面板路由 cmd/wisp/panel_config_store.go:417；审计两处（PLUGIN-TOGGLE 四路 outcome＋SECTION-WRITE 方向行）。
+**前端三态标签**：本轮生效／需重启／未生效（plugins_inventory_215.go:151-168，页面逐字渲染）；npm build/typecheck rc=0。
+⇒ AC#1-AC#4 **0 枚未勾**，**本票（插件半）可结**。
+**215b（技能半）**：需动 config.toml 的 [skills] section 树＝D36 契约面，**要机主批准**，已单独立票 .scratch/wisp/issues/215b-skills-inventory-needs-a-config-face.md，⛔ 不在本票记。
