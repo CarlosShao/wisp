@@ -393,9 +393,9 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 - **并入票 34**（同日裁：34 与 77 同一件事，34 superseded、不再派）：
   - [ ] **AC#8**（←34）：docker build→dist→go build 出的二进制在**真面板窗**里服务脚手架（不是只本地 dev server）。
   - [ ] **AC#9**（←34）：CI job 覆盖 tsc／lint／build 全绿，且**种子违规会被抓**（硬编码 hex、emoji、禁用导入各一枚）。
-  - [ ] **AC#10**（←34）：token parity —— design/assets/tokens.css 与前端 token 名册的**脚本化 diff** 为空（或逐条具名差异）。
+  - [x] **AC#10**（←34）：token parity —— design/assets/tokens.css 与前端 token 名册的**脚本化 diff** 为空（或逐条具名差异）。
   - [ ] **AC#11**（←34）：深色＋浅色各渲染一次外壳＋一枚样例屏，对比度抽查 ≥AA。
-  - [ ] **AC#12**（←34）：bundle 预算 —— 首屏 JS ≤400KB gz（React 成本按 D29 可接受；motion/Shiki 懒载）。
+  - [x] **AC#12**（←34）：bundle 预算 —— 首屏 JS ≤400KB gz（React 成本按 D29 可接受；motion/Shiki 懒载）。
 
 - **2026-11-16 18:5x `agent-89`（解冻后第一批 frontend 写腿）四格数字交付**（AC#1 / AC#4 / AC#10 / AC#12；AC#3/6/8/9/11 按派单明确不做）。证据＋读数件＝`docs/evidence/s1/77-scaffold-batch1-ac1-ac4-ac10-ac12.md`、`77-scaffold-batch1-d22scan.log`、`77-scaffold-batch1-token-diff.txt`。**框一个没勾**，勾选与裁决表留给非实现者。
   - **AC#1**：`npm --prefix frontend run build` rc=0（Vite 8.3.0 / node v24.21.0 @ D:\work\server\node24，2457 modules）；typecheck rc=0；`go build -o build/wisp.exe ./cmd/wisp` rc=0；`go test -count=1 ./internal/panel/ -run 'Built|Assets'` rc=0（4 个匹配测试全 PASS，`TestBuiltinBundleIsCompleteOrAbsentNeverHalf` 自报 `entry 1044 bytes, 2 asset refs, 5 embedded files`）。**Go 侧数 dist 条目**＝`wisp.exe panel-assets` rc=0（`5 files, entry=index.html built=true`）＋ `-manifest` 逐文件（.gitkeep 0 / assets/index-CLdPDwCM.js 500879 / assets/index-Cw4ODNoI.css 65368 / assets/showcase-1wn9e3sF.js 155086 / index.html 1044）＋ `-check` rc=0（2 asset refs resolve）。**跑完 dist 删回 .gitkeep**（目录仅剩 .gitkeep，`git status -- frontend/dist` 空）⇒ 零 dist 字节入库。
