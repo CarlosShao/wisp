@@ -3,9 +3,20 @@ import { createRoot } from "react-dom/client";
 import { PanelRoot } from "@/panel-root";
 import { AppHarness } from "@/components/harness/app-harness";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { Showcase } from "@/components/showcase";
+import { ShowcaseRoute } from "@/components/showcase-lazy";
 import { HARNESS_BANNER } from "@/fixtures/harness";
 import "./styles/theme.css";
+
+/**
+ * The harness-only component gallery is lazy-loaded through ShowcaseRoute
+ * (components/showcase-lazy.tsx, ticket 34 AC#12): it is mounted only by
+ * ?harness=2 and it is the one module that drags motion/react into the module
+ * graph (react-bits/{blur-text,count-up,magnet,animated-list,shiny-text}.tsx
+ * all import from "motion/react"). Splitting it keeps that dependency out of
+ * the first-screen chunk the product panel ships; the product root (?harness
+ * absent) and the app root (?harness=1) never fetch this chunk, so their
+ * screens are byte-identical without it.
+ */
 
 /**
  * The host page is loaded three ways and only one of them carries data:
@@ -98,7 +109,12 @@ if (harness === "1" || harness === "2") {
 const ROOTS = {
   product: { area: "面板", node: <PanelRoot /> },
   app: { area: "演示应用", node: <AppHarness /> },
-  showcase: { area: "组件总览", node: <Showcase /> },
+  showcase: {
+    area: "组件总览",
+    // ShowcaseRoute lazy-loads the gallery behind its own Suspense; the product
+    // root never suspends because it never imports this chunk.
+    node: <ShowcaseRoute />,
+  },
 } as const;
 
 function root(): ReactNode {
