@@ -74,3 +74,13 @@ summaries + budgets), plus Models and Diagnostics views.
 > **本票 AC 的真数据 e2e 格仍等票 145/35/33 的字段与宿主，一格未勾、不由本程
 > 勾**；可视壳的 commit 链见票 77 进度追记（`424ac84`…`5e23d99`）与
 > `docs/reports/frontend-session-log-zcode.md` §1–§7。
+
+---
+
+## 编排者追加事实（2026-11-16 20:3x，来自只读审计腿 `census-unwired`，件 `docs/evidence/s1/census-unwired-20261116-2017.md`）
+
+**这一段是"现读坐标"，比票面正文新；按它做，⛔ 按票面旧行号。**
+- **成本格是"假免接线"**：`frontend/src/components/settings-page.tsx:114` 说"没收到用量数据"，但 **Go 侧读口早接好了**——`cmd/wisp/panel_cost_194.go:51` 读真表 ＋ `panel_inbound.go:354` 装配 ＋ `internal/panel/cost_handlers.go:120` 出 `wisp-cost-summary:` payload 行（票 194 七格全勾 -done），**而 `frontend/` 里 `cost.summary` 零命中** ⇒ **数据在门口没人取**。本票必须把它取上屏（行为牙：喂真 payload ⇒ 逐字段上屏；喂不到 ⇒ 显式"未判"）。
+- **安全格同样是"假免接线"**：`settings-page.tsx:104` 说"没收到策略快照"，但档位**每包都推**（`cmd/wisp/run.go:1187`→`internal/panel/pump.go:372-373`）⇒ 接上即可。
+- **`settings-page.tsx` 12 格里 9 格是 waiting 格**（左栏 9 枚灰点＋「（还没有数据）」aria 名）——这就是机主说的"一堆未接线"的本体。本票逐格判：**有数据的接上、真没有的显式说缺哪台引擎**，⛔ 保持一个含糊的"还没有数据"。
+- **MCP 格不接是架构裁定的**（D13），⛔ 顺手接；但**文案要写明"按设计不接"**而不是让它看起来像忘了接。

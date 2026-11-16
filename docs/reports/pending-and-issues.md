@@ -37712,3 +37712,12 @@ AC#11 余 3 对（深色白字/红钮 3.31、warn 胶囊 2.67、信息不足 2.9
 伪 allow 走**真页面桥边**、最强伪造信封 ⇒ 逐字拒绝句＋spy.reqs==0＋恰 1 条审计；两发突变（开名册／拒改放）都 FAIL。
 resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器突变都 FAIL。
 **C17 白名单零新增**（突变只在仓外 overlay）。⇒ 36/37/38/39/40 五张产品页正式解锁（已在跑）。
+
+## A1916（11-16 20:3x）：**审计答了"为什么一堆未接线"——三条硬事实，我都认**
+
+审计腿（只读）件 docs/evidence/s1/census-unwired-20261116-2017.md（333 行）。三条：
+1. **「未接线」徽章是编译期写死的字面量**：config-screen.tsx:411 const live = row.blocked === ""，locked 是 APPEARANCE_ROWS（:152-162）硬编码串 ⇒ 徽章**与 Go 有没有读者毫无关系**（双向都可能说谎）。历史 6 行→1 行（d9b29fd9→4017962b3）。
+2. **今天真机没有设置页**：rontend/dist 只有 .gitkeep ⇒ Built()==false ⇒ panel_host_windows.go:1024-1025 报「embedded bundle not built」。⇒ 机主看到的那屏只可能是 ?harness=2 dev 或 design/doubao/demo（demo 每枚徽章都写"即时"）。
+3. **"一堆"的本体是 settings-page.tsx 的 12 格里 9 格 waiting 格**，其中**3 格是假话**：成本（panel_cost_194.go:51 读真表＋cost_handlers.go:120 出 payload，**rontend/ 里 cost.summary 零命中＝数据在门口没人取**）、安全（档位每包都推 un.go:1187→pump.go:372-373）、技能。
+**处置**：census 现读坐标已写进票 39／40 票面（那两腿随后读到）；两枚无票认领缺口立票 441（font_size 消费引擎／SetTheme 零调用者／外观波四枚无票号）。
+**我的错**：此前一直按 config-screen 的徽章跟机主讲"接线"，而那是硬编码的字面量 —— 又一次"拿文案当事实"。

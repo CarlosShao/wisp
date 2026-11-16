@@ -51,3 +51,13 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 > **本票 AC 的真数据 e2e 格仍等票 145/35/33 的字段与宿主，一格未勾、不由本程
 > 勾**；可视壳的 commit 链见票 77 进度追记（`424ac84`…`5e23d99`）与
 > `docs/reports/frontend-session-log-zcode.md` §1–§7。
+
+---
+
+## 编排者追加事实（2026-11-16 20:3x，来自只读审计腿 `census-unwired`，件 `docs/evidence/s1/census-unwired-20261116-2017.md`）
+
+**这一段是"现读坐标"，比票面正文新；按它做，⛔ 按票面旧行号。**
+- **`app.theme` 今天零读者**：`App.Theme` 全仓 22 命中全在 `internal/config` 自转圈＋测试；`internal/ball/renderer_windows.go:106 SetTheme` **零调用者**；`ball.Options.Theme`（`ball_windows.go:93`）装配根**不填**（`resident_ball_windows.go:488-500`）；写侧也不在名册（`config_write_313.go:201-209` 六册并集无它）。⇒ 本票据 GUI 时**要么接上球侧消费者（`SetTheme` 有人调），要么这一行明确标"未接引擎"**，⛔ 显示"即时"。
+- **`panel.font_size` 四跳已通（写/读/快照/装配）但零消费引擎**：`config_write_wave.go:40`＋`panel_config_store.go:431-440`＋`settings_appearance_wave.go:179`＋`run.go:1272-1274`；`Panel.FontSize` 全仓 6 命中全在 `internal/config`＋测试，`panel_host_windows.go` **0 命中**。⇒ 要么接到页面字号，要么标明缺引擎。
+- **`panel.opacity`／`panel.animations` 不是 config 键**（页面本地 CSS 变量／`html[data-motion]`）⇒ 本页若展示它们，**标明"仅本次会话、不落盘"**，⛔ 让用户以为存了。
+- **★ 徽章判据是假的**：`frontend/src/components/config-screen.tsx:411` `const live = row.blocked === ""`，`blocked` 是 `APPEARANCE_ROWS`（`:152-162`）**硬编码字符串** ⇒ 徽章与 Go 到底有没有读者**毫无关系**。本票必须把它改成**读真状态**（有生产读者/引擎才"即时"），并给一枚行为牙：某行读者被摘 ⇒ 徽章翻"未接线"且测试红。
