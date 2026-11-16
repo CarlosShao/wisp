@@ -218,6 +218,16 @@ type replySurface struct {
 	// case that does not care leaves it nil and record() then books the audit
 	// line only - no invented history.
 	review *replyReview
+	// archive is the LOCAL audit档 that holds the second copy of a truncated
+	// reason (ticket 219 AC#5's 可找回指针: the 2026-11-15 receipt measured that
+	// dropped = only a count, so the cut words had no home at all). nil means
+	// this assembly has no data root to write one in; archivePointer then says
+	// so out loud instead of minting a pointer nothing can resolve. Today every
+	// path that can carry an operator-typed truncatable reason goes through
+	// newReplySurface (the console verbs `no` / `panel-no`); the tray's fixed
+	// sentence bypasses the wash entirely, which is why the no-pipeline shape
+	// leaves this nil.
+	archive *replyReasonArchive
 	// vetoChannel is the channel this host's cancel transport really is. Empty
 	// means this assembly wired none of SPEC-06 §2's four, and Gate.Veto's own
 	// ChannelRegistry says so back.
@@ -337,28 +347,65 @@ func (s *replySurface) reject(corr string, reason replyReason) (string, error) {
 // because the ONLY difference between them is which router the decision travels
 // through - and a second copy is how one of them grows a leniency the other does
 // not have.
+//
+// AC#5's 可找回指针 is minted HERE, before the answer travels: a reason the
+// ceiling cut gets its second copy appended to the archive档 first, and the
+// pointer (the档's line number) rides the same text the model, the audit line
+// and the review list all see. Archiving BEFORE the route also means a REFUSED
+// attempt leaves its typed words in the档 (keyed by corr) even though no mark
+// was ever delivered for it.
 func (s *replySurface) refuse(corr string, reason replyReason, viaPanel bool) (string, error) {
 	card, _ := s.live.look(corr)
 	route, routeText := "native", "原生侧"
-	var err error
 	if viaPanel {
 		route, routeText = "panel", "面板路线"
-		err = s.live.h.PanelReject(s.ctx, corr, reason.text)
+	}
+	// The pointer is minted BEFORE the answer travels, so the mark the model,
+	// the audit line and the review list all see is already resolvable: the
+	// text routed below is reason.text plus the pointer clause (both empty when
+	// the reason was within the ceiling - 口径①).
+	pointer := s.archivePointer(corr, route, reason)
+	text := reason.text + pointer
+	var err error
+	if viaPanel {
+		err = s.live.h.PanelReject(s.ctx, corr, text)
 	} else {
-		err = s.live.h.Reject(s.ctx, corr, reason.text)
+		err = s.live.h.Reject(s.ctx, corr, text)
 	}
 	if err != nil {
 		s.record("REFUSED", corr, card.Tool, route+"/reject", err.Error())
 		return "", err
 	}
-	s.record("ANSWERED", corr, card.Tool, route+"/reject", reason.text)
+	s.recordWithOriginal("ANSWERED", corr, card.Tool, route+"/reject", text, reason.full)
 	if reason.text == "" {
 		return "已拒绝 " + corr + "（" + routeText + "，未填理由）：未执行", nil
 	}
 	if note := reason.truncationNote(); note != "" {
-		return "已拒绝 " + corr + "（" + routeText + "）：未执行，理由已随结果回给模型（" + note + "）", nil
+		return "已拒绝 " + corr + "（" + routeText + "）：未执行，理由已随结果回给模型（" + note + pointer + "）", nil
 	}
 	return "已拒绝 " + corr + "（" + routeText + "）：未执行，理由已随结果回给模型", nil
+}
+
+// archivePointer is AC#5's 口径③ made concrete: the ONLY thing that turns a cut
+// reason into a findable one. It appends the full washed original to the local
+// audit档 and returns the pointer clause that makes that copy resolvable from
+// the mark; when there is nothing to point at (reason within the ceiling) it
+// returns "" and NO copy is grown anywhere - 口径①'s "只在真截断时才有第二份".
+// The clause never lies about completeness: the档 line holds the whole washed
+// original, so the 全文 N 字 claim is checkable against it.
+func (s *replySurface) archivePointer(corr, route string, r replyReason) string {
+	if r.dropped <= 0 || r.full == "" {
+		return ""
+	}
+	if s == nil || s.archive == nil {
+		return "；原文另存未接入（这一装配没有答复理由档，可找回指针缺失——装配缺陷）"
+	}
+	seq, err := s.archive.append(corr, "reject", route, r)
+	if err != nil {
+		return fmt.Sprintf("；原文另存写入失败（%v）：原文仍可在本进程 decisions 回看里取回全文", err)
+	}
+	return fmt.Sprintf("；原文另存：%s 第 %d 行（corr=%q，全文 %d 字）",
+		replyReasonArchiveRelPath(), seq, corr, len([]rune(r.full)))
 }
 
 // panelReject is the panel route's refusal - SPEC-06 §9 layer 3's 「拒绝」
@@ -470,17 +517,33 @@ func panelItemLine(item approval.PanelItem) string {
 // answered, and the two would drift the first time a route was added. The audit
 // line stays the durable record; review is the operator's readable copy of it.
 func (s *replySurface) record(kind, corr, tool, route, detail string) {
+	s.book(replyDecision{kind: kind, corr: corr, tool: tool, route: route, detail: detail})
+}
+
+// recordWithOriginal is record() for the one case whose ledger line carries a
+// reason the ceiling cut: original is the second copy's IN-PROCESS payload (the
+// full washed text the `decisions` verb prints back), and the durable copy of
+// the same text went to the archive档 in refuse() before the answer travelled.
+// AC#5's 口径① pins the pairing: original is filled only when a real truncation
+// happened - a reason within the ceiling passes "" and grows no copy anywhere.
+func (s *replySurface) recordWithOriginal(kind, corr, tool, route, detail, original string) {
+	s.book(replyDecision{kind: kind, corr: corr, tool: tool, route: route, detail: detail, original: original})
+}
+
+// book is the ONE write point into both destinations of a booked reply: the
+// audit line and the review list. It exists so the two can never drift - the
+// 2026-11-08 note on this function already refused a second truth source about
+// what was answered, and the archive pointer rides the same discipline.
+func (s *replySurface) book(d replyDecision) {
 	if s == nil {
 		return
 	}
-	when := time.Now()
+	d.when = time.Now()
 	if s.audit != nil {
 		s.audit("approval: REPLY %s corr=%q tool=%s route=%q detail=%q when=%s",
-			kind, corr, tool, route, detail, when.Format(time.RFC3339))
+			d.kind, d.corr, d.tool, d.route, d.detail, d.when.Format(time.RFC3339))
 	}
-	s.review.add(replyDecision{
-		when: when, kind: kind, corr: corr, tool: tool, route: route, detail: detail,
-	})
+	s.review.add(d)
 }
 
 // decisions is the operator's own copy: what this process answered, in what
@@ -495,6 +558,12 @@ func (s *replySurface) record(kind, corr, tool, route, detail string) {
 // (replyReviewKeep), the durable copy is the audit family, and it never
 // re-derives a decision from the queue - a card still waiting is not in here,
 // which is the difference between "what it decided" and "what it is asking".
+//
+// AC#5's 可找回指针 rides this verb: an entry whose reason was truncated carries
+// the full washed original, printed here verbatim, and the mark inside the
+// reason text names the archive档 line that holds the same text durably - so
+// the pointer is resolvable today (this verb, in-process) and after a restart
+// (the archive file, by line number).
 func (s *replySurface) decisions() (string, error) {
 	if s == nil || s.review == nil {
 		return "本进程没有答复回看账：这个装配没有接答复面，也就没有可回看的理由", nil
@@ -505,6 +574,10 @@ func (s *replySurface) decisions() (string, error) {
 	}
 	var b strings.Builder
 	fmt.Fprintf(&b, "本进程最近 %d 条答复（新的在前；落盘的证据是日志里 approval: REPLY 那一族行）：", len(all))
+	if s.archive != nil {
+		fmt.Fprintf(&b, "\n被截断理由的原文另存档：%s（只有真截断的答复才有行；标记里「原文另存」说的第 N 行就是这份档的第 N 行）",
+			s.archive.path)
+	}
 	for i := len(all) - 1; i >= 0; i-- {
 		e := all[i]
 		detail := strings.TrimSpace(e.detail)
@@ -513,6 +586,10 @@ func (s *replySurface) decisions() (string, error) {
 		}
 		fmt.Fprintf(&b, "\n  %s %s corr=%q tool=%s route=%q 理由/明细=%q",
 			e.when.Format(time.RFC3339), e.kind, e.corr, e.tool, e.route, detail)
+		if e.original != "" {
+			fmt.Fprintf(&b, "\n      原文全文=%q（这条的理由超过了 %d 字上限：明细里是截断后的文本，这一行是被截掉之前的完整原文，两者逐字对得上）",
+				e.original, replyReasonMax)
+		}
 	}
 	return b.String(), nil
 }
@@ -591,6 +668,7 @@ func (rt *agentRuntime) newReplySurface(root *observe.Root, vetoChannel approval
 		vetoChannel: vetoChannel,
 		ctx:         root.Ctx,
 		review:      newReplyReview(),
+		archive:     newReplyReasonArchive(rt.spec.dataDir),
 	}
 	rt.reply = surface
 	// Bind the seam to this gate before anything can be answered: the ledger was
@@ -804,6 +882,13 @@ type replyReason struct {
 	// removed, after whitespace collapsing. Zero means text is everything they
 	// typed.
 	dropped int
+	// full is the SECOND COPY's in-process payload: the complete washed
+	// original (the same text the mark's 原文共 N 字 counts), filled ONLY when
+	// dropped > 0. Empty means no truncation happened and no copy of this
+	// reason exists anywhere - AC#5's 口径① (a reason within the ceiling never
+	// grows a second copy). refuse() hands it to the archive档 and to the
+	// review entry; nothing else ever reads it.
+	full string
 }
 
 // truncationNote is the sentence a caller adds when the reason was cut, or ""
@@ -817,9 +902,12 @@ func (r replyReason) truncationNote() string {
 }
 
 // washReason turns one raw argument into the value the surface answers with.
+// When the ceiling cut the text, full carries the complete washed original -
+// the second copy's payload, filled here and only here, and only on a real
+// truncation (AC#5's 口径①: a reason within the ceiling passes full="").
 func washReason(raw string) replyReason {
-	text, dropped := washReplyText(raw)
-	return replyReason{text: text, dropped: dropped}
+	text, full, dropped := washReply(raw)
+	return replyReason{text: text, full: full, dropped: dropped}
 }
 
 // sanitizeReplyText is the historical name for the wash, kept because this
@@ -831,7 +919,16 @@ func sanitizeReplyText(s string) string {
 }
 
 // washReplyText washes one operator-typed reason and reports how many of its
-// runes the ceiling removed.
+// runes the ceiling removed. The composition lives in washReply; this wrapper
+// keeps the two-return shape the package's own teeth call.
+func washReplyText(s string) (string, int) {
+	text, _, dropped := washReply(s)
+	return text, dropped
+}
+
+// washReply is the ONE composition point of the wash: the marked text the
+// model and audit see, the full washed original ("" unless the ceiling cut,
+// the second copy's payload), and the dropped count.
 //
 // Why wash a human's own words at all: the reason is relayed into the model's
 // tool result verbatim (bridge.go's orDefault(why, …)), and a control character
@@ -842,15 +939,17 @@ func sanitizeReplyText(s string) string {
 // length survive, which is what keeps 「为什么拒绝」 the operator's sentence
 // rather than something this file paraphrased.
 //
-// The cut is now countable and stated (ticket 219 AC#5): a reason over the
-// ceiling comes back as the first replyReasonMax runes of the washed text plus
-// replyTruncationMark's sentence, and the second return value is the number of
-// runes dropped. The dropped runes themselves are NOT kept anywhere, and that
-// limit is said out loud in the marker rather than implied - storing a second,
-// unbounded copy of operator text was not this ticket's to add.
-func washReplyText(s string) (string, int) {
+// The cut is countable and stated (ticket 219 AC#5): a reason over the ceiling
+// comes back as the first replyReasonMax runes of the washed text plus
+// replyTruncationMark's sentence, the second return value is the number of
+// runes dropped, and the THIRD is the complete washed original the archive档
+// stores so the cut words can be found again (AC#5's 可找回指针; the 2026-11-15
+// receipt measured that the dropped runes had no home at all). The mark itself
+// is appended ON TOP of the 160 on purpose: a mark that could itself be cut off
+// is the same silence one layer deeper.
+func washReply(s string) (string, string, int) {
 	if s == "" {
-		return "", 0
+		return "", "", 0
 	}
 	washed := make([]rune, 0, len(s))
 	pendingSpace := false
@@ -872,12 +971,12 @@ func washReplyText(s string) (string, int) {
 		washed = append(washed, r)
 	}
 	if len(washed) <= replyReasonMax {
-		return string(washed), 0
+		return string(washed), "", 0
 	}
 	dropped := len(washed) - replyReasonMax
 	text := string(washed[:replyReasonMax]) +
 		fmt.Sprintf("%s %d 字，原文共 %d 字)", replyTruncationMark, dropped, len(washed))
-	return text, dropped
+	return text, string(washed), dropped
 }
 
 // replyReviewKeep is how many answered replies the in-process review list holds.
@@ -894,6 +993,11 @@ type replyDecision struct {
 	tool   string
 	route  string
 	detail string
+	// original is the second copy's in-process payload: the full washed
+	// original of a reason the ceiling cut, printed verbatim by decisions().
+	// Empty means no truncation happened (or this record carries no operator
+	// reason at all) - AC#5's 口径①: only a real truncation grows a copy.
+	original string
 }
 
 // replyReview is the bounded review list behind the `decisions` console verb -
