@@ -37721,3 +37721,8 @@ resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器�
 3. **"一堆"的本体是 settings-page.tsx 的 12 格里 9 格 waiting 格**，其中**3 格是假话**：成本（panel_cost_194.go:51 读真表＋cost_handlers.go:120 出 payload，**rontend/ 里 cost.summary 零命中＝数据在门口没人取**）、安全（档位每包都推 un.go:1187→pump.go:372-373）、技能。
 **处置**：census 现读坐标已写进票 39／40 票面（那两腿随后读到）；两枚无票认领缺口立票 441（font_size 消费引擎／SetTheme 零调用者／外观波四枚无票号）。
 **我的错**：此前一直按 config-screen 的徽章跟机主讲"接线"，而那是硬编码的字面量 —— 又一次"拿文案当事实"。
+
+## A1917（11-16 21:1x）：**票 48 审批队列结案（5/5，零生产码，全测试）**
+
+622b5f29。我复跑：approval 包 -run TestTicket48 ok 0.224s；载具 ^Test48 2/2 PASS。FIFO 保序/队头/回原任务、270→300s 注入时钟超时梯＋replay、fail-closed 红句、挂起 voided=2＋恢复拒死 grant、深度 1→12 且**额外轮询=0**。
+整包 ./cmd/wisp 512 RUN/378 PASS/0 FAIL 后 **exit 139 在 WebView2 区段**＝**票 450 既定未完成项**（非本腿引入），A1893 单跑截断点那枚 1.29s PASS；A1882 锚整包未命中但单跑 3/3 PASS。
