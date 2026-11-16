@@ -37644,3 +37644,14 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 症状①绿＝3b806876f（299-r1，交接改导航 panelEntryURL＋资源过滤器，钉 panel_host_windows.go:980-987）；症状②绿＝07f685eb（402-r1，**修的是测量**：waitSettledHandoverDocument，产码推入跳没坏）。
 AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean；AC#5 只记本票（33 的 AC#13/14 已 A1900 翻，不重记）。
 **教训**：这张"缺陷票"挂了 37 天，其实**症状早被别的腿顺手修好**，只是没人按票号判死 —— 同 A1896/A1897：**报缺陷前先现跑那枚钉**。
+
+## A1906（11-16 14:2x）：**审计腿判「成立 5／不成立 4」——两张链卡是"反向假话"，我认**
+
+uditTodaysCards（审计路由）结论：**成立**＝云端链改动前真为 0／链路连通／拆调用点谁红（M1 2 红、M2 2 红、M3 3 红）／CSP 两枚不恒真（M4 剥响应头⇒红）／实时语音仍标占位无反向假话／本机音频三键来源真／越界面零命中／dist 零字节。
+**不成立 4 条（我复读了源码，全真）**：
+- **R1（必须回退）**：链卡写「已接入·重启生效」是**反向假话** —— 写面只查 provider/model（internal/config/settings_313.go:105→catalog.go:51，**无能力位检查**），装配面查能力位（internal/speech/cloudcatalog.go:97/:101 lacks capabilities.audio_in），能力位**默认全 false**（internal/config/schema.go:368-374 probe-first），而**读面/写面都没有能力位**（panel_config_store.go:127-138）⇒ 新用户无处勾 ⇒ boot 必拒。
+- **P1**：票 255 名册那条刀**无牙**（删 ResolveCloudChain 调用点 255 全族 5/5 PASS）—— 断的是判决字符串、不是活调用图。
+- **P2**：docs/SLO.md:629 未写明 cold P95=1693 的**取样态**（同机安静态 33-r4＝815.826ms，**2.07 倍差**）。
+- **P3**：能力位不可达（无写口、无读口）＝R1 的根因。
+**处置**：已存档派单 .scratch/wisp/probes/orch/20261116/txt/313-audit-r1-p1p2p3-dispatch.txt，等 w215aplugins 收腿后（cmd/wisp 一波一腿）发。**判据**：默认 false 时装配拒、界面勾上 audio_in 后装配成功——这才叫"真接"。
+**给机主的话**：我上两条汇报说"两张卡真接上了"——**说过头了**。物理链路是通的（拆了会红），但**用户从界面上没法让它跑起来**。修完再报。

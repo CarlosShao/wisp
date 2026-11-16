@@ -1,0 +1,23 @@
+# 派单存档（先存档再发）—— 313 审计 R1/P1/P2/P3 修正：能力位可达＋文案条件式＋255 牙＋SLO 取样态（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**审计腿 `auditTodaysCards` 判「成立 5／不成立 4／无法判 1」**，本单修其中 4 条，按序做；⛔ 反驳审计、⛔ 只改文案不改机制。
+
+**根因（我已复读源码，是真）**：写面只查 provider/model 存在（`internal/config/settings_313.go:105 requireChainElements` → `internal/config/catalog.go:51 checkChainElement`，无能力位检查）；装配面查能力位（`internal/speech/cloudcatalog.go:97/:101` `lacks capabilities.audio_in/audio_out`）；模型能力位**默认全 false**（`internal/config/schema.go:368-374` ModelSpec 注释「probe-first」）；读面 `cmd/wisp/panel_config_store.go:127-138 VoiceSettingsView` **无能力位**、写面也无。
+⇒ 今天页面写「已接入·重启生效」，但**新用户无处声明 audio_in/audio_out ⇒ boot 时链必被拒**＝**反向假话**。
+
+**逐条（按序，打不完照实说打到哪）**：
+1. **【根因】能力位可达（P3）**：给模型行加 `capabilities.audio_in`／`audio_out`（至少这两枚）的 **读面＋写面**：
+   - 读面：`VoiceSettingsView`（或模型行视图）带上每枚模型的这两个位；
+   - 写面：走票 248 的 `config.set` 受保护 setter（`internal/panel/config_write_313.go` 一族），⛔ 另造新路；非密钥字段不必进 DPAPI；
+   - **前端**：模型行上给两枚开关（Capabilities: audio in / audio out），⛔ UI emoji；`npm --prefix frontend run build` rc=0（node 在 `D:\work\server\node24`）＋`typecheck` rc=0。
+   - **判据（行为）**：默认 false ⇒ 链装配拒绝（红句 `lacks capabilities.audio_in`）；用户在界面把 audio_in 打开并保存 ⇒ **链装配成功**（行为牙：改位 ⇒ 装配结果跟着变）。
+2. **【R1】文案条件式**：`frontend/src/components/voice-settings.tsx` 的听写/朗读两卡——文案改成**条件式＋点名门槛**（例：「已接入：需该模型在能力位里勾上 audio in/out，保存后重启生效」）；保存回执**按"这链现在能不能装配"分流**（能装配＝已接入·重启生效；不能＝醒目标出缺哪一位）。⛔ 保留"已接入"却不提门槛。
+3. **【P1】255 名册无牙 → 补一条按活调用图判的尺**：现状 `cmd/wisp/config_receipt_255_test.go:367-380` 断的是**判决字符串**、`scanReadFiles` 按文件存在记名 ⇒ 删 `ResolveCloudChain` 调用点仍 rc=0。补一条**删装配点必红**的牙（⛔ 断字符串；按真调用路径／行为）。
+4. **【P2】`docs/SLO.md` 附录 E 补取样态**：写清本发机器态（审计实测 CPU 57%＋`Weixin`/`magpie-windows-amd64`/`DeepSeek Harness` 在跑）、同机同态对照（`33-r4` 安静态 815.826ms＝2.07 倍差）、并**明写「本发是负载态，⛔ 不得与安静态 815.826 合并成一个冷启 P95」**。⛔ 改阈值。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽任何断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）；⛔ 拆 `internal/config/unwired.go` 响亮拒收。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 是环境红，别当自己弄坏、别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/config/**`、`internal/panel/**`、`frontend/src/**`、`docs/SLO.md`（仅附录）、`docs/evidence/s1/313-*`。
+回话第一行＝commit hash ＋「能力位读/写/前端落点 file:line」＋「默认 false 时装配拒绝红句＋打开后装配成功的牙名」＋「两卡文案改成什么原文」＋「255 新牙名＋删装配点时的红句」＋「SLO 附录补了哪三句」＋npm build/typecheck rc。没干完写「未完成，卡在哪」。
