@@ -37637,3 +37637,10 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 - **216**：internal/llm/errors.go:215 case 413: 分支按**错误码**不按英文串；我复跑 go test ./internal/llm/... ./internal/panel ⇒ llm ok 108.082s／panel ok 42.599s 全绿 ⇒ 0 枚未勾结案。
 - ⚠ **我踩的坑（必须记）**：上一轮我关 169 后跑 path-length 门得 GREEN —— **假绿**，因为 -done 新名当时还**未跟踪**（git ls-files 只数跟踪件）；**提交后**再跑才 RED（169 的 -done 名 111 字超 100 帽、且名册键还是旧名）。尺：**改名类收口必须"提交后"再跑 path-length 门**（或先 git add 再跑）。
 - 已把名册键改到 -done 名，门回 GREEN（over=69／roster=69）。
+
+## A1905（11-16 14:1x）：**票 305 结案 —— 两枚症状"本来就好"，零产码；绿分别由 3b806876f／07f685eb 带出**
+
+7909e628＋710244e9e（证据 docs/evidence/s1/305-livedoc-verdict.md 8792 B）。我复跑三枚钉 **3/3 PASS**（AC13 1.43s／AC14Awaited 1.19s／AC14GoSideEvalPush 1.43s，现造 dist 后）。
+症状①绿＝3b806876f（299-r1，交接改导航 panelEntryURL＋资源过滤器，钉 panel_host_windows.go:980-987）；症状②绿＝07f685eb（402-r1，**修的是测量**：waitSettledHandoverDocument，产码推入跳没坏）。
+AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean；AC#5 只记本票（33 的 AC#13/14 已 A1900 翻，不重记）。
+**教训**：这张"缺陷票"挂了 37 天，其实**症状早被别的腿顺手修好**，只是没人按票号判死 —— 同 A1896/A1897：**报缺陷前先现跑那枚钉**。
