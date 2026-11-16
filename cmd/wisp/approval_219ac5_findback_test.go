@@ -106,7 +106,7 @@ func Test219AC5TruncatedReasonIsFindableThroughTheMark(t *testing.T) {
 	// the cut 160, so this assertion is exactly the retrieval tooth.
 	console := h.out.String()
 	if !strings.Contains(console, long) {
-		t.Error("the decisions read entry does not carry the verbatim 200-rune original: "+
+		t.Error("the decisions read entry does not carry the verbatim 200-rune original: " +
 			"the retrieval was deleted or broken")
 	}
 	if !strings.Contains(console, "原文全文=") {

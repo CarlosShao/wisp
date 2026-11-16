@@ -1034,4 +1034,3 @@ func (r *replyReview) snapshot() []replyDecision {
 	defer r.mu.Unlock()
 	return append([]replyDecision(nil), r.entries...)
 }
-
