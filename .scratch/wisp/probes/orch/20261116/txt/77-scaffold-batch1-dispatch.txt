@@ -1,0 +1,17 @@
+# 派单存档（先存档再发）—— 票 77 前端脚手架（解冻后第一批）：AC#1 / AC#4 / AC#10 / AC#12（写腿，本波唯一 frontend 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/77-frontend-scaffold-reactbits-beautifului-shadcn.md` 全文（**已解冻**；余 AC#1/AC#3/AC#4/AC#6＋并入 34 的 AC#8–AC#12）。本轮只打下面四格，⛔ 全做。
+
+**本轮四格**：
+1. **AC#1（能力型）**：`npm --prefix frontend run build`（node 在 `D:\work\server\node24`）rc=0 ⇒ 产物被 `go:embed all:dist` 打进二进制 ⇒ `go test ./internal/panel -run 'Built|Assets'` 绿 ＋ **Go 侧数 `frontend.Dist()` 条目**（index.html＋assets/*.js＋*.css 各在）⇒ 跑完 dist 删回 `.gitkeep`（⛔ 提交 dist 字节）。
+2. **AC#4**：`ban #6`／`ban #8` 对真实 `frontend/` 的**逐作用域文件数**（`sh scripts/d22scan.sh` 自报行，>0），并把"哪些目录被扫/哪些没被扫"写成台账（⛔ 只写"clean"）。
+3. **AC#10**：token parity —— `design/assets/tokens.css`（若不在仓就具名写"文件不存在、以哪份为准"）与前端 token 名册**脚本化 diff**；差集逐条列出，能补则补，⛔ 凭空声称一致。
+4. **AC#12**：bundle 预算 —— 构建后量**首屏 JS 的 gz 字节**（`gzip -c` 或 node zlib 现量），给数字；>400KB gz 就**具名写超多少**（⛔ 删代码凑数、⛔ 谎称达标）。motion/Shiki 是否懒载给 file:line。
+
+**不在本轮**（⛔ 顺手做）：AC#3（L2 卡真数据，要 `internal/risk` 真决策对象）、AC#6（要 CI 真 run id）、AC#8/9/11（docker／CI job／深浅色对比度）。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；⛔ 提交 `frontend/dist` 字节；⛔ UI emoji（d22scan 扫）；改前端后 `npm run build` rc=0＋`typecheck` rc=0。
+**写面**：`frontend/**`（本波唯一写腿）、`docs/evidence/s1/77-*`；`internal/panel` 若需只读例外给 file:line。
+**串行**：若跑 `go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等）；⛔ 裸跑（A1888）。**A1880** 牙要行为；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`。
+回话第一行＝commit hash ＋「dist 条目数明细」＋「ban#6/ban#8 逐作用域文件数」＋「token diff 差集几条」＋「首屏 JS gz 字节」＋「哪些没打完卡在哪」。没干完写「未完成，卡在哪」。

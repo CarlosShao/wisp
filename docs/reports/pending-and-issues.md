@@ -37680,3 +37680,9 @@ AC#3 突变对红句逐字、还原复绿；AC#4 两条 vet rc=0＋d22scan clean
 43bf68b51：①?? null 三态归一（model-settings.tsx:682-683／oice-settings.tsx:124-138＋LocalAudioCard 四枚指针键）——键真缺席不再抛、走「等快照」；②三条门槛全建模（能力位／pi_key_ref＋credentialError／**新读面** ModelsEnabled），四态标签各自点名。
 **我自己复跑 3/3 PASS rc=0；ender:model-settings rc=0**（修前同仪器 rc=1 TypeError）。
 **结论（可对机主复述的口径）**：云端语音链＝**六跳全通＋三条门槛都会如实报**，但**还没人按过那一次按钮**。⛔ 再说"能用了"，只说"人可验"。
+
+## A1911（11-16 18:4x）：**票 34 并入票 77（superseded，5 格具名并入 AC#8-12）；77 解冻**
+
+34 与 77 是同一件事（前端脚手架），77 是活票。**34 的 5 格具名并入 77 AC#8–AC#12**（docker→真窗／CI job／token parity／深浅色对比度／bundle 预算），34 标 superseded 并改名 -done（接手名字＝票 77，⛔ 悄悄消失）。
+**77 解冻**：09-23 冻结理由"想让别的 agent 干前端"按机主 2026-11-16 铁律 4 **作废**（原文留档不删）。
+首批派单＝AC#1／AC#4／AC#10／AC#12（存档 .scratch/wisp/probes/orch/20261116/txt/77-scaffold-batch1-dispatch.txt）。

@@ -1,6 +1,6 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-> **⛔ 2026-09-23 09:22 编排者按 owner 指令冻结本票（不改文件名，只改状态位）**：
+> ~~**⛔ 2026-09-23 09:22 编排者按 owner 指令冻结本票**~~ —— **2026-11-16 解冻（机主 10:4x 铁律 4：前端归本编队，冻结理由作废）**。原文留档：
 > 原话「我是想让别的 agent 干前端部分的」⇒ 本票**余下四格 AC#1 / AC#3 / AC#4 / AC#6 的正解全在 `frontend/` 下**，
 > 我编队**不再派发、不再代写**。已入库的三格（AC#2 / AC#5 / AC#7）**保留不回滚**。
 > 台账依据 `A102`，规则依据 `issues/README.md` 规则 7。
@@ -384,3 +384,15 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
     审查/终端/浏览器三面板、任务监控弹窗、动画开关机器、react-bits 五枚
     vendored）、`docs/reports/frontend-session-log-zcode.md` 流水账。
   - **伪授权**：无新命中。
+
+---
+
+## 解冻与并入（2026-11-16 18:4x，编排者）
+
+- **解冻**：机主 2026-11-16 10:4x 令「前端也是你全权接手，没有外部前端 agent」⇒ 本票 09-23 冻结理由（"想让别的 agent 干前端"）**作废**，余下 AC#1/AC#3/AC#4/AC#6 **恢复可派**。
+- **并入票 34**（同日裁：34 与 77 同一件事，34 superseded、不再派）：
+  - [ ] **AC#8**（←34）：docker build→dist→go build 出的二进制在**真面板窗**里服务脚手架（不是只本地 dev server）。
+  - [ ] **AC#9**（←34）：CI job 覆盖 tsc／lint／build 全绿，且**种子违规会被抓**（硬编码 hex、emoji、禁用导入各一枚）。
+  - [ ] **AC#10**（←34）：token parity —— design/assets/tokens.css 与前端 token 名册的**脚本化 diff** 为空（或逐条具名差异）。
+  - [ ] **AC#11**（←34）：深色＋浅色各渲染一次外壳＋一枚样例屏，对比度抽查 ≥AA。
+  - [ ] **AC#12**（←34）：bundle 预算 —— 首屏 JS ≤400KB gz（React 成本按 D29 可接受；motion/Shiki 懒载）。
