@@ -172,13 +172,21 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 		// model page's switches have a real "当前" to show instead of a guess.
 		if len(p.Models) > 0 {
 			caps := make(map[string]panel.ModelCapabilityBits, len(p.Models))
+			enabled := make(map[string]bool, len(p.Models))
 			for id, spec := range p.Models {
 				caps[id] = panel.ModelCapabilityBits{
 					AudioIn:  spec.Capabilities.AudioIn,
 					AudioOut: spec.Capabilities.AudioOut,
 				}
+				// R1-recheck residual 2's third gate: the model's enabled flag,
+				// the same specs the names and bits above come from. The boot
+				// refuses a chain element naming an enabled=false model
+				// (internal/speech/cloudcatalog.go:87-90); without this read
+				// face the page could only judge the gate by guessing.
+				enabled[id] = spec.Enabled
 			}
 			row.ModelCapabilities = caps
+			row.ModelsEnabled = enabled
 		}
 		ref := strings.TrimSpace(p.APIKeyRef)
 		if ref != "" {

@@ -669,7 +669,18 @@ function ProviderEdit({
               // switch is one write through the ticket-248 door
               // (model_audio_in / model_audio_out); the reload after it brings
               // back the new read, and the receipt line is the door's own.
-              const bits = row.modelCapabilities === null ? undefined : row.modelCapabilities[id];
+              //
+              // THREE STATES (R1-recheck residual 1): Go's wire tag is
+              // `modelCapabilities,omitempty` (config_handlers.go:776), so an
+              // unanswering leg leaves the key OFF the wire and the bare-cast
+              // parse hands us `undefined`, not `null` - a zero-model provider
+              // row (CreateProviderRow without an id, settings_313.go:154) is
+              // factory-reachable, and judging `=== null` here crashed the page
+              // on it. `?? null` folds absence and null into one fact - "the
+              // leg did not answer" - and a record that answered but skips THIS
+              // model id stays 等快照 too (never a guessed false, never a throw).
+              const caps = row.modelCapabilities ?? null;
+              const bits = caps === null ? undefined : (caps[id] ?? undefined);
               return (
                 <div className="flex flex-wrap items-center gap-2" key={id}>
                   <span className="font-mono text-[11px] text-ink-2">{id}</span>

@@ -71,6 +71,15 @@ const ROW: ConfigViewProvider = {
   billing: "pay-per-token",
   modelCount: 2,
   models: ["示例模型-1", "示例模型-2"],
+  // R1-recheck re-adjudication (2026-11-16): the read face answers both
+  // per-model maps. This fixture is the ANSWERED shape - the wire keeps the
+  // keys off only when the leg did not answer (omitempty), and tooth 6 feeds
+  // that absent shape explicitly.
+  modelCapabilities: {
+    "示例模型-1": { audioIn: true, audioOut: false },
+    "示例模型-2": { audioIn: false, audioOut: false },
+  },
+  modelsEnabled: { "示例模型-1": true, "示例模型-2": true },
   credentialSet: true,
   credentialError: "",
 };
@@ -389,11 +398,26 @@ check(
   (voiceFresh.match(/>stepfun</g) ?? []).length >= 3,
   `${(voiceFresh.match(/>stepfun</g) ?? []).length} preselected pickers`,
 );
+// R1-recheck re-adjudication (2026-11-16): this check predates the conditional
+// tags. The saved tag stopped being a static 已接入·重启生效 when the R1 rework
+// made it a verdict (an unset chain is 未设置, not wired), so the wired-truth
+// count moves to the view whose chains ARE set and answered (VOICED): the ASR
+// chain passes every gate (已接入·重启生效 once), the TTS chain lacks its
+// audio_out bit (装配不了·缺能力位 once), and the realtime card keeps its
+// placeholder. The unset view asserts the unset states. No assertion loosened:
+// each count is exact and the placeholder pin stays.
 check(
   "the two chain cards must say the wired truth and the realtime card keeps its placeholder",
-  (voiceFresh.match(/已接入·重启生效/g) ?? []).length === 2 &&
-    (voiceFresh.match(/占位·当前不生效/g) ?? []).length === 1,
-  `wired=${(voiceFresh.match(/已接入·重启生效/g) ?? []).length} placeholder=${(voiceFresh.match(/占位·当前不生效/g) ?? []).length}`,
+  (voiceView.match(/已接入·重启生效/g) ?? []).length === 1 &&
+    (voiceView.match(/装配不了·缺能力位/g) ?? []).length === 1 &&
+    (voiceView.match(/占位·当前不生效/g) ?? []).length === 1,
+  `wired=${(voiceView.match(/已接入·重启生效/g) ?? []).length} lacks=${(voiceView.match(/装配不了·缺能力位/g) ?? []).length} placeholder=${(voiceView.match(/占位·当前不生效/g) ?? []).length}`,
+);
+check(
+  "the unset chain cards must read 未设置, never a wired tag (verdict, not static copy)",
+  (voiceFresh.match(/未设置/g) ?? []).length >= 2 &&
+    (voiceFresh.match(/已接入·重启生效/g) ?? []).length === 0,
+  `unset=${(voiceFresh.match(/未设置/g) ?? []).length} wired=${(voiceFresh.match(/已接入·重启生效/g) ?? []).length}`,
 );
 check(
   "the wired chain copy must name the restart contract, not promise a live effect",
@@ -436,6 +460,174 @@ check(
 );
 
 /* ---------------------------------------------------------------------------
+   Tooth 6 - the R1-recheck residuals (2026-11-16).
+   --------------------------------------------------------------------------- */
+
+// Residual 1's fixture: the WIRE shape with modelCapabilities genuinely
+// ABSENT. Go's omitempty (config_handlers.go:776) leaves the key off the wire
+// and the bare-cast parse hands the page `undefined`, not `null` - the shape
+// the audit proved crashes both pages (Node 24.21.0: TypeError reading
+// properties of undefined). Built via JSON round-trip + delete so the key is
+// truly absent, not a typed null: this is the fixture the old `=== null`
+// judgment threw on, and a zero-model provider row (CreateProviderRow without
+// an id, settings_313.go:154) is factory-reachable.
+const wireAbsentCapsRow: ConfigViewProvider = (() => {
+  const raw = JSON.parse(
+    JSON.stringify({ ...ROW, models: ["示例模型-1"], modelCount: 1 }),
+  ) as Record<string, unknown>;
+  delete raw["modelCapabilities"];
+  delete raw["modelsEnabled"];
+  return raw as unknown as ConfigViewProvider;
+})();
+
+function voiceWithChain(row: ConfigViewProvider, asr: string[] | null): ConfigView {
+  return {
+    ...CONFIGURED,
+    providers: [row],
+    voice: {
+      ...FRESH.voice,
+      cloudASRChain: asr,
+      cloudTTSChain: null,
+    },
+  };
+}
+
+/** Read one switch's rendered state out of the markup (attribute order is the
+    component's own: aria-checked before aria-label). */
+function switchState(markup: string, label: string): string | null {
+  const m = markup.match(new RegExp(`aria-checked="(true|false)"[^>]*aria-label="${label}"`));
+  return m === null ? null : m[1];
+}
+
+// 崩页牙 (residual 1), model page: the absent-key row must render the waiting
+// tag and must not throw. The old judgment threw INSIDE this render.
+const absentCapsRowEdit = renderToStaticMarkup(
+  <ProviderRow
+    autoFetch={false}
+    busy={null}
+    editing={true}
+    onAutoFetchHandled={noop}
+    onEditing={noop}
+    onFeedback={noop}
+    performCredential={performCredential}
+    performFetchModels={performFetchModels}
+    performWrite={performWrite}
+    row={wireAbsentCapsRow}
+    run={run}
+  />,
+);
+check(
+  "residual-1 crash tooth: a provider row whose modelCapabilities key is ABSENT must render 等快照 and must not throw",
+  absentCapsRowEdit.includes("等快照"),
+  "waiting tag",
+);
+check(
+  "residual-1: the absent-key row must mount no capability switch (never a guessed false)",
+  !absentCapsRowEdit.includes("audio in 能力位"),
+  "no switch",
+);
+check("the absent-key row markup must hold zero emoji", !EMOJI_RE.test(absentCapsRowEdit));
+
+// 正常值牙 (residual 1): with the read face answered, BOTH bits render with
+// their real states - audio in on for the first model, everything else off.
+const rowEditPage = renderToStaticMarkup(
+  <ProviderRow
+    autoFetch={false}
+    busy={null}
+    editing={true}
+    onAutoFetchHandled={noop}
+    onEditing={noop}
+    onFeedback={noop}
+    performCredential={performCredential}
+    performFetchModels={performFetchModels}
+    performWrite={performWrite}
+    row={ROW}
+    run={run}
+  />,
+);
+check(
+  "residual-1 normal-value tooth: the answered bits render with their real states",
+  switchState(rowEditPage, "示例模型-1 的 audio in 能力位") === "true" &&
+    switchState(rowEditPage, "示例模型-1 的 audio out 能力位") === "false" &&
+    switchState(rowEditPage, "示例模型-2 的 audio in 能力位") === "false" &&
+    switchState(rowEditPage, "示例模型-2 的 audio out 能力位") === "false",
+  `in1=${switchState(rowEditPage, "示例模型-1 的 audio in 能力位")} out1=${switchState(rowEditPage, "示例模型-1 的 audio out 能力位")}`,
+);
+
+// 崩页牙 (residual 1), voice page: a saved chain over the absent-key row
+// renders 装配未判（等快照） and must not throw.
+const absentCapsVoicePage = renderToStaticMarkup(
+  <VoiceSettingsView onReload={noop} performWrite={performWrite} view={voiceWithChain(wireAbsentCapsRow, ["stepfun/示例模型-1"])} />,
+);
+check(
+  "residual-1 crash tooth: a saved chain over the absent-key row must render 装配未判（等快照） and must not throw",
+  absentCapsVoicePage.includes("装配未判（等快照）"),
+  "unknown tag",
+);
+check("the absent-key voice markup must hold zero emoji", !EMOJI_RE.test(absentCapsVoicePage));
+
+// 三枚假象牙 (residual 2): each "looks assemblable" illusion fed once - the
+// tag must NOT be 已接入·重启生效, and only the all-gates-pass view is
+// allowed to say it. Gate order and sentences follow the boot's own
+// (cloudcatalog.go:87-90 enabled / :95-102 bits / :121-131 api_key_ref).
+const nokeyRow: ConfigViewProvider = { ...ROW, credentialSet: false };
+const credErrRow: ConfigViewProvider = { ...ROW, credentialSet: false, credentialError: "凭据存储未接入" };
+const disabledRow: ConfigViewProvider = { ...ROW, modelsEnabled: { "示例模型-1": false, "示例模型-2": true } };
+
+const nokeyPage = renderToStaticMarkup(
+  <VoiceSettingsView onReload={noop} performWrite={performWrite} view={voiceWithChain(nokeyRow, ["stepfun/示例模型-1"])} />,
+);
+check(
+  "residual-2 illusion 1 (api_key_ref declared, not affirmed): the tag must be 装配不了·缺 API Key",
+  nokeyPage.includes("装配不了·缺 API Key") && !nokeyPage.includes("已接入·重启生效"),
+  "nokey tag",
+);
+check(
+  "residual-2 illusion 1: the refusal must name the provider and its ref state",
+  nokeyPage.includes("stepfun 缺 API Key（api_key_ref"),
+  "named provider",
+);
+check("the nokey markup must hold zero emoji", !EMOJI_RE.test(nokeyPage));
+
+const credErrPage = renderToStaticMarkup(
+  <VoiceSettingsView onReload={noop} performWrite={performWrite} view={voiceWithChain(credErrRow, ["stepfun/示例模型-1"])} />,
+);
+check(
+  "residual-2 illusion 2 (credentialError): the tag must not be 已接入 and the error must render verbatim on the voice card",
+  !credErrPage.includes("已接入·重启生效") &&
+    credErrPage.includes("装配不了·缺 API Key") &&
+    credErrPage.includes("凭据存储未接入") &&
+    credErrPage.includes("无法核对密钥：stepfun（凭据存储未接入）"),
+  "credentialError rendered",
+);
+check("the credentialError markup must hold zero emoji", !EMOJI_RE.test(credErrPage));
+
+const disabledPage = renderToStaticMarkup(
+  <VoiceSettingsView onReload={noop} performWrite={performWrite} view={voiceWithChain(disabledRow, ["stepfun/示例模型-1"])} />,
+);
+check(
+  "residual-2 illusion 3 (enabled=false): the tag must be 装配不了·模型已停用, naming the disabled element",
+  disabledPage.includes("装配不了·模型已停用") &&
+    !disabledPage.includes("已接入·重启生效") &&
+    disabledPage.includes("stepfun/示例模型-1 已停用（enabled=false）"),
+  "disabled tag",
+);
+check("the disabled markup must hold zero emoji", !EMOJI_RE.test(disabledPage));
+
+// 全过牙 (residual 2): with every gate answered and passing, and ONLY then,
+// the wired tag is allowed.
+const allPassPage = renderToStaticMarkup(
+  <VoiceSettingsView onReload={noop} performWrite={performWrite} view={voiceWithChain(ROW, ["stepfun/示例模型-1"])} />,
+);
+check(
+  "residual-2: all three gates passing is the one state that may say 已接入·重启生效",
+  (allPassPage.match(/已接入·重启生效/g) ?? []).length === 1 &&
+    !allPassPage.includes("装配不了·"),
+  "all-pass tag",
+);
+check("the all-pass markup must hold zero emoji", !EMOJI_RE.test(allPassPage));
+
+/* ---------------------------------------------------------------------------
    The verdict.
    --------------------------------------------------------------------------- */
 
@@ -448,5 +640,9 @@ console.error(
   "render-model-settings: OK, AC#1 pre-selection gated on the read (stepfun, preset-list + " +
     "unconfigured only, initializer once), user value wins, key row password + canary-proof, " +
     "chat/chain/realtime pairs mount and ride the whitelisted fields with re-read write-back, " +
-    "voice cards draft-prefill the owner vendor with the wired/placeholder copy split",
+    "voice cards draft-prefill the owner vendor with the verdict (not static) wired/unset copy " +
+    "split; residual 1: absent-key rows render 等快照 / 装配未判 without throwing and answered " +
+    "bits show their real states; residual 2: the three assembles-illusions (nokey, " +
+    "credentialError, enabled=false) each refuse the wired tag and only the all-gates-pass " +
+    "chain may say 已接入·重启生效",
 );

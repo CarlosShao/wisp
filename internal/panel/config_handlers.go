@@ -271,6 +271,16 @@ type ProviderSettings struct {
 	// non-nil map answers EVERY listed model (both bits ride as plain bools,
 	// the schema's own probe-first defaults included).
 	ModelCapabilities map[string]ModelCapabilityBits
+	// ModelsEnabled is the read face of each catalog model's enabled flag (the
+	// R1-recheck residual-2 read surface): the voice boot refuses a chain
+	// element whose model is enabled=false by name (cloudcatalog.go:87-90,
+	// "names a model disabled in the catalog (enabled=false)"), and the page
+	// must judge that gate off the same read the boot runs - the other two
+	// gates already ride this row (ModelCapabilities for the capability bits,
+	// APIKeyRef/CredentialSet/CredentialError for the api_key_ref resolution).
+	// nil = the leg did not answer, the same absent class as ModelCapabilities;
+	// a non-nil map answers EVERY listed model.
+	ModelsEnabled map[string]bool
 	// BaseURL / Protocol / Billing are the row's own identity, read back so the
 	// page can SHOW what a row is instead of only that it exists. They came in
 	// with the operator's second-billing-entry work: with two rows of one vendor
@@ -725,6 +735,7 @@ func renderSettingsPayload(v SettingsView) string {
 			ModelCount:        p.ModelCount,
 			Models:            p.Models,
 			ModelCapabilities: caps,
+			ModelsEnabled:     p.ModelsEnabled,
 			CredentialSet:     p.CredentialSet,
 			CredentialError:   p.CredentialError,
 		})
@@ -763,8 +774,17 @@ type providerPayload struct {
 	// the wire (the same absent = "the leg did not answer" class the voice
 	// payload's pointer-gated half uses; here the map's presence is the gate).
 	ModelCapabilities map[string]modelCapsPayload `json:"modelCapabilities,omitempty"`
-	CredentialSet     bool                        `json:"credentialSet"`
-	CredentialError   string                      `json:"credentialError"`
+	// ModelsEnabled is the R1-recheck residual-2 read surface (see
+	// ProviderSettings.ModelsEnabled): one enabled flag per catalog model, the
+	// third boot gate the page judges (cloudcatalog.go:87-90). Same omitempty
+	// class as ModelCapabilities: a leg that never answered leaves the key OFF
+	// the wire, so absent = "the leg did not answer" - the page renders its
+	// waiting state there and never folds the absence into "every model
+	// enabled" (that folding is exactly the 能装配假象 residual 2 exists to
+	// kill).
+	ModelsEnabled   map[string]bool `json:"modelsEnabled,omitempty"`
+	CredentialSet   bool            `json:"credentialSet"`
+	CredentialError string          `json:"credentialError"`
 }
 
 // modelCapsPayload is the wire shape of one model's two audio bits; separate

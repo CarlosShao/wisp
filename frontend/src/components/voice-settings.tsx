@@ -1,5 +1,5 @@
 /* ============================================================================
-   语音 settings page - v4 (audit R1 fix, 2026-11-16).
+   语音 settings page - v5 (R1-recheck residuals fix, 2026-11-16).
    ----------------------------------------------------------------------------
    Same interface as v1 (313-panel-ask.md §3): two cloud fallback chains and the
    realtime head. v2 made it a product surface (chain editors, plain language,
@@ -15,6 +15,23 @@
    computed from the same read face. The capability bits themselves are
    switchable on the model page's model rows (model_audio_in / model_audio_out
    through the ticket-248 door).
+
+   v5 closes the two residuals the R1 recheck caught:
+
+     - residual 1 (the absent-key crash): the wire keeps modelCapabilities /
+       modelsEnabled behind omitempty, so "the leg did not answer" arrives as
+       an ABSENT key (undefined), not null - and the old `=== null` judgments
+       threw on it (a zero-model provider row is factory-reachable,
+       settings_313.go:154). Every read-face lookup here is now three-state
+       (有值 / 腿没答 / 该模型没答), the waiting states render, and nothing
+       throws.
+     - residual 2 (the two invisible gates): the boot refuses a chain over
+       THREE gates, the page modeled one. chainAssembly now judges all three
+       off the read face (enabled=false via the new ConfigViewProvider.
+       modelsEnabled read surface; a declared api_key_ref without an affirmed
+       credential via apiKeyRef/credentialSet/credentialError), the tag
+       says 已接入·重启生效 ONLY when all three pass, and credentialError
+       renders on this page for the first time.
 
      - 听写 / 朗读 are now WIRED: the assembly root resolves the two chains at
        boot (cmd/wisp/voice_cloudchain_313_windows.go) and the resident voice
@@ -77,7 +94,7 @@ import {
 /** The chain directions and the capability bit each one consumes. The boot
     assembly refuses an ASR element whose model lacks capabilities.audio_in and
     a TTS element whose model lacks capabilities.audio_out
-    (cloudcatalog.go:97/:101); the read face's modelCapabilities carries the
+    (cloudcatalog.go:95-102); the read face's modelCapabilities carries the
     same two bits (audit R1/P3), so the page can judge a chain against the same
     ruler the boot will run instead of printing a static 已接入. */
 type Direction = "asr" | "tts";
@@ -91,17 +108,65 @@ const DIRECTION_CONFIG_KEY: Record<Direction, "audio_in" | "audio_out"> = {
   tts: "audio_out",
 };
 
-/** The assembly verdict for one SAVED chain, judged off the read face:
-    "assembles" = every element's model declared the direction's bit;
-    "lacks" = the boot would refuse, with each failing element named (the same
-    element-first vocabulary cloudcatalog.go refuses with); "unknown" = a
-    snapshot half was never answered, so no judgement is invented. A model id
-    the catalog does not list is also a refusal the boot names - it counts as
-    lacks, with its own wording. */
+/* ---------------------------------------------------------------------------
+   The read face's per-model answers, three-state (R1-recheck residual 1).
+   Go's wire keeps modelCapabilities / modelsEnabled behind omitempty
+   (config_handlers.go:776/:785), so an unanswering leg leaves BOTH keys off the
+   wire and the bare-cast parse (config-view.ts) hands us `undefined`, not
+   `null`. Absence and null are the same fact - "the leg did not answer" -
+   and must never read as "every bit false" or "every model enabled": that
+   folding is exactly the 能装配假象 both residuals exist to kill. A record
+   that answered but skips this model id stays unanswered too.
+   --------------------------------------------------------------------------- */
+
+type CapsRecord = NonNullable<ConfigViewProvider["modelCapabilities"]>;
+
+function capabilitiesOf(row: ConfigViewProvider): CapsRecord | null {
+  return row.modelCapabilities ?? null;
+}
+
+function capsOf(caps: CapsRecord | null, model: string): CapsRecord[string] | null {
+  return caps === null ? null : (caps[model] ?? null);
+}
+
+function enabledOf(row: ConfigViewProvider): Record<string, boolean> | null {
+  return row.modelsEnabled ?? null;
+}
+
+function enabledOfModel(enabled: Record<string, boolean> | null, model: string): boolean | null {
+  return enabled === null ? null : (enabled[model] ?? null);
+}
+
+/** The assembly verdict for one SAVED chain, judged off the read face against
+    the boot's gates in the boot's own order (internal/speech/cloudcatalog.go
+    resolveChainElement): a chain element names an existing catalog pair, the
+    model must be enabled, the model must DECLARE the direction's capability
+    bit, and a declared api_key_ref must resolve to a credential the panel can
+    affirm. The verdict kinds follow those gates:
+
+      - "disabled"  an element's model is enabled=false (cloudcatalog.go:87-90),
+                    named element-first with the boot's own vocabulary;
+      - "nokey"     a provider declares api_key_ref but the read face cannot
+                    affirm a resolvable credential behind it (CredentialSet
+                    false, or CredentialError: the panel could not even check -
+                    boot side both refuse, cloudcatalog.go:121-131);
+      - "lacks"     the direction's capability bit is off (cloudcatalog.go:95-102),
+                    or the element names a pair the catalog does not list;
+      - "unknown"   a snapshot half was never answered, so no judgement is
+                    invented (装配未判);
+      - "assembles" every answered gate passes and none is missing - the ONLY
+                    state allowed to say 已接入·重启生效.
+
+    Precedence when several gates fail across the chain: the hard refusals
+    win over "unknown" (the boot refuses regardless of what we could not
+    read), and among them disabled > nokey > lacks, matching the boot's own
+    check order within an element; the detail lines name every hit. */
 type ChainAssembly =
   | { kind: "assembles" }
   | { kind: "unknown" }
-  | { kind: "lacks"; missing: string[] };
+  | { kind: "lacks"; missing: string[] }
+  | { kind: "nokey"; providers: string[] }
+  | { kind: "disabled"; models: string[] };
 
 function chainAssembly(
   chain: string[] | null,
@@ -109,6 +174,8 @@ function chainAssembly(
   direction: Direction,
 ): ChainAssembly {
   const missing: string[] = [];
+  const nokey: string[] = [];
+  const disabled: string[] = [];
   let allAnswered = true;
   for (const el of chain ?? []) {
     const cut = el.indexOf("/");
@@ -119,15 +186,33 @@ function chainAssembly(
       missing.push(`${el}：目录里没有这一行`);
       continue;
     }
-    const bits = row.modelCapabilities === null ? null : (row.modelCapabilities[model] ?? null);
-    if (bits === null) {
-      allAnswered = false;
+    // Gate 2 (cloudcatalog.go:87-90): enabled=false refuses by name.
+    const enabled = enabledOfModel(enabledOf(row), model);
+    if (enabled === false) {
+      disabled.push(`${el} 已停用（enabled=false）`);
       continue;
     }
-    if (!bits[DIRECTION_BIT[direction]]) {
+    if (enabled === null) allAnswered = false;
+    // Gate 3 (cloudcatalog.go:95-102): the direction's capability bit.
+    const bits = capsOf(capabilitiesOf(row), model);
+    if (bits === null) {
+      allAnswered = false;
+    } else if (!bits[DIRECTION_BIT[direction]]) {
       missing.push(`${el} 缺 capabilities.${DIRECTION_CONFIG_KEY[direction]}`);
     }
+    // Gate 4 (cloudcatalog.go:121-131): a declared api_key_ref the read face
+    // cannot affirm a resolvable credential behind. An EMPTY ref passes - the
+    // boot skips resolution for one too (the if ref != "" gate).
+    if (row.apiKeyRef !== "" && (row.credentialError !== "" || !row.credentialSet)) {
+      nokey.push(
+        row.credentialError !== ""
+          ? `${provider} 无法核对密钥（${row.credentialError}）`
+          : `${provider} 缺 API Key（api_key_ref ${row.apiKeyRef} 未就绪）`,
+      );
+    }
   }
+  if (disabled.length > 0) return { kind: "disabled", models: disabled };
+  if (nokey.length > 0) return { kind: "nokey", providers: nokey };
   if (missing.length > 0) return { kind: "lacks", missing };
   return allAnswered ? { kind: "assembles" } : { kind: "unknown" };
 }
@@ -219,6 +304,18 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
         </SettingsCard>
       ) : (
         <>
+          {/* R1-recheck residual 2: the credential read face's cannot-check
+              state (credentialError) rode every provider row but no voice
+              card rendered it - the one page that assembles chains over that
+              key never said why the key is not affirmed. Rendered verbatim:
+              it is a state the leg answered, not a guess. */}
+          {view.providers
+            .filter((p) => p.credentialError !== "")
+            .map((p) => (
+              <p className="text-[11.5px] text-orange" key={p.name}>
+                无法核对密钥：{p.name}（{p.credentialError}）
+              </p>
+            ))}
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
@@ -318,19 +415,41 @@ function ChainEditor({
   });
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
-  // The saved chain's assembly verdict, judged off the read face's capability
-  // bits (audit R1): the tag stops being a static 已接入 and states what is
-  // actually true about THIS chain against the ruler the boot will run.
+  // The saved chain's assembly verdict, judged off the read face (audit R1 +
+  // R1-recheck residual 2): the tag stops being a static 已接入 and states
+  // what is actually true about THIS chain against the ruler the boot runs -
+  // all three of its gates, not only the capability bit. 已接入·重启生效 is
+  // reachable ONLY from the assembles verdict, where every answered gate
+  // passed and none is missing.
   const savedVerdict = chainAssembly(initial, providers, direction);
   const savedTag = ((): { text: string; tone: "ok" | "warn" | "neutral" | "error" } => {
     if (initial === null || initial.length === 0) return { text: "未设置", tone: "neutral" };
     switch (savedVerdict.kind) {
+      case "disabled":
+        return { text: "装配不了·模型已停用", tone: "warn" };
+      case "nokey":
+        return { text: "装配不了·缺 API Key", tone: "warn" };
       case "lacks":
         return { text: "装配不了·缺能力位", tone: "warn" };
       case "unknown":
         return { text: "已接入·装配未判（等快照）", tone: "neutral" };
       default:
         return { text: "已接入·重启生效", tone: "ok" };
+    }
+  })();
+  // Every gate's hit list, element-first in the boot's own vocabulary: the
+  // tag names the first gate the boot would refuse on, this line names them
+  // all, so a chain failing two gates hides neither.
+  const refusalLines = ((): string[] => {
+    switch (savedVerdict.kind) {
+      case "disabled":
+        return savedVerdict.models;
+      case "nokey":
+        return savedVerdict.providers;
+      case "lacks":
+        return savedVerdict.missing;
+      default:
+        return [];
     }
   })();
 
@@ -361,9 +480,23 @@ function ChainEditor({
         value: savedChain.join(","),
       }).then((feedback) => {
         if (feedback.tone !== "ok") return feedback;
-        // The receipt branches on "can this chain assemble NOW" (audit R1):
-        // the same verdict the boot will compute, from the read face's bits.
+        // The receipt branches on "can this chain assemble NOW" (audit R1 +
+        // R1-recheck residual 2): the same verdict the boot will compute -
+        // all three gates - from the read face. Each branch names the gate it
+        // refused on and the fix the user can make.
         const verdict = chainAssembly(savedChain, providers, direction);
+        if (verdict.kind === "disabled") {
+          return {
+            tone: "error",
+            text: `已写入配置文件，但这条链现在装配不了：${verdict.models.join("；")}。把这个模型启用或换一个模型，再回来存这条链，重启生效。`,
+          };
+        }
+        if (verdict.kind === "nokey") {
+          return {
+            tone: "error",
+            text: `已写入配置文件，但这条链现在装配不了：${verdict.providers.join("；")}。在「模型」页把这一家的密钥录好，再回来存这条链，重启生效。`,
+          };
+        }
         if (verdict.kind === "lacks") {
           return {
             tone: "error",
@@ -373,7 +506,7 @@ function ChainEditor({
         if (verdict.kind === "unknown") {
           return {
             tone: "warn",
-            text: "已保存，重启后生效；这条链现在能不能装配判不了（能力位快照还没读到）。",
+            text: "已保存，重启后生效；这条链现在能不能装配判不了（快照还没读到能力位或启用位）。",
           };
         }
         return { tone: "ok", text: "已接入：保存后重启生效" };
@@ -386,10 +519,8 @@ function ChainEditor({
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <StateTag text={savedTag.text} tone={savedTag.tone} />
-          {savedVerdict.kind === "lacks" ? (
-            <span className="text-[11.5px] text-orange">
-              现在装配不了：{savedVerdict.missing.join("；")}
-            </span>
+          {refusalLines.length > 0 ? (
+            <span className="text-[11.5px] text-orange">现在装配不了：{refusalLines.join("；")}</span>
           ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -469,12 +600,21 @@ function LocalAudioCard({
   const [aecFeedback, setAecFeedback] = useState<Feedback | null>(null);
   const [deviceFeedback, setDeviceFeedback] = useState<Feedback | null>(null);
 
-  const aecKnown = view.voice.aecEnabled !== null;
-  const deviceKnown = view.voice.inputDevice !== null;
-  const rateKnown = view.voice.sampleRate !== null;
+  // The 本机音频 half's answered flags, three-state (R1-recheck residual 1's
+  // own class): the four keys ride reader-gated pointers behind omitempty
+  // (config_handlers.go:787-794), so an unanswering leg leaves them OFF the
+  // wire and the bare-cast parse hands us `undefined`, not `null`. Judging
+  // `=== null` let absence read as an answered "关"/default - a fabricated
+  // fact. `?? null` folds absence and null into "the leg did not answer".
+  const aecRead = view.voice.aecEnabled ?? null;
+  const deviceRead = view.voice.inputDevice ?? null;
+  const rateRead = view.voice.sampleRate ?? null;
+  const aecKnown = aecRead !== null;
+  const deviceKnown = deviceRead !== null;
+  const rateKnown = rateRead !== null;
   // null = the leg did not answer the capability bit: keep the control rather
   // than pretend an absence that was never measured. false = answered absence.
-  const aecBuildable = view.voice.aecBuildAvailable !== false;
+  const aecBuildable = (view.voice.aecBuildAvailable ?? null) !== false;
   const deviceShown =
     view.voice.inputDevice === "" || view.voice.inputDevice === "default"
       ? "default（跟随系统默认）"

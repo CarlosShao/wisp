@@ -99,6 +99,8 @@ const CONFIGURED: ConfigView = {
         "示例模型-1": { audioIn: true, audioOut: false },
         "示例模型-2": { audioIn: false, audioOut: false },
       },
+      // R1-recheck residual 2's read face, answered: both models enabled.
+      modelsEnabled: { "示例模型-1": true, "示例模型-2": true },
       credentialSet: true,
       credentialError: "",
     },
@@ -112,6 +114,7 @@ const CONFIGURED: ConfigView = {
       modelCount: 0,
       models: [],
       modelCapabilities: null,
+      modelsEnabled: null,
       credentialSet: false,
       credentialError: "",
     },

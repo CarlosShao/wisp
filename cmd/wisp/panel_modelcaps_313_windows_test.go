@@ -219,3 +219,161 @@ func Test313CapabilityWritesRefuseByNameAndMoveNoByte(t *testing.T) {
 		t.Fatal("a refused capability write moved bytes in config.toml")
 	}
 }
+
+// ---------------------------------------------------------------------------
+// R1-recheck residual 2 (2026-11-16): the boot's other two thresholds had no
+// page-visible read face. The capability gate rode ModelCapabilities; the
+// enabled gate rode NOTHING (ProviderSettings carried the model NAMES only),
+// and the key gate's states (CredentialSet/CredentialError) were answered but
+// never tied to the boot's refusal. These teeth pin the read faces on the
+// real settings leg, against the boot's own refusal sentences.
+// ---------------------------------------------------------------------------
+
+const model313Disabled = "model-under-test-313-off"
+
+// enabled313Seed: one catalog row enabled, one disabled (enabled=false - only
+// reachable through a hand-edited file today: schema.go:393 defaults true and
+// no write face flips it), and the voice chain naming the DISABLED model.
+const enabled313Seed = `[llm.providers.stepfun]
+protocol = "openai-chat"
+base_url = "https://api.stepfun.com/v1"
+
+[llm.providers.stepfun.models.` + model313Caps + `]
+enabled = true
+
+[llm.providers.stepfun.models.` + model313Disabled + `]
+enabled = false
+
+[voice]
+cloud_asr_chain = ['stepfun/` + model313Disabled + `']
+`
+
+func enabled313Store(t *testing.T) (*configStore, *config.Manager) {
+	t.Helper()
+	dir := sealableTempDir124(t)
+	path := filepath.Join(dir, configFileName)
+	if err := os.WriteFile(path, []byte(enabled313Seed), 0o600); err != nil {
+		t.Fatalf("seed config.toml: %v", err)
+	}
+	mgr, err := config.NewManager(path, nil)
+	if err != nil {
+		t.Fatalf("manager: %v", err)
+	}
+	return newConfigStore(mgr, nil, nil, "test-313-enabled"), mgr
+}
+
+// Test313ModelsEnabledReadFaceAnswersTheDisabledGate: the boot refuses the
+// chain element naming an enabled=false model with its own named sentence
+// (cloudcatalog.go:87-90), and the read face answers the same truth per model
+// (the new ProviderSettings.ModelsEnabled, filled in ReadSettings) - so the
+// page can judge the gate off the same read the boot runs instead of saying
+// 已接入 over a chain the boot will refuse.
+func Test313ModelsEnabledReadFaceAnswersTheDisabledGate(t *testing.T) {
+	s, mgr := enabled313Store(t)
+	ctx := context.Background()
+
+	// Boot half: the production assembly's own refusal, verbatim.
+	_, err := speech.ResolveCloudChain(mgr.Config(), speech.ChainASR, nil)
+	if err == nil || !strings.Contains(err.Error(), "names a model disabled in the catalog (enabled=false)") {
+		t.Fatalf("the disabled-model chain must refuse with the boot's named sentence, got %v", err)
+	}
+
+	// Read-face half: the leg answers enabled per model - false for the
+	// disabled one, true for the enabled one, both real answers.
+	view, err := s.ReadSettings(ctx)
+	if err != nil {
+		t.Fatalf("ReadSettings: %v", err)
+	}
+	var row *panel.ProviderSettings
+	for i := range view.Providers {
+		if view.Providers[i].Name == "stepfun" {
+			row = &view.Providers[i]
+		}
+	}
+	if row == nil || row.ModelsEnabled == nil {
+		t.Fatalf("the read face did not answer the enabled map: %+v", view.Providers)
+	}
+	got, ok := row.ModelsEnabled[model313Disabled]
+	if !ok {
+		t.Fatalf("the disabled model has no enabled entry: %v", row.ModelsEnabled)
+	}
+	if got {
+		t.Errorf("ModelsEnabled[%q] = true, want the catalog's enabled=false", model313Disabled)
+	}
+	if !row.ModelsEnabled[model313Caps] {
+		t.Errorf("ModelsEnabled[%q] = false, want the catalog's enabled=true", model313Caps)
+	}
+}
+
+// keyref313Seed: the provider DECLARES api_key_ref, and this leg wires no
+// credential store - the read face must answer the "cannot affirm a
+// resolvable credential" state instead of a fake 已就绪. The model declares
+// capabilities.audio_in on purpose: the boot checks the capability gate
+// BEFORE the key gate (cloudcatalog.go:95 before :121), and a bit-less model
+// would refuse there first, never reaching the key sentence this tooth pins.
+const keyref313Seed = `[llm.providers.stepfun]
+protocol = "openai-chat"
+base_url = "https://api.stepfun.com/v1"
+api_key_ref = "dpapi:313canaryblob01"
+
+[llm.providers.stepfun.models.` + model313Caps + `]
+enabled = true
+capabilities = { audio_in = true, audio_out = false }
+
+[voice]
+cloud_asr_chain = ['stepfun/` + model313Caps + `']
+`
+
+func keyref313Store(t *testing.T) (*configStore, *config.Manager) {
+	t.Helper()
+	dir := sealableTempDir124(t)
+	path := filepath.Join(dir, configFileName)
+	if err := os.WriteFile(path, []byte(keyref313Seed), 0o600); err != nil {
+		t.Fatalf("seed config.toml: %v", err)
+	}
+	mgr, err := config.NewManager(path, nil)
+	if err != nil {
+		t.Fatalf("manager: %v", err)
+	}
+	return newConfigStore(mgr, nil, nil, "test-313-keyref"), mgr
+}
+
+// Test313CredentialReadFaceNamesTheUnresolvableKeyRef: the key gate's read
+// surface (already riding the row: APIKeyRef / CredentialSet / CredentialError)
+// answers "cannot affirm" when the ref cannot be checked - the state the
+// voice card now renders - and the boot side refuses a declared ref it cannot
+// resolve (cloudcatalog.go:121-131, the PROBE-KEYREF sentence family). The
+// page's gate reads exactly these two fields; nothing is invented client-side.
+func Test313CredentialReadFaceNamesTheUnresolvableKeyRef(t *testing.T) {
+	s, mgr := keyref313Store(t)
+	ctx := context.Background()
+
+	// Boot half: a declared api_key_ref with no resolvable credential is a
+	// named auth refusal, never a silent pass.
+	_, err := speech.ResolveCloudChain(mgr.Config(), speech.ChainASR, nil)
+	if err == nil || !strings.Contains(err.Error(), "api_key_ref") {
+		t.Fatalf("a chain over an unresolved api_key_ref must refuse, got %v", err)
+	}
+
+	// Read-face half: CredentialSet=false (not affirmed present) and
+	// CredentialError names why - the two states the card renders verbatim.
+	view, err := s.ReadSettings(ctx)
+	if err != nil {
+		t.Fatalf("ReadSettings: %v", err)
+	}
+	var row *panel.ProviderSettings
+	for i := range view.Providers {
+		if view.Providers[i].Name == "stepfun" {
+			row = &view.Providers[i]
+		}
+	}
+	if row == nil {
+		t.Fatalf("the provider row is missing: %+v", view.Providers)
+	}
+	if row.CredentialSet {
+		t.Errorf("CredentialSet = true, want false (the ref could not be affirmed)")
+	}
+	if row.CredentialError == "" {
+		t.Errorf("CredentialError is empty, want the cannot-check state named (store not wired)")
+	}
+}

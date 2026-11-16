@@ -29,8 +29,9 @@
                        models (the model-name list, the model picker's data
                        source, null = not answered), modelCapabilities (the
                        per-model audio bits the voice assembly refuses on,
-                       null = not answered), credentialSet,
-                       credentialError.
+                       null = not answered), modelsEnabled (the per-model
+                       enabled flags, the boot's third voice gate, null = not
+                       answered), credentialSet, credentialError.
      voice             cloudASRChain / cloudTTSChain (null = not answered),
                        realtimeEnabled / realtimeProvider / realtimeModel, and
                        the 本机音频 half (aecEnabled / aecBuildAvailable /
@@ -78,6 +79,14 @@ export interface ConfigViewProvider {
       listed model (probe-first default false is a real answer, not an
       absence). */
   modelCapabilities: Record<string, { audioIn: boolean; audioOut: boolean }> | null;
+  /** The per-model enabled flags (R1-recheck residual 2's read surface), keyed
+      by model id: the third boot gate (the voice boot refuses a chain element
+      naming an enabled=false model, cloudcatalog.go:87-90; the first two ride
+      modelCapabilities and apiKeyRef/credentialSet/credentialError). Go's own
+      json tag is `modelsEnabled`; nil there = the leg did not answer, and the
+      key stays OFF the wire, so `null` here is "等快照" - never folded into
+      "every model enabled". A non-null record answers EVERY listed model. */
+  modelsEnabled: Record<string, boolean> | null;
   credentialSet: boolean;
   credentialError: string;
 }

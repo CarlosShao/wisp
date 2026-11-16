@@ -337,6 +337,10 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 			// key in its wire spelling. audio_in true, audio_out false: the
 			// two shapes the page codes against (declared on, declared off).
 			ModelCapabilities: map[string]ModelCapabilityBits{"m": {AudioIn: true}},
+			// R1-recheck residual 2 (2026-11-16): the third boot gate's read
+			// face answers alongside the bits - enabled=true, the schema's
+			// catalog default (schema.go:393), in the same fixture.
+			ModelsEnabled: map[string]bool{"m": true},
 		}},
 		Voice: VoiceSettingsView{
 			AecEnabled: &aecOn, InputDevice: &device, SampleRate: &rate,
@@ -372,12 +376,15 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	sort.Strings(rowKeys)
 	// The audit-R1/P3 addition (2026-11-16): modelCapabilities joined the row on
 	// purpose - the capability bits the voice assembly refuses on were readable
-	// by nothing, and this payload key is the page's one channel to them. The
-	// pin still byte-pins the key set, so this is a re-adjudication to the new
-	// true state with the addition named, not a loosening: the key set is still
-	// exact-match, and the no-value-bearing-keys property is re-checked below
-	// over the grown set.
-	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCapabilities","modelCount","models","name","protocol"]`
+	// by nothing, and this payload key is the page's one channel to them.
+	// The R1-recheck residual-2 addition (2026-11-16): modelsEnabled joins the
+	// row the same way - the enabled=false gate the voice boot refuses on
+	// (cloudcatalog.go:87-90) had no read face at all, and this key is the
+	// page's one channel to it. Both pins still byte-pin the key set, so this
+	// is a re-adjudication to the new true state with each addition named, not
+	// a loosening: the key set is still exact-match, and the
+	// no-value-bearing-keys property is re-checked below over the grown set.
+	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCapabilities","modelCount","models","modelsEnabled","name","protocol"]`
 	if got := `["` + strings.Join(rowKeys, `","`) + `"]`; got != wantRow {
 		t.Errorf("provider row keys = %s, want %s", got, wantRow)
 	}
@@ -421,6 +428,13 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	// the TTS bit false exactly as the fixture set them.
 	if got := string(rows[0]["modelCapabilities"]); got != `{"m":{"audioIn":true,"audioOut":false}}` {
 		t.Errorf("the provider row's modelCapabilities = %s, want the byte-pinned map", got)
+	}
+	// R1-recheck residual 2: the answered enabled map rides the row with its
+	// own byte shape - one plain-bool entry per model, same class as the bits
+	// above. A leg that never answered leaves the whole key off the wire
+	// (omitempty), the absent = "the leg did not answer" class.
+	if got := string(rows[0]["modelsEnabled"]); got != `{"m":true}` {
+		t.Errorf("the provider row's modelsEnabled = %s, want the byte-pinned map", got)
 	}
 	// No travelled key is a value-bearing name (exact match: apiKeyRef is the
 	// reference the schema writes, and it is a different name from any value key).
