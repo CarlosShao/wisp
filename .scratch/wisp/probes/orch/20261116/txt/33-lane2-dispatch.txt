@@ -1,0 +1,18 @@
+# 派单存档（先存档再发）—— 票 33 lane-2：CSP／无监听socket／运行时缺失夹具／AC#7-9（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/33-panel-host-c27.md`：**已翻 5 格（AC#12/13/14＋早前 2 格）**，本轮只打下面这几格，⛔ 重做已翻的。宿主已存在，⛔ 重造。
+
+**逐条（打不完照实说打到哪，⛔ 造假绿）**：
+1. **AC#78（非正式行号）＝CSP**：`serveNotBuiltNotice`／真页面两条投递路径上，**被服务的文档必须带 CSP，且 `connect-src 'none'`**。判据＝**response inspection**（读真实响应头，⛔ 断言源码字符串）。三枚：真页面有 CSP／未构建通知页有 CSP／`connect-src` 逐字为 `'none'`。
+2. **AC#75＝无监听 socket**：`netstat -ano` 断言：面板起来期间**本进程零 LISTENING**（⛔ 只看"没用某端口"，要按 PID 断言零监听）。
+3. **AC#77＝运行时缺失夹具**：把 WebView2 loader 改名/遮蔽 ⇒ **回退事件发出、进程仍活、原生 L2 标志亮**。夹具用现成的（⛔ 真删系统 DLL）。
+4. **AC#7／AC#8／AC#9**：按票面各自判据（AC#7 从票 35 快照泵 r1 转入、AC#8 出站通道量一次、AC#9 `ComposerDispatch.Handle` 必须有**非 `*_test.go`** 真调用者）。逐条给读数；哪条前提缺失就**具名跳过并给数字**。
+5. **延迟（票面 `:74`）**：cold ≤1500ms／hot ≤200ms，10 次 P50/P95 进 SLO 附录。**能做就做**（真窗或可判的启动读数）；做不动就具名写清缺什么前提（⛔ 拿墙钟猜想当判据）。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为（⛔ 源码字符串断言）；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 桌面态红是**环境红**，别当自己弄坏、**别杀机主进程**。
+
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`、`docs/evidence/s1/33-*`、`docs/SLO.md`（仅追加本轮实测行，⛔ 改阈值）。
+回话第一行＝commit hash ＋「CSP 三枚与 netstat 断言的红句/命令」＋「AC#7/8/9 各判了啥」＋「延迟是否测到、10 次 P50/P95 数字或具名缺口」＋「哪些没打完卡在哪」。没干完写「未完成，卡在哪」。
