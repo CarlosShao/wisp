@@ -1,0 +1,14 @@
+# 派单存档（先存档再发）—— 审计腿：今天四张语音卡与面板的"真接"是否成立（审计路由，只读）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（机主 2026-11-15 令；⛔ 任何 fallback model）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 审计腿（**只读，⛔ 改产码**）。审今天的四枚提交：`6832d4e6c`（票 313 云端链装配＋前端两卡）、`79c1f64ae`（票 33 本机音频快照＋前端三行）、`8d4eb0e5c`（票 33 CSP/netstat/夹具）、`35c66ae87`（证据＋SLO 附录 E）。
+
+**必须逐条取证、给"成立／不成立／无法判"＋file:line＋命令读数（⛔ 凭提交信息当结论）**：
+1. **云端语音链真的接到运行路径了吗**：`speech.NewCloudASRChain/NewCloudTTSChain` 是否有**生产**调用者（非 `*_test.go`）？改动前是否**真的是 0**？链路：config → resolve（`resident_voice_windows.go:2003`）→ 装配（`resident_voice_engines_windows.go:457/462、500/505`）是否真连通？**拆掉调用点，哪一枚测试会红**（用 `-overlay` 突变实测，⛔ 只读代码猜）。
+2. **前端文案有没有说假话**：`frontend/src/components/voice-settings.tsx` 里"已接入"的两张卡与后端能力**逐条对得上**吗？"没通"的实时语音/本机音频是否**仍标占位**（⛔ 反向假话）？本机音频三键的**值**从哪来（file:line）？
+3. **CSP 那两枚**的判据是不是**真响应头**（⛔ 源码字符串）：我本地跑过两枚互斥（dist 在场/不在场），请你独立判它是否会**恒真**（例如 `securitypolicyviolation` 在无 CSP 时也可能不触发）。
+4. **SLO 附录 E 的数字**是否与"10 发"一致、cold P95=1693 的**取样态**是否写明（球 PID 49348 在跑）？⛔ 把干扰态当定论。
+5. **越界检查**：四枚提交有没有动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`／C17 白名单？有没有提交 `frontend/dist` 字节？
+
+**⛔ 硬约束**：只读，⛔ 改任何产码/票面/文档（证据件可写 `docs/evidence/s1/…`）；⛔ **不要跑 `go test ./cmd/wisp`**（有另一条写腿正占载具，会撞车）——可跑 `go test ./internal/panel ./internal/speech`；⛔push。
+回话第一行＝「成立 X／不成立 Y／无法判 Z」＋必须回退或必须补的清单；每条带 file:line 或命令读数。

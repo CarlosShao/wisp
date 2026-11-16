@@ -1,0 +1,15 @@
+# 派单存档（先存档再发）—— 票 33 lane-3：焦点往返／AC#7／AC#8（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 `.scratch/wisp/issues/33-panel-host-c27.md` **已勾 9 格／剩 5 格**（剩：`:74` 延迟、`:76` 焦点往返、AC#7、AC#8、AC#10-scale）。本轮只打 `:76`／AC#7／AC#8，⛔ 重做已翻的、⛔ 重造宿主。
+
+**逐条**：
+1. **`:76` 焦点往返（automated 半）**：editor → panel → hide → 焦点回 editor。判据＝**可判事实**（前台窗口句柄/焦点归属在事件前后各取一次），⛔ 拿"took<Xms"当判据。**manual 半留机主**（具名写清"需机主看一眼"）。
+2. **AC#7（票 35 快照泵 r1 验收 F-PUMP-4 转入）**：票面判据逐字执行；现状已知＝`Marshal()` 直接非测试调用者仍 0，但票 329 推送路径给了全量包字节生产读者。**判据改成能力型**：全量包字节在**生产路径**上真被读（⛔ 只数 `Marshal()` 调用者），并给出它走哪条链（file:line）。
+3. **AC#8（同一份验收 §7 第 3 条＋F-PUMP-6）**：接出站通道时**量一次**；`EvToolStart` 已不再不可达（`loop.go:654-660` 有首个生产发射者）—— 复核并给读数；超 440 丢 ids 分支的负控要分得开。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 `frontend/dist` 字节；⛔ 动 `:74` 延迟那格（等安静桌面复量）。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 桌面态红是**环境红**，别当自己弄坏、**别杀机主进程**；`:76` 若因球占前台而无法取准，**具名跳过并给数字**。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/panel/**`、`docs/evidence/s1/33-*`。
+回话第一行＝commit hash ＋「`:76` 前三后三的句柄/焦点读数或具名跳过的数字」＋「AC#7 全量包字节走哪条生产链 file:line」＋「AC#8 读数」＋「哪些没打完卡在哪」。没干完写「未完成，卡在哪」。
