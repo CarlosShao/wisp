@@ -1,0 +1,17 @@
+time=2026-11-16T19:44:10.445+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestResyncOnShowDeliversFreshSnapshotFieldByField35g6
+time=2026-11-16T19:44:10.451+08:00 level=INFO msg="panel host: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed"
+wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+time=2026-11-16T19:44:10.460+08:00 level=INFO msg="panel host: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
+wisp: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。"
+wisp: panel window is up (35g6-show-1, cold 0.0 ms, hot path 0.0 ms)
+time=2026-11-16T19:44:10.463+08:00 level=INFO msg="panel: SNAPSHOT at=2026-11-16T11:44:10Z depth=0 pending= mode=ask_every_step ws=unset results=0/0 done bytes=3308 sha256=c18d357c12fa1d31"
+time=2026-11-16T19:44:10.473+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=ball.style wrote=[ball.style]
+wisp: panel window is up (35g6-show-2, cold 0.0 ms, hot path 0.0 ms)
+time=2026-11-16T19:44:11.578+08:00 level=INFO msg="panel: SNAPSHOT at=2026-11-16T11:44:11Z depth=0 pending= mode=ask_every_step ws=unset results=0/0 done bytes=3309 sha256=c02d93d862a4a04b"
+    panel_resync_stateless_35g6_windows_test.go:247: 35g6 RED: packet 2's ballStyle.style = "glass", want the NEW value "jarvis" - the page received a stale state across hide/mutate/show (cross-show cache or a stale packet)
+    panel_resync_stateless_35g6_windows_test.go:256: 35g6 RED: both packets carry ballStyle.style = "glass" - the second show did not deliver the state move
+    panel_resync_stateless_35g6_windows_test.go:266: 35g6 RED: generatedAt is identical across the two shows ("\"2026-11-16T11:44:10Z\"") - the second packet was not built at show time
+    panel_resync_stateless_35g6_windows_test.go:282: 35g6 resync field-by-field: ballStyle.style "glass" -> "glass", generatedAt "2026-11-16T11:44:10Z" -> "2026-11-16T11:44:10Z"
+--- FAIL: TestResyncOnShowDeliversFreshSnapshotFieldByField35g6 (1.13s)
+FAIL

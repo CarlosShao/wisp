@@ -1,0 +1,10 @@
+time=2026-11-16T19:44:11.756+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestResyncOnShowDeliversFreshSnapshotFieldByField35g6
+time=2026-11-16T19:44:11.766+08:00 level=INFO msg="panel host: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed"
+wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+wisp: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。"
+time=2026-11-16T19:44:11.778+08:00 level=INFO msg="panel host: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
+wisp: panel window is up (35g6-show-1, cold 0.0 ms, hot path 0.0 ms)
+    panel_resync_stateless_35g6_windows_test.go:167: 35g6 RED: after one show the page holds 0 packet(s), want exactly 1: []
+--- FAIL: TestResyncOnShowDeliversFreshSnapshotFieldByField35g6 (0.02s)
+FAIL

@@ -1,0 +1,9 @@
+time=2026-11-16T19:44:10.082+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelForgedApprovalDecideAllowIsRefusedByNameOnPageEdge35g5
+    panel_forged_allow_35g5_windows_test.go:157: 35g5 RED: the reply does not carry the roster guard's sentence "不是面板 composer 通路的能力入口"; a forged panel allow that loses its named refusal is a hole, not a style change. reply="面板请求被拒绝 [approval.decide pc-35g5-allow-1]：panel: 方法在白名单内而派发表未列出: 名册与派发表不一致（requestId=\"pc-35g5-allow-1\"），处理器未调用"
+    panel_forged_allow_35g5_windows_test.go:197: 35g5 forged allow on the page edge: door reply="面板请求被拒绝 [approval.decide pc-35g5-allow-1]：panel: 方法在白名单内而派发表未列出: 名册与派发表不一致（requestId=\"pc-35g5-allow-1\"），处理器未调用" audit=1 line(s)
+--- FAIL: TestPanelForgedApprovalDecideAllowIsRefusedByNameOnPageEdge35g5 (0.00s)
+=== RUN   TestPanelForgedAllowPositiveControlLegitRequestStillDelivered35g5
+    panel_forged_allow_35g5_windows_test.go:224: 35g5 positive control: legit panel.mode.request delivered, 0 refusal line(s)
+--- PASS: TestPanelForgedAllowPositiveControlLegitRequestStillDelivered35g5 (0.00s)
+FAIL
