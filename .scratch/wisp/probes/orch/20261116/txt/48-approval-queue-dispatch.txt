@@ -1,0 +1,15 @@
+# 派单存档（先存档再发）—— 票 48 ApprovalQueue(C18) 五格（写腿，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/48-approval-queue-full.md` 全文（5 格全做）。**先现读**：`grep -rn "ApprovalQueue\|approval.Queue\|FIFO\|head" internal/agent internal/panel cmd/wisp | head -30`，⛔ 照票面行号当今天。
+逐格（每格**行为牙**，⛔ 源码字符串断言）：
+1. **5 并发任务 × L2 请求**：FIFO 次序保住、**只显示队头**、决定各自回到**原任务**（给逐任务 id 与次序读数）。
+2. **超时梯**：270s 警告可见、300s 自动拒、**replay 补完原请求**（用可控时钟/注入时基，⛔ 墙钟 sleep 当判据；A1886）。
+3. **fail-closed**：pending 中杀桥 ⇒ **自动拒**＋任务存活。
+4. **挂起夹具**：pending 审批作废＋通知；resume 后**不接受陈旧审批**。
+5. **徽标/面板深度 <100ms 同步**；空队列迁移正确（给数字，用可判事实：时间戳前移/计数器，⛔ 墙钟猜想）。
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单；⛔ 提交 dist 字节。**若某格必须改契约文字（C18 的语义）⇒ 停下具名报**，⛔ 自己改契约。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸跑（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1893** 整包无声断掉先单跑那一枚复量。⚠ **Wisp 球 PID 49348 在跑** ⇒ `TestAC4Focus…`/`TestAC246…` 是环境红，别当自己弄坏、别杀机主进程。
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/agent/**`、`internal/panel/**`、`docs/evidence/s1/48-*`。
+回话第一行＝commit hash ＋「FIFO 次序逐任务读数」＋「超时梯三读数」＋「fail-closed 红句」＋「挂起/恢复读数」＋「深度同步数字」＋「哪格没打完卡在哪／哪格要改契约」。没干完写「未完成，卡在哪」。
