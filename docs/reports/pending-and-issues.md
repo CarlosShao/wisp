@@ -37705,3 +37705,10 @@ AC#1 命令级绿但真窗口半格归票 33 ⇒ 不勾。
  7cd7c89e。我复跑 ender:shell77 rc=0（47/50 AA、3 具名 <AA）、ender:l2 真决策 rc=0（21822 B）、ender:l2 未判 rc=0（21873 B）、build rc=0。
 AC#11 余 3 对（深色白字/红钮 3.31、warn 胶囊 2.67、信息不足 2.97）**修需新增彩色 token** ⇒ 会击穿四方对账未覆盖表 ＋ internal/panel/tokens_fourway_test.go 钉名表（写面外）⇒ 后续腿（需 internal/panel 写额）。
 **口径**：AC#11 属"真欠账但有名字"，⛔ 不许把 KNOWN_BREAKS 悄悄删了充绿。
+
+## A1915（11-16 20:1x）：**票 35 面板桥结案（10/10）—— 伪 allow 被名册挡在门外，resync 无缓存**
+
+679e0b255。我复跑 2/2 PASS（…RefusedByNameOnPageEdge35g5 0.00s／…FreshSnapshotFieldByField35g6 1.15s）＋合法路 3.30s PASS。
+伪 allow 走**真页面桥边**、最强伪造信封 ⇒ 逐字拒绝句＋spy.reqs==0＋恰 1 条审计；两发突变（开名册／拒改放）都 FAIL。
+resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器突变都 FAIL。
+**C17 白名单零新增**（突变只在仓外 overlay）。⇒ 36/37/38/39/40 五张产品页正式解锁（已在跑）。

@@ -44,9 +44,9 @@ state push making the frontend provably stateless.
       〔11-15 收件 `541c4eaba`（`64259b818` 订正证据）＋**我自己复跑 3/3 PASS**｜`:42` 两枚尺：`TestWhitelistFuzz50NamesAllRefusedAndAudited35g1`／`TestEveryRosterMethodDispatchesToItsOwnHandler35g1`。50 名**逐个经生产入口 `panel.ComposerDispatch.Handle`**（⛔ 不是直接调守卫）断「必错＋`errors.Is(ErrComposerRequest)`＋回句非空带自己 requestId＋mode 槽 0 次＋**审计恰 50 条且第 i 条含 `method=<该名>`**」；正控一在册名必受理、处理器恰 1 次。在册 8 名逐一 `Handle`，断「本槽 +1、其余六槽 +0」（config.get/config.set 共用槽各记 delta），并经 `ParseComposerRequest` 复核仍是运行中守卫受理。〕
 - [x] Concurrency routing: 10 parallel invokes with shuffled replies → correct pairing.
       〔11-15 收件 `541c4eaba`＋**我自己复跑 PASS（0.00s）**｜尺＝`TestRPCReplyPairsByFrameIDUnder10WayOutOfOrder35g1`：真异步 `_rpc[seq]` 槽表 10 槽先全开 × `g1Pipe.msgcb`（逐行照 `panel_control_windows.go:782-826`，含 `id := strconv.Itoa(d.ID)`、`_rpc[id]`）× **真答案走生产 `Handle`**（`panel.bogus.<id>` 拒句自带 `rid-k<id>`，每条自证身份）；10 帧回执按乱序 `[7,2,9,1,10,4,6,3,8,5]` 落槽，断「每槽只叫自己的 `rid-k<id>`、恰 settle 一次」。**反证**：`byArrival` 9/10 槽错、`singleSlot` 10/10 槽错，都被捕获 ⇒ 不是同步桩下的恒真尺。★**诚实边界**：这是 **headless 模型尺**（页面槽表＋照抄产码的 `msgcb` 支＋真 `Handle` 答案），**不是真窗端到端**——具体 `*panelControl` 的 `Eval` 是 `*edge.Chromium` COM 调用、无注入接缝（加接缝＝改产码），开第二个真窗又撞本包已量到的"连续开窗必抖"。模型↔产码的系绳 `assertProductionPairsByFrameID35g1` 读 `panel_control_windows.go`，**它是字面钉、已在码注 `:55-58` 明标"不是行为牙"**。〕
-- [ ] Forged panel allow: direct bridge call `approval.decide{allow:true}` from the webview
+- [x] Forged panel allow: direct bridge call `approval.decide{allow:true}` from the webview
       context → server rejects (decision test at Go boundary + browser-context e2e).
-- [ ] Resync: hide → tool state changes → show → UI reflects fresh state; SDK forbids cross-show
+- [x] Resync: hide → tool state changes → show → UI reflects fresh state; SDK forbids cross-show
       caches (architecture test/lint).
 - [x] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
       asserted), content integrity kept.
@@ -475,3 +475,15 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 ### 本票仍开着的两格（都缺同一类东西：真窗/CI 面）
 - **`:45` 伪造面板 allow**：Go 边界那半**已有牙**（`TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject`，我 11-15 复跑 PASS 3.06s），缺的是括号里要求的 **browser-context e2e**。
 - **`:47` resync**：只有 5 个 `strings.Contains` 字面钉；`render:receiver` **CI 不跑**，要把它加进 `ci.yml`（**改 CI 文件需先问机主**）。
+
+---
+
+## 编排者收件（2026-11-16 20:1x，`679e0b255`，件 `docs/evidence/s1/35-g5-forged-allow-and-resync-20261116.md`＋6 枚日志）
+
+**尺1** `679e0b255` 在。**尺2** 证据＋6 枚日志在。**尺3 我自己复跑**（载具一发，跑前 `wisp.test`=0）：
+`TestPanelForgedApprovalDecideAllowIsRefusedByNameOnPageEdge35g5` **PASS 0.00s**／`TestResyncOnShowDeliversFreshSnapshotFieldByField35g6` **PASS 1.15s** ⇒ **2/2 rc=0**；另 `TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject` **PASS 3.30s** ＋正控 **PASS**（L1/L2 合法路仍通）。
+
+- **伪 allow**：入口走**页面那条桥边**（`installPanelTransport`→`openDocument`→`pagePost`，⛔ 直调 dispatchRaw/⛔ Eval 扮页面）；最强伪造信封（合法 source+requestId，把名册后两道守卫喂饱）⇒ 逐字红句「`方法 "approval.decide" 不是面板 composer 通路的能力入口`」＋`spy.reqs==0`＋恰 1 条 `INBOUND-DISPATCH` 审计。突变 M-forged-1（开一格名册）/M-forged-2（拒→放）**都 FAIL**，还原复绿 4/4。
+- **resync**：真桥全链（RequestShow→showOnThread→Show→publishOnShow→`SnapshotPump.Publish` 现读→`evalPanelJS`→页面 Eval），`ballStyle.style` `glass`→**`jarvis`**、`generatedAt` 现打戳、包数恰 2、未动维度相等；反向牙 M-resync-cache（发缓存）FAIL「…a stale state across hide/mutate/show…」、M-resync-noop FAIL「0 packet(s)」，还原 PASS 1.12s。SDK 侧 `panel.ts:560-578/:611-617/:13` 三处证**无缓存**；**前端零字节改动**。
+- **C17 白名单零新增**（两发"开一格"只在仓外 overlay 副本，产码件 worktree==HEAD）。
+⇒ 10/10，**本票结**。
