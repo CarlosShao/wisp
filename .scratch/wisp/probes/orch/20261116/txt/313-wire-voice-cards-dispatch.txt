@@ -1,0 +1,22 @@
+# 派单存档（先存档再发）—— 票 313 让四张卡变真（写腿：后端装配 + 前端文案一起，本波唯一 cmd/wisp 写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+# 机主令 2026-11-16：前端 frontend/** 也是本编队写面，没有外部前端 agent。
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。读 `.scratch/wisp/issues/313-default-provider-stepfun-and-model-config-stays-in-the-ui.md` 全文，再读 `frontend/src/components/voice-settings.tsx`（四张卡的文案就写死在这儿：`:81` lede、`:144` 听写、`:154` 朗读、实时语音那段）。
+
+**为什么要你**：机主截图那四张卡（听写/朗读/实时语音/本机音频）都写着「占位·当前不生效」。真缺口两条，现量：
+- `NewCloudChain` **全仓调用点 0**（`grep -rn --include=*.go "NewCloudChain(" internal cmd` 只有定义）⇒ 云端链**从未装配**，所以"没有运行路径"是真的；
+- 票 248 的设置写入路由**已在树上**（`bridge.go:66-67` config.get/set、`panel_inbound.go:321` DPAPI）⇒ **配置能写了，但没人拿配置去 new 那条链**。
+
+**本轮要做（打不完照实说打到哪）**：
+1. **AC#2 的运行那一半：真装配**。在 `cmd/wisp` 里加**生产调用点**：从 `config.Manager` 读出语音链配置（provider＋model，票 248 已能给），`speech.NewCloudChain(...)`（`internal/speech/cloudchain.go`）装配 ASR/TTS，接进常驻语音的既有入口（`resident_voice_engines_windows.go` 那一族；⛔ 新造第五档配置）。**判据**：配置里写 stepfun＋模型名 ⇒ 装配成功且被运行路径取用（行为牙：改配置 ⇒ 装配结果跟着变；删调用点 ⇒ 红）。
+2. **AC#1 默认供应商 stepfun**：设置页默认选 stepfun，但⛔ 写死——用户存过的值优先（判据：默认态出现 stepfun＋用户值覆盖后仍是用户值）。
+3. **前端文案跟真相同步**（这是本轮唯一动 `frontend/**` 的地方，允许）：哪张卡的后端**真的**通到运行路径了，就把那句「占位·当前不生效」改成如实（如"已接入：保存后重启生效"）；**没通的不许改**（⛔ 把假话换成另一种假话）。⛔ UI emoji（d22scan 扫）。改完 `npm --prefix frontend run build`（node 在 `D:\work\server\node24`）必须 rc=0，并跑 `npm --prefix frontend run typecheck`。
+4. **AC#3 复核**：key 走既有 `api_key_ref`（DPAPI）—— 值⛔回显/⛔进日志/⛔进模型可读文本。已有哨兵用例 `TestAC2CredentialSentinelAppearsInNoArtifact`，⛔ 新造重复件，复跑它即可。
+
+**硬约束**：⛔ 动 `thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／D43／`design/**`；⛔ 放宽断言；⛔push；新协程走 `observe.Registry.Spawn`；⛔ 反向动 C17 白名单（票 35 已收口）；⛔ 提交 `frontend/dist` 字节（票 77：dist 故意不入库，跑完删回 `.gitkeep`）。
+**串行**：`go test ./cmd/wisp` **只能经载具 `scripts/wisp-cli-staged-tests.sh`、一次一发**；跑前 `Get-Process wisp.test` 有就等（每 20 秒最多 15 分钟）。⛔ 裸 `go test ./cmd/wisp`（A1888）。
+**A1880** 牙要行为；**A1882** 整包带终点锚 `TestZZ315A1` 是否命中＋最后一条 `=== RUN`＋新测试在截断点前/后；**A1884** 两个 `sh` 门用 `D:\work\soft\Git\bin\bash.exe`；**A1886** cpu 不涨＝在等；**A1893** 整包无声断掉先单跑那一枚复量。
+
+写面：`cmd/wisp/**`（本波唯一写腿）、`internal/speech/**`（只读优先，装配点可在 cmd/wisp）、`frontend/src/components/voice-settings.tsx`（＋必要的小改）、`docs/evidence/s1/313-*`。
+回话第一行＝commit hash ＋「NewCloudChain 生产调用点落在 file:line」＋「哪些卡文案改了、改成什么原文」＋「行为的牙测试名＋拆掉时红句」＋「npm build/typecheck rc」＋「AC#1/2/3 哪些勾了/哪条没打完」。没干完写「未完成，卡在哪」。
