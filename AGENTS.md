@@ -48,7 +48,7 @@
 >    两处**显式 pathspec**（⛔ `add -A`/amend/reset/rebase/stash/checkout ./clean）；`cmd/wisp/**` 与
 >    `internal/panel/**`（共享编译面）**每波只许一枚写腿**、`go test ./cmd/wisp` 重包同一时刻只跑一个；
 >    收件只认**盘上三把尺**（提交真在 / 件真在 / 自己复跑），**完成通知一律当未验证**；
->    `frontend/**`、`design/**` 归机主外部 agent（本编队零写面）；派单**先存档再发**
+>    `frontend/**`、`design/**` **由本 agent 全权负责（机主 2026-11-16 令：没有外部前端 agent，旧说法作废）**；派单**先存档再发**
 >    （`.scratch/wisp/probes/orch/YYYYMMDD/txt/<腿名>-dispatch.txt`＋`-send.txt`）。
 > ④ 并发常态：**写腿 ≥2 条在飞**、**CPU ≤70% 就补位**（机主 2026-10-13 两次点名：⛔ "一腿独跑"、"比 qoder 还保守"）。
 
