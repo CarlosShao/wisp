@@ -1,0 +1,56 @@
+
+> frontend@0.0.0 render:shell77
+> vite build --ssr scripts/render-shell-77.tsx --outDir node_modules/.tmp/shell77render --logLevel warn && node node_modules/.tmp/shell77render/render-shell-77.js
+
+render-shell-77: contrast pairs measured = 50
+[light] 正文 body-on-surface: #1f2124 on #ffffff = 16.14:1 vs 4.5:1 PASS
+[light] 正文 body-on-surface: #1f2124 on #ffffff = 16.14:1 vs 4.5:1 PASS
+[light] 正文 body-on-page: #1f2124 on #fafafb = 15.47:1 vs 4.5:1 PASS
+[light] 正文 body-on-page: #1f2124 on #fafafb = 15.47:1 vs 4.5:1 PASS
+[light] 正文 body-on-inset: #1f2124 on #f7f8f9 = 15.18:1 vs 4.5:1 PASS
+[light] 正文 body-on-inset: #1f2124 on #f7f8f9 = 15.18:1 vs 4.5:1 PASS
+[light] 次要 secondary-on-surface: #62656b on #ffffff = 5.84:1 vs 4.5:1 PASS
+[light] 次要 secondary-on-surface: #62656b on #ffffff = 5.84:1 vs 4.5:1 PASS
+[light] 标签 label-on-surface: #6d727a on #ffffff = 4.84:1 vs 4.5:1 PASS
+[light] 标签 label-on-surface: #6d727a on #ffffff = 4.84:1 vs 4.5:1 PASS
+[light] 标签 label-on-page: #6d727a on #fafafb = 4.64:1 vs 4.5:1 PASS
+[light] 标签 label-on-page: #6d727a on #fafafb = 4.64:1 vs 4.5:1 PASS
+[light] 标签 kbd-on-field: #62656b on #f2f2f3 = 5.22:1 vs 4.5:1 PASS
+[light] 标签 kbd-on-field: #62656b on #f2f2f3 = 5.22:1 vs 4.5:1 PASS
+[light] 按钮 button-white-on-red: #ffffff on #d13d43 = 4.71:1 vs 4.5:1 PASS
+[light] 按钮 button-white-on-red: #ffffff on #d13d43 = 4.71:1 vs 4.5:1 PASS
+[light] 按钮 button-ink-on-surface: #1f2124 on #ffffff = 16.14:1 vs 4.5:1 PASS
+[light] 按钮 button-ink-on-surface: #1f2124 on #ffffff = 16.14:1 vs 4.5:1 PASS
+[light] 标签 pill-warn-on-soft: #ef720c on #fdf1e5 = 2.67:1 vs 4.5:1 FAIL(<AA) [registered break]
+[light] 标签 pill-warn-on-soft: #ef720c on #fdf1e5 = 2.67:1 vs 4.5:1 FAIL(<AA) [registered break]
+[light] 标签(未判) unjudged-warn-on-surface: #ef720c on #ffffff = 2.97:1 vs 4.5:1 FAIL(<AA) [registered break]
+[light] 标签 badge-red-on-surface: #d13d43 on #ffffff = 4.71:1 vs 4.5:1 PASS
+[light] 标签 badge-red-on-surface: #d13d43 on #ffffff = 4.71:1 vs 4.5:1 PASS
+[light] 禁用态 disabled-on-shell: #b6b9bd on #ffffff (ink-3 @0.5 over surface) = 1.97:1 vs 4.5:1 FAIL(<AA)
+[light] 禁用态 disabled-on-shell: #b6b9bd on #ffffff (ink-3 @0.5 over surface) = 1.97:1 vs 4.5:1 FAIL(<AA)
+[dark] 正文 body-on-surface: #f2f3f4 on #232427 = 13.97:1 vs 4.5:1 PASS
+[dark] 正文 body-on-surface: #f2f3f4 on #232427 = 13.97:1 vs 4.5:1 PASS
+[dark] 正文 body-on-page: #f2f3f4 on #17181a = 15.99:1 vs 4.5:1 PASS
+[dark] 正文 body-on-page: #f2f3f4 on #17181a = 15.99:1 vs 4.5:1 PASS
+[dark] 正文 body-on-inset: #f2f3f4 on #1f2022 = 14.68:1 vs 4.5:1 PASS
+[dark] 正文 body-on-inset: #f2f3f4 on #1f2022 = 14.68:1 vs 4.5:1 PASS
+[dark] 次要 secondary-on-surface: #a5a8ad on #232427 = 6.51:1 vs 4.5:1 PASS
+[dark] 次要 secondary-on-surface: #a5a8ad on #232427 = 6.51:1 vs 4.5:1 PASS
+[dark] 标签 label-on-surface: #8b8f96 on #232427 = 4.78:1 vs 4.5:1 PASS
+[dark] 标签 label-on-surface: #8b8f96 on #232427 = 4.78:1 vs 4.5:1 PASS
+[dark] 标签 label-on-page: #8b8f96 on #17181a = 5.47:1 vs 4.5:1 PASS
+[dark] 标签 label-on-page: #8b8f96 on #17181a = 5.47:1 vs 4.5:1 PASS
+[dark] 标签 kbd-on-field: #a5a8ad on #2b2c2f = 5.85:1 vs 4.5:1 PASS
+[dark] 标签 kbd-on-field: #a5a8ad on #2b2c2f = 5.85:1 vs 4.5:1 PASS
+[dark] 按钮 button-white-on-red: #ffffff on #ee5c61 = 3.31:1 vs 4.5:1 FAIL(<AA) [registered break]
+[dark] 按钮 button-white-on-red: #ffffff on #ee5c61 = 3.31:1 vs 4.5:1 FAIL(<AA) [registered break]
+[dark] 按钮 button-ink-on-surface: #f2f3f4 on #232427 = 13.97:1 vs 4.5:1 PASS
+[dark] 按钮 button-ink-on-surface: #f2f3f4 on #232427 = 13.97:1 vs 4.5:1 PASS
+[dark] 标签 pill-warn-on-soft: #f68f3c on #41332a = 5.15:1 vs 4.5:1 PASS
+[dark] 标签 pill-warn-on-soft: #f68f3c on #41332a = 5.15:1 vs 4.5:1 PASS
+[dark] 标签(未判) unjudged-warn-on-surface: #f68f3c on #232427 = 6.59:1 vs 4.5:1 PASS
+[dark] 标签 badge-red-on-surface: #ee5c61 on #232427 = 4.68:1 vs 4.5:1 PASS
+[dark] 标签 badge-red-on-surface: #ee5c61 on #232427 = 4.68:1 vs 4.5:1 PASS
+[dark] 禁用态 disabled-on-shell: #575a5f on #232427 (ink-3 @0.5 over surface) = 2.24:1 vs 4.5:1 FAIL(<AA)
+[dark] 禁用态 disabled-on-shell: #575a5f on #232427 (ink-3 @0.5 over surface) = 2.24:1 vs 4.5:1 FAIL(<AA)
+render-shell-77: OK, 50 pair measurements across light+dark x real+unjudged; 47 pairs pass AA 4.5:1, 3 pairs registered below AA with a named fix hop (KNOWN_BREAKS; measured and printed every run, auto-fails when fixed)

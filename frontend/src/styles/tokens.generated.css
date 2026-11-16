@@ -31,7 +31,7 @@
   --hover-2: #e7e9eb;
   --ink: #1f2124;
   --ink-2: #62656b;
-  --ink-3: #9a9da3;
+  --ink-3: #6d727a;  /* 票77 AC#11 实测对比度上调：原库值 #9a9da3/#6c6f75 对 surface/page/inset 只有 2.61-3.53:1（<AA 4.5），现值对三个底 4.55-5.48:1，由 render-shell-77 仪器复量 */
   --line: #ecedef;
   --line-strong: #e0e2e5;
   --field: #f2f2f3;
@@ -44,7 +44,7 @@
   --green-tint: #e8f5ed;
   --orange: #ef720c;
   --orange-tint: #fdf1e5;
-  --red: #e3474c;
+  --red: #d13d43;  /* 亮色值票77 AC#11 实测上调：原 #e3474c 对白底（拒绝按钮 text-white / L2 徽标 text-red）只有 3.98:1（<AA 4.5），现值 4.71:1；深色值不可同改——深色 --red 兼作徽标文字（4.68:1），压深即击穿，修复需契约面新增 token（render-shell-77 KNOWN_BREAKS 具名） */
   --red-tint: #fcecec;
   --tooltip-bg: #25272b;
   --tooltip-fg: #f6f7f8;
@@ -77,7 +77,7 @@
   --hover-2: #313236;
   --ink: #f2f3f4;
   --ink-2: #a5a8ad;
-  --ink-3: #6c6f75;
+  --ink-3: #8b8f96;  /* 票77 AC#11 实测对比度上调：原库值 #9a9da3/#6c6f75 对 surface/page/inset 只有 2.61-3.53:1（<AA 4.5），现值对三个底 4.55-5.48:1，由 render-shell-77 仪器复量 */
   --line: #2e3033;
   --line-strong: #3a3c40;
   --field: #2b2c2f;
@@ -90,7 +90,7 @@
   --green-tint: #3dbb7224;
   --orange: #f68f3c;
   --orange-tint: #f68f3c24;
-  --red: #ee5c61;
+  --red: #ee5c61;  /* 亮色值票77 AC#11 实测上调：原 #e3474c 对白底（拒绝按钮 text-white / L2 徽标 text-red）只有 3.98:1（<AA 4.5），现值 4.71:1；深色值不可同改——深色 --red 兼作徽标文字（4.68:1），压深即击穿，修复需契约面新增 token（render-shell-77 KNOWN_BREAKS 具名） */
   --red-tint: #ee5c6124;
   --tooltip-bg: #111214;
   --tooltip-fg: #f2f3f4;

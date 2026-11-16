@@ -1,0 +1,21 @@
+{
+  "correlationId": "panel-assets-l2-unjudged-reason",
+  "tool": "fs.delete",
+  "args": [
+    "C:/Users/swq/Documents/notes.md"
+  ],
+  "level": "L2",
+  "rulesHit": [
+    "R1",
+    "R8"
+  ],
+  "reason": "",
+  "reasonKnown": false,
+  "sessionOverrideBlocked": false,
+  "callChain": [
+    "cli",
+    "panel-assets",
+    "fs.delete"
+  ],
+  "decidedBy": "native"
+}
