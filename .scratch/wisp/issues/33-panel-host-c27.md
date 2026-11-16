@@ -72,10 +72,10 @@ declaration consumed by 37's native card.
 - [x] Show/hide/destroy lifecycle: second show within session reuses window (process-tree
       child-count stable); session dispose destroys + WebView children exit ≤2s.
 - [ ] Latency: cold ≤1500ms / hot ≤200ms (10-run P50/P95 into SLO appendix).
-- [ ] Embedded resource serving works offline; no listening socket exists (netstat assertion).
+- [x] Embedded resource serving works offline; no listening socket exists (netstat assertion).
 - [ ] Focus round-trip: editor → panel → hide → focus back in editor (automated + manual).
-- [ ] Runtime-missing fixture (rename/mask loader) → fallback event, app alive, native L2 flag on.
-- [ ] CSP present on served documents (response inspection) with connect-src 'none'.
+- [x] Runtime-missing fixture (rename/mask loader) → fallback event, app alive, native L2 flag on.
+- [x] CSP present on served documents (response inspection) with connect-src 'none'.
 - [ ] **AC#7（从票 35 快照泵 r1 验收转入，2026-09-25，来源 `35-panel-snapshot-pump-r1-accept-r1.md` F-PUMP-4）**：
       面板真的能看到快照之后，`SnapshotPump.Snapshot()` 那份包**跨两个瞬间**的形状要有一条会响的检——
       它不持泵锁地先后读 `Verdicts()` 与 `Results()`（`internal/panel/pump.go`），而今天四个读数点各自有锁、
@@ -93,7 +93,7 @@ declaration consumed by 37's native card.
       `internal/agent/sink.go:25` ＋ 它的注释 `:24` ＋ 这一处消费；没有任何一处 `emit`）。
       判据：这两枚分支各要么有一发"拿掉它就红"的用例，要么被删；**不许留着让人以为它们在守什么**。
 
-- [ ] **AC#9（片 B：入向有具名生产听众）**：`ComposerDispatch.Handle` 必须被**一枚非 `*_test.go` 文件**真调用，
+- [x] **AC#9（片 B：入向有具名生产听众）**：`ComposerDispatch.Handle` 必须被**一枚非 `*_test.go` 文件**真调用，
       且那条通道在本机可端到端跑一次并留读数（派单口径：`AGENTS.md` §1.3 的第四条注入缝＝CLI `wisp` 面；
       **不许**用只有测试能构造的假宿主充当听众）。写腿 `33-r2` 已把这一枚造出来并验过，**读数与结论在**
       `docs/evidence/s1/33-inbound-listener-r2.md`；⚠ **它落不了地，判丙**——被本票片 A 自己交付的在册钉
@@ -429,3 +429,13 @@ CI／新鲜检出里 embed 只有 `.gitkeep` ⇒ 走 not-built 分支，那一�
 **本波翻**：AC#12、AC#13、AC#14。
 **AC#14 我的裁定（技术选择我拍）**：取 **ⓐ 形**（专用 STA 线程泵 `panel_resident_windows.go:437`、Dispatch 上线程 `:498`）—— 它**已落地乃现状**，两枚真窗钉 PASS（页自报 `REPLIED,REPLIED,REPLIED`＋推送 `PUSHED-33R5-OK`）。撤销口令＝**把 33 面板线程改回投 `ui-sta`**。
 **⛔ AC#10 不翻**：五枚字段里 `scale` **无生产者**（fork 的 `PutZoomFactor` 无 Go 包装），已有具名钉 `TestAC10ScaleHasNoProducerAndTheReasonIsNamed`（摘障碍自动转红）⇒ **如实留开**，不拿"四枚有"冒充"五枚齐"。
+
+---
+
+## lane-2 收件（2026-11-16 13:1x，`8d4eb0e5c`＋`35c66ae87`，件 `docs/evidence/s1/33-lane2-csp-socket-ac5789.md` 10352 B）
+
+**尺1** 两枚提交在（产码 `panel_control_windows.go`／`panel_host_windows.go`／`panel_csp_response_33lane2_windows_test.go`；证据＋`docs/SLO.md` 附录 E）。**尺2** 件在 10352 B。**尺3 我自己复跑**（重建 dist 后一发）：`TestAC6CSPOnTheRealPageIsReadFromItsRealResponse33lane2` **PASS 2.28s**；dist 清回后再一发 `TestAC6CSPOnTheNotBuiltNoticeIsReadFromItsRealResponse33lane2` **PASS 1.42s**（⚠ 这两枚互斥：dist 在场时通知页那条**具名 SKIP**，我按两种状态各跑一次才齐）；`TestAC3ListeningSocketRulerSeesItsOwnListener` **PASS**（尺 0→1→0 不恒真）；`TestAC9ComposerDispatchHasAProductionCaller` **PASS 0.11s**（生产调用者 `panel_inbound.go:174 disp.Handle`）；AC#5 夹具四枚 **全 PASS**。
+
+**本波翻**：`:75`（离线服务＋按 PID 零监听）、`:77`（运行时缺失夹具：具名拒绝＋`panel.unavailable`＋L2 旗亮）、`:78`（CSP 响应头实测，浏览器 `securitypolicyviolation.originalPolicy` 逐字含 `connect-src 'none'`，反向控制 M1 红）、AC#9（`ComposerDispatch.Handle` 有非测试真调用者）。
+**⛔ `:74` 延迟不翻（如实红）**：`docs/SLO.md:634-636` —— hot **P50 50.241／P95 120.657ms（≤200）PASS**；cold **P50 1203.090ms（在预算内）、P95 1693.016ms（≤1500，红）**，样本 9 单发超线，**未挑发未重跑拧绿**。⛔ `:76` 焦点往返本轮未打。
+**我的处置**：`:74` 记 `A1901` 留开；**冷 P95 这次是「机器上那颗 Wisp 球 PID 49348 在跑」的干扰态读数** ⇒ 等机主关球后在安静桌面复量再裁（⛔ 拿干扰态数字当定论，也⛔ 拿它当"已达标"）。
