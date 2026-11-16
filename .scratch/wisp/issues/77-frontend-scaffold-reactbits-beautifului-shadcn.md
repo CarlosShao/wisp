@@ -80,7 +80,7 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 - [ ] **AC#1** `frontend/` 可构建，产物被 `go:embed` 打进二进制，`wisp.exe` 在无 node 环境的机器上能拉起面板。
       判据：**剥光 PATH 里的 node/npm** 后跑一次真拉起（这条来自我们自己踩过的"签收命令只在开发机能跑"）。
 - [x] **AC#2** token 四方对账用例落地 + 一次"只改前端一处颜色 ⇒ 用例红"的变异（grep 证落盘 → 跑 → 还原 → 证还原）。
-- [ ] **AC#3** L2 确认卡渲染真数据：由 `internal/risk` 的真实决策对象驱动，**不是**组件库 demo 的假 props。
+- [x] **AC#3** L2 确认卡渲染真数据：由 `internal/risk` 的真实决策对象驱动，**不是**组件库 demo 的假 props。
       ⚠ 能力类判据：**说清生产调用者是谁**（哪个装配根、什么事件流），否则按 A33 只能记 PARTIAL。
 - [x] **AC#4** `ban #6` 与 `ban #8` 对真实 `frontend/` 的作用域台账：贴出扫描器自报的**逐作用域文件数**（>0），
       并给出一次故意在前端写 `approval.decide` ⇒ **rc=1 且点名文件** 的真红。
@@ -420,3 +420,11 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   - **AC#11（深浅双主题 50 次配对实测，终态 47 过 / 3 对挂账断跳）**：新仪器 `frontend/scripts/render-shell-77.tsx`（`npm run render:shell77`，vite --ssr 形状，零新依赖）渲生产根 App（外壳）＋L2 卡（样例屏）×深浅×真/未判 4 棵树，走渲染树标签栈提取实际绘制配对（重构删配对即红）、从 `tokens.generated.css` 解析颜色（别名跟链、8 位 hex alpha 按面合成、--panel-alpha 断言 100%）、WCAG 实算逐对判 AA。**token 小改**（生成器真相源＋重生成，`tokens:check` rc=0，四方对账仍绿）：`--ink-3` 亮 #9a9da3→#6d727a、深 #6c6f75→#8b8f96（标签层 2.61-3.53:1 → 4.64-5.47:1）；`--red` 亮 #e3474c→#d13d43（拒绝钮白字与 L2 徽标 3.98:1 → 4.71:1；深色 --red 兼徽标文字 4.68:1 不可同改）。**3 对 <AA 具名挂账**（KNOWN_BREAKS 机检：变绿即 rc=1 逼删账）：深色 white/red 钮 3.31:1、亮色 warn/warn-soft 胶囊 2.67:1、亮色 warn/surface 信息不足 2.97:1——修复均需新增彩色 token（--red-strong/--warn-ink），触发四方对账 check 2 未覆盖，须同步 c21-native-tokens.md＋钉名表，本波写面之外 ⇒ 具名报断跳。诚实边界：静态渲染树配对＋token 值合成，非浏览器合成像素；hover/focus 态未测；仪器未接 CI（ci.yml 本波不在写面）。
   - **门禁复读**：typecheck rc=0 / lint rc=0（36 warnings 0 errors，109 files，新文件 0 新增）/ build rc=0（gzip 147.70 kB，dist 删回 .gitkeep，`git status -- frontend/dist` 空）/ tokens:check rc=0 / render:shell77 rc=0 / render:l2 两 fixture rc=0 / `go build ./cmd/wisp` rc=0 / Go 卫生五测（四方对账＋零 emoji＋无状态＋ban#6 孪生＋颜色字面量）rc=0 / d22scan 双门 rc=0（ban#8 frontend/ 128 含新文件）。硬约束遵守：未动 thresholds/golden/allowlist/PLAN/specs/D43/design；未放宽既有断言（render-l2 一字未改）；未 push；零 emoji；dist 零字节。
   - `next=` 非实现者按证据文件出裁决表与勾框；3 对挂账的修复（新 token＋契约面两处同步）另派；AC#6/8/9 与 AC#1 真窗口半格另波。
+---
+
+## 编排者收件·第二批（2026-11-16 20:0x，`07cd7c89e`，件 `docs/evidence/s1/77-scaffold-batch2-ac3-ac11.md` 11930 B＋`…-contrast.txt` 4560 B）
+
+**尺1** `07cd7c89e` 在。**尺2** 两件在。**尺3 我自己复跑**：`npm run render:shell77` **rc=0**（50 对测量、47 过 AA、3 对登记 <AA）；`npm run render:l2 -- fixtures/l2-card-fs-delete.json` **rc=0**（`render-l2: OK, 1 card(s) rendered from real risk decisions, 21822 bytes`）；`npm run render:l2 -- fixtures/l2-card-unjudged-reason.json` **rc=0**（21873 bytes）；`npm run build` **rc=0**；dist 已删回 `.gitkeep`。
+
+- **AC#3 勾**：链路逐跳 file:line 无断跳 —— `internal/risk/assessor.go:230`（真 Decision）→ `internal/panel/approval.go:64-99` → 装配根 `cmd/wisp/run.go:1185-1186`＋`panel_resident_pump.go:94-99` → `pump.go:349-360`＋`composer.go:58` → `panel_snapshot_deliver_329.go:57` → `frontend/src/panel-root.tsx:37`＋`lib/panel.ts:568-578` → `App.tsx:351-353` → `l2-approval-card.tsx`；两枚牙（真决策逐字段／未判负控显式「信息不足」）。
+- **AC#11 不勾（诚实，具名挂账）**：**47/50 对过 AA**；**3 对 <AA** ＝①深色 白字/红钮 **3.31:1**（该红兼作 L2 徽标文字 4.68:1，压深必击穿文字，单 token 无解）②warn 胶囊亮色 **2.67:1** ③信息不足亮色 **2.97:1**（另有禁用态 2.24:1，WCAG 对禁用控件豁免）。修复须**新增彩色 token**（`--red-strong`/`--warn-ink`），而新增会让四方对账 check 2 报「未覆盖」⇒ 须同步 `internal/panel/tokens_fourway_test.go` 钉名表＋`docs/evidence/s1/c21-native-tokens.md` —— **该两处不在本波写面**，腿停下具名报断（**不是偷懒，是写面互斥**）。⇒ 已排后续腿（需 `internal/panel` 写额）。

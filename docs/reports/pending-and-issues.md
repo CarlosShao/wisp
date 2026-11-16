@@ -37699,3 +37699,9 @@ AC#1 命令级绿但真窗口半格归票 33 ⇒ 不勾。
 若继续把 35 挂在 33 后面，会连带堵住 36/37/38/39/40（五张产品页＝31 格）。宿主 13 生产文件早在跑、桥白名单（Method*）与 dispatch 已在 ⇒ 35 余 2 格（伪 allow 必拒 / resync 无态）**现在就能做**。
 派单存档 .scratch/wisp/probes/orch/20261116/txt/35-bridge-forged-resync-dispatch.txt，即发。
 **理由（铁律⓪⓪⓪）**：最有价值不是"继续等安静桌面"，而是把**面板桥**这条主干收口，让五张产品页能开工。
+
+## A1914（11-16 20:0x）：**77 AC#3 勾（链路无断跳＋两枚牙）；AC#11 到 47/50，3 对挂账卡在写面外**
+
+ 7cd7c89e。我复跑 ender:shell77 rc=0（47/50 AA、3 具名 <AA）、ender:l2 真决策 rc=0（21822 B）、ender:l2 未判 rc=0（21873 B）、build rc=0。
+AC#11 余 3 对（深色白字/红钮 3.31、warn 胶囊 2.67、信息不足 2.97）**修需新增彩色 token** ⇒ 会击穿四方对账未覆盖表 ＋ internal/panel/tokens_fourway_test.go 钉名表（写面外）⇒ 后续腿（需 internal/panel 写额）。
+**口径**：AC#11 属"真欠账但有名字"，⛔ 不许把 KNOWN_BREAKS 悄悄删了充绿。
