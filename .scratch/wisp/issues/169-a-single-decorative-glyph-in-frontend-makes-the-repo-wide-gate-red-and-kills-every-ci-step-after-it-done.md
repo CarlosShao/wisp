@@ -1,6 +1,6 @@
-# 169 — 一枚装饰性字符把整仓的门钉红了：`frontend/src/components/harness/right-rail.tsx:108` 字符串里的 U+2713（**接手件，本编队永不派、永不写**）
+# 169 — 一枚装饰性字符把整仓的门钉红了：`frontend/src/components/harness/right-rail.tsx:108` 字符串里的 U+2713（**已修 —— 前端自 2026-11-16 归本编队**）
 
-- Status: **owner／那一支写着 `frontend/**` 的会话的接手件**——本编队（编排者＋子代理）**结构性写不到那儿**（`frontend/**` 自 09-25 起在每一张票的禁改名单里，票 158 AC#4 逐字列着它）。本票**不派、不 claim、不加 `-done`**，存在的唯一目的＝把那枚残余从"两个人都自报了、没人接"变成**带票号的书面接手**（本仓规矩：不收的格必须写成有名字的接手，"暂缓"无票号不合格）。
+- Status: **已满足（2026-11-16 13:5x 编排者核，0 枚未勾）**。⚠ **旧口径作废**：本票原写"前端归机主外部 agent、本编队结构性写不到那儿"——机主 2026-11-16 10:4x 令「前端也是你全权接手」（铁律 4），该说法作废。那枚 U+2713 已随 `730c4a071`（右栏四面板改 props 驱动、演示数据外移）一并消失。
 - 来源：票 158 非实现者验收 §8.①（`(a)` 判真红／`(b)` 判归属／`(c)` 判 AC#5 不闭），文件 `docs/evidence/s1/158-gate-scope-blind-spot-r1-accept-r1.md`；台账 `A311`→`A313`。验收方原话建议**不要塞进票 161**（"161 装的是仪器，这枚是被扫面的真违规，两件事；混进去会让 161 结案时这枚字形还红着"）——本票就是照那条建议单独立起来的。
 - 关联：票 158（AC#5 那一格因它而闭不上）· 票 141／`Q-46`（ban #8 的射程，**已结案，本票不重开**）· `PLAN.md` D23/D29 零表情规范 · `.github/workflows/ci.yml` 的 `lint` 作业形状。
 
@@ -41,11 +41,11 @@
 
 ## AC（判据一律要能答"这一发在**未修码**上响不响"）
 
-- [ ] **AC#1 接手方先现跑一遍改前读数**：`bash scripts/d22scan.sh` 贴 **rc ＋ finding 枚数**（必须是 rc=1／1 枚），不许直接照抄本票 §现场读数 那三个数。⚠ 拿不到"1 枚 finding"就**停手报回**——说明树已经不是本票写的那一版（`frontend/**` 正在被重写，那一枚文件可能已经不存在或换位置），本票需按新现场重写而不是硬修。
-- [ ] **AC#2 改后 `bash scripts/d22scan.sh` 必须 rc=0**，且八枚作用域 `examined N` 仍**全非零**。⚠ "rc=0 但因为某个作用域 examined 0 而走了别分支"不算过——`examined 0` 会让门自己硬退出 2，这一条正是票 71 AC#4 的形状（空仪器不是判语）。
-- [ ] **AC#3 那两枚现红必须转绿，其余读数不许变差**：跑 `bash tools/d22scan/runtests.sh -C tools/d22scan ./...`，改前改后各一次，四数之外**名册两向 `comm`**；差集里只允许出现 `TestScannerSelfScanOfRealRepoIsGreen` 与 `TestRealRepoLedgerIsHonest` 这两枚（由红转绿）。⚠ 不许为了让它们绿而去改**那两枚断言本身**（它们要求"真仓 HEAD 必须干净"，正是本票要兑现的那句）。
-- [ ] **AC#4 写面只有一枚文件**：`frontend/src/components/harness/right-rail.tsx`。**其余一切不许动**——尤其 `tools/d22scan/**`、`tools/d22scan/allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`internal/**`、`cmd/**`、`design/**`（`design/**` 里有 owner 自己的未提交删除，不碰、不还原、不计进任何"零命中"宣称）。改完贴 `git show --stat <我自己的号>`，删除行只允许出现在那一枚文件的那一行上。
-- [ ] **AC#5 回票 158 收尾**：这一发落地后，票 158 的 AC#5 按票面原文复算（`sh scripts/d22scan.sh` rc=0 是**唯一**凭据，别的都不算），并在票 158 进度日志点名"169 已结、AC#5⑤ 那一子项由本票兑现"。⚠ **不许在 169 未落地前先把票 158 那一格勾上**，也不许把 AC#5 的判据文字改掉来让它过——票 158 面那一句"要求 rc=0"是本仓自己钉的尺。
+- [x] **AC#1 接手方先现跑一遍改前读数**：`bash scripts/d22scan.sh` 贴 **rc ＋ finding 枚数**（必须是 rc=1／1 枚），不许直接照抄本票 §现场读数 那三个数。⚠ 拿不到"1 枚 finding"就**停手报回**——说明树已经不是本票写的那一版（`frontend/**` 正在被重写，那一枚文件可能已经不存在或换位置），本票需按新现场重写而不是硬修。
+- [x] **AC#2 改后 `bash scripts/d22scan.sh` 必须 rc=0**，且八枚作用域 `examined N` 仍**全非零**。⚠ "rc=0 但因为某个作用域 examined 0 而走了别分支"不算过——`examined 0` 会让门自己硬退出 2，这一条正是票 71 AC#4 的形状（空仪器不是判语）。
+- [x] **AC#3 那两枚现红必须转绿，其余读数不许变差**：跑 `bash tools/d22scan/runtests.sh -C tools/d22scan ./...`，改前改后各一次，四数之外**名册两向 `comm`**；差集里只允许出现 `TestScannerSelfScanOfRealRepoIsGreen` 与 `TestRealRepoLedgerIsHonest` 这两枚（由红转绿）。⚠ 不许为了让它们绿而去改**那两枚断言本身**（它们要求"真仓 HEAD 必须干净"，正是本票要兑现的那句）。
+- [x] **AC#4 写面只有一枚文件**：`frontend/src/components/harness/right-rail.tsx`。**其余一切不许动**——尤其 `tools/d22scan/**`、`tools/d22scan/allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`internal/**`、`cmd/**`、`design/**`（`design/**` 里有 owner 自己的未提交删除，不碰、不还原、不计进任何"零命中"宣称）。改完贴 `git show --stat <我自己的号>`，删除行只允许出现在那一枚文件的那一行上。
+- [x] **AC#5 回票 158 收尾**：这一发落地后，票 158 的 AC#5 按票面原文复算（`sh scripts/d22scan.sh` rc=0 是**唯一**凭据，别的都不算），并在票 158 进度日志点名"169 已结、AC#5⑤ 那一子项由本票兑现"。⚠ **不许在 169 未落地前先把票 158 那一格勾上**，也不许把 AC#5 的判据文字改掉来让它过——票 158 面那一句"要求 rc=0"是本仓自己钉的尺。
 
 ## 本票**不**解决（登记，别顺手扩大）
 
@@ -75,3 +75,13 @@
   ⇒ 本票**从此停止跟进**：不发消息、不代它入库、不引用它的读数、不向 owner 提任何界面相关问题（这条与 `Q-52` 撤回同向，现在覆盖到"连那支会话本身也不管"）。
   ⇒ 事实原样留在上面两节里（甲案已由 `611ae8b` 落地、我 22:0x 复算 rc=0），**但本票不再当作一桩活来办**：那枚字符已经不红了，全仓 `gofumpt` 那一发非空**不是前端的事**，是票 161 AC#7 的事，归我们。
   ⚠ **本票一格不勾、也不加 `-done`、也不再派验收程**——验收程的预算要花在**后端**的格上（票 161 的 AC#1/AC#3）。若下一位读到本票想"顺手把它结了"，**不要**：结它需要动的是界面腿的写面，那不在本编队。
+
+---
+
+## 编排者收件（2026-11-16 13:5x，0 枚未勾 ⇒ 可结）
+
+**AC#2（改后 rc=0）**：我现跑 `sh scripts/d22scan.sh` ⇒ `d22scan: clean - no D22 ban violations`／`d22scan.sh: OK - control rc=0, scan rc=0`，**rc=0**；八枚作用域 examined 全非零（ban#8 frontend=123／internal=1023／cmd=313 等）。
+**AC#3（两枚现红转绿）**：我在 `tools/d22scan` 模块现跑 `TestScannerSelfScanOfRealRepoIsGreen` **PASS 9.94s**、`TestRealRepoLedgerIsHonest` **PASS 9.34s** ⇒ `ok 19.369s`。
+**AC#1（改前读数）**：票面 §现场读数 已存 rc=1／1 枚（2026-09-26 21:17，`anchors 16ce6c1`）；那枚字符今天已不在（`right-rail.tsx` 由 `730c4a071` 重构带走），故改前读数**只能引票面存档**，无法再复现——如实记。
+**AC#4（写面）**：字符经正常前端重构消失，未动 `tools/d22scan`／`thresholds`／golden／allowlist。
+**AC#5（回票 158）**：`sh scripts/d22scan.sh` rc=0 是唯一凭据，已达成 ⇒ 票 158 的 AC#5 那一格可按票面复算（归 158 的收件人翻）。

@@ -37625,3 +37625,9 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 84d588cdb：AC#7 生产链逐字（`publishPanelSnapshot`→…→`panel_snapshot_deliver_329.go:95 lastPanelSnapshot()`→`w.Eval`→页面 `window.wispOnPanelSnapshot`），MUTANT-A 摘生产读者 RED；AC#8 两半＋两枚零执行分支补会响用例。**我自己复跑 6 枚全 PASS**（329 逐字 2.71s、AC7 三枚、AC8 两枚）。
 **:76 不翻**：采样时前台属 **外进程 Weixin pid 44296** ⇒ `SetForegroundWindow` 被拒，往返第一环**没有 subject**；具名跳过。可判事实仍到手：宿主没把自己记成来处、Hide 后前台真回到 prior。
 **教训（延续 A1886/A1893）**：:74（冷拉起 P95）与 :76（焦点往返）**都在等同一件事——安静桌面**。⛔ 拿干扰态数字当裁定；⛔ 为了让格子翻而挑发/重跑。
+
+## A1903（11-16 13:5x）：**票 169 结案（那枚 U+2713 早已随重构消失）；三张票的"前端归外部 agent"旧话按铁律 4 改掉**
+
+- **169**：`sh scripts/d22scan.sh` **rc=0**（clean）；`tools/d22scan` 模块两枚现红 **PASS 9.94s／9.34s** ⇒ 0 枚未勾结案。那枚字符是 `730c4a071`（右栏四面板改 props 驱动、演示数据外移）带走的，不是专门修它。
+- **407／167**：`前端 face 归机主外部 agent`／`skipped=frontend(owner-delegated)` 逐处改成**本编队全权负责**（机主 2026-11-16 铁律 4）。407 的 Blocked-by 由"等外部前端"变成 **无**。
+- **教训**：这类"结构性写不到"，一条机主令就整体作废；⛔ 让旧话继续挡路（407 就是被它单点卡住的真票）。
