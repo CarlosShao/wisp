@@ -37598,3 +37598,11 @@ RED - count guard: the roster holds 69 entries, the tree has 68 over-budget trac
 
 我自己复跑：`TestAC2CredentialSentinelAppearsInNoArtifact` **PASS 0.03s**；重建 dist 后 `TestBuiltinBundleIsCompleteOrAbsentNeverHalf` **PASS**，判语逐字 `bundle complete - entry 1044 bytes, 2 asset refs, 4 embedded files`（跑完 dist 已清回 .gitkeep，零 dist 字节）。AC#10 复核：`newResidentApprovalWithConfig`（`resident_approval_windows.go:601`）真读 [risk] 两项。
 **仍开 2 格**：`AC#4`＝真机"点设置→填参数凭据→保存→下一任务真用上"（要机主点，依赖票 33 链）；`AC#8`＝文案"不许出现保存即生效"（生产面已 0 命中，整格还卡票面 §8 两道外部前置）。
+
+## A1899（11-16 12:1x，票 313 收口：**四张卡里两张真的接上了**）
+
+6832d4e6c：云端语音链**首次有生产调用点** —— boot 解析（`resident_voice_windows.go:2003`）→ 装配（`resident_voice_engines_windows.go:457/462` 与 `:500/505`）→ `speech.NewCloudASRChain`（`cloudchain.go:111`）／`NewCloudTTSChain`（`:144`），本地 sherpa/matcha 作 terminal fallback。
+**我自己复跑**：三枚 313 牙＋AC#3 哨兵 **4/4 PASS rc=0**；`render:model-settings` **rc=0**（AC#1 预选 stepfun 的仪器判语全绿）；`TestTicket255*` **35 PASS／ok 17.00s**（名册重裁经我复核）。
+**前端**：**听写/朗读**两张卡文案翻成「已接入…保存后重启生效」＋标签「已接入·重启生效」；**实时语音、本机音频一字未动**（引擎 Reserved／快照未补 ⇒ 没通就不许改）。
+⇒ **四张卡＝2 真接（听写/朗读）＋2 仍占位（实时语音归票 60/C32、本机音频归快照票）**。⛔ 拿「听写朗读通了」冒充「四张全通」。
+**机主须知（两条环境红）**：`TestAC4Focus…`／`TestAC246…` 因**右下角那颗 Wisp 球正在跑**（PID 49348）而红；关掉球后重跑即绿。

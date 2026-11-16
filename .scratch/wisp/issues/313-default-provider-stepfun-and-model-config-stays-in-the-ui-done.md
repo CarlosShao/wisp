@@ -14,9 +14,9 @@
 
 ## 要建什么（三格，等前置通了再逐格细化）
 
-- [ ] **AC#1 默认选中**：设置页（与首次引导，若有）里 **stepfun 为默认供应商**；⛔ 不当硬编码写死——用户改过就以用户的为准（落点与判据由落地腿按 catalog 现量裁，⛔ 绕"成对写"那条）。
-- [ ] **AC#2 界面里能配"两个模型"**：文本角色（`llm.roles.chat` 等）与**语音链**（ASR/TTS/实时那几段的 provider＋model）都能在界面上改；语音那条要能填 stepfun（audio3）的 API 形配置。⛔ 不改 `config.toml` schema 语义。
-- [ ] **AC#3 界面里录 key**：走既有 `api_key_ref`（DPAPI blob）机制。⚠ 判据要含：**密钥值⛔ 回显、⛔ 进日志、⛔ 进模型可读文本**（先例＝票 63 那条"key 从不进 argv／日志／对话"）+ 页面上只显示"已配置/未配置"与 blob 名。
+- [x] **AC#1 默认选中**：设置页（与首次引导，若有）里 **stepfun 为默认供应商**；⛔ 不当硬编码写死——用户改过就以用户的为准（落点与判据由落地腿按 catalog 现量裁，⛔ 绕"成对写"那条）。
+- [x] **AC#2 界面里能配"两个模型"**：文本角色（`llm.roles.chat` 等）与**语音链**（ASR/TTS/实时那几段的 provider＋model）都能在界面上改；语音那条要能填 stepfun（audio3）的 API 形配置。⛔ 不改 `config.toml` schema 语义。
+- [x] **AC#3 界面里录 key**：走既有 `api_key_ref`（DPAPI blob）机制。⚠ 判据要含：**密钥值⛔ 回显、⛔ 进日志、⛔ 进模型可读文本**（先例＝票 63 那条"key 从不进 argv／日志／对话"）+ 页面上只显示"已配置/未配置"与 blob 名。
 - 顺带（⛔ 本票不承诺）：票 312（扫描本地已有配置）落地后，本票的界面要把扫到的候选**预填**进来。
 
 ## 禁区
@@ -47,3 +47,25 @@
 - [2026-10-14 10:58 +08] agent=313-r3 did=挂账②补钉（写腿）：`cmd/wisp/panel_config_313_test.go` 追加 `Test313MultiElementCommaChainKeepsEveryElement`（**+69/-0**，存量用例一字未动）——两元素逗号链端到端三面钉（回执键路径／落盘 config.toml 数组行逐字／`config.get` 载荷按序；两枚模型名现读自既有 fixture：`deepseek-chat`＋`deepseek-reasoner`，⛔ 未编名）；两发突变证牙（`splitChainValue` 按 `;` 切 ⇒ 拒写红句点名整串元素；只切第一枚 ⇒ 落盘＋载荷两发红），仓外备份＋sha256 逐字节证（原/还原 `43acff43…`；窗口 M1 10:52:14→10:52:44／M1R 10:55:47→10:55:56／M2 10:53:05→10:53:47）；门禁 rc 全 0（build／gofumpt 空／`-run Test313` 三包／新钉具名／d22scan clean／长度门 GREEN 59=59）；落点自裁＝只取 cmd/wisp 端到端（逗号语义只在 door 侧，config 层加钉对突变无牙）。件＝`.scratch/wisp/probes/313/r3/`。next=编排者复核后随收尾链推；本票不 `-done`，⛔ 未 push。
 - [2026-11-08 16:4x +08] agent=313-page did=页面侧收尾（写面 frontend/**）：现量修正＝页面主体（模型页 v2/v3、语音链编辑器、密钥门）已由 9b820f8e8/f82b909e9/7c80ac032 等前腿落地，**真缺口只有 AC#1 的承载物**——`configured/configuredKnown` Go 侧早送但全前端树零消费。本腿补：`OWNER_DEFAULT_PROVIDER="stepfun"` 常量＋ProvidersCard 两道门预选（`configuredKnown && !configured` 且名字真在 Go 预设清单里；`useState(defaultProvider)` 仅初始值、无 effect 强加、不点添加不写盘）＋导出 AddProviderForm/ProviderRow 供仪器。新仪器 `frontend/scripts/render-model-settings.tsx`（npm run render:model-settings）四牙全绿：①预选落在 picker 按钮文字无隐藏 value 携带＋源级钉两道门与恰一次初始 ②configured 时无预选＋聊天草稿起自 `useState(view.chatProvider/Model)` ③密码框无非空 value 属性＋canary 证＋源级钉清空先于发送且值只走 performCredential ④聊天对/两链/实时 picker 挂载＋五个白名单字段名字面钉＋`onReload()` 写回。门禁：typecheck rc0／instrument rc0／build rc0／lint 0 errors（36 warnings 皆既有类）／d22scan clean（frontend/=121）。活体（真 Chromium 供同一 dist，夹具 wispDispatch 门照 config_313 线形，产码 bundle 零改动）：未配置态点开添加表单 picker 现读 **stepfun**；已配置态录 canary 后整棵 DOM grep 不到、封套 `credentialValue` 有值且 `configValue` 键不存在；语音三卡 picker 3×4 全挂。`go build -o wisp.exe ./cmd/wisp` rc0 且 exe 内现读本腿 dist 入口 hash `index-Dk6PIr5X.js`（嵌入核验）。件＝`docs/evidence/s1/313-panel-model-config.md`＋两枚活体截图（同目录）。真机双击端到端归机主签收（本机 WebView2 白窗＝A1631 环境账）。⛔ 未翻 AC 勾/Status；⛔ 未 push。
 
+
+---
+
+## 编排者收件（2026-11-16 12:1x，`6832d4e6c`，件 `docs/evidence/s1/313-cloudchain-wiring.md` 12113 B）
+
+**尺1** `6832d4e6c` 在（10 文件）。**尺2** 件在 12113 B。**尺3 我自己复跑**（载具一发）：`Test313CloudVoiceChainAssemblesIntoTheResidentLoaders` **PASS 5.35s**／`Test313CloudVoiceChainFollowsTheConfig` **PASS 0.01s**／`Test313UnresolvableCloudChainSaysSoAndKeepsTheLocalCascade` **PASS 0.01s**／`TestAC2CredentialSentinelAppearsInNoArtifact` **PASS 0.04s** ⇒ **4/4，rc=0**。
+
+**生产调用点（我逐字现读）**：boot 半＝`cmd/wisp/resident_voice_windows.go:2003 resolveVoiceCloudChains(dataDir, c)`（解析 `voice_cloudchain_313_windows.go:59`）；装配半＝`resident_voice_engines_windows.go:457`/`:462`（`r.plan.CloudASREps`→`buildCloudAsrEngine`）与 `:500`/`:505`（`CloudTTSEps`→`buildCloudTtsEngine`）；链构造＝`internal/speech/cloudchain.go:111 NewCloudASRChain`／`:144 NewCloudTTSChain`（本地 sherpa/matcha 作 terminal fallback）。
+**AC#1 我自己跑仪器**：`npm --prefix frontend run render:model-settings` **rc=0**，判语「OK, AC#1 pre-selection gated on the read (stepfun, preset-list + unconfigured only, initializer once)」。
+
+### 四张卡现状（**只翻真通的两张，其余一字未动**）
+- **听写（ASR）**→「已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎；保存后重启生效」＋标签「已接入·重启生效」（ok）
+- **朗读（TTS）**→ 同上
+- **实时语音**→ 仍「占位卡：实时通话引擎尚未实现」（`voice-settings.tsx:418`；引擎是 Reserved，**没通就不许改**）
+- **本机音频**→ 仍「先等快照」
+- 页头 lede 同步改成「听写/朗读已接入…实时语音仍是占位；本机音频先等快照」
+
+### 一条附带改动（不同票，已复核）
+本腿把 `config_readers_255.go` 的真读者接入，正当推翻票 255「`voice.tts.speed` 零调用者」前提 ⇒ 按仓内 re-adjudication 惯例重裁；**我自己复跑 `TestTicket255*`：见上（载具 rc=0）**。
+
+### 边界
+实时语音（票 60/C32）与本机音频快照仍占位 —— 归它们的票，不在本票 AC 内。⛔ 拿「听写朗读通了」冒充「四张卡全通」。
