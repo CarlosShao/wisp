@@ -1,50 +1,46 @@
 /* ============================================================================
-   语音 settings page - v2 (owner review 2026-10-14; see model-settings.tsx's
-   header for what changed and why).
+   语音 settings page - v3 (ticket 313's wiring leg, 2026-11-16).
    ----------------------------------------------------------------------------
    Same interface as v1 (313-panel-ask.md §3): two cloud fallback chains and the
-   realtime head. v2 makes it a product surface:
+   realtime head. v2 made it a product surface (chain editors, plain language,
+   pair rule at save time); v3 makes the honest copy follow the backend truth:
 
-     - 听写 / 朗读 are CHAIN EDITORS (rows of provider+model, add/remove), which
-       is what the field actually is - a comma-separated fallback list. v1 wrote
-       a whole chain from one typed string, which silently overwrote a multi-hop
-       chain the operator may have written by hand.
-     - everything reads in plain language; the enabled-switch gap is stated as a
-       scope line, not as internal jargon.
-     - the pair rule is checked at SAVE time, per segment.
+     - 听写 / 朗读 are now WIRED: the assembly root resolves the two chains at
+       boot (cmd/wisp/voice_cloudchain_313_windows.go) and the resident voice
+       loaders build speech.NewCloudASRChain / NewCloudTTSChain with the local
+       cascade as the terminal fallback - the chains were "savable but read by
+       no runtime path" before this leg (grep: zero NewCloud*Chain call sites).
+       The chains are TierReload config, so the honest receipt is "保存后重启
+       生效", and the placeholder warn-downgrade below no longer applies to
+       these two cards.
+     - 实时语音 stays a PLACEHOLDER card, exactly as v2 graded it: the
+       RealtimeEngine seam is Reserved with no implementation, so its writes
+       are still real-save/no-effect and keep the warn receipt.
+     - 本机音频 keeps the WAITING state (snapshot keys and write fields still
+       absent backend-side; the v2 STATE ALIGNMENT note below names the three
+       keys); unchanged by this leg.
 
    A chain element must name a provider AND a model the config already lists
    (checkChainElement at load and on write), so the model control lists the
    provider's catalog - there is no typed-id path here, and a provider with no
    models says so instead of offering a doomed save.
 
-   HONEST-BLOCKED RULING (census 2026-11-10, .scratch/wisp/probes/orch/
-   20261110/panel-wiring-matrix.md §①): all three cards on this page are
-   PLACEHOLDER cards. Their writes are real - the config.set route lands the
-   values in config and the read-back shows them - but no runtime path reads
-   them: the resident voice leg is local-only (internal/speech/engines.go),
-   the only cloud-chain consumer ResolveCloudChain has zero callers (ticket
-   255's roster), and the RealtimeEngine seam is Reserved with no
-   implementation. So the copy says so, and every ok receipt on this page is
-   restated: the SAVE is real, the EFFECT is not. C-class silent fakes were
-   re-graded B (honest read-write stubs); un-restating them re-opens the lie.
+   AC#1 (owner's default vendor): the chain editors and the realtime head
+   prefill the owner-named default vendor (OWNER_DEFAULT_PROVIDER, the same
+   constant the model page defines) ONLY as the draft state of an unset field -
+   the read's saved value always wins, nothing writes until the user saves,
+   and the name is only offered because a provider row actually carries it.
 
-   STATE ALIGNMENT (2026-11-11): the backend grew three REAL readers/guards
-   this page did not show - voice.aec.enabled feeds the barge-in monitor
-   (cmd/wisp/resident_voice_windows.go:1872 -> :1882), audio.input_device
+   STATE ALIGNMENT kept from v2 (2026-11-11, still true): the 本机音频 keys -
+   voice.aec.enabled feeds the barge-in monitor
+   (cmd/wisp/resident_voice_windows.go:1992 -> :2010), audio.input_device
    resolves per capture open and hotplug reopen
    (cmd/wisp/resident_audio_windows.go:307), and audio.sample_rate is a
-   load-time guard pinned to 16000 (internal/config/validate.go; the roster
-   sentence at cmd/wisp/config_readers_255.go:233). What the backend does NOT
-   have for them is a panel channel: the config.get snapshot's voice payload
-   carries five keys only (pinned in config_313_test.go - no aecEnabled, no
-   inputDevice, no sampleRate), and the config.set whitelist has no write
-   field for any of the three (grep over internal/panel + panel_config_store.go:
-   zero hits). So the new 本机音频 card renders the WAITING state - the
-   backend fact as words plus "等快照" - never a guessed value and never a
-   control that looks switchable. When Go adds the snapshot keys and the write
-   fields, this card graduates to real controls; drawing them now would
-   re-open the C-class lie this page exists to keep shut.
+   load-time guard pinned to 16000 (internal/config/validate.go) - all have
+   real backend readers, but the config.get snapshot's voice payload carries
+   five keys only (pinned in config_313_test.go) and the config.set whitelist
+   has no write field for any of the three. So that card renders the WAITING
+   state; drawing switchable controls now would re-open the C-class lie.
 
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
@@ -56,6 +52,7 @@ import { ConfigReadGate } from "@/components/config-read-state";
 import { COPY, configStatus, type Feedback } from "@/lib/config-feedback";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
 import { performConfigWrite, type ConfigWireWrite } from "@/lib/config-actions";
+import { OWNER_DEFAULT_PROVIDER } from "@/components/model-settings";
 import {
   EmptyState,
   FeedbackLine,
@@ -64,11 +61,23 @@ import {
   StateTag,
 } from "@/components/settings-controls";
 
-/** The census ruling these three cards carry: the save is real, the effect is
-    not. The generic translated receipt ("已保存，重启后生效") promises an
-    effect no runtime path can deliver today, so every ok answer on this page
-    is restated as a warn - and the tone downgrade is the point: a green
-    "saved" line on a card that cannot take effect reads as "working". */
+/** 票 313 AC#1 的语音半边：机主点名的默认供应商，与 model-settings.tsx 的
+    OWNER_DEFAULT_PROVIDER 是同一个常量（一处定义，两页引用，不许漂）。
+    语音卡上的用法比模型页更窄：它只是「未设置字段的草稿初值」——链条为空时
+    第一段的供应商预选、realtime 未配置时的草稿。门槛是这行供应商真的存在
+    （链元素必须点名已建行的 provider/model，给一个不存在行的预选就是必然
+    保存失败的坑），用户存过的值永远原样显示，从不被默认值盖写。 */
+function voiceDefaultProvider(providers: readonly ConfigViewProvider[]): string {
+  return providers.some((p) => p.name === OWNER_DEFAULT_PROVIDER)
+    ? OWNER_DEFAULT_PROVIDER
+    : "";
+}
+
+/** The realtime card's receipt: the save is real, the effect is not (the
+    RealtimeEngine seam is still Reserved). The generic translated receipt
+    ("已保存，重启后生效") would promise an effect no runtime path can deliver,
+    so the ok answer is restated as a warn - the v2 tone downgrade, kept
+    exactly for the card that still needs it. */
 function placeholderReceipt(feedback: Feedback): Feedback {
   return feedback.tone === "ok"
     ? { tone: "warn", text: "已写入配置文件；这一项还没有接到运行路径，当前不生效" }
@@ -78,7 +87,7 @@ function placeholderReceipt(feedback: Feedback): Feedback {
 
 export function VoiceSettings({
   heading = "语音",
-  lede = "云端听写链、云端朗读链与实时语音的供应商和模型（三张卡都是占位：写入会保存，但云端链路与实时引擎还没有接到运行路径，当前不生效）；本机音频的后端读者已接真，面板先等快照。",
+  lede = "云端听写链与云端朗读链已接入常驻语音的装配（保存后重启生效，链尽回退本地引擎）；实时语音的引擎尚未实现仍是占位；本机音频的后端读者已接真，面板先等快照。",
 }: {
   heading?: string;
   lede?: string;
@@ -141,7 +150,8 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
         <>
           <ChainEditor
             busy={busy}
-            description="占位卡：常驻语音的听写目前只走本地引擎。这里列出的云端顺序可以写入配置，但还没有接到听写运行路径，接入前改它不会生效。"
+            defaultProvider={voiceDefaultProvider(view.providers)}
+            description="已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎；保存后重启生效。"
             field="voice_cloud_asr_chain"
             initial={view.voice.cloudASRChain}
             performWrite={performWrite}
@@ -151,7 +161,8 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
           />
           <ChainEditor
             busy={busy}
-            description="占位卡：朗读的云端引擎尚未接入。这里列出的顺序可以写入配置，但当前没有运行路径按它取朗读，接入前改它不会生效。"
+            defaultProvider={voiceDefaultProvider(view.providers)}
+            description="已接入：常驻语音启动时按这条链的顺序装配云端朗读，链尽回退本地引擎；保存后重启生效。"
             field="voice_cloud_tts_chain"
             initial={view.voice.cloudTTSChain}
             performWrite={performWrite}
@@ -207,6 +218,7 @@ function ChainEditor({
   busy,
   run,
   performWrite,
+  defaultProvider,
 }: {
   title: string;
   description: string;
@@ -216,10 +228,16 @@ function ChainEditor({
   busy: string | null;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
+  /** AC#1's draft default for an unset chain: the owner vendor's name as the
+      first empty segment's provider, only when a provider row carries it.
+      Initial state only - no effect re-imposes it, and the read's saved
+      chain always parses in verbatim below. */
+  defaultProvider: string;
 }) {
   const [segments, setSegments] = useState<ChainSegment[]>(() => {
     const parsed = parseChain(initial);
-    return parsed.length > 0 ? parsed : [{ provider: "", model: "" }];
+    if (parsed.length > 0) return parsed;
+    return [{ provider: defaultProvider, model: "" }];
   });
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
@@ -248,13 +266,13 @@ function ChainEditor({
         field,
         value: segments.map((seg) => `${seg.provider}/${seg.model}`).join(","),
       }),
-    ).then((feedback) => setFeedback(placeholderReceipt(feedback)));
+    ).then((feedback) => setFeedback(feedback));
   }
 
   return (
     <SettingsCard title={title} description={description}>
       <div className="flex flex-col gap-2">
-        <StateTag text="占位·当前不生效" tone="warn" />
+        <StateTag text="已接入·重启生效" tone="ok" />
         <div className="flex flex-col gap-1.5">
           {segments.map((seg, index) => (
             <div className="flex flex-wrap items-center gap-2" key={`${index}-${seg.provider}`}>
@@ -369,7 +387,12 @@ function RealtimeCard({
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
 }) {
-  const [provider, setProvider] = useState(view.voice.realtimeProvider);
+  // AC#1's draft default for an unset head: the owner vendor when no realtime
+  // provider is saved. The read's saved value wins verbatim; the default is
+  // read once here as the initial state and never re-imposed by an effect.
+  const [provider, setProvider] = useState(
+    view.voice.realtimeProvider || voiceDefaultProvider(providers),
+  );
   const [model, setModel] = useState(view.voice.realtimeModel);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 

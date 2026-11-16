@@ -372,6 +372,70 @@ check(
 );
 
 /* ---------------------------------------------------------------------------
+   Tooth 5 - ticket 313's wiring leg (2026-11-16): AC#1 reaches the voice
+   cards, and the honest copy follows the backend truth (chains wired at boot,
+   realtime still Reserved).
+   --------------------------------------------------------------------------- */
+
+// CONFIGURED carries a provider row but no saved voice chains and no saved
+// realtime head: every unset field's draft prefills the owner vendor - three
+// provider pickers (ASR chain, TTS chain, realtime) start on stepfun, as
+// initial state only.
+const voiceFresh = renderToStaticMarkup(
+  <VoiceSettingsView onReload={noop} performWrite={performWrite} view={CONFIGURED} />,
+);
+check(
+  "the unset voice fields must draft-prefill the owner vendor (AC#1 voice half)",
+  (voiceFresh.match(/>stepfun</g) ?? []).length >= 3,
+  `${(voiceFresh.match(/>stepfun</g) ?? []).length} preselected pickers`,
+);
+check(
+  "the two chain cards must say the wired truth and the realtime card keeps its placeholder",
+  (voiceFresh.match(/已接入·重启生效/g) ?? []).length === 2 &&
+    (voiceFresh.match(/占位·当前不生效/g) ?? []).length === 1,
+  `wired=${(voiceFresh.match(/已接入·重启生效/g) ?? []).length} placeholder=${(voiceFresh.match(/占位·当前不生效/g) ?? []).length}`,
+);
+check(
+  "the wired chain copy must name the restart contract, not promise a live effect",
+  voiceFresh.includes("保存后重启生效"),
+  "TierReload wording",
+);
+check("the fresh voice-page markup must hold zero emoji", !EMOJI_RE.test(voiceFresh));
+
+// Source-level: the default is gated on a REAL provider row (a chain element
+// must name a declared provider/model), read exactly once as initial state,
+// and never re-imposed by an effect.
+check(
+  "the voice default must be gated on an existing provider row",
+  voiceSrc.includes("providers.some((p) => p.name === OWNER_DEFAULT_PROVIDER)"),
+  "row-exists gate",
+);
+check(
+  "the chain draft default must be initializer-only (no effect re-imposes it)",
+  voiceSrc.includes('provider: defaultProvider, model: ""') &&
+    !/useEffect\([\s\S]*?setSegments/.test(voiceSrc),
+  "initializer once",
+);
+check(
+  "the realtime draft default must yield to a saved value verbatim",
+  voiceSrc.includes("view.voice.realtimeProvider || voiceDefaultProvider(providers)"),
+  "saved value wins",
+);
+check(
+  "the chain saves must no longer downgrade their ok receipts (they are wired)",
+  !voiceSrc.includes("setFeedback(placeholderReceipt(feedback))"),
+  "real receipt",
+);
+
+// User wins on read: the VOICED view shows the saved realtime pair verbatim
+// (the default draft must not have replaced it anywhere).
+check(
+  "the saved realtime pair must render verbatim (user value wins)",
+  voiceView.includes("stepfun / 示例模型-2"),
+  "current line",
+);
+
+/* ---------------------------------------------------------------------------
    The verdict.
    --------------------------------------------------------------------------- */
 
@@ -383,5 +447,6 @@ if (failures.length > 0) {
 console.error(
   "render-model-settings: OK, AC#1 pre-selection gated on the read (stepfun, preset-list + " +
     "unconfigured only, initializer once), user value wins, key row password + canary-proof, " +
-    "chat/chain/realtime pairs mount and ride the whitelisted fields with re-read write-back",
+    "chat/chain/realtime pairs mount and ride the whitelisted fields with re-read write-back, " +
+    "voice cards draft-prefill the owner vendor with the wired/placeholder copy split",
 );

@@ -338,11 +338,16 @@ func TestTicket255RosterStillMatchesTheActualReadSites(t *testing.T) {
 //     the row must be "consumed", cite the [cost] leaves, and splitHotTier must
 //     claim it - a [cost] edit that the tick hot-applies reaches the NEXT task
 //     with no restart, which is 票 255 AC#1's definition of 已立即生效.
-//   - [voice.tts.speed] must STAY "no-reader" even though 票 61 gave it a read
-//     site: the site lives in ResolveCloudChain, which still has zero non-test
-//     callers, so nothing that runs acts on the value. Promoting it would be
-//     the same lie in the other direction; the row names the dead site instead
-//     of denying it (the 扫描零命中 wording it used to carry is no longer true).
+//   - [voice.tts.speed] re-adjudicated 2026-11-16 (ticket 313's wiring leg):
+//     the pin used to demand "stays no-reader" because ResolveCloudChain had
+//     zero non-test callers. That premise moved: cmd/wisp/
+//     voice_cloudchain_313_windows.go's resolveVoiceCloudChains now calls it at
+//     boot, so the value IS acted on - by the NEXT process (the chains are a
+//     boot feed, TierReload), which is exactly the "other-process" verdict. It
+//     is still not "consumed" (no live reader in this host re-reads it), and it
+//     still must name its production read site. Correcting a premise pin to the
+//     new true state with the caller named is a re-adjudication, not a
+//     loosening - the same move the ledger records for 313-r2's null pin.
 func TestTicket255RosterReJudgedAfterTickets44And61(t *testing.T) {
 	cost := hotRowClaims["cost"]
 	if !strings.HasPrefix(cost, hotClaimConsumed) {
@@ -357,18 +362,25 @@ func TestTicket255RosterReJudgedAfterTickets44And61(t *testing.T) {
 	if want := []string{"internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"}; !slicesEqualSorted(sectionReadSites["Cost"], want) {
 		t.Errorf("sectionReadSites[Cost] = %v, want %v: both ticket 44 adapters read the four caps off the config they are handed", sectionReadSites["Cost"], want)
 	}
-	// The dead-read-site row: the token is re-checked by
+	// The re-adjudicated row: the token is re-checked by
 	// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim; what this case adds
-	// is the VERDICT - a read site with no caller is still no-reader.
+	// is the VERDICT - since 313's wiring leg ResolveCloudChain has a production
+	// caller at boot (cmd/wisp/voice_cloudchain_313_windows.go), so the value is
+	// other-process: the next voice boot assembles the chain with it. A live
+	// reader would still be required for consumed; boot-only is other-process.
 	speed := hotRowClaims["voice.tts.speed"]
-	if !strings.HasPrefix(speed, hotClaimNoReader) {
-		t.Errorf("[voice.tts.speed] = %q, want it to stay %q: internal/speech/cloudcatalog.go reads it inside ResolveCloudChain, a function with zero non-test callers, so no running path acts on the value", speed, hotClaimNoReader)
+	if !strings.HasPrefix(speed, hotClaimOtherProcess) {
+		t.Errorf("[voice.tts.speed] = %q, want a %q verdict: since ticket 313's wiring leg ResolveCloudChain has a production caller (cmd/wisp/voice_cloudchain_313_windows.go resolves the cloud TTS chain at boot), so the value is acted on by the next process, not never",
+			speed, hotClaimOtherProcess)
 	}
 	if !strings.Contains(speed, "internal/speech/cloudcatalog.go") {
-		t.Errorf("[voice.tts.speed] must name its one production read site (internal/speech/cloudcatalog.go) instead of still claiming 扫描零命中: %q", speed)
+		t.Errorf("[voice.tts.speed] must name its production read site (internal/speech/cloudcatalog.go): %q", speed)
+	}
+	if !strings.Contains(speed, "voice_cloudchain_313_windows.go") {
+		t.Errorf("[voice.tts.speed] must name the caller that moved its verdict (cmd/wisp/voice_cloudchain_313_windows.go): %q", speed)
 	}
 	if got := splitHotTier([]string{"voice"}).claimable; len(got) != 0 {
-		t.Errorf("splitHotTier([voice]) claimable = %v, want none: none of the four hot [voice] keys has a reader that runs", got)
+		t.Errorf("splitHotTier([voice]) claimable = %v, want none: none of the four hot [voice] keys has a live reader in this host (boot-only readers are other-process)", got)
 	}
 }
 

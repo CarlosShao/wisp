@@ -311,6 +311,16 @@ type voicePlan struct {
 	// off rather than a degraded run. The schema default is true, so the
 	// pre-wire shape is unchanged.
 	AECEnabled bool
+	// CloudASREps / CloudTTSEps are ticket 313's two cloud voice chains,
+	// resolved once at boot (resolveVoiceCloudChains) and carried so the
+	// residency's loaders build speech.NewCloudASRChain / NewCloudTTSChain
+	// instead of the local-only factories. Both empty = the historical local
+	// cascade shape, byte-identical boot behaviour. The endpoints carry the
+	// resolved plaintext key ONLY inside speech.CloudEndpoint.APIKey - the
+	// plan is never printed, and every chain spelling in the verdict and the
+	// log is ChainKey-shaped, which has no key in it.
+	CloudASREps []speech.CloudEndpoint
+	CloudTTSEps []speech.CloudEndpoint
 }
 
 // voiceKwsFiles is the KWS transducer triple plus its token and keyword tables,
@@ -1896,6 +1906,13 @@ func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, t
 	if line, unavailable := bargeinAECPosture452(); unavailable {
 		fmt.Printf("wisp: %s\n", line)
 	}
+	// Ticket 313: the cloud chains' transport goroutines spawn through the
+	// process's own registry. The handoff must precede rv.start - after it the
+	// loaders (the only readers) run on the voice owner goroutine, and the
+	// boot write is the happens-before edge.
+	if rv != nil && rv.residency != nil {
+		rv.residency.attachCloudRegistry(rt.Registry)
+	}
 	rv.start(rt.Registry)
 	if rb != nil {
 		// Both ends of the tray's pause-wake hop, attached here because this leg
@@ -1977,6 +1994,14 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 		rv.verdict = why
 		return rv
 	}
+	// Ticket 313's production call point, boot half: the two cloud voice
+	// chains resolve here, off the same LoadFile feed the plan rode in on
+	// (TierReload keys - "save then restart" is the contract the settings
+	// page states). A chain that refuses to resolve is a named note and an
+	// empty list for that direction, so the verdict below can never name a
+	// cloud head the loaders will not build.
+	asrEps, ttsEps, cloudNotes := resolveVoiceCloudChains(dataDir, c)
+	plan.CloudASREps, plan.CloudTTSEps = asrEps, ttsEps
 	rv.plan = plan
 	rv.frames = ra.frames
 	// TICKET 26p: the monitor rides the production frame channel; the scope
@@ -1988,7 +2013,20 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 	// constructor got is the zero one on this path, and a residency holding no
 	// paths would answer "语音链：ASR 目录为空" for every turn.
 	rv.residency = newVoiceResidency(plan, rv.queue, nil)
-	rv.verdict = "语音链已装配"
+	// The chain refusals need a residency (and the boot line needs the notes
+	// said out loud), so they land after the objects exist - same posture as
+	// every other degraded branch this leg has.
+	for _, why := range cloudNotes {
+		rv.noteProblem(why)
+	}
+	verdict := "语音链已装配"
+	if len(plan.CloudASREps) > 0 {
+		verdict += fmt.Sprintf("；云端听写 %s", voiceCloudChainNames(plan.CloudASREps))
+	}
+	if len(plan.CloudTTSEps) > 0 {
+		verdict += fmt.Sprintf("；云端朗读 %s", voiceCloudChainNames(plan.CloudTTSEps))
+	}
+	rv.verdict = verdict
 	return rv
 }
 

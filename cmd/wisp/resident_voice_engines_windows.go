@@ -302,6 +302,16 @@ type voiceResidency struct {
 	queue *voiceOwnerQueue
 	clock session.Clock
 
+	// cloudRegistry is the process's goroutine registry, handed in by
+	// startResidentVoice BEFORE rv.start books the owner: the cloud chains'
+	// per-utterance transport goroutines spawn through it
+	// (observe.Registry.Spawn - the roster must show one picture, not a
+	// detached one). nil is legal and means observe.Default (the cascade's
+	// own fallback), which is what every direct-constructor case gets; the
+	// field is written once before the owner exists and read only from the
+	// owner goroutine afterwards, so it needs no lock of its own.
+	cloudRegistry *observe.Registry
+
 	mu    sync.Mutex
 	slot  *speech.Slot
 	scope *session.Scope
@@ -403,6 +413,19 @@ func (r *voiceResidency) noteProblem(why string) {
 	r.mu.Unlock()
 }
 
+// attachCloudRegistry arms the cloud chains' transport goroutines with the
+// process registry. Called once, by startResidentVoice, before rv.start books
+// the owner goroutine - after that line the loaders (the only readers) run on
+// the owner, so the handoff is a happens-before edge and not a race.
+func (r *voiceResidency) attachCloudRegistry(reg *observe.Registry) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	r.cloudRegistry = reg
+	r.mu.Unlock()
+}
+
 func (r *voiceResidency) problemsSnapshot() []string {
 	if r == nil {
 		return nil
@@ -424,6 +447,25 @@ func (r *voiceResidency) noteEngineClosed(kind session.EngineKind) {
 func (r *voiceResidency) loader(kind session.EngineKind) (session.Engine, error) {
 	switch kind {
 	case session.EngineASR:
+		// Ticket 313's production call point: a configured cloud ASR chain is
+		// the family the epoch loads - the cascade walks the chain and falls
+		// through to the local sherpa session (built HERE as the terminal
+		// fallback, ownership joined by voiceCloudAsrFamily so the slot's one
+		// Close releases both). An empty endpoint list takes the historical
+		// local-only path below, byte-identical to what shipped before the
+		// chains existed.
+		if len(r.plan.CloudASREps) > 0 {
+			eng, err := r.slot.LoadAsr(func() (speech.AsrEngine, error) {
+				r.mu.Lock()
+				r.loaderCalls++
+				r.mu.Unlock()
+				return r.buildCloudAsrEngine()
+			})
+			if err != nil {
+				return nil, err
+			}
+			return &voiceEngineHandle{kind: kind, slot: r.slot, asr: eng, residency: r}, nil
+		}
 		if r.plan.AsrDir == "" {
 			return nil, errors.New("语音链：ASR 目录为空")
 		}
@@ -449,6 +491,24 @@ func (r *voiceResidency) loader(kind session.EngineKind) (session.Engine, error)
 		return &voiceEngineHandle{kind: kind, slot: r.slot, asr: eng, residency: r}, nil
 
 	case session.EngineTTS:
+		// Ticket 313's TTS twin: a configured cloud TTS chain leads the epoch
+		// and the local matcha checkpoint is the terminal fallback behind it.
+		// The branch sits BEFORE the complete() check on purpose: a machine
+		// without the local checkpoint must still be able to speak through
+		// the cloud chain, which is exactly the configuration the voice
+		// settings page now writes.
+		if len(r.plan.CloudTTSEps) > 0 {
+			eng, err := r.slot.LoadTts(func() (speech.TtsEngine, error) {
+				r.mu.Lock()
+				r.loaderCalls++
+				r.mu.Unlock()
+				return r.buildCloudTtsEngine()
+			})
+			if err != nil {
+				return nil, err
+			}
+			return &voiceEngineHandle{kind: kind, slot: r.slot, tts: eng, residency: r}, nil
+		}
 		if !r.plan.Tts.complete() {
 			return nil, fmt.Errorf("语音链：TTS 模型文件不全（%s）", r.plan.Tts.Acoustic)
 		}
