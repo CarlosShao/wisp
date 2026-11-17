@@ -443,6 +443,12 @@ func (s *replySurface) sessionPattern(corr string) (string, error) {
 // 「面板安全页实时列出」's console stand-in while the panel routes stay
 // unbuilt): scope, tool, pattern, id, and the liveness verdict, with the
 // revoke numbers the next verb spends. Read-only.
+//
+// VERB TOOTH (2026-11-17, 判票 49 of 4849-adversarial-20261117-1052.md: this
+// verb had zero test calls until then): TestTicket49GrantsVerbReadsTheRealRows
+// FieldByField in cmd/wisp/ticket49_verbs_test.go drives handle("grants")
+// against an assembled run - empty-ledger zero-row control, field-by-field
+// read-back of two real rows, and the 已撤销 state after a real revoke.
 func (s *replySurface) grantsList() (string, error) {
 	rt := s.rt
 	if rt == nil || rt.session == nil {
@@ -479,6 +485,15 @@ func (s *replySurface) grantsList() (string, error) {
 // revokeGrant stamps ONE grant revoked immediately (SPEC-06 §8.2 一键撤销).
 // The rows stay on disk for the audit window; what dies is the next call's
 // answer to "已授权过吗".
+//
+// VERB TOOTH (2026-11-17, 判票 49 of 4849-adversarial-20261117-1052.md: this
+// verb had zero test calls until then): TestTicket49RevokeGrantVerbPopsTheNext
+// CoveredCallBack in cmd/wisp/ticket49_verbs_test.go drives
+// handle("revoke-grant") end to end - the negative control (grant live, 0
+// cards), the verb itself, then the next same-shaped call really re-asking on
+// the production UI counter. The assembly file's
+// TestTicket49RevokeVerbStopsTheNextCoveredCall calls session.Revoke directly
+// and covers the ledger half, not this verb.
 func (s *replySurface) revokeGrant(arg string) (string, error) {
 	rt := s.rt
 	if rt == nil || rt.session == nil {

@@ -10,8 +10,14 @@ package main
 //	lifecycle (audit rows per call, session-end sweep)
 //	                      TestTicket49SessionEndSweepRevokesEveryLiveGrant
 //	revoke (immediate)    TestTicket49RevokeVerbStopsTheNextCoveredCall
-//	audit (SQL)           TestTicket49EveryGrantBackedExecutionCarriesGrantID
-//	                      (reads the real tool_call rows off disk)
+//	audit (SQL)           three teeth read the real tool_call rows off disk:
+//	                      TestTicket49SessionEndSweepRevokesEveryLiveGrant,
+//	                      TestTicket49RevokeVerbStopsTheNextCoveredCall and
+//	                      TestTicket49AssembledTargetBindingDowngradesAndIsolates.
+//	                      (The name this line carried before 2026-11-17 -
+//	                      TestTicket49EveryGrantBackedExecutionCarriesGrantID -
+//	                      does not exist anywhere; 判票 49 of
+//	                      4849-adversarial-20261117-1052.md corrected it.)
 //	batch one-card        covered at the approval layer
 //	                      (ticket49_answer_doors_test.go); the assembled-run
 //	                      half of the danger tier is
@@ -181,8 +187,11 @@ func argIntAny(params map[string]any, key string) (int64, bool) {
 
 // TestTicket49RevokeVerbStopsTheNextCoveredCall is AC#2's red/green cell at
 // assembled-run scale: with the grant live, a covered call runs silently with
-// grant_id booked; after the ledger's Revoke (the door `revoke-grant` spends),
-// the SAME call asks its L1 window again and books no grant linkage.
+// grant_id booked; then this tooth calls session.Revoke DIRECTLY (it does not
+// walk the operator verb - the verb tooth is
+// TestTicket49RevokeGrantVerbPopsTheNextCoveredCallBack in
+// ticket49_verbs_test.go, which drives replySurface.handle("revoke-grant")),
+// and the SAME call asks its L1 window again and books no grant linkage.
 func TestTicket49RevokeVerbStopsTheNextCoveredCall(t *testing.T) {
 	h := newReplyHost(t, 40*time.Second)
 	h.reply = strings.NewReader("")
