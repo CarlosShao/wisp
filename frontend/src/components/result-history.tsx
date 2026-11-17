@@ -84,7 +84,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import type { Schema as SanitizeSchema } from "hast-util-sanitize";
-import type { ResultChunkView, RunSection } from "@/lib/panel";
+import type { ResultChunkView, RunSection, RunUsageRow } from "@/lib/panel";
 import { cn } from "@/lib/cn";
 import { RevealText } from "@/components/reveal-text";
 
@@ -405,6 +405,36 @@ export function RunRegion({ run }: { run?: RunSection }) {
 }
 
 /* --------------------------------------------------------------------------
+   Token counter (ticket 36 AC#4): the chunk's own usage row, read off the
+   wire. A chunk WITH a usage event shows 已用 N tokens where N is the event's
+   own tokensIn + tokensOut (the page-side rendering decision - no unit is
+   derived in Go), with the verbatim breakdown as the title. A chunk WITHOUT
+   one says 未知 out loud: "the task published no usage event" is a different
+   fact from "the provider said zero", and a fabricated 0 is the one shape
+   this line may never take.
+   -------------------------------------------------------------------------- */
+
+function TokenCounter({ usage }: { usage?: RunUsageRow }) {
+  if (!usage) {
+    return (
+      <p className="m-0 text-[11px] leading-[1.5] text-ink-3" aria-label="token 用量未知">
+        token 用量未知（本任务未发布 usage 事件）
+      </p>
+    );
+  }
+  const used = usage.tokensIn + usage.tokensOut;
+  return (
+    <p
+      className="m-0 font-mono text-[11px] leading-[1.5] text-ink-3 tabular-nums"
+      aria-label={`已用 ${used} tokens`}
+      title={`tokensIn ${usage.tokensIn} / tokensOut ${usage.tokensOut}${usage.cachedTokens ? ` / cachedTokens ${usage.cachedTokens}` : ""}`}
+    >
+      已用 {used} tokens
+    </p>
+  );
+}
+
+/* --------------------------------------------------------------------------
    Region wrapper used by App: chunks + run region + honest empty states
    -------------------------------------------------------------------------- */
 
@@ -432,6 +462,7 @@ export function ResultHistory({ run, results }: { run?: RunSection; results: Res
                    construction; the finished state gets the whitelist. */
                 <RevealText text={chunk.text} />
               )}
+              <TokenCounter usage={chunk.usage} />
             </li>
           ))}
         </ul>

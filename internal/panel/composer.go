@@ -228,6 +228,18 @@ type ResultChunk struct {
 	CorrelationID string `json:"correlationId"`
 	Text          string `json:"text"`
 	Done          bool   `json:"done"`
+	// Usage is the chunk's own task spend as the Cost accumulator's EvUsage
+	// events carried it - the same RunUsageRow the run section's roster rows
+	// nest, recorded by StreamLog.Usage from the sink that already forwards
+	// the event (ticket 36 AC#4's token counter, the wire half). Absent is
+	// honest and is the whole point: a chunk whose task published no usage
+	// event travels WITHOUT the key, so the page can say "未知" instead of
+	// being handed a zero that means "the provider said nothing" and reads
+	// as "the provider said zero". Pointer with omitempty = the same
+	// reader-gated optionality rule the sections above follow; the page half
+	// (frontend/src/lib/panel.ts ResultChunkView.usage) declared the key in
+	// the same commit, so the two-way contract walk judges it from here on.
+	Usage *RunUsageRow `json:"usage,omitempty"`
 }
 
 // workspaceRewrittenUnnarratedReason is the display boundary's fallback narration

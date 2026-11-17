@@ -137,8 +137,12 @@ func TestNPlusOneSubagentsEachGetTheirOwnStream(t *testing.T) {
 		t.Errorf("packet has %d result rows for %d subagents: %s", len(results), len(agents), describeRows(chunks))
 	}
 	for _, r := range results {
+		// Ticket 36 AC#4 added the fourth key (usage, omitempty): a row with a
+		// usage event carries it, a row without travels with exactly the
+		// original three - which is what these subagent rows hold, and the
+		// count pins that the added key cannot arrive without its reader.
 		if len(r) != 3 {
-			t.Errorf("a result row carries %d JSON keys, want the three ResultChunk has: %v", len(r), r)
+			t.Errorf("a result row carries %d JSON keys, want the three ResultChunk has without a usage event: %v", len(r), r)
 		}
 	}
 }

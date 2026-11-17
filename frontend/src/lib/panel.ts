@@ -300,6 +300,15 @@ export interface ResultChunkView {
   correlationId: string;
   text: string;
   done: boolean;
+  /** The chunk's own task spend as the EvUsage event carried it (the same
+      RunUsageRow TaskRowView.costToDate nests; ticket 36 AC#4's token
+      counter, wire half = internal/panel StreamLog.Usage). OPTIONAL with the
+      sections' own rule: a chunk whose task published no usage event travels
+      WITHOUT the key, and the page renders that absence as 未知 - never as a
+      zero that means "the provider said nothing" while reading as "the
+      provider said zero". Declared in the same commit the Go key landed, so
+      the two-way contract walk judges it from here on. */
+  usage?: RunUsageRow;
 }
 
 /* --------------------------------------------------------------------------

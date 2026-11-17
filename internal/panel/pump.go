@@ -672,11 +672,14 @@ func (p *SnapshotPump) count() {
 // the total - "nobody is showing this one" is a different sentence from
 // "somebody merged this one", and neither may cost unbounded memory.
 //
-// What this file does NOT do is put either fact on the wire: ResultChunk keeps its
-// three JSON keys (composer.go:65-69, mirrored by frontend/src/lib/panel.ts's
-// ResultChunkView, which this leg may not touch - see
-// TestComposerContractTypesMatchFrontend). The accessors below are the host-facing
-// half; carrying the marker into the packet is ticket 197's carrier leg (197-r3).
+// What this file does NOT do (any more) is leave the usage fact off the wire:
+// ticket 36 AC#4 added the one key ResultChunk now carries beyond its original
+// three - Usage, the task's own Cost-accumulator row as the EvUsage event
+// carried it, recorded by Usage below and attached by Chunks. Everything else
+// stays as it was: the packet's composer section is still scrubbed at the push,
+// and the two-way reconciliation against frontend/src/lib/panel.ts's
+// ResultChunkView (TestComposerContractTypesMatchFrontend) judges the added key
+// because the page half declared it in the same commit.
 type StreamLog struct {
 	mu        sync.Mutex
 	order     []string
@@ -691,6 +694,15 @@ type StreamLog struct {
 	// what keeps the capped ledger honest: a bound on the names without a
 	// count of the unnamed would turn "the oldest names fell off" into silence.
 	droppedTotal int
+	// usage is the per-key Cost-accumulator row each task's EvUsage events
+	// carried (ticket 36 AC#4's token-counter source). It lives beside the
+	// chunks, not inside them, so the event may land before, between or after
+	// the key's text deltas and the read below attaches whatever arrived. An
+	// entry for a key the log no longer tracks is deleted with the key (the
+	// drop below); a late Usage call for a dropped key can re-write an entry,
+	// but Chunks only ever attaches entries for keys still in s.order, so a
+	// dead key's row is inert and the ledger stays bounded by the task count.
+	usage map[string]RunUsageRow
 }
 
 // streamKept is what one row retains of ITS OWN stream once the log is
@@ -807,7 +819,7 @@ func NewStreamLog(maxKeys int) *StreamLog {
 	if maxKeys <= 0 {
 		maxKeys = DefaultStreamKeys
 	}
-	return &StreamLog{chunks: map[string]ResultChunk{}, kept: map[string]*streamKept{}, maxKeys: maxKeys}
+	return &StreamLog{chunks: map[string]ResultChunk{}, kept: map[string]*streamKept{}, usage: map[string]RunUsageRow{}, maxKeys: maxKeys}
 }
 
 // Append adds one delta to its key's chunk. A key the log already tracks is
@@ -866,7 +878,28 @@ func (s *StreamLog) Close(key string) {
 	s.chunks[key] = cur
 }
 
-// Chunks returns the accumulated result chunks in arrival order.
+// Usage records the Cost accumulator's cumulative totals for one key's chunk -
+// the values ONE EvUsage event carried, verbatim (ticket 36 AC#4's wire half).
+// The row replaces whatever the key held before, because the accumulator's own
+// reading is cumulative and the newest event is the current truth; it never
+// derives a token count from the chunk's text (that is the character-estimate
+// the dispatch forbids) and never invents a row for a key that was never
+// named. A key with no usage event keeps no entry, which is what makes the
+// page's "未知" reading possible and a fake zero impossible.
+func (s *StreamLog) Usage(key string, row RunUsageRow) {
+	if s == nil || key == "" {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.usage == nil {
+		s.usage = map[string]RunUsageRow{}
+	}
+	s.usage[key] = row
+}
+
+// Chunks returns the accumulated result chunks in arrival order, each with its
+// own usage row attached when its task published one.
 func (s *StreamLog) Chunks() []ResultChunk {
 	if s == nil {
 		return nil
@@ -875,7 +908,12 @@ func (s *StreamLog) Chunks() []ResultChunk {
 	defer s.mu.Unlock()
 	out := make([]ResultChunk, 0, len(s.order))
 	for _, k := range s.order {
-		out = append(out, s.chunks[k])
+		c := s.chunks[k]
+		if u, ok := s.usage[k]; ok {
+			row := u
+			c.Usage = &row
+		}
+		out = append(out, c)
 	}
 	return out
 }
@@ -899,6 +937,7 @@ func (s *StreamLog) enforceBoundLocked() {
 		s.order = s.order[1:]
 		delete(s.chunks, oldest)
 		delete(s.kept, oldest)
+		delete(s.usage, oldest)
 		s.droppedTotal++
 		s.dropped = append(s.dropped, oldest)
 		if len(s.dropped) > streamDroppedNamesCap {

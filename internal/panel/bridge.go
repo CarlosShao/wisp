@@ -197,7 +197,8 @@ const (
 	// shape ticket 242's M-D2 conviction already ruled on - so the door lands
 	// under the name that truthfully says what it addresses: one row of the
 	// task roster the tasks view renders. Ticket 38's own progress note
-	// (".scratch/wisp/issues/38-command-palette-tasks.md:66-68") names this
+	// (".scratch/wisp/issues/38-command-palette-tasks-done.md:66-68" - the
+	// ticket closed and its file took the -done suffix, 2026-11-17) names this
 	// instrument and hands the naming to the Go leg; the semantic target
 	// (D34's task.cancel family, the roster row id selector) is unchanged,
 	// and the receipt names the row it stopped. If the owner later rules the

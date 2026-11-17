@@ -2905,6 +2905,20 @@ func (c consoleSink) Publish(e agent.Event) {
 		// roster row's costToDate, per task, kept as the pair they arrived in.
 		c.taskLive.usageRecorded(e.TaskID, e.Usage.InputTokens, e.Usage.OutputTokens,
 			e.Usage.CachedTokens, e.CostMicros, e.Currency)
+		// Ticket 36 AC#4's token counter, the feed half: the same event's own
+		// row goes onto the task's result chunk, so the page can say 已用 N
+		// tokens from the provider's usage and - when no event ever lands -
+		// 未知 instead of zero. Same object as runFeed/taskLive above: one
+		// event, every reader it names, each carrying the values verbatim.
+		if c.stream != nil {
+			c.stream.Usage(e.TaskID, panel.RunUsageRow{
+				TokensIn:     e.Usage.InputTokens,
+				TokensOut:    e.Usage.OutputTokens,
+				CachedTokens: e.Usage.CachedTokens,
+				Micros:       e.CostMicros,
+				Currency:     e.Currency,
+			})
+		}
 		changed = true
 	case agent.EvStuck:
 		fmt.Fprintf(c.out, "\n[停滞] %s\n", e.Text)

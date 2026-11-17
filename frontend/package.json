@@ -34,7 +34,8 @@
     "render:taskcard38": "vite build --ssr scripts/render-taskcard-38.tsx --outDir node_modules/.tmp/taskcard38render --logLevel warn && node node_modules/.tmp/taskcard38render/render-taskcard-38.js",
     "render:discovery38": "vite build --ssr scripts/render-discovery38.tsx --outDir node_modules/.tmp/discovery38render --logLevel warn && node node_modules/.tmp/discovery38render/render-discovery38.js",
     "render:forcechip38": "vite build --ssr scripts/render-forcechip38.tsx --outDir node_modules/.tmp/forcechip38render --logLevel warn && node node_modules/.tmp/forcechip38render/render-forcechip38.js",
-    "render:cfggolden": "vite build --ssr scripts/render-cfg-golden.tsx --outDir node_modules/.tmp/cfggoldenrender --logLevel warn && node node_modules/.tmp/cfggoldenrender/render-cfg-golden.js"
+    "render:cfggolden": "vite build --ssr scripts/render-cfg-golden.tsx --outDir node_modules/.tmp/cfggoldenrender --logLevel warn && node node_modules/.tmp/cfggoldenrender/render-cfg-golden.js",
+    "render:stream20036": "vite build --ssr scripts/render-stream200-36.tsx --outDir node_modules/.tmp/stream200render --logLevel warn && node node_modules/.tmp/stream200render/render-stream200-36.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
