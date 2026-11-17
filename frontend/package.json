@@ -27,6 +27,7 @@
     "render:history36": "vite build --ssr scripts/render-history-36.tsx --outDir node_modules/.tmp/history36render --logLevel warn && node node_modules/.tmp/history36render/render-history-36.js",
     "render:approval37": "vite build --ssr scripts/render-approval-37.tsx --outDir node_modules/.tmp/approval37render --logLevel warn && node node_modules/.tmp/approval37render/render-approval-37.js",
     "render:palette38": "vite build --ssr scripts/render-palette-38.tsx --outDir node_modules/.tmp/palette38render --logLevel warn && node node_modules/.tmp/palette38render/render-palette-38.js",
+    "render:palette38kbd": "vite build --ssr scripts/render-palette-kbd-38.tsx --outDir node_modules/.tmp/palette38kbdrender --logLevel warn && node node_modules/.tmp/palette38kbdrender/render-palette-kbd-38.js",
     "render:security40": "vite build --ssr scripts/render-security-cost-40.tsx --outDir node_modules/.tmp/security40render --logLevel warn && node node_modules/.tmp/security40render/render-security-cost-40.js"
   },
   "dependencies": {

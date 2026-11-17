@@ -34,9 +34,28 @@
    DOM event's own isComposing flag), so pinyin -> 选字 -> commit submits
    only the FINAL text; the keydown that commits the candidate never
    selects a row.
+
+   KEYBOARD RULE (ticket 38 AC#6): the whole vocabulary is ONE pure decision
+   (paletteKeyDecision + paletteCursorStep, exported so the render instrument
+   drives the same code path the component runs, not a re-derived copy):
+   ArrowDown/ArrowUp walk the flat row list and wrap at both ends, Enter
+   selects the highlighted row, and everything else - Tab, ESC - is
+   deliberately "none": Tab must keep its native DOM-order walk (search box,
+   then the rows as buttons, in order), and ESC belongs to App's dialog
+   handler, which closes the palette. The list itself answers the same
+   decision when focus Tabbed onto a row: focus landing on a row moves the
+   highlight with it, and an arrow key moves the highlight and puts focus
+   back in the input so aria-activedescendant (which lives on the input)
+   keeps naming the row a screen reader would announce next.
    ============================================================================ */
 
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FocusEvent,
+  type KeyboardEvent,
+} from "react";
 import {
   Activity,
   Command,
@@ -121,6 +140,41 @@ function ItemIcon({ icon }: { icon?: string }) {
   return <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-ink-3" />;
 }
 
+/* The palette's whole key vocabulary as one pure decision (ticket 38 AC#6).
+   `blocked` is the IME composition guard (AC#2): while a composition is open
+   EVERY key returns "none", so the Enter that commits 选字 never selects a
+   row and an arrow key never walks it. Empty list: nothing to walk, nothing
+   to select. Tab and ESC fall through to "none" ON PURPOSE - Tab keeps the
+   browser's DOM-order focus walk (search box, then rows, in order), and ESC
+   belongs to the dialog owner (App closes the palette there). */
+export type PaletteKeyAction = "down" | "up" | "select" | "none";
+
+export function paletteKeyDecision(
+  key: string,
+  blocked: boolean,
+  rowCount: number,
+): PaletteKeyAction {
+  if (blocked || rowCount === 0) return "none";
+  if (key === "ArrowDown") return "down";
+  if (key === "ArrowUp") return "up";
+  if (key === "Enter") return "select";
+  return "none";
+}
+
+/** Where the highlighted row (and therefore aria-activedescendant) lands
+    after an action: both arrow directions wrap around the flat list, and a
+    select or a blocked key moves nothing. */
+export function paletteCursorStep(
+  cursor: number,
+  action: PaletteKeyAction,
+  rowCount: number,
+): number {
+  if (rowCount === 0) return 0;
+  if (action === "down") return (cursor + 1) % rowCount;
+  if (action === "up") return (cursor - 1 + rowCount) % rowCount;
+  return cursor;
+}
+
 export function PaletteScreen({
   query,
   onQueryChange,
@@ -199,25 +253,61 @@ export function PaletteScreen({
   }, [flat.length]);
 
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
-    // Composition open: every key here is the IME's. Returning early means
-    // the Enter that commits 选字 never selects a row - only the committed
-    // text reaches the query, and only the NEXT Enter dispatches it.
-    if (composing || e.nativeEvent.isComposing) return;
-    if (flat.length === 0) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActive((current) => (current + 1) % flat.length);
-      return;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActive((current) => (current - 1 + flat.length) % flat.length);
-      return;
-    }
-    if (e.key === "Enter") {
-      e.preventDefault();
+    // Composition open: every key here is the IME's. The decision returns
+    // "none" while blocked, so the Enter that commits 选字 never selects a
+    // row - only the committed text reaches the query, and only the NEXT
+    // Enter dispatches it. Tab and ESC are "none" here too, on purpose:
+    // Tab keeps its native DOM-order walk, ESC bubbles to App's dialog
+    // handler (ticket 38 AC#6).
+    const action = paletteKeyDecision(
+      e.key,
+      composing || e.nativeEvent.isComposing,
+      flat.length,
+    );
+    if (action === "none") return;
+    e.preventDefault();
+    if (action === "select") {
       onSelect?.(flat[cursor]);
+      return;
     }
+    setActive(paletteCursorStep(cursor, action, flat.length));
+  }
+
+  // Which row a Tabbed focus landed on: rows carry id="palette-row-N", and
+  // the index in the id IS the position in the flat list the keyboard walks.
+  function rowIndexOf(target: EventTarget | null): number {
+    if (!(target instanceof Element)) return -1;
+    const row = target.closest("[data-menu-row]");
+    if (!(row instanceof HTMLElement)) return -1;
+    const id = row.id;
+    return id.startsWith("palette-row-") ? Number(id.slice("palette-row-".length)) : -1;
+  }
+
+  // Focus arriving on a row (by Tab, or by a screen-reader's virtual cursor)
+  // moves the highlight with it - so Enter on a focused row selects THAT row,
+  // never a stale cursor the pointer left behind.
+  function onSurfaceFocus(e: FocusEvent<HTMLElement>) {
+    const index = rowIndexOf(e.target);
+    if (index >= 0) setActive(index);
+  }
+
+  // The list answers the same vocabulary when focus is ON a row. The input's
+  // own handler owns the keys while focus is in the input - a keydown bubbles
+  // from the input through this element, and handling it here too would step
+  // two rows per keypress. An arrow key moves the highlight AND puts focus
+  // back in the input, where aria-activedescendant lives, so the announced
+  // row is always the row Enter would land on.
+  function onSurfaceKey(e: KeyboardEvent<HTMLElement>) {
+    if (e.target === inputRef.current) return;
+    const action = paletteKeyDecision(e.key, e.nativeEvent.isComposing, flat.length);
+    if (action === "none") return;
+    e.preventDefault();
+    if (action === "select") {
+      onSelect?.(flat[cursor]);
+      return;
+    }
+    setActive(paletteCursorStep(cursor, action, flat.length));
+    inputRef.current?.focus();
   }
 
   let seen = 0;
@@ -305,50 +395,56 @@ export function PaletteScreen({
              you move the mouse. Painting both as a background wash meant the
              two fought over one visual slot - hover the list and you lost track
              of where Enter would land. */
-          <GlideMenu className="p-1.5" highlightClassName="inset-x-1.5 rounded-[6px] bg-hover" rowSelector="[data-menu-row]">
-            {shown.map((group) => (
-              <div className="flex flex-col" key={group.name}>
-                <p className="px-2 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
-                  {group.name}
-                </p>
-                {group.items.map((item) => {
-                  const index = seen++;
-                  const on = index === cursor;
-                  return (
-                    <button
-                      aria-selected={on}
-                      className={cn(
-                        "relative flex h-9 w-full items-center gap-2.5 rounded-[6px] py-0 pr-2 pl-2.5 text-left transition-colors duration-100",
-                        on ? "text-ink" : "text-ink-2 hover:text-ink",
-                      )}
-                      data-menu-row
-                      id={`palette-row-${index}`}
-                      key={item.label}
-                      onClick={() => onSelect?.(item)}
-                      onMouseEnter={() => setActive(index)}
-                      role="option"
-                      style={{ animation: "fade-in 200ms ease-out both" }}
-                      type="button"
-                    >
-                      {on ? (
-                        <span
-                          aria-hidden="true"
-                          className="absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent"
-                        />
-                      ) : null}
-                      <ItemIcon icon={item.icon} />
-                      <span className="min-w-0 flex-1 truncate text-[13px]">
-                        {item.label}
-                      </span>
-                      {item.hint && (
-                        <span className="shrink-0 text-[11px] text-ink-3">{item.hint}</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
-          </GlideMenu>
+          /* The listbox wrapper is AC#6's aria face: role=listbox carrying the
+             option rows, the input's aria-activedescendant pointing INTO this
+             region, and the key/focus handlers that keep the vocabulary alive
+             when focus has Tabbed onto a row. */
+          <div aria-label="命令列表" onFocusCapture={onSurfaceFocus} onKeyDown={onSurfaceKey} role="listbox">
+            <GlideMenu className="p-1.5" highlightClassName="inset-x-1.5 rounded-[6px] bg-hover" rowSelector="[data-menu-row]">
+              {shown.map((group) => (
+                <div aria-label={group.name} className="flex flex-col" key={group.name} role="group">
+                  <p className="px-2 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
+                    {group.name}
+                  </p>
+                  {group.items.map((item) => {
+                    const index = seen++;
+                    const on = index === cursor;
+                    return (
+                      <button
+                        aria-selected={on}
+                        className={cn(
+                          "relative flex h-9 w-full items-center gap-2.5 rounded-[6px] py-0 pr-2 pl-2.5 text-left transition-colors duration-100",
+                          on ? "text-ink" : "text-ink-2 hover:text-ink",
+                        )}
+                        data-menu-row
+                        id={`palette-row-${index}`}
+                        key={item.label}
+                        onClick={() => onSelect?.(item)}
+                        onMouseEnter={() => setActive(index)}
+                        role="option"
+                        style={{ animation: "fade-in 200ms ease-out both" }}
+                        type="button"
+                      >
+                        {on ? (
+                          <span
+                            aria-hidden="true"
+                            className="absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent"
+                          />
+                        ) : null}
+                        <ItemIcon icon={item.icon} />
+                        <span className="min-w-0 flex-1 truncate text-[13px]">
+                          {item.label}
+                        </span>
+                        {item.hint && (
+                          <span className="shrink-0 text-[11px] text-ink-3">{item.hint}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </GlideMenu>
+          </div>
         )}
 
         {/* the command roster: read-only discovery rows (ticket 213's wire

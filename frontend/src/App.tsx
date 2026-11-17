@@ -225,11 +225,56 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   // header advertises it. A chip promising a key with no listener is worse
   // than no chip. Escape closes the palette from the same handler, because a
   // modal you can only leave with the mouse is not a modal you can use.
+  //
+  // Ticket 38 AC#6 completes the vocabulary:
+  //  - Tab, while the palette is open, is TRAPPED inside the dialog: the
+  //    focusables of [role="dialog"] are walked in DOM order (search box,
+  //    then the rows as buttons), the ends wrap instead of escaping, and a
+  //    focus that somehow landed outside is pulled back into the first
+  //    focusable. Shift+Tab walks the same ring backwards.
+  //  - Whatever held focus when the palette OPENED (the header button, or
+  //    whatever Ctrl+K fired from) gets it BACK when the palette closes -
+  //    a keyboard-only user is not dropped at the top of the document.
+  //  - While an IME composition is open every key belongs to it (AC#2), so
+  //    the guard returns before any palette verb - Ctrl+K, Tab, Escape -
+  //    can fire mid-composition.
+  const paletteReturnFocusRef = useRef<HTMLElement | null>(null);
+  function rememberPaletteReturnFocus() {
+    paletteReturnFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  }
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if (event.isComposing) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
+        if (!local.paletteOpen) rememberPaletteReturnFocus();
         setLocal((c) => ({ ...c, paletteOpen: !c.paletteOpen }));
+        return;
+      }
+      if (event.key === "Tab" && local.paletteOpen) {
+        const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-label="命令面板"]');
+        if (dialog) {
+          const focusables = Array.from(
+            dialog.querySelectorAll<HTMLElement>("input, button:not([disabled])"),
+          );
+          if (focusables.length > 0) {
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            const current = document.activeElement;
+            if (!dialog.contains(current)) {
+              // Stray focus cannot linger outside an open modal: pull it in.
+              event.preventDefault();
+              first.focus();
+            } else if (event.shiftKey && current === first) {
+              event.preventDefault();
+              last.focus();
+            } else if (!event.shiftKey && current === last) {
+              event.preventDefault();
+              first.focus();
+            }
+          }
+        }
         return;
       }
       if (event.key === "Escape") {
@@ -239,7 +284,17 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [narrow]);
+  }, [narrow, local.paletteOpen]);
+
+  // Closing the palette (any path: Escape, Ctrl+K again, backdrop click, a
+  // dispatched row) hands focus back to the element that opened it.
+  useEffect(() => {
+    if (local.paletteOpen) return;
+    const back = paletteReturnFocusRef.current;
+    if (!back) return;
+    paletteReturnFocusRef.current = null;
+    back.focus();
+  }, [local.paletteOpen]);
 
   function toggleTheme() {
     const next = !local.dark;
@@ -450,7 +505,12 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
             type="button"
             aria-label="命令面板"
             className="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
-            onClick={() => setLocal((c) => ({ ...c, paletteOpen: !c.paletteOpen }))}
+            onClick={() => {
+              // The button is the second open path; whoever used it gets
+              // focus back on close (AC#6), same as the Ctrl+K path.
+              if (!local.paletteOpen) rememberPaletteReturnFocus();
+              setLocal((c) => ({ ...c, paletteOpen: !c.paletteOpen }));
+            }}
             title="命令面板"
           >
             <Command aria-hidden="true" size={14} strokeWidth={1.9} />
