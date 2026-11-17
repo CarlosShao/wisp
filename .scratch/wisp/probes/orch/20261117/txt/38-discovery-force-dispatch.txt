@@ -1,0 +1,9 @@
+# 派单存档（先存档再发）—— 票 38 AC#3 discovery 风险丸/launch 走门 ＋ AC#5 force rules 读面（写腿 cmd/wisp，唯一一枚共享编译面写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只补 Go 面（⛔动前端**除了**摘 gap ledger 行），两格：
+1. **票 38 AC#3**：已安装工具集名册读出**正确风险丸**＋**launch 走 gate**。现读真源：`internal/tools` 的工具注册表（真 `risk` 分级：查 `internal/risk` 的 R 规则/L1/L2/L3）——给一只 `tools.list` 读面（含 `name/title/riskPill/argSummary`），另一只 `tool.launch` 必须**真过 gate**（照 `internal/tools/bridge.go:427`/`:590` 那条路，⛔直调绕过）。牙：喂一枚 L2 工具 launch⇒真弹审批卡（数真卡，照 ticket49 形状）；L1 工具⇒不弹；名册里 L2 工具风险丸逐字＝risk 分级真值（⛔硬编码）。C17 名册加这两枚须**附理由**（同 privacy 三枚先例）。
+2. **票 38 AC#5**：force rules 读面 —— per-task override chip ＋ TOML 规则**都**能扭 agent 模式（prompt snapshot 里看得出）。给一只只读面（`rules.force`）列出：生效的 force 规则（来自 config `[agent]`/TOML 真值）、每条来源（override/toml）、以及**下一 prompt 快照里实际采用的 mode**。牙：TOML 置一条⇒快照 mode 变；override 置一条⇒覆盖 TOML 且**来源标注 override**；都无⇒默认 mode 且来源 default。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design；⛔放宽断言；⛔push；新协程走 observe.Registry.Spawn；C17 新增须附理由。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等）；⛔裸跑。**改完三样现跑**：①`sh scripts/d22scan.sh` 0 findings ②载具重跑相关测试全绿 ③`go build ./...` rc=0。
+写面：`cmd/wisp/**`（唯一）、`internal/panel/**`、`internal/tools/**`（读面）、`internal/risk/**`（读）、`internal/config/**`（读）、`docs/evidence/s1/38-discovery-force-*`。
+回话第一行＝commit hash ＋两格 file:line ＋牙名与红/绿读数 ＋d22scan 末行 ＋载具 rc。
