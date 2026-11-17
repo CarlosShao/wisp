@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 前端消费波3：票 38 AC#3/#5 的页半边（写腿；本波唯一碰 internal/panel 的腿，仅摘 ledger）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。Go 面已落（`c25c3086d`：`bridge.go:227 tools.list`／`:243 tool.launch`／`:257 rules.force`；`cmd/wisp/panel_tools_discovery.go`／`force_rules.go:188`）。补页两格：
+1. **AC#3 页半边**：设置/面板出**工具发现**页 —— 列 `tools.list` 每行（名称/标题/**风险丸**逐字＝载荷 `riskPill`，⛔自己映射 L1/L2）；每行一个 **launch** 键 → 走 `tool.launch`（**真门**：L2 会不会弹卡由门/宿主决定，页不预判、页不置 allow）。牙：喂真 payload⇒每行风险丸逐字；喂 3 枚不同级⇒三色/三字；缺字段⇒未判⛔假值。
+2. **AC#5 页半边**：**per-task override chip**（force_tool|force_chat 两态切换）→ 搭 `panel.message.send` 顺封套（Go 侧 `admitTask` 消费）；只读显示 `rules.force` 当前生效规则＋来源（override/toml/default）＋下一 prompt 采用 mode。牙：TOML 在⇒显示 toml 来源与 mode；override 置⇒显示 override 且覆盖；都无⇒default。
+3. **同 commit 摘 gap ledger**：`panel.ts` 加 `tools.list`/`tool.launch`/`rules.force` 三枚字面量后，同 commit 删 `internal/panel/` 里登记的这三条 pending（真身在 `bridge_test.go` 的 ledger 或 `composer_test.go`，先 `git grep tools.list` 找；不删则 stale-red）。
+**硬约束**：⛔ 契约/PLAN/specs/thresholds/golden/allowlist/D43/design、⛔放宽断言、⛔push、⛔提交 dist 字节（删回 .gitkeep）、⛔UI emoji、⛔造数据；**本波你独占 `internal/panel/**` 写额**（只许动 ledger 行）。⛔ 别碰工作树里别人的改动（34-frontend-scaffold.md D／44-costmeter M／composer-states.html M／probes M）。
+**串行**：`npm --prefix frontend run build` rc=0＋typecheck rc=0＋lint rc=0＋相关仪器 rc=0（新建 render:discovery38／render:forcechip38）＋`go test ./internal/panel` rc=0；node 在 `D:\work\server\node24`。
+写面：`frontend/src/**`、`frontend/scripts/render-*`、`internal/panel/bridge_test.go|composer_test.go`（仅 ledger 行）、`docs/evidence/s1/38-discovery-force-ui-*`。
+回话第一行＝commit hash ＋两格牙名/读数 ＋build/typecheck/lint/仪器/panel rc。没干完写「卡在哪」。
