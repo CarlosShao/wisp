@@ -37832,3 +37832,10 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - C17 名册 +3（tools.list/tool.launch/rules.force，理由逐枚写常量上）；封闭名册 13→16、非前缀 9→12、派发表 13→16。
 - **风险待审**：`tool.launch` 若可被同源 postMessage 伪造 ⇒ L1 工具**无卡任意执行**（后门嫌疑）。已发 `audit38doors` 专审“能/不能”；审完据此决定要不要给 launch 也加 source 白名单/确认位。
 - 两格均**不整勾**：前端半边（panel.ts 三字面＋force chip 控件）留 next。
+## A1933（11-17 22:0x）：越权口子焊上 `22b4568ba` —— privacy 破坏性门 Go 侧确认位＋roster 真牙
+
+VPN 断线后死腿半成品经 `wauditfix2` 收口（`22b4568ba`，8 件）。**尺3 我自己复跑**：载具 8/8 PASS rc=0（`Test40PrivacyDestructiveRefusalWithoutTheConfirmBit` 0.36s／`TestRosterCancelDoorRootStopNeedsTheConfirmBit` 6.32s／`TestRosterCancelDoorStopsARealSubagent…` 8.08s 等）；`d22scan` **clean**；build rc=0；前端 typecheck/build/lint rc=0。
+- **越权 R=1 已封**：`privacy.delete-one`/`privacy.purge` 现在**必须先有 `privacyConfirmed:true`**，否则 `errNoPrivacyConfirm` 具名拒绝、**句柄不开、零删除由构造保证**；export 不设门（只读）。`roster.cancel` 停根任务同门。
+- **空牙补上**：`panel_roster_cancel_wave2_test.go:216` 真断言 `!= statemachine.StateMuted`；腿做变异「返回 true 不真停」⇒ 红（settled state="Settling"），还原⇒绿（终态=Muted）。privacy 门变异「恒 true」⇒ 无位用例红。
+- 前端置位路径逐一核过：purge 位只在确认卡「确认清空」键、roster 取消位只在「确认停止」键；其余请求不带位。
+- ⚠ 工作树仍有**别人的**改动（34-frontend-scaffold.md D、44-costmeter M、composer-states.html M、speech 探针 M）—— 非本编队，未触碰。
