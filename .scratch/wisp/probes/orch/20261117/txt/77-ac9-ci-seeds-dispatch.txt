@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 77 AC#9：CI job 覆盖 tsc/lint/build 全绿＋种子违规必被抓（写腿，前端/CI 写面）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只做票 77 的 **AC#9**（其余格⛔动）。票全文 `.scratch/wisp/issues/77-frontend-scaffold-reactbits-beautifului-shadcn.md`；现读 `frontend/package.json` 的 scripts 与 `.github/workflows/*.yml`（有就扩、没有就建）。
+**要求**：
+1. **CI job**（`.github/workflows/ci.yml` 或既有 workflow 里新增）跑 `npm --prefix frontend ci`→`typecheck`→`lint`→`build`，node 版本钉住（仓里 node 实测 24）。job 名与步骤要能被一眼看懂。
+2. **种子违规必被抓**：写一枚**正/负控**扫描器（建议 `frontend/scripts/lint-seeds.mjs`，零新依赖或用仓里已有），三族各一枚**种子违规**必须在**负控**里被点红——①硬编码 hex 颜色（`#rrggbb` 直接写进 tsx/css 而非 token）②UI emoji（照 `tools/d22scan` 的 emojiRe 区间**去掉注释豁免**的部分；⛔ 与 Go 侧规格冲突时以"UI 零 emoji"为准）③禁用导入（如 `frontend/src` 里 import 了 demo/fixtures 目录）。**正控**（干净文件）必须绿。
+3. 把这枚扫描器接进 CI job；并在本地**现跑**正控绿、三枚负控各红（贴读数）。
+**硬约束**：⛔ 改 `docs/PLAN.md`／`docs/specs/**`／thresholds／golden／allowlist／D43／design 契约文字；⛔ 放宽断言；⛔ push（CI 真 run id 由编排者核后触发，AC#6 不在本单）；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）；⛔ UI emoji 进入产品文案。
+**串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0；`node` 在 `D:\work\server\node24`。
+写面：`.github/workflows/**`、`frontend/scripts/**`、`frontend/package.json`（仅加 script）、`docs/evidence/s1/77-ac9-*`。
+回话第一行＝commit hash ＋「CI job 名＋步骤清单」＋「正控绿读数＋三枚负控红读数」＋npm build/typecheck/lint rc。没干完写「未完成，卡在哪」。
