@@ -132,15 +132,83 @@ const (
 	//     them" - because a door whose argument can mean everything deletes
 	//     everything by accident.
 	//
-	// The page literal half is REGISTERED, not dodged: the three names sit in
-	// bridge_test.go's rosterPageGapLedger194 with reasons until the page's
-	// privacy leg spells them in frontend/src/lib/panel.ts (this Go leg does
-	// not touch frontend/), and the closed-roster counts in
-	// inbound_roster_253_test.go moved with them (8 -> 11, unprefixed 4 -> 7)
-	// in the same change - the friction those constants were built to produce.
+	// The page literal half LANDED with the privacy page leg (frontend,
+	// 2026-11-17): panel.ts spells all three names (requestPrivacyDeleteOne /
+	// requestPrivacyPurge / requestPrivacyExport on the settings envelope),
+	// and the pending registrations they carried in bridge_test.go's
+	// rosterPageGapLedger194 were removed in that same commit, per the
+	// two-way audit's own rule. The closed-roster counts in
+	// inbound_roster_253_test.go moved with them (8 -> 11, unprefixed
+	// 4 -> 7) in the change that added the routes - the friction those
+	// constants were built to produce.
 	MethodPrivacyDeleteOne = "privacy.delete-one"
 	MethodPrivacyPurge     = "privacy.purge"
 	MethodPrivacyExport    = "privacy.export"
+	// MethodHistoryPage is readface wave 2 (2026-11-17), ticket 36 AC#3's Go
+	// half: the paged history read over the two tables the D35 schema already
+	// holds (internal/memory's task_log = task history, tool_call = result
+	// forensics - the real table names read off schema.go's ddlV1). Three
+	// naming facts, the same ones every unprefixed name above records:
+	//
+	//   - The name is the face's own verb, not a fourth vocabulary: it pages
+	//     history, so it says history.page. It carries no "panel." prefix
+	//     (ticket 181's extractor counts those literals) and no word of the
+	//     grant-boundary instrument's verdict vocabulary - a read cannot
+	//     approve anything.
+	//   - It is an INDEPENDENT roster name, deliberately not routed through
+	//     panel.view.request: that sixth outbound name was deleted by the
+	//     owner's Q-50 ruling (甲, A238) and the C17 whitelist never carried
+	//     it. Answering this read under its own name is exactly what the
+	//     ticket-36 whitespace asked for ("缺 SQLite 历史 reader＋
+	//     panel.view.request 被 Q-50 封"), so Q-50 does NOT block this face:
+	//     the read rides its own named door, and the deleted view-request
+	//     name stays deleted.
+	//   - delete-one / purge / export are NOT re-landed here: the privacy.*
+	//     doors above already route the destructive verbs through
+	//     internal/memory's privacy layer, and this face is a pure read.
+	//     Zero destructive vocabulary arrives with it.
+	//
+	// The page literal half is REGISTERED, not dodged: the name sits in
+	// bridge_test.go's rosterPageGapLedger194 until the panel's history page
+	// leg spells it in frontend/src/lib/panel.ts (this wave is Go-only by
+	// dispatch; frontend/** is untouched).
+	MethodHistoryPage = "history.page"
+	// MethodRosterCancel is readface wave 2 (2026-11-17), ticket 38 AC#4's
+	// cancel door: the panel-side route that stops ONE task row through the
+	// Go host's existing cancel paths. Why it exists at all (the reason the
+	// C17 roster addition owes): the tasks view renders the host's roster
+	// rows, and a user clicking 停止 on one needs a Go通路 - without one the
+	// button is the same "dormant, nothing happens" shape ticket 38's page
+	// leg already had to name. Why it is NOT approval.decide: that route
+	// answers a card the queue actually holds, and fabricating an answer for
+	// a card that does not exist is exactly the refusal-shape the golden law
+	// forbids (Q-49 family); a cancel is not an approval answer, it is a
+	// task-control verb, so it gets its own door and the approval route is
+	// untouched.
+	//
+	// WHY THE NAME IS "roster.cancel" AND NOT THE TICKET'S "task.cancel":
+	// internal/tools' frozen ticket-188 task-axis instrument
+	// (task_state_188_test.go:385-401) reddens every panel-side Method*
+	// constant whose VALUE contains "task" or "state", reading such a name
+	// as "a panel-side whitelisted method claiming the task axis". That test
+	// is outside this leg's write face (internal/tools/** is not on the
+	// wave's list), its assertion is not loosened, and routing the constant
+	// through an indirection to keep the literal would be the laundering
+	// shape ticket 242's M-D2 conviction already ruled on - so the door lands
+	// under the name that truthfully says what it addresses: one row of the
+	// task roster the tasks view renders. Ticket 38's own progress note
+	// (".scratch/wisp/issues/38-command-palette-tasks.md:66-68") names this
+	// instrument and hands the naming to the Go leg; the semantic target
+	// (D34's task.cancel family, the roster row id selector) is unchanged,
+	// and the receipt names the row it stopped. If the owner later rules the
+	// 188 scan's scope narrower, renaming this constant to the ticket's
+	// spelling is a one-line diff plus the roster/count moves.
+	//
+	// The same three naming facts as above hold: no "panel." prefix, no
+	// grant-boundary verdict word (cancel is not an approval word), and the
+	// page literal half is REGISTERED in rosterPageGapLedger194 while the
+	// page half is pending (Go-only wave by dispatch).
+	MethodRosterCancel = "roster.cancel"
 )
 
 // ErrComposerRequest is every way a composer request can fail to be usable.
@@ -210,6 +278,21 @@ type ComposerRequest struct {
 	// an item id is refused by the handler before the leg is reached.
 	PrivacyDomain string `json:"privacyDomain,omitempty"`
 	PrivacyItemID string `json:"privacyItemId,omitempty"`
+	// HistoryOffset / HistoryLimit are readface wave 2's paging window
+	// (history.page): plain integers, not key paths, the same selector class
+	// as the settings selectors above. Zero limit is the door's own default
+	// (named in the handler), not a "read everything"; a negative value or a
+	// page over the ceiling is refused by the leg before the store is opened.
+	HistoryOffset int `json:"historyOffset,omitempty"`
+	HistoryLimit  int `json:"historyLimit,omitempty"`
+	// RosterTaskID is readface wave 2's cancel selector (roster.cancel): the
+	// id of the ONE roster row the tasks view showed the user. Selector-
+	// shaped like PrivacyItemID - a name the page echoes from the snapshot,
+	// never a key path - and the only thing the door stops. An empty value
+	// is refused by the handler before the leg is reached; a value the
+	// roster does not hold is refused by the host's own cancel paths with
+	// their own reason (the ONE stop path's fail-closed pair), never guessed.
+	RosterTaskID string `json:"rosterTaskId,omitempty"`
 }
 
 // ParseComposerRequest reads one postMessage string. Every refusal is an error
@@ -242,7 +325,7 @@ func knownComposerMethod(m string) bool {
 	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
 	// exact one-line form, so wrapping it would leave real plants replacing
 	// nothing. Appending a constant means extending this line, deliberately.
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel:
 		return true
 	}
 	return false

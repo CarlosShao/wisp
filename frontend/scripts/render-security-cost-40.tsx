@@ -418,8 +418,17 @@ const settingsSrc = readFileSync("src/components/harness/settings-page.tsx", "ut
 check("the settings page must draw 安全 with the security control", settingsSrc.includes('control: "security"'));
 check("the settings page must draw 成本 with the cost control", settingsSrc.includes('control: "cost"'));
 check("the settings page must draw 技能 with the skills control", settingsSrc.includes('control: "skills"'));
-check("the settings page's privacy cell must name the uncaller readers (A365)", settingsSrc.includes("ListPrivacy") && settingsSrc.includes("A365"));
-check("the settings page's privacy cell must name the dispatch table", settingsSrc.includes("composer_dispatch.go"));
+// The privacy cell moved on 2026-11-17 (the privacy page leg): the three
+// doors went live on the Go side and the cell now mounts the real buttons,
+// so the old A365 zero-caller sentence is replaced by the wiring fact -
+// re-pinned here onto the new truth (the cell draws 隐私 with the privacy
+// control, and the route literals live in panel.ts).
+check("the settings page must draw 隐私 with the privacy control", settingsSrc.includes('control: "privacy"'));
+const privacySrc = readFileSync("src/components/privacy-settings.tsx", "utf8");
+check(
+  "the privacy page must name the three doors' Go landing points (bridge.go:141-143 roster, composer_dispatch.go routing, panel_inbound.go:411 wiring)",
+  privacySrc.includes("bridge.go:141-143") && privacySrc.includes("composer_dispatch.go:174") && privacySrc.includes("panel_inbound.go:411"),
+);
 check("the settings page's MCP cell must say the D13 ruling, not a bug", settingsSrc.includes("按设计不接（D13）"));
 check("the settings page's memory cell must name the pump and the roster", settingsSrc.includes("PumpSources") && settingsSrc.includes("bridge.go:41-107"));
 check("the rail's waiting suffix must be the census word", settingsSrc.includes("（未接线）") && !settingsSrc.includes("（还没有数据）"));

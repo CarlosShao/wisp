@@ -69,8 +69,10 @@ const (
 	// doors ("privacy.delete-one", "privacy.purge", "privacy.export") joined
 	// for ticket 40 AC#1's Go half, size 8 -> 11 and non-prefixed 4 -> 7, in
 	// the same change that added the routes (bridge.go's MethodPrivacy*
-	// constants) and the cmd/wisp handlers. The page literals are pending and
-	// REGISTERED in bridge_test.go's rosterPageGapLedger194, not dodged.
+	// constants) and the cmd/wisp handlers. Their pending page-literal
+	// registrations in bridge_test.go's rosterPageGapLedger194 left again
+	// with the privacy page leg (same day): panel.ts spells all three names,
+	// so the ledger is empty and every name is judged by the original rule.
 	wantFullInboundRosterSize253 = 11
 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
 	// "panel." prefix, invisible to both old rulers. It was 3 ("config.get",

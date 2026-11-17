@@ -177,3 +177,15 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 - **勾 AC#3**：`CostAggregateCard` 十字段逐字上屏（月累计 IN 2100/OUT 460/金额 900、日/月预算 0⇒「不封顶」、计价版本 3＋2026-11-01），**对账牙** `1000/1000 Agree=true`、`+1micro ⇒ false 点名 1001/1000`。
 - **勾 AC#4**：`BudgetStateBar` 三态各一枚（normal 绿/warn 橙/paused 红，**只听 state 词**、⛔ 不复算百分比）；Go 四子例 700→normal／800→warn／1000+pause→paused／1000+warn→warn 现跑 PASS；词表外词「观察中」⇒ 零点亮＋逐字显示。
 - 留白：AC#1 隐私三按钮（路由已备，本单未接 UI）、AC#2 grants 视图（面板无入站读面，已具名）、AC#5 诊断包导出面、mod 管理行、AC#7 视觉签收（机主）。
+
+## Progress log（续，2026-11-17 11:5x，本票隐私页腿 agent-111 · AC#1 页半；只追加不勾框）
+
+**本轮交付（AC#1 隐私三支按钮页半；证据件 `docs/evidence/s1/40-privacy-ui-20261117.md`）：**
+
+1. **三支真按钮落地**：`frontend/src/lib/panel.ts` 新增 `requestPrivacyDeleteOne/Purge/Export`（选择器键照 bridge.go:211-212 JSON tag：privacyDomain/privacyItemId，走既有 settings 门，无第二通道）；`frontend/src/lib/privacy-view.ts` 新解析器（拒绝对照 RefusedEnvelopeForUser 句首分类；export 解析 `wisp-privacy-export:` 载荷行，records=N＝载荷 records 数组长度，envelope 的 count 键故意不读——internal/memory 不填它，第二个数＝第二个裁判；无载荷⇒未判，⛔假 0）；`frontend/src/components/privacy-settings.tsx` 新组件：删除一条（域词＋id 两输入，id 空⇒按钮禁用＝需选 id，页面写明名册无 privacy.list 读面不假造行选器）、清空某域（两步确认卡 role=alertdialog，purge 请求源级单发点只在确认键上，⛔一键清空；门上无「全清」参数页面不发明）、导出某域（prose 逐字＋records=N＋JSON 原行上屏）。域词不复制词表：PrivacyDomains() 拥有词表，未知域的拒绝句点名五域逐字上屏。
+2. **设置页隐私格转实控件**（harness/settings-page.tsx `control: "privacy"`）：旧 A365 零调用方 waiting 文案随接线作废（三扇门现在有真调用方——面板这三支）。
+3. **仪器**：新 `render:privacy40`（frontend/scripts/render-privacy-40.tsx，rc=0）——喂真 payload⇒三支逐字上屏（delete 点名 id=42／purge 报 store 自报计数 3／export records=2＋行内数据原样）；喂拒绝⇒逐字（含 Test40PrivacyRefusalsNameTheDomainVocabulary 钉的域词句）；喂不到⇒显式未判，records=0 全绿检查；源级牙：三枚字面量落 panel.ts＋台账条目同 commit 已删＋purge 单发点＋delete 需 id＋页面不复制域词表＋零 emoji。`render:security40` 两枚隐私格旧断言改钉新真话（断言一枚没删）。
+4. **Go 侧唯一改动（同 commit 双向审计）**：`internal/panel/bridge_test.go` 的 `rosterPageGapLedger194` 删三条 privacy 注册（页面开始携带⇒同 commit 删条目，与 cost.summary 同例；plant 正控保留）；`bridge.go`/`inbound_roster_253_test.go` 相应注释同步（无行为改动；名册计数 11/7 不动）。`go test ./internal/panel` rc=0。
+
+**门禁读数**：build/typecheck/lint rc=0（40 条既有 warning，0 error，新件零命中）；`render:privacy40`/`render:security40` rc=0；`go test ./internal/panel` rc=0；`go build ./...` rc=0；d22scan clean；dist 已删回 `.gitkeep`；⛔ 未 push。
+**AC 格未勾**（裁决者≠实现者）；诚实边界：面板无隐私清单读面（id/域词手填，缺面具名）、录音留存/遥测仍无读口不画。

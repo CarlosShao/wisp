@@ -904,3 +904,59 @@ export function requestCostSummary(): Promise<string | null> {
     source: "panel-composer",
   });
 }
+
+/* --------------------------------------------------------------------------
+   Privacy doors (ticket 40 AC#1, readface wave 1's page half)
+   --------------------------------------------------------------------------
+   Three destructive/data doors against the user's own D35 data, answered on
+   the Go side by cmd/wisp/panel_privacy_40.go over internal/memory's privacy
+   layer (bridge.go:141-143 roster names; composer_dispatch.go routes them;
+   panel_inbound.go:411 wires the leg). Same settings-door shape as
+   cost.summary above: the reply comes back through window.wispDispatch as
+   one string - a receipt sentence, or RefusedEnvelopeForUser's refusal
+   sentence naming the cause (the domain-vocabulary refusal names the five
+   D35 domains internal/memory's PrivacyDomains() owns; this page never
+   copies that vocabulary - the domain word rides the envelope's
+   privacyDomain key verbatim and the door is the only judge of it).
+
+   privacy.purge is the irreversible one: the page must confirm before this
+   request is ever sent (privacy-settings.tsx's confirm card) - a purge that
+   fired on the first click would make the destructive verb one-click.
+   -------------------------------------------------------------------------- */
+
+/** Delete ONE item out of ONE domain (privacy.delete-one). The receipt names
+    the id; the door refuses an empty id and an unknown domain word by name. */
+export function requestPrivacyDeleteOne(domain: string, itemId: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "privacy.delete-one",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    privacyDomain: domain,
+    privacyItemId: itemId,
+  });
+}
+
+/** Purge ONE WHOLE domain (privacy.purge). There is no "purge everything"
+    argument anywhere on the wire: the domain word is required, and the door
+    refuses anything PrivacyDomains() does not answer. Confirm first. */
+export function requestPrivacyPurge(domain: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "privacy.purge",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    privacyDomain: domain,
+  });
+}
+
+/** Export ONE domain as the store's own JSON envelope (privacy.export). The
+    reply is prose plus one line starting with PrivacyExportPayloadMarker
+    ("wisp-privacy-export:"); parse it with parsePrivacyReply
+    (lib/privacy-view.ts) and never by reading the prose. */
+export function requestPrivacyExport(domain: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "privacy.export",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    privacyDomain: domain,
+  });
+}

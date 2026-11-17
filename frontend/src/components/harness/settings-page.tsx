@@ -45,6 +45,7 @@ import { ConfigScreen } from "@/components/config-screen";
 import { ModelSettings } from "@/components/model-settings";
 import { VoiceSettings } from "@/components/voice-settings";
 import { SecuritySettings } from "@/components/security-settings";
+import { PrivacySettings } from "@/components/privacy-settings";
 import { CostSettings } from "@/components/cost-settings";
 import { SkillsSettings } from "@/components/skills-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
@@ -70,7 +71,7 @@ interface Category {
       category has real controls. */
   waiting: string;
   /** Which real component draws this category when `waiting` is empty. */
-  control?: "config" | "model" | "voice" | "security" | "cost" | "skills";
+  control?: "config" | "model" | "voice" | "security" | "privacy" | "cost" | "skills";
 }
 
 const CATEGORIES: readonly Category[] = [
@@ -148,16 +149,20 @@ const CATEGORIES: readonly Category[] = [
     control: "security",
   },
   {
+    // Ticket 40 AC#1, the privacy page leg (2026-11-17): the three doors went
+    // live on the Go side (bridge.go:141-143 privacy.delete-one /
+    // privacy.purge / privacy.export, composer_dispatch.go's table,
+    // panel_inbound.go:411 wiring, panel_privacy_40.go over internal/memory's
+    // privacy layer - the layer census A365 recorded as having zero callers
+    // until then), so the cell stops being a waiting note and mounts the
+    // three real buttons. What the cell still does NOT have: a privacy LIST
+    // read face (no privacy.list on the roster), so delete-one's id is typed
+    // and the page says so; 录音留存/遥测开关 have no read face either and
+    // stay unmentioned on the privacy page itself.
     name: "隐私",
-    purpose: "哪些数据留在本机、录音留存多久、遥测开关。",
-    // Ticket 40: the D35 privacy ops (list/delete-one/purge-all/export over
-    // profile/memory/task_log/tool_call/artifacts) have NO panel route, and
-    // the memory-side readers (ListPrivacy/ExportPrivacy,
-    // internal/memory/privacy.go) have zero production callers (census A365).
-    // Wiring them needs a cmd/wisp leg + a dispatch-table case; this wave's
-    // cmd/wisp is another leg's, so the cell stays an honest 未接线 naming
-    // the engines instead of a front-end invention.
-    waiting: "没接。缺的引擎：C17 名册（internal/panel/bridge.go:41-107）没有任何 privacy 路由；internal/memory/privacy.go 的 ListPrivacy/ExportPrivacy 生产零调用方（census-unwired 2026-11-16，台账 A365）——数据面在，没人接到面板。隐私数据的列出/删除/清空/导出要 Go 侧先加读/写面（cmd/wisp 装配 + internal/panel/composer_dispatch.go 派发表加 case）；录音留存、遥测开关同样没有读口，一个字也不显示。",
+    purpose: "本机数据的删除、清空与导出。",
+    waiting: "",
+    control: "privacy",
   },
   {
     // Ticket 40's census re-cut: the cost door has answered since ledger
@@ -345,6 +350,12 @@ export function SettingsPage({
               lede={cat.purpose}
               mode={composer?.mode ?? { current: "unknown", names: [], l2ConfirmNames: [] }}
             />
+          ) : cat.control === "privacy" ? (
+            /* Ticket 40 AC#1: the three privacy doors' page half. Every click
+               goes out on the real bridge (privacy.delete-one / privacy.purge /
+               privacy.export); the purge branch confirms first; receipts and
+               refusals render verbatim. */
+            <PrivacySettings heading={cat.name} lede={cat.purpose} />
           ) : cat.control === "cost" ? (
             /* Ticket 40: the cost door's page reader. The component fetches
                cost.summary itself (the settings door), keeps no copy, and
