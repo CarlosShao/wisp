@@ -20,22 +20,35 @@
         output, not a replacement for the repo scanner).
 
    ball.size joined the live class (tickets 413/422, 2026-11-11): the same
-   render also asserts that row - 能改 badge with 等快照 and no slider when
-   no ballSize section is handed down, and a second render WITH a section
-   asserts the slider mounts on the snapshot's own min/max band with the
-   current diameter shown. Both rows' badge words are sliced from each row's
-   own description text onward, never from the markup start - a global first
-   match went stale the moment a second 能改 row entered the screen.
+   render also asserts that row - 等快照 with no slider and the badge flipped
+   to 未接线 when no ballSize section is handed down, and a second render
+   WITH a section asserts the badge flips back to 能改 and the slider mounts
+   on the snapshot's own min/max band with the current diameter shown. That
+   two-direction flip is the census tooth. Badge words are sliced from each
+   row's own description text onward, never from the markup start - a global
+   first match went stale the moment a second 能改 row entered the screen.
 
-   The appearance wave's four rows joined the same day (ball.opacity_idle /
-   ball.click_through / panel.width / panel.font_size): the live render with
-   no sections asserts each says 等快照 and mounts no control, and a render
-   WITH the four sections asserts the percent slider mounts on the section's
-   own 0..1 band, the switch mounts on the section's own boolean, and the
-   two number fields hold the px values the host read. The four rows' badges
-   are the honest tier words (立即/重启 for the click-through row, 关窗/重启
-   生效 for the other three), never 能改 - the receipt states the exact
-   tier, and the badge must not promise more than the wire does.
+   TICKET 39'S CENSUS RE-CUT (2026-11-16). The badge used to derive from a
+   hardcoded `blocked === ""` string - a criterion with no relation to
+   whether Go carries a reader. The screen now reads the pump (each config
+   row's snapshot section), and this instrument pins the honest semantics:
+
+     - readerless render: every config row's badge is 未接线, the four wave
+       rows say 等快照, NO tier word (能改 / 立即/重启 / 关窗/重启生效 /
+       缺消费引擎) appears anywhere, the two page-local rows badge 仅本次
+       会话 (never 即时), and the theme row NAMES its missing engine
+       (SetTheme has no caller, the ball assembly root fills no Theme);
+     - fed render: the badges carry the tier words, and panel.font_size
+       still says 缺消费引擎 even with its section on the pump - the write
+       lands, but no engine consumes the key (census: Panel.FontSize has
+       zero consumers outside internal/config).
+
+   The appearance wave's four rows (ball.opacity_idle / ball.click_through /
+   panel.width / panel.font_size): the live render with no sections asserts
+   each says 等快照 and mounts no control, and a render WITH the four
+   sections asserts the percent slider mounts on the section's own 0..1
+   band, the switch mounts on the section's own boolean, and the two number
+   fields hold the px values the host read.
 
    The picker's CLOSED popover shows only the current value, so the
    vocabulary rows themselves are not visible in static markup; that the
@@ -99,14 +112,18 @@ check(
   styleRow.slice(0, 120),
 );
 // ball.size joined the live class too (tickets 413/422). The live render above
-// hands down no ballSize section, so the row must carry the same 能改 badge
-// yet refuse to draw a diameter it was not handed: 等快照, no slider, no
-// invented number (P9 - the read half is the snapshot's, never a local copy).
+// hands down no ballSize section, so the badge MUST flip to 未接线 - the
+// census tooth's absent-reader half: a tier word here would be a claim about
+// an engine this pump cannot even read. The row still refuses to draw a
+// diameter it was not handed: 等快照, no slider, no invented number (P9).
 const sizeRowStart = live.indexOf("悬浮球直径");
-const sizeRow = live.slice(sizeRowStart, live.indexOf("能改", sizeRowStart) + 2);
+const sizeRow = live.slice(sizeRowStart, live.indexOf("未接线", sizeRowStart) + 3);
 check(
-  "the ball.size row must carry 能改 but say 等快照 with no slider while the reader is absent",
-  sizeRow.includes("能改") && sizeRow.includes("等快照") && !sizeRow.includes('type="range"'),
+  "the ball.size row must flip its badge to 未接线 while its reader is absent (census tooth) and say 等快照 with no slider",
+  sizeRow.includes("未接线") &&
+    sizeRow.includes("等快照") &&
+    !sizeRow.includes("能改") &&
+    !sizeRow.includes('type="range"'),
   sizeRow.slice(0, 120),
 );
 check(
@@ -114,9 +131,18 @@ check(
   !live.includes('aria-label="悬浮球大小"'),
 );
 check(
-  "the page-local rows must keep their 即时 badges (2 row badges + 1 footer mention, needle words verbatim)",
-  (live.match(/即时/g) ?? []).length === 3,
-  `${(live.match(/即时/g) ?? []).length} occurrences`,
+  "the two page-local rows must badge 仅本次会话, never 即时 (census: page-local CSS is not a config key; 2 row badges + 1 footer mention, needle words verbatim)",
+  (live.match(/仅本次会话/g) ?? []).length === 3 && !live.includes("即时"),
+  `${(live.match(/仅本次会话/g) ?? []).length} occurrences of 仅本次会话, ${(live.match(/即时/g) ?? []).length} of 即时`,
+);
+check(
+  "the readerless render must badge its six unfed config rows 未接线 (6 row badges + 1 footer mention) and carry no unfed tier word (the style row alone keeps its 能改 badge, and the footer's own 能改变权限档位 sentence accounts for the second)",
+  (live.match(/未接线/g) ?? []).length === 7 &&
+    !live.includes("立即/重启") &&
+    !live.includes("关窗/重启生效") &&
+    !live.includes("缺消费引擎") &&
+    (live.match(/能改/g) ?? []).length === 2,
+  `${(live.match(/未接线/g) ?? []).length} occurrences of 未接线, ${(live.match(/能改/g) ?? []).length} of 能改`,
 );
 check(
   "the appearance row must mount the picker (aria-label 球风格), not the refusal sentence",
@@ -128,19 +154,12 @@ check(
 );
 // The appearance wave's four rows joined the live class (2026-11-11). The
 // live render above hands down none of their sections, so each row must
-// carry its honest tier badge yet refuse to draw a value it was not handed:
-// 等快照, no slider, no switch, no number field (P9 - the read half is the
-// snapshot's, never a local copy). The badge words, not 能改: promising an
-// instant effect the wire does not carry would be the lie the receipt
-// exists to correct.
-check(
-  "the appearance wave's four rows must carry their honest tier badges (1 立即/重启 + 3 关窗/重启生效)",
-  live.includes("立即/重启") && (live.match(/关窗\/重启生效/g) ?? []).length === 3,
-  `${(live.match(/关窗\/重启生效/g) ?? []).length} occurrences of 关窗/重启生效`,
-);
+// badge 未接线 (census tooth, covered by the count above) yet refuse to
+// draw a value it was not handed: 等快照, no slider, no switch, no number
+// field (P9 - the read half is the snapshot's, never a local copy).
 check(
   "without sections the wave's rows must say 等快照 and mount no control",
-  (live.match(/等快照/g) ?? []).length === 5 && // ball.size + the four wave rows
+  (live.match(/等快照/g) ?? []).length === 6 && // ball.size + the four wave rows + 1 footer mention
     !live.includes('aria-label="空闲球不透明度"') &&
     !live.includes('role="switch"') &&
     !live.includes('aria-label="面板宽度"') &&
@@ -148,8 +167,10 @@ check(
   `${(live.match(/等快照/g) ?? []).length} occurrences`,
 );
 check(
-  "the theme row must stay dormant (the host owns the theme, badge 未接线)",
-  live.includes("主题由原生宿主决定，面板只跟随") && live.includes("未接线"),
+  "the theme row must stay 未接线 and NAME its missing engine (census: SetTheme has no caller, the ball assembly root fills no Theme)",
+  live.includes("主题由原生宿主决定，面板只跟随") &&
+    live.includes("SetTheme 暂无调用者") &&
+    live.includes("未接线"),
 );
 check("the live markup must hold zero emoji", !EMOJI_RE.test(live));
 
@@ -180,7 +201,7 @@ const sizeRowLive = sizeLive.slice(
   sizeLive.indexOf("能改", sizeRowLiveStart) + 2,
 );
 check(
-  "with the reader the ball.size row must mount the snapshot-banded slider",
+  "with the reader the ball.size row must mount the snapshot-banded slider (census tooth, fed half: the badge flips back to 能改)",
   sizeRowLive.includes("能改") &&
     sizeRowLive.includes('type="range"') &&
     sizeRowLive.includes('aria-label="悬浮球大小"') &&
@@ -235,6 +256,30 @@ check(
     waveLive.includes('aria-label="面板字号"') &&
     waveLive.includes('value="12"'),
 );
+// The fed pump's badges: tier words where the engine exists, and the census's
+// 缺消费引擎 verdict on the one key nothing consumes - even with its section
+// on the pump (the write lands; the effect does not, and the badge must say
+// so rather than promise 关窗/重启生效).
+const fontRowStart = waveLive.indexOf("面板正文字号");
+const fontRow = waveLive.slice(fontRowStart, waveLive.indexOf("缺消费引擎", fontRowStart) + 5);
+check(
+  "with every section on the pump the font-size row must still badge 缺消费引擎, never its tier word (census: no engine consumes Panel.FontSize)",
+  fontRow.includes("缺消费引擎") && !fontRow.includes("关窗/重启生效"),
+  fontRow.slice(0, 140),
+);
+check(
+  "the fed pump's badges must be the tier words (能改 x2 + the footer's 能改变权限档位 sentence, 关窗/重启生效 x2, 立即/重启 x1, 缺消费引擎 x1)",
+  (waveLive.match(/能改/g) ?? []).length === 3 &&
+    (waveLive.match(/关窗\/重启生效/g) ?? []).length === 2 &&
+    (waveLive.match(/立即\/重启/g) ?? []).length === 1 &&
+    (waveLive.match(/缺消费引擎/g) ?? []).length === 1,
+  `能改 ${(waveLive.match(/能改/g) ?? []).length}, 关窗/重启生效 ${(waveLive.match(/关窗\/重启生效/g) ?? []).length}, 立即/重启 ${(waveLive.match(/立即\/重启/g) ?? []).length}, 缺消费引擎 ${(waveLive.match(/缺消费引擎/g) ?? []).length}`,
+);
+check(
+  "the fully-fed pump's only 未接线 are the theme row's badge (dormant) and the footer's mention - a fed config row must never badge unwired",
+  (waveLive.match(/未接线/g) ?? []).length === 2,
+  `${(waveLive.match(/未接线/g) ?? []).length} occurrences`,
+);
 check("the wave-bearing markup must hold zero emoji", !EMOJI_RE.test(waveLive));
 
 // --- the write half is a source-level fact --------------------------------
@@ -257,6 +302,32 @@ check(
   "the write must go through the shared performConfigWrite door, not a second channel",
   screenSrc.includes("performConfigWrite") && !screenSrc.includes("postMessage"),
 );
+// The badge's read half and the write's admission word must stay the same
+// pair per row: a section key that drifts from its field would let the badge
+// read one wire key while the write lands on another.
+const rowPairs = [
+  /field: "ball_size",\s*section: "ballSize"/,
+  /field: "ball_opacity_idle",\s*section: "ballOpacityIdle"/,
+  /field: "ball_click_through",\s*section: "ballClickThrough"/,
+  /field: "ball_style",\s*section: "ballStyle"/,
+  /field: "panel_width",\s*section: "panelWidth"/,
+  /field: "panel_font_size",\s*section: "panelFontSize"/,
+];
+check(
+  "the row table's six config sources must pair each wire field with its snapshot section",
+  rowPairs.every((re) => re.test(screenSrc)),
+  rowPairs.filter((re) => !re.test(screenSrc)).length + " pair(s) missing",
+);
+check(
+  "the badge words must stay spelled once in the screen's needle table (BADGE_WORDS), not re-typed at call sites",
+  screenSrc.includes("sessionOnly: \"仅本次会话\"") &&
+    screenSrc.includes('unwired: "未接线"') &&
+    screenSrc.includes('noConsumer: "缺消费引擎"'),
+);
+check(
+  "the old hardcoded criterion must stay gone (no `blocked === \"\"` and no `row.blocked` in the screen source)",
+  !screenSrc.includes('row.blocked === ""') && !screenSrc.includes("row.blocked") && !screenSrc.includes("blocked:"),
+);
 
 if (failures.length > 0) {
   for (const f of failures) console.error("render-config: FAIL " + f);
@@ -264,6 +335,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.error(
-  "render-config: OK, ball.style + ball.size + the appearance wave's four rows live (pickers/slider/switch/number fields mounted, snapshot values shown, " +
+  "render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier words, font_size 缺消费引擎 even fed, page-local rows 仅本次会话, theme names SetTheme; pickers/slider/switch/number fields mounted, snapshot values shown, " +
     "no-reader honest states, write rides the settings door, zero emoji)",
 );

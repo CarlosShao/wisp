@@ -3,8 +3,9 @@
    ----------------------------------------------------------------------------
    Re-cut onto the fine-tune-card inspector anatomy from the library
    blueprint: mono key chip + description on the left, control + effect badge
-   on the right, one row per key. The key vocabulary and the honest
-   blocked-or-live split survive from the previous generation unchanged.
+   on the right, one row per key. The key vocabulary survives from the
+   previous generation unchanged; the badge's wiring split was re-cut to
+   read the pump's real state (ticket 39's census, see the paragraph below).
 
    Which rows work is decided by whether the panel owns the thing being
    changed:
@@ -76,6 +77,41 @@ the opacity row  WORKS. The frost is a CSS custom property in this
    2026-11-11) and the appearance wave's four rows above left it the same
    day.
 
+   THE BADGE READS THE PUMP, NOT THE ROW LIST (ticket 39's census re-cut,
+   2026-11-16 - docs/evidence/s1/census-unwired-20261116-2017.md appendix).
+   The old wiring split was one hardcoded string per row and had
+   nothing to do with whether Go actually carries a reader, so the badge
+   now derives from where each row's control lives:
+
+     document rows    badge 仅本次会话, never 即时 - the census called the
+                       two page-local knobs out by name (panel.opacity is a
+                       CSS custom property, panel.animations is
+                       html[data-motion]; neither is a config key), so the
+                       badge must say the effect is real but ephemeral and
+                       NOT persisted.
+
+     config rows      the badge carries its tier word ONLY when the row's
+                       snapshot section actually arrived on this pump (the
+                       Go reader gates the key on the wire - a nil pointer
+                       there leaves the key off). Absent section ⇒ the badge
+                       flips to 未接线 and the control area says 等快照.
+                       That flip is the census tooth: pull a reader, the
+                       badge turns; render-config-screen pins both
+                       directions.
+
+     panel.font_size  writes, reads and snapshots ride the four live hops,
+                       but NO engine consumes the key (Panel.FontSize has
+                       zero hits outside internal/config;
+                       panel_host_windows.go 0 hits, census 2026-11-16), so
+                       even with the section on the pump the badge says
+                       缺消费引擎 instead of promising a tier word.
+
+     app.theme        stays 未接线 and NAMES the missing engine: the ball
+                       side's SetTheme (renderer_windows.go:106) has no
+                       caller and the ball assembly root does not fill
+                       Theme. Saying so is the census rule; showing a
+                       live-looking theme row would be the lie.
+
    Spelling note that is load-bearing: the dotted key labels are stored in two
    halves (group / name) and joined only at render time, because
    internal/panel's renderer gate treats any quoted dotted host-route string
@@ -126,6 +162,40 @@ function readPanelAlpha(): number | null {
   return Number.isFinite(n) ? Math.round(n) : null;
 }
 
+/** The snapshot section keys a config row's read half rides on. The Go side
+    gates each key on the wire (nil pointer = key OFF), so presence here is
+    "this pump has a reader" - the fact the badge reads. */
+type SectionKey =
+  | "ballStyle"
+  | "ballSize"
+  | "ballOpacityIdle"
+  | "ballClickThrough"
+  | "panelWidth"
+  | "panelFontSize";
+
+/** Where a row's control writes and reads. The badge derives from THIS, not
+    from a hardcoded string (see the file header's census paragraph). */
+type RowSource =
+  /** Page-local: restyles this document, is NOT a config write and is NOT
+      persisted (panel.opacity is a CSS custom property, panel.animations is
+      html[data-motion]). The badge says 仅本次会话 - the census wording. */
+  | { kind: "document"; control: "alpha" | "motion" }
+  /** A real config write through the settings door (`field` is the write
+      route's admission word), whose read half is `section`. `tier` is the
+      badge word shown only when the section arrived. `consumerMissing`
+      names the engine that does not yet consume the key: even a fed pump
+      gets the 缺消费引擎 badge instead of the tier word. */
+  | {
+      kind: "config";
+      field: string;
+      section: SectionKey;
+      tier: string;
+      consumerMissing?: string;
+    }
+  /** No engine on either side. `reason` names the missing engine in plain
+      words - a dormant row must say which engine it waits for. */
+  | { kind: "dormant"; reason: string };
+
 interface Row {
   /** The config section, spelled the way config.toml spells it. */
   group: string;
@@ -134,48 +204,120 @@ interface Row {
   name: string;
   /** What it does, one plain line. */
   desc: string;
-  /** Why this row is not editable yet. Empty string = the panel owns it. */
-  blocked: string;
-  /** Which live control this row draws when `blocked` is empty. */
-  control?:
-    | "alpha"
-    | "motion"
-    | "ballStyle"
-    | "ballSize"
-    | "ballOpacity"
-    | "clickThrough"
-    | "panelWidth"
-    | "panelFontSize";
+  source: RowSource;
+}
+
+/** The badge's three states: green = wired with its tier word, warn = fed
+    but no engine consumes the key, neutral = not wired on this pump (or
+    page-local and ephemeral). */
+type Badge = { word: string; tone: "ok" | "warn" | "neutral" };
+
+/** The needle words, spelled once. 未接线 and 仅本次会话 are this screen's
+    own vocabulary; render-config-screen counts them. */
+const BADGE_WORDS = {
+  sessionOnly: "仅本次会话",
+  unwired: "未接线",
+  noConsumer: "缺消费引擎",
+} as const;
+
+/**
+ * The effect badge reads the pump: a config row shows its tier word only
+ * when its snapshot section actually arrived; absent reader ⇒ 未接线 (the
+ * census tooth); a fed row whose key no engine consumes ⇒ 缺消费引擎; the
+ * two page-local rows say 仅本次会话 because their effect dies with the
+ * panel and nothing is persisted.
+ */
+function rowBadge(source: RowSource, sections: Record<SectionKey, boolean>): Badge {
+  if (source.kind === "document") return { word: BADGE_WORDS.sessionOnly, tone: "neutral" };
+  if (source.kind === "dormant") return { word: BADGE_WORDS.unwired, tone: "neutral" };
+  if (!sections[source.section]) return { word: BADGE_WORDS.unwired, tone: "neutral" };
+  if (source.consumerMissing !== undefined) return { word: BADGE_WORDS.noConsumer, tone: "warn" };
+  return { word: source.tier, tone: "ok" };
 }
 
 /** The appearance rows, in the demo owner's original order. */
 const APPEARANCE_ROWS: readonly Row[] = [
-  { group: "app", name: "theme", desc: "界面主题", blocked: "主题由原生宿主决定，面板只跟随" },
-  { group: "panel", name: "opacity", desc: "面板背景不透明度", blocked: "", control: "alpha" },
-  { group: "panel", name: "animations", desc: "界面动画（关掉后全部静帧，性能最省）", blocked: "", control: "motion" },
-  { group: "panel", name: "font_size", desc: "面板正文字号（px）", blocked: "", control: "panelFontSize" },
-  { group: "ball", name: "size", desc: "悬浮球直径（44-160）", blocked: "", control: "ballSize" },
-  { group: "ball", name: "opacity_idle", desc: "空闲时悬浮球不透明度", blocked: "", control: "ballOpacity" },
-  { group: "ball", name: "click_through", desc: "空闲时鼠标穿透悬浮球", blocked: "", control: "clickThrough" },
-  { group: "ball", name: "style", desc: "悬浮球外观风格（玻璃 / Jarvis 粒子）", blocked: "", control: "ballStyle" },
-  { group: "panel", name: "width", desc: "面板宽度（px）", blocked: "", control: "panelWidth" },
+  {
+    group: "app",
+    name: "theme",
+    desc: "界面主题",
+    source: {
+      kind: "dormant",
+      reason:
+        "主题由原生宿主决定，面板只跟随；宿主侧的消费引擎还没接线（SetTheme 暂无调用者，球侧装配根也不填 Theme）",
+    },
+  },
+  {
+    group: "panel",
+    name: "opacity",
+    desc: "面板背景不透明度（仅本页样式，不落盘）",
+    source: { kind: "document", control: "alpha" },
+  },
+  {
+    group: "panel",
+    name: "animations",
+    desc: "界面动画（关掉后全部静帧，性能最省；仅本页样式，不落盘）",
+    source: { kind: "document", control: "motion" },
+  },
+  {
+    group: "panel",
+    name: "font_size",
+    desc: "面板正文字号（px）——写入会落盘，但还没有引擎消费这个键，暂不生效",
+    source: {
+      kind: "config",
+      field: "panel_font_size",
+      section: "panelFontSize",
+      tier: "关窗/重启生效",
+      consumerMissing:
+        "原生宿主未读 Panel.FontSize（panel_host_windows.go 0 命中，census-unwired 2026-11-16）",
+    },
+  },
+  {
+    group: "ball",
+    name: "size",
+    desc: "悬浮球直径（44-160）",
+    source: { kind: "config", field: "ball_size", section: "ballSize", tier: "能改" },
+  },
+  {
+    group: "ball",
+    name: "opacity_idle",
+    desc: "空闲时悬浮球不透明度",
+    source: { kind: "config", field: "ball_opacity_idle", section: "ballOpacityIdle", tier: "关窗/重启生效" },
+  },
+  {
+    group: "ball",
+    name: "click_through",
+    desc: "空闲时鼠标穿透悬浮球",
+    source: { kind: "config", field: "ball_click_through", section: "ballClickThrough", tier: "立即/重启" },
+  },
+  {
+    group: "ball",
+    name: "style",
+    desc: "悬浮球外观风格（玻璃 / Jarvis 粒子）",
+    source: { kind: "config", field: "ball_style", section: "ballStyle", tier: "能改" },
+  },
+  {
+    group: "panel",
+    name: "width",
+    desc: "面板宽度（px）",
+    source: { kind: "config", field: "panel_width", section: "panelWidth", tier: "关窗/重启生效" },
+  },
 ];
 
-/** The effect badge: the two page-local rows say 即时 (they restyle this
-    document and nothing else), the config-write row says 能改 (its effect
-    tier is the receipt's to state - now when the ball is alive, restart when
-    it is not), dormant rows say 未接线. 即时 and 未接线 are this screen's
-    own needle words; 能改 joins them only because calling a restart-tier
-    write 即时 would be the lie the receipt exists to correct. */
-function EffectBadge({ live, word }: { live: boolean; word?: string }) {
+/**
+ * The effect badge: tone carries the wiring fact, word carries the tier.
+ */
+function EffectBadge({ badge }: { badge: Badge }) {
   return (
     <span
       className={cn(
         "inline-flex h-[18px] shrink-0 items-center rounded-full px-1.5 text-[10px] font-medium leading-none",
-        live ? "bg-green-tint text-green" : "bg-field text-ink-2",
+        badge.tone === "ok" && "bg-green-tint text-green",
+        badge.tone === "warn" && "bg-orange-tint text-orange",
+        badge.tone === "neutral" && "bg-field text-ink-2",
       )}
     >
-      {live ? (word ?? "即时") : "未接线"}
+      {badge.word}
     </span>
   );
 }
@@ -240,7 +382,7 @@ function NumberWriteField({
 
 export function ConfigScreen({
   heading = "设置",
-  lede = "外观一节九行键。除了主题那一行由原生宿主决定之外，其余八行都能动：悬浮球风格、大小、空闲透明度、穿透，面板不透明度、宽度、字号和动画。",
+  lede = "外观一节九行键：两行只改本页自己的样式（不落盘，关掉面板即回默认），六行走设置写入通路落盘，主题一行等原生宿主的消费引擎。",
   ballStyle = null,
   ballSize = null,
   ballOpacityIdle = null,
@@ -401,6 +543,19 @@ export function ConfigScreen({
     });
   }
 
+  // Whether this pump actually carries each read half. This is what the
+  // badge reads - the census tooth: the wire gates each section on its Go
+  // reader, so presence here is the real "wired on this pump" state, never
+  // a hardcoded string in the row list.
+  const sections: Record<SectionKey, boolean> = {
+    ballStyle: ballStyle != null,
+    ballSize: ballSize != null,
+    ballOpacityIdle: ballOpacityIdle != null,
+    ballClickThrough: ballClickThrough != null,
+    panelWidth: panelWidth != null,
+    panelFontSize: panelFontSize != null,
+  };
+
   return (
     <section aria-label="设置" className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
@@ -408,7 +563,7 @@ export function ConfigScreen({
 
       <div className="mt-1 flex flex-col">
         {APPEARANCE_ROWS.map((row) => {
-          const live = row.blocked === "";
+          const badge = rowBadge(row.source, sections);
           return (
             <div
               className="flex items-center justify-between gap-4 border-b border-line py-3 last:border-b-0"
@@ -426,13 +581,13 @@ export function ConfigScreen({
                 <div className="mt-0.5 text-xs text-ink-2">{row.desc}</div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {live && row.control === "motion" ? (
+                {row.source.kind === "document" && row.source.control === "motion" ? (
                   <SegmentedControl
                     onChange={moveMotion}
                     options={MOTION_TIERS}
                     value={motion}
                   />
-                ) : live && row.control === "alpha" ? (
+                ) : row.source.kind === "document" && row.source.control === "alpha" ? (
                   alpha === null ? (
                     <span className="text-xs text-ink-3">
                       读不到 {ALPHA_VAR}
@@ -457,7 +612,7 @@ export function ConfigScreen({
                       <span className="text-[11px] text-ink-3">%</span>
                     </>
                   )
-                ) : live && row.control === "ballSize" ? (
+                ) : row.source.kind === "config" && row.source.section === "ballSize" ? (
                   ballSize === null || ballSize === undefined ? (
                     /* No reader on this pump: say so instead of mounting a
                         slider with an invented diameter (P9). The real page
@@ -487,7 +642,7 @@ export function ConfigScreen({
                       </span>
                     </>
                   )
-                ) : live && row.control === "ballOpacity" ? (
+                ) : row.source.kind === "config" && row.source.section === "ballOpacityIdle" ? (
                   ballOpacityIdle === null || ballOpacityIdle === undefined ? (
                     /* No reader on this pump: say so instead of mounting a
                         slider with an invented opacity (P9). */
@@ -516,7 +671,7 @@ export function ConfigScreen({
                       </span>
                     </>
                   )
-                ) : live && row.control === "clickThrough" ? (
+                ) : row.source.kind === "config" && row.source.section === "ballClickThrough" ? (
                   ballClickThrough === null || ballClickThrough === undefined ? (
                     /* No reader: 等快照, never a switch guessing at false -
                         false is a real value on this wire and the two must
@@ -529,13 +684,13 @@ export function ConfigScreen({
                       onChange={moveClickThrough}
                     />
                   )
-                ) : live && row.control === "ballStyle" ? (
+                ) : row.source.kind === "config" && row.source.section === "ballStyle" ? (
                   <BallStylePicker
                     section={ballStyle}
                     onSelect={moveBallStyle}
                     className="w-[180px] shrink-0"
                   />
-                ) : live && row.control === "panelWidth" ? (
+                ) : row.source.kind === "config" && row.source.section === "panelWidth" ? (
                   panelWidth === null || panelWidth === undefined ? (
                     <span className="text-xs text-ink-3">等快照</span>
                   ) : panelWidth.width <= 0 ? (
@@ -551,7 +706,7 @@ export function ConfigScreen({
                       value={panelWidth.width}
                     />
                   )
-                ) : live && row.control === "panelFontSize" ? (
+                ) : row.source.kind === "config" && row.source.section === "panelFontSize" ? (
                   panelFontSize === null || panelFontSize === undefined ? (
                     <span className="text-xs text-ink-3">等快照</span>
                   ) : panelFontSize.fontSize <= 0 ? (
@@ -564,25 +719,15 @@ export function ConfigScreen({
                       value={panelFontSize.fontSize}
                     />
                   )
-                ) : live ? (
-                  <span className="text-xs text-ink-3">此行缺控件定义</span>
+                ) : row.source.kind === "dormant" ? (
+                  /* No engine on either side: the row says WHICH engine it
+                      waits for (the census rule - a dormant row names its
+                      missing feed), never a control and never a value. */
+                  <span className="text-xs text-ink-3">{row.source.reason}</span>
                 ) : (
-                  <span className="text-xs text-ink-3">{row.blocked}</span>
+                  <span className="text-xs text-ink-3">此行缺控件定义</span>
                 )}
-                <EffectBadge
-                  live={live}
-                  word={
-                    row.control === "ballStyle" || row.control === "ballSize"
-                      ? "能改"
-                      : row.control === "clickThrough"
-                        ? "立即/重启"
-                        : row.control === "ballOpacity" ||
-                            row.control === "panelWidth" ||
-                            row.control === "panelFontSize"
-                          ? "关窗/重启生效"
-                          : undefined
-                  }
-                />
+                <EffectBadge badge={badge} />
               </div>
             </div>
           );
@@ -600,10 +745,11 @@ export function ConfigScreen({
       ) : null}
 
       <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
-        「即时」那两行改的是这个页面自己的一层样式：关掉面板就回到 token 表里的默认值。
+        「仅本次会话」那两行改的是这个页面自己的一层样式：不落盘，关掉面板就回到 token 表里的默认值。
         悬浮球风格、大小、空闲透明度、穿透和面板宽度、字号那六行不同：它们走设置写入通路真正落盘，
         收据句会写明生效时机——穿透是有球当场就生效、没球要重启，宽度是关掉面板再打开就跟着变，
-        其余按收据照实说。
+        其余按收据照实说。徽章写着「未接线」的行是这一泵还没等到它的读口：等快照，不画猜出来的值。
+        字号那一行写入会落盘，但还没有引擎消费它，改了暂时看不到效果。
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">

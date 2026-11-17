@@ -59,7 +59,7 @@ const CATEGORIES: readonly Category[] = [
   {
     name: "外观",
     purpose: "主题、面板底色深浅、动画档位、字号。",
-    waiting: "", // ConfigScreen renders here; eight of its nine rows are live today.
+    waiting: "", // ConfigScreen renders here; its badges read the snapshot sections (ticket 39's census re-cut).
     control: "config",
   },
   {

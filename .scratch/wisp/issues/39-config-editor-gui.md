@@ -61,3 +61,48 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 - **`panel.font_size` 四跳已通（写/读/快照/装配）但零消费引擎**：`config_write_wave.go:40`＋`panel_config_store.go:431-440`＋`settings_appearance_wave.go:179`＋`run.go:1272-1274`；`Panel.FontSize` 全仓 6 命中全在 `internal/config`＋测试，`panel_host_windows.go` **0 命中**。⇒ 要么接到页面字号，要么标明缺引擎。
 - **`panel.opacity`／`panel.animations` 不是 config 键**（页面本地 CSS 变量／`html[data-motion]`）⇒ 本页若展示它们，**标明"仅本次会话、不落盘"**，⛔ 让用户以为存了。
 - **★ 徽章判据是假的**：`frontend/src/components/config-screen.tsx:411` `const live = row.blocked === ""`，`blocked` 是 `APPEARANCE_ROWS`（`:152-162`）**硬编码字符串** ⇒ 徽章与 Go 到底有没有读者**毫无关系**。本票必须把它改成**读真状态**（有生产读者/引擎才"即时"），并给一枚行为牙：某行读者被摘 ⇒ 徽章翻"未接线"且测试红。
+
+---
+
+## Progress log（续，2026-11-17 08:4x，本票前端写腿 agent-100 · 编排者 20261116 五票批次的第 4 张）
+
+> **AC 勾格状态：5 格 0 勾、5 格留白**（原因逐格在下列表，均因缺 Go 侧读面/写面，前端⛔造数据）。
+> 本轮落地的是**编排者追加事实一节的四条 census 指令**（徽章读真状态＋三行诚实标注）＋渲染仪器重钉。
+
+### 本轮落地（frontend/**，三件）
+
+1. **★徽章判据换成读真状态**（census ★）：`frontend/src/components/config-screen.tsx`
+   `Row.blocked`/`control` 硬编码字符串删除，改 `RowSource` 三态模型
+   （`document`／`config{field,section,tier,consumerMissing?}`／`dormant{reason}`）；
+   徽章由 `rowBadge(source, sections)` 从**快照节是否真的到达本泵**推导
+   （Go 侧 nil 指针＝键不上线，节缺席＝"这台泵没有读者"）：
+   - 未喂到的 config 行 ⇒ 徽章翻 **未接线**＋控件区 等快照（census 牙：读者被摘⇒徽章翻）；
+   - `panel.opacity`／`panel.animations` ⇒ 徽章 **仅本次会话**（census：非 config 键，⛔让用户以为存了），desc 加"仅本页样式，不落盘"；
+   - `app.theme` ⇒ 保持 **未接线** 并具名缺引擎："SetTheme 暂无调用者，球侧装配根也不填 Theme"（census 原话点名）；
+   - `panel.font_size` ⇒ 即使节已到泵，徽章 **缺消费引擎**（橙警示），desc 写明"写入会落盘，但还没有引擎消费这个键，暂不生效"（census：四跳已通但零消费引擎）；
+   - 已喂到的行徽章保持原 tier 词（能改／立即/重启／关窗/重启生效）。
+2. **渲染仪器重钉**：`frontend/scripts/render-config-screen.tsx`——census 牙**双向**钉死：
+   无读者渲染＝6 枚 config 行徽章全翻 未接线＋零 tier 词＋页本地行 仅本次会话×3（含页脚）＋主题行具名 SetTheme；
+   全喂渲染＝tier 词到位（能改×2／关窗重启×2／立即重启×1）而 font_size 仍 缺消费引擎；
+   外加源级钉：行表六对 `field,section` 配对不许漂、旧 `blocked === ""` 判据不许回来。
+   **仪器 exit 0 全绿**（约 24 枚 check）。
+3. `frontend/src/components/harness/settings-page.tsx:62` 注释同步（旧行数声明过期）。
+
+### 门禁读数（2026-11-17 08:3x，本机 windows，node24）
+
+`typecheck` rc=0｜`lint` rc=0（38 警告 0 错误，全为存量）｜`build` rc=0｜`render:config-screen` 仪器 exit 0｜
+`render:nav` OK（9 屏/70 冻结名）｜`render:composer` 7 态全画 rc=0｜`probe-ballsize-render` OK｜
+`d22scan` rc=1 但 **frontend/** 零发现**（4 条全在 `cmd/wisp/approval_reply.go:464/:379`、`internal/session/ticket49_lifecycle_test.go:172`、`internal/tools/ticket49_limits_test.go:139`——本轮 cmd/wisp 另一写腿的在飞文件，未触碰）；`frontend/dist` 仍只有 `.gitkeep`（dist 产物 git-ignored，未入库字节）。
+
+### AC 逐格留白（⛔前端造数据，需 Go 侧字段/file:line）
+
+- **[ ] AC#1**（D36 全 section 按 schema 渲染＋golden snapshot＋tier 事件观测）：**留白**。缺 Go：①config.get 的结构化 payload 现量只有 票313 的 模型/语音两节＋快照推送的 ball/panel 六节（`internal/panel/config_handlers.go`、`composer.go`），**没有** D36 全 section 树的 schema+值 reader；②没有"reload/restart 事件"推送字段。要加的：config.get 增 `sections[]{key,value,tier}` 全节读面＋reload 事件推送（file:line 落点由 cmd/wisp 腿定）。
+- **[ ] AC#2**（安全节 loosening → 原生 L2 卡 → accept/reject）：**留白**。缺 Go：risk/fs/net/plugins 四节既无读面也无写面（快照零推送），票21 的原生卡流程无 config 侧入口。
+- **[ ] AC#3**（api_key write-only＋last-4＋ref 创建）：**部分现量**：模型页已是 write-only（`frontend/src/components/model-settings.tsx:606-625` type=password、值不进 state、发出即清）＋`apiKeyRef` 展示（`:597-598`）＋凭据写走 SecretStore；**留白部分＝last-4 占位显示**：`internal/panel` 刻意"红线尾不上线"（`frontend/src/lib/config-view.ts:44-45` 注释），与票面"placeholder shows last-4"冲突——要显示 last-4 需 Go 改 payload（改契约文字，须人工批准），未动。
+- **[ ] AC#4**（round-trip 无 diff＋外部编辑未知键带行号报错）：**留白**。缺 Go：无"校验错误＋行号"的读面（config.get 只答冻结句＋节 payload，无 `errors[]{line,message}` 字段）。
+- **[ ] AC#5**（对照 design/screens/config.html 视觉签收＋安全节锁图标）：**留白**。安全节没有读面就画不出锁行；且 design/** 与视觉签收属验收者（裁决者≠实现者），不在本腿射程。
+
+### 回话摘要（给编排者）
+
+> commit hash 见 git log；勾格 0/5（全留白，原因＋要加的 Go 字段如上）＋census 四条全落地；新牙＝`render-config-screen.tsx` 的 census 双向徽章牙＋行表 field/section 配对钉；npm build/typecheck/lint rc=0。
+
