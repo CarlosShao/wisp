@@ -74,6 +74,7 @@ import {
 } from "lucide-react";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
+import { riskPillTone } from "@/lib/tools-discovery-view";
 
 export interface PaletteItem {
   label: string;
@@ -113,6 +114,82 @@ export interface PaletteRosterRow {
   door: string;
 }
 
+/* ---------------------------------------------------------------------------
+   Readface wave 3 (2026-11-17, ticket 38 AC#3 / AC#5): the tool discovery
+   rows and the per-task force chip. Both sections ride the palette surface
+   the way the roster does - App fetches through lib/panel's own doors
+   (tools.list / tool.launch / rules.force) and hands the parsed shapes in;
+   the palette holds no state and derives nothing.
+
+   THE PILL IS THE TRUTH: riskPill is the wire's own level word
+   (internal/risk's Level.String() vocabulary, carried verbatim off
+   internal/panel/discovery_force_w3.go's ToolRosterRow). This component
+   tints the word and never renames it: a missing pill renders 未判, and no
+   code path maps a level of its own.
+
+   THE LAUNCH KEY IS THE REAL DOOR: every row carries 启动, which sends
+   tool.launch and nothing else. Whether an L2 confirmation card appears is
+   the gate's decision on the host's own path - the pill never gates the
+   button, no verdict is predicted here, and no allow vocabulary exists in
+   this file.
+
+   THE CHIP IS TWO WORDS + OFF: force_tool | force_chat (D11③'s own
+   vocabulary) plus the neutral off state, applied per task - it rides the
+   send row's panel.message.send envelope as the forceMode payload key and
+   is consumed by the Go side's admitTask. The rules.force view beside it is
+   READ-ONLY: it reports the effective rules with their source
+   (override/toml/default) and the mode the next prompt adopts; this file
+   neither stages nor clears an override.
+   -------------------------------------------------------------------------- */
+
+/** One tool roster row (lib/panel.ts ToolRosterRowView, parsed by
+    lib/tools-discovery-view.ts). riskPill stays optional: a payload that
+    arrives without it renders 未判, never a level this page guessed. */
+export interface PaletteToolRow {
+  name: string;
+  title: string;
+  riskPill?: string;
+  argSummary?: string;
+}
+
+/** The force chip's own vocabulary plus off: "" sends the envelope without
+    the forceMode key (byte-identical to its pre-chip shape), the two words
+    ride it. */
+export type PaletteForceChip = "" | "force_tool" | "force_chat";
+
+/** One effective rule row (lib/panel.ts ForceRuleRowView). source/mode stay
+    optional at the parse boundary: an absent word renders 未判 in its slot. */
+export interface PaletteForceRuleRow {
+  source?: string;
+  pattern?: string;
+  mode?: string;
+}
+
+/** The rules.force read (lib/panel.ts ForceRulesViewView, parsed by
+    lib/tools-discovery-view.ts): the effective rules plus the mode the NEXT
+    prompt adopts for the requested task text. mode ""/absent is the
+    default; source is "override" | "toml" | "default" verbatim. */
+export interface PaletteForceView {
+  mode?: string;
+  source?: string;
+  pattern?: string;
+  instruction?: string;
+  rules?: readonly PaletteForceRuleRow[];
+}
+
+/** Where each section's feed stands, classified by lib/tools-discovery-view
+    (plus "pending" while the request is in flight and "nohost" when
+    requestHostAnswer resolved null). Undefined = the section is not
+    mounted at all, so a caller that feeds nothing sees the pre-wave palette. */
+export type PaletteDiscoveryPhase =
+  | "pending"
+  | "roster"
+  | "view"
+  | "refused"
+  | "no-payload"
+  | "payload-error"
+  | "nohost";
+
 /** A tiny name table for the icons the fixtures and App's wired rows
     actually use; a name outside it falls back to a neutral dot rather than
     a guessed glyph. */
@@ -138,6 +215,244 @@ function ItemIcon({ icon }: { icon?: string }) {
     return <Named aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />;
   }
   return <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-ink-3" />;
+}
+
+/* The pill's word->hue table (lib/tools-discovery-view.ts riskPillTone is
+   the derivation; this is its rendering). L0/L1/L2 are three DISTINCT hues
+   and the word rides verbatim inside - three levels, three colours, three
+   words, and no fourth mapping this page invented. */
+const PILL_TONE_CLASS: Record<string, string> = {
+  ok: "bg-green-tint text-green",
+  warn: "bg-warn-soft text-warn",
+  danger: "bg-red-tint text-red",
+  neutral: "bg-inset text-ink-3",
+};
+
+function RiskPill({ pill }: { pill: string | undefined }) {
+  const known = typeof pill === "string" && pill !== "";
+  const tone = known ? (riskPillTone(pill) as string) : "neutral";
+  return (
+    <span
+      className={cn(
+        "shrink-0 rounded-full px-1.5 py-0.5 text-[10.5px] font-medium tabular-nums",
+        PILL_TONE_CLASS[tone],
+      )}
+      data-pill-tone={known ? tone : "unjudged"}
+      data-risk-pill
+    >
+      {/* The wire's own word, verbatim. Absent renders 未判 - never a level
+          this page mapped, never a safe-looking default. */}
+      {known ? pill : "未判"}
+    </span>
+  );
+}
+
+/** The tools.list section body (ticket 38 AC#3): the installed roster, one
+    row per registry entry, search-filtered with the same query the groups
+    get. Each row's 启动 key sends tool.launch through lib/panel's ONE wire
+    function - the pill never gates it and no verdict is predicted here
+    (the real card, if the gate raises one, arrives on the snapshot's own
+    pending push). */
+function ToolRosterSection({
+  phase,
+  rows,
+  note,
+  prose,
+  launchNote,
+  onLaunchTool,
+  query,
+}: {
+  phase: PaletteDiscoveryPhase;
+  rows: readonly PaletteToolRow[];
+  note?: string;
+  prose?: string;
+  launchNote?: string;
+  onLaunchTool?: (row: PaletteToolRow) => void;
+  query: string;
+}) {
+  const q = query.trim().toLowerCase();
+  const shown = q
+    ? rows.filter(
+        (row) =>
+          row.name.toLowerCase().includes(q) || row.title.toLowerCase().includes(q),
+      )
+    : rows;
+  const emptyMatch = q.length > 0 && rows.length > 0 && shown.length === 0;
+  return (
+    <div className="border-t border-line px-2 py-1.5" data-tools-section>
+      <p className="px-2 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
+        工具名册
+      </p>
+      {phase === "pending" ? (
+        <p className="px-2 py-1.5 text-[12px] text-ink-3">正在读取名册…</p>
+      ) : null}
+      {phase === "nohost" ? (
+        <p className="px-2 py-1.5 text-[12px] text-ink-3">
+          没接到宿主：tools.list 没有送达，名册未判，不画假行
+        </p>
+      ) : null}
+      {phase === "refused" || phase === "no-payload" || phase === "payload-error" ? (
+        <p className="px-2 py-1.5 text-[12px] leading-[1.6] text-ink-3" data-tool-refusal>
+          {note}
+        </p>
+      ) : null}
+      {phase === "roster" && prose !== "" ? (
+        <p className="px-2 py-1 text-[11px] text-ink-3">{prose}</p>
+      ) : null}
+      {phase === "roster" && emptyMatch ? (
+        <p className="px-2 py-1.5 text-[12px] text-ink-3">名册里没有匹配的工具</p>
+      ) : null}
+      {phase === "roster"
+        ? shown.map((row) => (
+            <div
+              className="flex items-center gap-2 rounded-[6px] px-2 py-1"
+              data-tool-row
+              key={row.name}
+            >
+              <RiskPill pill={row.riskPill} />
+              <span className="shrink-0 font-mono text-[12.5px] text-ink">{row.name}</span>
+              <span className="min-w-0 flex-1 truncate text-[12px] text-ink-2" title={row.title}>
+                {row.title}
+              </span>
+              {row.argSummary ? (
+                <span
+                  className="hidden shrink-0 text-[11px] text-ink-3 sm:inline"
+                  title={row.argSummary}
+                >
+                  {row.argSummary}
+                </span>
+              ) : null}
+              <button
+                aria-label={`启动工具 ${row.name}`}
+                className="shrink-0 rounded-control border border-line px-2 py-0.5 text-[11px] text-ink-2 transition-colors duration-100 hover:bg-hover hover:text-ink"
+                data-launch-tool
+                onClick={() => onLaunchTool?.(row)}
+                type="button"
+              >
+                启动
+              </button>
+            </div>
+          ))
+        : null}
+      {launchNote ? (
+        <p className="px-2 py-1 text-[11px] leading-[1.6] text-ink-2" data-launch-note>
+          {launchNote}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** The rules.force section body (ticket 38 AC#5): the effective rules and
+    the next-prompt mode, READ-ONLY, plus the per-task chip whose two words
+    leave through the send row's own envelope (panel.message.send's forceMode
+    payload - never a route of its own). */
+function ForceRulesSection({
+  phase,
+  view,
+  note,
+  chip,
+  onChipChange,
+}: {
+  phase: PaletteDiscoveryPhase;
+  view?: PaletteForceView;
+  note?: string;
+  chip: PaletteForceChip;
+  onChipChange?: (next: PaletteForceChip) => void;
+}) {
+  const modeWord =
+    view?.mode === undefined ? "未判" : view.mode === "" ? "默认（无强制）" : view.mode;
+  const sourceWord = view?.source === undefined ? "未判" : view.source;
+  const pattern = view?.pattern ?? "";
+  const rules = view?.rules ?? [];
+  return (
+    <div className="border-t border-line px-3.5 py-2" data-force-section>
+      <p className="pb-1 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
+        模式强制
+      </p>
+      {phase === "pending" ? (
+        <p className="text-[12px] text-ink-3">正在读取 force 规则…</p>
+      ) : null}
+      {phase === "nohost" ? (
+        <p className="text-[12px] text-ink-3">没接到宿主：rules.force 没有送达，规则未判</p>
+      ) : null}
+      {phase === "refused" || phase === "no-payload" || phase === "payload-error" ? (
+        <p className="text-[12px] leading-[1.6] text-ink-3" data-force-refusal>
+          {note}
+        </p>
+      ) : null}
+      {phase === "view" ? (
+        <>
+          {/* The next-prompt reading, off the payload's own words: mode and
+              source verbatim, pattern only when the payload carried one. */}
+          <p className="text-[12px] leading-[1.6] text-ink-2" data-force-next>
+            下一 prompt 采用 {modeWord}（来源 {sourceWord}
+            {pattern !== "" ? `，命中 ${pattern}` : ""}）
+          </p>
+          {view?.instruction ? (
+            <p className="pt-0.5 text-[11px] leading-[1.6] text-ink-3" data-force-instruction>
+              {view.instruction}
+            </p>
+          ) : null}
+          <div className="pt-1" data-force-rules>
+            {rules.length === 0 ? (
+              <p className="text-[11px] text-ink-3">无登记规则</p>
+            ) : (
+              rules.map((rule, index) => (
+                <p
+                  className="flex items-baseline gap-2 text-[11.5px] leading-[1.6]"
+                  data-force-rule
+                  key={`${rule.source ?? "unjudged"}-${rule.pattern ?? index}-${rule.mode ?? ""}-${index}`}
+                >
+                  <span className="shrink-0 text-ink-3" data-rule-source>
+                    {rule.source ?? "未判"}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-ink-2" title={rule.pattern ?? ""}>
+                    {rule.pattern ?? "未判"}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-ink-3" data-rule-mode>
+                    {rule.mode ?? "未判"}
+                  </span>
+                </p>
+              ))
+            )}
+          </div>
+        </>
+      ) : null}
+      {/* The per-task chip: two forced states + off. Selecting one changes
+          nothing on the host - the word rides the NEXT send's envelope and
+          the Go side's admitTask consumes it there. */}
+      <div aria-label="本条任务的强制档" className="flex flex-wrap items-center gap-1.5 pt-1.5" data-force-chip role="group">
+        <span className="text-[11px] text-ink-3">本条任务发送时：</span>
+        {(
+          [
+            ["", "默认"],
+            ["force_tool", "强制工具"],
+            ["force_chat", "强制对话"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            aria-pressed={chip === value}
+            className={cn(
+              "rounded-control border px-2 py-0.5 text-[11px] transition-colors duration-100",
+              chip === value
+                ? "border-accent/40 bg-accent-tint text-accent-ink"
+                : "border-line text-ink-2 hover:bg-hover hover:text-ink",
+            )}
+            data-force-chip-option={value === "" ? "off" : value}
+            key={value === "" ? "off" : value}
+            onClick={() => onChipChange?.(value)}
+            type="button"
+          >
+            {label}
+          </button>
+        ))}
+        <span className="text-[10.5px] text-ink-3">
+          搭 panel.message.send 的 forceMode 顺封套，Go 侧 admitTask 消费
+        </span>
+      </div>
+    </div>
+  );
 }
 
 /* The palette's whole key vocabulary as one pure decision (ticket 38 AC#6).
@@ -182,6 +497,17 @@ export function PaletteScreen({
   onSelect,
   roster = [],
   notes = [],
+  toolsPhase,
+  toolsRows = [],
+  toolsProse,
+  toolsNote,
+  launchNote,
+  onLaunchTool,
+  forcePhase,
+  forceView,
+  forceNote,
+  forceChip = "",
+  onForceChipChange,
 }: {
   query: string;
   onQueryChange: (next: string) => void;
@@ -198,6 +524,29 @@ export function PaletteScreen({
       Each names its missing engine; none is clickable, none is a status the
       page invented. */
   notes?: readonly PaletteNote[];
+  /** Readface wave 3 (ticket 38 AC#3): the tools.list feed's phase. Undefined
+      = the section is not mounted (the pre-wave shape every older instrument
+      renders). The rows are the parsed payload verbatim; note carries the
+      refusal/error sentence verbatim for the non-roster phases. */
+  toolsPhase?: PaletteDiscoveryPhase;
+  toolsRows?: readonly PaletteToolRow[];
+  toolsProse?: string;
+  toolsNote?: string;
+  /** The last tool.launch receipt or refusal, verbatim - the launch does not
+      wait for a card or a result, so this line is the whole answer. */
+  launchNote?: string;
+  /** The launch key's one wire call (lib/panel requestToolLaunch). Omitting
+      it leaves the rows readable but unlaunchable - never a fake launch. */
+  onLaunchTool?: (row: PaletteToolRow) => void;
+  /** Readface wave 3 (ticket 38 AC#5): the rules.force feed's phase and its
+      parsed view. Undefined = the section is not mounted. */
+  forcePhase?: PaletteDiscoveryPhase;
+  forceView?: PaletteForceView;
+  forceNote?: string;
+  /** The per-task chip's current word ("" = off). The palette owns no state:
+      the value lives in the owner's view preference and rides the NEXT send. */
+  forceChip?: PaletteForceChip;
+  onForceChipChange?: (next: PaletteForceChip) => void;
 }) {
   const q = query.trim().toLowerCase();
   const shown = groups
@@ -475,6 +824,35 @@ export function PaletteScreen({
               ))
             )}
           </div>
+        ) : null}
+
+        {/* The tool discovery face (ticket 38 AC#3): rows off tools.list with
+            the wire's own risk pill, launch keys through the real door. Not
+            mounted until the owner feeds a phase. */}
+        {toolsPhase !== undefined ? (
+          <ToolRosterSection
+            launchNote={launchNote}
+            note={toolsNote}
+            onLaunchTool={onLaunchTool}
+            phase={toolsPhase}
+            prose={toolsProse}
+            query={query}
+            rows={toolsRows}
+          />
+        ) : null}
+
+        {/* The force-rules read + the per-task chip (ticket 38 AC#5):
+            read-only view off rules.force, the chip riding the send
+            envelope's forceMode key. Not mounted until the owner feeds a
+            phase. */}
+        {forcePhase !== undefined ? (
+          <ForceRulesSection
+            chip={forceChip}
+            note={forceNote}
+            onChipChange={onForceChipChange}
+            phase={forcePhase}
+            view={forceView}
+          />
         ) : null}
 
         {/* the palette's dormancy sentences: what is NOT wired and which

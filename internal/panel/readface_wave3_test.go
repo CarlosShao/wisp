@@ -180,19 +180,25 @@ func TestWave3SelectorsAreSelectorShaped(t *testing.T) {
 	}
 }
 
-// TestWave3PageGapLedgerRegistersTheThreeNames keeps the registration honest:
-// every wave-3 entry must name its reason (an empty reason is a silent
-// exemption) and the ledger must hold exactly the three names this wave owes
-// the page.
-func TestWave3PageGapLedgerRegistersTheThreeNames(t *testing.T) {
+// TestWave3PageGapEntriesLeftWithThePageLiterals is the both-ways rule run in
+// the consume wave's direction. Re-adjudicated 2026-11-17 (same day, page
+// half leg): the original pin demanded the three entries be REGISTERED while
+// the page half was pending (the Go-only wave's honest shape) - but the page
+// literal half landed in panel.ts the same day (requestToolsList /
+// requestToolLaunch / requestRulesForce, plus sendMessage's forceMode payload
+// key), and rosterPageGapLedger194's own both-ways audit makes a registration
+// the page carries a STALE one: the ledger is a bridge, not a home for the
+// name. So the entries must have left bridge_test.go in the same commit, and
+// this test now pins that departure: a wave-3 name re-registered after its
+// page literal landed is red, and the ordinary ticket-114 AC#8 mirror gate
+// judges the names from here on. Nothing loosened - the pin moved with the
+// truth, exactly the re-adjudication the wave-2 consume commit made to the
+// palette's cancel-dormancy note.
+func TestWave3PageGapEntriesLeftWithThePageLiterals(t *testing.T) {
 	for _, name := range []string{MethodToolsList, MethodToolLaunch, MethodRulesForce} {
 		why, ok := rosterPageGapLedger194[name]
-		if !ok {
-			t.Errorf("%q is not registered in rosterPageGapLedger194: an unmirrored pending name must be registered with its reason, not left to the original rule", name)
-			continue
-		}
-		if strings.TrimSpace(why) == "" {
-			t.Errorf("%q is registered with an empty reason - the ledger is a bridge, not a silent exemption", name)
+		if ok {
+			t.Errorf("%q is still registered in rosterPageGapLedger194 (%s) but the page literal landed in panel.ts: a stale registration is the both-ways audit's red - delete the entry in the commit that spells the literal, never keep the ledger as a home for the name", name, why)
 		}
 	}
 }

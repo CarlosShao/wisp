@@ -807,9 +807,21 @@ export function submitAttachment(file: File): Promise<void> {
   });
 }
 
-/** Send one composed message: text plus the references native accepted. */
-export function sendMessage(text: string, attachments: ComposerAttachment[]): void {
-  sendRequest("panel.message.send", { text, attachments });
+/** Send one composed message: text plus the references native accepted.
+    forceMode is readface wave 3's per-task override chip (ticket 38 AC#5):
+    D11③'s own two words "force_tool" | "force_chat", riding the SAME
+    panel.message.send envelope as a payload key - never a second route. The
+    Go side judges the word (an unknown one refuses the whole message) and
+    stages it for the task this message starts (admitTask consumes it); an
+    omitted/empty chip sends the envelope byte-identically to its pre-chip
+    shape, so the composer's own call sites never grow a force word. */
+export function sendMessage(text: string, attachments: ComposerAttachment[], forceMode?: string): void {
+  const chip = typeof forceMode === "string" ? forceMode.trim() : "";
+  if (chip === "") {
+    sendRequest("panel.message.send", { text, attachments });
+    return;
+  }
+  sendRequest("panel.message.send", { text, attachments, forceMode: chip });
 }
 
 function toBase64(buf: ArrayBuffer): string {
@@ -1073,5 +1085,122 @@ export function requestRosterCancel(taskId: string): Promise<string | null> {
     source: "panel-composer",
     rosterTaskId: taskId,
     privacyConfirmed: true,
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Readface wave 3 doors (2026-11-17, ticket 38 AC#3 / AC#5)
+   --------------------------------------------------------------------------
+   Three doors answered over the SAME settings envelope above
+   (internal/panel/bridge.go's MethodToolsList / MethodToolLaunch /
+   MethodRulesForce, routed by composer_dispatch.go, answered by
+   cmd/wisp/panel_tools_discovery.go). The three literals below are the half
+   bridge.go's page-gap ledger (rosterPageGapLedger194 in bridge_test.go)
+   registered as pending when the Go-only wave landed; all three entries are
+   deleted in the same commit that spells these literals, per that ledger's
+   own both-ways rule.
+
+   tools.list is a PURE READ: the installed tool roster, one row per
+   registry entry with name/title/riskPill/argSummary verbatim off
+   internal/panel/discovery_force_w3.go's ToolRosterRow. The risk pill is the
+   registry's own declared level rendered by internal/risk's vocabulary - the
+   page renders the WORD it receives and never maps a level of its own.
+
+   tool.launch is the launch door, and the page treats it as what it is: the
+   request hands the invocation to the host's own task path, where the ONE
+   agent.ToolRequest construction point dispatches it through the real bridge
+   gate (C19 judge, permission-mode screen, route). Whether an L2
+   confirmation card appears is the gate's decision alone - this page never
+   predicts a verdict, never gates the button on the pill, and carries no
+   allow vocabulary anywhere.
+
+   rules.force is the force-rules read: the effective force_tool/force_chat
+   rules with their source (override/toml/default) and the mode the NEXT
+   prompt will adopt for the requested task text. The override WRITE does not
+   ride this door - it rides panel.message.send's own payload (the forceMode
+   key sendMessage above carries), consumed by the Go side's admitTask.
+   -------------------------------------------------------------------------- */
+
+/** One tools.list row as the door's payload carries it
+    (internal/panel/discovery_force_w3.go ToolRosterRow's JSON tags,
+    verbatim). riskPill is the level word internal/risk's Level.String()
+    renders ("L0" | "L1" | "L2" | "Deny") and is shown verbatim; the field is
+    typed OPTIONAL on purpose - a payload that arrives without it renders
+    未判, never a level this page guessed. argSummary is the tool's JSON
+    Schema top-level property names ("无参数" when it takes none). */
+export interface ToolRosterRowView {
+  name: string;
+  title: string;
+  riskPill?: string;
+  argSummary?: string;
+}
+
+/** One effective force rule row (internal/panel/discovery_force_w3.go
+    ForceRuleRow, verbatim). source is "toml" (a [[force_rule]] row) or
+    "override" (the palette chip; pattern carries the task id it rode); mode
+    is D11③'s own two words. The face reports; it never ranks. */
+export interface ForceRuleRowView {
+  source: string;
+  pattern: string;
+  mode: string;
+}
+
+/** The rules.force payload (internal/panel/discovery_force_w3.go
+    ForceRulesView, verbatim): the effective rules plus the mode the NEXT
+    prompt will adopt for the requested task text - the same ForceDecision
+    the prompt injection consumed, so the face and the next prompt cannot
+    disagree. mode "" (or absent) is the default: no force, no injected
+    instruction. source is "override" | "toml" | "default"; a payload that
+    arrives without it renders 未判, never an invented source. */
+export interface ForceRulesViewView {
+  mode?: string;
+  source?: string;
+  pattern?: string;
+  instruction?: string;
+  rules?: ForceRuleRowView[];
+}
+
+/** Ask the host for the installed tool roster (tools.list). The reply is
+    prose plus one line starting with the wisp-tools-list marker; parse it
+    with parseToolsListReply (lib/tools-discovery-view.ts). A machine with no
+    task pipeline refuses the read by name - the refusal sentence is what the
+    page shows, never an empty roster dressed up as an answer. */
+export function requestToolsList(): Promise<string | null> {
+  return requestHostAnswer({
+    method: "tools.list",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+  });
+}
+
+/** Ask the host to launch ONE roster tool (tool.launch): toolName is the
+    roster row's own name echoed verbatim (tools.list is the only launch
+    menu - the Go door refuses a name the registry does not hold). The reply
+    is the receipt sentence; it does NOT wait for a card or a result. Whether
+    the call raises the real L2 card is the gate's own decision on the host's
+    own path - this page adds no verdict, no allow, and no pre-judged pill
+    gate on the button that sends this request. */
+export function requestToolLaunch(toolName: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "tool.launch",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    toolName,
+  });
+}
+
+/** Ask the host for the effective force rules (rules.force). forceTask is
+    the task text the "next prompt" reading is computed against (the palette
+    sends the text the user is about to send); the reply is prose plus one
+    line starting with the wisp-rules-force marker; parse it with
+    parseRulesForceReply (lib/tools-discovery-view.ts). This door CHANGES
+    nothing - staging the override happens through panel.message.send's
+    forceMode payload, never here. */
+export function requestRulesForce(forceTask: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "rules.force",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    forceTask,
   });
 }

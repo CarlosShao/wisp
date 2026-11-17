@@ -45,10 +45,14 @@ import { HistoryBrowser } from "@/components/history-page";
 import { MonitorPopover, type MonitorAgentRow } from "@/components/harness/monitor-popover";
 import {
   PaletteScreen,
+  type PaletteDiscoveryPhase,
+  type PaletteForceChip,
+  type PaletteForceView,
   type PaletteGroup,
   type PaletteItem,
   type PaletteNote,
   type PaletteRosterRow,
+  type PaletteToolRow,
 } from "@/components/palette-screen";
 import { LineSidebar } from "@/components/react-bits/line-sidebar";
 import { ResultHistory } from "@/components/result-history";
@@ -57,7 +61,18 @@ import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
-import { requestHistoryPage, requestRosterCancel, sendMessage } from "@/lib/panel";
+import {
+  parseRulesForceReply,
+  parseToolsListReply,
+} from "@/lib/tools-discovery-view";
+import {
+  requestHistoryPage,
+  requestRosterCancel,
+  requestRulesForce,
+  requestToolLaunch,
+  requestToolsList,
+  sendMessage,
+} from "@/lib/panel";
 import { TIER_NAMES as libTierNames } from "@/lib/tier-names";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
@@ -189,6 +204,19 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         the LIST's data lives in the browser's own state fed by
         history.page, never cached here. */
     historyOpen: boolean;
+    /** Readface wave 3 (2026-11-17, ticket 38 AC#3/AC#5): the palette's two
+        read faces and the per-task chip. All ephemeral view preference -
+        the tools.list / rules.force data is refetched every open, never
+        cached across one; the chip's word dies with the document. */
+    paletteToolsPhase: PaletteDiscoveryPhase;
+    paletteToolsRows: PaletteToolRow[];
+    paletteToolsProse: string;
+    paletteToolsNote: string;
+    paletteLaunchNote: string;
+    paletteForcePhase: PaletteDiscoveryPhase;
+    paletteForceView?: PaletteForceView;
+    paletteForceNote: string;
+    paletteForceChip: PaletteForceChip;
     sessionId: string | null;
     activeTurn: string | null;
   }>({
@@ -202,6 +230,14 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     paletteQuery: "",
     paletteError: "",
     historyOpen: false,
+    paletteToolsPhase: "pending",
+    paletteToolsRows: [],
+    paletteToolsProse: "",
+    paletteToolsNote: "",
+    paletteLaunchNote: "",
+    paletteForcePhase: "pending",
+    paletteForceNote: "",
+    paletteForceChip: "",
     sessionId: null,
     activeTurn: null,
   });
@@ -264,7 +300,17 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         if (!local.paletteOpen) rememberPaletteReturnFocus();
-        setLocal((c) => ({ ...c, paletteOpen: !c.paletteOpen }));
+        setLocal((c) => ({
+          ...c,
+          paletteOpen: !c.paletteOpen,
+          // Readface wave 3: reopening refetches both read faces - reset the
+          // phases here (an event handler, not a cascading effect), so the
+          // sections say 正在读取 instead of showing the previous open's
+          // data for a tick.
+          paletteToolsPhase: "pending",
+          paletteForcePhase: "pending",
+          paletteLaunchNote: "",
+        }));
         return;
       }
       if (event.key === "Tab" && local.paletteOpen) {
@@ -310,6 +356,63 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     paletteReturnFocusRef.current = null;
     back.focus();
   }, [local.paletteOpen]);
+
+  /* ---------------------------------------------------------------------------
+     Readface wave 3 (ticket 38 AC#3/AC#5): the palette's two read faces.
+     Every open refetches both doors through lib/panel's own wire functions -
+     nothing is cached across an open, and a null reply (no host attached)
+     lands as the section's own nohost line, never an empty roster dressed up
+     as an answer. The force read rides the CURRENT query: rules.force's
+     "next prompt" reading is computed against the task text the user is
+     about to send, so it re-reads as the query moves (a seq ref keeps a
+     slow reply from overwriting a fresh one).
+     --------------------------------------------------------------------------- */
+  const toolsReqRef = useRef(0);
+  const forceReqRef = useRef(0);
+  useEffect(() => {
+    if (!local.paletteOpen) return;
+    const seq = ++toolsReqRef.current;
+    requestToolsList().then((reply) => {
+      if (seq !== toolsReqRef.current) return;
+      if (reply === null) {
+        setLocal((c) => ({ ...c, paletteToolsPhase: "nohost", paletteToolsRows: [], paletteToolsProse: "", paletteToolsNote: "" }));
+        return;
+      }
+      const state = parseToolsListReply(reply);
+      if (state.phase === "roster") {
+        setLocal((c) => ({
+          ...c,
+          paletteToolsPhase: "roster",
+          paletteToolsRows: state.rows,
+          paletteToolsProse: state.prose,
+          paletteToolsNote: "",
+        }));
+      } else if (state.phase === "payload-error") {
+        setLocal((c) => ({ ...c, paletteToolsPhase: "payload-error", paletteToolsRows: [], paletteToolsProse: "", paletteToolsNote: state.message }));
+      } else {
+        setLocal((c) => ({ ...c, paletteToolsPhase: state.phase, paletteToolsRows: [], paletteToolsProse: "", paletteToolsNote: state.raw }));
+      }
+    });
+  }, [local.paletteOpen]);
+  useEffect(() => {
+    if (!local.paletteOpen) return;
+    const seq = ++forceReqRef.current;
+    requestRulesForce(local.paletteQuery).then((reply) => {
+      if (seq !== forceReqRef.current) return;
+      if (reply === null) {
+        setLocal((c) => ({ ...c, paletteForcePhase: "nohost", paletteForceView: undefined, paletteForceNote: "" }));
+        return;
+      }
+      const state = parseRulesForceReply(reply);
+      if (state.phase === "view") {
+        setLocal((c) => ({ ...c, paletteForcePhase: "view", paletteForceView: state.view, paletteForceNote: "" }));
+      } else if (state.phase === "payload-error") {
+        setLocal((c) => ({ ...c, paletteForcePhase: "payload-error", paletteForceView: undefined, paletteForceNote: state.message }));
+      } else {
+        setLocal((c) => ({ ...c, paletteForcePhase: state.phase, paletteForceView: undefined, paletteForceNote: state.raw }));
+      }
+    });
+  }, [local.paletteOpen, local.paletteQuery]);
 
   function toggleTheme() {
     const next = !local.dark;
@@ -384,33 +487,53 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         "走 roster.cancel（internal/panel/bridge.go 的取消门，票 38 AC#4）：任务监控浮层的每一行有停止键，先确认再取消；回执逐字上屏，已落地步骤读数走 history.page 的取证行。",
     },
     {
-      word: "模式强制 未接线",
+      // Readface wave 3 (2026-11-17): the force doors landed on the C17
+      // roster (internal/panel/bridge.go's MethodRulesForce, ticket 38
+      // AC#5's Go half), so this is no longer dormant - the read face
+      // reports the effective rules and the chip rides the send envelope.
+      word: "模式强制 已接线",
       reason:
-        "D11③ force_tool/force_chat 规则表未实现（DEFERRED(D11-3)，internal/agent/control.go:13-15）：快照无读取面，C17 无写入路由",
+        "走 rules.force（internal/panel/bridge.go 的 force 规则门，票 38 AC#5）：本面板只读显示生效规则＋来源（override/toml/default）＋下一 prompt 采用 mode；per-task 覆盖搭 panel.message.send 的 forceMode 顺封套，由 Go 侧 admitTask 消费——本页不预判档位、不置 allow。",
     },
     {
+      // Readface wave 3 (2026-11-17): the discovery face landed too - the
+      // palette's 工具名册 section reads tools.list and its launch keys go
+      // through tool.launch, the real gate. The Tier-2 plugin inventory
+      // keeps its own composer plus-menu face (snapshot.plugins).
       word: "第三方工具清单",
       reason:
-        "走 composer 加号菜单的插件清单（snapshot.plugins，internal/panel/plugins_inventory_215.go 的读取面，composer-row.tsx 已接）",
+        "内置工具走本面板的工具名册（tools.list 只读名册＋tool.launch 真门，票 38 AC#3）；Tier-2 插件清单走 composer 加号菜单（snapshot.plugins，internal/panel/plugins_inventory_215.go 的读取面，composer-row.tsx 已接）",
     },
   );
 
   // The palette's one execution face. Everything except "send" is a view
   // preference this document owns; "send" is the single bridge request, and
   // its failure lands on the palette's error line instead of vanishing.
+  // Readface wave 3 (ticket 38 AC#5): the per-task chip's word rides the
+  // SAME panel.message.send envelope as the forceMode payload key when one
+  // is selected; off sends the envelope byte-identically to its pre-chip
+  // shape. The Go side judges the word and consumes it at admission - this
+  // page never stages, clears or reads back an override.
   function runPaletteItem(item: PaletteItem) {
     switch (item.action) {
       case "send": {
         const body = paletteQueryTrim;
         if (body === "") return;
         try {
-          sendMessage(body, []);
+          if (local.paletteForceChip === "") {
+            sendMessage(body, []);
+          } else {
+            sendMessage(body, [], local.paletteForceChip);
+          }
         } catch (err) {
           const detail = err instanceof Error ? err.message : String(err);
           setLocal((c) => ({ ...c, paletteError: `消息没有发出去：${detail}` }));
           return;
         }
-        setLocal((c) => ({ ...c, paletteOpen: false, paletteQuery: "", paletteError: "" }));
+        // The chip is per task: it applied to THIS send (the Go side's
+        // admitTask consumed it there), so it resets instead of leaking
+        // into whatever the user types next.
+        setLocal((c) => ({ ...c, paletteOpen: false, paletteQuery: "", paletteError: "", paletteForceChip: "" }));
         return;
       }
       case "settings":
@@ -433,6 +556,17 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
       default:
         return;
     }
+  }
+
+  // Readface wave 3 (ticket 38 AC#3): the tool row's launch key. The page
+  // sends tool.launch through lib/panel's ONE wire function and shows the
+  // receipt or refusal verbatim; whether an L2 confirmation card appears is
+  // the gate's decision on the host's own path - the pill never gates this
+  // button, no verdict is predicted, and no allow vocabulary rides along.
+  function launchTool(row: PaletteToolRow) {
+    requestToolLaunch(row.name).then((reply) => {
+      setLocal((c) => ({ ...c, paletteLaunchNote: reply ?? "没接到宿主：tool.launch 没有送达，工具未被触碰" }));
+    });
   }
 
   return (
@@ -549,7 +683,17 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               // The button is the second open path; whoever used it gets
               // focus back on close (AC#6), same as the Ctrl+K path.
               if (!local.paletteOpen) rememberPaletteReturnFocus();
-              setLocal((c) => ({ ...c, paletteOpen: !c.paletteOpen }));
+              setLocal((c) => ({
+                ...c,
+                paletteOpen: !c.paletteOpen,
+                // Readface wave 3: reopening refetches both read faces -
+                // reset the phases here (an event handler, not a cascading
+                // effect), so the sections say 正在读取 instead of showing
+                // the previous open's data for a tick.
+                paletteToolsPhase: "pending",
+                paletteForcePhase: "pending",
+                paletteLaunchNote: "",
+              }));
             }}
             title="命令面板"
           >
@@ -692,12 +836,23 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               </p>
             ) : null}
             <PaletteScreen
+              forceChip={local.paletteForceChip}
+              forceNote={local.paletteForceNote}
+              forcePhase={local.paletteForcePhase}
+              forceView={local.paletteForceView}
               groups={paletteGroups}
+              launchNote={local.paletteLaunchNote}
               notes={paletteNotes}
+              onForceChipChange={(next) => setLocal((c) => ({ ...c, paletteForceChip: next }))}
+              onLaunchTool={launchTool}
               onQueryChange={(next) => setLocal((c) => ({ ...c, paletteQuery: next, paletteError: "" }))}
               onSelect={runPaletteItem}
               query={local.paletteQuery}
               roster={paletteRoster}
+              toolsNote={local.paletteToolsNote}
+              toolsPhase={local.paletteToolsPhase}
+              toolsProse={local.paletteToolsProse}
+              toolsRows={local.paletteToolsRows}
             />
           </div>
         </div>

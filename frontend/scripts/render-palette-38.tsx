@@ -192,6 +192,24 @@ check("Escape must close the palette", appSrc.includes("paletteOpen: false"));
 // real door into the task monitor's cancel flow - a stronger pin, not a
 // loosened one (the gate itself is pinned tooth-by-tooth by
 // render:taskcard38).
+// Re-adjudicated 2026-11-17 twice (the consume waves move these pins with
+// the truth, never loosen them):
+//   - the cancel note (consume wave 2): roster.cancel landed on the C17
+//     roster (internal/panel/bridge.go's MethodRosterCancel, ticket 38
+//     AC#4's Go half, commit 3a62bed97), so the note must say the door
+//     LANDED and name it, and App must bind the real door into the task
+//     monitor's cancel flow.
+//   - the force note (consume wave 3): rules.force landed on the C17 roster
+//     (ticket 38 AC#5's Go half, commit c25c3086d) and the page half landed
+//     the same day - the read face reports the effective rules with their
+//     source, and the per-task chip's two words ride panel.message.send's
+//     forceMode payload key (the Go side's admitTask consumes it there). The
+//     old dormancy pin ("DEFERRED(D11-3)", the missing read face) pinned a
+//     fact that is no longer true; the note must now say the doors LANDED,
+//     name rules.force, and App must bind the real read through lib/panel's
+//     own wire functions - a stronger pin, not a loosened one (the face's
+//     rendering is pinned tooth-by-tooth by render:forcechip38 and the
+//     discovery face by render:discovery38).
 check(
   "the cancel note must say the door landed and name it (roster.cancel; the monitor carries the real gate)",
   appSrc.includes("取消任务 已接线") &&
@@ -199,8 +217,13 @@ check(
     appSrc.includes("cancelDoors={{ cancelTask: requestRosterCancel, historyLoad: requestHistoryPage }}"),
 );
 check(
-  "the force-rule dormancy note must name DEFERRED(D11-3) and its file",
-  appSrc.includes("DEFERRED(D11-3)") && appSrc.includes("internal/agent/control.go"),
+  "the force note must say the doors landed and name them (rules.force read + forceMode payload; the chip rides the send envelope)",
+  appSrc.includes("模式强制 已接线") &&
+    appSrc.includes("rules.force") &&
+    appSrc.includes("forceMode") &&
+    appSrc.includes("requestRulesForce") &&
+    appSrc.includes("requestToolsList") &&
+    appSrc.includes("requestToolLaunch"),
 );
 check(
   "the commands no-reader note must name the missing reader (PumpSources.Commands)",
@@ -252,6 +275,6 @@ if (failures.length > 0) {
 console.error(
   "render-palette38: OK, ticket 38's palette face consumes the pushed commands roster " +
     "(send row verbatim onto panel.message.send, roster facts round-trip read-only, " +
-    "IME guard + autofocus + arrow/enter keys, cancel/force/roster dormancy notes name " +
-    "their missing engines, no invented started/cost/step dims)",
+    "IME guard + autofocus + arrow/enter keys, the cancel and force notes re-adjudicated " +
+    "to the doors that landed, no invented started/cost/step dims)",
 );
