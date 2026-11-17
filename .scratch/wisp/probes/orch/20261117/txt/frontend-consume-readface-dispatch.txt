@@ -10,3 +10,6 @@ Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。前置：`b1d2162dd` 已
 **串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0＋相关仪器 rc=0；node 在 `D:\work\server\node24`。
 写面：`frontend/src/components/{config-screen,config-editor,cost-settings,approval-screen,approval-queue}.tsx` 及新件、`frontend/scripts/render-*`、`docs/evidence/s1/readface-consume-*`。
 回话第一行＝commit hash ＋五格各自读数/牙名 ＋build/typecheck/lint rc。没干完写「未完成，卡在哪」。
+# 追加单（同 frontend-consume-readface-dispatch.txt 一起发）—— 修 render:security40 的过期断言
+⛔ 忘带这条：`dd52313e1` 把 `security-settings.tsx` 的 grants 假话改成真话后，`frontend/scripts/render-security-cost-40.tsx` 里仍断言**旧假话**（`render-security40: FAIL the grants absence must name the nil grant_id writer`）——**仪器把谎言当真理钉住了**。改成断言**新的真话**：面板无 grants 列表读面、生产在写（`gate.go:859`/`grants.go:201/274`/`bridge.go:1445`）、出口＝console 动词 `grants`/`revoke-grant`；⛔ 不许把断言删掉了事，要正控（真句在⇒绿）＋负控（把句子改回"生产零写入"⇒红）。
+

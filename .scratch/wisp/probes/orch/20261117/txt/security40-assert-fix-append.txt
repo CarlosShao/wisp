@@ -1,0 +1,2 @@
+# 追加单（同 frontend-consume-readface-dispatch.txt 一起发）—— 修 render:security40 的过期断言
+⛔ 忘带这条：`dd52313e1` 把 `security-settings.tsx` 的 grants 假话改成真话后，`frontend/scripts/render-security-cost-40.tsx` 里仍断言**旧假话**（`render-security40: FAIL the grants absence must name the nil grant_id writer`）——**仪器把谎言当真理钉住了**。改成断言**新的真话**：面板无 grants 列表读面、生产在写（`gate.go:859`/`grants.go:201/274`/`bridge.go:1445`）、出口＝console 动词 `grants`/`revoke-grant`；⛔ 不许把断言删掉了事，要正控（真句在⇒绿）＋负控（把句子改回"生产零写入"⇒红）。
