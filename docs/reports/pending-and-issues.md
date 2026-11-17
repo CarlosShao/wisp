@@ -37746,3 +37746,12 @@ resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器�
 dd0c8a04a（腿报 …f60a…，真值 …f80a…——**以后 hash 以 git rev-parse/HEAD 现读为准，⛔ 照抄回话**）。
 我复跑：seeds:self-test rc=0（正控绿＋三枚种子违规各红：hex #0285ff／注释内 emoji U+2713／禁用导入 @/fixtures/harness）；seeds rc=0（104/103/100 分母，0 findings）。
 CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 run id"两半仍待 push 后取。
+
+## A1921（11-17 10:0x）：**五张页对抗验收：成立 8／不成立 0／反向谎言 2**
+
+审计腿（只读，件 docs/evidence/s1/pages5-adversarial-20261117-0953.md）逐条核 8 项全**成立**：成本链路端到端（cost-settings.tsx:117→lib/panel.ts:871-877→panel_cost_194.go:51→cost_handlers.go:86 五字段逐字对）、安全 composer.mode 每包重读、技能清单真喂、徽章推导实参链闭合且 ow.blocked 零命中、**票 36 消毒 46 家族探针 0 存活**（无 rehype-raw／urlTransform 未覆写／无 dangerouslySetInnerHTML）、palette send 到 panel_message_453.go:102、容量 8＝queue.go:130。
+**反向谎言 2 处**（我判：都改文案，不先动 wire）：
+1. security-settings.tsx:58-61「D45 会话授权生产零写入」——**被票 49 证伪**（gate.go:859 Record／grants.go:201/274 InsertGrant／ridge.go:1445）。改真话：生产在写、面板无读面、出口＝console 动词。
+2. cost-settings.tsx:99-103「没有预算读数」——预算判定 Go 侧**已活**（schema.go:608-613／costbudget.go:103／costbook_44.go:147），只是 payload 不带；eadface1 正在补字段。
+**另一处口径差（非脚本执行）**：TIGHT_SCHEMA 未禁协议相对 URL，[x](//evil.example/x) 存活＝**开放重定向面** ⇒ 已派腿收紧＋加负控牙。
+⚠ 审计基线提醒：审计时别的腿在并发改 internal/panel/pump.go（mtime 09:46/09:55/09:58），故行号一律以 git show <被审提交>:<file> 取。**并发下审计必须钉在提交上，⛔ 读漂移的工作树。**
