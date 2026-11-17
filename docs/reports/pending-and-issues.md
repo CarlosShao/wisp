@@ -37797,3 +37797,10 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - **40 AC#3**：成本十字段上屏＋**对账到微单位**牙（1000/1000 true；+1micro false 点名 1001/1000）。
 - **40 AC#4**：预算三态（Go 四子例＋UI 棒只听 state 词、⛔复算百分比）。
 - 顺带：`composer_test.go` ledger 里 `ApprovalCardView` 过期登记同 commit 删（双向规则），复跑绿。fixture 里 `panel.width` 被门禁抓红一次（routeLiteralRe 正常工作），已改占位并在仪器注明。
+## A1928（11-17 12:0x）：**写面撞车事故**——我让两条写腿同时碰 `internal/panel`，隐私腿的 commit 卷进了 wave-2 的半成品
+
+事故：`w40privacy` 的写面里有 `internal/panel/bridge_test.go`＋`bridge.go` 注释，而 `wreadface2` 同时在同一批文件上改。结果 `a79262acd`（隐私页）在 11:57 把 wave-2 在 11:52–11:57 的**未提交** `bridge.go`（`MethodHistoryPage`/`MethodRosterCancel` 常量＋envelope 三字段）一起提交了 ⇒ **当前 HEAD 上 `internal/panel` 两把尺红**（13 名 vs 表 11；ledger 空而 panel.ts 无 `history.page`/`roster.cancel` 字面量），且 wave-2 的 `readface_wave2_test.go` 仍引 `marshalComposerWave2`（未定义，在飞半成品）。
+- **性质**：不是谁的错，是**我违反了自家的写面互斥** —— 规矩写的是“`cmd/wisp/**` 与 `internal/panel/**` 每波只许一枚写腿”，但我把“写面含 `internal/panel` 的前端腿”没算进这条互斥。
+- **新纪律（即刻生效）**：**任何腿（不分前端/Go）只要写面里出现 `internal/panel/**`，就计入那一枚共享编译面的写额；同一波内 ⛔ 两条腿同时碰 `internal/panel/**`。** 派单前先看两条腿的写面清单有没有交集，有交集就串行。
+- **处理**：⛔ 不 reset/amend（append-only）；等 `wreadface2` 自己 commit 落地→回绿后我再复量 `go test ./internal/panel` 与 `Test40Privacy*`，绿了才翻 40 AC#1。
+- **隐私腿自身读数（撞车前绿树）**：`render:privacy40` 我复跑 rc=0（删除收据点名 id、清空报 store 自报计数、导出 records=N）；三件在盘。
