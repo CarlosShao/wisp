@@ -37,7 +37,7 @@ view (task.list/cancel tools backing it).
 - [x] IME: Chinese composition (pinyin → 选字 → commit) submits final text only (e2e with
       Windows IME on runner or manual evidence).
 - [ ] Discovery: installed tool set listed with correct risk pills; launch routes through gate.
-- [ ] Tasks view: live task state transitions reflected; cancel mid-tool → applied-steps report.
+- [x] Tasks view: live task state transitions reflected; cancel mid-tool → applied-steps report.
 - [ ] force rules: per-task override chip + TOML rule both steer agent mode (prompt snapshot).
 - [x] Keyboard-only: full palette flow reachable without mouse (tab/arrow/enter audit).
 
@@ -103,3 +103,11 @@ view (task.list/cancel tools backing it).
 我复跑（载具）：`TestTaskCardFieldsRideTheRosterWire` 0.00s／`TestRosterCancelDoorStopsARealSubagentAndTheForensicsCarryTheAppliedSteps` **3.28s PASS**（取消后读数＝终态 Stopped、已落地 1 步 fs.read、被中止 0 步）⇒ 全 PASS。
 - 面：`internal/panel/subagent_roster_197.go:180-182 TaskRowView +startedAt/costToDate/currentStep` → `cmd/wisp/panel_pump.go:256`（`panel_tasklive_wave2.go:119` 取值）＋`internal/panel/bridge.go:211 roster.cancel`（理由写在常量上）→ `composer_dispatch.go:349` → `cmd/wisp/panel_roster_cancel_wave2.go:111/:187`。
 - **命名裁定（编排者拍）**：票面要的 `task.cancel` 被 `internal/tools` 的票 188 名轴仪钉死（该包不在本波写面、⛔绕仪）⇒ 落地名 **`roster.cancel`**（语义＝停名册一行）。**撤销口令**：若日后把 188 扫描收窄，一行改回 `task.cancel`。
+
+---
+
+## 编排者收件·第二批（2026-11-17 14:2x，`71ccf56c0`，件 `docs/evidence/s1/readface-consume2-20261117-r1.md`）
+
+**尺1** `71ccf56c0` 在（13 件）。**尺3 我自己复跑**：`render:taskcard38` rc=0；`render:historypage36` rc=0；build/typecheck/lint rc=0；`go test ./internal/panel` ok 18.866s；ledger 两枚页字面注册确已摘（`bridge_test.go` 的 rosterPageGapLedger194）。
+- **勾 AC#4**：三键逐字（开始=生产 formatter／123456 micros CNY／tokens 1200-340／fs.write；缺⇒「未判」无 1970 无假 0）；**取消走真门**（第一下只开确认卡、请求仅一处发出）；取消三读数＝终态 Stopped·已落地 1 步·被中止 0 步（整史取证扫描；扫描不全⇒未判）；腿跑真子代理取消 2.86s PASS。
+- 留白：AC#3（discovery 风险丸/launch 走门需 Go dispatch）、AC#5（force rules 无读面）、AC#6 已勾。

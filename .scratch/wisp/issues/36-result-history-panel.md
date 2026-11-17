@@ -82,3 +82,9 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 我复跑（载具）：`TestHistoryPageDoorAnswersTheRealTables` 0.14s／`TestHistoryPageScrollsOneThousandRowsWithoutOverlap` 0.56s（1005 行三窗滚动不重不漏）／`TestHistoryPageRefusesAnUnservableWindowByName` 0.13s ⇒ **全 PASS**。
 - 面：`internal/memory/dao_history_page_36.go:104 HistoryPage`（真表 `task_log`+`tool_call`）→ `internal/panel/bridge.go:175 history.page` → `composer_dispatch.go:344` → `cmd/wisp/panel_history_wave2.go:78`。**Q-50 不影响**：走独立名册方法，`panel.view.request` 不复活的裁定（A238）照守。
 ⇒ 前端 AC#3 只剩"把它画成 1000 行滚动列表＋delete-one/purge/export 三支走既有 privacy 面"。
+
+## 编排者收件（2026-11-17 14:2x，`71ccf56c0`）—— AC#3 **两半验过、不整格勾**（60fps 需真宿主窗）
+
+**尺1** 在。**尺3 我自己复跑**：`render:historypage36` rc=0（1005 行三窗滚动，读数与 Go 测试同）；build/typecheck/lint rc=0。
+- 已证两半：①1005 行**三窗滚动不重不漏**（虚拟切片并集恰全覆盖）②delete-one/purge/export **复用 wave-1 privacy 面**（Go 侧对真 DB 计数已验 5/5）。
+- **不勾的原因（具名）**：AC#3 头一句是「1000-row fixture scrolls at **60fps**」—— 60fps 需**真宿主窗**测帧（与票 77 AC#1/AC#8 同类环境边界），仪器环境测不出真帧率，⛔ 不造假读数。⇒ 留给真窗口签收时一并勾。

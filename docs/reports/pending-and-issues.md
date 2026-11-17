@@ -37812,3 +37812,9 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - **命名裁定**：`task.cancel` 撞票 188 冻结名轴仪 ⇒ 落地 `roster.cancel`（撤销口令：188 收窄后一行改回）。
 - 载具实测：wave2 五枚 + 40 privacy 五枚 全 PASS；d22scan clean（腿报）。
 - 40 **AC#1 勾**（三支 e2e 计数对真 DB＋UI 三按钮＋清空确认卡＋拒绝句逐字，均我复跑）。
+## A1930（11-17 14:2x）：前端消费波2 落地 `71ccf56c0` —— 38 AC#4 勾；36 AC#3 两半证、60fps 留真窗
+
+我复跑：render:historypage36 / render:taskcard38 rc=0；build/typecheck/lint rc=0；internal/panel ok 18.866s；gap ledger 两枚页字面确已摘。
+- 38 AC#4 勾：三键上屏（缺⇒未判无假 0）＋取消真门（只开确认卡）＋三读数（Stopped/已落地 1/中止 0），真子代理取消 2.86s PASS。
+- 36 AC#3 不整勾：1005 行三窗不重不漏＋privacy 三支复用已证；**60fps 需真宿主窗**（同 77 AC#1 边界），⛔ 造假帧率。
+- 腿如实报偏差：ledger 真身是 `bridge_test.go`（派单写作 composer_test.go）；package.json 加两行仪器脚本（否则仪器无法按名复跑）。
