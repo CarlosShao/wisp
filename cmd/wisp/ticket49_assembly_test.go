@@ -450,7 +450,7 @@ func TestTicket49AssembledTargetBindingDowngradesAndIsolates(t *testing.T) {
 			t.Fatalf("isolated call: %v", err)
 		}
 		if cards := rt.windowCount() - before; cards < 1 {
-			t.Errorf("a different target showed %d cards, want at least 1: per-process isolation (Word ≠ 终端)", cards)
+			t.Errorf("a different target showed %d cards, want at least 1: per-process isolation (Word != 终端)", cards)
 		}
 	}
 	if code := h.run("总结一下 这份笔记"); code != 0 {

@@ -169,7 +169,7 @@ func TestTicket49TargetGrantIsPerProcess(t *testing.T) {
 		t.Fatalf("RecordTarget: %v", err)
 	}
 	if _, ok := l.TargetCovering(ctx, "input.type", "cmd.exe"); ok {
-		t.Errorf("a Word grant covered cmd.exe: per-process isolation (Word ≠ 终端) is not holding")
+		t.Errorf("a Word grant covered cmd.exe: per-process isolation (Word != 终端) is not holding")
 	}
 	if _, ok := l.TargetCovering(ctx, "fs.write", "winword.exe"); ok {
 		t.Errorf("a target grant answered for a different tool: the binding is (tool, process), not process alone")

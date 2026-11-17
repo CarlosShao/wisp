@@ -376,7 +376,7 @@ func (s *replySurface) sessionExpand(corr string) (string, error) {
 	s.mu.Unlock()
 	s.record("EXPAND-ARMED", corr, card.Tool, "native/session-expand",
 		fmt.Sprintf("target=%q window=%s", card.TargetProcess, sessionExpandWindow))
-	return "⚠ 危险档："+"本会话内允许向所有应用注入 —— 不再绑定 "+func() string {
+	return "危险档："+"本会话内允许向所有应用注入 —— 不再绑定 "+func() string {
 		if card.TargetProcess == "" {
 			return "任何应用"
 		}
@@ -461,7 +461,12 @@ func (s *replySurface) grantsList() (string, error) {
 		state := "生效中"
 		if g.RevokedAt != nil {
 			state = "已撤销"
-		} else if g.ExpiresAt <= time.Now().Unix() {
+		} else if time.Unix(g.ExpiresAt, 0).Before(time.Now()) {
+			// D42#9：ExpiresAt 落盘于 approval_grant（internal/session/grants.go 的
+			// Record/RecordTarget/recordRow 写库），是跨重启仍有效的绝对过期时刻，
+			// 不是进程内的时长测量 ⇒ D42#9 禁的「wall clock 差值做超时判断」不适用：
+			// 这里没有差值运算，是持久化绝对时刻与当前时刻的 time.Time 比较；
+			// 单调时钟表达不了跨重启的绝对时刻，落盘时间戳按 D42#9 本就该用 wall clock。
 			state = "已过期"
 		}
 		fmt.Fprintf(&b, "  #%d %s「%s」 created=%d state=%s\n",
