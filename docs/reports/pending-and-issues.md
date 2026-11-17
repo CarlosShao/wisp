@@ -37755,3 +37755,9 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 2. cost-settings.tsx:99-103「没有预算读数」——预算判定 Go 侧**已活**（schema.go:608-613／costbudget.go:103／costbook_44.go:147），只是 payload 不带；eadface1 正在补字段。
 **另一处口径差（非脚本执行）**：TIGHT_SCHEMA 未禁协议相对 URL，[x](//evil.example/x) 存活＝**开放重定向面** ⇒ 已派腿收紧＋加负控牙。
 ⚠ 审计基线提醒：审计时别的腿在并发改 internal/panel/pump.go（mtime 09:46/09:55/09:58），故行号一律以 git show <被审提交>:<file> 取。**并发下审计必须钉在提交上，⛔ 读漂移的工作树。**
+## A1922（11-17 10:2x）：两处反向谎言改真话＋36 消毒加两道 href 牙（6 族）
+
+`dd52313e1`。我复跑：`render:history36` rc=0 → **6 XSS families**（原 4＋协议相对 `//evil.example`＋反斜杠形式，均"剥 href 留文本"）；build/typecheck/lint rc=0。
+- `security-settings.tsx:73` 改真话：生产在写（`gate.go:859`/`grants.go:201/274`/`bridge.go:1445`）＋面板无 grants 读面（`panel_inbound_fuzz_35g1_test.go:160` 把 `grants.revoke` 钉成非法名）＋出口＝console 动词（`approval_reply.go:415/:474`）；StateTag 仍「未接线」＝缺的只是读面。
+- `cost-settings.tsx:33/107` 改真话：预算判定 Go 侧已活（`observe/costbudget.go:103`、`agent/costbook_44.go:147`），payload 未带字段前不画任何数字。
+- 根因：hast-util-sanitize v5 `safeProtocol` 对无冒号 URL（双斜杠、反斜杠）直接放行 ⇒ 在 urlTransform 层补最后一道闸（`result-history.tsx:121/:139`）。
