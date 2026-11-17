@@ -37839,3 +37839,11 @@ VPN 断线后死腿半成品经 `wauditfix2` 收口（`22b4568ba`，8 件）。*
 - **空牙补上**：`panel_roster_cancel_wave2_test.go:216` 真断言 `!= statemachine.StateMuted`；腿做变异「返回 true 不真停」⇒ 红（settled state="Settling"），还原⇒绿（终态=Muted）。privacy 门变异「恒 true」⇒ 无位用例红。
 - 前端置位路径逐一核过：purge 位只在确认卡「确认清空」键、roster 取消位只在「确认停止」键；其余请求不带位。
 - ⚠ 工作树仍有**别人的**改动（34-frontend-scaffold.md D、44-costmeter M、composer-states.html M、speech 探针 M）—— 非本编队，未触碰。
+## A1934（11-17 22:4x）：**票 38 结案 6/6**（`a5295e40b` 页半边）
+
+我复跑：render:discovery38/forcechip38/palette38 全 rc=0；build/typecheck/lint rc=0；internal/panel ok 19.902s。
+- AC#3 勾：风险丸逐字＝载荷 riskPill（缺⇒未判）；launch 真门、页不预判不置 allow。
+- AC#5 勾：force 来源三态（toml/override/default）＋下一 prompt mode＋instruction 逐字；chip off 时封套字节不变、不跨任务泄漏。
+- 接受腿的一处偏离：`TestWave3PageGapLedgerRegistersTheThreeNames` 永真断言与双向审计互斥 ⇒ 重裁为"再登记即红"（增强）。
+- ⚠ 遗留小账：`bridge.go:226/242/256` 与 `inbound_roster_253_test.go:90-92` 的 「REGISTERED while pending」注释过期 —— 待有写面的腿顺手更（不影响行为）。
+- **票 38 改名 `-done`**（6/6）。
