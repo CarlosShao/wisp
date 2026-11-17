@@ -76,3 +76,11 @@ revocable live, fully audited — including the input.type target-process bindin
 2. **「revoke-grant 动词」零覆盖**：`cmd/wisp/ticket49_assembly_test.go:184` 注释说走动词，实调 `rt.session.Revoke()`。⇒ 行为牙真、**动词入口没牙**。
 3. **头注释指向不存在的测试**：`cmd/wisp/ticket49_assembly_test.go:13` 写的 `TestTicket49EveryGrantBackedExecutionCarriesGrantID` 全仓无此 func（行为由另外三枚真库 SQL 牙覆盖）。
 **裁定（编队自己拍）**：①票 49 **行为层结**、**动词层不结**；②补两枚小牙（`revoke-grant <编号>` 后下一调用重弹；`grants` 读出行与状态）—— 已排单，等 cmd/wisp 写额；③以上三处更正当场落笔。**撤销口令**：删本节即可复原表述（行为与码一字未改）。
+
+## 编排者收件·动词牙补齐（2026-11-17 11:2x，`3da1f1940`，件 `docs/evidence/s1/49-verbs-impl-20261117.md`）
+
+**尺1** `3da1f1940` 在（4 件：两测试件＋`approval_reply.go` 仅注释＋证据件）。**尺3 我自己复跑**（载具一发，跑前 `wisp.test`=0）：`TestTicket49RevokeGrantVerbPopsTheNextCoveredCallBack` **PASS 42.46s**／`TestTicket49GrantsVerbReadsTheRealRowsFieldByField` **PASS 2.10s** ⇒ **2/2 rc=0**；腿另报 `d22scan` 末行 `OK - control rc=0, scan rc=0`、`go build ./...` rc=0。
+- **牙1**：`revoke-grant <编号>` 走**真动词** `replySurface.handle`（⛔直调 session.Revoke）——负控 grant 生效时同形调用 **0 卡** → 动词撤销后**真弹回 ≥1 卡**；SQL 复核绿行 `grant_id=<行号>`、红行 `grant_id=NULL`。
+- **牙2**：`grants` 走真动词三读——空库**明说 0 行不吞**；两枚真行逐字段（`#id tool「pattern」 created=… state=生效中`）；动词撤销后读 `state=已撤销` 且 `revoked_at` 在 sweep 前已置位（证状态来自真列）。
+- 三处谎话注释已更正为真名（`ticket49_assembly_test.go` 头注释／revoke 格／`approval_reply.go` 两处 VERB TOOTH 注）。
+⇒ **票 49 行为层＋动词层都结**。
