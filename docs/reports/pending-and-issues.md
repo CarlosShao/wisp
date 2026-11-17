@@ -37776,3 +37776,11 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 `approval_reply.go:464` [wallclock-timeout D42#9] ＋ emoji 4 枚（`approval_reply.go:379` ⚠／`ticket49_lifecycle_test.go:172` ≠／`ticket49_limits_test.go:139` 🔒／`ticket49_assembly_test.go:453` ≠）。**已单开 `wd22clean` 清。**
 ⇒ **新纪律：任何 Go 写腿结票前，三把尺之外还必须现跑 `scripts/d22scan.sh` 0 findings；⛔ 只跑测试就翻框。**
 **另一条同类**：`dd52313e1` 把我方假话改真话后，`render:security40` 仪器仍断言**旧假话**（把谎言钉成真理）⇒ 已并入前端单修（要正控＋负控，⛔ 删断言了事）。
+## A1925（11-17 11:0x）：48/49 对抗审计：**有牙 8／空牙 2／反向谎言 3／冲突 0**
+
+审计腿件 `docs/evidence/s1/4849-adversarial-20261117-1052.md`（39KB）。复跑尺：approval ok 6.037s／session ok 5.511s／tools ok 37.873s／memory ok 36.311s／载具 `Test48…|TestTicket49` ok 133.00s（7 枚 PASS）；被审 19 件与 HEAD **blob 逐字节相同**。
+- **48**：0 反向谎言、5 格全绿、牙全在（真注入时钟：300＝`queue.go:125 DefaultApprovalTimeout`、270＝`Timeout()-WarningLead()`；fail-closed 断言答复枚举本身；突变 `queue.go:559 AnswerReject→AnswerAllow` 必红）⇒ 结。
+- **49**：行为层牙硬（撤销走真 SQLite 无缓存、`grants.go:445 RevokedAt!=nil` 判死、审计每行 grant_id 真库两层、taint 走真 risk 链）⇒ 行为结；**动词层空牙 2 枚**（`approval_reply.go:446 grants`／`:477 revoke-grant` 零测试调用，摘掉今天零红）。
+- **三处反向谎言**（全在 49 的记账，非码）：把 224 的 `asked()==0` 记在 49 名下／revoke 注释说动词实调 session／头注释指向不存在的测试名。已就地更正（见票尾「编排者更正」）。
+- **两票冲突 0**（49 是 48 的后代、纯增量；approval 包全绿）。
+**我的裁定**：49 行为结、动词不结；**补两枚动词牙**（已排单，等 cmd/wisp 写额）。撤销口令：删票 49 那条更正节即可复原表述。

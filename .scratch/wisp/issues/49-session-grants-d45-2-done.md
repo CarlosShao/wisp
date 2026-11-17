@@ -67,3 +67,12 @@ revocable live, fully audited — including the input.type target-process bindin
 **六格最硬读数（腿交，我认可为行为型）**：①生命周期＝run 收口后 `approval_grant` 1 行、`revoked_at` 非空＋审计 `SESSION-GRANT-SWEEP revoked=1`；②revoke＝撤前 0 卡＋`grant_id=<行id>`、撤后 ≥1 卡＋`grant_id=NULL`；③limits＝**grant 源全覆盖（Covering/TargetCovering 全 true）下 L2 仍 1 卡、grant 源 0 次被查**；R4 全命中升级无视 grant；mode-silenced `decision=allow、grant_id=NULL` 永不 `allow_session_grant`；④input.type＝`RecordTarget("notepad.exe")` 后 0 卡、换目标重弹、swap guard 执行前重解析不符即拒（原文「目标应用已切换…重新确认」）、all-apps 两步仪式、未展开先答被拒；⑤batch＝10 路径 **1 张卡**→**恰 1 行 `<dir>/*`**；⑥audit SQL＝真库两笔被授权调用**两行 tool_call 各带 `grant_id=31`**，未授权行 NULL。
 **边界（登记入票，非省略）**：面板侧 `grants.list`/`revoke` **入站方法未建** —— banned-root 表禁 Go 入站 grant 路由，操作者出口＝console 动词 `grants`/`revoke-grant <编号>`。⇒ **票 40 AC#2（grants 视图）因此判不了**，已在该票留白节写明。
 ⇒ 6/6，**本票结**；零契约改动、C17 白名单与面板入站路由零触碰。
+---
+
+## 编排者更正（2026-11-17 11:0x，来自对抗审计 `4849-adversarial-20261117-1052.md`）
+
+审计判：**有牙 8／牙是空的 2／反向谎言 3／两票冲突 0**。本节**更正我上面收件里的三处读数归属**（不是行为缺陷，是记账错）：
+1. **「grant 源 0 次被查／Covering+TargetCovering 全答 true」不是我这一枚的断言** —— 那是票 224 的 `internal/tools/grant_test.go:301 TestTicket224SessionGrantNeverCoversL2`（`:325-329` 断言 `grD.asked()==0`）。票 49 的 `TestTicket49L2WithALiveGrantStillShowsTheCard`（`internal/tools/ticket49_limits_test.go:38`）只读 `gate.counts()`，且用的是**只有 Covering** 的 `promiscuousGrantSource{}`。⇒ 结论仍成立（L2 真过 gate 仍弹卡），但**主牙在 224**，此处不再冒充。
+2. **「revoke-grant 动词」零覆盖**：`cmd/wisp/ticket49_assembly_test.go:184` 注释说走动词，实调 `rt.session.Revoke()`。⇒ 行为牙真、**动词入口没牙**。
+3. **头注释指向不存在的测试**：`cmd/wisp/ticket49_assembly_test.go:13` 写的 `TestTicket49EveryGrantBackedExecutionCarriesGrantID` 全仓无此 func（行为由另外三枚真库 SQL 牙覆盖）。
+**裁定（编队自己拍）**：①票 49 **行为层结**、**动词层不结**；②补两枚小牙（`revoke-grant <编号>` 后下一调用重弹；`grants` 读出行与状态）—— 已排单，等 cmd/wisp 写额；③以上三处更正当场落笔。**撤销口令**：删本节即可复原表述（行为与码一字未改）。

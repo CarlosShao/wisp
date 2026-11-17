@@ -1,0 +1,10 @@
+# 派单存档（先存档再发，等 wd22clean 收腿后发）—— 票 49 补两枚「动词牙」（写腿 cmd/wisp 唯一一腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。审计 `4849-adversarial-20261117-1052.md` 判票 49 **动词层空牙**：`cmd/wisp/approval_reply.go:446 grants`／`:477 revoke-grant` 零测试调用。补两枚**行为牙**（⛔源码字符串断言）：
+1. `revoke-grant <编号>` 走**真动词**（`approval_reply.go:477` 分派 `:991-994`）撤销后，下一发同形受门控调用**真弹回卡**（数真 gate 真弹到生产 UI 的卡数，照 `ticket49_assembly_test.go:186` 的 `rt.windowCount()/shown()` 形状）；负控：不撤则该调用 0 卡。
+2. `grants` 动词（`:446`／`:987-990`）读出**真库**行与状态（grant_id/pattern/revoked_at），断言与插入的真行逐字段一致；负控：空库 ⇒ 报 0 行不吞。
+**顺带更正**：把 `cmd/wisp/ticket49_assembly_test.go:13` 头注释里**不存在的测试名** `TestTicket49EveryGrantBackedExecutionCarriesGrantID` 改成真实覆盖它的三枚牙名；`:184` 的注释改成"实调 session.Revoke，动词牙见 xxx"（⛔ 谎话留在注释里）。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔ 放宽断言、⛔push。**改完必须三样现跑**：①`sh scripts/d22scan.sh` **0 findings**（贴末行）②载具重跑 `Test49*` 全绿 ③`go build ./...` rc=0。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等）；⛔裸跑（A1888）。
+写面：`cmd/wisp/approval_reply.go`（不改行为，仅注释更正）、`cmd/wisp/ticket49_verbs_test.go`（新）、`docs/evidence/s1/49-verbs-*`。
+回话第一行＝commit hash ＋两枚牙名与红/绿读数 ＋d22scan 末行 ＋载具 rc。
