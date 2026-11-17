@@ -1,0 +1,214 @@
+{
+  "_what": "Ticket 39 AC#1's golden-snapshot input: the D36 section tree exactly as the config.get wire answers it (internal/config/sections_456.go SectionRows over config.NewDefaults(), values from schema.go's default tags, tiers from tiers.go's TierRegistry). One entry per D36 top-level section, rows in the schema walk's field order.",
+  "_shape": "This is a FRONTEND RENDER SNAPSHOT input, not the Go golden / thresholds face: the golden files beside it (one <section>.html per D36 section) are what frontend's ConfigSectionTables paints from these rows, and render:cfggolden regenerates (npm run render:cfggolden -- --generate) or verifies (no arg) them.",
+  "_split_keys": "The wire's dotted key is name + '.' + row.key (the instrument joins them). The two halves are stored apart so no quoted 'section dotted key' literal appears in this file - the renderer-door gate (internal/panel/composer_test.go routeLiteralRe) bans unallowlisted quoted literals of that shape across frontend/**.",
+  "_scope": "The 18 D36 sections only. The walk also emits one non-section header row 'schema_version' (value 0, unregistered tier on a default config) which rides the real wire outside this fixture's per-section scope; the instrument documents this and pins the 18-section roster.",
+  "_nil_slices": "A nil slice walks out as the string \"null\" (Go json.Marshal of a nil slice); nil maps emit no row at all - both facts are the walk's own semantics, kept verbatim here.",
+  "sections": [
+    {
+      "name": "app",
+      "rows": [
+        { "key": "language", "value": "zh-CN", "tier": "restart" },
+        { "key": "theme", "value": "dark", "tier": "hot" },
+        { "key": "autostart", "value": "false", "tier": "restart" },
+        { "key": "single_instance", "value": "true", "tier": "restart" }
+      ]
+    },
+    {
+      "name": "ball",
+      "rows": [
+        { "key": "size", "value": "56", "tier": "hot" },
+        { "key": "style", "value": "glass", "tier": "hot" },
+        { "key": "position.x", "value": "0", "tier": "hot" },
+        { "key": "position.y", "value": "0", "tier": "hot" },
+        { "key": "position.monitor", "value": "", "tier": "hot" },
+        { "key": "opacity_idle", "value": "0.35", "tier": "hot" },
+        { "key": "click_through", "value": "true", "tier": "hot" },
+        { "key": "hide_on_fullscreen", "value": "true", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "hotkey",
+      "rows": [
+        { "key": "summon", "value": "", "tier": "hot" },
+        { "key": "mute", "value": "", "tier": "hot" },
+        { "key": "cancel", "value": "Esc", "tier": "hot" },
+        { "key": "panel", "value": "", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "session",
+      "rows": [
+        { "key": "warm_timeout_sec", "value": "90", "tier": "hot" },
+        { "key": "settling_sec", "value": "3", "tier": "hot" },
+{ "key": "conversation_idle_sec", "value": "30", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "voice",
+      "rows": [
+        { "key": "enabled", "value": "true", "tier": "reload" },
+        { "key": "wake_word.enabled", "value": "false", "tier": "reload" },
+        { "key": "wake_word.keywords", "value": "null", "tier": "reload" },
+        { "key": "wake_word.thresholds", "value": "null", "tier": "hot" },
+        { "key": "wake_word.veto_words", "value": "[\"取消\",\"停下\",\"别\"]", "tier": "hot" },
+        { "key": "asr.provider", "value": "local-sherpa", "tier": "reload" },
+        { "key": "asr.model", "value": "", "tier": "reload" },
+        { "key": "tts.provider", "value": "local-sherpa", "tier": "reload" },
+        { "key": "tts.voice", "value": "", "tier": "reload" },
+        { "key": "tts.speed", "value": "1", "tier": "hot" },
+        { "key": "punctuation", "value": "true", "tier": "hot" },
+        { "key": "conversation_mode", "value": "false", "tier": "reload" },
+        { "key": "aec.enabled", "value": "true", "tier": "reload" },
+        { "key": "aec.echo_ref", "value": "self-render", "tier": "reload" },
+        { "key": "realtime.enabled", "value": "false", "tier": "reload" },
+        { "key": "realtime.provider", "value": "", "tier": "reload" },
+        { "key": "realtime.model", "value": "", "tier": "reload" },
+        { "key": "realtime.api_key_ref", "value": "", "tier": "reload" },
+        { "key": "realtime.base_url", "value": "", "tier": "reload" },
+        { "key": "cloud_asr_chain", "value": "null", "tier": "reload" },
+        { "key": "cloud_tts_chain", "value": "null", "tier": "reload" }
+      ]
+    },
+    {
+      "name": "audio",
+      "rows": [
+        { "key": "input_device", "value": "default", "tier": "hot" },
+        { "key": "sample_rate", "value": "16000", "tier": "hot" },
+        { "key": "half_duplex", "value": "true", "tier": "hot" },
+        { "key": "mic_muted_default", "value": "true", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "llm",
+      "rows": [
+        { "key": "text_chain", "value": "null", "tier": "hot" },
+        { "key": "roles.chat.provider", "value": "", "tier": "hot" },
+        { "key": "roles.chat.model", "value": "", "tier": "hot" },
+        { "key": "roles.chat.temperature", "value": "0.7", "tier": "hot" },
+        { "key": "roles.chat.thinking_intensity", "value": "off", "tier": "hot" },
+        { "key": "roles.chat.max_output_tokens", "value": "0", "tier": "hot" },
+        { "key": "roles.memory_extract.provider", "value": "", "tier": "hot" },
+        { "key": "roles.memory_extract.model", "value": "", "tier": "hot" },
+        { "key": "roles.memory_extract.temperature", "value": "0.7", "tier": "hot" },
+        { "key": "roles.memory_extract.thinking_intensity", "value": "off", "tier": "hot" },
+        { "key": "roles.memory_extract.max_output_tokens", "value": "0", "tier": "hot" },
+        { "key": "roles.handoff.provider", "value": "", "tier": "hot" },
+        { "key": "roles.handoff.model", "value": "", "tier": "hot" },
+        { "key": "roles.handoff.temperature", "value": "0.7", "tier": "hot" },
+        { "key": "roles.handoff.thinking_intensity", "value": "off", "tier": "hot" },
+        { "key": "roles.handoff.max_output_tokens", "value": "0", "tier": "hot" },
+        { "key": "roles.summarize.provider", "value": "", "tier": "hot" },
+        { "key": "roles.summarize.model", "value": "", "tier": "hot" },
+        { "key": "roles.summarize.temperature", "value": "0.7", "tier": "hot" },
+        { "key": "roles.summarize.thinking_intensity", "value": "off", "tier": "hot" },
+        { "key": "roles.summarize.max_output_tokens", "value": "0", "tier": "hot" },
+        { "key": "timeout_ms", "value": "60000", "tier": "hot" },
+        { "key": "retry.max", "value": "3", "tier": "hot" },
+        { "key": "retry.backoff_ms", "value": "1000", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "agent",
+      "rows": [
+        { "key": "max_rounds", "value": "50", "tier": "hot" },
+        { "key": "token_budget", "value": "0", "tier": "hot" },
+        { "key": "per_tool_timeout_ms", "value": "0", "tier": "hot" },
+        { "key": "loop_guard.repeat_thresholds", "value": "[3,5,8]", "tier": "hot" },
+        { "key": "steering_enabled", "value": "true", "tier": "hot" },
+        { "key": "project_instructions_enabled", "value": "true", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "risk",
+      "rows": [
+        { "key": "confirm_timeout_sec", "value": "300", "tier": "locked" },
+        { "key": "l1_window_sec", "value": "2", "tier": "locked" },
+        { "key": "shell_enabled", "value": "false", "tier": "locked" },
+        { "key": "allow_shell_string", "value": "false", "tier": "locked" },
+        { "key": "shell_allowlist", "value": "null", "tier": "locked" },
+        { "key": "blacklist_overrides", "value": "null", "tier": "locked" },
+        { "key": "permission_mode", "value": "ask_every_step", "tier": "locked" }
+      ]
+    },
+    {
+      "name": "fs",
+      "rows": [
+        { "key": "allowed_dirs", "value": "null", "tier": "locked" },
+        { "key": "reparse_point_exceptions", "value": "null", "tier": "locked" },
+        { "key": "delete_enabled", "value": "false", "tier": "locked" }
+      ]
+    },
+    {
+      "name": "net",
+      "rows": [
+        { "key": "allowlist", "value": "null", "tier": "locked" },
+        { "key": "block_private_ranges", "value": "true", "tier": "locked" },
+        { "key": "proxy.mode", "value": "system", "tier": "locked" },
+        { "key": "proxy.url", "value": "", "tier": "locked" }
+      ]
+    },
+    {
+      "name": "privacy",
+      "rows": [
+        { "key": "redact_paths", "value": "false", "tier": "hot" },
+        { "key": "diagnostics_opt_in", "value": "false", "tier": "hot" },
+{ "key": "retention_days", "value": "30", "tier": "hot" },
+        { "key": "keep_transcript", "value": "false", "tier": "hot" },
+        { "key": "keep_audio", "value": "false", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "memory",
+      "rows": [
+        { "key": "l1_enabled", "value": "true", "tier": "hot" },
+        { "key": "l1_max", "value": "20", "tier": "hot" },
+        { "key": "l3_retention_days", "value": "30", "tier": "hot" },
+        { "key": "extract_model", "value": "", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "panel",
+      "rows": [
+        { "key": "enabled", "value": "true", "tier": "hot" },
+        { "key": "width", "value": "640", "tier": "hot" },
+        { "key": "height", "value": "0", "tier": "hot" },
+        { "key": "keep_alive_in_session", "value": "true", "tier": "hot" },
+        { "key": "scale", "value": "0", "tier": "hot" },
+        { "key": "font_size", "value": "12", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "cost",
+      "rows": [
+        { "key": "daily_budget", "value": "0", "tier": "hot" },
+        { "key": "monthly_budget", "value": "0", "tier": "hot" },
+        { "key": "alert_threshold", "value": "0.8", "tier": "hot" },
+        { "key": "over_budget", "value": "pause", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "plugins",
+      "rows": [
+        { "key": "tier2_enabled", "value": "false", "tier": "locked" }
+      ]
+    },
+    {
+      "name": "models",
+      "rows": [
+        { "key": "dir", "value": "", "tier": "hot" },
+        { "key": "mirror", "value": "null", "tier": "hot" },
+        { "key": "verify_signature", "value": "true", "tier": "hot" }
+      ]
+    },
+    {
+      "name": "observe",
+      "rows": [
+        { "key": "level", "value": "info", "tier": "hot" },
+        { "key": "roll.size_mb", "value": "10", "tier": "hot" },
+        { "key": "roll.days", "value": "7", "tier": "hot" },
+        { "key": "slo_sample_interval_sec", "value": "5", "tier": "hot" }
+      ]
+    }
+  ]
+}

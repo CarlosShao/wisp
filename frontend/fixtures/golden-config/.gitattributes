@@ -1,0 +1,5 @@
+# These goldens are BYTE-pinned render snapshots: render:cfggolden compares a
+# fresh SSR render against the committed bytes, so EOL normalization (autocrlf)
+# must never touch any file in this directory - otherwise a fresh checkout
+# would drift every golden and go red with no real change.
+* -text
