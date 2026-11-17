@@ -40,7 +40,7 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 - [ ] Fallback: with panel runtime masked, L2 still approvable via native card (33 fixture).
 - [x] No-allow invariant: panel card markup contains no allow action wired to decision API
       (DOM + bridge double test).
-- [ ] Batch view: 10-op batch renders aggregated card; 50+ upgrades to L2 card (R7).
+- [x] Batch view: 10-op batch renders aggregated card; 50+ upgrades to L2 card (R7).
 - [ ] Human visual sign-off of card + fallback (screenshots vs design/screens/approval.html).
 
 ## Progress log (append-only, newest last)
@@ -130,3 +130,9 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 
 **门禁读数**：build/typecheck/lint rc=0；`render:approval37` rc=0；`render:l2`（喂 fixtures/l2-card-fs-delete.json）rc=0；`go test ./internal/panel` rc=0；d22scan rc=0；⛔ 未 push；dist 未入库。
 **留白不变**：AC#1 深度 e2e（真宿主）/AC#2 270/300s 倒计时（原生卡）/AC#3 原生回退卡/AC#6 人眼签收（机主）。
+
+## 编排者收件·第二批（2026-11-17 11:4x，`f392f34a2`，件 `docs/evidence/s1/readface-consume-20261117-r1.md`）
+
+**尺1** `f392f34a2` 在（16 件）。**尺3 我自己复跑**：`render:approval37` rc=0；`go test ./internal/agent/approval -run 'TestR7…|TestBatch'` **ok 0.052s**；build/typecheck/lint rc=0。
+- **勾 AC#5**：①10 操作 ⇒ **一张卡**（「需要你的确认」×1）＋五字段逐字（batchSummary 原句／本批共 10 项／余 7 项／目录×2／预览×3），普通卡零 batch 痕、batch 块**零 allow 形控件**；②50+ 升级 L2 **不聚合** —— Go 侧 `internal/agent/approval/batch_test.go:87 TestR7SizedBatchEscalatesToL2Unaggregated` 现跑 PASS（断言 level=L2、不得聚合、`rules_hit` 带 R7）。
+- 留白：AC#1 深度 1→2 e2e（需宿主）、AC#2 270/300 倒计时＋球徽标（球侧）、AC#3 原生回退卡（33 夹具/宿主）、AC#6 人眼签收（机主）。

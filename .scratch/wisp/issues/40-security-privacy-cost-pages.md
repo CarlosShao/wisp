@@ -47,8 +47,8 @@ summaries + budgets), plus Models and Diagnostics views.
 - [ ] Every privacy object type: delete-one/purge/export e2e against live DB (counts match).
 - [ ] Grants view reflects 49's grants live (integration fixture); revoke takes effect
       immediately on next gated call.
-- [ ] Cost numbers reconcile with cost_daily/task_log to the micro-unit (reconciliation test).
-- [ ] Budget states: <80 normal, ≥80 warn, ≥100 paused (fixture by editing aggregates).
+- [x] Cost numbers reconcile with cost_daily/task_log to the micro-unit (reconciliation test).
+- [x] Budget states: <80 normal, ≥80 warn, ≥100 paused (fixture by editing aggregates).
 - [ ] Diagnostics preview lists exactly the bundle contents; exported bundle verified to exclude
       audio/keys/transcript-full.
 - [ ] **Model-management: CRUD round-trip into config.toml; probe button → provider_health
@@ -170,3 +170,10 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 
 **门禁读数**：build/typecheck/lint rc=0；`render:security40` rc=0；`go test ./internal/panel` rc=0；d22scan rc=0；⛔ 未 push；dist 未入库。
 **诚实边界**：隐私三支按钮（privacy.delete-one/purge/export）不在本派单五格，页未接——留给下一腿（路由已落地：bridge.go:141 名册＋composer_dispatch.go:174＋panel_privacy_40.go:89）。
+
+## 编排者收件·第二批（2026-11-17 11:4x，`f392f34a2`）
+
+**尺1** `f392f34a2` 在。**尺3 我自己复跑**：`render:security40` rc=0（成本十字段逐字、`cachedKnown=false` ⇒ CACHED「未知」零 `>0<`）；载具 `Test40CostReconcileAgreesToTheMicroUnit` PASS 0.20s／`Test40BudgetThreeStatesFromTheAdapter` PASS 0.57s（4 子例）；build/typecheck/lint rc=0。
+- **勾 AC#3**：`CostAggregateCard` 十字段逐字上屏（月累计 IN 2100/OUT 460/金额 900、日/月预算 0⇒「不封顶」、计价版本 3＋2026-11-01），**对账牙** `1000/1000 Agree=true`、`+1micro ⇒ false 点名 1001/1000`。
+- **勾 AC#4**：`BudgetStateBar` 三态各一枚（normal 绿/warn 橙/paused 红，**只听 state 词**、⛔ 不复算百分比）；Go 四子例 700→normal／800→warn／1000+pause→paused／1000+warn→warn 现跑 PASS；词表外词「观察中」⇒ 零点亮＋逐字显示。
+- 留白：AC#1 隐私三按钮（路由已备，本单未接 UI）、AC#2 grants 视图（面板无入站读面，已具名）、AC#5 诊断包导出面、mod 管理行、AC#7 视觉签收（机主）。

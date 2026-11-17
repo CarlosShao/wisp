@@ -37790,3 +37790,10 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 牙1：`revoke-grant <编号>` 走真动词 ⇒ 撤销后同形调用真弹回卡（负控 0 卡）；SQL 复核 grant_id 绿行有值、红行 NULL。
 牙2：`grants` 真动词读真库三路（空库明说 0 行／两枚真行逐字段／撤销后 state=已撤销）。
 三处谎话注释改真名。⇒ 票 49 行为层＋动词层全结；审计空牙 2 枚清零。
+## A1927（11-17 11:4x）：读面消费落地 `f392f34a2` —— 37 AC#5／40 AC#3／40 AC#4 勾
+
+我复跑：render:security40 / render:approval37 / render:history36(6 族) / render:palette38 / render-config-screen 全 rc=0；approval `TestR7…|TestBatch` ok 0.052s；build/typecheck/lint rc=0。
+- **37 AC#5**：10 操作一张卡＋五字段逐字；50+ 走 R7 升级 L2 **不聚合**（`batch_test.go:87 TestR7SizedBatchEscalatesToL2Unaggregated` 现跑 PASS）。
+- **40 AC#3**：成本十字段上屏＋**对账到微单位**牙（1000/1000 true；+1micro false 点名 1001/1000）。
+- **40 AC#4**：预算三态（Go 四子例＋UI 棒只听 state 词、⛔复算百分比）。
+- 顺带：`composer_test.go` ledger 里 `ApprovalCardView` 过期登记同 commit 删（双向规则），复跑绿。fixture 里 `panel.width` 被门禁抓红一次（routeLiteralRe 正常工作），已改占位并在仪器注明。
