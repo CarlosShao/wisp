@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 票 38 AC#6 键盘全流审计（写腿，frontend 写面）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只做票 38 的 **AC#6**（键盘全流，其余格⛔动）。票 `.scratch/wisp/issues/38-command-palette-tasks.md`。
+**要求**：把 `frontend/src/components/palette-screen.tsx`＋`App.tsx` 的命令面板流做成**纯键盘可达**并给牙：
+1. **Tab 次序**：打开面板后焦点进搜索框，Tab 在「搜索框→行列表→行内操作」间按 DOM 次序推进，**没有焦点逃出面板**（focus trap）；关闭后焦点回原处。
+2. **↑↓ 移行**、**Enter 选行/发送**、**ESC 关闭**、**Ctrl+K 开关**——每一支一枚行为牙。
+3. **composing 期**（IME）以上键全部不触发（票 38 AC#2 已实现，别弄坏）。
+4. **aria**：行列表 `role=listbox`/`option`、`aria-activedescendant` 随高亮行移、搜索框 `aria-label`。
+5. **仪器**：扩展 `frontend/scripts/render-palette-38.tsx`（或新 `render-palette-kbd-38.tsx`）断言上述**可判读数**（焦点 id 序列、aria-activedescendant 值），正/负控各一。
+**硬约束**：⛔ 改契约/PLAN/specs/thresholds/golden/allowlist/D43/design、⛔ 放宽断言、⛔push、⛔ 提交 dist 字节（跑完删回 .gitkeep）、⛔ UI emoji。
+**串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0＋仪器 rc=0；node 在 `D:\work\server\node24`。
+写面：`frontend/src/components/palette-screen.tsx`、`frontend/src/App.tsx`、`frontend/scripts/render-palette*`、`docs/evidence/s1/38-ac6-*`。
+回话第一行＝commit hash ＋五支各自牙名与读数 ＋build/typecheck/lint/仪器 rc。没干完写「未完成，卡在哪」。

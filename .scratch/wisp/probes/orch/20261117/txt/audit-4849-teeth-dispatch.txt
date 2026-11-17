@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 审计：票 48／49 安全声称的反向审计＋"牙有没有牙"（审计腿，只读）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何 fallback model）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 审计腿（只读，可跑测试／只读命令，⛔改产码／票面）。目标＝**票 48（审批队列，`f622b5f29`）与票 49（会话授权，`0172714d4`）的"牙到底有没有牙"**。⛔只读注释、⛔只数测试名。
+逐条核，每条给「若把该行为摘掉，哪枚测试会红？」的**突变推理**（⛔ 真改产码；可用 `git show <被审提交>:<file>` 取基线，⛔ 读漂移工作树）：
+1. **49「L2 永不被 grant 放行」**：找到那枚测试，读出它到底断言了什么（`TestTicket49L2WithALiveGrantStillShowsTheCard`）；判断它是否**依赖真实 gate 判定**而非测试自造布尔。
+2. **49「撤 grant 后立刻重问」**：`TestTicket49RevokeVerbStopsTheNextCoveredCall`／`…RevokeStopsTheNextCoveringCall` 的断言是否真过 gate（`internal/tools/gate.go`／`internal/agent/approval/gate.go`），还是只查内存表。
+3. **49「审计每行带 grant_id」**：`TestTicket49GrantUseBooksGrantIDOnEveryRow` 是查**真 SQLite** 还是查注入假库（`internal/session/grants.go` 落库路径）。
+4. **49「taint 无视 grant」**：`TaintedExfil/PathWrite` 两枚是否真走 risk 升级链。
+5. **48 注入时钟**：`Test48*` 是不是**真注入了可控时钟**（还是墙钟+mock），超时梯 270/300 读数从哪来；⛔ 墙钟当判据。
+6. **48 fail-closed**：`Test48…` 杀桥分支是否真让答复变 `AnswerReject`，还是直接断言错误码。
+7. **反向谎言专项**：票 48/49 票面 Progress 里写「PASS/已验」的短语，逐条核对应测试**真存在且真跑**（有没有写"X 已验"却查无此测）。
+8. **重叠面**：49 改了 `internal/agent/approval/gate.go`、48 也碰 approval 包 ⇒ 核**两票互不打架**（同一函数有没有相反断言）。
+硬约束：只读；证据件写 `docs/evidence/s1/4849-adversarial-<time>.md`；⛔push。回话第一行＝「有牙 N 枚／牙是空的 M 枚／反向谎言 K 处／两票冲突 C 处」＋逐条判词（file:line）。
