@@ -1,0 +1,9 @@
+# 派单存档（先存档再发）—— 读面波2：36 AC#3 历史读面（SQLite）＋ 38 AC#4 任务态/取消（写腿，cmd/wisp 唯一一腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。补两面（只补 Go 面，⛔动前端）：
+1. **票 36 AC#3 历史读面**：SQLite 里已有任务/结果历史表（照 `internal/store`／`internal/memory` 现读真表名），出**分页读面** `history.page{offset,limit}` → 行 `{id, ts, kind, tool, outcome, summary}`，能支撑 1000 行滚动；`delete-one`/`purge`/`export` 若表已在则走既有 privacy 面，⛔ 新造第二套。给现读真表名与行数。**必须说明 Q-50（`panel.view.request` 封死）是否影响本面**：走独立名册方法而非 `panel.view.request`。
+2. **票 38 AC#4 任务态/取消**：`internal/panel/subagent_roster_197.go:111-142 TaskRowView` 补 `startedAt`/`costToDate`/`currentStep` 三字段（现读真值来源：任务开始时刻、cost_daily 当前任务行、当前步骤名）；C17 名册加 `task.cancel`（附理由：面板侧取消需 Go 通路；⛔ 不走 `approval.decide` 那条拒合金律），`composer_dispatch.go` 派发表加处理器 → 真取消（复用既有 cancel 语义，⛔ 自造），给"取消后 applied-steps 报告"读数。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design；⛔ 放宽断言；⛔push；新协程走 observe.Registry.Spawn；⛔ 提交 dist 字节；**C17 名册新增一枚须附理由**（同 privacy 三枚先例）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等）；⛔裸跑（A1888）。**改完三样现跑**：①`sh scripts/d22scan.sh` 0 findings ②载具重跑相关测试全绿 ③`go build ./...` rc=0。
+写面：`cmd/wisp/**`（唯一写腿）、`internal/panel/**`、`internal/store/**`、`internal/agent/**`、`docs/evidence/s1/readface-wave2-*`。
+回话第一行＝commit hash ＋两面各自 file:line ＋每面牙名与红/绿读数 ＋d22scan 末行 ＋载具 rc。

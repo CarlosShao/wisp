@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 40 AC#1 隐私三按钮（写腿，frontend 写面）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只做票 40 的 **AC#1**（隐私对象 delete-one/purge/export，其余格⛔动）。**Go 路由已备**（`internal/panel/bridge.go:141` 名册／`composer_dispatch.go:174` 派发表／`cmd/wisp/panel_privacy_40.go:89` 处理器／`panel_inbound.go:411` 接线）。
+**要求**：
+1. 前端在「设置 → 隐私」页签出三支真按钮：**删除一条**（需选对象 id）、**清空某域**（必带域，域词向 `memory.PrivacyDomains()` 问）、**导出某域**（JSON）；每支走真桥（`privacy.delete-one`/`privacy.purge`/`privacy.export`），⛔ 造本地假结果。
+2. **确认卡**：purge（不可逆）走一次确认（复用 L2 卡形状或独立确认），⛔ 一键直接清空。
+3. **回执逐字**：删除⇒「收据点名 id」、清空⇒「收据报 store 自报计数」、导出⇒「records=N」；失败⇒逐字错误句（`Test40PrivacyRefusalsNameTheDomainVocabulary` 的域词）。
+4. **仪器牙**（`render:privacy40` 或扩展 render:security40）：喂真 payload ⇒ 三支各自逐字上屏；喂拒绝 ⇒ 逐字错误；喂不到 ⇒ 显式「未判」，⛔ 假 0。
+**硬约束**：⛔ 契约/PLAN/specs/thresholds/golden/allowlist/D43/design、⛔ 放宽断言、⛔push、⛔ 提交 dist 字节（删回 .gitkeep）、⛔ UI emoji、⛔ 造数据。
+**串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0＋仪器 rc=0；node 在 `D:\work\server\node24`。
+写面：`frontend/src/components/*privacy*` 及新件、`frontend/src/lib/panel.ts`、`frontend/scripts/render-*`、`docs/evidence/s1/40-privacy-ui-*`。
+回话第一行＝commit hash ＋三支各自读数/牙名 ＋build/typecheck/lint/仪器 rc。没干完写「未完成，卡在哪」。
