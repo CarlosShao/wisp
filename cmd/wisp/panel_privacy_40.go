@@ -22,6 +22,15 @@ package main
 // copied), and the destructive verb always carries it. An unknown domain is a
 // named refusal that lists the five, never a guess.
 //
+// THE CONFIRM IS ALSO THE DOOR'S (2026-11-17, the adversarial audit's R1 fix):
+// delete-one and purge execute only when the request carries the confirm bit
+// (ComposerRequest.PrivacyConfirmed, JSON key privacyConfirmed). Until today
+// SPEC-08:170's "purge 需确认" lived only on the page's danger card, so a
+// same-origin forged postMessage could fire one purge and Go would execute it;
+// now the door refuses such a request by name and opens no store handle, so
+// the refusal deletes zero rows by construction. Export stays bit-free - it
+// writes nothing.
+//
 // WHY OPEN PER READ. The same shape every read/write outlet in this package
 // already uses (sessions.go's outlets, panel_cost_194.go): memory.Open, one
 // operation, defer Close. A privacy request is a user-triggered, rare
@@ -33,12 +42,32 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/panel"
 )
+
+// errNoPrivacyConfirm is the destructive gate's named refusal (the audit R1
+// fix, 2026-11-17): the request arrived without the confirm bit
+// (ComposerRequest.PrivacyConfirmed, JSON key privacyConfirmed), so the
+// destructive verb does not run and the store is never opened. The sentence
+// NAMES the confirmation it needs first - that naming is the refusal's whole
+// point, the Go-side half of SPEC-08:170's "purge 需确认" that until today
+// lived only on the page's confirm card.
+func errNoPrivacyConfirm(verb string) error {
+	return errors.New("需要确认位 privacyConfirmed:true：privacy." + verb +
+		" 是不可逆的破坏性动词；没有确认位的请求零删除，带上确认位再发一次")
+}
+
+// privacyConfirmed40 is the gate itself: false = refuse, true = the page's own
+// confirm step (the confirm card's confirm key, or the one-click delete
+// button) rode the request and the door may execute.
+func privacyConfirmed40(req panel.ComposerRequest) bool {
+	return req.PrivacyConfirmed
+}
 
 // PrivacyExportPayloadMarker starts the export door's payload line: the JSON
 // the page parses (memory.Store.ExportPrivacy's own envelope: domain,
@@ -98,6 +127,10 @@ func (h *privacyHandler40) HandlePrivacyDeleteOne(ctx context.Context, req panel
 			"privacyItemId 是空的：delete-one 只删一条，不给它 id 就什么都不删"))
 		return "", err
 	}
+	if !privacyConfirmed40(req) {
+		err := h.refuse(req, "delete-one", errNoPrivacyConfirm("delete-one"))
+		return "", err
+	}
 	st, err := h.openStore()
 	if err != nil {
 		err := h.refuse(req, "delete-one", fmt.Errorf("隐私存储不可用（%s）：%w", h.dir, err))
@@ -121,6 +154,10 @@ func (h *privacyHandler40) HandlePrivacyPurge(ctx context.Context, req panel.Com
 	if !ok {
 		err := h.refuse(req, "purge", fmt.Errorf(
 			"privacyDomain %q 不是 D35 隐私域；purge 只按域执行，可用的只有 %v", req.PrivacyDomain, memory.PrivacyDomains()))
+		return "", err
+	}
+	if !privacyConfirmed40(req) {
+		err := h.refuse(req, "purge", errNoPrivacyConfirm("purge"))
 		return "", err
 	}
 	st, err := h.openStore()

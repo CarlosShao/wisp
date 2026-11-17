@@ -38,6 +38,15 @@
    itself has no such argument (panel_privacy_40.go's file comment), and the
    page invents none.
 
+   THE GO-SIDE CONFIRM BIT (2026-11-17, the audit R1 fix). The door now also
+   re-judges the confirmation itself: a destructive request without
+   privacyConfirmed:true is refused by name and deletes ZERO rows. The bit is
+   placed at the wire layer (lib/panel.ts's two destructive request functions
+   - the only calls this card's 确认清空 key and the delete button's 发起删除
+   click can reach) and nowhere else: the first card button sends nothing, the
+   取消 exit sends nothing, and export never carries the bit. Confirm here,
+   the bit rides; skip this card, the door refuses.
+
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
@@ -189,7 +198,7 @@ export function PrivacySettings({
 
       <SettingsCard
         title="删除一条"
-        description="privacy.delete-one：一域一条，回执点名 id。面板没有隐私条目的清单读面（名册只有这三扇门），id 需要你手头有；不填 id 这一格不发起。"
+        description="privacy.delete-one：一域一条，回执点名 id。面板没有隐私条目的清单读面（名册只有这三扇门），id 需要你手头有；不填 id 这一格不发起。这一次点击就是确认：请求带 privacyConfirmed:true，门上没有确认位的同源伪造请求会被具名拒绝、零删除。"
       >
         <div className="flex flex-wrap items-end gap-3">
           <PrivacyField label="域（privacyDomain）" onChange={setDeleteDomain} placeholder="域词" value={deleteDomain} />

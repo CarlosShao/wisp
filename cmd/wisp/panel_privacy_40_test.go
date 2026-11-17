@@ -7,15 +7,24 @@ package main
 // match"). None of them stops at a nil check:
 //
 //	Test40PrivacyDeleteOneDeletesExactlyOneRow  正控+计数: one row out, the
-//	                                            others untouched.
+//	                                            others untouched (with the
+//	                                            confirm bit).
 //	Test40PrivacyPurgeClearsTheDomainAndCounts  正控+计数: n rows out, the
 //	                                            count in the receipt is the
-//	                                            store's own.
+//	                                            store's own (with the bit).
 //	Test40PrivacyExportCarriesTheDomainJSON     正控: the export payload is
-//	                                            the store's own envelope.
+//	                                            the store's own envelope (no
+//	                                            bit needed - export writes
+//	                                            nothing).
 //	Test40PrivacyWiringNailInProductionChain    反向: unplug the leg and the
 //	                                            door refuses by name.
 //	Test40PrivacyRefusalsNameTheDomainVocabulary 域词与空 id 的拒绝都有名字。
+//	Test40PrivacyDestructiveRefusalWithoutTheConfirmBit 反向+零删除: no
+//	                                            privacyConfirmed bit => the
+//	                                            named refusal and the DB
+//	                                            count unchanged (delete-one
+//	                                            AND purge; the audit R1's
+//	                                            tooth).
 
 import (
 	"context"
@@ -28,10 +37,13 @@ import (
 	"github.com/CarlosShao/wisp/internal/panel"
 )
 
-func privacyEnvelope40(requestID, method, domain, itemID string) string {
+func privacyEnvelope40(requestID, method, domain, itemID string, confirmed bool) string {
 	env := `{"method":"` + method + `","requestId":"` + requestID + `","source":"` + panel.ComposerRequestSource + `","privacyDomain":"` + domain + `"`
 	if itemID != "" {
 		env += `,"privacyItemId":"` + itemID + `"`
+	}
+	if confirmed {
+		env += `,"privacyConfirmed":true`
 	}
 	return env + `}`
 }
@@ -82,7 +94,7 @@ func Test40PrivacyDeleteOneDeletesExactlyOneRow(t *testing.T) {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}
 	reply, err := disp.Handle(context.Background(),
-		privacyEnvelope40("rid-p-del", panel.MethodPrivacyDeleteOne, "memory", ids[0]))
+		privacyEnvelope40("rid-p-del", panel.MethodPrivacyDeleteOne, "memory", ids[0], true))
 	if err != nil {
 		t.Fatalf("privacy.delete-one refused on a wired chain: %v\nreply=%q", err, reply)
 	}
@@ -102,7 +114,7 @@ func Test40PrivacyPurgeClearsTheDomainAndCounts(t *testing.T) {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}
 	reply, err := disp.Handle(context.Background(),
-		privacyEnvelope40("rid-p-purge", panel.MethodPrivacyPurge, "memory", ""))
+		privacyEnvelope40("rid-p-purge", panel.MethodPrivacyPurge, "memory", "", true))
 	if err != nil {
 		t.Fatalf("privacy.purge refused on a wired chain: %v\nreply=%q", err, reply)
 	}
@@ -122,7 +134,9 @@ func Test40PrivacyExportCarriesTheDomainJSON(t *testing.T) {
 		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
 	}
 	reply, err := disp.Handle(context.Background(),
-		privacyEnvelope40("rid-p-exp", panel.MethodPrivacyExport, "memory", ""))
+		// confirmed=false ON PURPOSE: export writes nothing, so the
+		// destructive gate must not demand the bit from it.
+		privacyEnvelope40("rid-p-exp", panel.MethodPrivacyExport, "memory", "", false))
 	if err != nil {
 		t.Fatalf("privacy.export refused on a wired chain: %v\nreply=%q", err, reply)
 	}
@@ -168,7 +182,7 @@ func Test40PrivacyWiringNailInProductionChain(t *testing.T) {
 	// the guard: a door that parse accepts but nobody handles is the
 	// silent-drop shape the dispatch's default branch exists to refuse.
 	for _, method := range []string{panel.MethodPrivacyDeleteOne, panel.MethodPrivacyPurge, panel.MethodPrivacyExport} {
-		env := privacyEnvelope40("rid-p-nail", method, "memory", "")
+		env := privacyEnvelope40("rid-p-nail", method, "memory", "", false)
 		if _, err := disp.Handle(context.Background(), env); err != nil &&
 			strings.Contains(err.Error(), panel.ErrNoHandlerAttached.Error()) {
 			t.Errorf("roster name %q is on the chain but its handler socket is nil: %v", method, err)
@@ -185,17 +199,56 @@ func Test40PrivacyRefusalsNameTheDomainVocabulary(t *testing.T) {
 	ctx := context.Background()
 	// Unknown domain: the refusal lists the five D35 domains instead of
 	// guessing.
-	_, err = disp.Handle(ctx, privacyEnvelope40("rid-p-dom", panel.MethodPrivacyPurge, "sessions", ""))
+	_, err = disp.Handle(ctx, privacyEnvelope40("rid-p-dom", panel.MethodPrivacyPurge, "sessions", "", false))
 	if err == nil || !strings.Contains(err.Error(), "task_log") {
 		t.Errorf("unknown-domain refusal = %v, want one that names the D35 vocabulary", err)
 	}
 	// Delete-one without an id: nothing is deleted and the refusal says so.
 	seedMemories40(t, dir, 1)
-	_, err = disp.Handle(ctx, privacyEnvelope40("rid-p-noid", panel.MethodPrivacyDeleteOne, "memory", ""))
+	_, err = disp.Handle(ctx, privacyEnvelope40("rid-p-noid", panel.MethodPrivacyDeleteOne, "memory", "", false))
 	if err == nil || !strings.Contains(err.Error(), "privacyItemId") {
 		t.Errorf("no-id refusal = %v, want one that names the missing id", err)
 	}
 	if n := countMemories40(t, dir); n != 1 {
 		t.Errorf("a refused delete-one moved the DB (%d rows), want 1", n)
+	}
+}
+
+// Test40PrivacyDestructiveRefusalWithoutTheConfirmBit is the audit R1's tooth
+// (readface-adversarial-20261117-1432.md §9.1): a request that names a VALID
+// domain (and, for delete-one, a valid id) but carries no privacyConfirmed bit
+// is refused BY NAME and the store is never opened - the refusal costs zero
+// deletions on the real database, counted, not asserted. The bit the two
+// positive tests above carry is the only way past this gate; export (fed
+// without the bit in its own test) is untouched by it.
+func Test40PrivacyDestructiveRefusalWithoutTheConfirmBit(t *testing.T) {
+	dir := newInboundDataDir33(t, "ask_every_step")
+	seedMemories40(t, dir, 3)
+	disp, _, err := newComposerDispatchChain(dir, auditQuiet194, panelInboundActor, nil, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("the production chain did not assemble on %s: %v", dir, err)
+	}
+	ctx := context.Background()
+	// purge, valid domain, no bit: refused by name, zero deletions.
+	_, err = disp.Handle(ctx, privacyEnvelope40("rid-p-nobit-purge", panel.MethodPrivacyPurge, "memory", "", false))
+	if err == nil {
+		t.Fatal("privacy.purge without the confirm bit executed: the destructive gate is gone")
+	}
+	if !strings.Contains(err.Error(), "privacyConfirmed") {
+		t.Errorf("no-bit purge refusal = %v, want it to name the confirm bit it needs", err)
+	}
+	if n := countMemories40(t, dir); n != 3 {
+		t.Errorf("a no-bit purge moved the DB (%d rows), want 3 (zero deletions)", n)
+	}
+	// delete-one, valid domain AND id, no bit: refused by name, zero deletions.
+	_, err = disp.Handle(ctx, privacyEnvelope40("rid-p-nobit-del", panel.MethodPrivacyDeleteOne, "memory", "999999", false))
+	if err == nil {
+		t.Fatal("privacy.delete-one without the confirm bit executed: the destructive gate is gone")
+	}
+	if !strings.Contains(err.Error(), "privacyConfirmed") {
+		t.Errorf("no-bit delete-one refusal = %v, want it to name the confirm bit it needs", err)
+	}
+	if n := countMemories40(t, dir); n != 3 {
+		t.Errorf("a no-bit delete-one moved the DB (%d rows), want 3 (zero deletions)", n)
 	}
 }

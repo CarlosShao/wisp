@@ -63,12 +63,13 @@ import (
 )
 
 // rosterCancelSeam is the one thing the door needs from the task pipeline:
-// hand it the row id the user's row carried, and it answers with the
-// host's own verdict - stopped (the handle fired) or refused (with the
-// refusing path's own reason, verbatim). It is a function, not an interface,
-// because it has exactly one method and the 453 relay precedent set that
-// shape.
-type rosterCancelSeam func(taskID string) (stopped bool, reason string)
+// hand it the row id the user's row carried and whether the request carried
+// the confirm bit (ComposerRequest.PrivacyConfirmed - the SAME destructive
+// bit the privacy doors gate on), and it answers with the host's own verdict
+// - stopped (the handle fired) or refused (with the refusing path's own
+// reason, verbatim). It is a function, not an interface, because it has
+// exactly one method and the 453 relay precedent set that shape.
+type rosterCancelSeam func(taskID string, confirmed bool) (stopped bool, reason string)
 
 // rosterCancelDoor is the cancel socket of the panel chain.
 type rosterCancelDoor struct {
@@ -108,6 +109,13 @@ func (d *rosterCancelDoor) seamOf() rosterCancelSeam {
 //	no seam bound         -> refused by name (no task pipeline in this process)
 //	id the host can't stop -> the host's own refusal, verbatim
 //	otherwise             -> receipt naming the row, stop issued
+//
+// The confirm bit is the seam's business, not the door's pre-filter: the
+// ROOT-task branch is the destructive one (stopping the root stops the whole
+// run), so the seam demands the bit there and refuses without it; the
+// per-row roster path keeps its existing shape (the row the tasks view
+// showed, stopped through the ONE per-row stop path). Either way a refusal
+// is named and the audit line records it.
 func (d *rosterCancelDoor) HandleRosterCancel(ctx context.Context, req panel.ComposerRequest) (string, error) {
 	id := strings.TrimSpace(req.RosterTaskID)
 	if id == "" {
@@ -123,7 +131,7 @@ func (d *rosterCancelDoor) HandleRosterCancel(ctx context.Context, req panel.Com
 		d.record(req, id, "refused", err)
 		return "", err
 	}
-	stopped, reason := seam(id)
+	stopped, reason := seam(id, req.PrivacyConfirmed)
 	if !stopped {
 		err := fmt.Errorf("panel: 任务 %s 没有停下：%s", id, reason)
 		d.record(req, id, "refused", err)
@@ -184,7 +192,16 @@ func (rt *agentRuntime) setCurrentRoot(bg *agent.RunningTask) {
 // ones, in the order the roster itself is built: the row the run is running
 // first, then any row the TaskRoster holds. Nothing else is cancelled, nothing
 // cascades, and both refusals are the host's own words.
-func (rt *agentRuntime) cancelRosterRowWave2(taskID string) (bool, string) {
+//
+// THE ROOT BRANCH IS THE CONFIRM-GATED ONE (2026-11-17, the adversarial
+// audit's R1 second class): stopping the root stops the whole run, so it
+// executes only when the request carried the confirm bit
+// (ComposerRequest.PrivacyConfirmed - the same bit privacy.delete-one /
+// privacy.purge gate on; page-side it rides only from the monitor cancel
+// card's confirm key, the ONE send site). Without the bit the branch refuses
+// by name and the root's handle is not touched - the same zero-effect
+// refusal shape the privacy doors answer with.
+func (rt *agentRuntime) cancelRosterRowWave2(taskID string, confirmed bool) (bool, string) {
 	if rt == nil {
 		return false, "本进程没有任务管线"
 	}
@@ -192,6 +209,10 @@ func (rt *agentRuntime) cancelRosterRowWave2(taskID string) (bool, string) {
 	id, root := rt.rootCancel.id, rt.rootCancel.root
 	rt.rootCancel.mu.Unlock()
 	if root != nil && id == taskID {
+		if !confirmed {
+			return false, "停根任务需要确认位 privacyConfirmed:true（root 是整轮任务，" +
+				"没有确认位的根任务停止零触碰）；带上确认位再发一次"
+		}
 		// The root's existing stop path (loop.go:342 RunningTask.Cancel ->
 		// the loop root's own cancel). The run's execute() joins this exact
 		// handle at Wait.

@@ -208,6 +208,14 @@ func TestRosterCancelDoorStopsARealSubagentAndTheForensicsCarryTheAppliedSteps(t
 	if !statemachine.Valid(stoppedRow.State) {
 		t.Errorf("settled state %q is not one of D43's names (the row must not carry a private word)", stoppedRow.State)
 	}
+	// The audit's 10.3/10.2-3 tooth (readface-adversarial-20261117-1432.md): the
+	// cancelled child's real terminal name is D43's Muted - a seam that answers
+	// "stopped" without stopping (the M16 mutation: known id => true, nothing
+	// halted) lets the child settle to its own finished state instead, which is
+	// a different D43 word, and this line is what turns that red.
+	if stoppedRow.State != statemachine.StateMuted {
+		t.Errorf("settled state = %q, want D43's Muted (the cancelled child's real terminal name; any other word means the stop did not really fire)", stoppedRow.State)
+	}
 	if stoppedRow.Kind != tools.TaskKindSubagent {
 		t.Errorf("settled kind = %q, want a subagent row", stoppedRow.Kind)
 	}
@@ -241,4 +249,87 @@ func TestRosterCancelDoorStopsARealSubagentAndTheForensicsCarryTheAppliedSteps(t
 	}
 	t.Logf("取消后 applied-steps 读数：task=%s 终态=%s；已落地 %d 步（tool_call success，tool=fs.read，路径 %s）；"+
 		"被中止 %d 步；回执：%s", id, string(stoppedRow.State), appliedRows, applied, cancelledRows, rcpt)
+}
+
+// TestRosterCancelDoorRootStopNeedsTheConfirmBit is the audit R1's second
+// class (readface-adversarial-20261117-1432.md §9.1-6): roster.cancel can stop
+// the ROOT task - stopping the whole run - and until today the root branch of
+// the seam executed with zero confirmation. Now the root branch demands the
+// SAME destructive bit the privacy doors gate on (ComposerRequest
+// .PrivacyConfirmed, JSON key privacyConfirmed): driven against a REAL
+// running root (the fixture's own task), a bit-less cancel of the root's id
+// is refused BY NAME and the run keeps going; the same id WITH the bit gets
+// the receipt and the run exits the cancelled way (runExitCode's rc=1 for
+// StatusCancelled) - which is also what reddens the "returns true, stops
+// nothing" mutation: a fake stop leaves the run finishing normally at rc=0.
+func TestRosterCancelDoorRootStopNeedsTheConfirmBit(t *testing.T) {
+	f := newRunFixture(t, "openai-chat")
+	// A wide latency window: the root's echo streams in chunks for seconds, so
+	// "cancel mid-run" is a state, not a coin toss.
+	f.srv.Control(t, "/__control/latency", `{"ms":300}`)
+	door := newRosterCancelDoor(nil, "test")
+	var (
+		mu         sync.Mutex
+		rootID     string
+		waitErr    error
+		refusedErr error
+		receipt    string
+		confirmErr error
+	)
+	f.rtHook = func(rt *agentRuntime) {
+		door.bindSeam(rt.cancelRosterRowWave2)
+		go func() {
+			id, err := waitRootRow197(rt)
+			mu.Lock()
+			rootID, waitErr = id, err
+			mu.Unlock()
+			if err != nil {
+				return
+			}
+			// THE GATE'S NEGATIVE: no confirm bit, the root's own id. The
+			// refusal must name the bit it needs, and the root's handle must
+			// not be touched (the positive below still finds it live).
+			_, refusedErr = door.HandleRosterCancel(context.Background(), panel.ComposerRequest{
+				Method: panel.MethodRosterCancel, RequestID: "rw2-root-nobit",
+				Source: panel.ComposerRequestSource, RosterTaskID: id,
+			})
+			// THE GATE'S POSITIVE: the same id WITH the bit - the stop is
+			// issued and the receipt says so.
+			receipt, confirmErr = door.HandleRosterCancel(context.Background(), panel.ComposerRequest{
+				Method: panel.MethodRosterCancel, RequestID: "rw2-root-ok",
+				Source: panel.ComposerRequestSource, RosterTaskID: id,
+				PrivacyConfirmed: true,
+			})
+		}()
+	}
+	code := f.run(carrier197RootTask)
+	mu.Lock()
+	id, werr, rerr, rcpt, cerr := rootID, waitErr, refusedErr, receipt, confirmErr
+	mu.Unlock()
+	if werr != nil {
+		t.Fatalf("the run never produced a root row to cancel: %v", werr)
+	}
+	if id == "" {
+		t.Fatal("the run never produced a root row to cancel")
+	}
+	if rerr == nil {
+		t.Fatal("a bit-less root cancel was executed: the root stop's confirm gate is gone")
+	}
+	if !strings.Contains(rerr.Error(), "privacyConfirmed") {
+		t.Errorf("no-bit root refusal = %v, want it to name the confirm bit it needs", rerr)
+	}
+	if cerr != nil {
+		t.Fatalf("the confirmed root cancel was refused: %v", cerr)
+	}
+	if !strings.Contains(rcpt, id) || !strings.Contains(rcpt, "发出停止") {
+		t.Errorf("receipt = %q, want it to name the root row and state the stop was issued", rcpt)
+	}
+	// The stop REALLY landed: the root task ended cancelled, and the process
+	// exit code reflects that class (run.go runExitCode: StatusCancelled ->
+	// ClassCancelled -> 1). A seam that faked the stop would leave this run
+	// completing normally at rc=0 and this line red.
+	if code != 1 {
+		t.Errorf("exit code after the confirmed root cancel = %d, want 1 (the cancelled class; 0 would mean the stop never fired)\nstdout:\n%s\nstderr:\n%s", code, f.out.String(), f.err.String())
+	}
+	t.Logf("根任务确认位读数：task=%s 无位拒绝=%v；带位回执：%s；exit=%d", id, rerr, rcpt, code)
 }

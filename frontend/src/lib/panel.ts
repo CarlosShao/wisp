@@ -956,10 +956,25 @@ export function requestCostSummary(): Promise<string | null> {
    privacy.purge is the irreversible one: the page must confirm before this
    request is ever sent (privacy-settings.tsx's confirm card) - a purge that
    fired on the first click would make the destructive verb one-click.
+
+   THE GO-SIDE CONFIRM BIT (2026-11-17, the adversarial audit's R1 fix): the
+   Go doors now REFUSE delete-one and purge that arrive without
+   privacyConfirmed:true (ComposerRequest.PrivacyConfirmed), so the two
+   destructive wire functions below carry the bit - and ONLY these two, never
+   the export, history or any other request built in this file. The bit is
+   honest exactly because of where these functions sit: each is the ONE wire
+   call its verb has, reachable only from the page's own confirm actions
+   (privacy-settings' 发起删除 button and the confirm card's 确认清空 key,
+   history-page's row delete and its confirm card) - the first confirm-card
+   button sends nothing at all. A forged same-origin postMessage that skips
+   the page gets the door's named refusal and zero deletion.
    -------------------------------------------------------------------------- */
 
 /** Delete ONE item out of ONE domain (privacy.delete-one). The receipt names
-    the id; the door refuses an empty id and an unknown domain word by name. */
+    the id; the door refuses an empty id, an unknown domain word, and a
+    request without the confirm bit by name. The bit rides here because this
+    call IS the one-click delete the page's 发起删除 button makes - the
+    user's own confirmation (ticket 40's deletion-stays-one-click ruling). */
 export function requestPrivacyDeleteOne(domain: string, itemId: string): Promise<string | null> {
   return requestHostAnswer({
     method: "privacy.delete-one",
@@ -967,18 +982,23 @@ export function requestPrivacyDeleteOne(domain: string, itemId: string): Promise
     source: "panel-composer",
     privacyDomain: domain,
     privacyItemId: itemId,
+    privacyConfirmed: true,
   });
 }
 
 /** Purge ONE WHOLE domain (privacy.purge). There is no "purge everything"
     argument anywhere on the wire: the domain word is required, and the door
-    refuses anything PrivacyDomains() does not answer. Confirm first. */
+    refuses anything PrivacyDomains() does not answer. The bit rides here
+    because the ONLY path to this call is the confirm card's 确认清空 key
+    (purge.submit is pinned to that single send site); the door re-judges the
+    bit itself and refuses without it. */
 export function requestPrivacyPurge(domain: string): Promise<string | null> {
   return requestHostAnswer({
     method: "privacy.purge",
     requestId: nextRequestId(),
     source: "panel-composer",
     privacyDomain: domain,
+    privacyConfirmed: true,
   });
 }
 
@@ -1036,12 +1056,22 @@ export function requestHistoryPage(offset: number, limit: number): Promise<strin
     own and the applied-steps evidence lands in the tool_call forensics rows
     and the terminal task_log row, which the page reads back off history.page
     (lib/history-view.ts's forensics scan), never from a local guess. An id
-    the host cannot stop comes back as the host's own refusal sentence. */
+    the host cannot stop comes back as the host's own refusal sentence.
+
+    The confirm bit rides here for the ROOT row: stopping the root stops the
+    whole run, and the Go seam refuses a bit-less root stop by name (the
+    audit R1's second class, 2026-11-17). This function is the ONE send site
+    the monitor cancel card's 确认停止 key reaches (the 停止 button only
+    opens that card), so the bit is set exactly at that confirmation - a
+    forged postMessage without it gets the named refusal and the root keeps
+    running. Child-row stops are untouched by the gate; the bit is inert
+    there. */
 export function requestRosterCancel(taskId: string): Promise<string | null> {
   return requestHostAnswer({
     method: "roster.cancel",
     requestId: nextRequestId(),
     source: "panel-composer",
     rosterTaskId: taskId,
+    privacyConfirmed: true,
   });
 }

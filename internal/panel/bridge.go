@@ -339,6 +339,21 @@ type ComposerRequest struct {
 	// roster does not hold is refused by the host's own cancel paths with
 	// their own reason (the ONE stop path's fail-closed pair), never guessed.
 	RosterTaskID string `json:"rosterTaskId,omitempty"`
+	// PrivacyConfirmed is THE destructive-confirm bit (2026-11-17, the
+	// adversarial audit's R1 fix, readface-adversarial-20261117-1432.md §9.1):
+	// the two destructive privacy doors (privacy.delete-one, privacy.purge)
+	// and the cancel door's ROOT-task branch (roster.cancel) execute only when
+	// the request carries it true; without it the door refuses by name and
+	// deletes nothing, stops nothing. It is a request-body field, NOT a new
+	// C17 method, and it lives on this shared envelope because it is
+	// selector-class, not a value: a flag the page sets exactly on the paths
+	// that are themselves confirmations (the privacy confirm card's confirm
+	// key, the one-click delete button, the monitor cancel card's confirm key
+	// - each verb's ONE send site). A same-origin forgery that fires one
+	// postMessage without the bit gets the named refusal and zero effect; it
+	// must deliberately spell the bit, which is the Go-side half of
+	// SPEC-08:170's "purge 需确认" the audit found missing.
+	PrivacyConfirmed bool `json:"privacyConfirmed,omitempty"`
 	// ToolName / ToolArgs are readface wave 3's launch selectors (tool.launch,
 	// ticket 38 AC#3): the tool name the discovery roster showed and the raw
 	// JSON argument object the page echoes for it. Both selector-shaped - a
