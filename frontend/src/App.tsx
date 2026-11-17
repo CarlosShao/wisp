@@ -57,6 +57,7 @@ import { PanelSidebar } from "@/components/panel-sidebar";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
 import { sendMessage } from "@/lib/panel";
+import { TIER_NAMES as libTierNames } from "@/lib/tier-names";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
@@ -82,14 +83,12 @@ const EMPTY: PanelSnapshot = {
   generatedAt: "",
 };
 
-/** Native mode names -> the Chinese the tier row shows. Spelled once, in the
-    component that draws them, so a fourth tier cannot be invented here. */
-const TIER_NAMES: Record<string, string> = {
-  ask_every_step: "每步都问",
-  ask_high_risk: "高风险才问",
-  auto_approve: "全自动",
-  unknown: "档位未知",
-};
+/** Native mode names -> the Chinese the tier rows show. Moved to
+    lib/tier-names.ts (ticket 40) so the settings page's 安全 category shows
+    the SAME words from the SAME map instead of growing a second copy that
+    could drift from this one - a fourth tier cannot be invented twice
+    differently. */
+const TIER_NAMES = libTierNames;
 
 /** The task monitor's roster rows, straight off the wire (ticket 197/220: the
     fields are copied verbatim - blockedOnApproval is the host's own join,
@@ -526,6 +525,12 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               ballClickThrough={snapshot.ballClickThrough ?? null}
               panelWidth={snapshot.panelWidth ?? null}
               panelFontSize={snapshot.panelFontSize ?? null}
+              /* Ticket 40: the 安全 category reads the tier off the snapshot's
+                 composer section, the 技能 category reads the plugin
+                 inventory - both pushed every packet, both rendered here and
+                 nowhere cached. */
+              composer={composer}
+              plugins={snapshot.plugins ?? null}
             />
           ) : (
             <>

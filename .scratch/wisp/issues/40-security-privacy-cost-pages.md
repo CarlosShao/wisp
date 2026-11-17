@@ -84,3 +84,57 @@ summaries + budgets), plus Models and Diagnostics views.
 - **安全格同样是"假免接线"**：`settings-page.tsx:104` 说"没收到策略快照"，但档位**每包都推**（`cmd/wisp/run.go:1187`→`internal/panel/pump.go:372-373`）⇒ 接上即可。
 - **`settings-page.tsx` 12 格里 9 格是 waiting 格**（左栏 9 枚灰点＋「（还没有数据）」aria 名）——这就是机主说的"一堆未接线"的本体。本票逐格判：**有数据的接上、真没有的显式说缺哪台引擎**，⛔ 保持一个含糊的"还没有数据"。
 - **MCP 格不接是架构裁定的**（D13），⛔ 顺手接；但**文案要写明"按设计不接"**而不是让它看起来像忘了接。
+
+---
+
+## 进度追记（2026-11-17 09:3x，前端写腿 agent-101，票 40 本轮；只追加不勾框）
+
+**本轮交付（前端面，全部 `frontend/**` 写面；未动 cmd/wisp 一字节）：**
+
+1. **成本格接线（census ①的"假免接线"清账）**：`frontend/src/lib/panel.ts` 新增
+   `requestCostSummary()`（`cost.summary` 页面字面量落在唯一门文件 panel.ts）；
+   `frontend/src/lib/cost-view.ts` 新增 `wisp-cost-summary:` 解析器＋`useCostSummary()` hook
+   （五态：loading/no-host/ready/unreadable/payload-error，拒绝句逐字上屏不解释）；
+   `frontend/src/components/cost-settings.tsx` 新组件：按天表（day/IN/OUT/costMicros/tasks
+   逐字上屏，IN/OUT 微标签，行序照读口），残缺行**计数丢弃不补零**；页面不派生任何聚合。
+   行为牙＝`frontend/scripts/render-security-cost-40.tsx`（npm script `render:security40`，
+   rc=0）：喂真 payload ⇒ 逐字段同值回屏；refusal ⇒ 原话逐字；payloadError ⇒ 具名态。
+2. **安全格接线（census ②的"假免接线"清账）**：`frontend/src/components/security-settings.tsx`
+   新组件，读 snapshot `composer.mode`（每包都推）：当前档位（unknown ⇒ 档位未知＋"本泵没读到
+   档位读数"，⛔ 借最安全档名）、词表（risk.ModeNames 逐字）、L2 强确认切换名单逐字；**本页不画
+   切档控件**（切档只走 composer 行的 panel.mode.request 原生 L2 通路）。五枚缺引擎面（阈值/
+   会话授权撤销/B-list/taint 历史/审批审计）逐枚具名"未接线"＋缺哪台引擎（含
+   internal/risk/thresholds.go、internal/agent/journal.go）。
+3. **技能格接线（census 判"技能半假"清账）**：`plugins-screen.tsx` 抽出 `PluginInventoryList`
+   （加号浮层与设置页共挂同一份清单，DOM 不复制），`frontend/src/components/skills-settings.tsx`
+   新组件挂 snapshot `plugins` 节：行（id/name/version/state/能力/网络白名单/宿主面）＋
+   engineState/skillState **逐字**；开关走 config.set 的 plugin_enabled（同一设置门）；无读取器
+   （键缺）⇒ 具名 PumpSources.Plugins 缺失句，不是空清单。
+4. **设置页左栏 12 格逐格重判**（`harness/settings-page.tsx`）：安全/成本/技能三格转实控件；
+   通用/记忆/MCP/隐私/引导/悬浮球六格 waiting 文案逐格改写——每格写明缺哪台引擎（MCP 格明确
+   写"按设计不接（D13）"）；aria 后缀「（还没有数据）」改「（未接线）」（census 点名的含糊本体）。
+5. **TIER_NAMES 收拢**：`frontend/src/lib/tier-names.ts`（一处拼写，App 档位控件与安全格共用）。
+
+**Go 侧需要（⛔ 本腿不造，留给编排者派 cmd/wisp／internal/panel 腿；file:line 现读）：**
+- 成本聚合/cached/预算/计价版本：字段加在 `internal/panel/cost_handlers.go:30-36`（CostDayRow）
+  与 `:124-127`（costPayload），页面读取随后补——页面侧已具名待接。
+- 隐私 D35 四操作＋config 读口：`internal/panel/bridge.go:41-107` 名册加 privacy 路由 +
+  `internal/panel/composer_dispatch.go` 派发表加 case + `cmd/wisp` 装配（接
+  `internal/memory/privacy.go` 的 ListPrivacy/ExportPrivacy——生产零调用方，census A365）；
+  工具调用行 tier 自批的人话文案（AC 最后一格）在该读面落地时一并做（列值保持逐字）。
+- 会话授权（D45）读面＋撤销写面、B-list 审计行、taint-hit 历史、审批审计 correlationId 关联：
+  全部无快照节无路由，安全格已逐枚具名。
+- 诊断导出束、模型管理 CRUD 的探针/角色下拉/拖序（票 40 其余 AC）：无 Go 读/写面，未开工。
+
+**Go 侧唯一改动（本腿，同 commit 铁则）**：`internal/panel/bridge_test.go` 的
+`rosterPageGapLedger194` 删除 `cost.summary` 条目——页面字面量已落 panel.ts，双向审计规定
+"页面开始携带 ⇒ 同 commit 删条目"；`go test ./internal/panel` 三把镜像尺
+（TestEveryWhitelistedInboundNameIsAlsoSentByThePage／TestFrontendComposerRequestsMatchTheEnvelope
+／TestTheRendererHoldsExactlyOneDoorToTheHost）rc=0。
+
+**AC 格全部未勾**，理由：真数据 e2e（live DB 对账、budget fixture、诊断束验证）要上面的
+Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
+
+**门禁读数**：`npm run build` rc=0；`typecheck` rc=0；`lint` rc=0（38 条既有 warning，0 error）；
+`render:security40` rc=0；`render:nav` / `render:palette38` / `render:composer` / `render:shell77`
+全部 rc=0；dist 已删回 `.gitkeep`；⛔ 未 push；未动 thresholds/golden/allowlist/PLAN/specs。

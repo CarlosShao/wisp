@@ -134,13 +134,16 @@ func TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests(t *testing.T) {
 // every entry is audited both ways each run - an entry the running guard does
 // not answer is a phantom registration, and an entry the page STARTS carrying
 // is stale and must be removed in the same commit that lands the page literal
-// (frontend/src/lib/panel.ts is an external agent's write surface, Q-51; the
-// ledger is the bridge, not a new home for the name). Reasons carry the ledger
-// anchor; the per-item A## entries behind them live in
-// docs/reports/pending-and-issues.md.
-var rosterPageGapLedger194 = map[string]string{
-	"cost.summary": "ticket 194, ledger A1681: backend door landed, page literal pending (Q-51, frontend is an external agent's surface)",
-}
+// (frontend/src/lib/panel.ts is this agent's own write surface since the
+// owner's 2026-11-16 ruling; the ledger is the bridge, not a new home for the
+// name). Reasons carry the ledger anchor; the per-item A## entries behind them
+// live in docs/reports/pending-and-issues.md.
+//
+// cost.summary's entry left with ticket 40's page literal (frontend leg,
+// 2026-11-17): the page now spells the name in panel.ts, so the stale
+// registration is removed in the same commit, exactly as the two-way audit
+// prescribes.
+var rosterPageGapLedger194 = map[string]string{}
 
 // TestFrontendComposerRequestsMatchTheEnvelope reads the real frontend source
 // and checks the four method names, the source claim and the requestId are

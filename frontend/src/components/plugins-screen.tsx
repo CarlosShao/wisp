@@ -44,6 +44,92 @@ function stateTone(state: string): string {
   return "bg-inset text-ink-3";
 }
 
+/** The inventory body, extracted (ticket 40) so the settings page's 技能
+    category can mount the SAME reader face the plus-menu overlay mounts
+    instead of growing a second copy that could drift from it. The two honest
+    sentences, the rows and the empty fact render identically in both places;
+    the toggle buttons appear exactly when the caller passes onToggle. */
+export function PluginInventoryList({
+  section,
+  busyId,
+  onToggle,
+}: {
+  section: PluginsSection;
+  /** The id whose write is in flight; nothing disabled without a caller that
+      handles toggles. */
+  busyId?: string | null;
+  /** Absent = read-only rows (a caller that only displays the inventory). */
+  onToggle?: (row: PluginRowView) => void;
+}) {
+  return (
+    <>
+      <p className="text-[11px] leading-[1.7] text-ink-3" role="note">
+        {section.engineState}
+      </p>
+      <p className="mt-1 text-[11px] leading-[1.7] text-ink-3" role="note">
+        {section.skillState}
+      </p>
+
+      {section.rows.length > 0 ? (
+        <ul className="mt-3 list-none flex-col gap-1.5 p-0">
+          {section.rows.map((row) => (
+            <li
+              className="flex flex-col gap-1 rounded-card border border-line bg-surface px-3 py-2.5"
+              key={row.id}
+            >
+              <div className="flex min-w-0 items-center gap-2">
+                <Puzzle aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />
+                <span className="shrink-0 text-[12.5px] font-medium text-ink">
+                  {row.name !== "" ? row.name : row.id}
+                </span>
+                {row.version !== "" ? (
+                  <span className="shrink-0 font-mono text-[10.5px] text-ink-3">v{row.version}</span>
+                ) : null}
+                <span className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-ink-3">
+                  {row.name !== "" ? row.id : ""}
+                </span>
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${stateTone(row.state)}`}
+                  title="生效与否由装配探针判，不是配置里的开关字面量"
+                >
+                  {row.state}
+                </span>
+                {onToggle ? (
+                  <button
+                    aria-label={row.enabled ? `关闭插件 ${row.id}` : `开启插件 ${row.id}`}
+                    className="shrink-0 rounded-chip bg-inset px-2 py-0.5 text-[11px] font-medium text-ink-2
+                      transition-colors duration-100 hover:bg-hover hover:text-ink
+                      disabled:pointer-events-none disabled:opacity-50"
+                    disabled={busyId !== null && busyId !== undefined}
+                    onClick={() => onToggle(row)}
+                    type="button"
+                  >
+                    {row.enabled ? "关闭" : "开启"}
+                  </button>
+                ) : null}
+              </div>
+              {row.note !== undefined && row.note !== "" ? (
+                <p className="text-[10.5px] leading-[1.6] text-warn" role="note">
+                  {row.note}
+                </p>
+              ) : null}
+              <p className="truncate text-[10.5px] leading-[1.6] text-ink-3">
+                能力 {row.capabilities.length > 0 ? row.capabilities.join(" / ") : "（无）"}
+                {row.netAllowlist.length > 0 ? ` · 网络白名单 ${row.netAllowlist.join(" / ")}` : ""}
+                {row.hostApi.length > 0 ? ` · 宿主面 ${row.hostApi.join(" / ")}` : ""}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-[12px] leading-[1.7] text-ink-3">
+          配置里没有声明任何 [plugins.&lt;id&gt;] 条目——这是读到的清单事实，不是读不到。
+        </p>
+      )}
+    </>
+  );
+}
+
 export function PluginsScreen({
   section,
   onClose,
@@ -93,67 +179,9 @@ export function PluginsScreen({
   return (
     <div className="flex max-h-[70vh] flex-col px-4 py-4">
       <ScreenHeader tier2Enabled={section.tier2Enabled} onClose={onClose} />
-      <p className="mt-2 text-[11px] leading-[1.7] text-ink-3" role="note">
-        {section.engineState}
-      </p>
-      <p className="mt-1 text-[11px] leading-[1.7] text-ink-3" role="note">
-        {section.skillState}
-      </p>
-
-      {section.rows.length > 0 ? (
-        <ul className="mt-3 flex min-h-0 flex-1 list-none flex-col gap-1.5 overflow-y-auto p-0">
-          {section.rows.map((row) => (
-            <li
-              className="flex flex-col gap-1 rounded-card border border-line bg-surface px-3 py-2.5"
-              key={row.id}
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <Puzzle aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />
-                <span className="shrink-0 text-[12.5px] font-medium text-ink">
-                  {row.name !== "" ? row.name : row.id}
-                </span>
-                {row.version !== "" ? (
-                  <span className="shrink-0 font-mono text-[10.5px] text-ink-3">v{row.version}</span>
-                ) : null}
-                <span className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-ink-3">
-                  {row.name !== "" ? row.id : ""}
-                </span>
-                <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${stateTone(row.state)}`}
-                  title="生效与否由装配探针判，不是配置里的开关字面量"
-                >
-                  {row.state}
-                </span>
-                <button
-                  aria-label={row.enabled ? `关闭插件 ${row.id}` : `开启插件 ${row.id}`}
-                  className="shrink-0 rounded-chip bg-inset px-2 py-0.5 text-[11px] font-medium text-ink-2
-                    transition-colors duration-100 hover:bg-hover hover:text-ink
-                    disabled:pointer-events-none disabled:opacity-50"
-                  disabled={busyId !== null}
-                  onClick={() => void toggle(row)}
-                  type="button"
-                >
-                  {row.enabled ? "关闭" : "开启"}
-                </button>
-              </div>
-              {row.note !== undefined && row.note !== "" ? (
-                <p className="text-[10.5px] leading-[1.6] text-warn" role="note">
-                  {row.note}
-                </p>
-              ) : null}
-              <p className="truncate text-[10.5px] leading-[1.6] text-ink-3">
-                能力 {row.capabilities.length > 0 ? row.capabilities.join(" / ") : "（无）"}
-                {row.netAllowlist.length > 0 ? ` · 网络白名单 ${row.netAllowlist.join(" / ")}` : ""}
-                {row.hostApi.length > 0 ? ` · 宿主面 ${row.hostApi.join(" / ")}` : ""}
-              </p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-3 text-[12px] leading-[1.7] text-ink-3">
-          配置里没有声明任何 [plugins.&lt;id&gt;] 条目——这是读到的清单事实，不是读不到。
-        </p>
-      )}
+      <div className="mt-2 flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <PluginInventoryList busyId={busyId} onToggle={(row) => void toggle(row)} section={section} />
+      </div>
 
       {feedback !== null ? (
         <div className="mt-3 shrink-0">

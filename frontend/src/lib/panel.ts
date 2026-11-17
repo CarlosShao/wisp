@@ -858,3 +858,20 @@ export function requestProviderModels(provider: string): Promise<string | null> 
     configProvider: provider,
   });
 }
+
+/** Ask the host for the per-day cost summary (cost.summary, ticket 194's
+    read-only door; the Go half has been live since ledger A1681 - the page
+    literal is what ticket 40's census called the missing half: "数据在门口
+    没人取"). The reply is prose plus one line starting with the
+    wisp-cost-summary marker; parse it with parseCostSummaryReply
+    (lib/cost-view.ts). The door takes NO selector - anything filter-shaped
+    on the envelope is refused by name (cost_handlers.go foreignSelectors) -
+    so this call sends identity fields only. Until a machine attaches no cost
+    leg the door refuses with its own sentence, which the page shows in place. */
+export function requestCostSummary(): Promise<string | null> {
+  return requestHostAnswer({
+    method: "cost.summary",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+  });
+}

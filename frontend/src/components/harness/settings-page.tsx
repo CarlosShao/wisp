@@ -8,6 +8,27 @@
    category now carries its own one-liner saying what it is for and what it is
    waiting on, so the rail itself becomes the honest status board.
 
+   Ticket 40's census re-cut (2026-11-17, per
+   docs/evidence/s1/census-unwired-20261116-2017.md §4.3): the rail was 9
+   waiting cells out of 12, and the census measured THREE of the waiting
+   sentences as half-false - the feed existed with nobody rendering it. The
+   re-cut judges every cell against the wire:
+     安全   was half-false: the tier rides EVERY packet (run.go:1187 ->
+           pump.go:372-373). Now wired: SecuritySettings reads composer.mode.
+     成本   was the loudest half-false: the cost door has answered since
+           ledger A1681 (cmd/wisp/panel_cost_194.go:51 -> panel_inbound.go
+           -> cost_handlers.go:86's payload line) and frontend never called
+           it - "数据在门口没人取". Now wired: CostSettings fetches
+           cost.summary through the settings door.
+     技能   was half-false: the plugins inventory has had a reader all along
+           (plugins_inventory_215.go; PumpSources.Plugins). Now wired:
+           SkillsSettings mounts the inventory's own list component.
+   The cells with NO source keep their dot and their aria suffix, and every
+   remaining waiting sentence names the engine it waits for - the census
+   rule: a dormant cell says which feed it waits for, never a vague "还没有
+   数据". MCP is a D13 design ruling, and its cell says so instead of
+   looking forgotten.
+
    Where the 9 legacy rail rows went, since the sidebar used to show them:
 
      命令  -> not a view. It is the Ctrl+K palette, opened from the header.
@@ -23,6 +44,9 @@ import { ArrowLeft } from "lucide-react";
 import { ConfigScreen } from "@/components/config-screen";
 import { ModelSettings } from "@/components/model-settings";
 import { VoiceSettings } from "@/components/voice-settings";
+import { SecuritySettings } from "@/components/security-settings";
+import { CostSettings } from "@/components/cost-settings";
+import { SkillsSettings } from "@/components/skills-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 import type {
@@ -30,8 +54,10 @@ import type {
   BallOpacityIdleSection,
   BallSizeSection,
   BallStyleSection,
+  ComposerState,
   PanelFontSizeSection,
   PanelWidthSection,
+  PluginsSection,
 } from "@/lib/panel";
 
 /** One category: what it is, and what it is still waiting for. The second
@@ -40,21 +66,21 @@ interface Category {
   name: string;
   /** One line: what a person would expect to change here. */
   purpose: string;
-  /** What the panel is waiting on. "" means the category has real controls. */
+  /** What the panel is waiting on, NAMING the missing engine. "" means the
+      category has real controls. */
   waiting: string;
   /** Which real component draws this category when `waiting` is empty. */
-  control?: "config" | "model" | "voice";
+  control?: "config" | "model" | "voice" | "security" | "cost" | "skills";
 }
 
 const CATEGORIES: readonly Category[] = [
   {
     name: "通用",
     purpose: "启动行为、默认工作区、面板与球的分工。",
-    // Ticket 313's read door and the appearance wave made the old "C17 has
-    // not pushed any section" sentence false: config.get answers the model
-    // and voice halves, and the ball/panel sections ride the snapshot push.
-    // What this category still lacks is its OWN keys, so the line says that.
-    waiting: "配置读口（config.get）已经落地：模型、语音两节走读口回执，悬浮球与面板各节随快照推送。这一类自己的键（启动行为、默认工作区）还没有节推上来，等它们上读口再画。",
+    // Ticket 40 re-cut: the census judged the old sentence 基本为真 but 措辞
+    // 绕. The own-keys fact stands (internal/panel has no [app] section), now
+    // naming the keys and the missing reader instead of a vague "还没有".
+    waiting: "配置读口（config.get）与快照推送已落地：模型、语音两节走读口回执，悬浮球与面板各节随快照上屏。这一类自己的键（app.language / app.autostart / app.single_instance）没有快照节、读口也不携带——internal/panel 里没有 [app] 节，等 Go 侧加读面再画。",
   },
   {
     name: "外观",
@@ -86,37 +112,73 @@ const CATEGORIES: readonly Category[] = [
   {
     name: "记忆",
     purpose: "长期记忆的开关、范围与清空。",
-    waiting: "还没收到记忆数据。D20 定义了记忆系统，但没有任何一条推送告诉面板「记了什么」。",
+    // Ticket 40 re-cut: the census judged this cell 真 (no source), but the
+    // sentence now names the engines instead of a vague "还没收到".
+    waiting: "没接。缺的引擎：快照泵（internal/panel/pump.go 的 PumpSources）没有记忆读取器，C17 名册（internal/panel/bridge.go:41-107）也没有记忆读路由——internal/memory 的表在，但没有一行把「记了什么」报给面板。D20 的记忆操作（开关、清空）还要 Go 侧写面。",
   },
   {
+    // Ticket 40's census re-cut: the plugin inventory has had a reader all
+    // along (internal/panel/plugins_inventory_215.go; PumpSources.Plugins at
+    // cmd/wisp/run.go), so this category stopped being a waiting note and
+    // mounts the inventory's own list component. The SKILL half genuinely
+    // has no config keys (SkillsNotInConfigModel215) - the section's own
+    // skillState sentence, rendered verbatim, says that where it belongs.
     name: "技能",
     purpose: "装了哪些技能、每个技能的权限范围。",
-    waiting: "还没收到技能清单。技能要能被列出来，前提是它们从插件运行时注册上来。",
+    waiting: "",
+    control: "skills",
   },
   {
     name: "MCP",
     purpose: "MCP 服务端、每个服务提供哪些工具。",
-    waiting: "还没收到 MCP 状态。D13 定了 MCP 的取舍，但没有字段把已连的服务端报给面板。",
+    // Ticket 40, per the dispatch's census note: MCP is a DESIGN ruling (D13),
+    // not a forgotten feed - the cell must read as a ruling, never as a bug
+    // someone forgot to close.
+    waiting: "按设计不接（D13）：D13 定了 MCP 的取舍，面板不显示 MCP 服务端状态——这不是忘了接，是架构裁定，internal/panel 里也没有任何 MCP 字段。除非裁定被推翻，这一格保持未接线。",
   },
   {
+    // Ticket 40's census re-cut: the tier rides EVERY packet (cmd/wisp/run.go
+    // :1187 -> internal/panel/pump.go:372-373), so the old "还没收到策略
+    // 快照" was a 假免接线. The wired half is the mode; the rest of the
+    // security face (thresholds, grants, B-list, taint history) still has no
+    // read face, and SecuritySettings names each engine it waits for.
     name: "安全",
     purpose: "权限档位、门控阈值、批量授权的边界。",
-    waiting: "还没收到策略快照。这一节最敏感：档位和阈值属于原生侧，面板在这里显示的任何数字都必须是读来的，不能是猜的。",
+    waiting: "",
+    control: "security",
   },
   {
     name: "隐私",
     purpose: "哪些数据留在本机、录音留存多久、遥测开关。",
-    waiting: "还没收到隐私配置。本节的所有项都要落到 config.toml 的读口上，没有读口就一个字也不能显示。",
+    // Ticket 40: the D35 privacy ops (list/delete-one/purge-all/export over
+    // profile/memory/task_log/tool_call/artifacts) have NO panel route, and
+    // the memory-side readers (ListPrivacy/ExportPrivacy,
+    // internal/memory/privacy.go) have zero production callers (census A365).
+    // Wiring them needs a cmd/wisp leg + a dispatch-table case; this wave's
+    // cmd/wisp is another leg's, so the cell stays an honest 未接线 naming
+    // the engines instead of a front-end invention.
+    waiting: "没接。缺的引擎：C17 名册（internal/panel/bridge.go:41-107）没有任何 privacy 路由；internal/memory/privacy.go 的 ListPrivacy/ExportPrivacy 生产零调用方（census-unwired 2026-11-16，台账 A365）——数据面在，没人接到面板。隐私数据的列出/删除/清空/导出要 Go 侧先加读/写面（cmd/wisp 装配 + internal/panel/composer_dispatch.go 派发表加 case）；录音留存、遥测开关同样没有读口，一个字也不显示。",
   },
   {
+    // Ticket 40's census re-cut: the cost door has answered since ledger
+    // A1681 (cmd/wisp/panel_cost_194.go:51 reads the real cost_daily table,
+    // cmd/wisp/panel_inbound.go:354 assembles the handler,
+    // internal/panel/cost_handlers.go:86 emits the payload line) and the
+    // frontend never called it - the census's loudest 假免接线, "数据在门口
+    // 没人取". Now wired: CostSettings fetches cost.summary through the
+    // settings door; the wire's missing dimensions (cached, aggregates,
+    // budget, pricing version) stay named absences on the page.
     name: "成本",
     purpose: "每轮花费、本月累计、预算与超支提醒。",
-    waiting: "还没收到用量数据。成本口径由 C23 定，但面板快照里没有 token 数，所以这一格连一个空壳数字都不画。",
+    waiting: "",
+    control: "cost",
   },
   {
     name: "引导",
     purpose: "首次使用的几步，以及随时能重看的说明。",
-    waiting: "还没收到引导进度。首启那套画面在首启屏上，不在这里重画一遍。",
+    // Ticket 40 re-cut: the screens exist (firstrun-screen.tsx); what has no
+    // source is the PROGRESS dimension - so the sentence names exactly that.
+    waiting: "首启那套画面在首启屏（firstrun-screen.tsx），不在这里重画一遍；「走到第几步」没有读数面：快照无此节、config.get 也不携带，所以这里不画进度。",
   },
   {
     // 球状态 was a row in the left sidebar until 2026-09-28. Owner: 「这个球
@@ -127,7 +189,10 @@ const CATEGORIES: readonly Category[] = [
     // from the 外观 category's ball.style row.
     name: "悬浮球",
     purpose: "球的大小、空闲透明度、鼠标穿透、唤醒词、热键。",
-    waiting: "球的大小、外观风格、空闲透明度、穿透都已能切：去「外观」类的对应行，走设置写入通路落盘。唤醒词与热键还没有数据源。",
+    // Ticket 40 re-cut: the census verified 唤醒词/热键 have no reader
+    // (Hotkey/WakeWord: 0 hits in internal/panel) - the sentence now says
+    // WHERE the absence was measured instead of "还没有数据源".
+    waiting: "球的大小、外观风格、空闲透明度、穿透都已能切：去「外观」类的对应行，走设置写入通路落盘。唤醒词与热键没有数据源：internal/panel 里没有 Hotkey / WakeWord 的读取器或路由（census 2026-11-16 复量 0 命中）。",
   },
 ];
 
@@ -141,6 +206,8 @@ export function SettingsPage({
   ballClickThrough = null,
   panelWidth = null,
   panelFontSize = null,
+  composer = null,
+  plugins = null,
 }: {
   activeSection: string;
   onSelectSection: (section: string) => void;
@@ -162,6 +229,16 @@ export function SettingsPage({
   ballClickThrough?: BallClickThroughSection | null;
   panelWidth?: PanelWidthSection | null;
   panelFontSize?: PanelFontSizeSection | null;
+  /** The snapshot's composer section, handed straight to the 安全 category
+      (ticket 40): the mode rides every packet, so the page reads it rather
+      than a remembered tier. Null in the hand-assembled render harnesses -
+      the security category then says 档位未知, never the safest-sounding
+      default. */
+  composer?: ComposerState | null;
+  /** The snapshot's plugins section, handed straight to the 技能 category
+      (ticket 40). Null means this pump has no plugins reader - a different
+      fact from an empty inventory, and the category says which one. */
+  plugins?: PluginsSection | null;
 }) {
   // An unknown name is not guessed at: it lands on the first category, the
   // same way an unknown view does. A rail that lights nothing is worse.
@@ -199,7 +276,11 @@ export function SettingsPage({
               // instead. An aria-label on the DOT leaked into the button's
               // accessible name (「成本还没有数据」), which broke every by-name
               // lookup of the rail - including a smoke test's own click.
-              const name = c.waiting ? `${c.name}（还没有数据）` : c.name;
+              // Ticket 40 re-cut: the suffix is 未接线, the census vocabulary,
+              // because "还没有数据" read as vagueness - the cells' waiting
+              // sentences are the engine-named reasons, the aria name just
+              // marks WHICH half of the rail is real.
+              const name = c.waiting ? `${c.name}（未接线）` : c.name;
               return (
                 <button
                   key={c.name}
@@ -254,6 +335,26 @@ export function SettingsPage({
             <ModelSettings heading={cat.name} lede={cat.purpose} />
           ) : cat.control === "voice" ? (
             <VoiceSettings heading={cat.name} lede={cat.purpose} />
+          ) : cat.control === "security" ? (
+            /* Ticket 40: fed from the snapshot's composer.mode - the tier
+               rides every packet, so this is a read, never a remembered pick.
+               A missing composer (hand-assembled render harnesses) lands on
+               the wire's own unknown marker, not a guessed tier. */
+            <SecuritySettings
+              heading={cat.name}
+              lede={cat.purpose}
+              mode={composer?.mode ?? { current: "unknown", names: [], l2ConfirmNames: [] }}
+            />
+          ) : cat.control === "cost" ? (
+            /* Ticket 40: the cost door's page reader. The component fetches
+               cost.summary itself (the settings door), keeps no copy, and
+               names every dimension the wire does not carry. */
+            <CostSettings heading={cat.name} lede={cat.purpose} />
+          ) : cat.control === "skills" ? (
+            /* Ticket 40: the plugin inventory's own list, mounted as a
+               category. Null (no reader on this pump) stays the honest
+               waiting sentence, never an empty list. */
+            <SkillsSettings heading={cat.name} lede={cat.purpose} section={plugins ?? null} />
           ) : (
             <section aria-label={cat.name} className="flex min-w-0 flex-col gap-1">
               <h2 className="text-[15px] font-semibold text-ink">{cat.name}</h2>
