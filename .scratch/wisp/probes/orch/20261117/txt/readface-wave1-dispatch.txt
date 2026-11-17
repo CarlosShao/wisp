@@ -1,0 +1,15 @@
+# 派单存档（先存档再发）—— 产品页读面波 1：config 全节树/errors、成本聚合、隐私路由、BatchView（写腿，cmd/wisp 一波一腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+# 目的：36/37/38/39/40 五张产品页的前端腿已把能接的接了；剩下 15+ 格全卡在"Go 读面/写面不存在"。本单补这些面，**只补面，不改前端**。
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。逐项做，每项给 file:line＋行为牙（⛔ 源码字符串断言）：
+1. **`config.get` 全节树读面**（解锁 39 AC#1）：出 `sections[]{key,value,tier}`（tier∈hot/restart/nextboot），涵盖 D36 全 section（不只 313 的模型/语音＋球/面板六节）；另出 **reload 事件**（写后推）。
+2. **`errors[]{line,message}` 读面**（解锁 39 AC#4）：`config.set` 遇未知键/类型错时带**行号**。
+3. **成本聚合字段**（解锁 40 AC#3/AC#4）：`internal/panel/cost_handlers.go:30-36/:124-127` 补 CACHED／月累计／预算／计价版本；预算三态（<80 normal/≥80 warn/≥100 paused）；**对账到微单位**的牙（cost_daily vs task_log）。
+4. **隐私路由**（解锁 40 AC#1）：`bridge.go:41-107` 名册＋`composer_dispatch.go` 派发表加 privacy 方法（delete-one/purge/export 三支），并在 `cmd/wisp` 落处理器；三支各一枚牙（计数对 DB）。
+5. **`BatchView` 聚合卡字段**（解锁 37 AC#5）：`internal/agent/approval/ui.go:193` 只走原生 Prompt 面 ⇒ 给 `ApprovalCardView` 补聚合卡字段（10 操作一张卡、50+ 升级 L2 走 R7 既有守卫 `gate.go:317-324`）。
+**⛔ 不动前端**（五张页的腿已交，前端另有后续腿）；**⛔ 改契约文字**（C18/D36 语义若要动 ⇒ 停下具名报）。
+硬约束：⛔thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、新协程走 observe.Registry.Spawn、⛔反向动 C17 白名单（**新增**要附理由）、⛔提交 dist 字节。
+串行：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等）；⛔裸跑（A1888）。⚠ 整包已知 **exit 139 在 WebView2 区段**（票 450 既定项）⇒ A1893 单跑复量；A1882 锚整包未命中时改载具单跑三枚锚并如实写。A1880 牙要行为；A1884 sh 门用 `D:\work\soft\Git\bin\bash.exe`。
+写面：`cmd/wisp/**`（唯一写腿）、`internal/panel/**`、`internal/agent/**`、`internal/config/**`、`docs/evidence/s1/readface-wave1-*`。
+回话第一行＝commit hash ＋五项各自 file:line ＋每项的牙名与红/绿读数 ＋哪项没做完卡在哪。

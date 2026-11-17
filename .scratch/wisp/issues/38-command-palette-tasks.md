@@ -33,8 +33,8 @@ view (task.list/cancel tools backing it).
 - Multi-task concurrency engine (47); voice path; config editing (39).
 
 ## Acceptance criteria
-- [ ] Text prompt via palette → streams into result view; identical behavior to CLI path.
-- [ ] IME: Chinese composition (pinyin → 选字 → commit) submits final text only (e2e with
+- [x] Text prompt via palette → streams into result view; identical behavior to CLI path.
+- [x] IME: Chinese composition (pinyin → 选字 → commit) submits final text only (e2e with
       Windows IME on runner or manual evidence).
 - [ ] Discovery: installed tool set listed with correct risk pills; launch routes through gate.
 - [ ] Tasks view: live task state transitions reflected; cancel mid-tool → applied-steps report.
@@ -81,3 +81,12 @@ view (task.list/cancel tools backing it).
 > usage 退出（既有行为，与本腿无关）。d22scan 对 frontend/ 零命中；仅有的两枚红
 > （`cmd/wisp/approval_reply.go:379/464`）在本波 cmd/wisp 另一腿的未提交 +186 行里，
 > 非本腿写面，已如实转报。AC 勾框一律留给非实现者。
+
+---
+
+## 编排者收件·第一批（2026-11-17 09:2x，`817785260`，仪器 `render:palette38`）
+
+**尺1** `817785260` 在。**尺3 我自己复跑**：`npm run render:palette38` **rc=0**；build/typecheck/lint 全 rc=0。
+- **勾 AC#1**：自由文本走 `panel.message.send` 同一封套（`lib/panel.ts:748`→`composer_dispatch.go:236`→生产读者 `panel_message_453.go:102`），结果进票 36 已接的结果面；仪器断言 send 行逐字上屏。
+- **勾 AC#2（IME）**：`palette-screen.tsx:33-34/:181-183/:205` compositionstart/end ＋ `isComposing` 双保险，组合期 Enter 提前 return，只提交选字终文。
+- **留白（具名）**：AC#3 名册只读面已接但「risk pills/launch 走门」缺 Go 派发表；AC#4 任务卡三字段（`subagent_roster_197.go:111-142 TaskRowView` 无 started/cost/step）＋ task.cancel 不在 C17 八法（`bridge.go:41-107`）；AC#5 force rules 无读面；AC#6 键盘全流（tab 审计）待补。

@@ -37726,3 +37726,11 @@ resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器�
 
 622b5f29。我复跑：approval 包 -run TestTicket48 ok 0.224s；载具 ^Test48 2/2 PASS。FIFO 保序/队头/回原任务、270→300s 注入时钟超时梯＋replay、fail-closed 红句、挂起 voided=2＋恢复拒死 grant、深度 1→12 且**额外轮询=0**。
 整包 ./cmd/wisp 512 RUN/378 PASS/0 FAIL 后 **exit 139 在 WebView2 区段**＝**票 450 既定未完成项**（非本腿引入），A1893 单跑截断点那枚 1.29s PASS；A1882 锚整包未命中但单跑 3/3 PASS。
+
+## A1918（11-17 09:2x）：**五张产品页首批交（36/37/38 共 5 格勾；39/40 全卡在 Go 读面）—— 真瓶颈已具名**
+
+五腿各交一件：36 9d2b873df／37 232a5da9e／38 817785260／39  21bb9832／40 2f173996e。**五台仪器我全复跑 rc=0**（history36／approval37／palette38／config-screen／security40），build/typecheck/lint 全 rc=0。
+- **勾**：36 AC#1（四族 XSS 经生产 MarkdownText 全灭）＋AC#2（dangerouslySetInnerHTML 用法 0）；37 AC#4（卡上**零 allow 接线到 decision API**）；38 AC#1（自由文本走同一封套）＋AC#2（IME 组合期不提交）。
+- **census 三处假免接线真清账（grep 复核）**：成本 cost-settings.tsx 真发 cost.summary；安全真读 composer.mode；技能复用 PluginInventoryList；config-screen.tsx 的 ow.blocked === "" 假判据**已删**。
+- **真瓶颈**：39 的 5 格、40 的 6 格、37 的 BatchView、38 的 task.cancel/TaskRowView —— 全是 **Go 读面/写面不存在**，⛔ 前端造不了。已写派单 20261117/txt/readface-wave1-dispatch.txt（config 全节树/errors、成本聚合、隐私路由、BatchView），等 w49grants 收腿即发。
+**顺带**：37 腿抓到一处假数——容量句原写「10」无读者，已改 **8**＝queue.go:130 DefaultMaxPending。

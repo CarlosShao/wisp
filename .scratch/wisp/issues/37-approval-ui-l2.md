@@ -38,7 +38,7 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
       head-only display, decision routing by correlationId.
 - [ ] Timeout: card warning at 270s → auto-reject at 300s → replay works; ball badge clears.
 - [ ] Fallback: with panel runtime masked, L2 still approvable via native card (33 fixture).
-- [ ] No-allow invariant: panel card markup contains no allow action wired to decision API
+- [x] No-allow invariant: panel card markup contains no allow action wired to decision API
       (DOM + bridge double test).
 - [ ] Batch view: 10-op batch renders aggregated card; 50+ upgrades to L2 card (R7).
 - [ ] Human visual sign-off of card + fallback (screenshots vs design/screens/approval.html).
@@ -101,3 +101,12 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
     320×140 卡，非面板写面；本腿零涉及。
   - AC#4（面板卡无 allow）：本轮重申 + `render-l2` 原有断言继续钉。
   - AC#6（人工签收）：等编排者排屏（`?harness=1` 可看新队列条与卡 corr 行）。
+
+---
+
+## 编排者收件·第一批（2026-11-17 09:2x，`232a5da9e`，仪器 `render:approval37`）
+
+**尺1** `232a5da9e` 在。**尺3 我自己复跑**：`npm run render:approval37` **rc=0**；build/typecheck/lint 全 rc=0。
+- **勾 AC#4（No-allow invariant）**：`frontend/src/components/l2-approval-card.tsx` 里**没有**任何可点的 allow 动作接到 decision API —— grep `allow|decide|decision` 只命中注释与 `判定来自 ${view.decidedBy}` 展示行（`:264/:347`），**零操作接线**。
+- 顺带修一处假数：容量句原写「10」无读者，已改 `QUEUE_CAPACITY=8` ＝`internal/agent/approval/queue.go:130 DefaultMaxPending`。
+- **留白（具名，均需真宿主或 Go 读面）**：AC#1 深度 1→2 e2e（需宿主）、AC#2 270/300s 倒计时＋球徽标清（球侧）、AC#3 原生回退卡、AC#5 BatchView（`internal/agent/approval/ui.go:193` 只走原生 Prompt 面，卡无字段）、AC#6 人眼签收（机主）。

@@ -106,3 +106,11 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 
 > commit hash 见 git log；勾格 0/5（全留白，原因＋要加的 Go 字段如上）＋census 四条全落地；新牙＝`render-config-screen.tsx` 的 census 双向徽章牙＋行表 field/section 配对钉；npm build/typecheck/lint rc=0。
 
+
+---
+
+## 编排者收件·第一批（2026-11-17 09:2x，`021bb9832`，仪器 `render-config-screen`）
+
+**尺1** `021bb9832` 在。**尺3 我自己复跑**：`vite build --ssr scripts/render-config-screen.tsx` ＋ `node …` 均 **rc=0**（`render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier …)`）；build/typecheck/lint 全 rc=0。
+**census 四件已落地（我 grep 复核）**：①`config-screen.tsx` 里 `row.blocked === ""` **判据已删**（全仓零命中；只有别的文件的 `blockedOnApproval`）；②`app.theme` 标「未接线」并具名（`SetTheme` 无调用者）；③`panel.font_size` 标「缺消费引擎」；④`panel.opacity/animations` 改「仅本次会话」。
+**0/5 格勾（诚实）**：五格全卡在 Go 读面 —— AC#1 缺 `sections[]{key,value,tier}` 全节树＋reload 事件；AC#2 risk/fs/net/plugins 四节零读零写＋无 L2 入口；AC#3 `api_key` last-4 与 `config-view.ts:44-45`「尾永不上线」契约冲突（**须机主批契约**）；AC#4 缺 `errors[]{line,message}`；AC#5 视觉签收（机主）。

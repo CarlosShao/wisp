@@ -36,10 +36,10 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 
 ## Acceptance criteria
 - [ ] 14-state visual checklist against chat.html — user sign-off (screenshots committed).
-- [ ] XSS suite: `<img onerror>`, `<script>`, `javascript:` href, event-handler attrs in fake
+- [x] XSS suite: `<img onerror>`, `<script>`, `javascript:` href, event-handler attrs in fake
       fetch/markdown content → neutralized; zero script execution (CSP report-only listener
       asserts zero violations).
-- [ ] dangerouslySetInnerHTML grep = 0; sanitizer whitelist config reviewed + committed.
+- [x] dangerouslySetInnerHTML grep = 0; sanitizer whitelist config reviewed + committed.
 - [ ] History: 1000-row fixture scrolls at 60fps; delete-one/purge/export verified against DB.
 - [ ] Long-task stream: 200-chunk golden replay renders with merge (no jank), token counter
       accurate.
@@ -67,3 +67,12 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 > 缺 reader 具名、git chip 走线）OK 0 失败；build/typecheck/lint/tokens:check rc=0，
 > render 仪器 8 枚全绿，d22scan clean。AC 勾框一律留给非实现者；留白格与具名缺引擎
 > 清单见证据件 §1/§3。
+
+---
+
+## 编排者收件·第一批（2026-11-17 09:2x，`9d2b873df`，件 `docs/evidence/s1/`＋仪器 `render:history36`）
+
+**尺1** `9d2b873df` 在。**尺3 我自己复跑**：`npm run render:history36` **rc=0**（`4 XSS families neutralized through production MarkdownText, run-feed values round-trip`）；`build/typecheck/lint` 全 **rc=0**。
+- **勾 AC#1**：四族 XSS 载荷（`<img onerror>`／`<script>`／`javascript:`／事件属性）走**生产 MarkdownText**（`result-history.tsx:114 rehypePlugins={[[rehypeSanitize, TIGHT_SCHEMA]]}`）全灭，仪器现跑 rc=0。
+- **勾 AC#2**：`dangerouslySetInnerHTML` **用法 0**（全仓 grep 命中 1 处，是 `result-history.tsx:35` 注释里的自述，非用法）；白名单 `rehype-sanitize ^6.0.0`（`package.json:41`）＋`TIGHT_SCHEMA` 已入库。
+- **留白（具名）**：AC#3 1000 行历史树（缺 SQLite 历史 reader＋`panel.view.request` 被 Q-50 封）、AC#4 token 计数（`ResultChunkView` 无字段）、AC#5 rAF 暂停（需真宿主窗）。
