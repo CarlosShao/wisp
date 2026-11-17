@@ -37818,3 +37818,9 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - 38 AC#4 勾：三键上屏（缺⇒未判无假 0）＋取消真门（只开确认卡）＋三读数（Stopped/已落地 1/中止 0），真子代理取消 2.86s PASS。
 - 36 AC#3 不整勾：1005 行三窗不重不漏＋privacy 三支复用已证；**60fps 需真宿主窗**（同 77 AC#1 边界），⛔ 造假帧率。
 - 腿如实报偏差：ledger 真身是 `bridge_test.go`（派单写作 composer_test.go）；package.json 加两行仪器脚本（否则仪器无法按名复跑）。
+## A1931（11-17 14:4x）：读面审计 有牙9/空牙3/反向谎言1/越权1；39 golden 半格落地；**我撤回一处假话（Stopped→Muted）**
+
+- **反向谎言＝1，而且是我们的账**：wave2 报的终态 `Stopped` 是假词，真值 `Muted`（`states.go:14`；D43 无 Stopped）。已更正票尾＋本账；commit message 不可改，以更正为凭。
+- **空牙3**：①`roster.cancel` 测试只断言"合法 D43 名"不断言 `StateMuted`（换成"返回 true 什么都不停"仍绿）②成本对账 M6（task_log 侧换常量）仍绿 ③config 18 名字各出假值挡不住。①已排单补一行牙；②③登记为牙的边界。
+- **越权1**：`privacy.purge` Go 侧零确认（确认只在页），同源 postMessage 伪造可单发清整域 ⇒ 我拍：**Go 侧加确认位**（复用 `newComposerDispatchChain` 现成 `confirm panel.ModeConfirm`，非改契约）；`roster.cancel` 停根任务也零确认但今天前端零命中不可触发，随确认位一并加。
+- 39 `d58dceb5a`：18 节 golden 快照＋正负控（`ball.size 56→90` 红点名 [drifted: ball]，改回绿），我复跑 rc=0；AC#1 仍留 edit→save 半格（真宿主）。

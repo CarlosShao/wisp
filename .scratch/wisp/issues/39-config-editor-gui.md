@@ -137,3 +137,9 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 
 **门禁读数**：build/typecheck/lint rc=0；`render:config-screen` rc=0（vite --ssr＋node 手动跑，无 npm script 历史如此）；`go test ./internal/panel` rc=0；d22scan rc=0（frontend 零发现）；⛔ 未 push；dist 未入库（.gitkeep 唯一跟踪件）。
 **回归牙记录**：fixture 里 [panel] 行被渲染门门禁（composer_test.go routeLiteralRe 禁 renderer 源里任何 "panel.*" 字面量）抓红一次，已换 demo 占位行并在仪器注释里写明原因——门禁工作正常，未放宽。
+
+## 编排者收件·golden 快照半格（2026-11-17 14:4x，`d58dceb5a`，件 `docs/evidence/s1/39-cfg-golden-20261117-r1.md`）
+
+**尺1** `d58dceb5a` 在（23 件）。**尺3 我自己复跑**：18 枚 `.html` 在盘；`npm run render:cfggolden` **校 rc=0**（`18 sections x 115 rows byte-verified`）；build/typecheck/lint rc=0；dist 归 `.gitkeep`。
+- **正控**：改 `ball.size 56→90` ⇒ rc=1 且点名 `[drifted: ball]`；**负控**：改回 ⇒ rc=0。快照输入是真 wire 形（`NewDefaults()` 值＋`TierRegistry` tier 逐字 hot×80/reload×17/restart×3/locked×15），零造数据；`.gitattributes * -text` 防 CRLF 假红。
+- AC#1 **仍不整勾**：golden-per-section 半格已证；「edit → save → 按 tier 生效」半格需真宿主 e2e。

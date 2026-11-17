@@ -111,3 +111,7 @@ view (task.list/cancel tools backing it).
 **尺1** `71ccf56c0` 在（13 件）。**尺3 我自己复跑**：`render:taskcard38` rc=0；`render:historypage36` rc=0；build/typecheck/lint rc=0；`go test ./internal/panel` ok 18.866s；ledger 两枚页字面注册确已摘（`bridge_test.go` 的 rosterPageGapLedger194）。
 - **勾 AC#4**：三键逐字（开始=生产 formatter／123456 micros CNY／tokens 1200-340／fs.write；缺⇒「未判」无 1970 无假 0）；**取消走真门**（第一下只开确认卡、请求仅一处发出）；取消三读数＝终态 Stopped·已落地 1 步·被中止 0 步（整史取证扫描；扫描不全⇒未判）；腿跑真子代理取消 2.86s PASS。
 - 留白：AC#3（discovery 风险丸/launch 走门需 Go dispatch）、AC#5（force rules 无读面）、AC#6 已勾。
+## 编排者更正（2026-11-17 14:4x，来自对抗审计 `readface-adversarial-20261117-1432.md`）
+
+**上面收件里写「终态 Stopped」是假话，我撤回更正**：真值是 **`Muted`**（`internal/statemachine/states.go:14 StateMuted = "Muted"`；D43 二十枚里**没有 `Stopped` 一词**，`statemachine.Valid("Stopped")==false`）。这处假话同时出现在 `3a62bed97` 的 commit message 与 wave2 证据件 §2 —— commit 不可改，此处更正为凭。
+- 附带**空牙**（审计判）：`TestRosterCancelDoorStopsARealSubagent…` 只断言终态非空＋是合法 D43 名，**没断言就是 Muted 那一枚** ⇒ 把实现换成"返回 true 什么都不停"仍绿。已排单补一行 `if stoppedRow.State != statemachine.StateMuted` 的牙。

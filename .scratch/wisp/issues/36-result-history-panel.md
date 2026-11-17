@@ -88,3 +88,7 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 **尺1** 在。**尺3 我自己复跑**：`render:historypage36` rc=0（1005 行三窗滚动，读数与 Go 测试同）；build/typecheck/lint rc=0。
 - 已证两半：①1005 行**三窗滚动不重不漏**（虚拟切片并集恰全覆盖）②delete-one/purge/export **复用 wave-1 privacy 面**（Go 侧对真 DB 计数已验 5/5）。
 - **不勾的原因（具名）**：AC#3 头一句是「1000-row fixture scrolls at **60fps**」—— 60fps 需**真宿主窗**测帧（与票 77 AC#1/AC#8 同类环境边界），仪器环境测不出真帧率，⛔ 不造假读数。⇒ 留给真窗口签收时一并勾。
+
+## 编排者更正（2026-11-17 14:4x，同上审计）
+
+若上文涉及「终态 Stopped」字样，一律更正为 **`Muted`**（D43 无 Stopped 一词）。
