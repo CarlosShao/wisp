@@ -1714,3 +1714,49 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run render:nav
 
+      # ADDED STEP ONLY (ticket 77 AC#9, 2026-11-17, leg from the
+      # 77-ac9-ci-seeds dispatch): no existing step was moved, edited, deleted,
+      # given an `if:` it did not have, or made continue-on-error (D22 run-away
+      # mode 6). Both new steps sit in the next free slot at the bottom of the
+      # job, the position rule this file wrote for itself when ticket 161
+      # started adding steps, and both carry the settled `!cancelled()` guard
+      # so they produce a verdict even when a step above is red.
+      #
+      # WHAT THEY RUN. frontend/scripts/lint-seeds.mjs (zero new dependencies,
+      # node:fs/path/url only) closes the second half of AC#9: the steps above
+      # prove tsc/lint/build green, but AC#9's own words require that a seeded
+      # violation is CAUGHT - "种子违规会被抓（硬编码 hex、emoji、禁用导入各
+      # 一枚）". Three families, one rule set each:
+      #   hex     - a colour literal in any src .ts/.tsx/.css; the single named
+      #             exclusion is src/styles/tokens.generated.css, the generated
+      #             C21 token source (guarded independently by tokens:check
+      #             above and TestC21DesignTokensFourWayAgree). Mirrors
+      #             TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme but over
+      #             every src file, reachable or not.
+      #   emoji   - the tools/d22scan emojiRe character class, copied verbatim,
+      #             with the comment exemption absent: raw lines, comments and
+      #             strings alike. Where the Go spec wording and the instrument
+      #             disagree, the product rule wins: UI zero emoji.
+      #   imports - (a) a specifier resolving outside src into a fixtures/ or
+      #             demo/ tree (render-fixture JSONs must never be bundled);
+      #             (b) an import of the src/fixtures/** harness data from any
+      #             file outside the stated harness face (src/main.tsx,
+      #             src/components/harness/**, src/components/showcase.tsx -
+      #             exactly the importers that existed when the rule landed).
+      #
+      # WHY TWO STEPS, in this order. Step 1 is the seeded pair (the shape the
+      # lint job above already uses for tools/d22scan: a gate that has never
+      # gone red cannot be trusted green): the self-test runs the clean sample
+      # through the same scan function and demands 0 findings, then demands
+      # each seeded family rings with the sample file named. Step 2 is the
+      # production scan of frontend/src. Exit codes: 0 clean, 1 findings or a
+      # misbehaving control, 2 empty denominator - a scan that matched nothing
+      # can never read as green.
+      - name: "Seed scanner self-test (ticket 77 AC#9 - clean control green, hex/emoji/forbidden-import seeds red)"
+        if: ${{ !cancelled() }}
+        run: npm run seeds:self-test
+
+      - name: "Seed scan frontend/src (ticket 77 AC#9 - hex outside the generated theme, UI emoji, forbidden fixture/demo imports)"
+        if: ${{ !cancelled() }}
+        run: npm run seeds
+
