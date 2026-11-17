@@ -1,8 +1,8 @@
 # 49 — Session grants (D45-2): (tool, pattern, session) authorization + input.type binding
 
 **Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Claimed by:** agent-97 (2026-11-17, impl leg, commit 0172714d4 — 非实现者验收未做)
+**Last update:** 2026-11-17
 **Blocked by:** 04-sqlite-core, 48-approval-queue-full
 **Parallel slots:** ≤2 sub-agents (A: grant store + evaluation in risk path; B: card third
 option + revoke UX + audit logging)
@@ -45,3 +45,16 @@ revocable live, fully audited — including the input.type target-process bindin
 - [ ] Audit: grant_id linkage present in tool_call rows for every grant-backed execution.
 
 ## Progress log (append-only, newest last)
+
+- 2026-11-17 agent-97（实现腿，commit `0172714d4`，基锚 `26ee1c081`）：六格实现全落（见
+  docs/evidence/s1/49-session-grants-impl.md 的逐格读数）。要点：生命周期＝身份失效（224 已有）+
+  收口 stamp（rt.close 的 SESSION-GRANT-SWEEP，行保留）；revoke＝Ledger.Revoke + console 动词
+  `revoke-grant <编号>`，下一调用重弹；三限全钉（L2 有全覆盖 grant 源仍弹卡、R4 升级无视 grant、
+  mode-silenced 永不记 allow_session_grant）；input.type＝解析进程名绑定（resolveInputTarget 与
+  执行同管线）+ per-process 隔离 + all-apps 危险档（session-expand→session-all 两步）+ byte 界
+  swap guard；batch＝PatternForPaths（最长公共祖先 + /*）+ session-pattern 一卡一行；
+  audit＝tool_call.grant_id 逐调用落库（allow_session_grant 词表）。AC 框全部留给非实现者勾。
+  自测：internal/session+tools+agent/approval+memory 全 ok；cmd/wisp 载具单跑五枚全 PASS
+  （一次一发、跑前 wisp.test 现查、Git bash 门）。整包死法按 A1893/A1882 处置记录。
+  未做（登记非省略）：面板侧 grants.list/revoke 入站方法（banned-root 表禁 Go 入站 grant 路由，
+  出口今天为 console 动词）。零契约文字改动。
