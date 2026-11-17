@@ -110,3 +110,10 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 - **勾 AC#4（No-allow invariant）**：`frontend/src/components/l2-approval-card.tsx` 里**没有**任何可点的 allow 动作接到 decision API —— grep `allow|decide|decision` 只命中注释与 `判定来自 ${view.decidedBy}` 展示行（`:264/:347`），**零操作接线**。
 - 顺带修一处假数：容量句原写「10」无读者，已改 `QUEUE_CAPACITY=8` ＝`internal/agent/approval/queue.go:130 DefaultMaxPending`。
 - **留白（具名，均需真宿主或 Go 读面）**：AC#1 深度 1→2 e2e（需宿主）、AC#2 270/300s 倒计时＋球徽标清（球侧）、AC#3 原生回退卡、AC#5 BatchView（`internal/agent/approval/ui.go:193` 只走原生 Prompt 面，卡无字段）、AC#6 人眼签收（机主）。
+
+---
+
+## 编排者追加·BatchView 字段已落地（2026-11-17 10:3x，`b1d2162dd`）
+
+`internal/panel/approval.go:81 ApprovalCardView` 新增五枚平铺 `omitempty` 字段 → `internal/panel/pump.go:126`（NativeVerdict.Batch 映射）→ 数据源 `internal/agent/approval/cardsummary_37.go:39 CardSummary`（display 字段 L1/L2 ≥3 目标都答，R4/R3 污染不出；**L2 永不聚合契约原样、`gate.go` R7 守卫未动**）。
+⇒ 前端 AC#5 剩：把聚合卡五字段画出来（10 操作一张卡），50+ 升级 L2 走既有守卫。

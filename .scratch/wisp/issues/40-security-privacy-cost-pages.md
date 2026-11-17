@@ -146,3 +146,12 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 **尺1** `2f173996e` 在。**尺3 我自己复跑**：`npm run render:security40` **rc=0**（`…consume the real feeds (cost.summary payload verbatim …)`）；build/typecheck/lint 全 rc=0。
 **census 点名的三处假免接线已清账（我 grep 复核）**：成本 `cost-settings.tsx:11` 真发 `cost.summary`（`lib/panel.ts requestCostSummary`）；安全 `security-settings.tsx:83` 真读 `composer.mode`；技能复用 `PluginInventoryList`（`skills-settings.tsx:27`）。
 **0/6 格勾（诚实）**：AC#1 隐私对象 delete/purge/export 对活 DB —— 缺 privacy 路由（`bridge.go:41-107` 八法无它＋`composer_dispatch.go` 派发表无它）；AC#2 grants 视图随 49 活（49 在跑）；AC#3 成本**对账到微单位**缺聚合字段（`cost_handlers.go:30-36/:124-127` CACHED/月累计/预算/计价版本 4 枚）；AC#4 预算三态同缺；AC#5 诊断包清单缺 Go 导出面；AC#6 视觉签收（机主）。
+
+---
+
+## 编排者追加·读面已落地（2026-11-17 10:3x，`b1d2162dd`）
+
+我复跑（载具一发）：`Test40CostReconcileAgreesToTheMicroUnit` 0.20s／`Test40BudgetThreeStatesFromTheAdapter` 0.57s（4 子例 normal/warn/paused/warn）／`Test40CostSummaryPayloadCarriesAggregateOnChain` 0.16s／`Test40PrivacyDeleteOneDeletesExactlyOneRow` 0.19s／`Test40PrivacyPurgeClearsTheDomainAndCounts` 0.18s／`Test40PrivacyExportCarriesTheDomainJSON` 0.14s／`Test40PrivacyWiringNailInProductionChain` 0.19s／`Test40PrivacyRefusalsNameTheDomainVocabulary` 0.20s ⇒ **8/8 PASS rc=0**（另有内部三包绿）。
+- **AC#3/AC#4**：`internal/panel/cost_handlers.go:54 CostAggregateRow`（月累计/预算/三态/计价版本）＋`:92 CostAggregateReader`；`cmd/wisp/panel_cost_194.go:94`（月累计＝cost_daily 真行求和；预算走 `observe.BudgetFrom/Judge` 整数基点）＋`:159 budgetStateWord`。**CACHED 是话不是读数**：`CostDayRow.CachedTokens` 存在但 cost_daily 无 cached 列 ⇒ payload `cachedKnown=false`，⛔ 画 0。
+- **AC#1**：名册 `internal/panel/bridge.go:141`（`privacy.delete-one`/`privacy.purge`/`privacy.export`）＋派发表 `composer_dispatch.go:174`＋处理器 `cmd/wisp/panel_privacy_40.go:89`＋接线 `panel_inbound.go:411`。三支计数对真 DB。
+⇒ 前端剩：预算条读 aggregate（100→paused/80→warn）、隐私三支按钮走真路由（删除/清空/导出，需确认卡）。

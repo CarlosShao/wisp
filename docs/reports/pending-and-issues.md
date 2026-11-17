@@ -37761,3 +37761,11 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - `security-settings.tsx:73` 改真话：生产在写（`gate.go:859`/`grants.go:201/274`/`bridge.go:1445`）＋面板无 grants 读面（`panel_inbound_fuzz_35g1_test.go:160` 把 `grants.revoke` 钉成非法名）＋出口＝console 动词（`approval_reply.go:415/:474`）；StateTag 仍「未接线」＝缺的只是读面。
 - `cost-settings.tsx:33/107` 改真话：预算判定 Go 侧已活（`observe/costbudget.go:103`、`agent/costbook_44.go:147`），payload 未带字段前不画任何数字。
 - 根因：hast-util-sanitize v5 `safeProtocol` 对无冒号 URL（双斜杠、反斜杠）直接放行 ⇒ 在 urlTransform 层补最后一道闸（`result-history.tsx:121/:139`）。
+## A1923（11-17 10:3x）：读面波1落地 `b1d2162dd`（28 件）—— 39/40/37 的 Go 钥匙配齐
+
+我复跑：internal/config 新牙 ok 0.133s；internal/panel ok 0.720s；internal/agent/approval ok 5.279s；载具 `Test39ConfigStoreReadFaceSectionsErrors`＋`Test40*` 八枚 ⇒ **13 RUN/13 PASS rc=0**。
+- config 全节树 `sections_456.go:45`＋reload 事件 `config_handlers.go:579`；`errors[]{line,message}` `loaderrors_456.go:43/54/108`。
+- 成本 `CostAggregateRow` `cost_handlers.go:54`＋`panel_cost_194.go:94/159`；**对账到微单位牙**（1000/1000 Agree=true，+1micro⇒false）；预算三态四子例真库真配置。
+- 隐私三路由 `bridge.go:141`＋`composer_dispatch.go:174`＋`panel_privacy_40.go:89`＋`panel_inbound.go:411`；三支计数对真 DB（3→2／3→0／records=2）。
+- BatchView 五字段 `approval.go:81`＋`cardsummary_37.go:39`（L2 永不聚合契约原样、R7 守卫未动）。
+**C17 入站名册扩 3 枚（`privacy.delete-one/purge/export`）—— 我拍板接受**：票 40 AC#1 明写要这三支 e2e，无 `panel.` 前缀、不入 grantRouteWords；**撤销口令**＝从 `bridge.go:141` 名册与 `composer_dispatch.go:174` 派发表删这三行、`panel_inbound.go:411` 摘接线即可复原。

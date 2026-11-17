@@ -114,3 +114,12 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 **尺1** `021bb9832` 在。**尺3 我自己复跑**：`vite build --ssr scripts/render-config-screen.tsx` ＋ `node …` 均 **rc=0**（`render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier …)`）；build/typecheck/lint 全 rc=0。
 **census 四件已落地（我 grep 复核）**：①`config-screen.tsx` 里 `row.blocked === ""` **判据已删**（全仓零命中；只有别的文件的 `blockedOnApproval`）；②`app.theme` 标「未接线」并具名（`SetTheme` 无调用者）；③`panel.font_size` 标「缺消费引擎」；④`panel.opacity/animations` 改「仅本次会话」。
 **0/5 格勾（诚实）**：五格全卡在 Go 读面 —— AC#1 缺 `sections[]{key,value,tier}` 全节树＋reload 事件；AC#2 risk/fs/net/plugins 四节零读零写＋无 L2 入口；AC#3 `api_key` last-4 与 `config-view.ts:44-45`「尾永不上线」契约冲突（**须机主批契约**）；AC#4 缺 `errors[]{line,message}`；AC#5 视觉签收（机主）。
+
+---
+
+## 编排者追加·读面已落地（2026-11-17 10:3x，`b1d2162dd`，件 `docs/evidence/s1/readface-wave1-20261117-r1.md`）
+
+我复跑：`internal/config` 新牙 ok 0.133s；载具 `Test39ConfigStoreReadFaceSectionsErrors` **PASS 0.01s**。**Go 读面已就位，前端可以接**：
+- **AC#1**：`internal/config/sections_456.go:45 SectionRows`（全 D36 树反射走查，含 `[plugins]` 动态子表）→ `internal/panel/config_handlers.go` payload `sections[]{key,value,tier}` → `cmd/wisp/panel_config_store.go:147`；**reload 事件** `config_handlers.go:579`（`wisp-config-reload:` marker；accepted 写才发、被拒零事件）。tier 词取自 `TierRegistry`（hot/reload/restart/locked）。
+- **AC#4**：`internal/config/loaderrors_456.go:43/:54/:108`（`errors[]{line,message}`，未知键/类型错带 1-based 行号；语义错 Line=0）。
+⇒ 前端只剩"把 sections 画成每节一张表＋tier 徽章、把 errors 按行号列出来"。

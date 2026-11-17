@@ -1,0 +1,12 @@
+# 派单存档（先存档再发，等 w38ac6 收腿后发）—— 前端消费读面波：39 AC#1/#4、40 AC#3/#4、37 AC#5（写腿，frontend 写面，一次一腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。前置：`b1d2162dd` 已把 Go 读面落地（详见三张票尾「编排者追加·读面已落地」节）。**只做这五格，一次做完一张票再下一张**：
+1. **票 39 AC#1**：把 `sections[]{key,value,tier}` 画成"每节一张表＋tier 徽章（hot/reload/restart/locked 逐字）"；监听 `wisp-config-reload:` 事件重取（被拒写零事件）。牙：喂 18 节假真值⇒18 张表；摘一节⇒那张表消失且不显示旧值；tier 徽章逐字。
+2. **票 39 AC#4**：`errors[]{line,message}` 按行号列出（语义错 Line=0 显示"（无行号）"）。牙：喂 line=5 未知键⇒显示"第 5 行"。
+3. **票 40 AC#3**：成本按天表已接；补 `CostAggregateRow`（月累计/预算/计价版本）上屏，`cachedKnown=false` 时**不画 cached 数字**（显示"未知"）。牙：喂 aggregate⇒逐字段；cachedKnown=false⇒无数字。
+4. **票 40 AC#4**：预算三态条：<80 normal／≥80 warn／≥100 paused（读 aggregate 的 state 词，⛔自己算阈值）。牙：三态各一枚。
+5. **票 37 AC#5**：聚合卡五字段（`ApprovalCardView` 的 omitempty 五枚）画出来；10 操作一张卡；⛔ 画 allow。
+**硬约束**：⛔ 改契约/PLAN/specs/thresholds/golden/allowlist/D43/design、⛔ 放宽断言、⛔push、⛔ 提交 dist 字节、⛔ UI emoji、⛔ 自己算阈值/派生总数。
+**串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0＋相关仪器 rc=0；node 在 `D:\work\server\node24`。
+写面：`frontend/src/components/{config-screen,config-editor,cost-settings,approval-screen,approval-queue}.tsx` 及新件、`frontend/scripts/render-*`、`docs/evidence/s1/readface-consume-*`。
+回话第一行＝commit hash ＋五格各自读数/牙名 ＋build/typecheck/lint rc。没干完写「未完成，卡在哪」。
