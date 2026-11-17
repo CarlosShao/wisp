@@ -66,6 +66,10 @@ var panelVerdictAllowedFields = []string{
 // tools.Decision: the fields the queue keeps. The reference-typed ones among
 // them (Params, Paths, Capabilities, Blacklist) are exactly the slots the
 // ticket-146 clone guarded; on the panel payload they are gone outright.
+// TargetProcess is ticket 49's input.type binding fact: it rides the NATIVE
+// card (the operator confirms a named application) and PanelItem carries no
+// such field by construction (SPEC-06 §9's read-only panel face), so it stays
+// in the dropped column with the rest.
 var panelVerdictDroppedFields = []string{
 	"Blacklist",
 	"CallID",
@@ -80,6 +84,7 @@ var panelVerdictDroppedFields = []string{
 	"PluginID",
 	"Provider",
 	"Refusal",
+	"TargetProcess",
 	"TaskID",
 	"Timeout",
 }

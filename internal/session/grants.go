@@ -51,13 +51,32 @@ import (
 type Store interface {
 	InsertGrant(ctx context.Context, g memory.ApprovalGrant) (int64, error)
 	ListGrantsBySession(ctx context.Context, sessionID string) ([]memory.ApprovalGrant, error)
+	RevokeGrant(ctx context.Context, id int64) error
 }
 
-// GrantRecorder is the write half as the approval layer sees it: one answered
-// card, one stored rule. approval.Gate holds this interface and nothing else
-// from this package, so it cannot read grants, list them, or revoke them.
+// GrantRecorder is the write half as the approval layer sees it. Ticket 224
+// froze it as "one answered card, one stored rule"; ticket 49 (D45-2's
+// input.type variant, §15 ruling item 7) extends the SAME interface with the
+// target-process rows and the all-apps row, because both are written from the
+// same native answer route and nowhere else. approval.Gate holds this interface
+// and nothing else from this package, so it cannot read grants, list them, or
+// revoke them - the read side stays tools.GrantSource's Covering/TargetCovering
+// and the revoke entrance is the host's own verb (the 面板 grants.list/revoke
+// routes SPEC-08:171 names stay unbuilt for the reason grants.go's header
+// records: implemented as inbound Go-answered methods they die on
+// internal/panel/l2_grant_boundary_test.go's banned-root table).
 type GrantRecorder interface {
 	Record(ctx context.Context, tool, pattern string) (int64, error)
+	// RecordTarget writes the input.type binding row: 「本会话内允许向
+	// <process> 注入」. The pattern is the RESOLVED process name the card
+	// named, never a model-supplied string and never a wildcard.
+	RecordTarget(ctx context.Context, tool, process string) (int64, error)
+	// RecordTargetAllApps writes the danger-tier row: 「本会话内允许向所有
+	// 应用注入」. It is a separate door from RecordTarget on purpose - the
+	// per-app door refuses the sentinel, so the only way a wildcard-shaped
+	// rule comes to exist is the answer route that is required to carry the
+	// danger ritual.
+	RecordTargetAllApps(ctx context.Context, tool string) (int64, error)
 }
 
 var _ GrantRecorder = (*Ledger)(nil)
@@ -106,6 +125,31 @@ type LedgerOptions struct {
 // A435's 乙 branch) is registered as open in ticket 224's progress note; this
 // ticket does not pick a new policy number.
 const clockCeilingDefault = memory.GrantAuditTTL
+
+// GrantPatternAllApps is the one wildcard shape a session grant may carry: the
+// input.type variant's 「本会话内允许向所有应用注入」 (§15 ruling item 7). It is
+// deliberately the literal "*": the dialect in patternCovers already treats a
+// pattern carrying `*` as a path.Match pattern and `*` alone matches every
+// slash-free term, which is exactly "this process name", so the sentinel rides
+// the EXISTING matcher instead of adding a second one.
+//
+// Two doors below protect it: RecordTarget refuses it (so a per-app answer can
+// never widen itself), and its only producer is RecordTargetAllApps, the door
+// the native answer route reaches only after the danger ritual (视觉降级 +
+// 二次点击展开, SPEC-06 §8.2). tools.GrantSource's read side refuses to key a
+// lookup on it in the other direction - the wildcard row exists so the D45
+// card variant can stand in for the per-call question, and the file-path
+// matcher's blast radius stays what patternCovers documented (a `*` never
+// crosses a separator), never a second all-apps grant.
+const GrantPatternAllApps = "*"
+
+// grantAllAppsTool is the tool whose grants the all-apps sentinel is reserved
+// for. The pattern column is shared by the file-path dialect and the
+// process-name dialect (SPEC-02 §3 freezes one TEXT column); the sentinel's
+// meaning is therefore pinned to the tool the danger ritual belongs to, so a
+// "*" row for any other tool is a row that matches nothing and a row that
+// matters cannot be forged for a cheaper tool.
+const grantAllAppsTool = "input.type"
 
 // NewLedger composes the ledger for one minted session.
 func NewLedger(o LedgerOptions) (*Ledger, error) {
@@ -168,6 +212,168 @@ func (l *Ledger) Record(ctx context.Context, tool, pattern string) (int64, error
 	l.log("session: GRANT-RECORD id=%d tool=%s pattern=%q session=%s expires_at=%d",
 		id, tool, pattern, l.id, now.Add(l.ttl).Unix())
 	return id, nil
+}
+
+// RecordTarget writes the input.type binding row (ticket 49, §15 ruling item 7):
+// 「本会话内允许向 <process> 注入」.
+//
+// The pattern is the RESOLVED target process name the card named - the same
+// lowercase image name realProcessName derives from the pid the call targeted,
+// never a model-supplied string and never a wildcard. A process name is
+// deliberately judged by the same rules a path pattern is judged by here
+// (recordablePattern/storeablePattern): a name with a `*` in it is refused as a
+// bad pattern, so the per-app door cannot be walked into writing the sentinel,
+// and the all-apps row exists only through its own door below.
+func (l *Ledger) RecordTarget(ctx context.Context, tool, process string) (int64, error) {
+	if strings.TrimSpace(tool) == "" {
+		return 0, errors.New("session: grant 需要 tool")
+	}
+	if process == GrantPatternAllApps {
+		return 0, fmt.Errorf("session: 「所有应用」不是 RecordTarget 的入参：" +
+			"逐进程行走 RecordTarget，全应用行只能走 RecordTargetAllApps（视觉降级 + 二次点击展开的门槛在这里）")
+	}
+	if !recordablePattern(process) {
+		return 0, fmt.Errorf("session: 目标进程名无法记账（空白或带「无法规范化」标记）：%q", process)
+	}
+	if err := storeablePattern(process); err != nil {
+		return 0, fmt.Errorf("session: 目标进程名按模式语法不合法（不允许通配进程名）: %w", err)
+	}
+	return l.recordRow(ctx, tool, process, "GRANT-RECORD-TARGET")
+}
+
+// RecordTargetAllApps writes the danger-tier row: 「本会话内允许向所有应用注入」.
+//
+// It is a SEPARATE method from RecordTarget on purpose, and the reason is the
+// ruling's own wording: the all-apps option 「必须显式标注为更危险」 and 「不得与
+// 推荐档并列」. Making the wildcard a parameter of the per-app door would let
+// any caller of RecordTarget mint it; giving it a door of its own is what lets
+// the answer route require the expand-confirm ritual BEFORE this method is
+// reachable, and lets the audit line name the danger tier on its own.
+//
+// The tool is pinned to input.type (grantAllAppsTool): the sentinel row for any
+// other tool is a row that can never match anything (TargetCovering refuses the
+// sentinel for other tools), so writing one would be an audit lie. Refuse
+// instead of storing a dead row.
+func (l *Ledger) RecordTargetAllApps(ctx context.Context, tool string) (int64, error) {
+	if strings.TrimSpace(tool) == "" {
+		return 0, errors.New("session: grant 需要 tool")
+	}
+	if tool != grantAllAppsTool {
+		return 0, fmt.Errorf("session: 「所有应用」档只属于 %s（收到 %s），其他工具的会话授权"+
+			"绑定 (工具, 路径模式)，没有全应用档", grantAllAppsTool, tool)
+	}
+	return l.recordRow(ctx, tool, GrantPatternAllApps, "GRANT-RECORD-ALL-APPS")
+}
+
+// recordRow is the shared insert behind all three Record* doors. It exists so
+// the three audit sentences differ (a per-path row, a per-process row and the
+// all-apps row are different facts about what was agreed) while the storage
+// call and the liveness stamping are written once.
+func (l *Ledger) recordRow(ctx context.Context, tool, pattern, kind string) (int64, error) {
+	now := l.now()
+	id, err := l.store.InsertGrant(ctx, memory.ApprovalGrant{
+		Scope:     memory.GrantScopeSession,
+		Tool:      tool,
+		Pattern:   pattern,
+		SessionID: l.id.String(),
+		CreatedAt: now.Unix(),
+		ExpiresAt: now.Add(l.ttl).Unix(),
+	})
+	if err != nil {
+		return 0, fmt.Errorf("session: 记录会话授权失败: %w", err)
+	}
+	l.log("session: %s id=%d tool=%s pattern=%q session=%s expires_at=%d",
+		kind, id, tool, pattern, l.id, now.Add(l.ttl).Unix())
+	return id, nil
+}
+
+// TargetCovering answers the input.type variant's one question: does THIS
+// session already hold a live grant covering (tool, target process)?
+//
+// Fail-closed on every branch, exactly like Covering: any error, an empty
+// process name, or a panic from the store answer (0, false), which puts the
+// question back on the user. A wildcard row (GrantPatternAllApps) answers TRUE
+// here and only here - the all-apps row's whole meaning - and the wildcard is
+// refused for any other tool, because for a tool without the danger ritual the
+// sentinel is not a rule anybody agreed to.
+func (l *Ledger) TargetCovering(ctx context.Context, tool, process string) (int64, bool) {
+	if strings.TrimSpace(tool) == "" || strings.TrimSpace(process) == "" {
+		return 0, false
+	}
+	rows, err := l.store.ListGrantsBySession(ctx, l.id.String())
+	if err != nil {
+		l.log("session: GRANT-READ-FAILED tool=%s err=%v; 按未授权处理（继续询问）", tool, err)
+		return 0, false
+	}
+	now := l.now().Unix()
+	// Exact per-process match first, then the all-apps row; the first live row
+	// that discharges the question is the id that lands on the audit line.
+	var allApps int64
+	for _, g := range rows {
+		if g.Tool != tool || !grantLive(g, now) {
+			continue
+		}
+		if g.Pattern == process {
+			l.log("session: GRANT-TARGET-HIT tool=%s target=%s grant_id=%d session=%s",
+				tool, process, g.ID, l.id)
+			return g.ID, true
+		}
+		if g.Pattern == GrantPatternAllApps && tool == grantAllAppsTool {
+			allApps = g.ID
+		}
+	}
+	if allApps != 0 {
+		l.log("session: GRANT-TARGET-HIT tool=%s target=%s grant_id=%d session=%s scope=all-apps",
+			tool, process, allApps, l.id)
+		return allApps, true
+	}
+	return 0, false
+}
+
+// Revoke stamps one of this ledger's rows revoked (SPEC-06 §8.2's 一键撤销).
+// It is the ledger's OWN revoke entrance: the host's operator verb reaches it
+// through the run it belongs to, the store stamps revoked_at, and the NEXT
+// Covering/TargetCovering call answers false because grantLive reads
+// revoked_at. Rows are retained (SPEC-02 §4's audit window), not deleted.
+func (l *Ledger) Revoke(ctx context.Context, id int64) error {
+	if err := l.store.RevokeGrant(ctx, id); err != nil {
+		return fmt.Errorf("session: 撤销会话授权失败: %w", err)
+	}
+	l.log("session: GRANT-REVOKE id=%d session=%s (下一次同类调用重新询问)", id, l.id)
+	return nil
+}
+
+// RevokeAll stamps every row of this session revoked. This is ticket 49's
+// session-end step, expressed as data instead of as a forgotten cleanup: the
+// rows stay on disk (SPEC-02 §4's audit window) with revoked_at set, so the
+// audit keeps its history AND no later read can honour them. The identity
+// invalidation (A435 clause 2) remains the primary death of a session's grants;
+// this stamp is the explicit belt-and-braces a live revoke-entrance needs.
+func (l *Ledger) RevokeAll(ctx context.Context) (int, error) {
+	rows, err := l.store.ListGrantsBySession(ctx, l.id.String())
+	if err != nil {
+		return 0, fmt.Errorf("session: 撤销全会话授权失败（读取）: %w", err)
+	}
+	n := 0
+	for _, g := range rows {
+		if g.RevokedAt != nil {
+			continue
+		}
+		if err := l.store.RevokeGrant(ctx, g.ID); err != nil {
+			return n, fmt.Errorf("session: 撤销会话授权失败（row %d）: %w", g.ID, err)
+		}
+		n++
+	}
+	l.log("session: GRANT-REVOKE-ALL session=%s revoked=%d (会话收口)", l.id, n)
+	return n, nil
+}
+
+// ListBySession returns this ledger's own rows, newest first - the read face
+// the host's operator verbs (list + revoke) walk. It is a plain projection of
+// the store's rows; liveness verdicts belong to the caller, which has the
+// clock and the display.
+func (l *Ledger) ListBySession(ctx context.Context) ([]memory.ApprovalGrant, error) {
+	return l.store.ListGrantsBySession(ctx, l.id.String())
 }
 
 // Covering answers the bridge's one question: does THIS session already hold a

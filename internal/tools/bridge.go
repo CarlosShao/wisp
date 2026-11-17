@@ -100,6 +100,16 @@ type Options struct {
 	// and PLAN.md:2148 D45-3 mean this seam is consulted for an unsilenced L1
 	// verdict and for nothing else. See Execute.
 	Grants GrantSource
+	// ResolveTarget is ticket 49's resolver for the injection target an
+	// input.type call names. The composition root wires it to the SAME
+	// SystemBridge the tools execute through, so the name a card shows, the
+	// name a grant binds and the name the backend injects into are one
+	// resolver's output. nil = the variant is dormant (fail closed: ask).
+	// The binding's READ side is not a second field: it goes through Grants
+	// (sessionTargetID discovers the TargetCovering capability on the same
+	// source), which is what keeps the bridge at exactly one grant-shaped
+	// field per ticket 224's pin.
+	ResolveTarget TargetResolver
 	// Confirmations returns the B-tier single-file overrides on record (the
 	// set risk.Gate's bOverrides argument was designed to receive). nil or
 	// empty means "no file has ever been confirmed", so every B-tier path stays
@@ -185,8 +195,11 @@ type Bridge struct {
 	taskCleanup func(taskID string) int
 	// grants is ticket 224's third read-only injection, same shape and the same
 	// rule: read per call, no setter, and nil means no session has ever
-	// answered anything.
-	grants GrantSource
+	// answered anything. The ticket-49 target dialect reads the SAME field
+	// (sessionTargetID's interface assertion); resolveTgt is the target
+	// resolver, a facts seam, not a grant channel.
+	grants     GrantSource
+	resolveTgt TargetResolver
 
 	// classifier is shared: it is stateless over the frozen blacklist.
 	classifier risk.SensitiveClassifier
@@ -229,6 +242,7 @@ func New(o Options) *Bridge {
 		cancel:      o.Cancel,
 		modes:       o.Modes,
 		grants:      o.Grants,
+		resolveTgt:  o.ResolveTarget,
 		taskCleanup: o.TaskCleanup,
 		confirmations: func() map[string]bool {
 			if o.Confirmations == nil {
@@ -419,10 +433,54 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 				req.Name, len(rawPaths), grantID, verdict.Level, mode)
 		}
 	}
+
+	// --- ticket 49: the input.type target-process binding --------------------
+	//
+	// §15 ruling item 7 scopes ONE downgrade to ONE tool: input.type stays L2
+	// for its first injection into an application, and 「本会话内允许向此应用
+	// 注入」 stands in for the per-call question afterwards - the D34 row's own
+	// sentence (PLAN.md:2557: L2 首次 → 可按 D45 会话授权降为 L1). Every gate
+	// below refuses closed:
+	//
+	//	sil.Silenced      a mode already removed the question; a grant must
+	//	                  not take credit for a silence (the 224 rule above),
+	//	sil.Level != L2   only an L2 verdict is the shape the downgrade answers
+	//	                  (an L1 input.type verdict does not exist today, and
+	//	                  if one ever does, it rides the L1 branch above),
+	//	red line / R4     targetBindingBlocked refuses every red line (§15
+	//	                  item-7 ⑤: C25 污染命中不受本授权覆盖),
+	//	tool != input.type the variant is scoped to one tool,
+	//	no resolver / no resolvable target / pid fallback name - the name a
+	//	                  grant binds must be the resolved process, or nothing.
+	//
+	// The resolved target travels on dec.TargetProcess: the route below hands it
+	// to the card (so the operator confirms a NAMED application, not an opaque
+	// hwnd), and the sessionSubject→record chain stores exactly that name as the
+	// grant's pattern. If a call's target cannot be resolved, the card still
+	// asks - L2 every time - which is the fail-closed direction.
+	var targetGrantID int64
+	targetProc := ""
+	if req.Name == TargetGrantTool && !sil.Silenced && sil.Level == risk.L2 && b.grants != nil && b.resolveTgt != nil {
+		if blockWhy, isBlocked := targetBindingBlocked(verdict); isBlocked {
+			b.log("tools: GRANT-TARGET-BLOCKED tool=%s reason=%s (L2 维持，会话授权降级不适用)", req.Name, blockWhy)
+		} else if proc, ok := b.resolveTgt(params); ok && proc != "" {
+			targetProc = proc
+			dec.TargetProcess = proc
+			if id := b.sessionTargetID(ctx, proc); id != 0 {
+				targetGrantID = id
+				b.log("tools: GRANT-TARGET-USE tool=%s target=%s grant_id=%d assessed=%s mode=%s "+
+					"(本会话内允许向此应用注入：L2 降 L1，§15 第 7 项定案)",
+					req.Name, proc, id, verdict.Level, mode)
+			}
+		}
+	}
+	if targetGrantID != 0 {
+		grantID = targetGrantID
+	}
 	b.emit(dec)
 
 	// --- routing: L0 pass, L1 window, L2 approval, Deny never reaches a gate -
-	ok2, why := b.route(ctx, &dec, sil, grantID)
+	ok2, why := b.route(ctx, &dec, sil, grantID, targetProc)
 	if !ok2 {
 		// Ticket 20 frame 7 (a): name WHICH refusal this was, in a
 		// machine-readable value, before the verdict leaves the bridge. It is
@@ -440,6 +498,24 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	}
 
 	// --- execution under the D38d ceiling and the C22 deadline --------------
+	// Ticket 49's swap guard: a granted input.type call re-resolves its target
+	// and refuses closed if the name moved. Between the judge and this line the
+	// foreground window can change, and without this check 「本会话内允许向
+	// notepad.exe 注入」 would type into whatever window the user focused - the
+	// §15 item-7 ③ sentence (「换目标应用要重新确认」) enforced at the byte
+	// boundary, not only at the card. The re-resolution is the SAME resolver
+	// the judge ran; a mismatch is a refusal with the exact wording the ruling
+	// names, and no grant row is spent for the refused call (grantID rides the
+	// booking, but decision=reject books no grant linkage on the row).
+	if targetProc != "" && grantID != 0 && b.resolveTgt != nil {
+		if proc, ok := b.resolveTgt(params); !ok || proc != targetProc {
+			dec.DecisionColumn = agent.DecisionReject
+			return b.reject(ctx, req, dec,
+				fmt.Sprintf("目标应用已切换（授权针对 %s，本次目标解析为 %s）：换目标应用要重新确认（§15 第 7 项 ③），已拒绝执行",
+					targetProc, orDefault(proc, "未解析")),
+				string(observe.ClassUserRejected), OutcomeKindRefused)
+		}
+	}
 	return b.run(ctx, req, entry, dec, grantID)
 }
 
@@ -502,7 +578,16 @@ func (b *Bridge) capsOf(name string, entry Entry) capSet {
 // branch. L2 and Deny have no path to it, which is SPEC-06 §8.3's first bullet
 // expressed as a switch statement rather than as a check this function might
 // forget.
-func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced, grantID int64) (bool, string) {
+//
+// targetProc is ticket 49's second key: non-empty ONLY when the caller proved
+// (Execute, before route ran) that (a) the tool is input.type, (b) the verdict
+// carries no red line, and (c) a live session grant covers the resolved target
+// process - the §15 item-7 downgrade. On the L2 branch that proof converts the
+// C18 card into the recorded allow_session_grant row WITHOUT a new prompt: the
+// click that answered the FIRST card for this application is the authorization,
+// and it books exactly like the L1 branch's grant does. Every other value of
+// sil.Level ignores it.
+func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced, grantID int64, targetProc string) (bool, string) {
 	switch sil.Level {
 	case risk.L0:
 		dec.DecisionColumn = agent.DecisionAllow
@@ -537,6 +622,20 @@ func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced, gr
 		}
 
 	case risk.L2:
+		if grantID != 0 && targetProc != "" {
+			// Ticket 49's downgrade branch. The guard is the PAIR: grantID
+			// alone would widen every L2, targetProc alone would widen on any
+			// lookup hit. Execute only sets both when the §15 item-7 gates all
+			// held (one tool, no red line, live grant on the resolved target),
+			// and this branch re-states them so route cannot be talked into
+			// the downgrade by a future caller that passes only one.
+			if dec.Tool != TargetGrantTool {
+				b.log("tools: GRANT-TARGET-REFUSED tool=%s (降级只属于 input.type)，走正常 L2 审批", dec.Tool)
+			} else {
+				dec.DecisionColumn = agent.DecisionAllowGrant
+				return true, ""
+			}
+		}
 		a, why := b.gate.PendingApproval(ctx, *dec)
 		switch a {
 		case AnswerAllow:

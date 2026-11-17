@@ -195,6 +195,16 @@ type runSpec struct {
 	// loop must hang under the ctx that D38(e) step 3 cancels, or "leaving
 	// cancels the running task" stays a sentence with no mechanism behind it).
 	taskCtx context.Context
+	// resolveTargetOverride is ticket 49's test-side resolver pin: when set,
+	// the assembled bridge uses it instead of the SystemBridge's own
+	// resolution. Production leaves it nil - the real machine resolves through
+	// sysBridge.ResolveTarget, the same object the tools execute through. The
+	// injection exists because a runner cannot guarantee a desktop window to
+	// resolve an hwnd against, and the binding cells need the name the §15
+	// item-7 ruling binds grants with to be a controlled value. It is a
+	// RESOLUTION seam (facts about the call), not an authority: it answers
+	// "which process would this land in", never "may this run".
+	resolveTargetOverride tools.TargetResolver
 }
 
 // runTextTask executes one CLI text task and returns the process exit code.
@@ -804,7 +814,6 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	}
 	// The task family (ticket 164 AC#3, plus ticket 221 甲形 per ruling A434) is
 	// what reads and stops the process-local task table above:
-	//
 	//	task.output  reads back what one row's task printed
 	//	task.cancel  stops ONE subagent the CALLING task itself derived
 	//
@@ -912,7 +921,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// and their R8 facts, and the bridge assembled above runs C19 over them per
 	// call - clipboard.write's "send" class and window.manage.close's
 	// "close-window" class reach the existing C18 card, not a new channel.
-	for _, e := range tools.BuiltinSystemEntries(tools.SystemDeps{Bridge: &tools.SystemBridge{}}) {
+	// Ticket 49: ONE SystemBridge instance for the whole run. The tools
+	// execute through it, and the bridge's ResolveTarget asks the SAME
+	// instance - so the process name a grant binds, the name a card shows and
+	// the window the bytes land in are one resolver's output, never two.
+	var sysBridge *tools.SystemBridge
+	sysBridge = &tools.SystemBridge{}
+	for _, e := range tools.BuiltinSystemEntries(tools.SystemDeps{Bridge: sysBridge}) {
 		if err := reg.Register(e); err != nil {
 			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
 			return rt, 2
@@ -953,7 +968,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	if rt.session != nil {
 		grantRead = rt.session
 		grantWrite = rt.session
+		// Ticket 49: the SAME ledger serves the input.type binding's read
+		// door - the bridge discovers its TargetCovering capability on this
+		// one source, so there is still exactly one grant channel into the
+		// decision chain.
 	}
+	// The system bridge the machine-control family runs through, kept for
+	// ticket 49's resolver: the grant question and the bytes must land on the
+	// same resolution. (Assigned at the registration block above, line ~918.)
 
 	// Two postures, and the second one is ticket 246 AC#7 (orchestrator ruling
 	// 2.2: 「一个进程只许一枚 approval.Gate」):
@@ -1367,6 +1389,25 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// could not mint a session, which is the state every pre-224 assembly was
 		// in and which leaves every question asked.
 		Grants: grantRead,
+		// Ticket 49: the input.type target-process resolver rides the SAME
+		// SystemBridge the tools execute through. The binding's READ side is
+		// grantRead itself (the bridge discovers TargetCovering on that one
+		// source), so exactly one grant channel enters the decision chain.
+		ResolveTarget: func(params map[string]any) (string, bool) {
+			// The test-side override first (a runner without a desktop cannot
+			// resolve a real hwnd); production leaves it nil.
+			if s.resolveTargetOverride != nil {
+				return s.resolveTargetOverride(params)
+			}
+			if sysBridge == nil {
+				return "", false
+			}
+			proc, ok, err := sysBridge.ResolveTarget(params)
+			if err != nil || !ok {
+				return "", false
+			}
+			return proc, true
+		},
 		// Ticket 230 AC#4's anchor line: the operator's STANDING B-tier
 		// exemptions (config.toml's risk.blacklist_overrides) enter the gate
 		// here and nowhere else, and deliberately NOT by unioning them into
@@ -1686,6 +1727,24 @@ func joinedWithin228(h *observe.Handle, budget time.Duration) bool {
 // repository's own "the cancel is not a join" sentence asked for, with the
 // reading behind it.
 func (rt *agentRuntime) close() {
+	// Ticket 49's session-end step (SPEC-06 §8.2: 会话结束失效): every grant
+	// this session minted is stamped revoked BEFORE the store closes. The
+	// identity invalidation (A435 clause 2) is the primary death - no later
+	// boot can key these rows - but the stamp is what keeps THIS boot's
+	// surviving rows honest in the audit view: revoked, not live-looking.
+	// Rows are retained (SPEC-02 §4's 30-day audit window), never deleted
+	// here; a failed stamp is booked and changes nothing else about shutdown.
+	if rt.session != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		if n, err := rt.session.RevokeAll(ctx); err != nil {
+			rt.auditf("close: SESSION-GRANT-SWEEP session=%s revoked=%d err=%v (已记账，行保留在审计窗内)",
+				rt.session.SessionID(), n, err)
+		} else if n > 0 {
+			rt.auditf("close: SESSION-GRANT-SWEEP session=%s revoked=%d (会话结束，授权失效；行保留 30 天审计)",
+				rt.session.SessionID(), n)
+		}
+		cancel()
+	}
 	if rt.replyRoot != nil {
 		rt.replyRoot.Cancel()
 	}

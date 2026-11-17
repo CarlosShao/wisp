@@ -26,6 +26,15 @@ type Decision struct {
 	RulesHit     []risk.RuleID
 	Reason       string
 	Paths        []string // canonical, as judged by R2/R3
+	// TargetProcess is ticket 49's input.type binding fact: the RESOLVED
+	// target process name (lowercase image name from the pid the call
+	// targets), filled by the bridge only for input.type calls whose target
+	// resolved. It is a DESCRIPTION of the call, not an authority - the allow
+	// shape pins (ticket 90 / 224) are untouched, and a grant is looked up by
+	// this name, never carried in. The card prints it so the operator confirms
+	// a named application, and the session-subject record stores it as the
+	// grant row's pattern (§15 ruling item 7: 绑定 (工具, 目标进程名, 会话)).
+	TargetProcess string
 	Capabilities []Capability
 	// SessionOverrideBlocked is R4's "no D45 grant covers this" flag.
 	SessionOverrideBlocked bool

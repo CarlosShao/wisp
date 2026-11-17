@@ -454,22 +454,25 @@ func (q *Queue) allowScoped(corr, nonce string, forSession bool) error {
 	return nil
 }
 
-// sessionSubject reads the (tool, paths) one pending card named, on the exact
-// key the queue issued - the same lookup the allow side uses, so the pair being
-// recorded is the pair the user was shown and nothing an alias index could
+// sessionSubject reads the (tool, paths, target) one pending card named, on the
+// exact key the queue issued - the same lookup the allow side uses, so the pair
+// being recorded is the pair the user was shown and nothing an alias index could
 // redirect a refusal toward.
+//
+// target is ticket 49's input.type binding fact (dec.TargetProcess): "" for
+// every tool without a resolved injection target.
 //
 // It is a read, not an answer: the caller still has to spend a live nonce
 // through allowScoped, and if the card leaves the queue between this call and
 // that one, the spend fails and nothing is recorded.
-func (q *Queue) sessionSubject(corr string) (string, []string, bool) {
+func (q *Queue) sessionSubject(corr string) (string, []string, string, bool) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	it := q.lookupForAllowLocked(corr)
 	if it == nil || it.state != statePending {
-		return "", nil, false
+		return "", nil, "", false
 	}
-	return it.Dec.Tool, append([]string(nil), it.Dec.Paths...), true
+	return it.Dec.Tool, append([]string(nil), it.Dec.Paths...), it.Dec.TargetProcess, true
 }
 
 // revokeGrants burns every live nonce of one item without answering it. A

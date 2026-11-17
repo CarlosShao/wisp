@@ -85,6 +85,10 @@ func (b brokenStore) ListGrantsBySession(context.Context, string) ([]memory.Appr
 	return nil, b.err
 }
 
+func (b brokenStore) RevokeGrant(context.Context, int64) error {
+	return b.err
+}
+
 // ---------------------------------------------------------------------------
 // AC#1 - the minter
 // ---------------------------------------------------------------------------

@@ -40,6 +40,18 @@ type Prompt struct {
 	Channels      []ChannelStatus
 	Depth         int
 	Grant         string
+	// SessionGrant marks that the host's ledger can actually record a D45
+	// session rule for this card (ticket 224/49): true only when the host
+	// wired Options.Grants. The gate sets it in promptFor; a card rendered
+	// from a host with no ledger shows the third option as unavailable rather
+	// than promising a rule nothing will store.
+	SessionGrant bool
+	// TargetProcess is ticket 49's input.type binding fact: the resolved
+	// target process name the bridge stamped on the decision ("" for every
+	// other tool and for an unresolvable target). The card names the
+	// application the question is about, and the session answer records the
+	// grant against exactly this name.
+	TargetProcess string
 }
 
 // PanelItem is everything the panel (ticket 37) is allowed to see about one
@@ -169,6 +181,22 @@ type NativeAPI interface {
 	// method at all, so a panel-sourced host cannot store an authorization
 	// because there is no method for it to call.
 	AllowSession(ctx context.Context, correlationID, grant string) error
+	// AllowSessionAllApps is ticket 49's danger-tier answer for the input.type
+	// variant (§15 ruling item 7 ②'s third option): 「本会话内允许向所有应用
+	// 注入」. It records the wildcard row through RecordTargetAllApps - the
+	// ONLY door that can mint it - and exists on this native-only interface
+	// like AllowSession. The host surface owning the danger ritual (视觉降级 +
+	// 二次点击展开) calls this only after that ritual completed; the approval
+	// layer cannot verify pixels, so the ritual's enforcement lives at the
+	// host's verb, and the audit line names the danger tier so a recording
+	// without the ritual is a visible fact.
+	AllowSessionAllApps(ctx context.Context, correlationID, grant string) error
+	// AllowSessionPattern is ticket 49's batch-interplay answer (D45-2 §8.1's
+	// aggregated confirm + opt-in grant): ONE answer that records ONE
+	// wildcard-terminated rule for the WHOLE batch pattern, instead of one row
+	// per path. The pattern is derived from the card's own paths by
+	// PatternForPaths; the click still spends the same single-use nonce.
+	AllowSessionPattern(ctx context.Context, correlationID, grant string) error
 	// Reject needs no proof: refusing is always safe, so the panel may do it
 	// too through PanelAPI.
 	Reject(correlationID, reason string) error

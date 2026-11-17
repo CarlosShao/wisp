@@ -74,6 +74,30 @@ func (r *recGrantRecorder) Record(_ context.Context, tool, pattern string) (int6
 	return r.next, nil
 }
 
+// RecordTarget and RecordTargetAllApps are ticket 49's two target doors on the
+// SAME fixture recorder: the §15 item-7 rows land in the same calls list (the
+// pattern column carries the process name, the all-apps row carries the
+// sentinel), so the ticket-49 answer-door cases read one recorder and the
+// ticket-224 cases above are untouched - they never take the target route.
+func (r *recGrantRecorder) RecordTarget(_ context.Context, tool, process string) (int64, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if err, bad := r.failOn[process]; bad {
+		return 0, err
+	}
+	r.next++
+	r.calls = append(r.calls, recCall{tool: tool, pattern: process})
+	return r.next, nil
+}
+
+func (r *recGrantRecorder) RecordTargetAllApps(_ context.Context, tool string) (int64, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.next++
+	r.calls = append(r.calls, recCall{tool: tool, pattern: "*"})
+	return r.next, nil
+}
+
 func (r *recGrantRecorder) got() []recCall {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -106,6 +130,12 @@ func (b *logBox) has(needle string) bool { return strings.Contains(b.all(), need
 // box. withRecorder=false builds the pre-224 host: a gate that cannot store a
 // scope at all.
 type grantFixture struct {
+	// rec is the recorder the gate was handed, typed as the BASE recorder
+	// ticket 224 declared. Ticket 49's fixture stores a *rec49 (the same
+	// recorder extended with the two target doors) in this field - the
+	// GrantRecorder interface holds both - and its own cases narrow it back
+	// with rec49Of. A plain *recGrantRecorder here is exactly the pre-49
+	// ledger shape the danger-door case needs.
 	rec *recGrantRecorder
 	log *logBox
 	ui  *fakeUI

@@ -1412,20 +1412,35 @@ func (b *systemBackend) input(a Action, args map[string]any) (ActionResult, erro
 // elevated target is refused HERE, before any byte is sent, with
 // ErrElevatedTarget. There is no bypass branch anywhere in this file.
 func (b *systemBackend) inputTarget(args map[string]any) (uintptr, string, error) {
+	h, name, _, err := b.resolveInputTarget(args)
+	if err != nil {
+		return 0, "", err
+	}
+	return h, name, nil
+}
+
+// resolveInputTarget is inputTarget's three-answer body, split out so the SAME
+// resolution (hwnd → pid → process name, with the UIPI refusal) can run BEFORE
+// execution - ticket 49's grant binding and card wording need the resolved
+// process name at judge time, and the execution half re-runs the identical
+// resolution so what the card named is what the bytes land in. One body, two
+// callers: a second copy of the resolution is how "the grant named app A and
+// the bytes landed in app B" gets written.
+func (b *systemBackend) resolveInputTarget(args map[string]any) (uintptr, string, uint32, error) {
 	h := uintptr(0)
 	if n, ok := argInt(args, "hwnd"); ok && n > 0 {
 		h = uintptr(n)
 	} else if title := strings.TrimSpace(argString(args, "title")); title != "" {
 		resolved, err := resolveWindow(map[string]any{"title": title})
 		if err != nil {
-			return 0, "", err
+			return 0, "", 0, err
 		}
 		h = resolved
 	} else {
 		h = b.foregroundHWND()
 	}
 	if h == 0 {
-		return 0, "", fmt.Errorf("没有目标窗口：既没法取到 hwnd，也没有焦点窗口")
+		return 0, "", 0, fmt.Errorf("没有目标窗口：既没法取到 hwnd，也没有焦点窗口")
 	}
 	pid := b.pidOf(h)
 	name := b.procName(pid)
@@ -1436,12 +1451,26 @@ func (b *systemBackend) inputTarget(args map[string]any) (uintptr, string, error
 		elevated = realProcessElevated(pid)
 	}
 	if elevated {
-		return 0, "", ErrElevatedTarget
+		return 0, "", 0, ErrElevatedTarget
 	}
 	if name == "" {
 		name = fmt.Sprintf("pid:%d", pid)
 	}
-	return h, name, nil
+	return h, name, pid, nil
+}
+
+// resolveTarget implements the ticket 49 TargetResolver over the input.type
+// argument map: hwnd → pid → lowercase image name, the SAME pipeline
+// inputTarget runs at execution time. The UIPI refusal surfaces as
+// ErrElevatedTarget here too - a target the OS will refuse is not a target a
+// grant question should be asked about. ok=false when the call names no
+// resolvable target, which keeps the card asking at L2 (fail closed).
+func (b *systemBackend) resolveTarget(args map[string]any) (string, bool, error) {
+	_, name, _, err := b.resolveInputTarget(args)
+	if err != nil {
+		return "", false, err
+	}
+	return name, true, nil
 }
 
 // powerAction implements system.power. The typed confirmation word has already

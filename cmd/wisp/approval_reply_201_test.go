@@ -97,6 +97,10 @@ type replyHost struct {
 	l2Wait    time.Duration
 	rtHook    func(*agentRuntime)
 	cleaner   []func()
+	// resolveTarget is ticket 49's test-side resolver for the input.type
+	// binding cells. nil (every case that does not set it) keeps the
+	// production resolution through the run's own SystemBridge.
+	resolveTarget func(map[string]any) (string, bool)
 	// keyRef is the api_key_ref this host booted with: the seam's own answer
 	// (secret_fixture_180_test.go, 票 98 C1). A case that reads the live
 	// Manager's ref must not have to guess whether this platform's fixture used
@@ -178,6 +182,9 @@ func (h *replyHost) run(task string) int {
 		// console cases leave it empty exactly as cmdRun does.
 		replyVeto: h.replyVeto,
 		notify:    func(string, string) error { return nil },
+		// Ticket 49's test-side target resolver. nil for every case that does
+		// not set one; production callers never set it.
+		resolveTargetOverride: h.resolveTarget,
 		onRuntime: func(rt *agentRuntime) {
 			if h.rtHook != nil {
 				h.rtHook(rt)

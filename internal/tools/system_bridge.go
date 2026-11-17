@@ -149,6 +149,34 @@ func (b *SystemBridge) Do(ctx context.Context, a Action, args map[string]any) (A
 	return res, err
 }
 
+// targetResolver is the optional face a backend carries when it can answer
+// ticket 49's question "which process would this injection land in". The
+// Windows backend implements it (resolveTarget, the same resolution pipeline
+// inputTarget runs); a backend without it (every test fake that predates 49)
+// makes ResolveTarget answer ok=false, which the bridge reads as "the variant
+// is dormant, ask" - fail closed.
+type targetResolver interface {
+	resolveTarget(args map[string]any) (process string, ok bool, err error)
+}
+
+// ResolveTarget is the ticket 49 resolver the composition root hands to
+// tools.Options.ResolveTarget. It routes to the SAME backend the tools execute
+// through, so the name a card shows, the name a grant binds and the name the
+// bytes land in are one resolver's output. A backend that cannot answer
+// (implements no resolveTarget) answers ok=false - the caller treats that as
+// "unresolved" and keeps asking.
+func (b *SystemBridge) ResolveTarget(args map[string]any) (string, bool, error) {
+	f, err := b.funcs()
+	if err != nil {
+		return "", false, err
+	}
+	tr, ok := f.(targetResolver)
+	if !ok {
+		return "", false, nil
+	}
+	return tr.resolveTarget(args)
+}
+
 // ErrNoSystemBackend is the honest answer of a build (or a composition) with no
 // OS backend. It is a REFUSAL, not a fault: the tools turn it into IsError text
 // so the model learns the machine cannot be reached from here, and the task

@@ -65,6 +65,25 @@ func RenderCard(p Prompt) []string {
 	if len(p.Paths) > 0 {
 		lines = append(lines, fmt.Sprintf("  影响路径：%s", strings.Join(p.Paths, ", ")))
 	}
+	// Ticket 49: an input.type card names the application the question is
+	// about (the bridge-resolved target process), because 「向一个无名窗口注入」
+	// is not something an operator can weigh. The line is a disclosure, not a
+	// control: the answer verbs live on the host surface.
+	if strings.TrimSpace(p.TargetProcess) != "" {
+		lines = append(lines, fmt.Sprintf("  目标应用：%s", p.TargetProcess))
+	}
+	if p.SessionGrant && p.Level == "L2" {
+		// Ticket 224/49: the third option is offered ONLY when the host can
+		// record the rule. The wording is the frozen §15 item-7 shape for the
+		// input.type variant (three tiers, the all-apps one visually distinct)
+		// and the generic path variant otherwise.
+		if strings.TrimSpace(p.TargetProcess) != "" {
+			lines = append(lines,
+				"  选项：仅本次 / 本会话内允许向此应用（"+p.TargetProcess+"）注入 / 向所有应用注入（危险档：需展开后二次确认）")
+		} else {
+			lines = append(lines, "  选项：仅本次 / 本会话内允许此工具+模式（会话授权）")
+		}
+	}
 	for _, c := range p.Channels {
 		lines = append(lines, fmt.Sprintf("  取消方式：%s（%s）", c.Text, channelAvailability(c)))
 	}

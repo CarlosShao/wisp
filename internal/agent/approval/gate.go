@@ -80,6 +80,16 @@ type GrantRecorder interface {
 	Record(ctx context.Context, tool, pattern string) (int64, error)
 }
 
+// TargetGrantRecorder is ticket 49's extension the input.type variant needs:
+// the two target doors. Declared SEPARATELY from GrantRecorder so a host whose
+// ledger predates ticket 49 keeps answering plain session grants; allowSession
+// asserts the capability with a type assertion and drops the scope loudly when
+// the wired ledger cannot record target rows (fail closed: ask again).
+type TargetGrantRecorder interface {
+	RecordTarget(ctx context.Context, tool, process string) (int64, error)
+	RecordTargetAllApps(ctx context.Context, tool string) (int64, error)
+}
+
 // Gate is ticket 21's approval mechanics behind the internal/tools/gate.go
 // seam: the L1 pre-execution block window with its four veto channels, the L2
 // route into the C18 queue with its native-only allow proof, D45-1 batch
@@ -731,6 +741,12 @@ func (g *Gate) promptFor(d tools.Decision, corr string, win, deadline time.Durat
 		Deadline:      deadline,
 		Channels:      g.channels.Statuses(),
 		Grant:         grant,
+		// Ticket 224/49: the third option is offered only when this host can
+		// actually record the rule. A ledger-less host answers session as a
+		// single-use allow and says so in its audit; the card must not show a
+		// verb that would silently record nothing.
+		SessionGrant:  g.grants != nil,
+		TargetProcess: d.TargetProcess,
 	}
 }
 
@@ -775,17 +791,35 @@ func (n nativeAPI) AllowSession(ctx context.Context, corr, grant string) error {
 	return n.g.allowSession(ctx, corr, grant)
 }
 
+// AllowSessionAllApps is ticket 49's danger-tier answer (§15 ruling item 7,
+// 「本会话内允许向所有应用注入」). The proof requirement is identical to
+// AllowSession's; the recording goes through RecordTargetAllApps, the only
+// door that mints the wildcard row, and the audit line carries the danger tier
+// so the answer is distinguishable from a per-app grant in the ledger.
+func (n nativeAPI) AllowSessionAllApps(ctx context.Context, corr, grant string) error {
+	return n.g.allowSessionAllApps(ctx, corr, grant)
+}
+
+// AllowSessionPattern is ticket 49's batch answer: one wildcard-terminated
+// rule for the whole batch pattern (D45-2 §8.1's opt-in grant on an aggregated
+// confirm). Same nonce discipline, one row instead of one row per path.
+func (n nativeAPI) AllowSessionPattern(ctx context.Context, corr, grant string) error {
+	return n.g.allowSessionPattern(ctx, corr, grant)
+}
+
 // allowSession is the body behind NativeAPI.AllowSession.
 func (g *Gate) allowSession(ctx context.Context, corr, grant string) error {
 	// Read the subject before the answer retires the card: this is the exact
-	// (tool, paths) pair the user was shown, taken through the same exact-key
-	// lookup the allow side uses. The alias index is not in this path, so a
-	// refusal alias cannot be used to point a grant at some other call.
-	tool, paths, ok := g.q.sessionSubject(corr)
+	// (tool, paths, target) triple the user was shown, taken through the same
+	// exact-key lookup the allow side uses. The alias index is not in this
+	// path, so a refusal alias cannot be used to point a grant at some other
+	// call. target is ticket 49's resolved process name for input.type cards
+	// ("" everywhere else).
+	tool, paths, target, ok := g.q.sessionSubject(corr)
 	if !ok {
 		// Let the funnel below produce the precise error (unknown correlation
 		// vs already settled) rather than inventing a third wording here.
-		tool, paths = "", nil
+		tool, paths, target = "", nil, ""
 	}
 	g.logf("approval: native route corr=%s allow=true scope=session", corr)
 	if err := g.q.allowScoped(corr, grant, true); err != nil {
@@ -801,6 +835,26 @@ func (g *Gate) allowSession(ctx context.Context, corr, grant string) error {
 		g.logf("approval: GRANT-DROPPED corr=%s (卡片主题在答复前已离开队列，未落盘任何规则)", corr)
 		return nil
 	}
+	// Ticket 49: an input.type card answers through the TARGET door - the row
+	// is (tool, resolved process name, session), and the all-apps variant is a
+	// separate verb (allowSessionAllApps) that alone can write the wildcard
+	// row. A path door would store a row the matcher can never key with.
+	if target != "" {
+		if rt, hasTarget := g.grants.(TargetGrantRecorder); hasTarget {
+			id, err := rt.RecordTarget(ctx, tool, target)
+			if err != nil {
+				g.logf("approval: GRANT-RECORD-FAILED corr=%s tool=%s target=%q err=%v "+
+					"(本次已放行，但会话授权没记下：下一次同类操作仍会询问)", corr, tool, target, err)
+			} else {
+				g.logf("approval: GRANT-RECORDED-TARGET corr=%s grant_id=%d tool=%s target=%q "+
+					"(本会话内允许向此应用注入)", corr, id, tool, target)
+			}
+			return nil
+		}
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s target=%q "+
+			"(本机接入的记账面不支持目标进程绑定，本次按「仅本次」放行)", corr, tool, target)
+		return nil
+	}
 	for _, p := range paths {
 		id, err := g.grants.Record(ctx, tool, p)
 		if err != nil {
@@ -814,6 +868,171 @@ func (g *Gate) allowSession(ctx context.Context, corr, grant string) error {
 		g.logf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s pattern=%q", corr, id, tool, p)
 	}
 	return nil
+}
+
+// allowSessionAllApps is the body behind NativeAPI.AllowSessionAllApps (ticket
+// 49's danger tier). It spends the same nonce through the same funnel, then
+// records ONE wildcard row through RecordTargetAllApps - the only door that
+// can mint it. A ledger without the target doors drops the scope loudly.
+func (g *Gate) allowSessionAllApps(ctx context.Context, corr, grant string) error {
+	tool, _, target, ok := g.q.sessionSubject(corr)
+	if !ok {
+		tool, target = "", ""
+	}
+	g.logf("approval: native route corr=%s allow=true scope=session-all-apps (danger tier)", corr)
+	if err := g.q.allowScoped(corr, grant, true); err != nil {
+		return err
+	}
+	if g.grants == nil {
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s (本机没有接入会话授权记账，"+
+			"本次按「仅本次」放行，没有落盘任何规则)", corr, tool)
+		return nil
+	}
+	rt, hasTarget := g.grants.(TargetGrantRecorder)
+	if !hasTarget {
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s (本机接入的记账面不支持目标进程绑定，"+
+			"本次按「仅本次」放行)", corr, tool)
+		return nil
+	}
+	if target == "" {
+		// The all-apps answer only makes sense on a card that resolved a
+		// target. Nothing was resolved → nothing to widen.
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s (这张卡没有已解析的注入目标，"+
+			"「所有应用」档无从谈起，未落盘任何规则)", corr, tool)
+		return nil
+	}
+	if tool != "input.type" {
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s (「所有应用」档只属于 input.type，"+
+			"未落盘任何规则)", corr, tool)
+		return nil
+	}
+	id, err := rt.RecordTargetAllApps(ctx, tool)
+	if err != nil {
+		g.logf("approval: GRANT-RECORD-FAILED corr=%s tool=%s scope=all-apps err=%v "+
+			"(本次已放行，但会话授权没记下：下一次同类操作仍会询问)", corr, tool, err)
+		return nil
+	}
+	g.logf("approval: GRANT-RECORDED-ALL-APPS corr=%s grant_id=%d tool=%s (危险档：向所有应用注入 "+
+			"—— 视觉降级 + 二次点击展开后的答复)", corr, id, tool)
+	return nil
+}
+
+// allowSessionPattern is the body behind NativeAPI.AllowSessionPattern (ticket
+// 49's batch interplay): ONE wildcard-terminated rule for the WHOLE batch
+// pattern, derived from the card's own paths by PatternForPaths. The click
+// spends the same single-use nonce; the recording goes through the ledger's
+// Record door with the derived pattern (a wildcard pattern the dialect already
+// matches), so no new storage shape and no second matcher exist.
+func (g *Gate) allowSessionPattern(ctx context.Context, corr, grant string) error {
+	tool, paths, _, ok := g.q.sessionSubject(corr)
+	if !ok {
+		tool, paths = "", nil
+	}
+	g.logf("approval: native route corr=%s allow=true scope=session-pattern (D45-2 批量 opt-in)", corr)
+	if err := g.q.allowScoped(corr, grant, true); err != nil {
+		return err
+	}
+	if g.grants == nil {
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s (本机没有接入会话授权记账，"+
+			"本次按「仅本次」放行，没有落盘任何规则)", corr, tool)
+		return nil
+	}
+	if len(paths) < BatchMinOps {
+		// The batch pattern is only derivable from a real batch. A card that
+		// was never aggregated has no pattern to grant; the per-path door
+		// (AllowSession) is the answer for it.
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s paths=%d (非聚合卡没有整批模式，"+
+			"整批授权不适用；要记规则请走「本会话内允许」的逐路径档)", corr, tool, len(paths))
+		return nil
+	}
+	pattern, ok := PatternForPaths(paths)
+	if !ok {
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s paths=%d (整批模式无法从这张卡的路径推出，"+
+			"未落盘任何规则)", corr, tool, len(paths))
+		return nil
+	}
+	id, err := g.grants.Record(ctx, tool, pattern)
+	if err != nil {
+		g.logf("approval: GRANT-RECORD-FAILED corr=%s tool=%s pattern=%q err=%v "+
+			"(本次已放行，但会话授权没记下：下一次同类操作仍会询问)", corr, tool, pattern, err)
+		return nil
+	}
+	g.logf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s pattern=%q "+
+		"(整批模式一次授予，D45-2 批量 opt-in)", corr, id, tool, pattern)
+	return nil
+}
+
+// PatternForPaths derives the whole-batch pattern ticket 49's grant records:
+// the LONGEST COMMON ANCESTOR DIRECTORY of the card's canonical paths, plus
+// "/*" - 「本会话内允许 <tool> 于 <该目录>/*」. It is pure string work over
+// already-canonical C26 paths (the ban-2 rule is about making path DECISIONS
+// outside risk's resolver; these paths were judged there and this only shapes
+// the RULE TEXT the user was shown), it refuses a marked path, a bare drive
+// root, and a batch that shares no common directory, and the dialect's own
+// floor (a `*` never crosses a separator) keeps the blast radius at "direct
+// children of that directory".
+func PatternForPaths(paths []string) (string, bool) {
+	if len(paths) == 0 {
+		return "", false
+	}
+	common := ""
+	for i, p := range paths {
+		if strings.Contains(p, "无法规范化") {
+			return "", false
+		}
+		d := dirOf(p)
+		if d == "" || d == "." || isBareDrivePattern(d) {
+			return "", false
+		}
+		if i == 0 {
+			common = d
+			continue
+		}
+		common = commonDirOf(common, d)
+		if common == "" {
+			return "", false
+		}
+	}
+	if common == "" {
+		return "", false
+	}
+	return common + "/*", true
+}
+
+// commonDirOf walks two slash-form directories down to their common prefix at
+// a separator boundary. "" means no common ancestor (different drives) or a
+// bare drive root (a whole-volume rule is a refusal, not a grant).
+func commonDirOf(a, b string) string {
+	i := 0
+	for i < len(a) && i < len(b) && a[i] == b[i] {
+		i++
+	}
+	// If the shared prefix ended MID-segment (i < len(a) and the byte before
+	// i is not a separator), cut back to the start of that segment so the
+	// kept prefix is a whole directory. A prefix that already ends at a
+	// segment boundary (including one dir being a prefix of the other) stays
+	// as it is.
+	if i > 0 && i < len(a) && a[i-1] != '/' {
+		for i > 0 && a[i-1] != '/' {
+			i--
+		}
+	}
+	if i > 0 && a[i-1] == '/' {
+		i--
+	}
+	if i <= 2 && len(a) > 2 && a[1] == ':' {
+		return ""
+	}
+	if i <= 0 {
+		return ""
+	}
+	return a[:i]
+}
+
+// isBareDrivePattern mirrors replies.go's isBareDrive for the derived pattern.
+func isBareDrivePattern(s string) bool {
+	return len(s) == 2 && s[1] == ':' &&
+		((s[0] >= 'A' && s[0] <= 'Z') || (s[0] >= 'a' && s[0] <= 'z'))
 }
 
 func (n nativeAPI) Reject(corr, reason string) error { return n.g.q.reject(corr, reason) }

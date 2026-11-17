@@ -80,6 +80,10 @@ type ReplyCard struct {
 	// reads it to state which rule a widening would store (ticket 201 AC#4), so
 	// the rule text comes off the card rather than off a re-derivation.
 	Paths []string
+	// TargetProcess is ticket 49's input.type binding fact off the Prompt (the
+	// bridge-resolved injection target). "" for every other tool; the danger
+	// verbs read it so the answer names the application the ritual was about.
+	TargetProcess string
 	// Window is the L1 block length, zero on an L2 card. Deadline is the C18
 	// ceiling an unanswered L2 card dies at.
 	Window   time.Duration
@@ -178,6 +182,7 @@ func (r *Replies) Record(p Prompt) {
 		Level:         p.Level,
 		Grant:         p.Grant,
 		Paths:         append([]string(nil), p.Paths...),
+		TargetProcess: p.TargetProcess,
 		Window:        p.Window,
 		Deadline:      p.Deadline,
 	}
@@ -361,6 +366,55 @@ func (r *Replies) AllowSession(ctx context.Context, corr string) error {
 		return ErrNoGateAttached
 	}
 	if err := g.Native().AllowSession(ctx, corr, card.Grant); err != nil {
+		return err
+	}
+	r.Forget(corr)
+	return nil
+}
+
+// AllowSessionAllApps is ticket 49's danger-tier answer (「本会话内允许向所有
+// 应用注入」): the same tracked card, the same single-use native nonce, and the
+// card's resolved target recorded as the wildcard rule through
+// RecordTargetAllApps - the only door that can mint that row. It exists only on
+// this native seam like AllowSession; there is deliberately no panel-shaped
+// sibling.
+func (r *Replies) AllowSessionAllApps(ctx context.Context, corr string) error {
+	card, ok := r.Look(corr)
+	if !ok {
+		return ErrNoTrackedCard
+	}
+	if card.Grant == "" {
+		return ErrRouteHasNoAllow
+	}
+	g, _, _, _ := r.routes()
+	if g == nil {
+		return ErrNoGateAttached
+	}
+	if err := g.Native().AllowSessionAllApps(ctx, corr, card.Grant); err != nil {
+		return err
+	}
+	r.Forget(corr)
+	return nil
+}
+
+// AllowSessionPattern is ticket 49's batch answer (D45-2's opt-in grant on an
+// aggregated confirm): the same tracked card, the same nonce, and ONE
+// wildcard-terminated rule for the whole batch pattern instead of one row per
+// path. PatternForPaths derives the pattern from the card's own paths; the
+// gate refuses a card that was never aggregated.
+func (r *Replies) AllowSessionPattern(ctx context.Context, corr string) error {
+	card, ok := r.Look(corr)
+	if !ok {
+		return ErrNoTrackedCard
+	}
+	if card.Grant == "" {
+		return ErrRouteHasNoAllow
+	}
+	g, _, _, _ := r.routes()
+	if g == nil {
+		return ErrNoGateAttached
+	}
+	if err := g.Native().AllowSessionPattern(ctx, corr, card.Grant); err != nil {
 		return err
 	}
 	r.Forget(corr)

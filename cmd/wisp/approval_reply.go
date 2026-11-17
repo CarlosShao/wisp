@@ -69,6 +69,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -234,6 +235,16 @@ type replySurface struct {
 	vetoChannel approval.Channel
 	// ctx is the listener's own context; it carries no authority.
 	ctx context.Context
+	// expandArmed is ticket 49's danger-ritual state: correlation id -> the
+	// instant the expand-confirm window closes. Armed only by session-expand,
+	// spent (and cleared) by session-all, and never read anywhere else - so
+	// the ritual is a sequence on THIS surface's verbs and cannot be armed by
+	// anything that did not print the consequences first.
+	expandArmed map[string]time.Time
+	// mu guards expandArmed. The listener handles one line at a time, but the
+	// resident shapes answer from other goroutines, so the map gets a lock of
+	// its own rather than a comment about callers.
+	mu sync.Mutex
 	// parked is the listener's own statement of WHERE it is (ticket 228 AC#4):
 	// true while it sits inside its blocking read on the operator's stream, where
 	// a cancelled context cannot reach it, and false while it is handling a line.
@@ -242,6 +253,11 @@ type replySurface struct {
 	// comment asserted the first case from outside and nothing measured it.
 	parked atomic.Bool
 }
+
+// sessionExpandWindow is ticket 49's danger-ritual confirm window: how long an
+// armed session-expand stays spendable by session-all. Short, because the
+// window's whole point is that the operator read the consequences NOW.
+const sessionExpandWindow = 30 * time.Second
 
 // noteParked is the listener telling its owner where it is. Called on both sides
 // of every read by runReplyLoop and nowhere else: the loop is the only thing that
@@ -333,6 +349,146 @@ func (s *replySurface) session(corr string) (string, error) {
 	return "已按「本会话内允许」答复 " + corr + "（" + card.Tool + "）：" +
 		"这一发已放行，卡片上那些路径对本会话后续的 L1 询问不再重复提问" +
 		"（L2 永不被会话授权覆盖，SPEC-06 §8.3 第 1 条）", nil
+}
+
+// ---------------------------------------------------------------------------
+// Ticket 49's operator verbs: the input.type danger tier, the batch pattern,
+// the live grant list and the one-click revoke.
+// ---------------------------------------------------------------------------
+
+// sessionExpand arms ticket 49's danger ritual for ONE card: it prints exactly
+// what the wildcard row will mean and opens a short confirm window. The window
+// is armed per correlation id on the surface, never globally - two pending
+// input.type cards each need their own expand step, and a window armed for one
+// card must not unlock another's.
+func (s *replySurface) sessionExpand(corr string) (string, error) {
+	card, ok := s.live.look(corr)
+	if !ok {
+		s.record("REFUSED", corr, "", "native/session-expand", "本机没有这张卡的记录")
+		return "", fmt.Errorf("没有找到这张卡 %q：危险档的展开步骤必须由一张显示过的卡片推出", corr)
+	}
+	if card.Level == "L1" {
+		s.record("REFUSED", corr, card.Tool, "native/session-expand", "该路线没有允许动作")
+		return "", fmt.Errorf("%s 是执行前阻止窗口，只有否决；「所有应用」是允许的更宽档，得先有允许这一动作", card.Level)
+	}
+	s.mu.Lock()
+	s.expandArmed[corr] = time.Now().Add(sessionExpandWindow)
+	s.mu.Unlock()
+	s.record("EXPAND-ARMED", corr, card.Tool, "native/session-expand",
+		fmt.Sprintf("target=%q window=%s", card.TargetProcess, sessionExpandWindow))
+	return "⚠ 危险档："+"本会话内允许向所有应用注入 —— 不再绑定 "+func() string {
+		if card.TargetProcess == "" {
+			return "任何应用"
+		}
+		return card.TargetProcess
+	}()+
+		"，本会话内对任何窗口的注入都不再询问。"+
+		"确认请 30 秒内再发 session-all "+corr+"（二次点击展开，SPEC-06 §8.2）", nil
+}
+
+// sessionAll spends the armed expand window and answers the card through the
+// danger door. An un-armed or expired arm refuses the ritual and the card
+// stays pending - the operator can still answer it the ordinary way.
+func (s *replySurface) sessionAll(corr string) (string, error) {
+	s.mu.Lock()
+	deadline, armed := s.expandArmed[corr]
+	delete(s.expandArmed, corr)
+	s.mu.Unlock()
+	if !armed || time.Now().After(deadline) {
+		s.record("REFUSED", corr, "", "native/session-all", "expand-confirm 窗口未就绪或已过期")
+		return "", fmt.Errorf("「向所有应用注入」需要先发 session-expand %s 展开后果，再在 30 秒内二次确认；"+
+			"本次未展开或已超时，卡片保持原样", corr)
+	}
+	card, ok := s.live.look(corr)
+	if !ok {
+		s.record("REFUSED", corr, "", "native/session-all", "本机没有这张卡的记录")
+		return "", fmt.Errorf("没有找到这张卡 %q", corr)
+	}
+	if err := s.live.h.AllowSessionAllApps(s.ctx, corr); err != nil {
+		s.record("REFUSED", corr, card.Tool, "native/session-all", err.Error())
+		return "", err
+	}
+	s.record("ANSWERED", corr, card.Tool, "native/session-all",
+		fmt.Sprintf("原生侧允许并记入本会话（危险档 all-apps）target=%q", card.TargetProcess))
+	return "已按「本会话内允许向所有应用注入」（危险档）答复 " + corr + "（" + card.Tool + "）：" +
+		"这一发已放行，且本会话对任何窗口的注入不再询问。" +
+		"撤销：grants 里找这行 → revoke-grant <编号>。", nil
+}
+
+// sessionPattern answers an aggregated batch card with ticket 49's whole-pattern
+// grant: ONE wildcard-terminated rule instead of one row per path. The gate
+// refuses a card that was never aggregated, so the verb is honest everywhere.
+func (s *replySurface) sessionPattern(corr string) (string, error) {
+	card, ok := s.live.look(corr)
+	if !ok {
+		s.record("REFUSED", corr, "", "native/session-pattern", "本机没有这张卡的记录")
+		return "", fmt.Errorf("没有找到这张卡 %q", corr)
+	}
+	pattern, derivable := approval.PatternForPaths(card.Paths)
+	if err := s.live.h.AllowSessionPattern(s.ctx, corr); err != nil {
+		s.record("REFUSED", corr, card.Tool, "native/session-pattern", err.Error())
+		return "", err
+	}
+	s.record("ANSWERED", corr, card.Tool, "native/session-pattern",
+		fmt.Sprintf("原生侧允许并记入本会话（整批 pattern），paths=%d derivable=%v", len(card.Paths), derivable))
+	if !derivable {
+		return "已按「本会话内允许」答复 " + corr + "（" + card.Tool + "）：这一发已放行。" +
+			"（这张卡的路径推不出整批模式，未落任何整批规则；要逐路径规则请用 session）", nil
+	}
+	return "已按「本会话内允许（整批）」答复 " + corr + "（" + card.Tool + "）：这一发已放行，" +
+		"且整批模式 " + pattern + " 对本会话后续的同类 L1 询问不再重复提问。", nil
+}
+
+// grantsList is the operator's live view of THIS session's rules (SPEC-06 §8.2
+// 「面板安全页实时列出」's console stand-in while the panel routes stay
+// unbuilt): scope, tool, pattern, id, and the liveness verdict, with the
+// revoke numbers the next verb spends. Read-only.
+func (s *replySurface) grantsList() (string, error) {
+	rt := s.rt
+	if rt == nil || rt.session == nil {
+		return "", errors.New("这一装配没有接入会话授权记账（rt.session=nil），grants 无从列出")
+	}
+	rows, err := rt.session.ListBySession(context.Background())
+	if err != nil {
+		return "", fmt.Errorf("读取会话授权失败：%v", err)
+	}
+	if len(rows) == 0 {
+		return "本会话（" + rt.session.SessionID().String() + "）当前没有生效中的授权。", nil
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "本会话（%s）的授权（最新在前）：\n", rt.session.SessionID().String())
+	for _, g := range rows {
+		state := "生效中"
+		if g.RevokedAt != nil {
+			state = "已撤销"
+		} else if g.ExpiresAt <= time.Now().Unix() {
+			state = "已过期"
+		}
+		fmt.Fprintf(&b, "  #%d %s「%s」 created=%d state=%s\n",
+			g.ID, g.Tool, g.Pattern, g.CreatedAt, state)
+	}
+	fmt.Fprintf(&b, "撤销一枚：revoke-grant <编号>（立即生效，下一次同类调用重新询问）")
+	return b.String(), nil
+}
+
+// revokeGrant stamps ONE grant revoked immediately (SPEC-06 §8.2 一键撤销).
+// The rows stay on disk for the audit window; what dies is the next call's
+// answer to "已授权过吗".
+func (s *replySurface) revokeGrant(arg string) (string, error) {
+	rt := s.rt
+	if rt == nil || rt.session == nil {
+		return "", errors.New("这一装配没有接入会话授权记账（rt.session=nil），revoke-grant 无从撤销")
+	}
+	id, err := strconv.ParseInt(strings.TrimSpace(arg), 10, 64)
+	if err != nil || id <= 0 {
+		return "", fmt.Errorf("revoke-grant 需要 grants 列出的编号（收到 %q）", arg)
+	}
+	if err := rt.session.Revoke(context.Background(), id); err != nil {
+		s.record("GRANT-REVOKE-FAILED", "", "", "native/revoke-grant", fmt.Sprintf("id=%d err=%v", id, err))
+		return "", fmt.Errorf("撤销 #%d 失败：%v", id, err)
+	}
+	s.record("GRANT-REVOKED", "", "", "native/revoke-grant", fmt.Sprintf("id=%d", id))
+	return fmt.Sprintf("已撤销授权 #%d：本会话内对应的下一次调用会重新弹卡确认。", id), nil
 }
 
 // reject refuses through the native router. The reason is not decoration: the
@@ -669,6 +825,7 @@ func (rt *agentRuntime) newReplySurface(root *observe.Root, vetoChannel approval
 		ctx:         root.Ctx,
 		review:      newReplyReview(),
 		archive:     newReplyReasonArchive(rt.spec.dataDir),
+		expandArmed: map[string]time.Time{},
 	}
 	rt.reply = surface
 	// Bind the seam to this gate before anything can be answered: the ledger was
@@ -811,6 +968,30 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 		return s.allow(corr)
 	case "session":
 		return s.session(corr)
+	case "session-all":
+		// Ticket 49's danger tier (「本会话内允许向所有应用注入」): the
+		// EXPAND-CONFIRM is THIS verb's two-step shape - `session-expand` prints
+		// what the wildcard row will mean and arms a 30s confirm window, and
+		// `session-all` only answers while that window is live. One verb that
+		// typed everything in one go would make the danger ritual a spelling
+		// accident; two verbs make it a sequence.
+		return s.sessionAll(corr)
+	case "session-expand":
+		return s.sessionExpand(corr)
+	case "session-pattern":
+		// Ticket 49's batch interplay: ONE wildcard-terminated rule for the
+		// whole aggregated batch (the opt-in grant D45-2 §8.1 names). The gate
+		// refuses a card that was never aggregated, so the verb is honest on
+		// non-batch cards too.
+		return s.sessionPattern(corr)
+	case "grants":
+		// Ticket 49: the operator's live view of THIS session's rules, with the
+		// revoke numbers the next verb spends. Read-only.
+		return s.grantsList()
+	case "revoke-grant":
+		// Ticket 49's 一键撤销: the number printed by `grants`, stamped revoked
+		// immediately - the NEXT covered call re-asks (SPEC-06 §8.2).
+		return s.revokeGrant(strings.TrimSpace(corr + " " + arg))
 	case "no":
 		return s.reject(corr, washReason(arg))
 	case "veto":
@@ -837,6 +1018,9 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 		return s.view(corr)
 	case "help":
 		return "yes/session/no [理由]/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
+			"session-expand + session-all（input.type 的「向所有应用注入」危险档：先展开再二次确认，票 49）· " +
+			"session-pattern（聚合批量的整批授权，D45-2 批量 opt-in，票 49）· " +
+			"grants（列本会话生效中的授权）· revoke-grant <编号>（立即撤销一枚授权，下一次同类调用重新询问，票 49）· " +
 			"always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
 			"revoke <规则或目录>（撤销一条长期规则：revoke [fs] allowed_dirs += \"D:/某目录\" 或 revoke D:/某目录，" +
 			"只减不加、下一次启动生效，票 226）· " +
@@ -844,7 +1028,8 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 			"L1 窗口存活时任意输入（含回车）＝否决（票 170）· " +
 			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
-		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/revoke/decisions/panel-no/panel-yes/head/view/help/quit）", verb)
+		return "", fmt.Errorf("未知答复指令 %q（yes/session/session-all/session-pattern/grants/revoke-grant/" +
+			"no/veto/always/revoke/decisions/panel-no/panel-yes/head/view/help/quit）", verb)
 	}
 }
 
