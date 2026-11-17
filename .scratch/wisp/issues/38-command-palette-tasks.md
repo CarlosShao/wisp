@@ -98,3 +98,8 @@ view (task.list/cancel tools backing it).
 **尺1** `7a2b83fa4` 在。**尺3 我自己复跑**：`npm run render:palette38kbd` **rc=0**（`listbox/option aria with activedescendant announcing the active row`）；build/typecheck/lint rc=0。
 - **勾 AC#6**：五支牙——①Tab 次序＝DOM 次序（`<input` 在所有行 id 前、`palette-row-0<1<2`）②↑↓ 焦点序列 `0→1→2→1→0`＋环绕 `0↑→2`/`2↓→0` ③Enter＝`select`＋`aria-activedescendant` 与 `aria-selected` 同行 ④ESC/⑤Ctrl+K；空结果集无 listbox/无 activedescendant。composing 期**六键决策全 `none`**（AC#2 守卫从输入框扩到对话框级）。
 - 转报（我另案处理）：`render:security40` rc=1 是**仪器钉住了旧假话**（`dd52313e1` 改真话后过期）⇒ 已并入前端下一单修；`d22scan` 5 枚红在 Go 面（票 49 引入）⇒ 已单开 `wd22clean` 清。
+## 编排者追加·任务态/取消面已落地（2026-11-17 13:3x，`3a62bed97`）
+
+我复跑（载具）：`TestTaskCardFieldsRideTheRosterWire` 0.00s／`TestRosterCancelDoorStopsARealSubagentAndTheForensicsCarryTheAppliedSteps` **3.28s PASS**（取消后读数＝终态 Stopped、已落地 1 步 fs.read、被中止 0 步）⇒ 全 PASS。
+- 面：`internal/panel/subagent_roster_197.go:180-182 TaskRowView +startedAt/costToDate/currentStep` → `cmd/wisp/panel_pump.go:256`（`panel_tasklive_wave2.go:119` 取值）＋`internal/panel/bridge.go:211 roster.cancel`（理由写在常量上）→ `composer_dispatch.go:349` → `cmd/wisp/panel_roster_cancel_wave2.go:111/:187`。
+- **命名裁定（编排者拍）**：票面要的 `task.cancel` 被 `internal/tools` 的票 188 名轴仪钉死（该包不在本波写面、⛔绕仪）⇒ 落地名 **`roster.cancel`**（语义＝停名册一行）。**撤销口令**：若日后把 188 扫描收窄，一行改回 `task.cancel`。

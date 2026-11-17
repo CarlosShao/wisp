@@ -37804,3 +37804,11 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - **新纪律（即刻生效）**：**任何腿（不分前端/Go）只要写面里出现 `internal/panel/**`，就计入那一枚共享编译面的写额；同一波内 ⛔ 两条腿同时碰 `internal/panel/**`。** 派单前先看两条腿的写面清单有没有交集，有交集就串行。
 - **处理**：⛔ 不 reset/amend（append-only）；等 `wreadface2` 自己 commit 落地→回绿后我再复量 `go test ./internal/panel` 与 `Test40Privacy*`，绿了才翻 40 AC#1。
 - **隐私腿自身读数（撞车前绿树）**：`render:privacy40` 我复跑 rc=0（删除收据点名 id、清空报 store 自报计数、导出 records=N）；三件在盘。
+## A1929（11-17 13:3x）：撞车回绿＋读面波2 落地 `3a62bed97`＋40 AC#1 勾
+
+**回绿**：`internal/panel` ok 21.020s／`internal/memory` ok 32.883s（上一轮 `w40privacy` 卷入的半成品已由 wave-2 自己收口）。
+- 36 历史分页面：`dao_history_page_36.go:104`→`bridge.go:175 history.page`→`cw/panel_history_wave2.go:78`；1005 行三窗滚动不重不漏；Q-50 不影响（独立名册方法，A238 照守）。
+- 38 任务三字段＋`roster.cancel`：`subagent_roster_197.go:180-182`／`panel_tasklive_wave2.go:119`／`bridge.go:211`／`cw/panel_roster_cancel_wave2.go:111/:187`；取消读数终态 Stopped、落地 1 步、中止 0 步。
+- **命名裁定**：`task.cancel` 撞票 188 冻结名轴仪 ⇒ 落地 `roster.cancel`（撤销口令：188 收窄后一行改回）。
+- 载具实测：wave2 五枚 + 40 privacy 五枚 全 PASS；d22scan clean（腿报）。
+- 40 **AC#1 勾**（三支 e2e 计数对真 DB＋UI 三按钮＋清空确认卡＋拒绝句逐字，均我复跑）。

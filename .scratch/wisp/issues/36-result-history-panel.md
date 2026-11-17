@@ -76,3 +76,9 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 - **勾 AC#1**：四族 XSS 载荷（`<img onerror>`／`<script>`／`javascript:`／事件属性）走**生产 MarkdownText**（`result-history.tsx:114 rehypePlugins={[[rehypeSanitize, TIGHT_SCHEMA]]}`）全灭，仪器现跑 rc=0。
 - **勾 AC#2**：`dangerouslySetInnerHTML` **用法 0**（全仓 grep 命中 1 处，是 `result-history.tsx:35` 注释里的自述，非用法）；白名单 `rehype-sanitize ^6.0.0`（`package.json:41`）＋`TIGHT_SCHEMA` 已入库。
 - **留白（具名）**：AC#3 1000 行历史树（缺 SQLite 历史 reader＋`panel.view.request` 被 Q-50 封）、AC#4 token 计数（`ResultChunkView` 无字段）、AC#5 rAF 暂停（需真宿主窗）。
+
+## 编排者追加·历史读面已落地（2026-11-17 13:3x，`3a62bed97`，件 `docs/evidence/s1/readface-wave2-20261117-r1.md`）
+
+我复跑（载具）：`TestHistoryPageDoorAnswersTheRealTables` 0.14s／`TestHistoryPageScrollsOneThousandRowsWithoutOverlap` 0.56s（1005 行三窗滚动不重不漏）／`TestHistoryPageRefusesAnUnservableWindowByName` 0.13s ⇒ **全 PASS**。
+- 面：`internal/memory/dao_history_page_36.go:104 HistoryPage`（真表 `task_log`+`tool_call`）→ `internal/panel/bridge.go:175 history.page` → `composer_dispatch.go:344` → `cmd/wisp/panel_history_wave2.go:78`。**Q-50 不影响**：走独立名册方法，`panel.view.request` 不复活的裁定（A238）照守。
+⇒ 前端 AC#3 只剩"把它画成 1000 行滚动列表＋delete-one/purge/export 三支走既有 privacy 面"。
