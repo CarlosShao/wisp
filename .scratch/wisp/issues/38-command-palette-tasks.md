@@ -39,7 +39,7 @@ view (task.list/cancel tools backing it).
 - [ ] Discovery: installed tool set listed with correct risk pills; launch routes through gate.
 - [ ] Tasks view: live task state transitions reflected; cancel mid-tool → applied-steps report.
 - [ ] force rules: per-task override chip + TOML rule both steer agent mode (prompt snapshot).
-- [ ] Keyboard-only: full palette flow reachable without mouse (tab/arrow/enter audit).
+- [x] Keyboard-only: full palette flow reachable without mouse (tab/arrow/enter audit).
 
 ## Progress log (append-only, newest last)
 
@@ -90,3 +90,11 @@ view (task.list/cancel tools backing it).
 - **勾 AC#1**：自由文本走 `panel.message.send` 同一封套（`lib/panel.ts:748`→`composer_dispatch.go:236`→生产读者 `panel_message_453.go:102`），结果进票 36 已接的结果面；仪器断言 send 行逐字上屏。
 - **勾 AC#2（IME）**：`palette-screen.tsx:33-34/:181-183/:205` compositionstart/end ＋ `isComposing` 双保险，组合期 Enter 提前 return，只提交选字终文。
 - **留白（具名）**：AC#3 名册只读面已接但「risk pills/launch 走门」缺 Go 派发表；AC#4 任务卡三字段（`subagent_roster_197.go:111-142 TaskRowView` 无 started/cost/step）＋ task.cancel 不在 C17 八法（`bridge.go:41-107`）；AC#5 force rules 无读面；AC#6 键盘全流（tab 审计）待补。
+
+---
+
+## 编排者收件·第二批（2026-11-17 10:4x，`7a2b83fa4`，件 `docs/evidence/s1/38-ac6-keyboard.md`）
+
+**尺1** `7a2b83fa4` 在。**尺3 我自己复跑**：`npm run render:palette38kbd` **rc=0**（`listbox/option aria with activedescendant announcing the active row`）；build/typecheck/lint rc=0。
+- **勾 AC#6**：五支牙——①Tab 次序＝DOM 次序（`<input` 在所有行 id 前、`palette-row-0<1<2`）②↑↓ 焦点序列 `0→1→2→1→0`＋环绕 `0↑→2`/`2↓→0` ③Enter＝`select`＋`aria-activedescendant` 与 `aria-selected` 同行 ④ESC/⑤Ctrl+K；空结果集无 listbox/无 activedescendant。composing 期**六键决策全 `none`**（AC#2 守卫从输入框扩到对话框级）。
+- 转报（我另案处理）：`render:security40` rc=1 是**仪器钉住了旧假话**（`dd52313e1` 改真话后过期）⇒ 已并入前端下一单修；`d22scan` 5 枚红在 Go 面（票 49 引入）⇒ 已单开 `wd22clean` 清。

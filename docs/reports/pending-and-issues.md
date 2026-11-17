@@ -37769,3 +37769,10 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - 隐私三路由 `bridge.go:141`＋`composer_dispatch.go:174`＋`panel_privacy_40.go:89`＋`panel_inbound.go:411`；三支计数对真 DB（3→2／3→0／records=2）。
 - BatchView 五字段 `approval.go:81`＋`cardsummary_37.go:39`（L2 永不聚合契约原样、R7 守卫未动）。
 **C17 入站名册扩 3 枚（`privacy.delete-one/purge/export`）—— 我拍板接受**：票 40 AC#1 明写要这三支 e2e，无 `panel.` 前缀、不入 grantRouteWords；**撤销口令**＝从 `bridge.go:141` 名册与 `composer_dispatch.go:174` 派发表删这三行、`panel_inbound.go:411` 摘接线即可复原。
+## A1924（11-17 10:4x）：38 AC#6 勾；**我结票 49 时漏跑 d22scan，5 枚红在盘上**（自记过）
+
+`7a2b83fa4`（38 键盘全流，我复跑 render:palette38kbd rc=0）⇒ AC#6 勾。
+**自我记过**：我 10:1x 结票 49 时只跑了三包测试，**没跑 `sh scripts/d22scan.sh`** ⇒ 盘上留 5 枚红（票 49 引入）：
+`approval_reply.go:464` [wallclock-timeout D42#9] ＋ emoji 4 枚（`approval_reply.go:379` ⚠／`ticket49_lifecycle_test.go:172` ≠／`ticket49_limits_test.go:139` 🔒／`ticket49_assembly_test.go:453` ≠）。**已单开 `wd22clean` 清。**
+⇒ **新纪律：任何 Go 写腿结票前，三把尺之外还必须现跑 `scripts/d22scan.sh` 0 findings；⛔ 只跑测试就翻框。**
+**另一条同类**：`dd52313e1` 把我方假话改真话后，`render:security40` 仪器仍断言**旧假话**（把谎言钉成真理）⇒ 已并入前端单修（要正控＋负控，⛔ 删断言了事）。
