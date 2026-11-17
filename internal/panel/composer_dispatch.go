@@ -12,8 +12,10 @@ package panel
 // hop: raw in, method + args out, one door per whitelisted method. Four when
 // slice A shipped; the two settings doors ticket 248 added make six, ticket
 // 320's fetch route seven, ticket 194's cost door eight, readface wave 1's
-// three privacy doors (ticket 40 AC#1) eleven, and readface wave 2's two doors
-// (ticket 36 AC#3's history read, ticket 38 AC#4's cancel door) thirteen - and
+// three privacy doors (ticket 40 AC#1) eleven, readface wave 2's two doors
+// (ticket 36 AC#3's history read, ticket 38 AC#4's cancel door) thirteen, and
+// readface wave 3's three doors (ticket 38 AC#3's tools.list read and
+// tool.launch door, ticket 38 AC#5's rules.force read) sixteen - and
 // the roster they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
@@ -202,6 +204,42 @@ type RosterCancelHandler interface {
 	HandleRosterCancel(ctx context.Context, req ComposerRequest) (string, error)
 }
 
+// ToolsListHandler answers readface wave 3's discovery read (ticket 38 AC#3,
+// tools.list): the installed tool roster, one row per registry entry with
+// name/title/riskPill/argSummary. Read-only by construction - one method, no
+// execution, no approval surface - which is the security statement that let
+// the name join the roster without touching the frozen grant-boundary
+// instrument. Settings-route shape (sentence + payload line) like the other
+// read faces. nil socket = the named refusal every unattached door gives.
+type ToolsListHandler interface {
+	HandleToolsList(ctx context.Context, req ComposerRequest) (string, error)
+}
+
+// ToolLaunchHandler answers readface wave 3's launch door (ticket 38 AC#3,
+// tool.launch): hand ONE tool invocation to the host's own task path, where
+// the loop's dispatch sends it through the real bridge gate (C19, the
+// permission-mode screen, route) - the dispatch's "same host bridge, no
+// bypass" is a property of where the invocation lands, so this interface
+// deliberately declares no gate of its own and no answer surface: the door
+// issues the launch and the approval card, if the verdict is L2, is the
+// REAL one. Settings-route shape: the receipt names what was launched; it
+// does not wait for a card or a result (a dispatch goroutine parked on a
+// 300s card would stall every other panel request - the roster-cancel
+// precedent). nil socket = the named refusal.
+type ToolLaunchHandler interface {
+	HandleToolLaunch(ctx context.Context, req ComposerRequest) (string, error)
+}
+
+// RulesForceHandler answers readface wave 3's force-rules read (ticket 38
+// AC#5, rules.force): the effective force_tool/force_chat rules with their
+// source (override/toml) and the mode the next prompt will adopt. One read
+// method and nothing else - the override write rides panel.message.send's
+// own payload (ComposerRequest.ForceMode), so this face can report steering
+// it can never perform. Settings-route shape. nil socket = the named refusal.
+type RulesForceHandler interface {
+	HandleRulesForce(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -244,6 +282,15 @@ type ComposerDispatch struct {
 	// that reaches a machine with no cancel leg attached must be told so,
 	// not dropped.
 	RosterCancel RosterCancelHandler
+	// Tools answers readface wave 3's discovery read (ticket 38 AC#3).
+	// Optional like every socket above; nil refuses by name.
+	Tools ToolsListHandler
+	// Launch answers readface wave 3's launch door (ticket 38 AC#3).
+	// Optional like every socket above; nil refuses by name.
+	Launch ToolLaunchHandler
+	// Rules answers readface wave 3's force-rules read (ticket 38 AC#5).
+	// Optional like every socket above; nil refuses by name.
+	Rules RulesForceHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -351,6 +398,21 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.RosterCancel.HandleRosterCancel(ctx, req)
+	case MethodToolsList:
+		if d == nil || d.Tools == nil {
+			return "", d.unattached(req)
+		}
+		return d.Tools.HandleToolsList(ctx, req)
+	case MethodToolLaunch:
+		if d == nil || d.Launch == nil {
+			return "", d.unattached(req)
+		}
+		return d.Launch.HandleToolLaunch(ctx, req)
+	case MethodRulesForce:
+		if d == nil || d.Rules == nil {
+			return "", d.unattached(req)
+		}
+		return d.Rules.HandleRulesForce(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

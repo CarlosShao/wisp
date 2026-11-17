@@ -59,10 +59,29 @@ type panelMessageDoor453 struct {
 
 	mu    sync.RWMutex
 	relay panelMessageRelay453
+	// forceStage is readface wave 3's (2026-11-17, ticket 38 AC#5) second
+	// late-bound seam: the palette's per-task force chip rides THIS door's
+	// payload (ComposerRequest.ForceMode - the ONE write route the message
+	// send already owns, so no second write route is minted), and the stage
+	// hands it to the runtime's override slot (force_rules.go). The chip is
+	// staged BEFORE the task is submitted and cleared on a refusal, exactly
+	// like the 453 marks it shares the envelope with.
+	forceStage func(mode string)
 }
 
 func newPanelMessageDoor453(preview *panelPreviewQuoteDoor, drafts *attachmentDraftLedger, audit panel.AuditFunc, actor string) *panelMessageDoor453 {
 	return &panelMessageDoor453{preview: preview, drafts: drafts, audit: audit, actor: actor}
+}
+
+// bindForceStageW3 is the late bind for the force chip; nil stays legal (the
+// chip is then refused by name with the rest of the undeliverable shapes).
+func (d *panelMessageDoor453) bindForceStageW3(stage func(mode string)) {
+	if d == nil {
+		return
+	}
+	d.mu.Lock()
+	d.forceStage = stage
+	d.mu.Unlock()
 }
 
 // bindRelay453 is the late bind. The panel chain is assembled before the task
@@ -112,6 +131,32 @@ func (d *panelMessageDoor453) HandleMessageRequest(ctx context.Context, req pane
 		d.record453(req, 0, err)
 		return err
 	}
+	// Readface wave 3 (2026-11-17, ticket 38 AC#5): the force chip. The
+	// vocabulary is judged HERE, before anything is staged (an unknown word
+	// is a refusal naming the two legal spellings, never a guess). Staging
+	// happens right before the relay call - the admission hook consumes it -
+	// and a refused submission clears it in the same call, so a staged chip
+	// can never leak into a task this message did not start (the same rule
+	// the 453 marks follow).
+	var stagedForce453 string
+	if chip := strings.TrimSpace(req.ForceMode); chip != "" {
+		if chip != "force_tool" && chip != "force_chat" {
+			err := fmt.Errorf("%w: forceMode=%q 不在 %s 里：整条消息拒绝，什么都不送（不许猜）",
+				panel.ErrComposerRequest, chip, forceModeVocabularyW3)
+			d.record453(req, len(rows), err)
+			return err
+		}
+		d.mu.RLock()
+		stage := d.forceStage
+		d.mu.RUnlock()
+		if stage == nil {
+			err := fmt.Errorf("%w: 强制档位未接入（本进程没有任务管线）：forceMode %s 没有生效，消息也没有送出",
+				panel.ErrNoHandlerAttached, chip)
+			d.record453(req, len(rows), err)
+			return err
+		}
+		stagedForce453 = chip
+	}
 	relay := d.relay453()
 	if relay == nil {
 		err := fmt.Errorf("%w: 消息中继未接入（本进程没有任务管线，或任务入口没有起来）：已收下的附件 %d 枚留在本机，但它们没有进模型，也不会被静默丢掉",
@@ -123,6 +168,15 @@ func (d *panelMessageDoor453) HandleMessageRequest(ctx context.Context, req pane
 		err := fmt.Errorf("%w: 这条消息既没有文字，也没有已收下的附件，本机没有内容可送出", panel.ErrComposerRequest)
 		d.record453(req, 0, err)
 		return err
+	}
+	// Stage the validated chip only now: everything between here and the
+	// relay is the last refusal window, and a chip staged past it is consumed
+	// by the admission hook of the task the relay starts.
+	if stagedForce453 != "" {
+		d.mu.RLock()
+		stage := d.forceStage
+		d.mu.RUnlock()
+		stage(stagedForce453)
 	}
 	// THE production construction point of panel.OutgoingMessage. It carries
 	// the ledger truth, and the rendering below is ForAgent's contract - the
@@ -136,6 +190,15 @@ func (d *panelMessageDoor453) HandleMessageRequest(ctx context.Context, req pane
 		return err
 	}
 	if err := relay(ctx, rendered, rows); err != nil {
+		// The submission was refused: the staged chip belongs to THIS message
+		// and must not leak into whatever task the slot runs next (the 453
+		// rule). clearForceOverride453 stages the empty word, which clears.
+		if stagedForce453 != "" {
+			d.mu.RLock()
+			stage := d.forceStage
+			d.mu.RUnlock()
+			stage("")
+		}
 		err = fmt.Errorf("面板消息没有送进模型：%w", err)
 		d.record453(req, len(rows), err)
 		return err
@@ -155,8 +218,16 @@ func (d *panelMessageDoor453) record453(req panel.ComposerRequest, attachments i
 	if err != nil {
 		outcome = "refused"
 	}
-	d.audit("panel: MESSAGE-SEND request=%q actor=%q attachments=%d textRunes=%d outcome=%s err=%v",
-		req.RequestID, d.actor, attachments, len([]rune(req.Text)), outcome, err)
+	// The chip word rides the line (wave 3): which force mode the message
+	// carried is auditable, never the message text itself.
+	d.audit("panel: MESSAGE-SEND request=%q actor=%q attachments=%d textRunes=%d force=%q outcome=%s err=%v",
+		req.RequestID, d.actor, attachments, len([]rune(req.Text)), stagedForceWord453(req), outcome, err)
+}
+
+// stagedForceWord453 echoes the force chip the envelope carried ("" when
+// none) for the audit line above.
+func stagedForceWord453(req panel.ComposerRequest) string {
+	return strings.TrimSpace(req.ForceMode)
 }
 
 // storedSelection453 turns the page's claimed rows into the ledger's own rows.

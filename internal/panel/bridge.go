@@ -209,6 +209,52 @@ const (
 	// page literal half is REGISTERED in rosterPageGapLedger194 while the
 	// page half is pending (Go-only wave by dispatch).
 	MethodRosterCancel = "roster.cancel"
+	// MethodToolsList is readface wave 3 (2026-11-17), ticket 38 AC#3's
+	// discovery read: the installed tool roster ("我到底装了什么", the D9
+	// transparency role) with name/title/riskPill/argSummary per row. The
+	// C17 roster addition's reason (the privacy-three precedent): the palette
+	// renders the tool directory, and without a Go door the page has nothing
+	// to render - the same dormant-shape the 38 page leg had to name. Why it
+	// is a READ and stays one: the roster answers what is INSTALLED, never
+	// what is allowed next; the risk pill is the registry's own declared
+	// level rendered by internal/risk's vocabulary (never a pill invented
+	// here), and no execution rides this door - launching is tool.launch's,
+	// below. Same naming facts as every unprefixed name above: the face's own
+	// verb (it lists tools), no "panel." prefix (ticket 181's extractor
+	// counts those literals), and no word of the grant-boundary instrument's
+	// verdict vocabulary. The page literal half is REGISTERED in
+	// rosterPageGapLedger194 while pending (Go-only wave by dispatch).
+	MethodToolsList = "tools.list"
+	// MethodToolLaunch is readface wave 3 (2026-11-17), ticket 38 AC#3's
+	// launch door: invoking a tool from the palette. WHY IT EXISTS (the
+	// roster addition's reason): the ticket's own line - "invoking a tool
+	// from palette goes through the SAME host bridge (no bypass)" - needs a
+	// Go通路, or the discovery roster is a menu nobody can order from. Why
+	// the name carries no approval word and no "panel." prefix: the same
+	// naming facts as above; "launch" is a task-control verb, not a verdict,
+	// and the door does not answer anything - it hands the invocation to the
+	// host's own task path, where the ONE agent.ToolRequest construction
+	// point (internal/agent/loop.go, ticket 309's nail) dispatches through
+	// tools.Bridge.Execute - C19 judge, permission-mode screen, route (the
+	// bridge.go path the dispatch names). An L2 verdict therefore raises the
+	// REAL approval card; this door never fabricates one and never answers
+	// one (approval.decide stays untouched, Q-49 family). The page literal
+	// half is REGISTERED in rosterPageGapLedger194 while pending.
+	MethodToolLaunch = "tool.launch"
+	// MethodRulesForce is readface wave 3 (2026-11-17), ticket 38 AC#5's
+	// force-rules read: the effective force_tool/force_chat rules (D11③)
+	// with their source (override/toml) and the mode the NEXT prompt will
+	// actually adopt. WHY IT EXISTS (the roster addition's reason): the
+	// palette's per-task override chip and the TOML rule table both steer the
+	// agent mode, and ticket 38's page leg named the Go side missing ("快照
+	// 无读取面") - without a read face the steering is invisible to the
+	// operator steering it. Why it is a READ and stays one: it changes
+	// nothing - overrides are staged through the message door's own payload
+	// (panel.message.send), TOML rules live in their own file, and this door
+	// only reports what is in force. Same naming facts: no "panel." prefix,
+	// no grant-boundary verdict word, and the page literal half is
+	// REGISTERED in rosterPageGapLedger194 while pending.
+	MethodRulesForce = "rules.force"
 )
 
 // ErrComposerRequest is every way a composer request can fail to be usable.
@@ -293,6 +339,30 @@ type ComposerRequest struct {
 	// roster does not hold is refused by the host's own cancel paths with
 	// their own reason (the ONE stop path's fail-closed pair), never guessed.
 	RosterTaskID string `json:"rosterTaskId,omitempty"`
+	// ToolName / ToolArgs are readface wave 3's launch selectors (tool.launch,
+	// ticket 38 AC#3): the tool name the discovery roster showed and the raw
+	// JSON argument object the page echoes for it. Both selector-shaped - a
+	// name echoed from the roster and a JSON object string, never key paths -
+	// and both are judged by the host they reach: the launch refuses a name
+	// the registry does not hold, and the arguments are judged by the same
+	// C19/C26 machinery every model-driven call goes through, because the
+	// launch rides the loop's own dispatch (see MethodToolLaunch). An empty
+	// tool name is refused by the handler before the seam is reached.
+	ToolName string `json:"toolName,omitempty"`
+	ToolArgs string `json:"toolArgs,omitempty"`
+	// ForceTask is readface wave 3's evaluation selector (rules.force, ticket
+	// 38 AC#5): the task text the face evaluates the force rules against to
+	// report the mode the NEXT prompt will adopt. Read-only input, the same
+	// selector class as HistoryOffset - a value the face reads, never one it
+	// writes back.
+	ForceTask string `json:"forceTask,omitempty"`
+	// ForceMode is readface wave 3's override payload (ticket 38 AC#5): the
+	// per-task force chip ("force_tool" | "force_chat", D11③'s own
+	// vocabulary) riding panel.message.send - the ONE write route the
+	// message door already owns, so no second write route is minted. The
+	// message handler validates the vocabulary and stages it for the next
+	// admitted task; an unknown word is refused before anything is staged.
+	ForceMode string `json:"forceMode,omitempty"`
 }
 
 // ParseComposerRequest reads one postMessage string. Every refusal is an error
@@ -325,7 +395,7 @@ func knownComposerMethod(m string) bool {
 	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
 	// exact one-line form, so wrapping it would leave real plants replacing
 	// nothing. Appending a constant means extending this line, deliberately.
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:
 		return true
 	}
 	return false

@@ -159,7 +159,18 @@ func TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests(t *testing.T) {
 // rosterTaskId), so the stale registrations are removed in that commit and
 // the ledger is empty again - every whitelisted name is judged by the
 // original rule below.
-var rosterPageGapLedger194 = map[string]string{}
+//
+// Readface wave 3's three entries (2026-11-17, ticket 38 AC#3's tools.list /
+// tool.launch and AC#5's rules.force) are REGISTERED here, not dodged: the
+// dispatch for this wave is Go-only (frontend/** untouched except the gap
+// ledger rows), so the page literal half is pending and each entry names
+// that reason. The two-way audit below keeps every entry honest both ways -
+// a name the page starts carrying must leave this ledger in the same commit.
+var rosterPageGapLedger194 = map[string]string{
+	"tools.list":  "readface wave 3 (2026-11-17, ticket 38 AC#3): Go-only wave by dispatch; the palette's tool roster reader in panel.ts is the pending page half",
+	"tool.launch": "readface wave 3 (2026-11-17, ticket 38 AC#3): Go-only wave by dispatch; the palette's launch row in panel.ts is the pending page half",
+	"rules.force": "readface wave 3 (2026-11-17, ticket 38 AC#5): Go-only wave by dispatch; the palette's force-chip read in panel.ts is the pending page half",
+}
 
 // TestFrontendComposerRequestsMatchTheEnvelope reads the real frontend source
 // and checks the four method names, the source claim and the requestId are

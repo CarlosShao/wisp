@@ -409,6 +409,13 @@ type agentRuntime struct {
 	// reader in panel_pump.go. Same one-object-two-hops rule as runFeed.
 	taskLive *taskLiveLedger
 
+	// force is readface wave 3's (2026-11-17, ticket 38 AC#5) force-rule
+	// store (force_rules.go): the TOML table's path plus the override slots.
+	// Both consumers of D11③ read through it - the rules.force face and the
+	// prompt injection in execute() - so the face and the prompt cannot
+	// report two different modes. nil on no-runtime shapes.
+	force *forceStore
+
 	// rootCancel holds the ROOT text task's own stop handle (the
 	// agent.RunningTask the loop mints at RunAsync) while that task is in
 	// flight, so the panel's roster.cancel door can stop it through the
@@ -540,8 +547,7 @@ type agentRuntime struct {
 	snapMu        sync.Mutex
 	lastSnap      panel.Snapshot
 	lastSnapBytes []byte
-	snapSeen      bool
-	// snapHost is ticket 329 form 甲's destination for the booked bytes: the one
+	snapSeen      bool	// snapHost is ticket 329 form 甲's destination for the booked bytes: the one
 	// panel window this process owns, attached by the assembly root after this
 	// runtime is built and read by pushPanelSnapshotToHost on every publish. Nil
 	// means this run has no window to push to - a console `wisp run` is exactly
@@ -668,6 +674,12 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	}
 	rt := &agentRuntime{spec: s, stdout: s.stdout, stderr: s.stderr, notify: s.notify}
 	cfgPath := filepath.Join(s.dataDir, configFileName)
+	// Readface wave 3 (2026-11-17, ticket 38 AC#5): the force-rule store lives
+	// beside config.toml (force_rules.go explains why the table is its own
+	// file and not a config.toml key). It is built for EVERY runtime - the
+	// face reads it and the prompt injection consults it; a missing file is
+	// the default state, never an error.
+	rt.force = newForceStore(forceRulesPathFor(cfgPath))
 	st, err := secret.NewStore(s.dataDir)
 	if err != nil {
 		fmt.Fprintf(s.stderr, "wisp run: 凭据存储不可用：%v\n", err)
@@ -1890,6 +1902,12 @@ func (rt *agentRuntime) admitTask(taskID string) func() {
 	// that CloseTask below will also close (bridge.go:989-997 names the legs that
 	// dispatch with host-invented ids - this is deliberately not one of them).
 	rt.markPanelMessage453(taskID)
+	// Readface wave 3 (2026-11-17, ticket 38 AC#5): the palette's force chip
+	// staged by the message door is consumed here, under the loop-minted task
+	// id - the same first-hook moment the 453 mark uses. The active map the
+	// rules.force face reads is written by this consumption, never by the
+	// door.
+	rt.takeForceOverride(taskID)
 	return func() {
 		if revoke != nil {
 			revoke()
@@ -2101,6 +2119,10 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// survive into the next task's scope; admitTask consumes them on the normal
 	// path, so this defer is the no-op there and the honest cleanup here.
 	defer rt.clearPanelMessage453()
+	// Readface wave 3 (2026-11-17, ticket 38 AC#5): a force chip staged for
+	// THIS task's admission must not survive a failed assembly into the next
+	// one - the same cleanup rule the 453 marks follow.
+	defer rt.clearForceOverride()
 	// The LIVE config, read per task: since ticket 223 a resident 1s tick hot-
 	// applies changed sections into the Manager, so reading the boot snapshot
 	// here (the shape before ticket 233) meant every task kept acting on the
@@ -2311,7 +2333,26 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		Log: func(s string) { rt.auditf("projctx: %s", s) },
 	})
 	rt.setInstructionLoader(instrLoader)
-	loop.AttachProjectInstructions(instrLoader)
+	// Readface wave 3 (2026-11-17, ticket 38 AC#5): the D11③ force decision
+	// is resolved HERE, once per task, from the same store the rules.force
+	// face reads - the face and the prompt cannot drift because there is one
+	// resolver. The instruction rides the ticket-200 InstructionSource seam
+	// (SPEC-05 §2: 注入为指令而非前置分类), wrapped around the project loader;
+	// with no rule in force the wrapper renders byte-identical to the bare
+	// loader, so the default path is unchanged. A broken rules table is
+	// surfaced on this run's audit line and the task runs unforced - the
+	// honest default, never a half-table.
+	forceDec, forceErr := rt.resolveForce(task)
+	if forceErr != nil {
+		rt.auditf("wisp run: force-rules.toml 不可读，本任务按无强制跑（%v）", forceErr)
+	}
+	if forceDec.Instruction != "" {
+		rt.auditf("wisp run: FORCE-MODE mode=%s source=%s pattern=%q（D11③：注入为指令）",
+			forceDec.Mode, forceDec.Source, forceDec.Pattern)
+		loop.AttachProjectInstructions(&forceInstructionSource{inner: instrLoader, block: forceDec.Instruction})
+	} else {
+		loop.AttachProjectInstructions(instrLoader)
+	}
 
 	// The task's own deadline rides on the parent named above (ticket 246 AC#7's
 	// ruling 2.3). For `wisp run` that is context.Background(), which is what this

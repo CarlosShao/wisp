@@ -564,6 +564,12 @@ func runResident() {
 	// door keeps refusing cancels by name - not a silent drop.
 	bindPanelRosterCancel(rp, src)
 
+	// Readface wave 3 (2026-11-17, ticket 38 AC#3/AC#5): the discovery and
+	// force doors' seams, late-bound on the same first line where both
+	// objects exist (the roster-cancel bind's pattern). Absent either side,
+	// the seams stay nil and the doors keep refusing by name.
+	bindPanelDiscoveryForce(rp, src)
+
 	// Ticket 228 AC#2/AC#3: the two hops this slice adds, both on the first line
 	// where the runtime (and therefore the card ledger and the answer surface)
 	// exists:

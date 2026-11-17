@@ -177,6 +177,33 @@ func (s *g1RosterCancel) HandleRosterCancel(_ context.Context, req panel.Compose
 	return "roster-cancelled", nil
 }
 
+// The wave-3 sockets (2026-11-17, ticket 38 AC#3/AC#5): same spy shape, one
+// handler each, so the dispatch ruler covers the grown roster without
+// loosening anything.
+type g1ToolsList struct{ c g1Call }
+
+func (s *g1ToolsList) HandleToolsList(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.c.calls++
+	s.c.last = req
+	return "tools-listed", nil
+}
+
+type g1ToolLaunch struct{ c g1Call }
+
+func (s *g1ToolLaunch) HandleToolLaunch(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.c.calls++
+	s.c.last = req
+	return "tool-launched", nil
+}
+
+type g1RulesForce struct{ c g1Call }
+
+func (s *g1RulesForce) HandleRulesForce(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.c.calls++
+	s.c.last = req
+	return "rules-forced", nil
+}
+
 // g1Envelope marshals one composer envelope with the attribution fields the two
 // later guards require, so the ONLY refusal any name in this file can draw is the
 // method-whitelist guard - never source and never requestId.
@@ -284,22 +311,24 @@ func TestWhitelistFuzz50NamesAllRefusedAndAudited35g1(t *testing.T) {
 		t.Fatalf("the fuzz table holds %d names, want exactly 50: ticket 35 :42 asks for 50 random/forbidden names, and a smaller table would silently lower the bar", len(names))
 	}
 
-	// A roster must exist and be the closed thirteen, or "all rejected" is
+	// A roster must exist and be the closed sixteen, or "all rejected" is
 	// trivially true against an empty whitelist. This is the anti-empty-universe
 	// guard the closed-roster ruler in internal/panel also carries. 2026-11-17
 	// re-adjudication (readface wave 2's carrier run): the slice was pinned at
 	// the 35g1-era eight while readface wave 1 (b1d2162dd) had already grown
-	// the whitelist to eleven with the three privacy doors; wave 2 adds the
-	// two doors this package wires, so the slice is the full thirteen.
+	// the whitelist to eleven with the three privacy doors; wave 2 added the
+	// two doors this package wires (thirteen), and readface wave 3 adds
+	// tools.list / tool.launch / rules.force (sixteen).
 	roster := []string{
 		panel.MethodModeRequest, panel.MethodWorkspaceRequest, panel.MethodAttachmentAdd,
 		panel.MethodMessageSend, panel.MethodConfigGet, panel.MethodConfigSet,
 		panel.MethodModelsList, panel.MethodCostSummary,
 		panel.MethodPrivacyDeleteOne, panel.MethodPrivacyPurge, panel.MethodPrivacyExport,
 		panel.MethodHistoryPage, panel.MethodRosterCancel,
+		panel.MethodToolsList, panel.MethodToolLaunch, panel.MethodRulesForce,
 	}
-	if len(roster) != 13 {
-		t.Fatalf("the roster slice here has %d names, want 13 - the count this ruler reports against", len(roster))
+	if len(roster) != 16 {
+		t.Fatalf("the roster slice here has %d names, want 16 - the count this ruler reports against", len(roster))
 	}
 	onRoster := map[string]bool{}
 	for _, r := range roster {
@@ -398,6 +427,9 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 	privacy := &g1Privacy{}
 	history := &g1History{}
 	rosterCancel := &g1RosterCancel{}
+	tools := &g1ToolsList{}
+	launch := &g1ToolLaunch{}
+	rules := &g1RulesForce{}
 
 	d := &panel.ComposerDispatch{
 		Mode:         mode,
@@ -410,6 +442,9 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 		Privacy:      privacy,
 		History:      history,
 		RosterCancel: rosterCancel,
+		Tools:        tools,
+		Launch:       launch,
+		Rules:        rules,
 		Audit:        (&g1Audit{}).fn,
 	}
 
@@ -431,9 +466,12 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 		{panel.MethodPrivacyExport},
 		{panel.MethodHistoryPage},
 		{panel.MethodRosterCancel},
+		{panel.MethodToolsList},
+		{panel.MethodToolLaunch},
+		{panel.MethodRulesForce},
 	}
-	if len(rows) != 13 {
-		t.Fatalf("the dispatch table covers %d roster names, want all 13", len(rows))
+	if len(rows) != 16 {
+		t.Fatalf("the dispatch table covers %d roster names, want all 16", len(rows))
 	}
 
 	all := map[string]func() int{
@@ -449,6 +487,9 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 		"privacy.export":     func() int { return privacy.export.calls },
 		"history":            func() int { return history.c.calls },
 		"cancel":             func() int { return rosterCancel.c.calls },
+		"tools.list":         func() int { return tools.c.calls },
+		"tool.launch":        func() int { return launch.c.calls },
+		"rules.force":        func() int { return rules.c.calls },
 	}
 
 	dispatched := 0
@@ -489,6 +530,12 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 			ownKey = "history"
 		case panel.MethodRosterCancel:
 			ownKey = "cancel"
+		case panel.MethodToolsList:
+			ownKey = "tools.list"
+		case panel.MethodToolLaunch:
+			ownKey = "tool.launch"
+		case panel.MethodRulesForce:
+			ownKey = "rules.force"
 		}
 		for k, get := range all {
 			delta := get() - before[k]
@@ -503,8 +550,8 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 		dispatched++
 	}
 
-	if dispatched != 13 {
-		t.Fatalf("dispatched %d roster names, want 13", dispatched)
+	if dispatched != 16 {
+		t.Fatalf("dispatched %d roster names, want 16", dispatched)
 	}
 
 	// Every roster name is also answered by the RUNNING guard. This is the other
@@ -517,5 +564,5 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 			t.Errorf("roster method %q is handled by the dispatch table but the running whitelist guard refuses it: %v", r.method, err)
 		}
 	}
-	t.Logf("roster dispatch: %d/%d roster names each reached their own handler exactly once and no other socket moved", dispatched, 13)
+	t.Logf("roster dispatch: %d/%d roster names each reached their own handler exactly once and no other socket moved", dispatched, 16)
 }

@@ -374,6 +374,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// bindPanelRosterCancel hands it the runtime's own cancel paths - never a
 	// self-invented stop mechanism.
 	rosterCancel := newRosterCancelDoor(auditf, actor)
+	// Readface wave 3 (2026-11-17, ticket 38 AC#3/AC#5): the discovery and
+	// force doors. All three seams are late-bound (same pattern):
+	// bindPanelDiscoveryForce hands them the runtime's own registry read,
+	// launch path and force resolver. Until then every door refuses by name.
+	discovery := newDiscoveryDoors(auditf, actor)
 	// Ticket 186's leg, attached only where a runtime scope was handed over (see
 	// the signature note). The interface is left nil rather than holding a typed
 	// nil pointer, because the router's refusal is decided by a nil interface
@@ -426,6 +431,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		// Readface wave 2 (2026-11-17, ticket 38 AC#4): the cancel door,
 		// seam nil until the boot binds it (see the door's own note).
 		RosterCancel: rosterCancel,
+		// Readface wave 3 (2026-11-17, ticket 38 AC#3/AC#5): the discovery
+		// and force doors, seams nil until the boot binds them.
+		Tools:        discovery,
+		Launch:       discovery,
+		Rules:        discovery,
 		Audit:        auditf,
 	}, mgr, nil
 }
