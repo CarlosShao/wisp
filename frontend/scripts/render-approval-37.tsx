@@ -20,9 +20,13 @@
 
    Where a dimension has NO wire field, the check asserts its ABSENCE - a
    renderer that invented a value for an undeclared key would be the exact
-   假值 the dispatch forbids. The named Go-only dimensions here:
-     - the D45-1 batch summary (BatchView, internal/agent/approval/ui.go:193)
-       travels only on the native Prompt; ApprovalCardView carries no batch;
+   假值 the dispatch forbids. The dimensions and where they now stand:
+     - the batch display fields (readface wave 1, 2026-11-17): the five flat
+       ApprovalCardView keys (batchTotal/batchDirs/batchFirst/batchDeferred/
+       batchSummary, internal/panel/approval.go:81-85, produced by
+       approval.CardSummary) now RIDE the card wire, so a fed card must draw
+       them verbatim and ONE card only, while a plain card (no batch keys -
+       omitempty) must draw no batch chrome from zeros;
      - the 270s/300s deadline (gate.go's deadline, EventWarning.Remaining)
        is not on the card wire either - the countdown lives on the native
        card (cardrender.go) and the ball, never on this page;
@@ -236,17 +240,73 @@ const emptyScreenHtml = renderToStaticMarkup(<ApprovalScreen snapshot={snapshotW
 check("the empty queue must be its own sentence, not a blank list", emptyScreenHtml.includes(esc("队列当前为空")));
 
 /* ---------------------------------------------------------------------------
+   4b. The aggregate card (ticket 37 AC#5, readface wave 1): a many-target
+       call renders ONE card wearing the batch's display fields, verbatim
+   --------------------------------------------------------------------------- */
+
+// The wire's own batch shape, transcribed off readface_wave1_test.go's
+// NativeVerdict.Batch fixture (10 targets, 2 dirs, preview rows, deferred
+// remainder) and Go's CardSummary sentence format (cardsummary_37.go:67-76).
+const BATCH_CARD: ApprovalCardView = {
+  correlationId: "t48-join-batch#call_1",
+  tool: "fs.write",
+  args: ["--batch", "C:/data/cleanup.txt"],
+  level: "L2",
+  rulesHit: ["R7"],
+  reason: "本批 10 项同类写入，超过 R7 的批量阈值，升级逐项确认。",
+  reasonKnown: true,
+  sessionOverrideBlocked: false,
+  callChain: [],
+  decidedBy: "native",
+  batchTotal: 10,
+  batchDirs: ["C:/data/x", "C:/data/y"],
+  batchFirst: ["C:/data/x/a.txt", "C:/data/x/b.txt", "C:/data/x/c.txt"],
+  batchDeferred: 7,
+  batchSummary: "本次调用包含 10 项同类 L2 操作，涉及 2 个目录：C:/data/x、C:/data/y；前 3 项：C:/data/x/a.txt、C:/data/x/b.txt、C:/data/x/c.txt（另有 7 项可展开查看）",
+};
+
+const batchHtml = renderToStaticMarkup(<App snapshot={snapshotWith([BATCH_CARD])} />);
+check(
+  "10 操作 must stay ONE card (one 需要你的确认 head, one card body)",
+  (batchHtml.match(/需要你的确认/g) ?? []).length === 1,
+  `${(batchHtml.match(/需要你的确认/g) ?? []).length} card heads`,
+);
+check("the card must carry batchSummary verbatim (Go's own words, unparaphrased)", batchHtml.includes(esc(BATCH_CARD.batchSummary)));
+check("the card must carry the batch total verbatim", batchHtml.includes(esc("本批共 10 项")));
+check("the card must carry the deferred remainder verbatim", batchHtml.includes(esc("7 项未在卡上展开")));
+check("the card must carry every affected dir verbatim", BATCH_CARD.batchDirs.every((d) => batchHtml.includes(esc(d))));
+check("the card must carry every preview path verbatim", BATCH_CARD.batchFirst.every((p) => batchHtml.includes(esc(p))));
+check("the batch block must hold zero emoji", !EMOJI_RE.test(batchHtml));
+check(
+  "the batch block must add no approval-shaped control (the native confirm covers the whole batch)",
+  (() => {
+    const names: string[] = [];
+    for (const m of batchHtml.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) {
+      const aria = m[1]?.match(/aria-label="([^"]*)"/)?.[1] ?? "";
+      const text = (m[2] ?? "").replace(/<[^>]*>/g, "").replace(/&quot;/g, '"').trim();
+      names.push(`${text} ${aria}`.trim());
+    }
+    return names.length > 0 && names.every((n) => !/允许|同意|批准|通过|approve|allow|grant/i.test(n));
+  })(),
+);
+check(
+  "the plain cards above must render NO batch chrome (no batch keys on their wire, no zeros dressed up)",
+  !singleHtml.includes(esc("本批共")) && !singleHtml.includes(esc("涉及目录")) && !screenHtml.includes(esc("本批共")),
+);
+check(
+  "panel.ts must declare the five batch keys (the Go judged-gap ledger goes stale otherwise)",
+  readFileSync("src/lib/panel.ts", "utf8").includes("batchTotal") &&
+    readFileSync("src/lib/panel.ts", "utf8").includes("batchSummary"),
+);
+check(
+  "the Go ledger's ApprovalCardView batch-key registration must be gone the same commit (the both-ways rule; the pairs-table name stays)",
+  !/ApprovalCardView[^\n]*batchTotal/.test(readFileSync("../internal/panel/composer_test.go", "utf8")),
+);
+
+/* ---------------------------------------------------------------------------
    5. The Go-only dimensions: named absences, never invented values
    --------------------------------------------------------------------------- */
 
-// D45-1 batch: BatchView exists ONLY on the native Prompt (ui.go:193); the
-// card wire carries no batch field, so no batch sentence may appear anywhere
-// on the page. (The native card face renders it - cardrender.go:84 - which
-// is where D45-1's panel-grade view actually lives.)
-check(
-  "no batch aggregation sentence may be drawn from the packet (no BatchView on the card wire)",
-  !screenHtml.includes(esc("同类")) && !screenHtml.includes(esc("可展开查看")),
-);
 // The 270s/300s ladder: the wire carries no deadline, the countdown is the
 // native card's. A countdown on this page would be an invented number.
 check(
@@ -299,5 +359,6 @@ if (failures.length > 0) {
 console.error(
   "render-approval37: OK, ticket 37's panel faces consume the pushed queue " +
     "(corr on the card, depth + FIFO head strip on every view, 等待于 off the roster join, " +
-    "capacity = the queue's own 8, batch/deadline named absences, no allow-shaped control)",
+    "capacity = the queue's own 8, the aggregate card: 10 ops = ONE card wearing the five batch fields verbatim with no allow-shaped control, plain cards render no batch chrome, " +
+    "deadline + depth stamps stay named absences, no allow-shaped control)",
 );

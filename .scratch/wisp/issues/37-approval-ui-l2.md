@@ -117,3 +117,16 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 
 `internal/panel/approval.go:81 ApprovalCardView` 新增五枚平铺 `omitempty` 字段 → `internal/panel/pump.go:126`（NativeVerdict.Batch 映射）→ 数据源 `internal/agent/approval/cardsummary_37.go:39 CardSummary`（display 字段 L1/L2 ≥3 目标都答，R4/R3 污染不出；**L2 永不聚合契约原样、`gate.go` R7 守卫未动**）。
 ⇒ 前端 AC#5 剩：把聚合卡五字段画出来（10 操作一张卡），50+ 升级 L2 走既有守卫。
+
+---
+
+## Progress log（续，2026-11-17 11:4x，本票前端消费腿 agent-109 · 读面消费波；只追加不勾框）
+
+**本轮交付（frontend/**＋internal/panel/composer_test.go 一处；证据件 `docs/evidence/s1/readface-consume-20261117-r1.md`）：**
+
+1. **AC#5 页半落地**：`frontend/src/lib/panel.ts` 的 `ApprovalCardView` 声明五枚可选 batch 键（batchTotal/batchDirs/batchFirst/batchDeferred/batchSummary，对应 `internal/panel/approval.go:81-85` omitempty 平铺字段；门＝batchTotal>0＝Go HasBatch()，非 batch 卡 wire 逐字节同旧形）；`frontend/src/components/l2-approval-card.tsx` 新 `BatchBlock`：batchSummary 原句逐字＋本批共 N 项（含未展开余数）＋涉及目录（Go 去重排序逐字）＋前 N 项路径预览（调用自身顺序逐字）；**块内零控件**——no-allow invariant 不变（「批准权在原生侧 · 面板不提供允许按钮」与球提示行原样）。
+2. **同 commit 删 ledger 登记**：`internal/panel/composer_test.go` composerTSGapLedger 的 `"ApprovalCardView"` 条目删除——ledger 双向规则自点名（page 一声明⇒stale-red，须删条目由普通双向比对接管）；`TestApprovalCardViewJSONKeysMatchFrontendTypes` 复跑 rc=0。
+3. **牙**：`render-approval-37.tsx` 新 4b 节——10 操作 ⇒ **一张卡**（「需要你的确认」×1）＋五字段逐字回屏；普通卡零 batch 痕（无「本批共/涉及目录」）；batch 卡按钮名断言无 allow 形；panel.ts 五键声明钉＋Go ledger 条目消失钉（双向都钉）。
+
+**门禁读数**：build/typecheck/lint rc=0；`render:approval37` rc=0；`render:l2`（喂 fixtures/l2-card-fs-delete.json）rc=0；`go test ./internal/panel` rc=0；d22scan rc=0；⛔ 未 push；dist 未入库。
+**留白不变**：AC#1 深度 e2e（真宿主）/AC#2 270/300s 倒计时（原生卡）/AC#3 原生回退卡/AC#6 人眼签收（机主）。

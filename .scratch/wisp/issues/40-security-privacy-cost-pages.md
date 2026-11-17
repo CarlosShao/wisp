@@ -155,3 +155,18 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 - **AC#3/AC#4**：`internal/panel/cost_handlers.go:54 CostAggregateRow`（月累计/预算/三态/计价版本）＋`:92 CostAggregateReader`；`cmd/wisp/panel_cost_194.go:94`（月累计＝cost_daily 真行求和；预算走 `observe.BudgetFrom/Judge` 整数基点）＋`:159 budgetStateWord`。**CACHED 是话不是读数**：`CostDayRow.CachedTokens` 存在但 cost_daily 无 cached 列 ⇒ payload `cachedKnown=false`，⛔ 画 0。
 - **AC#1**：名册 `internal/panel/bridge.go:141`（`privacy.delete-one`/`privacy.purge`/`privacy.export`）＋派发表 `composer_dispatch.go:174`＋处理器 `cmd/wisp/panel_privacy_40.go:89`＋接线 `panel_inbound.go:411`。三支计数对真 DB。
 ⇒ 前端剩：预算条读 aggregate（100→paused/80→warn）、隐私三支按钮走真路由（删除/清空/导出，需确认卡）。
+
+---
+
+## Progress log（续，2026-11-17 11:4x，本票前端消费腿 agent-109 · 读面消费波；只追加不勾框）
+
+**本轮交付（frontend/**；证据件 `docs/evidence/s1/readface-consume-20261117-r1.md`）：**
+
+1. **AC#3 页半落地**：`frontend/src/lib/cost-view.ts` 解析 `cachedKnown`/`aggregateKnown`/`aggregate`（CostAggregateRow 十字段；aggregateKnown=true 而块残缺 ⇒ payload-error 具名态，不猜字段）；`frontend/src/components/cost-settings.tsx`：CACHED 列上屏但听 cachedKnown 门（false ⇒ 每行「未知」，**结构零不画**）；新 `CostAggregateCard`（月累计 IN/OUT/金额、今日金额、日/月预算——0 ⇒ 「不封顶（0 = 未设预算）」、计价版本 0/空 ⇒ 「计价版本未知」）。
+2. **AC#4 页半落地**：新 `BudgetStateBar`——**只听 aggregate.budgetState 词**点亮三态段（normal/warn/paused），词表外的词零点亮＋逐字显示；新任务准入读 budgetAllowNewTask 布尔逐字；**页面不复算百分比**（internal/observe 整数基点判定是唯一裁判，⛔ 第二裁判）。
+3. **牙**：`render-security-cost-40.tsx` 重钉——aggregate 十字段喂真⇒逐字段同值回屏；三态各一枚＋词表外词一枚；days-only leg ⇒ aggregateKnown=false 逐字；malformed aggregate ⇒ payload-error；cachedKnown=false ⇒ 「未知」且零 >0<；cachedKnown=true ⇒ 数字逐字。
+4. **追加单同轮落地**：修该仪器 §4 的过期 grants 断言（dd52313e1 改真话后旧断言钉着 journal.go 假话一直红）——改钉新真话（生产在写 gate.go:859／grants.go:201/274／tools/bridge.go:1445、面板侧无 grants 列表读面、出口＝console 动词 grants/revoke-grant），**正控**（真句在源＋渲染面同时钉）＋**负控**（剥掉真句模拟改回旧假话⇒探测器必须翻红），断言一枚没删。
+5. **[ ] AC#3 / AC#4 勾格留白（裁决者≠实现者）**：页半＋牙已齐，等对抗验收；对账到微单位的真数据 e2e 仍要 live 宿主。
+
+**门禁读数**：build/typecheck/lint rc=0；`render:security40` rc=0；`go test ./internal/panel` rc=0；d22scan rc=0；⛔ 未 push；dist 未入库。
+**诚实边界**：隐私三支按钮（privacy.delete-one/purge/export）不在本派单五格，页未接——留给下一腿（路由已落地：bridge.go:141 名册＋composer_dispatch.go:174＋panel_privacy_40.go:89）。

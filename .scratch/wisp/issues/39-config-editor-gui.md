@@ -123,3 +123,17 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 - **AC#1**：`internal/config/sections_456.go:45 SectionRows`（全 D36 树反射走查，含 `[plugins]` 动态子表）→ `internal/panel/config_handlers.go` payload `sections[]{key,value,tier}` → `cmd/wisp/panel_config_store.go:147`；**reload 事件** `config_handlers.go:579`（`wisp-config-reload:` marker；accepted 写才发、被拒零事件）。tier 词取自 `TierRegistry`（hot/reload/restart/locked）。
 - **AC#4**：`internal/config/loaderrors_456.go:43/:54/:108`（`errors[]{line,message}`，未知键/类型错带 1-based 行号；语义错 Line=0）。
 ⇒ 前端只剩"把 sections 画成每节一张表＋tier 徽章、把 errors 按行号列出来"。
+
+---
+
+## Progress log（续，2026-11-17 11:4x，本票前端消费腿 agent-109 · 读面消费波）
+
+**本轮交付（frontend/**＋internal/panel/composer_test.go 一处；证据件 `docs/evidence/s1/readface-consume-20261117-r1.md`）：**
+
+1. **AC#1 页半落地**：`frontend/src/lib/config-view.ts` 解析 `sections[]{key,value,tier}`（omitempty 缺席＝腿未答，不画成空文件）＋`wisp-config-reload:` 事件解析；`frontend/src/lib/config-actions.ts` 加 reload 事件总线，五个 config.set 写助手都在 reply 上检测（被拒写零通知）；新件 `frontend/src/components/config-editor.tsx`：每节一张表＋tier 徽章逐字（hot/reload/restart/locked，"" ⇒ 未登记档位，locked 红 tint）＋`ConfigEditorSection`（自读 config.get＋订阅事件整页重读）；挂外观类脚底（config-screen.tsx 尾）。
+2. **AC#4 页半落地**：`ConfigErrorList` 按行号列（line=5 ⇒ 「第 5 行」；Line=0 ⇒ 「（无行号）」，不折第 1 行）；errors 缺席 ⇒ 「清洁或未检查分不出」句，不编错误。
+3. **牙**：`render-config-screen.tsx` 新增消费牙——18 节⇒18 表、摘一节⇒表消失且旧值零残留、tier 词逐字计数（hot×12/reload/restart/locked×4）、未登记档位、errors 两态、reload 事件逐字＋被拒零通知＋五助手 notify 计数＝5。
+4. **[ ] AC#1 / AC#4 勾格留白（裁决者≠实现者）**：页半＋牙已齐，等对抗验收；AC#2（安全节 L2 流）/AC#3（last-4 契约冲突）/AC#5（视觉签收）不动。
+
+**门禁读数**：build/typecheck/lint rc=0；`render:config-screen` rc=0（vite --ssr＋node 手动跑，无 npm script 历史如此）；`go test ./internal/panel` rc=0；d22scan rc=0（frontend 零发现）；⛔ 未 push；dist 未入库（.gitkeep 唯一跟踪件）。
+**回归牙记录**：fixture 里 [panel] 行被渲染门门禁（composer_test.go routeLiteralRe 禁 renderer 源里任何 "panel.*" 字面量）抓红一次，已换 demo 占位行并在仪器注释里写明原因——门禁工作正常，未放宽。

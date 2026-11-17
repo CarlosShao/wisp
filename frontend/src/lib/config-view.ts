@@ -44,6 +44,29 @@
    WHAT NEVER ARRIVES: no credential value and no redacted tail of one - the
    reference name is the whole of what a page may see.
 
+   WHAT ARRIVES SINCE READFACE WAVE 1 (2026-11-17, tickets 39 AC#1/AC#4):
+     sections       the FULL D36 section tree (internal/config/sections_456.go
+                    SectionRows, through config_handlers.go's
+                    configSectionPayload): one row per leaf - key (dotted
+                    path), value (the struct's own spelling, composites as
+                    compact JSON), tier (the registry's own word:
+                    hot/reload/restart, "locked" for the four locked
+                    sections). ABSENT on the JSON (omitempty) = the leg did
+                    not answer the tree - the editor page renders that as its
+                    own named state, never as "the file has nothing in it".
+     errors         the line-numbered load errors
+                    (internal/config/loaderrors_456.go): line is the 1-based
+                    line the decoder pointed at, 0 = the problem names no
+                    line (a semantic validation or a read failure). ABSENT =
+                    the file loads clean OR the leg did not check - the page
+                    says which fact it can and cannot tell apart, never an
+                    invented error.
+     reload event   an ACCEPTED config.set carries one extra reply line
+                    beginning with CONFIG_RELOAD_MARKER
+                    (internal/panel/config_handlers.go:579); a refused write
+                    carries none - the editor page listens for exactly this
+                    line and re-reads on it.
+
    THE HOOK. useConfigView() sends one config.get on mount and exposes reload()
    for after a write: every accepted write re-reads rather than patching a
    local picture, because the receipt is the fact and this page keeps no
@@ -130,6 +153,33 @@ export interface ConfigView {
   chatModelKnown: boolean;
   providers: ConfigViewProvider[];
   voice: ConfigViewVoice;
+  /** Ticket 39 AC#1: the full D36 section tree the leg read. Undefined here
+      means the key was ABSENT on the JSON (Go's omitempty on a nil list) =
+      the leg did not answer the tree - a different fact from a tree that
+      answered, and the editor page renders the two differently. */
+  sections?: ConfigSectionRowView[];
+  /** Ticket 39 AC#4: what the read pipeline found in the file on disk THIS
+      read. Undefined = the key was absent = the file loads clean or the leg
+      did not check; a non-empty list is the breakage, verbatim rows. */
+  errors?: ConfigLoadErrorView[];
+}
+
+/** One leaf of the config tree, as configSectionPayload carries it
+    (internal/panel/config_handlers.go:910-914). tier is the registry's own
+    word (hot/reload/restart/locked); "" rides through verbatim - the page
+    shows an unregistered path as its own named absence, never a tier word. */
+export interface ConfigSectionRowView {
+  key: string;
+  value: string;
+  tier: string;
+}
+
+/** One load error, as configErrorPayload carries it
+    (internal/panel/config_handlers.go:918-921). line is 1-based; 0 = the
+    problem names no line - the page renders that as 无行号, never as line 1. */
+export interface ConfigLoadErrorView {
+  line: number;
+  message: string;
 }
 
 /** The wire marker. Spelled once here; panel.SettingsPayloadMarker is the
@@ -139,6 +189,59 @@ export const CONFIG_VIEW_MARKER = "wisp-config-view:";
 /** The model-catalog marker (ticket 320's config.models.list; the Go half is
     320-r2). Same shape as the view marker: prose, then exactly one line. */
 export const MODELS_LIST_MARKER = "wisp-models-list:";
+
+/** The reload-event marker (ticket 39 AC#1; the Go half is
+    internal/panel/config_handlers.go:579 ConfigReloadEventMarker). It rides
+    the awaited binding reply of an ACCEPTED config.set, on its own line, as
+    one JSON object; a refused write emits no event line. Same two naming
+    properties as every marker in this family: no `panel.` prefix and no dot. */
+export const CONFIG_RELOAD_MARKER = "wisp-config-reload:";
+
+/** What one reload event says, as configReloadEvent carries it
+    (internal/panel/config_handlers.go:585-590): what actually changed on disk
+    (the guarded merge writer's own key paths), the effective tier, and the
+    distinct top-level sections those paths live in - all Go's own words,
+    nothing derived here. */
+export interface ConfigReloadEventView {
+  event: string;
+  tier: string;
+  written: string[];
+  sections: string[];
+}
+
+/** Parse one config.set reply for the reload event. Answers null when the
+    reply carries no event line - which is exactly the refused-write shape
+    (nothing changed, nothing reloads), and also the shape of any reply a
+    different route produced. The page must treat null as "no reload", never
+    guess one from the receipt's prose. */
+export function parseConfigReloadEvent(reply: string | null): ConfigReloadEventView | null {
+  if (reply === null) return null;
+  const at = reply.indexOf(CONFIG_RELOAD_MARKER);
+  if (at < 0) return null;
+  const afterMarker = reply.slice(at + CONFIG_RELOAD_MARKER.length);
+  const line = afterMarker.split("\n", 1)[0] ?? "";
+  let data: unknown;
+  try {
+    data = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (typeof data !== "object" || data === null) return null;
+  const ev = data as Record<string, unknown>;
+  if (ev.event !== "config.reload") return null;
+  if (typeof ev.tier !== "string" || !Array.isArray(ev.written) || !Array.isArray(ev.sections)) {
+    return null;
+  }
+  if (!ev.written.every((k) => typeof k === "string") || !ev.sections.every((k) => typeof k === "string")) {
+    return null;
+  }
+  return {
+    event: ev.event,
+    tier: ev.tier,
+    written: ev.written as string[],
+    sections: ev.sections as string[],
+  };
+}
 
 /** What one config.models.list reply turned out to be. A failure carries only
     prose (D37 class copy, no marker line), which the page shows in place. */

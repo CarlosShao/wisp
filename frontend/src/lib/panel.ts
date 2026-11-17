@@ -44,6 +44,35 @@ export interface ApprovalCardView {
   /** Where the verdict came from; always "native" while the ball and the
       gate are native (SPEC-06 §1). */
   decidedBy: string;
+
+  // ---- ticket 37 AC#5's aggregate-card fields (readface wave 1, 2026-11-17;
+  // the page declares the five keys the Go side already carries - the judged-
+  // gap ledger entry in internal/panel/composer_test.go composerTSGapLedger
+  // goes stale the moment this interface names them, and its own both-ways
+  // rule demands the entry be deleted in the same commit, so the ordinary
+  // two-way comparison judges the keys from here on).
+  //
+  // They are DISPLAY data read off approval.CardSummary
+  // (internal/agent/approval/cardsummary_37.go) and carried flat through
+  // ApprovalCardView (internal/panel/approval.go:81-85): one tool call that
+  // touches many targets renders as ONE card with the batch's display fields
+  // on it. This page derives nothing - a card that re-derived a count would
+  // be a second judge of the batch.
+  //
+  // All five are omitempty on the Go side, so OPTIONAL here: a card that is
+  // not about a batch carries none of them (its wire is byte-identical to
+  // its pre-field shape), and the card must not render batch chrome from
+  // zeros - the gate is batchTotal > 0, exactly Go's HasBatch().
+  /** How many targets the one call touches (CardSummary.Total). */
+  batchTotal?: number;
+  /** The affected directories, deduped and sorted by the Go side. */
+  batchDirs?: string[];
+  /** The first preview rows (BatchPreviewCount paths). */
+  batchFirst?: string[];
+  /** The deferred remainder: Total minus the preview rows carried. */
+  batchDeferred?: number;
+  /** The summary sentence, Go's own words, shown verbatim. */
+  batchSummary?: string;
 }
 
 /** Outcome the user asked for. The native gate decides; this is only intent. */

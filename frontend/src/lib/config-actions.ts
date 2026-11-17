@@ -20,7 +20,7 @@ import {
   translateWriteReply,
   type Feedback,
 } from "@/lib/config-feedback";
-import { parseModelsListReply } from "@/lib/config-view";
+import { parseModelsListReply, parseConfigReloadEvent, type ConfigReloadEventView } from "@/lib/config-view";
 import {
   requestConfigWrite,
   requestCredentialWrite,
@@ -43,9 +43,47 @@ export type ModelsFetchResult =
   | { ok: true; models: string[] }
   | { ok: false; feedback: Feedback };
 
-/** One whitelisted write (config.set), answered as the sentence to show. */
+/* --------------------------------------------------------------------------
+   The reload-event bus (ticket 39 AC#1's "after save, applied-tier feedback
+   surfaced from the reload events", 2026-11-17).
+   --------------------------------------------------------------------------
+   An ACCEPTED config.set's reply carries one `wisp-config-reload:` event
+   line (internal/panel/config_handlers.go:579); a refused write carries
+   none. The write helpers below are where every reply lands, so the event
+   is detected HERE - once per reply - and handed to subscribers (the config
+   editor page re-reads on it, PLAN.md:1044: the receipt is the fact, no
+   local copy is patched). Subscribers never see a refusal: notify returns
+   false for a reply without the event line, and no listener runs.
+   -------------------------------------------------------------------------- */
+
+const reloadListeners = new Set<(event: ConfigReloadEventView) => void>();
+
+/** Subscribe to accepted-write reload events. Returns the unsubscribe fn.
+    The listener runs synchronously off the write reply the host handed back. */
+export function onConfigReloadEvent(listener: (event: ConfigReloadEventView) => void): () => void {
+  reloadListeners.add(listener);
+  return () => {
+    reloadListeners.delete(listener);
+  };
+}
+
+/** Detect the reload event on one write reply and fan it out. False = no
+    event line on this reply (a refused write, a non-config route, null) -
+    zero listener runs, zero re-reads. */
+export function notifyConfigReloadListeners(reply: string | null): boolean {
+  const event = parseConfigReloadEvent(reply);
+  if (event === null) return false;
+  for (const listener of reloadListeners) listener(event);
+  return true;
+}
+
+/** One whitelisted write (config.set), answered as the sentence to show. An
+    accepted write's reload event fans out to the page subscribers BEFORE the
+    receipt is returned; a refused write notifies nobody. */
 export async function performConfigWrite(write: ConfigWireWrite): Promise<Feedback> {
-  return translateWriteReply(await requestConfigWrite(write));
+  const reply = await requestConfigWrite(write);
+  notifyConfigReloadListeners(reply);
+  return translateWriteReply(reply);
 }
 
 /** The composer row's model switch (ticket 187): one offerable catalog row,
@@ -53,9 +91,9 @@ export async function performConfigWrite(write: ConfigWireWrite): Promise<Feedba
     receipt keeping the Go receipt's own tier sentence (model writes are
     restart tier). Same door, same envelope, tiered translation. */
 export async function performComposerModelWrite(provider: string, model: string): Promise<Feedback> {
-  return translateTieredWriteReply(
-    await requestConfigWrite({ field: "role_chat_pair", provider, model }),
-  );
+  const reply = await requestConfigWrite({ field: "role_chat_pair", provider, model });
+  notifyConfigReloadListeners(reply);
+  return translateTieredWriteReply(reply);
 }
 
 /** The composer row's thinking-tier switch (ticket 187): the value is one of
@@ -63,9 +101,9 @@ export async function performComposerModelWrite(provider: string, model: string)
     here - and the receipt keeps the next-task tier sentence the host stamps
     on this field. */
 export async function performComposerThinkingWrite(level: string): Promise<Feedback> {
-  return translateTieredWriteReply(
-    await requestConfigWrite({ field: "role_chat_thinking", value: level }),
-  );
+  const reply = await requestConfigWrite({ field: "role_chat_thinking", value: level });
+  notifyConfigReloadListeners(reply);
+  return translateTieredWriteReply(reply);
 }
 
 /** The plugin inventory's switch (ticket 215a): one row, addressed by the
@@ -74,14 +112,16 @@ export async function performComposerThinkingWrite(level: string): Promise<Feedb
     (配置层已生效；引擎未接线；面板侧只能关不能开) - nothing here is optimistic,
     the row's state is the NEXT snapshot's, exactly like every other write. */
 export async function performPluginToggleWrite(id: string, on: boolean): Promise<Feedback> {
-  return translateTieredWriteReply(
-    await requestConfigWrite({ field: "plugin_enabled", plugin: id, value: on ? "true" : "false" }),
-  );
+  const reply = await requestConfigWrite({ field: "plugin_enabled", plugin: id, value: on ? "true" : "false" });
+  notifyConfigReloadListeners(reply);
+  return translateTieredWriteReply(reply);
 }
 
 /** The credential write: the value rides credentialValue and only that key. */
 export async function performCredentialWrite(provider: string, value: string): Promise<Feedback> {
-  return translateWriteReply(await requestCredentialWrite(provider, value));
+  const reply = await requestCredentialWrite(provider, value);
+  notifyConfigReloadListeners(reply);
+  return translateWriteReply(reply);
 }
 
 /** Fetch one provider's model catalog (config.models.list). */

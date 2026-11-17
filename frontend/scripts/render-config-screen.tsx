@@ -61,6 +61,9 @@
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { ConfigScreen } from "@/components/config-screen";
+import { ConfigEditorSection, ConfigErrorList, ConfigSectionTables } from "@/components/config-editor";
+import { notifyConfigReloadListeners, onConfigReloadEvent } from "@/lib/config-actions";
+import { parseConfigReply, parseConfigReloadEvent, type ConfigLoadErrorView, type ConfigSectionRowView } from "@/lib/config-view";
 import type {
   BallClickThroughSection,
   BallOpacityIdleSection,
@@ -80,6 +83,17 @@ function check(label: string, ok: boolean, detail = ""): void {
 // combining sequence and oxlint warns (no-misleading-character-class).
 const EMOJI_RE =
   /[\u{1F000}-\u{1FAFF}\u{2200}-\u{22FF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}]|\uFE0F/u;
+
+/** Same escaping React applies to a text node - so a match here is a match on
+    screen, not on an unescaped substring that never renders. */
+function esc(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
 
 const READ: BallStyleSection = { style: "glass", vocabulary: ["glass", "jarvis"] };
 
@@ -329,6 +343,229 @@ check(
   !screenSrc.includes('row.blocked === ""') && !screenSrc.includes("row.blocked") && !screenSrc.includes("blocked:"),
 );
 
+/* ---------------------------------------------------------------------------
+   TICKET 39 AC#1/AC#4 (readface consume wave, 2026-11-17): the config
+   editor's two faces, fed real wire shapes.
+   ---------------------------------------------------------------------------
+   The section tree (sections[]{key,value,tier}, internal/config/
+   sections_456.go through config_handlers.go:805) renders ONE TABLE PER
+   SECTION with the tier badge VERBATIM; the load errors
+   (errors[]{line,message}, loaderrors_456.go through config_handlers.go:806)
+   list under their lines with line 0 rendered （无行号）. The reload event
+   rides an accepted config.set reply (config_handlers.go:579); a refused
+   write carries no event line and notifies nobody.
+   --------------------------------------------------------------------------- */
+
+// The D36 tree's own 18 top-level sections, one row each, the registry's
+// four tier words distributed the way TierRegistry actually distributes
+// them (12 hot whole-section rows, one restart per-key row, one reload
+// per-key row, the four locked markers). One honest substitution: the
+// [panel] row cannot be spelled "panel.width" here - the renderer door gate
+// (internal/panel/composer_test.go routeLiteralRe) bans ANY "panel.*" literal
+// in renderer sources, so a demo-section stand-in rides in its slot. The
+// tooth is the count and the verbatim round-trip, not the key name.
+const SECTIONS_456: ConfigSectionRowView[] = [
+  { key: "ball.size", value: "90", tier: "hot" },
+  { key: "demo.width", value: "720", tier: "hot" },
+  { key: "session.max_turns", value: "24", tier: "hot" },
+  { key: "audio.input_device", value: "default", tier: "hot" },
+  { key: "llm.roles.chat", value: '["stepfun","glm-4-flash"]', tier: "hot" },
+  { key: "agent.max_steps", value: "12", tier: "hot" },
+  { key: "privacy.retention_days", value: "30", tier: "hot" },
+  { key: "memory.enabled", value: "true", tier: "hot" },
+  { key: "cost.daily_budget_micros", value: "0", tier: "hot" },
+  { key: "models.cache_dir", value: "D:/models", tier: "hot" },
+  { key: "observe.sampling", value: "0.1", tier: "hot" },
+  { key: "hotkey.toggle", value: "Ctrl+Alt+P", tier: "hot" },
+  { key: "app.language", value: "zh-CN", tier: "restart" },
+  { key: "voice.aec.enabled", value: "false", tier: "reload" },
+  { key: "risk.permission_mode", value: "ask_high_risk", tier: "locked" },
+  { key: "fs.extra_roots", value: '["D:/data"]', tier: "locked" },
+  { key: "net.allow_hosts", value: '["api.example.com"]', tier: "locked" },
+  { key: "plugins.weather.enabled", value: "true", tier: "locked" },
+];
+
+const treeHtml = renderToStaticMarkup(<ConfigSectionTables sections={SECTIONS_456} />);
+check(
+  "feeding 18 sections must paint 18 tables (one per top-level section, wire order kept)",
+  (treeHtml.match(/aria-label="配置节 /g) ?? []).length === 18,
+  `${(treeHtml.match(/aria-label="配置节 /g) ?? []).length} tables`,
+);
+check(
+  "every fed value must come back out verbatim (including the compact-JSON rows)",
+  SECTIONS_456.every((row) => treeHtml.includes(esc(row.value))),
+  SECTIONS_456.filter((row) => !treeHtml.includes(esc(row.value))).map((r) => r.key).join(","),
+);
+check(
+  "the tier badges must be the registry's own words, verbatim (hot x12 / reload x1 / restart x1 / locked x4)",
+  (treeHtml.match(/>hot<\/span>/g) ?? []).length === 12 &&
+    (treeHtml.match(/>reload<\/span>/g) ?? []).length === 1 &&
+    (treeHtml.match(/>restart<\/span>/g) ?? []).length === 1 &&
+    (treeHtml.match(/>locked<\/span>/g) ?? []).length === 4,
+  `hot ${(treeHtml.match(/>hot<\/span>/g) ?? []).length}, reload ${(treeHtml.match(/>reload<\/span>/g) ?? []).length}, restart ${(treeHtml.match(/>restart<\/span>/g) ?? []).length}, locked ${(treeHtml.match(/>locked<\/span>/g) ?? []).length}`,
+);
+check(
+  "the locked markers must carry the danger tint ticket 39's lock affordance spells",
+  /bg-red-tint text-red/.test(treeHtml),
+);
+check(
+  "the editor must state the verbatim rule it obeys (no second tier vocabulary)",
+  treeHtml.includes("页面不造第二个词表"),
+);
+
+// Pull ONE section out of the feed: its table must vanish entirely - the
+// tables render from THIS read only, no stale value survives the read that
+// no longer carries it.
+const prunedHtml = renderToStaticMarkup(
+  <ConfigSectionTables sections={SECTIONS_456.filter((row) => row.key !== "plugins.weather.enabled")} />,
+);
+check(
+  "removing a section from the feed must remove its table (17 tables, no stale value)",
+  (prunedHtml.match(/aria-label="配置节 /g) ?? []).length === 17 &&
+    !prunedHtml.includes("weather") &&
+    !prunedHtml.includes("plugins"),
+  `${(prunedHtml.match(/aria-label="配置节 /g) ?? []).length} tables`,
+);
+
+// An unregistered path: the wire's "" tier shows the named absence, never a
+// tier word nobody registered.
+const unregisteredHtml = renderToStaticMarkup(
+  <ConfigSectionTables sections={[{ key: "custom.novel_key", value: "1", tier: "" }]} />,
+);
+check(
+  "an empty tier must render the named absence 未登记档位, never an invented tier word",
+  unregisteredHtml.includes("未登记档位") &&
+    !/>(hot|reload|restart|locked)<\/span>/.test(unregisteredHtml),
+);
+check("the section-table markup must hold zero emoji", !EMOJI_RE.test(treeHtml));
+
+// AC#4: the errors list. Line 5 rides its line; line 0 (a semantic failure)
+// renders （无行号） - never 第 0 行, never folded into 第 1 行.
+const ERRORS_456: ConfigLoadErrorView[] = [
+  { line: 5, message: 'unknown key "bogus" at line 5' },
+  { line: 0, message: "validation: daily budget must not be negative" },
+];
+const errorsHtml = renderToStaticMarkup(<ConfigErrorList errors={ERRORS_456} />);
+check(
+  "a line-carrying error must render under its own line (第 5 行, message verbatim)",
+  errorsHtml.includes("第 5 行") && errorsHtml.includes('unknown key &quot;bogus&quot; at line 5'),
+  errorsHtml.slice(0, 200),
+);
+check(
+  "a lineless error must render （无行号） - never 第 0 行 and never 第 1 行",
+  errorsHtml.includes("（无行号）") &&
+    !errorsHtml.includes("第 0 行") &&
+    !errorsHtml.includes("第 1 行") &&
+    errorsHtml.includes("validation: daily budget must not be negative"),
+);
+check(
+  "the error list must say the count and the line=0 semantics it obeys",
+  errorsHtml.includes("查到了 2 个问题") && errorsHtml.includes("line=0"),
+);
+check("the error-list markup must hold zero emoji", !EMOJI_RE.test(errorsHtml));
+
+// AC#1's reload event: the parser, then the bus the write helpers notify.
+const EVENT_REPLY =
+  '设置已写入。\nwisp-config-reload:{"event":"config.reload","tier":"restart","written":["app.language"],"sections":["app"]}';
+const ev = parseConfigReloadEvent(EVENT_REPLY);
+check(
+  "an accepted write's reply must parse into the reload event verbatim",
+  ev !== null && ev.event === "config.reload" && ev.tier === "restart" &&
+    ev.written.length === 1 && ev.written[0] === "app.language" &&
+    ev.sections.length === 1 && ev.sections[0] === "app",
+  JSON.stringify(ev),
+);
+check(
+  "a refused write's reply must parse as NO event (the wire's own zero-event shape)",
+  parseConfigReloadEvent('panel: 配置字段不在可写名册内（field=not_a_field，requestId="rid-456"）') === null,
+);
+check("a null reply must parse as no event", parseConfigReloadEvent(null) === null);
+check(
+  "a malformed event line must parse as no event (the page never guesses a reload from prose)",
+  parseConfigReloadEvent("wisp-config-reload:{\"event\":\"other\"}") === null &&
+    parseConfigReloadEvent("wisp-config-reload:not-json") === null,
+);
+
+let fired: number = 0;
+let lastTier: string = "";
+const offReload = onConfigReloadEvent((e) => {
+  fired += 1;
+  lastTier = e.tier;
+});
+check(
+  "an event reply must fan out to the subscriber exactly once",
+  notifyConfigReloadListeners(EVENT_REPLY) && fired === 1 && lastTier === "restart",
+);
+fired = 0;
+check(
+  "a refused reply must notify nobody (zero events, zero re-reads - 被拒写零事件)",
+  !notifyConfigReloadListeners("panel: 配置字段不在可写名册内") && fired === 0,
+);
+offReload();
+check(
+  "after unsubscribe the listener stays silent",
+  !notifyConfigReloadListeners(EVENT_REPLY) || fired === 0,
+);
+
+// The payload half: config.get's parsed view carries sections/errors through,
+// and the editor section is mounted on the appearance category.
+const CFG_PAYLOAD = JSON.stringify({
+  readable: true,
+  credential: "none",
+  presetsKnown: true,
+  presets: ["stepfun"],
+  configuredKnown: true,
+  configured: false,
+  chatProvider: "stepfun",
+  chatModel: "glm-4-flash",
+  chatModelKnown: true,
+  providers: [],
+  voice: {},
+  sections: [{ key: "ball.size", value: "90", tier: "hot" }],
+  errors: [{ line: 5, message: 'unknown key "bogus" at line 5' }],
+});
+const cfgParsed = parseConfigReply(`读面 prose\nwisp-config-view:${CFG_PAYLOAD}`);
+check(
+  "config.get's parsed view must carry the section tree and the errors through",
+  cfgParsed.kind === "parsed" &&
+    cfgParsed.view.sections?.length === 1 &&
+    cfgParsed.view.sections[0]?.key === "ball.size" &&
+    cfgParsed.view.errors?.length === 1 &&
+    cfgParsed.view.errors[0]?.line === 5,
+  JSON.stringify(cfgParsed.kind === "parsed" ? { s: cfgParsed.view.sections, e: cfgParsed.view.errors } : cfgParsed.kind),
+);
+check(
+  "the editor section must be mounted at the foot of the appearance category",
+  screenSrc.includes("<ConfigEditorSection />"),
+);
+const editorSrc = readFileSync("src/components/config-editor.tsx", "utf8");
+check(
+  "the editor must subscribe to the reload-event bus and answer with a full re-read",
+  editorSrc.includes("onConfigReloadEvent(() => reload())"),
+);
+check(
+  "the editor must treat an absent sections key as 未答, never as an empty file",
+  editorSrc.includes("state.view.sections === undefined") && editorSrc.includes("本腿没有答这一面"),
+);
+check(
+  "the editor must treat an absent errors key as 清洁或未检查, never as an invented error",
+  editorSrc.includes("state.view.errors === undefined") && editorSrc.includes("不编一个错误出来"),
+);
+check(
+  "the editor section must hold zero emoji in its source",
+  !EMOJI_RE.test(editorSrc),
+);
+const actionsSrc = readFileSync("src/lib/config-actions.ts", "utf8");
+check(
+  "every config.set write helper must notify the reload bus off its reply",
+  (actionsSrc.match(/notifyConfigReloadListeners\(reply\)/g) ?? []).length === 5,
+  `${(actionsSrc.match(/notifyConfigReloadListeners\(reply\)/g) ?? []).length} notify calls`,
+);
+check(
+  "the editor's SSR (no effects) must show the loading sentence, never tables fed from nothing",
+  renderToStaticMarkup(<ConfigEditorSection />).includes("正在读取配置文件"),
+);
+
 if (failures.length > 0) {
   for (const f of failures) console.error("render-config: FAIL " + f);
   console.error(`render-config: FAIL, ${failures.length} check(s) failed`);
@@ -336,5 +573,6 @@ if (failures.length > 0) {
 }
 console.error(
   "render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier words, font_size 缺消费引擎 even fed, page-local rows 仅本次会话, theme names SetTheme; pickers/slider/switch/number fields mounted, snapshot values shown, " +
-    "no-reader honest states, write rides the settings door, zero emoji)",
+    "no-reader honest states, write rides the settings door, zero emoji); " +
+    "ticket 39 AC#1/AC#4 consume teeth: 18 sections -> 18 tables with verbatim tier badges (hot x12/reload/restart/locked x4, danger tint on locked), prune-a-section removes its table and its stale value, 未登记档位 for an empty tier, errors under their lines with line 0 as （无行号）, reload event parses verbatim and refused writes notify nobody (zero re-reads), every config.set helper fans the event out",
 );

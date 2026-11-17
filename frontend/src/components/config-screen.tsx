@@ -135,6 +135,7 @@ import {
 import { performConfigWrite } from "@/lib/config-actions";
 import { BallStylePicker, FeedbackLine } from "@/components/settings-controls";
 import { Switch } from "@/components/ai-native/switch";
+import { ConfigEditorSection } from "@/components/config-editor";
 import type {
   BallClickThroughSection,
   BallOpacityIdleSection,
@@ -759,6 +760,19 @@ export function ConfigScreen({
             paragraph here that the page contradicts. */}
         <span>其余各类在左边那一列上，各自写着它在等哪个数据源。</span>
         <span>设置项里没有一格能改变权限档位或工作区，那是面板的边界（P9）。</span>
+      </div>
+
+      {/* Ticket 39 AC#1/AC#4 (readface consume wave, 2026-11-17): the config
+          editor hangs at the foot of this category - the FULL D36 section
+          tree (one table per section, tier badges verbatim) and the
+          line-numbered load errors, read off config.get's new sections/errors
+          faces, re-read on every accepted write's wisp-config-reload event.
+          It is self-reading (its own config.get on mount, the cost page's
+          hook shape), so no snapshot prop plumbing crosses here. Re-slotting
+          it into its own rail category is a page-layout move, not a wire
+          move. */}
+      <div className="mt-3">
+        <ConfigEditorSection />
       </div>
     </section>
   );

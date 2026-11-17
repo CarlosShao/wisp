@@ -12,7 +12,9 @@
    Blueprint for the anatomy: TurboKach's approval-card (the vendored demo at
    src/components/ai-native/approval-card.tsx). The props contract is
    untouched: ApprovalCardView's ten fields, pinned on the Go side by
-   TestApprovalCardViewJSONKeysMatchFrontendTypes.
+   TestApprovalCardViewJSONKeysMatchFrontendTypes - plus the five OPTIONAL
+   batch display fields ticket 37 AC#5 landed (readface wave 1): a card that
+   is not about a batch carries none of them and renders no batch chrome.
 
    Two demo ornaments are deliberately NOT drawn, because the snapshot has no
    field behind them and a decoration that implies state is a lie:
@@ -168,11 +170,70 @@ function ParamsBlock({
   );
 }
 
+/**
+ * The aggregate-card block (ticket 37 AC#5, readface wave 1): one tool call
+ * that touches many targets is still ONE card, and this block puts the
+ * batch's display fields on it. Every value here is verbatim off the wire's
+ * flat batch fields (ApprovalCardView.batchTotal/batchDirs/batchFirst/
+ * batchDeferred/batchSummary - internal/panel/approval.go:81-85, produced by
+ * approval.CardSummary, cardsummary_37.go): the summary sentence rides
+ * unparaphrased, the lists are the Go side's own order (dirs sorted by Go,
+ * first rows in the call's own path order), and the two numbers are the
+ * leg's own counts - this page derives nothing (a card that re-counted the
+ * batch would be a second judge of it). The gate is batchTotal > 0, exactly
+ * Go's HasBatch(): a plain card carries no batch keys (omitempty), so no
+ * batch chrome may render from zeros. The block adds no control of any kind
+ * - the confirm that covers the whole batch is the standing native one, and
+ * the no-allow invariant is unchanged.
+ */
+function BatchBlock({ view }: { view: ApprovalCardView }) {
+  if (view.batchTotal === undefined || view.batchTotal <= 0) {
+    return null;
+  }
+  return (
+    <div>
+      <SectionTitle>这批操作（一次调用、一张卡）</SectionTitle>
+      <p className="text-[12.5px] leading-[1.6] text-ink-2">{view.batchSummary}</p>
+      <div className="mt-2 overflow-x-auto rounded-control border border-line bg-inset px-3 py-2.5 shadow-hairline">
+        <p className="font-mono text-[11.5px] text-ink">
+          {`本批共 ${view.batchTotal} 项`}
+          {view.batchDeferred !== undefined && view.batchDeferred > 0
+            ? `（其中 ${view.batchDeferred} 项未在卡上展开）`
+            : ""}
+        </p>
+        {view.batchDirs !== undefined && view.batchDirs.length > 0 ? (
+          <div className="mt-1.5">
+            <p className="text-[10.5px] text-ink-3">涉及目录（Go 侧去重排序后逐字）：</p>
+            <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
+              {view.batchDirs.map((dir) => (
+                <li className="font-mono text-[11.5px] leading-[1.45] text-ink" key={dir}>
+                  {dir}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {view.batchFirst !== undefined && view.batchFirst.length > 0 ? (
+          <div className="mt-1.5">
+            <p className="text-[10.5px] text-ink-3">前 {view.batchFirst.length} 项路径预览（调用自身的顺序，逐字）：</p>
+            <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
+              {view.batchFirst.map((path) => (
+                <li className="break-all font-mono text-[11.5px] leading-[1.45] text-ink" key={path}>
+                  {path}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 /** Rules that fired, as C19 ids - the operator reads these against SPEC-06 §3.
     The title repeats the id itself; inventing rule prose here would put words
     in the assessor's mouth. Outline capsule, mono 10.5px, the id in the
-    title attribute for the audit hover. */
-function RuleList({ rulesHit }: { rulesHit: string[] }) {
+    title attribute for the audit hover. */function RuleList({ rulesHit }: { rulesHit: string[] }) {
   if (rulesHit.length === 0) {
     return (
       <span className="text-[11.5px] text-ink-3">no rule id recorded</span>
@@ -313,6 +374,11 @@ export function L2ApprovalCard({
           <SectionTitle>完整参数</SectionTitle>
           <ParamsBlock args={view.args} expanded={expanded} tool={view.tool} />
         </div>
+
+        {/* Ticket 37 AC#5: a many-target call wears its batch display fields
+            on this same card; a plain card renders nothing here (HasBatch is
+            batchTotal > 0, never batch zeros). */}
+        <BatchBlock view={view} />
 
         <div>
           <SectionTitle>为什么需要确认</SectionTitle>
