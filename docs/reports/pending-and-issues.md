@@ -37734,3 +37734,9 @@ resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器�
 - **census 三处假免接线真清账（grep 复核）**：成本 cost-settings.tsx 真发 cost.summary；安全真读 composer.mode；技能复用 PluginInventoryList；config-screen.tsx 的 ow.blocked === "" 假判据**已删**。
 - **真瓶颈**：39 的 5 格、40 的 6 格、37 的 BatchView、38 的 task.cancel/TaskRowView —— 全是 **Go 读面/写面不存在**，⛔ 前端造不了。已写派单 20261117/txt/readface-wave1-dispatch.txt（config 全节树/errors、成本聚合、隐私路由、BatchView），等 w49grants 收腿即发。
 **顺带**：37 腿抓到一处假数——容量句原写「10」无读者，已改 **8**＝queue.go:130 DefaultMaxPending。
+
+## A1919（11-17 09:3x）：**票 49 会话授权结案（6/6）—— L2 永不被 grant 放行这一条是硬的**
+
+ 172714d4。我复跑 session/tools/approval 三包 -run TestTicket49 全 ok（27 枚）。
+最硬的两条：**grant 源全覆盖时 L2 仍弹卡、grant 源 0 次被查**；**撤 grant 后下一次立即重新弹卡**（grant_id=NULL）。batch 10 路径 1 张卡、恰 1 行 <dir>/*；审计两笔授权调用两行各带 grant_id=31。
+**边界登记**：面板侧 grants.list/evoke 入站方法**未建**（banned-root 禁 Go 入站 grant 路由），出口＝console 动词。⇒ 票 40 AC#2 判不了，已具名。

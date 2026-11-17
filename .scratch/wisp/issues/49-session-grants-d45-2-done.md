@@ -35,14 +35,14 @@ revocable live, fully audited — including the input.type target-process bindin
 - Cross-session persistent scopes (workspace/user — RESERVED, do not build).
 
 ## Acceptance criteria
-- [ ] Grant lifecycle: create → subsequent calls silent (audit rows written) → session end
+- [x] Grant lifecycle: create → subsequent calls silent (audit rows written) → session end
       expires → new session re-prompts.
-- [ ] Revoke: immediate effect test (next gated call re-prompts).
-- [ ] Limits: L2 never auto-allowed by grant; tainted exfil upgrades despite grant; config
+- [x] Revoke: immediate effect test (next gated call re-prompts).
+- [x] Limits: L2 never auto-allowed by grant; tainted exfil upgrades despite grant; config
       loosening unaffected by grants (three explicit tests).
-- [ ] input.type: per-process isolation; all-apps option danger flow; target-swap re-confirm.
-- [ ] Batch + grant: 10-op batch with opt-in grant → one card → whole pattern granted.
-- [ ] Audit: grant_id linkage present in tool_call rows for every grant-backed execution.
+- [x] input.type: per-process isolation; all-apps option danger flow; target-swap re-confirm.
+- [x] Batch + grant: 10-op batch with opt-in grant → one card → whole pattern granted.
+- [x] Audit: grant_id linkage present in tool_call rows for every grant-backed execution.
 
 ## Progress log (append-only, newest last)
 
@@ -58,3 +58,12 @@ revocable live, fully audited — including the input.type target-process bindin
   （一次一发、跑前 wisp.test 现查、Git bash 门）。整包死法按 A1893/A1882 处置记录。
   未做（登记非省略）：面板侧 grants.list/revoke 入站方法（banned-root 表禁 Go 入站 grant 路由，
   出口今天为 console 动词）。零契约文字改动。
+
+---
+
+## 编排者收件（2026-11-17 09:3x，`0172714d4`＋`8a429abdb`，件 `docs/evidence/s1/49-session-grants-impl.md`）
+
+**尺1** 两枚提交在（24 件）。**尺2** 件在。**尺3 我自己复跑**：`go test ./internal/session ./internal/tools ./internal/agent/approval -run TestTicket49` ⇒ **三包全 ok**（1.779s／0.163s／0.088s）；票内共 27 枚 `TestTicket49*`。
+**六格最硬读数（腿交，我认可为行为型）**：①生命周期＝run 收口后 `approval_grant` 1 行、`revoked_at` 非空＋审计 `SESSION-GRANT-SWEEP revoked=1`；②revoke＝撤前 0 卡＋`grant_id=<行id>`、撤后 ≥1 卡＋`grant_id=NULL`；③limits＝**grant 源全覆盖（Covering/TargetCovering 全 true）下 L2 仍 1 卡、grant 源 0 次被查**；R4 全命中升级无视 grant；mode-silenced `decision=allow、grant_id=NULL` 永不 `allow_session_grant`；④input.type＝`RecordTarget("notepad.exe")` 后 0 卡、换目标重弹、swap guard 执行前重解析不符即拒（原文「目标应用已切换…重新确认」）、all-apps 两步仪式、未展开先答被拒；⑤batch＝10 路径 **1 张卡**→**恰 1 行 `<dir>/*`**；⑥audit SQL＝真库两笔被授权调用**两行 tool_call 各带 `grant_id=31`**，未授权行 NULL。
+**边界（登记入票，非省略）**：面板侧 `grants.list`/`revoke` **入站方法未建** —— banned-root 表禁 Go 入站 grant 路由，操作者出口＝console 动词 `grants`/`revoke-grant <编号>`。⇒ **票 40 AC#2（grants 视图）因此判不了**，已在该票留白节写明。
+⇒ 6/6，**本票结**；零契约改动、C17 白名单与面板入站路由零触碰。
