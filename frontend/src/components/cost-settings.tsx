@@ -26,7 +26,13 @@
      CACHED          no cached column on CostDayRow.
      月/累计聚合       no aggregate fields on costPayload; the page does not
                      add them up itself.
-     预算条           the 80% warn / 100% paused bars have no budget fields.
+     预算条           the Go-side judgment IS LIVE ([cost] thresholds at
+                      internal/config/schema.go:608-613, the 80% warn / 100%
+                      over verdict at internal/observe/costbudget.go:103, the
+                      EvWarn exit at internal/agent/costbook_44.go:147), but
+                      the cost.summary payload does not carry a budget field
+                      yet - the bar waits for that field, never for a
+                      client-side guess.
      计价版本脚注      no pricing-version field.
    Landing each one means a Go-side field on costPayload (cost_handlers.go:124)
    plus a page read - filed in ticket 40's report, not faked here.
@@ -99,7 +105,8 @@ const ABSENCES: readonly { label: string; reason: string }[] = [
   },
   {
     label: "预算条（80% 警告 / 100% 暂停）",
-    reason: "预算字段不在 wire 上：没有预算读数就没有预算条，不画一根零长度的棒子。",
+    reason:
+      "预算判定 Go 侧已活（internal/config/schema.go:608-613 的 [cost] 阈值、internal/observe/costbudget.go:103 Judge 出 80% 警告 / 100% 超支、internal/agent/costbook_44.go:147 EvWarn），但 cost.summary payload（internal/panel/cost_handlers.go:124）尚未携带预算字段——字段落 wire 之前一格预算数字都不画，不造读数。",
   },
   {
     label: "计价版本脚注",

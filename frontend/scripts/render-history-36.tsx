@@ -14,8 +14,10 @@
    the check asserts its ABSENCE instead - a renderer that invented a value
    for an undeclared key would be the exact 假值 the dispatch forbids.
 
-   The XSS half (AC#2) feeds the four hostile payload families through the
-   production MarkdownText (the same function every finished chunk takes) and
+   The XSS half (AC#2) feeds the hostile payload families (parser-borne raw
+   HTML, schema-judged markdown links, plus the scheme-relative href negative
+   controls) through the production MarkdownText (the same function every
+   finished chunk takes) and
    asserts none of them reaches the markup. This is a function-level proof,
    not a browser run: the sanitizer is a pure string->string step, so if the
    hostile fragment is not in the static markup it cannot execute. The CSP
@@ -60,6 +62,25 @@ const XSS_CASES: { name: string; payload: string; hostile: RegExp; kept?: string
     name: "javascript: href",
     payload: "[点这里](javascript:alert(1))",
     hostile: /javascript:/i,
+    kept: "点这里",
+  },
+  {
+    // The scheme-relative negative control (the audit's open-redirect face):
+    // hast-util-sanitize's protocol check passes any colon-less URL untouched,
+    // so //evil.example/x survived the TIGHT_SCHEMA alone and a browser
+    // resolves it against the page origin. The urlTransform gate must strip
+    // the href - the anchor may keep its text, never its destination.
+    name: "protocol-relative href",
+    payload: "[点这里](//evil.example/x)",
+    hostile: /evil\.example|href="\/\//i,
+    kept: "点这里",
+  },
+  {
+    // The backslash sibling: browsers normalize \ to /, so a href starting
+    // with a backslash is the same scheme-relative trick in disguise.
+    name: "backslash scheme-relative href",
+    payload: "[点这里](\\evil.example/x)",
+    hostile: /evil\.example/i,
     kept: "点这里",
   },
   {

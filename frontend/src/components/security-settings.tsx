@@ -30,10 +30,22 @@
      门控阈值        thresholds are the native frozen face
                      (internal/risk/thresholds.go); no snapshot section, no
                      C17 route (internal/panel/bridge.go's roster).
-     会话授权/撤销    D45 grants have zero production writers (the census:
-                     journal.go:101 passes grant_id=nil verbatim); the
-                     snapshot carries no grants section; revoke needs a Go
-                     write face (ticket 49's lifecycle).
+     会话授权/撤销    D45 grants production writers are live - the census's
+                     journal.go:101 was the census's claim; ticket 49 proved
+                     production writes ARE live: gate.go:859
+                     g.grants.Record / gate.go:844 rt.RecordTarget, landing
+                     through internal/session/grants.go:201/274 InsertGrant,
+                     with the id carried back to the call face at
+                     tools/bridge.go:1445 (tc.GrantID = &g); session close
+                     stamps revoked_at and keeps the rows for audit
+                     (grants.go:346 RevokeAll). The absence is PANEL-side
+                     only: the snapshot carries no grants section and the
+                     architecture bans Go-inbound grant routes
+                     (grants.list/grants.revoke are not in C17's roster), so
+                     there is no grants list for this page to read. The
+                     operating exit is the console verbs: grants (list this
+                     session's live grants) and revoke-grant <编号>
+                     (cmd/wisp/approval_reply.go:415/:474).
      B-list 覆盖行    no snapshot section.
      taint-hit 历史  the tool_call table exists (internal/memory), but no
                      panel read face names it.
@@ -56,9 +68,9 @@ const ABSENCES: readonly { label: string; reason: string }[] = [
       "阈值表是原生冻结面（internal/risk/thresholds.go）：快照没有对应节，C17 名册（internal/panel/bridge.go:41-107）也没有读取路由。",
   },
   {
-    label: "会话授权与一键撤销",
+    label: "会话授权面板读面",
     reason:
-      "D45 会话授权生产零写入（grant_id 生产逐字传 nil，internal/agent/journal.go:101），快照无 grants 节；撤销要 Go 侧写面（49 lifecycle），C17 无路由。",
+      "会话授权生产在写（gate.go:859 g.grants.Record / gate.go:844 RecordTarget，落库走 internal/session/grants.go:201/274 InsertGrant，tools/bridge.go:1445 把 grant_id 带回调用面；会话收口盖 revoked_at、行保留审计，grants.go:346）。面板侧没有 grants 列表读面：快照无 grants 节，架构也禁 Go 入站 grant 路由（grants.list/grants.revoke 不在 C17 名册）。操作出口＝console 动词 grants（列本会话生效授权）/ revoke-grant <编号>（cmd/wisp/approval_reply.go:415/:474）。",
   },
   {
     label: "B-list 覆盖与审计行",

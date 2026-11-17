@@ -38,6 +38,13 @@
        family; no checkbox smuggling);
      - the href protocol set narrows to http/https/mailto - `javascript:` and
        data: hrefs die at the sanitize step;
+      - the URL gate (urlTransform below) is the belt AFTER the whitelist:
+        hast-util-sanitize's protocol check passes any colon-less URL
+        untouched, so the scheme-relative //evil.example/x and backslash
+        \evil.example/x shapes survive the schema alone and a browser resolves
+        them against the page origin. The gate keeps only http/https/mailto
+        absolute URLs and # anchors; everything else loses its href (the
+        attribute drops, the link text stays);
      - class attributes are stripped everywhere (token-only theme, and the
        class-based style smuggling vector goes with it).
    No dangerouslySetInnerHTML anywhere (CI grep). web.fetch / doc.read outputs
@@ -47,8 +54,9 @@
    node cannot execute, so the streaming state is safe by construction.
 
    The AC#2 payloads are exercisable without a browser: the sanitizer is a
-   pure function over strings, so scripts/render-history-36.tsx feeds the four
-   hostile families through the exported MarkdownText and asserts the
+   pure function over strings, so scripts/render-history-36.tsx feeds the
+   hostile families (including the scheme-relative href negative control)
+   through the exported MarkdownText and asserts the
    fragments never reach the markup. That is the tooth, and it runs in CI
    (`npm run render:history36`).
 
@@ -103,15 +111,32 @@ const TIGHT_SCHEMA: SanitizeSchema = (() => {
   return schema;
 })();
 
-/** Every finished chunk takes this exact function - the four AC#2 payload
-    families in scripts/render-history-36.tsx are judged by the schema above,
-    never by an if. Exported so the instrument feeds the same path users get. */
+/** The URL gate, mounted as react-markdown's urlTransform - which react-markdown
+    applies AFTER the rehype plugins ran, over every url attribute of the final
+    tree. Only http/https/mailto absolute URLs and # anchors keep their href;
+    the scheme-relative //host and \host shapes (which the schema's protocol
+    list cannot judge - hast-util-sanitize's check passes any colon-less URL)
+    and every other scheme lose the attribute. Returning null drops the href;
+    the link text stays. */
+function tightUrlTransform(url: string): string | null {
+  const value = url.trim();
+  if (value === "") return null;
+  if (value.startsWith("#")) return value;
+  if (/^(?:https?|mailto):/i.test(value)) return value;
+  return null;
+}
+
+/** Every finished chunk takes this exact function - the AC#2 payload families
+    in scripts/render-history-36.tsx are judged by the schema above plus the
+    URL gate below, never by an ad-hoc if at the call site. Exported so the
+    instrument feeds the same path users get. */
 export function MarkdownText({ text }: { text: string }) {
   return (
     <div className="min-w-0 text-[13px] leading-relaxed text-ink">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeSanitize, TIGHT_SCHEMA]]}
+        urlTransform={tightUrlTransform}
         components={{
           a: ({ children, href, title }) => (
             <a
