@@ -152,3 +152,8 @@ total 对账。
 （composer_dispatch/inbound_roster_253/composer_test/subagent_roster_197/bridge_test 等）当时未在
 其 pathspec 内、保持未提交，由本腿**追加新 commit** 正常 pathspec 提交（⛔ amend）。历史读法：
 bridge.go 的 wave-2 常量先随隐私页腿入库，roster/计数/注册/派发 case 随本枚回绿。
+
+---
+
+## 更正（编排者，2026-11-17 14:4x，来自 `readface-adversarial-20261117-1432.md`）
+本件 §2 与 `3a62bed97` commit message 所写「终态 `Stopped`」**是假话**：真值是 `Muted`（`internal/statemachine/states.go:14 StateMuted = "Muted"`；D43 二十枚无 `Stopped`；`statemachine.Valid("Stopped")==false`）。commit 不可改，以本更正为凭。附带：`panel_roster_cancel_wave2_test.go` 只断言"合法 D43 名"未断言 `StateMuted` ⇒ 空牙，已排单补一行。
