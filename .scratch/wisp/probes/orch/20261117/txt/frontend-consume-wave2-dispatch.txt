@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 前端消费波2：36 AC#3 历史列表＋38 AC#4 任务卡/取消（写腿；本波**唯一**碰 internal/panel 的腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。前置 `3a62bed97` 已落两面（票 36/38 尾「编排者追加」节有 file:line）。做两格：
+1. **票 36 AC#3**：`history.page{offset,limit}` 画成 1000 行滚动列表（虚拟化或分窗，滚动不重不漏）；行显示 `{ts,kind,tool,outcome,summary}`；delete-one/purge/export 走**既有 privacy 面**（⛔新造第二套）。牙：喂 1005 行三窗滚动⇒不重不漏；喂空⇒显式"暂无记录"；喂拒绝⇒逐字句。
+2. **票 38 AC#4 后半（任务态）**：`TaskRowView` 三键 `startedAt/costToDate/currentStep` 上屏；`roster.cancel` 走**真门**（先确认再取消，⛔一键杀）；取消后显示 applied-steps 读数（终态名／已落地步数／被中止步数）。牙：喂三键⇒逐字；取消⇒读数三值；缺字段⇒"未判"⛔假 0。
+3. **同 commit 摘 gap ledger**：`frontend/src/lib/panel.ts` 加 `history.page`/`roster.cancel` 字面量后，**同 commit 删** `internal/panel/composer_test.go` 里这两条 ledger 注册（ledger 双向规则，不删则 stale-red）。TaskRowView 三键若 ledger 有挂号，同样摘。
+**硬约束**：⛔ 契约/PLAN/specs/thresholds/golden/allowlist/D43/design、⛔ 放宽断言、⛔push、⛔ 提交 dist 字节（删回 .gitkeep）、⛔ UI emoji、⛔ 造数据。
+**本波你独占 `internal/panel/**` 写额**（其他腿不许碰；你只许动 `composer_test.go` 的 ledger 行）。
+**串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0＋相关仪器 rc=0＋`go test ./internal/panel` rc=0；node 在 `D:\work\server\node24`。
+写面：`frontend/src/**`、`frontend/scripts/render-*`、`internal/panel/composer_test.go`（仅 ledger 行）、`docs/evidence/s1/readface-consume2-*`。
+回话第一行＝commit hash ＋两格各自读数/牙名 ＋build/typecheck/lint/仪器/panel rc。没干完写「卡在哪」。

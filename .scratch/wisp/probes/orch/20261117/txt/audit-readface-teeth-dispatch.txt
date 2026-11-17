@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 审计：读面波1+波2 的「牙有没有牙」＋反向谎言（审计腿，只读）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何 fallback model）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 审计腿（只读，可跑测试，⛔改产码/票面）。被审＝`b1d2162dd`（读面波1）与 `3a62bed97`（波2）。逐条核「把读面摘掉/换个假值，哪枚测试会红」，行号一律 `git show <被审提交>:<file>` 取：
+1 **config sections 全节树**：`sections_456.go:45 SectionRows` 是否**真反射遍历 D36 全节**（⛔硬编码 18 个名字冒充）；tier 是否真来自 `TierRegistry`（造一枚假 tier ⇒ 哪枚红）。
+2 **reload 事件**：`config_handlers.go:579` 被拒写真的零事件？（喂一枚被拒写⇒若有事件则谎）
+3 **errors 行号**：`loaderrors_456.go:108 decodeErrorRows` 的 line 是否真从解析器来（不是按 key 表猜）。
+4 **成本对账**：`Test40CostReconcileAgreesToTheMicroUnit` 是否真读 `cost_daily`/`task_log`（⛔两造值对造值）；budget 三态是否真按 `observe.BudgetFrom` 基点比。
+5 **privacy 三路由**：`panel_privacy_40.go:89` 是否真删/清/导（对真库计数）；`bridge.go:141` 三枚是否**越权**（能否从面板侧触发不可逆而绕过确认）。
+6 **history.page**：`dao_history_page_36.go:104` 是否真查两张表（⛔返回造行）；1000 行窗是否真分页。
+7 **roster.cancel**：`bridge.go:211` + `panel_roster_cancel_wave2.go:187` 是否真 Stop 子代理（⛔只改内存标志）；有没有可能取消**别的**任务（id 校验）。
+8 **反向谎言专项**：波1/波2 的证据件与票尾进度里写「通/绿/已验」的短语，逐条核对应测试真存在且真跑。
+9 **越权面**：新增 5 枚 C17 名册（3 privacy + history.page + roster.cancel）里，有没有哪枚**从面板侧**能做不可逆动作而**没确认**。
+硬约束：只读；证据件写 `docs/evidence/s1/readface-adversarial-<time>.md`；⛔push。回话第一行＝「有牙 N／空牙 M／反向谎言 K／越权风险 R」＋逐条判词(file:line)。
