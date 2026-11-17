@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 票 36 AC#4：200 块 golden 回放（**按截断写判据，⛔不是 merge**）＋ token 计数准确（写腿，唯一共享编译面写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**先读票 36 的 AC#4 及其〔10-08 裁冲突〕注**（`.scratch/wisp/issues/36-result-history-panel.md:44-47`）：那句"renders with merge"与已重裁的规则**方向相反**——产码 `internal/panel/pump.go:397-409` 是 **Overflow TRUNCATES and never merges**（票 197 leg B 重裁，批准 A406，码 `94ea50f7`）。**⛔ 任何情况下不许为对上"merge"去改 pump**；本格按**截断**那形写判据。
+要做的：
+1. **token 计数上真线**：`ResultChunkView`/结果视图目前**无 token 数字段** ⇒ 在 Go 读面加**真实 token 计数**（来源＝真 usage，⛔用字符数估算冒充；无 usage 的块⇒显式"未知"，⛔ 假 0），前端显示"已用 N tokens"。
+2. **200 块 golden 回放**：造 200 块 golden（fixtures），仪器渲染 ⇒ 断言：①无 jank 判据用**可判事实**（⛔ 墙钟猜想）——如增量渲染批次数/每帧块数上限/合并后行数与内容逐块对账 ②**溢出按截断**（超 32 键/超限时后块被截断且**不合并**，与 `pump.go:397-409` 一致）③token 计数与 golden 期望逐块对账相等。
+3. 牙：把截断改成合并⇒仪器必须红；把 token 计数换成字符数/常量⇒对账必须红。变异只做仓外副本。
+**硬约束**：⛔ thresholds/golden(Go golden)/allowlist/PLAN/specs/D43/design、⛔ 改 pump 的截断规则、⛔放宽断言、⛔push、⛔提交 dist 字节、⛔UI emoji、⛔ 造数据。⛔ 别碰工作树里别人的改动（34/44/composer-states.html/probes）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；`npm --prefix frontend run build/typecheck/lint` rc=0＋新仪器 rc=0；node 在 `D:\work\server\node24`。
+写面：`internal/panel/**`（ResultChunkView 及测试）、`cmd/wisp/**`（唯一）、`frontend/src/**`、`frontend/scripts/render-*`、`docs/evidence/s1/36-stream-token-*`。
+回话第一行＝commit hash ＋三读数（token 对账/200 块无 jank 判据/截断牙）＋d22scan 末行 ＋载具 rc ＋前端 rc。没干完写「卡在哪」。
