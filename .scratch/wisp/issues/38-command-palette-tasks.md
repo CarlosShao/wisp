@@ -115,3 +115,10 @@ view (task.list/cancel tools backing it).
 
 **上面收件里写「终态 Stopped」是假话，我撤回更正**：真值是 **`Muted`**（`internal/statemachine/states.go:14 StateMuted = "Muted"`；D43 二十枚里**没有 `Stopped` 一词**，`statemachine.Valid("Stopped")==false`）。这处假话同时出现在 `3a62bed97` 的 commit message 与 wave2 证据件 §2 —— commit 不可改，此处更正为凭。
 - 附带**空牙**（审计判）：`TestRosterCancelDoorStopsARealSubagent…` 只断言终态非空＋是合法 D43 名，**没断言就是 Muted 那一枚** ⇒ 把实现换成"返回 true 什么都不停"仍绿。已排单补一行 `if stoppedRow.State != statemachine.StateMuted` 的牙。
+
+## 编排者收件·第三批（Go 面）（2026-11-17 16:1x，`c25c3086d`，件 `docs/evidence/s1/38-discovery-force-20261117-r1.md`）
+
+**尺1** `c25c3086d` 在。**尺3 我自己复跑**：`internal/panel` 全包 **ok 19.636s**；载具跑 `Test38*` 相关 **20/20 PASS rc=0**（`Test38ToolsListRosterPillsAreTheRiskTruth` 0.18s／`Test38ToolLaunchL2RaisesARealCard` 0.21s／`Test38ToolLaunchL1RaisesNoCard` 4.18s／`Test38ForceRulesFacePrecedence` 0.01s／`Test38ForceChipRidesTheMessageDoor`／`Test38DiscoveryDoorsRefuseByName`…）。
+- **AC#3 的 Go 面**：`bridge.go:227 tools.list`（riskPill 逐字＝`risk.L?.String()`，回 真 registry）＋`bridge.go:243 tool.launch`（走环路唯一 ToolRequest 构造点→真 gate；L2 弹 1 张真卡、L1 0 卡真执行）。
+- **AC#5 的 Go 面**：`bridge.go:257 rules.force`＋`cmd/wisp/force_rules.go:188 resolveForce` 唯一解算器；TOML⇒mode 变 source=toml／override 覆盖 source=override／都无⇒default；force 指令走票 200 接缝、无规则逐字节原样。
+- **两格仍不整勾**：AC#3 的“listed with risk pills”（页名单）与 AC#5 的“override chip”（页控件）都还差**前端半边**（`panel.ts` 三枚字面＋chip 控件，腿已按 Go-only 单留 pending 登记在 gap ledger）。⇒ 下一波前端腿接。

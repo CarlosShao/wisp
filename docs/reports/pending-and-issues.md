@@ -37824,3 +37824,11 @@ CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 ru
 - **空牙3**：①`roster.cancel` 测试只断言"合法 D43 名"不断言 `StateMuted`（换成"返回 true 什么都不停"仍绿）②成本对账 M6（task_log 侧换常量）仍绿 ③config 18 名字各出假值挡不住。①已排单补一行牙；②③登记为牙的边界。
 - **越权1**：`privacy.purge` Go 侧零确认（确认只在页），同源 postMessage 伪造可单发清整域 ⇒ 我拍：**Go 侧加确认位**（复用 `newComposerDispatchChain` 现成 `confirm panel.ModeConfirm`，非改契约）；`roster.cancel` 停根任务也零确认但今天前端零命中不可触发，随确认位一并加。
 - 39 `d58dceb5a`：18 节 golden 快照＋正负控（`ball.size 56→90` 红点名 [drifted: ball]，改回绿），我复跑 rc=0；AC#1 仍留 edit→save 半格（真宿主）。
+## A1932（11-17 16:1x）：38 Go 面落地 `c25c3086d`（tools.list/tool.launch/rules.force）；两格各留前端半格
+
+我复跑：internal/panel ok 19.636s；载具 Test38* 20/20 PASS rc=0；d22scan clean（腿报）；build rc=0。
+- AC#3 Go 面：riskPill 真来自 risk 词表、launch 真过 gate（L2=1 卡/L1=0 卡真执行）。
+- AC#5 Go 面：单一解算器、TOML/override/default 三来源、force 走 200 接缝无规则逐字节原样。
+- C17 名册 +3（tools.list/tool.launch/rules.force，理由逐枚写常量上）；封闭名册 13→16、非前缀 9→12、派发表 13→16。
+- **风险待审**：`tool.launch` 若可被同源 postMessage 伪造 ⇒ L1 工具**无卡任意执行**（后门嫌疑）。已发 `audit38doors` 专审“能/不能”；审完据此决定要不要给 launch 也加 source 白名单/确认位。
+- 两格均**不整勾**：前端半边（panel.ts 三字面＋force chip 控件）留 next。
