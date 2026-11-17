@@ -37740,3 +37740,9 @@ resync glass→jarvis 逐字段新鲜、包数恰 2；缓存突变/摘触发器�
  172714d4。我复跑 session/tools/approval 三包 -run TestTicket49 全 ok（27 枚）。
 最硬的两条：**grant 源全覆盖时 L2 仍弹卡、grant 源 0 次被查**；**撤 grant 后下一次立即重新弹卡**（grant_id=NULL）。batch 10 路径 1 张卡、恰 1 行 <dir>/*；审计两笔授权调用两行各带 grant_id=31。
 **边界登记**：面板侧 grants.list/evoke 入站方法**未建**（banned-root 禁 Go 入站 grant 路由），出口＝console 动词。⇒ 票 40 AC#2 判不了，已具名。
+
+## A1920（11-17 09:4x）：**77 AC#9 勾（种子扫描器有牙）；顺带一条教训：腿报的 hash 会错一个字符**
+
+dd0c8a04a（腿报 …f60a…，真值 …f80a…——**以后 hash 以 git rev-parse/HEAD 现读为准，⛔ 照抄回话**）。
+我复跑：seeds:self-test rc=0（正控绿＋三枚种子违规各红：hex #0285ff／注释内 emoji U+2713／禁用导入 @/fixtures/harness）；seeds rc=0（104/103/100 分母，0 findings）。
+CI lint-frontend 末尾只加两步（ci.yml:1755/1757/1761）；AC#6 的"真 run id"两半仍待 push 后取。

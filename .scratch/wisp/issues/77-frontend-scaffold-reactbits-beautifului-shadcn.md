@@ -392,7 +392,7 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 - **解冻**：机主 2026-11-16 10:4x 令「前端也是你全权接手，没有外部前端 agent」⇒ 本票 09-23 冻结理由（"想让别的 agent 干前端"）**作废**，余下 AC#1/AC#3/AC#4/AC#6 **恢复可派**。
 - **并入票 34**（同日裁：34 与 77 同一件事，34 superseded、不再派）：
   - [ ] **AC#8**（←34）：docker build→dist→go build 出的二进制在**真面板窗**里服务脚手架（不是只本地 dev server）。
-  - [ ] **AC#9**（←34）：CI job 覆盖 tsc／lint／build 全绿，且**种子违规会被抓**（硬编码 hex、emoji、禁用导入各一枚）。
+  - [x] **AC#9**（←34）：CI job 覆盖 tsc／lint／build 全绿，且**种子违规会被抓**（硬编码 hex、emoji、禁用导入各一枚）。
   - [x] **AC#10**（←34）：token parity —— design/assets/tokens.css 与前端 token 名册的**脚本化 diff** 为空（或逐条具名差异）。
   - [ ] **AC#11**（←34）：深色＋浅色各渲染一次外壳＋一枚样例屏，对比度抽查 ≥AA。
   - [x] **AC#12**（←34）：bundle 预算 —— 首屏 JS ≤400KB gz（React 成本按 D29 可接受；motion/Shiki 懒载）。
@@ -428,3 +428,12 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 
 - **AC#3 勾**：链路逐跳 file:line 无断跳 —— `internal/risk/assessor.go:230`（真 Decision）→ `internal/panel/approval.go:64-99` → 装配根 `cmd/wisp/run.go:1185-1186`＋`panel_resident_pump.go:94-99` → `pump.go:349-360`＋`composer.go:58` → `panel_snapshot_deliver_329.go:57` → `frontend/src/panel-root.tsx:37`＋`lib/panel.ts:568-578` → `App.tsx:351-353` → `l2-approval-card.tsx`；两枚牙（真决策逐字段／未判负控显式「信息不足」）。
 - **AC#11 不勾（诚实，具名挂账）**：**47/50 对过 AA**；**3 对 <AA** ＝①深色 白字/红钮 **3.31:1**（该红兼作 L2 徽标文字 4.68:1，压深必击穿文字，单 token 无解）②warn 胶囊亮色 **2.67:1** ③信息不足亮色 **2.97:1**（另有禁用态 2.24:1，WCAG 对禁用控件豁免）。修复须**新增彩色 token**（`--red-strong`/`--warn-ink`），而新增会让四方对账 check 2 报「未覆盖」⇒ 须同步 `internal/panel/tokens_fourway_test.go` 钉名表＋`docs/evidence/s1/c21-native-tokens.md` —— **该两处不在本波写面**，腿停下具名报断（**不是偷懒，是写面互斥**）。⇒ 已排后续腿（需 `internal/panel` 写额）。
+---
+
+## 编排者收件·第三批（2026-11-17 09:4x，**`dd0c8a04a`**，件 `docs/evidence/s1/77-ac9-ci-seeds.md`）
+
+⚠ **腿回话里的 hash 写错了一个字符**（报 `…50f60a56…`，真值是 `…50f80a56…`）—— 我按前缀 `dd0c8a04` 在 `HEAD` 定位到真身。**教训入账：腿报的 hash 一律当"线索"，以 `git rev-parse`／`HEAD` 现读为准。**
+**尺1** `dd0c8a04a` 在（＝当时 HEAD）。**尺2** 件在。**尺3 我自己复跑**：`npm --prefix frontend run seeds:self-test` **rc=0**（正控绿 `0 findings`＋三枚负控各红：`seed-bad-hex.tsx:2 [hex] "#0285ff"`／`[emoji] U+2713`（注释内也抓）／`[forbidden-import] "@/fixtures/harness"`）；`npm run seeds` **rc=0**（分母 emoji 104／hex 103（唯名排除 `tokens.generated.css`）／import 100，**0 findings**）。
+- **CI**：`lint-frontend` 末尾**只加两步**（`seeds:self-test`、`seeds`，`!cancelled()` 守卫，既有 11 步零改动，`ci.yml:1755/1757/1761`）。
+- **勾 AC#9**：CI job 覆盖 tsc/lint/build（既有步骤承载）＋种子违规三族必被抓（正/负控一体、现跑有牙）。
+- **诚实边界**：CI 两步**尚无 run id**（push 归编排者；AC#6 的 run id 半格另算）。产品树零 emoji（`ban#8` 125 文件 0 命中复跑绿）。
