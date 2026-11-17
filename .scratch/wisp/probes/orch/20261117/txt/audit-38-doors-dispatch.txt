@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 审计 38 波的三枚新门（tools.list / tool.launch / rules.force）有没有空牙与越权（审计腿，只读）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何 fallback model）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 审计腿（只读，可跑测试，⛔改产码/票面）。被审 `c25c3086d`。**头号问题：`tool.launch` 是不是一个"伪造一条面板消息就能任意执行 L1 工具"的后门**（L1 不弹卡 ⇒ 若面板侧可伪造 ⇒ 等于任意执行）。逐条变异推理（行号一律 `git show c25c3086d:<file>` 取）：
+1 **tool.launch 越权**：`bridge.go:243` 的请求字段能否被同源 postMessage 伪造（`ParseComposerRequest` 只验 method/source/requestId）？L1 工具 launch ⇒ 真执行且**无卡**。一个恶意页面/被注入的 markdown 能否构造 `wispDispatch("tool.launch",{name:"fs.delete",args:...})`？若 fs.delete 是 L2 会弹卡，那 L1 的 `fs.write`/`fs.read` 能否被伪造直接跑？**给出"能/不能"与判据**。
+2 **tools.list 风险丸**：`panel_tools_discovery.go:127` 的 riskPill 是否真来自 `internal/risk`（换硬编码⇒哪枚红）；名册是否真 `Registry().List()`（少一枚/多一枚假工具⇒红否）。
+3 **tool.launch 是否真过 gate**：`Test38ToolLaunchL2RaisesARealCard` 是否真数到生产 gate 的卡（把 gate 判定换成恒 allow⇒红否）；L1 那枚"窗口无人反对"是否真代表执行（把执行换成空转⇒红否）。
+4 **rules.force**：`force_rules.go:188 resolveForce` 是否唯一解算器（旁路另算一份⇒有没有牙抓）；TOML 与 override 互斥是否真互斥（同时置⇒谁赢，有测试否）。
+5 **force 指令注入接缝**：`Test38ForceInstructionRidesThe200Seam` 加的 force 指令会不会**污染别的任务**（越权改 agent 模式）；无规则时是否逐字节等于原样。
+6 **C17 名册 +3**（tools.list/tool.launch/rules.force）：是否都带理由；有没有哪枚能在面板侧做不可逆动作而无确认。
+7 **反向谎言**：`38-discovery-force-20261117-r1.md` 与 commit message 里任何"绿/通/真过"的短语，逐条核对应测试真存在真跑。
+硬约束：只读；证据件 `docs/evidence/s1/38-discovery-adversarial-<time>.md`；⛔push。回话第一行＝「tool.launch 越权：能/不能（一句判据）｜有牙 N／空牙 M／反向谎言 K／越权风险 R」＋逐条判词(file:line)。
