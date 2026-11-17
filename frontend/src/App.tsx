@@ -36,11 +36,12 @@
    ============================================================================ */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Activity, Command, Moon, PanelLeft, PanelRight, PanelRightClose, Sun } from "lucide-react";
+import { Activity, Command, Moon, PanelLeft, PanelRight, PanelRightClose, ScrollText, Sun } from "lucide-react";
 import { ApprovalQueueSection } from "@/components/approval-queue";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { ComposerRow } from "@/components/composer-row";
 import { GitBranchChip, GitBranchUnread } from "@/components/git-branch";
+import { HistoryBrowser } from "@/components/history-page";
 import { MonitorPopover, type MonitorAgentRow } from "@/components/harness/monitor-popover";
 import {
   PaletteScreen,
@@ -56,7 +57,7 @@ import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
-import { sendMessage } from "@/lib/panel";
+import { requestHistoryPage, requestRosterCancel, sendMessage } from "@/lib/panel";
 import { TIER_NAMES as libTierNames } from "@/lib/tier-names";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
@@ -98,7 +99,12 @@ const TIER_NAMES = libTierNames;
     this derivation existed the monitor was fed a bare empty array and every
     pushed row died unseen. An absent tasks key stays distinguishable from an
     empty roster: the popover is told which one it got (lib/panel.ts's
-    optionality rule). */
+    optionality rule).
+
+    Readface wave 2 (2026-11-17): the three task-card keys (ticket 38 AC#4)
+    ride verbatim too - startedAt / costToDate / currentStep are omitempty on
+    the wire, so an unstamped row stays ABSENT here and the popover renders
+    its 未判, never an epoch, a zero cost, or a fake step. */
 export function monitorAgents(tasks: TaskRosterSection | undefined): MonitorAgentRow[] {
   return (tasks?.rows ?? []).map((row) => ({
     id: row.taskId,
@@ -110,6 +116,9 @@ export function monitorAgents(tasks: TaskRosterSection | undefined): MonitorAgen
     streamTruncated: row.streamTruncated,
     streamElidedRunes: row.streamElidedRunes,
     streamDropped: row.streamDropped,
+    startedAt: row.startedAt,
+    costToDate: row.costToDate,
+    currentStep: row.currentStep,
   }));
 }
 
@@ -175,6 +184,11 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         swallowed - a request that never left would otherwise look like a
         palette that worked. */
     paletteError: string;
+    /** Readface wave 2 (2026-11-17): the history browser's overlay. The
+        same ephemeral view-preference class as monitorOpen/paletteOpen -
+        the LIST's data lives in the browser's own state fed by
+        history.page, never cached here. */
+    historyOpen: boolean;
     sessionId: string | null;
     activeTurn: string | null;
   }>({
@@ -187,6 +201,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     paletteOpen: false,
     paletteQuery: "",
     paletteError: "",
+    historyOpen: false,
     sessionId: null,
     activeTurn: null,
   });
@@ -278,7 +293,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         return;
       }
       if (event.key === "Escape") {
-        setLocal((c) => ({ ...c, paletteOpen: false, monitorOpen: false }));
+        setLocal((c) => ({ ...c, paletteOpen: false, monitorOpen: false, historyOpen: false }));
         if (narrow) setSidebarOpen(false);
       }
     }
@@ -361,9 +376,12 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         "名册只承载不执行（internal/panel/commands_roster_213.go:21-26），C17 名册（internal/panel/bridge.go:41-107）没有执行通路，名册行不可点",
     },
     {
-      word: "取消任务 未接线",
+      // Readface wave 2 (2026-11-17): roster.cancel landed on the C17 roster,
+      // so this is no longer dormant - the stop button lives on the task
+      // monitor's rows (monitor-popover.tsx), behind its own confirm card.
+      word: "取消任务 已接线",
       reason:
-        "C17 名册（internal/panel/bridge.go:41-107）没有取消通路；接 task.cancel 要 Go 侧在 internal/panel/composer_dispatch.go 的派发表加处理器，前端不造",
+        "走 roster.cancel（internal/panel/bridge.go 的取消门，票 38 AC#4）：任务监控浮层的每一行有停止键，先确认再取消；回执逐字上屏，已落地步骤读数走 history.page 的取证行。",
     },
     {
       word: "模式强制 未接线",
@@ -494,11 +512,33 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                   streamTruncated={snapshot.tasks?.streamTruncated}
                   streamElidedRunes={snapshot.tasks?.streamElidedRunes}
                   streamDroppedCount={snapshot.tasks?.droppedCount}
+                  /* Readface wave 2 (ticket 38 AC#4): the cancel flow's two
+                     doors, the same wispDispatch pipe the settings pages
+                     use. A reply of null (no host) lands on the row's own
+                     未判 line inside the popover - never a silent no-op. */
+                  cancelDoors={{ cancelTask: requestRosterCancel, historyLoad: requestHistoryPage }}
                   onPin={() => undefined}
                 />
               </div>
             ) : null}
           </div>
+
+          {/* 历史 (ticket 36 AC#3, readface wave 2): the paged history
+              browser over history.page. The read face landed on its own
+              roster name (Q-50's panel.view.request stays deleted); the
+              sidebar's history tree below is a SESSION-tree shape the read
+              face does not answer, so it stays an honest empty - this
+              button opens the paged list the face does answer. */}
+          <button
+            type="button"
+            aria-label="历史记录"
+            aria-expanded={local.historyOpen}
+            className="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
+            onClick={() => setLocal((c) => ({ ...c, historyOpen: !c.historyOpen }))}
+            title="历史记录"
+          >
+            <ScrollText aria-hidden="true" size={14} strokeWidth={1.9} />
+          </button>
 
           <kbd className="kbd hidden sm:flex">Ctrl K</kbd>
           <button
@@ -547,15 +587,14 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
           >
             <PanelSidebar
               activeSessionId={local.sessionId}
-              /* Dormancy, named (ticket 36): the 30-day history tree the
-                 ticket's history browser would feed has no engine on the
-                 wire - the snapshot carries no task-history section
-                 (internal/panel has no history reader; the SQLite
-                 task/transcript tables have no panel read face), and a
-                 panel.view.request route to ask for one is BANNED (Q-50 = 甲,
-                 lib/panel.ts's comment; reopening C17's whitelist needs human
-                 approval). So the groups stay an honest empty, not rows fed
-                 from nothing. */
+              /* Dormancy, narrowed (ticket 36 AC#3, readface wave 2): the
+                 paged HISTORY list the read face answers now has its page
+                 (the header's 历史 button -> HistoryBrowser over
+                 history.page). What the sidebar tree feeds is a different
+                 shape - a session tree, not the flat paged rows - and the
+                 read face declares no session grouping, so the groups stay
+                 an honest empty rather than rows reshaped to look like
+                 sessions. */
               historyGroups={[]}
               onNewTask={() => setLocal((c) => ({ ...c, sessionId: null, view: "chat" }))}
               onOpenSettings={() => setLocal((c) => ({ ...c, settingsOpen: true }))}
@@ -660,6 +699,31 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               query={local.paletteQuery}
               roster={paletteRoster}
             />
+          </div>
+        </div>
+      ) : null}
+
+      {/* 历史 (ticket 36 AC#3): the paged browser as an overlay dialog, the
+          palette's shape. The door's receipt, refusals, empty state and
+          privacy strip live inside HistoryBrowser; the window owns only the
+          backdrop and the dismiss paths (backdrop click, Escape). */}
+      {local.historyOpen ? (
+        <div
+          aria-label="历史记录"
+          aria-modal="true"
+          className="fixed inset-0 z-40 flex items-start justify-center bg-black/35 pt-[10vh]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setLocal((c) => ({ ...c, historyOpen: false }));
+          }}
+          role="dialog"
+        >
+          <div
+            className="w-[680px] max-w-[92vw] overflow-hidden rounded-card border border-line bg-page shadow-overlay"
+            style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}
+          >
+            <div className="max-h-[80vh] overflow-y-auto p-4">
+              <HistoryBrowser load={requestHistoryPage} />
+            </div>
           </div>
         </div>
       ) : null}

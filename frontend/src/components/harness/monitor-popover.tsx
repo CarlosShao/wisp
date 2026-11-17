@@ -8,9 +8,13 @@
    parent - this component only paints the card. Zero data of its own.
    ============================================================================ */
 
+import { useRef, useState } from "react";
 import { Pin } from "lucide-react";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
+import { formatHistoryTs, scanTaskForensics, appliedStepsReading, type AppliedStepsReading, type HistoryLoader } from "@/lib/history-view";
+import { REFUSED_ENVELOPE_PREFIX } from "@/lib/privacy-view";
+import type { RunUsageRow } from "@/lib/panel";
 
 export interface MonitorEnvRow {
   label: string;
@@ -40,7 +44,39 @@ export interface MonitorAgentRow {
   streamTruncated?: boolean;
   streamElidedRunes?: number;
   streamDropped?: boolean;
+  /** ---- readface wave 2 (2026-11-17), ticket 38 AC#4's three task-card
+      keys, copied verbatim off the wire (App's monitorAgents maps them
+      1:1 from TaskRowView). All three are omitempty on the wire, so ABSENT
+      is the host's own "stamped nothing" - the row renders 未判 for that
+      dimension and NEVER an epoch, a zero cost, or a fake step name.
+      EXCEPTION: currentStep's absence is the wire's own "no call in
+      flight" (the loop retires the row at EvToolEnd), which reads 无在飞 -
+      that is a reading, not an unknown. */
+  startedAt?: number;
+  costToDate?: RunUsageRow;
+  currentStep?: string;
 }
+
+/** The doors a hosted panel hands the cancel flow: roster.cancel (the ONE
+    stop path the C17 roster carries) and the history.page loader the
+    applied-steps reading counts its forensics rows from. Both undefined in
+    the showcase/demo shapes: rows then draw no 停止 control at all - a
+    button wired to a door that does not exist is the lie the render-nav
+    gate names. */
+export interface TaskCancelDoors {
+  cancelTask: (taskId: string) => Promise<string | null>;
+  historyLoad: HistoryLoader;
+}
+
+/** What one roster.cancel exchange turned out to be, per task. The receipt
+    and the refusal ride VERBATIM (the door's own words); the applied-steps
+    reading arrives from the forensics scan and stays undefined until it
+    completes - an incomplete scan is 未判, never a partial count. */
+export type TaskCancelState =
+  | { phase: "sending" }
+  | { phase: "receipt"; text: string; scanning: boolean; reading?: AppliedStepsReading; scanNote?: string }
+  | { phase: "refused"; raw: string }
+  | { phase: "no-host" };
 
 /** The dot's vocabulary - a DISPLAY tier, not a status judgement. blocked is
     the 等批准 tier: the row's task has its own card waiting. idle is "the host
@@ -157,6 +193,10 @@ export interface MonitorPopoverProps {
   streamTruncated?: boolean;
   streamElidedRunes?: number;
   streamDroppedCount?: number;
+  /** The two doors the cancel flow needs (readface wave 2, ticket 38 AC#4):
+      roster.cancel and the history.page loader. Absent (demo/showcase
+      shapes) = rows draw no 停止 control at all, never a dead button. */
+  cancelDoors?: TaskCancelDoors;
   onPin?: () => void;
 }
 
@@ -178,6 +218,102 @@ function StateDot({ state }: { state: AgentDot }) {
   return <span aria-hidden="true" className={cn("size-1.5 shrink-0 rounded-full", DOT_CLASS[state])} />;
 }
 
+/* ---------------------------------------------------------------------------
+   Readface wave 2 (2026-11-17), ticket 38 AC#4: the task-card line and the
+   cancel block. Both are exported PURE display components so the render
+   instrument feeds real wire shapes through the same functions the popover
+   uses - no second rendering path.
+   --------------------------------------------------------------------------- */
+
+/** The three task-card keys, one line per row (startedAt / costToDate /
+    currentStep). startedAt renders through the SAME formatter the history
+    rows use (0/absent stays 未判, never epoch); the cost numbers ride
+    verbatim with their currency pair (micros and currency travel together
+    per the wire's own pairing rule); currentStep's absence is the wire's
+    own "no call in flight" and reads 无在飞, not 未判. */
+export function TaskCardLine({ row }: { row: MonitorAgentRow }) {
+  const start =
+    row.startedAt === undefined ? "未判" : formatHistoryTs(row.startedAt);
+  const cost =
+    row.costToDate === undefined
+      ? "未判"
+      : `${row.costToDate.micros} micros ${row.costToDate.currency}（tokens ${row.costToDate.tokensIn}/${row.costToDate.tokensOut}${row.costToDate.cachedTokens === undefined ? "" : `，缓存 ${row.costToDate.cachedTokens}`}）`;
+  const step = row.currentStep === undefined || row.currentStep === "" ? "无在飞" : row.currentStep;
+  return (
+    <p
+      className="flex flex-wrap items-center gap-x-2 gap-y-0 px-1.5 pb-1 text-[10.5px] leading-[1.5] text-ink-3"
+      aria-label="任务卡三键"
+    >
+      <span>
+        开始 <span className="font-mono tabular-nums">{start}</span>
+      </span>
+      <span>
+        成本 <span className="font-mono tabular-nums">{cost}</span>
+      </span>
+      <span>
+        当前步 <span className="font-mono">{step}</span>
+      </span>
+    </p>
+  );
+}
+
+/** The applied-steps reading line (ticket 38 AC#4's three readings). Each
+    slot shows ITS value when the scan carries it and 未判 when it does not -
+    a count read from an incomplete store would be a fake number, so an
+    incomplete scan never renders a number. */
+export function AppliedReadingLine({
+  reading,
+  scanning,
+}: {
+  reading?: AppliedStepsReading;
+  scanning?: boolean;
+}) {
+  const terminal = reading?.terminalKnown === true ? reading.terminal : "未判";
+  const landed =
+    reading !== undefined && reading.landed !== null ? `已落地 ${reading.landed} 步` : "已落地步数：未判";
+  const aborted =
+    reading !== undefined && reading.aborted !== null ? `被中止 ${reading.aborted} 步` : "被中止步数：未判";
+  return (
+    <p className="px-1.5 pb-1 text-[10.5px] leading-[1.5] text-ink-3" aria-label="取消后读数">
+      终态 <span className="font-mono">{terminal}</span> · {landed} · {aborted}
+      {scanning === true ? "　（取证行读取中…）" : ""}
+    </p>
+  );
+}
+
+/** One roster.cancel exchange, rendered verbatim: the receipt is the door's
+    own sentence (已对任务 <id> 发出停止…), the refusal is the host's own
+    words, and a receipt carries the applied-steps reading underneath. */
+export function TaskCancelReply({ state }: { state: TaskCancelState }) {
+  if (state.phase === "sending") {
+    return <p className="px-1.5 pb-1 text-[10.5px] leading-[1.5] text-ink-3">停止请求已在桥上，等门回话…</p>;
+  }
+  if (state.phase === "no-host") {
+    return (
+      <p className="px-1.5 pb-1 text-[10.5px] leading-[1.5] text-ink-3">
+        没接到本机宿主（这一页没有 wispDispatch 门）：停止请求没有发出去，任务未被触碰。
+      </p>
+    );
+  }
+  if (state.phase === "refused") {
+    return (
+      <div className="mx-1.5 mb-1 rounded-card border border-red/40 bg-red-tint px-2 py-1.5">
+        <p className="text-[10.5px] leading-[1.5] text-red">门拒绝了停止，原话逐字：</p>
+        <p className="mt-0.5 whitespace-pre-wrap break-all font-mono text-[10px] leading-[1.5] text-ink">{state.raw}</p>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-1.5 mb-1 rounded-card border border-green/40 bg-green-tint px-2 py-1.5">
+      <p className="text-[10.5px] leading-[1.5] text-ink">回执逐字：{state.text}</p>
+      <AppliedReadingLine reading={state.reading} scanning={state.scanning} />
+      {state.scanNote !== undefined ? (
+        <p className="whitespace-pre-wrap break-all text-[10px] leading-[1.5] text-orange">{state.scanNote}</p>
+      ) : null}
+    </div>
+  );
+}
+
 export function MonitorPopover({
   open,
   env,
@@ -188,8 +324,65 @@ export function MonitorPopover({
   streamTruncated,
   streamElidedRunes,
   streamDroppedCount,
+  cancelDoors,
   onPin,
 }: MonitorPopoverProps) {
+  // The cancel flow's ephemeral view state: which row's confirm card is up,
+  // and each task's own roster.cancel exchange. It dies with the document
+  // (the same class as the palette's query); the task's settled truth comes
+  // back in the snapshot pushes, never from this state.
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [cancelStates, setCancelStates] = useState<Record<string, TaskCancelState>>({});
+  const agentsRef = useRef(agents);
+  agentsRef.current = agents;
+
+  /** The confirm card's confirm button is the ONE place a stop request is
+      sent from: the 停止 button only opens the card (先确认再取消，禁止一键杀),
+      exactly the two-step shape the privacy purge card established. */
+  function confirmStop(taskId: string) {
+    if (cancelDoors === undefined) return;
+    setConfirmId(null);
+    setCancelStates((c) => ({ ...c, [taskId]: { phase: "sending" } }));
+    void cancelDoors.cancelTask(taskId).then((reply) => {
+      if (reply === null) {
+        setCancelStates((c) => ({ ...c, [taskId]: { phase: "no-host" } }));
+        return;
+      }
+      if (reply.startsWith(REFUSED_ENVELOPE_PREFIX)) {
+        setCancelStates((c) => ({ ...c, [taskId]: { phase: "refused", raw: reply } }));
+        return;
+      }
+      setCancelStates((c) => ({ ...c, [taskId]: { phase: "receipt", text: reply, scanning: true } }));
+      // The task settles on its own goroutine; the receipt does not wait.
+      // The applied-steps reading is counted off the history read face once
+      // the WHOLE history has been scanned - an incomplete scan stays 未判.
+      void scanTaskForensics(cancelDoors.historyLoad, taskId).then((outcome) => {
+        setCancelStates((c) => {
+          const current = c[taskId];
+          if (current === undefined || current.phase !== "receipt") return c;
+          if (!outcome.complete) {
+            const note = outcome.noHost
+              ? "取证读取没接到宿主：读数未判"
+              : outcome.refused !== undefined
+                ? `取证读取被门拒绝，原话逐字：${outcome.refused}`
+                : outcome.payloadError !== undefined
+                  ? `取证读取未判：${outcome.payloadError}`
+                  : "取证读取未判（history.page 载荷行不在）";
+            return { ...c, [taskId]: { ...current, scanning: false, scanNote: note } };
+          }
+          const live = agentsRef.current.find((a) => a.id === taskId);
+          const reading = appliedStepsReading(
+            outcome.rows,
+            taskId,
+            live !== undefined ? { status: live.status, statusKnown: live.statusKnown } : undefined,
+            true,
+          );
+          return { ...c, [taskId]: { ...current, scanning: false, reading } };
+        });
+      });
+    });
+  }
+
   if (!open) return null;
   const boundLine = sectionBoundLine(streamTruncated ?? false, streamElidedRunes, streamDroppedCount);
   return (
@@ -254,29 +447,44 @@ export function MonitorPopover({
           agents.map((agent) => {
             const display = agentDisplay(agent);
             const bound = rowBoundLabel(agent);
+            const cancelState = cancelStates[agent.id];
             return (
-              <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row key={agent.id}>
-                <AgentAvatar />
-                <span className="min-w-0 flex-1 truncate text-ink-2" title={agent.name}>
-                  {agent.name}
-                </span>
-                {bound ? (
-                  <span
-                    className="shrink-0 font-mono text-[10.5px] tabular-nums text-warn"
-                    title={bound === "流已丢" ? "这一行的流页已被日志丢弃" : "这一行的流被日志折界，页面上少这么多字"}
-                  >
-                    {bound}
+              <div key={agent.id} className="flex flex-col">
+                <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row>
+                  <AgentAvatar />
+                  <span className="min-w-0 flex-1 truncate text-ink-2" title={agent.name}>
+                    {agent.name}
                   </span>
-                ) : null}
-                <span
-                  className={cn(
-                    "shrink-0 text-[11px] tabular-nums",
-                    display.dot === "blocked" ? "text-warn" : "text-ink-3",
-                  )}
-                >
-                  {display.label}
-                </span>
-                <StateDot state={display.dot} />
+                  {bound ? (
+                    <span
+                      className="shrink-0 font-mono text-[10.5px] tabular-nums text-warn"
+                      title={bound === "流已丢" ? "这一行的流页已被日志丢弃" : "这一行的流被日志折界，页面上少这么多字"}
+                    >
+                      {bound}
+                    </span>
+                  ) : null}
+                  <span
+                    className={cn(
+                      "shrink-0 text-[11px] tabular-nums",
+                      display.dot === "blocked" ? "text-warn" : "text-ink-3",
+                    )}
+                  >
+                    {display.label}
+                  </span>
+                  <StateDot state={display.dot} />
+                  {cancelDoors !== undefined ? (
+                    <button
+                      type="button"
+                      aria-label={`停止任务 ${agent.id}`}
+                      onClick={() => setConfirmId(agent.id)}
+                      className="shrink-0 rounded-chip px-1.5 py-0.5 text-[10.5px] text-ink-3 transition-colors duration-150 hover:bg-hover hover:text-red"
+                    >
+                      停止
+                    </button>
+                  ) : null}
+                </div>
+                <TaskCardLine row={agent} />
+                {cancelState !== undefined ? <TaskCancelReply state={cancelState} /> : null}
               </div>
             );
           })
@@ -285,6 +493,37 @@ export function MonitorPopover({
           <p className="px-1.5 py-1.5 text-[11.5px] leading-relaxed text-warn">{boundLine}</p>
         ) : null}
       </div>
+
+      {/* The stop confirm card (ticket 38 AC#4's 真门): the first click only
+          opens it, the request leaves ONLY from its confirm button, and it
+          names the row and the irreversibility of the request (the task
+          itself settles and lands its terminal rows). */}
+      {confirmId !== null ? (
+        <div className="mt-2 rounded-card border border-red/40 bg-red-tint px-2.5 py-2" role="alertdialog" aria-label="确认停止任务">
+          <p className="text-[11.5px] font-semibold text-red">确认停止任务</p>
+          <p className="mt-1 text-[11px] leading-[1.7] text-ink">
+            将对任务 <span className="font-mono">{confirmId}</span> 发出停止（roster.cancel，经既有取消通路）。停止不可从面板撤回；
+            任务会自行结算并落下终态行，已落地的步骤以 tool_call 取证行与任务终态为准。只停这一行，不级联。
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setConfirmId(null)}
+              className="rounded-chip bg-surface px-2 py-0.5 text-[11px] text-ink-2 transition-colors duration-150 hover:bg-hover"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              aria-label="确认停止"
+              onClick={() => confirmStop(confirmId)}
+              className="rounded-chip bg-red px-2 py-0.5 text-[11px] text-white transition-colors duration-150 hover:bg-red/90"
+            >
+              确认停止
+            </button>
+          </div>
+        </div>
+      ) : null}
     </GlideMenu>
     </div>
   );

@@ -79,8 +79,10 @@ const (
 	// "task.cancel" spelling is blocked by internal/tools' frozen ticket-188
 	// task-axis scan, see bridge.go's MethodRosterCancel) - size 11 -> 13 and
 	// non-prefixed 7 -> 9, in the same change that added the routes and the
-	// cmd/wisp handlers. Both page literals are registered pending in
-	// rosterPageGapLedger194 (Go-only wave; frontend/** untouched).
+	// cmd/wisp handlers. Both page literals left the pending registrations
+	// with the consume wave's page leg (same day): panel.ts spells both
+	// names, so the ledger is empty and every name is judged by the original
+	// rule.
 	wantFullInboundRosterSize253 = 13
 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
 	// "panel." prefix, invisible to both old rulers. It was 3 ("config.get",

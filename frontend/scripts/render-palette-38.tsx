@@ -184,9 +184,19 @@ check(
   appSrc.includes('(event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k"'),
 );
 check("Escape must close the palette", appSrc.includes("paletteOpen: false"));
+// Re-adjudicated 2026-11-17 (consume wave 2): roster.cancel landed on the
+// C17 roster (internal/panel/bridge.go's MethodRosterCancel, ticket 38
+// AC#4's Go half, commit 3a62bed97), so the old dormancy pin ("取消任务
+// 未接线" naming the missing engine) pins a fact that is no longer true.
+// The note must now say the door LANDED, name it, and the App must bind the
+// real door into the task monitor's cancel flow - a stronger pin, not a
+// loosened one (the gate itself is pinned tooth-by-tooth by
+// render:taskcard38).
 check(
-  "the cancel dormancy note must name the missing engine file",
-  appSrc.includes("internal/panel/composer_dispatch.go") && appSrc.includes("task.cancel"),
+  "the cancel note must say the door landed and name it (roster.cancel; the monitor carries the real gate)",
+  appSrc.includes("取消任务 已接线") &&
+    appSrc.includes("roster.cancel") &&
+    appSrc.includes("cancelDoors={{ cancelTask: requestRosterCancel, historyLoad: requestHistoryPage }}"),
 );
 check(
   "the force-rule dormancy note must name DEFERRED(D11-3) and its file",

@@ -29,7 +29,9 @@
     "render:palette38": "vite build --ssr scripts/render-palette-38.tsx --outDir node_modules/.tmp/palette38render --logLevel warn && node node_modules/.tmp/palette38render/render-palette-38.js",
     "render:palette38kbd": "vite build --ssr scripts/render-palette-kbd-38.tsx --outDir node_modules/.tmp/palette38kbdrender --logLevel warn && node node_modules/.tmp/palette38kbdrender/render-palette-kbd-38.js",
     "render:security40": "vite build --ssr scripts/render-security-cost-40.tsx --outDir node_modules/.tmp/security40render --logLevel warn && node node_modules/.tmp/security40render/render-security-cost-40.js",
-    "render:privacy40": "vite build --ssr scripts/render-privacy-40.tsx --outDir node_modules/.tmp/privacy40render --logLevel warn && node node_modules/.tmp/privacy40render/render-privacy-40.js"
+    "render:privacy40": "vite build --ssr scripts/render-privacy-40.tsx --outDir node_modules/.tmp/privacy40render --logLevel warn && node node_modules/.tmp/privacy40render/render-privacy-40.js",
+    "render:historypage36": "vite build --ssr scripts/render-history-page-36.tsx --outDir node_modules/.tmp/historypage36render --logLevel warn && node node_modules/.tmp/historypage36render/render-history-page-36.js",
+    "render:taskcard38": "vite build --ssr scripts/render-taskcard-38.tsx --outDir node_modules/.tmp/taskcard38render --logLevel warn && node node_modules/.tmp/taskcard38render/render-taskcard-38.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

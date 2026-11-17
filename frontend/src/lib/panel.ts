@@ -226,10 +226,34 @@ export interface InstructionsSection {
   files: ProjectInstructionFile[];
 }
 
+/** The Cost accumulator's cumulative spend for one task, as the EvUsage
+    events carried it (internal/panel/run_feed_145.go RunUsageRow). Micros and
+    Currency travel together or the row does not travel (the Go struct's own
+    pairing rule), so no consumer can hang a currency symbol on a bare number;
+    cachedTokens is omitempty on the wire. Declared by the consume wave-2 page
+    half (2026-11-17): TaskRowView.costToDate nests this shape, so the
+    contract walk descends into it - the Go-side translation entry went into
+    composerTSNameMap in the same commit. */
+export interface RunUsageRow {
+  tokensIn: number;
+  tokensOut: number;
+  cachedTokens?: number;
+  micros: number;
+  currency: string;
+}
+
 /** One roster row as the page reads it (internal/panel/subagent_roster_197.go).
     status is a D43 name and is empty exactly when statusKnown is false; the
     stream triple describes this row's own work page - "少了多少" is a number,
-    never a shrug. */
+    never a shrug.
+    The three task-card keys below are readface wave 2's page half (ticket 38
+    AC#4, 2026-11-17), all omitempty on the Go side and therefore OPTIONAL
+    here: a row the host stamped nothing for travels without them, and the
+    page renders that absence as 未判 - never as epoch, a zero cost, or an
+    empty step. The three keys were registered page-side gaps in
+    internal/panel/composer_test.go's composerTSGapLedger until this
+    declaration landed; that entry is deleted in the same commit per the
+    ledger's own both-ways rule. */
 export interface TaskRowView {
   taskId: string;
   label: string;
@@ -243,6 +267,16 @@ export interface TaskRowView {
   streamTruncated: boolean;
   streamElidedRunes: number;
   streamDropped: boolean;
+  /** Wall-clock unix second the host admitted this task id. Absent = the host
+      stamped nothing (never rendered as epoch 1970). */
+  startedAt?: number;
+  /** The row's cumulative spend as the host's sink carried it. Absent = the
+      sink published no spend event for this row (a subagent's spend is booked
+      on its own finalize) - a different fact from "cost zero". */
+  costToDate?: RunUsageRow;
+  /** The tool call the loop has started and not yet ended for this row.
+      Absent/empty = no call in flight. */
+  currentStep?: string;
 }
 
 /** The tasks section (internal/panel/subagent_roster_197.go TaskRosterSection).
@@ -958,5 +992,56 @@ export function requestPrivacyExport(domain: string): Promise<string | null> {
     requestId: nextRequestId(),
     source: "panel-composer",
     privacyDomain: domain,
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Readface wave 2 doors (2026-11-17, tickets 36 AC#3 / 38 AC#4)
+   --------------------------------------------------------------------------
+   Two more doors answered over the SAME settings envelope above
+   (internal/panel/bridge.go's MethodHistoryPage / MethodRosterCancel,
+   routed by composer_dispatch.go, answered by cmd/wisp's wave-2 legs). The
+   page literals below are the half bridge.go's page-gap ledger
+   (rosterPageGapLedger194 in bridge_test.go) registered as pending when the
+   Go-only wave landed; both entries are deleted in the same commit that
+   spells these literals, per that ledger's own both-ways rule.
+
+   history.page is a PURE READ over the two tables the D35 schema already
+   holds (task_log + tool_call): the paging window rides the envelope's
+   historyOffset/historyLimit keys, the reply is the settings-route shape
+   (one prose sentence plus one payload line behind "wisp-history-page:",
+   parsed by lib/history-view.ts). Zero destructive vocabulary arrives with
+   it - delete-one / purge / export of this same data keep their ONLY route,
+   the privacy doors above, and nothing here re-lands them.
+   -------------------------------------------------------------------------- */
+
+/** Ask the host for one page of the history, newest first. offset is the row
+    to start at, limit the window (0 = the door's own default page; the store
+    refuses a negative window and a page over its ceiling by name). The
+    reply's rows are {ts,kind,tool,outcome,summary} shaped
+    (internal/memory/dao_history_page_36.go HistoryPageRow). */
+export function requestHistoryPage(offset: number, limit: number): Promise<string | null> {
+  return requestHostAnswer({
+    method: "history.page",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    historyOffset: offset,
+    historyLimit: limit,
+  });
+}
+
+/** Ask the host to stop ONE roster row (the row the tasks view showed the
+    user; rosterTaskId is the row's own id echoed verbatim). The receipt
+    names the row and states the stop was ISSUED - the task settles on its
+    own and the applied-steps evidence lands in the tool_call forensics rows
+    and the terminal task_log row, which the page reads back off history.page
+    (lib/history-view.ts's forensics scan), never from a local guess. An id
+    the host cannot stop comes back as the host's own refusal sentence. */
+export function requestRosterCancel(taskId: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "roster.cancel",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    rosterTaskId: taskId,
   });
 }

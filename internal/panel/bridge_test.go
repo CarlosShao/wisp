@@ -150,19 +150,16 @@ func TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests(t *testing.T) {
 // (requestPrivacyDeleteOne / requestPrivacyPurge / requestPrivacyExport), so
 // the ledger is empty again and every whitelisted name is judged by the
 // original rule below - a name on one side only goes red.
-var rosterPageGapLedger194 = map[string]string{
-	// Readface wave 2 (2026-11-17), tickets 36 AC#3 / 38 AC#4: the two doors
-	// this wave lands on the Go side only (dispatch: Go 写面，frontend/**
-	// 本波不动). history.page is the paged history read over task_log +
-	// tool_call; roster.cancel is the cancel door - the ticket's own
-	// "task.cancel" spelling is blocked by internal/tools' frozen ticket-188
-	// task-axis scan, see bridge.go's MethodRosterCancel. Both entries leave
-	// the same day way the privacy ones did: the panel's history/cancel page
-	// leg spells the literals in frontend/src/lib/panel.ts, the stale-red
-	// fires, and the entries are removed in that commit.
-	"history.page":  "readface wave 2 (2026-11-17, ticket 36 AC#3): the Go paged-history read face is landed; the page literal is pending on the panel's history page leg and this Go wave must not touch frontend/",
-	"roster.cancel": "readface wave 2 (2026-11-17, ticket 38 AC#4): the Go cancel door over the host's existing cancel paths is landed; the page literal is pending on the tasks-view cancel button leg and this Go wave must not touch frontend/",
-}
+//
+// Readface wave 2's two entries (history.page / roster.cancel, tickets 36
+// AC#3 / 38 AC#4) left the same day with the consume wave's page leg
+// (frontend, 2026-11-17): the page spells both literals in panel.ts
+// (requestHistoryPage / requestRosterCancel on the settings envelope, with
+// the envelope's own selector keys historyOffset/historyLimit and
+// rosterTaskId), so the stale registrations are removed in that commit and
+// the ledger is empty again - every whitelisted name is judged by the
+// original rule below.
+var rosterPageGapLedger194 = map[string]string{}
 
 // TestFrontendComposerRequestsMatchTheEnvelope reads the real frontend source
 // and checks the four method names, the source claim and the requestId are

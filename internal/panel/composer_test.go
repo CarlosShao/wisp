@@ -176,6 +176,16 @@ func composerTSNameMap() map[string]string {
 		"TreeEntry":               "TreeEntryView",
 		"RunSection":              "RunSection",
 		"ToolRunRow":              "ToolRunRowView",
+		// RunUsageRow joined with the consume wave-2 page half (2026-11-17,
+		// ticket 38 AC#4): the page's TaskRowView now declares costToDate,
+		// so the walk descends into the nested usage struct and needs the
+		// page-half translation - panel.ts declares the RunUsageRow
+		// interface in the same commit, and the ordinary two-way comparison
+		// judges the five keys (tokensIn/tokensOut/cachedTokens/micros/
+		// currency) from here on. RunSection.usage stays a registered gap
+		// (the ledger below), so this translation is reached exactly once,
+		// through TaskRowView.costToDate.
+		"RunUsageRow":             "RunUsageRow",
 		"RunErrorRow":             "RunErrorRowView",
 		"RunStuckRow":             "RunStuckRowView",
 		"PluginInventorySection":  "PluginsSection",
@@ -232,16 +242,14 @@ func composerTSGapLedger() map[string][]string {
 		"RunErrorRowView":    {"retryable"},
 		"RunSection":         {"running", "usage", "done"},
 		"GitView":            {"uncommitted", "diff"},
-		// Readface wave 2 (2026-11-17), ticket 38 AC#4's task-card fields: the
-		// three keys the roster row now carries while the page's TaskRowView
-		// type does not declare them yet. This wave is Go-only by dispatch
-		// (frontend/** untouched), so the gap is REGISTERED, never silenced:
-		// panel.ts declaring any of the three goes stale-red, Go dropping one
-		// goes dead-red, and the ordinary two-way walk judges them the moment
-		// the page half lands. costToDate's child type (RunUsageRow) is
-		// already translated live ("RunSection" -> RunSection), so no second
-		// registration rides with it.
-		"TaskRowView": {"startedAt", "costToDate", "currentStep"},
+		// Readface wave 2's TaskRowView entry is GONE (2026-11-17): the
+		// consume wave's frontend leg declared the three task-card keys
+		// (startedAt / costToDate / currentStep) in frontend/src/lib/panel.ts,
+		// exactly the stale-red this ledger's both-ways rule promised - the
+		// gap closed, so the ordinary two-way walk judges them from here on
+		// (and costToDate's child type needed the RunUsageRow translation
+		// added to composerTSNameMap in the same commit, per the walk's own
+		// rule for a newly reached nested struct).
 		// Readface wave 1 (2026-11-17), ticket 37 AC#5: the ApprovalCardView
 		// entry is GONE - the consume wave's frontend leg declared the five
 		// batch keys (batchTotal/batchDirs/batchFirst/batchDeferred/
