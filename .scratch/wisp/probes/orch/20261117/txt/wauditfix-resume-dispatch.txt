@@ -1,0 +1,11 @@
+# 续跑存档（2026-11-17 21:5x，VPN 断线后恢复）—— wauditfix 死腿的半成品已在盘，续跑收口（写腿 cmd/wisp，唯一共享编译面写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**上一腿因断网死在收口前，半成品已在工作树（未提交、可编译）**：`cmd/wisp/panel_privacy_40.go`(+37) `panel_privacy_40_test.go`(+73) `panel_roster_cancel_wave2.go`(+37/-) `panel_roster_cancel_wave2_test.go`(+91) `frontend/src/components/privacy-settings.tsx`(+11) `frontend/src/lib/panel.ts`(+36) `internal/panel/bridge.go`(+15)。`go build ./...` rc=0、`npm run typecheck` rc=0（我验过）。
+**你要做的**：
+1. **审读这 7 个文件的改动是否就是这三条**（①`privacyConfirmed` 门：无位⇒具名拒绝「需要确认位 privacyConfirmed:true：privacy.<verb>…」且零删除；有位⇒执行 ②`roster.cancel` 停根任务同门 ③`panel_roster_cancel_wave2_test.go:216` 已有 `if stoppedRow.State != statemachine.StateMuted` 真牙）。补齐缺口（如前端确认卡只在确认键置位）。
+2. **证牙**：把 `privacyConfirmed40` 临时恒 true（仓外副本改，⛔仓内留变异）⇒ 无位用例必须红；换回⇒绿。把 roster 实现换"返回 true 不真停"⇒ StateMuted 用例必须红。
+3. **三样现跑**：①`sh scripts/d22scan.sh` 0 findings ②载具 `scripts/wisp-cli-staged-tests.sh -test.run 'Test40Privacy|TestRosterCancel'`（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）③`go build ./...` rc=0；前端 build/typecheck/lint rc=0。
+4. **提交只用显式 pathspec 这 7 个文件**（+证据件 `docs/evidence/s1/audit-fixes-*`）。**⛔ 别碰工作树里别人的改动**：`.scratch/wisp/issues/34-frontend-scaffold.md`(D)／`44-costmeter-c23-done.md`(M)／`frontend/fixtures/composer-states.html`(M)／`.scratch/wisp/probes/**`(M)／`.scratch/**` 未跟踪件 — 一概不 stage、不还原。
+硬约束：⛔thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言（只加）、⛔push、C17 名册不变（确认位是请求体字段）。
+写面：上述 7 文件＋`docs/evidence/s1/audit-fixes-*`。
+回话第一行＝commit hash ＋三条各自牙名与红/绿读数 ＋d22scan 末行 ＋载具 rc ＋前端 rc。
