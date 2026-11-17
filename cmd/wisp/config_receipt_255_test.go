@@ -362,8 +362,19 @@ func TestTicket255RosterReJudgedAfterTickets44And61(t *testing.T) {
 	if got := splitHotTier([]string{"cost"}).claimable; len(got) != 1 || got[0] != "cost" {
 		t.Errorf("splitHotTier([cost]) claimable = %v, want [cost]: the receipt may say 已立即生效 about [cost] only because that per-task reader exists", got)
 	}
-	if want := []string{"internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"}; !slicesEqualSorted(sectionReadSites["Cost"], want) {
-		t.Errorf("sectionReadSites[Cost] = %v, want %v: both ticket 44 adapters read the four caps off the config they are handed", sectionReadSites["Cost"], want)
+	// 2026-11-17 re-adjudication (readface wave 2's full-package carrier run
+	// reddened the scan ruler): readface wave 1 (b1d2162dd, ticket 40 AC#3's
+	// aggregate face) gave the cost door a second LIVE [cost] reader -
+	// cmd/wisp/panel_cost_194.go's CostAggregate adapter reads the daily/
+	// monthly budget caps per request to hand observe.BudgetVerdict its caps -
+	// and the scan reddened until the roster named it. The pin moves with the
+	// adjudication (config_readers_255.go's Cost row names the commit and the
+	// reader); the two ticket-44 adapters stay pinned underneath it. Correcting
+	// a premise pin to the new true state with the caller named is a
+	// re-adjudication, not a loosening - the same move the voice.tts.speed row
+	// below records for 313's wiring leg.
+	if want := []string{"cmd/wisp/panel_cost_194.go", "internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"}; !slicesEqualSorted(sectionReadSites["Cost"], want) {
+		t.Errorf("sectionReadSites[Cost] = %v, want %v: the two ticket-44 adapters read the four caps off the config they are handed, and wave 1's aggregate adapter (panel_cost_194.go, 2026-11-17 re-adjudication) reads the same caps per request", sectionReadSites["Cost"], want)
 	}
 	// The re-adjudicated row: the token is re-checked by
 	// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim; what this case adds

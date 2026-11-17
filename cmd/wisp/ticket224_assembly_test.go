@@ -166,8 +166,28 @@ func TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun(t *testing.T) {
 		t.Errorf("row created_at=%d expires_at=%d: born dead, so Covering would never honour it",
 			got.CreatedAt, got.ExpiresAt)
 	}
+	// 2026-11-17 re-adjudication (readface wave 2's full-package carrier run
+	// caught it): ticket 49's grant work (19a608c49/3da1f1940) gave the run's
+	// own close() a SESSION-GRANT-SWEEP - every grant the session minted is
+	// stamped revoked BEFORE the store closes (SPEC-06 §8.2 会话结束失效) - so a
+	// row read AFTER h.run() can no longer be expected NULL: the stamp at close
+	// is the new true state, and the sweep's 2s budget books its own audit line
+	// when it fails. What this cell still pins, unchanged in strength: the row
+	// was a FRESH answer when the user gave it - proven by the answered call
+	// actually executing above - and the post-close state must be explicable
+	// one of two ways, never silent:
+	//   - stamped: the session-end sweep ran; the stamp must sit at/after the
+	//     row's own creation (a stamp before birth would be a wrong clock).
+	//   - nil: the sweep did not stamp, and its failure line must be on the
+	//     audit (a vanished sweep would be a close that skipped its belt).
 	if got.RevokedAt != nil {
-		t.Errorf("row revoked_at=%v, want NULL for a fresh answer", *got.RevokedAt)
+		if *got.RevokedAt < got.CreatedAt {
+			t.Errorf("row revoked_at=%d created_at=%d: stamped before it was born - the session-end sweep read a clock ahead of the writer",
+				*got.RevokedAt, got.CreatedAt)
+		}
+	} else if !strings.Contains(h.err.String(), "SESSION-GRANT-SWEEP") {
+		t.Errorf("row revoked_at is NULL after close and the audit carries no SESSION-GRANT-SWEEP line: the session-end sweep neither stamped nor booked its failure (ticket 49's close step), so the nil is unexplained:\n%s",
+			grantLinesOf(h))
 	}
 
 	// The row must be readable by the ledger that wrote it: a row nothing can find

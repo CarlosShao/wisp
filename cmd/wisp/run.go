@@ -402,6 +402,21 @@ type agentRuntime struct {
 	// holder would let the packet and the sink disagree about what happened.
 	runFeed *panel.RunFeed
 
+	// taskLive is readface wave 2's (2026-11-17, ticket 38 AC#4) per-task
+	// holder for the roster rows' three card fields (startedAt / costToDate /
+	// currentStep): stamped by noteTask (admission) and the console sink's
+	// EvToolStart / EvToolEnd / EvUsage / EvDone branches, read by the roster
+	// reader in panel_pump.go. Same one-object-two-hops rule as runFeed.
+	taskLive *taskLiveLedger
+
+	// rootCancel holds the ROOT text task's own stop handle (the
+	// agent.RunningTask the loop mints at RunAsync) while that task is in
+	// flight, so the panel's roster.cancel door can stop it through the
+	// existing path (readface wave 2, ticket 38 AC#4; the seam lives in
+	// panel_roster_cancel_wave2.go). Nil root = no root task in flight, the
+	// honest state between tasks and on pipelines that never ran one.
+	rootCancel *currentRootCancel
+
 	gate   *approval.Gate
 	ui     *consoleApprovalUI
 	bridge *tools.Bridge
@@ -1204,6 +1219,15 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// it, and the Run reader in the literal below reads it. See runFeed's
 	// field comment for why it is one object and not two.
 	rt.runFeed = panel.NewRunFeed()
+	// Readface wave 2 (2026-11-17, ticket 38 AC#4): the per-task holder for the
+	// roster rows' three card fields, built with the same live snapshot objects
+	// and fed by noteTask plus the console sink's event branches (see
+	// panel_tasklive_wave2.go for which event carries which field).
+	rt.taskLive = newTaskLiveLedger()
+	// The root task's stop handle holder for the panel cancel seam
+	// (panel_roster_cancel_wave2.go): empty until execute() stores the loop's
+	// own RunningTask, which is the only root stop path this face reuses.
+	rt.rootCancel = &currentRootCancel{}
 	rt.pump = panel.NewSnapshotPump(panel.PumpSources{
 		Verdicts:  rt.liveVerdicts,
 		Mode:      rt.modes.PermissionMode,
@@ -1882,6 +1906,12 @@ func (rt *agentRuntime) noteTask(taskID string) {
 	if rt == nil || taskID == "" {
 		return
 	}
+	// Readface wave 2 (2026-11-17, ticket 38 AC#4): the admission moment IS
+	// the roster row's startedAt - the first instant the loop-minted task id
+	// exists in this process, the matching scope for a process-local roster
+	// (the DB row's started_at is the persisted twin the loop's journal
+	// writes). Wall clock per D42#9.
+	rt.taskLive.startStamped(taskID, observe.NowWallUTC().Unix())
 	rt.taskMu.Lock()
 	defer rt.taskMu.Unlock()
 	for _, seen := range rt.seenTasks {
@@ -2110,7 +2140,7 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// its Stream runs and the chain ADVANCES, with the skip and the step both
 	// announced on this run's own sink. The ledger lives on the runtime so the
 	// caps accumulate across this process's tasks.
-	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle, runFeed: rt.runFeed, store: rt.store}
+	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle, runFeed: rt.runFeed, store: rt.store, taskLive: rt.taskLive}
 	quotaKeys := append([]string{}, rt.names...)
 	if len(quotaKeys) > 0 {
 		quotaKeys[0] = ep.Provider + "/" + ep.Model
@@ -2317,7 +2347,14 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// the row reads 「宿主没有登记这一维」, which is the honest shape until the
 	// task has an ending to name.
 	rt.tasks.MarkRoot(bg.ID, task)
+	// Readface wave 2 (2026-11-17, ticket 38 AC#4): the root's own stop handle
+	// is on file for the panel cancel seam while the task is in flight, and
+	// cleared the moment Wait returns - after that the row has no live handle,
+	// and the seam's roster path answers with the roster's own "没有可停的句
+	// 柄" refusal instead of a no-op pretending to be a stop.
+	rt.setCurrentRoot(bg)
 	res := bg.Wait()
+	rt.setCurrentRoot(nil)
 
 	// Ticket 29 AC#1: hand the FINISHED task's conversation to the L1 extraction
 	// warm window. The placement is the requirement: it is after the task
@@ -2729,6 +2766,13 @@ type consoleSink struct {
 	// without a store) leaves argsJson absent - the honest shape for a run
 	// whose forensics were never booked.
 	store *memory.Store
+	// taskLive is readface wave 2's (2026-11-17, ticket 38 AC#4) per-task
+	// holder the EvToolStart / EvToolEnd / EvUsage / EvDone branches feed:
+	// the roster rows' currentStep / costToDate readings come from here, one
+	// object with the pump's reader (panel_tasklive_wave2.go). nil is safe by
+	// the ledger's own nil-receiver guards - a sink built without the holder
+	// just drops the line, the same posture runFeed's nil takes.
+	taskLive *taskLiveLedger
 }
 
 // bookedForensics looks up the booked forensics row of the call the event
@@ -2793,6 +2837,9 @@ func (c consoleSink) Publish(e agent.Event) {
 		// the moment a call is in flight, and retires when its end (or the
 		// task's end) arrives.
 		c.runFeed.ToolStarted(e.CallID, e.ToolName)
+		// Readface wave 2 (ticket 38 AC#4): the same event names the roster
+		// row's currentStep, per task.
+		c.taskLive.stepStarted(e.TaskID, e.ToolName)
 		changed = true
 	case agent.EvToolEnd:
 		fmt.Fprintf(c.out, "[工具 %s -> %s]\n", e.ToolName, e.Outcome)
@@ -2802,6 +2849,9 @@ func (c consoleSink) Publish(e agent.Event) {
 		// both joined by the correlation id the event carries.
 		args, level := c.bookedForensics(e)
 		c.runFeed.ToolEnded(e.CallID, e.ToolName, e.Outcome, e.Text, args, level)
+		// Readface wave 2 (ticket 38 AC#4): the same end retires the roster
+		// row's currentStep - the loop's own retirement rule, carried per task.
+		c.taskLive.stepEnded(e.TaskID)
 		changed = true
 	case agent.EvUsage:
 		// Ticket 145's rows 2 and 12, hop 1: the Cost accumulator's
@@ -2810,6 +2860,10 @@ func (c consoleSink) Publish(e agent.Event) {
 		// pair travels and the page decides how to render it.
 		c.runFeed.Usage(e.Usage.InputTokens, e.Usage.OutputTokens, e.Usage.CachedTokens,
 			e.CostMicros, e.Currency)
+		// Readface wave 2 (ticket 38 AC#4): the same cumulative totals are the
+		// roster row's costToDate, per task, kept as the pair they arrived in.
+		c.taskLive.usageRecorded(e.TaskID, e.Usage.InputTokens, e.Usage.OutputTokens,
+			e.Usage.CachedTokens, e.CostMicros, e.Currency)
 		changed = true
 	case agent.EvStuck:
 		fmt.Fprintf(c.out, "\n[停滞] %s\n", e.Text)
@@ -2849,6 +2903,10 @@ func (c consoleSink) Publish(e agent.Event) {
 			c.stream.Close(e.TaskID)
 		}
 		c.runFeed.TaskEnded(string(e.Stop))
+		// Readface wave 2 (ticket 38 AC#4): the task's own terminal event
+		// retires its roster row's currentStep - a task that died between a
+		// call's start and its end must not leave a step "in flight" forever.
+		c.taskLive.taskDone(e.TaskID)
 		changed = true
 	}
 	if changed && c.publish != nil {

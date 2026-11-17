@@ -555,6 +555,15 @@ func runResident() {
 	// plain messages by name - the pre-453 behaviour, not a silent drop.
 	bindPanelMessageRelay453(rp, src)
 
+	// Readface wave 2 (2026-11-17, ticket 38 AC#4): the panel cancel door's
+	// seam. The chain above was assembled before the task pipeline existed,
+	// so this is the first line where both objects do exist; the bind hands
+	// the door the runtime's own cancel paths (the root task's RunningTask
+	// handle, then the TaskRoster's one per-row stop path). If either side is
+	// absent (refused panel, refused pipeline) the seam stays nil and the
+	// door keeps refusing cancels by name - not a silent drop.
+	bindPanelRosterCancel(rp, src)
+
 	// Ticket 228 AC#2/AC#3: the two hops this slice adds, both on the first line
 	// where the runtime (and therefore the card ledger and the answer surface)
 	// exists:

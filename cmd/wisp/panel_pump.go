@@ -248,6 +248,12 @@ func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
 		// side assigns one - see TestTaskState188AC3PanelHasNoWriteLeg.
 		status, statusReason := rec.Out.StateAnswer()
 		trunc := rt.stream.TruncationFor(key)
+		// Readface wave 2 (2026-11-17, ticket 38 AC#4): the three card fields,
+		// read off the runtime's own live ledger (panel_tasklive_wave2.go) -
+		// admission stamp, latest EvUsage cumulative spend, in-flight tool
+		// name. A task the ledger never saw reads zero/nil/empty and the wire
+		// keeps those absent; nothing here fills a gap with a guess.
+		startedAt, cost, step := rt.taskLive.cardFields(rec.TaskID)
 		rows[rec.TaskID] = panel.TaskRow{
 			TaskID:            rec.TaskID,
 			ParentTaskID:      rec.Out.ParentTaskID,
@@ -260,6 +266,9 @@ func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
 			StreamTruncated:   trunc.Truncated,
 			StreamElidedRunes: trunc.ElidedRunes,
 			StreamDropped:     trunc.Dropped,
+			StartedAt:         startedAt,
+			CostToDate:        cost,
+			CurrentStep:       step,
 		}
 	}
 	for _, id := range ids {

@@ -11,9 +11,10 @@ package panel
 // been written and assembled with nobody able to ring it. This file is that one
 // hop: raw in, method + args out, one door per whitelisted method. Four when
 // slice A shipped; the two settings doors ticket 248 added make six, ticket
-// 320's fetch route seven, ticket 194's cost door eight, and readface wave 1's
-// three privacy doors (ticket 40 AC#1) eleven - and the roster
-// they are read from is bridge.go's, never a copy written here.
+// 320's fetch route seven, ticket 194's cost door eight, readface wave 1's
+// three privacy doors (ticket 40 AC#1) eleven, and readface wave 2's two doors
+// (ticket 36 AC#3's history read, ticket 38 AC#4's cancel door) thirteen - and
+// the roster they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
 // The whitelist decision is made exactly once, inside ParseComposerRequest, and
@@ -177,6 +178,30 @@ type PrivacyRequestHandler interface {
 	HandlePrivacyExport(ctx context.Context, req ComposerRequest) (string, error)
 }
 
+// HistoryPageHandler answers readface wave 2's history read (ticket 36 AC#3):
+// one paged page over the two history tables the D35 schema already holds
+// (task_log + tool_call), the settings-route shape - one prose sentence plus
+// one payload line behind the handler's marker. Read-only by construction:
+// the interface declares one read method and nothing else, so the destructive
+// verbs (delete-one / purge / export) can only ever be reached through the
+// privacy doors above, where they already live - no second set, per the wave
+// dispatch. nil socket = the same named refusal every unattached door gives.
+type HistoryPageHandler interface {
+	HandleHistoryPage(ctx context.Context, req ComposerRequest) (string, error)
+}
+
+// RosterCancelHandler answers readface wave 2's cancel door (ticket 38 AC#4):
+// stop ONE roster row through the host's existing cancel paths. The reason
+// the C17 roster carries this name at all (and why it is not approval.decide)
+// lives on bridge.go's MethodRosterCancel; here only the shape is declared.
+// Like the settings doors it returns the page-visible receipt sentence,
+// because a stop has no second voice to defer to - the user read a row and
+// clicked, and the receipt names what was stopped. nil socket = the named
+// refusal, never a silence and never a fake success.
+type RosterCancelHandler interface {
+	HandleRosterCancel(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -211,6 +236,14 @@ type ComposerDispatch struct {
 	// privacy leg attached refuses them by name instead of dropping the
 	// user's delete request on the floor.
 	Privacy PrivacyRequestHandler
+	// History answers readface wave 2's paged history read (ticket 36 AC#3).
+	// Optional like every socket above; nil refuses by name.
+	History HistoryPageHandler
+	// RosterCancel answers readface wave 2's cancel door (ticket 38 AC#4).
+	// Optional like every socket above; nil refuses by name - a stop request
+	// that reaches a machine with no cancel leg attached must be told so,
+	// not dropped.
+	RosterCancel RosterCancelHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -308,6 +341,16 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.Privacy.HandlePrivacyExport(ctx, req)
+	case MethodHistoryPage:
+		if d == nil || d.History == nil {
+			return "", d.unattached(req)
+		}
+		return d.History.HandleHistoryPage(ctx, req)
+	case MethodRosterCancel:
+		if d == nil || d.RosterCancel == nil {
+			return "", d.unattached(req)
+		}
+		return d.RosterCancel.HandleRosterCancel(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

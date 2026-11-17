@@ -363,6 +363,17 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// zero production callers (census A365); the wiring nail in
 	// panel_privacy_40_test.go reddens if this field is unplugged.
 	privacy := newPrivacyHandler40(dir, auditf, actor)
+	// Readface wave 2 (2026-11-17): the paged history read's real leg - the
+	// store opened per read over THIS data root (the cost/privacy shape), the
+	// destructive verbs untouched behind the privacy doors above. The wiring
+	// nail in panel_history_wave2_test.go reddens if this field is unplugged.
+	history := newHistoryHandlerWave2(dir, auditf, actor)
+	// Readface wave 2 (2026-11-17, ticket 38 AC#4): the cancel door. Its seam
+	// is late-bound (the 453 pattern): the chain is assembled before any task
+	// pipeline exists, so the door refuses by name until
+	// bindPanelRosterCancel hands it the runtime's own cancel paths - never a
+	// self-invented stop mechanism.
+	rosterCancel := newRosterCancelDoor(auditf, actor)
 	// Ticket 186's leg, attached only where a runtime scope was handed over (see
 	// the signature note). The interface is left nil rather than holding a typed
 	// nil pointer, because the router's refusal is decided by a nil interface
@@ -409,7 +420,13 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		// Readface wave 1 (2026-11-17, ticket 40 AC#1): the privacy doors'
 		// real leg, wired above.
 		Privacy: privacy,
-		Audit:   auditf,
+		// Readface wave 2 (2026-11-17, ticket 36 AC#3): the paged history
+		// read's real leg, wired above.
+		History: history,
+		// Readface wave 2 (2026-11-17, ticket 38 AC#4): the cancel door,
+		// seam nil until the boot binds it (see the door's own note).
+		RosterCancel: rosterCancel,
+		Audit:        auditf,
 	}, mgr, nil
 }
 

@@ -392,7 +392,15 @@ var sectionReadSites = map[string][]string{
 	// agent.QuotaWiring (quota_44r4.go, reached through quotaDispatchChain).
 	// The same two files also read [llm] provider cards, which is why they
 	// appear in both lists.
-	"Cost":    {"internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"},
+	//
+	// 2026-11-17 re-adjudication (readface wave 2's full-package carrier run
+	// caught it): readface wave 1 (b1d2162dd, ticket 40 AC#3's aggregate face)
+	// gave the cost door a second [cost] reader - panel_cost_194.go's
+	// CostAggregate adapter reads the daily/monthly budgets per request to
+	// hand observe.BudgetVerdict its caps - and this roster was not moved with
+	// it. The scan named the site; this entry is the adjudication, not a new
+	// reader.
+	"Cost":    {"cmd/wisp/panel_cost_194.go", "internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"},
 	"Observe": {"cmd/wisp/logsink.go"},
 	// Read by the resident panel host's assembly root, per window creation, since
 	// 票 255 AC#4. The host file itself is NOT in this list and must stay out of

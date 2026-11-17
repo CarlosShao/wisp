@@ -81,6 +81,34 @@ type TaskRow struct {
 	StreamTruncated   bool
 	StreamElidedRunes int
 	StreamDropped     bool
+
+	// ---- readface wave 2 (2026-11-17), ticket 38 AC#4's three task-card
+	// fields. Every value below is a copy of a fact the host already holds at
+	// the composition root (cmd/wisp's taskRosterState reader fills them);
+	// nothing here is derived from a second assessment, and an unfilled field
+	// stays at its zero - the wire shape's omitempty then keeps it absent,
+	// which is the honest "the host stamped nothing", never a fabricated
+	// number.
+
+	// StartedAt is the wall-clock unix second the host admitted this task id
+	// (admitTask/noteTask, the same hook that makes the row nameable at all).
+	// 0 = the host never stamped it (a row filed by a pre-wave build), and the
+	// wire carries it absent rather than as epoch.
+	StartedAt int64
+	// CostToDate is the task's cumulative spend as the loop's own EvUsage
+	// events carried it to the host's sink - the Cost accumulator's
+	// task-so-far totals (tokens in/out/cached, micros and its currency
+	// pair), the same numbers RunUsageRow already carries for the run
+	// section. nil = this host's sink has published no spend event for this
+	// row (a subagent's spend is booked on its own finalize, not streamed
+	// here), which is a different fact from "cost zero" and must stay one.
+	CostToDate *RunUsageRow
+	// CurrentStep is the tool call the loop has started and not yet ended for
+	// this row (the EvToolStart/EvToolEnd pair the host's sink already
+	// receives). Empty = no call in flight - which is also what a finished
+	// task leaves behind, the same retirement rule RunFeed's running rows
+	// follow.
+	CurrentStep string
 }
 
 // TaskRosterState is the pump's reader value: the rows plus the two facts about
@@ -140,6 +168,18 @@ type TaskRowView struct {
 	StreamTruncated   bool `json:"streamTruncated"`
 	StreamElidedRunes int  `json:"streamElidedRunes"`
 	StreamDropped     bool `json:"streamDropped"`
+	// ---- readface wave 2 (2026-11-17), ticket 38 AC#4: the three task-card
+	// fields, carried as copies of the host's own readings (TaskRow above).
+	// All three are omitempty: an unstamped start, a row with no spend event
+	// and a row with no call in flight travel ABSENT, not as epoch/zero/empty
+	// - the page renders "宿主没有这一维的读数" from absence, the same rule
+	// StatusKnown's pair follows. The three keys are registered page-side gaps
+	// in composer_test.go's composerTSGapLedger until the panel's TaskRowView
+	// type declares them (this wave is Go-only by dispatch; frontend/** is
+	// this agent's own write surface, but the wave's scope is the Go face).
+	StartedAt   int64        `json:"startedAt,omitempty"`
+	CostToDate  *RunUsageRow `json:"costToDate,omitempty"`
+	CurrentStep string       `json:"currentStep,omitempty"`
 }
 
 // TaskRosterSection is the carrier's whole answer: which tasks this process is
@@ -269,6 +309,14 @@ func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1
 			StreamTruncated:   row.StreamTruncated,
 			StreamElidedRunes: row.StreamElidedRunes,
 			StreamDropped:     row.StreamDropped || dropped[row.StreamKey],
+			// Readface wave 2 (ticket 38 AC#4): the three card fields ride as
+			// verbatim copies. CostToDate copies the pointer, so a row with no
+			// spend event stays nil on the wire (absent), and CurrentStep is
+			// the host's own in-flight tool name with no retirement judgement
+			// of its own - the loop's EvToolEnd is what retires it upstream.
+			StartedAt:   row.StartedAt,
+			CostToDate:  row.CostToDate,
+			CurrentStep: row.CurrentStep,
 		}
 		if !view.StatusKnown {
 			// A name the host's judge refused never travels as a status. This is

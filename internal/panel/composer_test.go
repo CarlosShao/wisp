@@ -232,6 +232,16 @@ func composerTSGapLedger() map[string][]string {
 		"RunErrorRowView":    {"retryable"},
 		"RunSection":         {"running", "usage", "done"},
 		"GitView":            {"uncommitted", "diff"},
+		// Readface wave 2 (2026-11-17), ticket 38 AC#4's task-card fields: the
+		// three keys the roster row now carries while the page's TaskRowView
+		// type does not declare them yet. This wave is Go-only by dispatch
+		// (frontend/** untouched), so the gap is REGISTERED, never silenced:
+		// panel.ts declaring any of the three goes stale-red, Go dropping one
+		// goes dead-red, and the ordinary two-way walk judges them the moment
+		// the page half lands. costToDate's child type (RunUsageRow) is
+		// already translated live ("RunSection" -> RunSection), so no second
+		// registration rides with it.
+		"TaskRowView": {"startedAt", "costToDate", "currentStep"},
 		// Readface wave 1 (2026-11-17), ticket 37 AC#5: the ApprovalCardView
 		// entry is GONE - the consume wave's frontend leg declared the five
 		// batch keys (batchTotal/batchDirs/batchFirst/batchDeferred/

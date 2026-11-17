@@ -73,12 +73,21 @@ const (
 	// registrations in bridge_test.go's rosterPageGapLedger194 left again
 	// with the privacy page leg (same day): panel.ts spells all three names,
 	// so the ledger is empty and every name is judged by the original rule.
-	wantFullInboundRosterSize253 = 11
+	// Readface wave 2 (2026-11-17) moved both again: two doors joined -
+	// "history.page" (ticket 36 AC#3's paged history read) and
+	// "roster.cancel" (ticket 38 AC#4's cancel door; the ticket's own
+	// "task.cancel" spelling is blocked by internal/tools' frozen ticket-188
+	// task-axis scan, see bridge.go's MethodRosterCancel) - size 11 -> 13 and
+	// non-prefixed 7 -> 9, in the same change that added the routes and the
+	// cmd/wisp handlers. Both page literals are registered pending in
+	// rosterPageGapLedger194 (Go-only wave; frontend/** untouched).
+	wantFullInboundRosterSize253 = 13
 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
 	// "panel." prefix, invisible to both old rulers. It was 3 ("config.get",
 	// "config.set", "config.models.list") until ticket 194 added the fourth:
-	// "cost.summary"; readface wave 1 added the three privacy doors (7).
-	wantNonPanelPrefixedInbound253 = 7
+	// "cost.summary"; readface wave 1 added the three privacy doors (7);
+	// readface wave 2 added history.page and roster.cancel (9).
+	wantNonPanelPrefixedInbound253 = 9
 )
 
 // wantFullInboundRoster253 is the closed roster: every name a page can put in the
@@ -88,6 +97,7 @@ var wantFullInboundRoster253 = []string{
 	"config.models.list",
 	"config.set",
 	"cost.summary",
+	"history.page",
 	"panel.attachment.add",
 	"panel.message.send",
 	"panel.mode.request",
@@ -95,6 +105,7 @@ var wantFullInboundRoster253 = []string{
 	"privacy.delete-one",
 	"privacy.export",
 	"privacy.purge",
+	"roster.cancel",
 }
 
 // inboundDotShaped reports whether s is spelled like a namespaced name: two or
@@ -678,7 +689,7 @@ func TestPlantedUnregisteredInboundMethodNameGoesRed(t *testing.T) {
 	// into a copy by replacing that copy's single case line.
 	dir := t.TempDir()
 	path := filepath.Join(dir, "bridge.go")
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is no longer written as one comma-separated clause - re-read knownComposerMethod and rebuild this plant from what is on disk rather than replacing nothing")
 	}
@@ -722,7 +733,7 @@ func TestRegistrationSilencesTheRosterRuler(t *testing.T) {
 		t.Fatalf("read bridge.go: %v", err)
 	}
 	constLine := "\nconst ConfigRegistered253Test = \"config.registered253\"\n"
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is not the one comma-separated clause this plant was written against - re-read knownComposerMethod rather than trusting this line")
 	}

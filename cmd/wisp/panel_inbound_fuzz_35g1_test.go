@@ -20,10 +20,12 @@ package main
 //   - The largest existing ruler enumerates 11 approval-shaped candidate names and
 //     calls knownComposerMethod DIRECTLY - it never goes through Handle, so it
 //     never reaches the audit line at composer_dispatch.go:298.
-//   - "Each listed method dispatches" was only nailed for 3 of the 8 roster names
-//     (workspace/attachment/message); the other five (mode, config.get, config.set,
-//     config.models.list, cost.summary) had no "the right handler ran exactly once"
-//     nail. This file drives all 8.
+//   - "Each listed method dispatches" was only nailed for 3 of the roster names
+//     (workspace/attachment/message); the other names (mode, the two settings
+//     routes, the fetch route, the cost door, the three privacy doors - wave 1's
+//     b1d2162dd - and readface wave 2's history/cancel doors) had no "the right
+//     handler ran exactly once" nail until the 2026-11-17 re-adjudication grew
+//     this table to the full thirteen. This file drives all 13.
 //
 // TWO TESTS, because the AC has two halves and they fail for different reasons:
 //   1. TestWhitelistFuzz50NamesAllRefusedAndAudited35g1 - 50 forbidden names through
@@ -32,7 +34,7 @@ package main
 //      sink carries EXACTLY 50 lines, each naming the method. Deleting the guard at
 //      bridge.go:172-174 turns this red (the name would then reach a handler or the
 //      default branch, and the audit count changes).
-//   2. TestEveryRosterMethodDispatchesToItsOwnHandler35g1 - a table over all 8
+//   2. TestEveryRosterMethodDispatchesToItsOwnHandler35g1 - a table over all 13
 //      roster names: each lands on ITS OWN handler exactly once and on no other.
 //      Deleting a `case` from composer_dispatch.go's switch, or dropping a name
 //      from bridge.go's knownComposerMethod, turns this red.
@@ -49,7 +51,7 @@ import (
 )
 
 // ----------------------------------------------------------------------------
-// the audit sink and the seven handler sockets, as spies
+// the audit sink and the handler sockets, as spies
 // ----------------------------------------------------------------------------
 
 // g1Audit is the project's existing "[audit]" sink shape (workspace.go's
@@ -128,6 +130,53 @@ func (s *g1Costs) HandleCostSummary(_ context.Context, req panel.ComposerRequest
 	return "cost-summarised", nil
 }
 
+// g1Privacy / g1History / g1RosterCancel are the wave-1/wave-2 sockets' spies
+// (2026-11-17 re-adjudication): the dispatch ruler's table now drives all
+// THIRTEEN roster names, so the three privacy verbs and the two readface
+// wave-2 doors get the same "its own socket moved by exactly one" nail the
+// eight 35g1-era names have. One call counter per privacy verb: a purge that
+// reached delete-one's handler would be the wrong answer to a destructive
+// request, which is exactly what this ruler exists to catch.
+type g1Privacy struct {
+	deleteOne g1Call
+	purge     g1Call
+	export    g1Call
+}
+
+func (s *g1Privacy) HandlePrivacyDeleteOne(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.deleteOne.calls++
+	s.deleteOne.last = req
+	return "privacy-deleted-one", nil
+}
+
+func (s *g1Privacy) HandlePrivacyPurge(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.purge.calls++
+	s.purge.last = req
+	return "privacy-purged", nil
+}
+
+func (s *g1Privacy) HandlePrivacyExport(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.export.calls++
+	s.export.last = req
+	return "privacy-exported", nil
+}
+
+type g1History struct{ c g1Call }
+
+func (s *g1History) HandleHistoryPage(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.c.calls++
+	s.c.last = req
+	return "history-paged", nil
+}
+
+type g1RosterCancel struct{ c g1Call }
+
+func (s *g1RosterCancel) HandleRosterCancel(_ context.Context, req panel.ComposerRequest) (string, error) {
+	s.c.calls++
+	s.c.last = req
+	return "roster-cancelled", nil
+}
+
 // g1Envelope marshals one composer envelope with the attribution fields the two
 // later guards require, so the ONLY refusal any name in this file can draw is the
 // method-whitelist guard - never source and never requestId.
@@ -176,8 +225,15 @@ func g1ForbiddenNames() []string {
 		"approval.queue",
 		"grants.list",
 		"grants.revoke",
-		"privacy.purge",
-		"privacy.export",
+		// 2026-11-17 re-adjudication (readface wave 2's full-package carrier
+		// run caught it): privacy.purge / privacy.export joined the whitelist
+		// with readface wave 1 (b1d2162dd, ticket 40 AC#1) and this table was
+		// not moved with it - a name the whitelist answers is by definition
+		// not a fuzz-table member. The two join as fresh near-miss shapes so
+		// the table stays exactly 50; history.page / roster.cancel (wave 2)
+		// were minted off-table, so nothing else moves.
+		"privacy.delete-all",
+		"privacy.export.all",
 		"models.delete",
 		"diagnostics.export",
 		// near-misses of the eight roster names
@@ -228,16 +284,22 @@ func TestWhitelistFuzz50NamesAllRefusedAndAudited35g1(t *testing.T) {
 		t.Fatalf("the fuzz table holds %d names, want exactly 50: ticket 35 :42 asks for 50 random/forbidden names, and a smaller table would silently lower the bar", len(names))
 	}
 
-	// A roster must exist and be the closed eight, or "all rejected" is trivially
-	// true against an empty whitelist. This is the anti-empty-universe guard the
-	// closed-roster ruler in internal/panel also carries.
+	// A roster must exist and be the closed thirteen, or "all rejected" is
+	// trivially true against an empty whitelist. This is the anti-empty-universe
+	// guard the closed-roster ruler in internal/panel also carries. 2026-11-17
+	// re-adjudication (readface wave 2's carrier run): the slice was pinned at
+	// the 35g1-era eight while readface wave 1 (b1d2162dd) had already grown
+	// the whitelist to eleven with the three privacy doors; wave 2 adds the
+	// two doors this package wires, so the slice is the full thirteen.
 	roster := []string{
 		panel.MethodModeRequest, panel.MethodWorkspaceRequest, panel.MethodAttachmentAdd,
 		panel.MethodMessageSend, panel.MethodConfigGet, panel.MethodConfigSet,
 		panel.MethodModelsList, panel.MethodCostSummary,
+		panel.MethodPrivacyDeleteOne, panel.MethodPrivacyPurge, panel.MethodPrivacyExport,
+		panel.MethodHistoryPage, panel.MethodRosterCancel,
 	}
-	if len(roster) != 8 {
-		t.Fatalf("the roster slice here has %d names, want 8 - the count this ruler reports against", len(roster))
+	if len(roster) != 13 {
+		t.Fatalf("the roster slice here has %d names, want 13 - the count this ruler reports against", len(roster))
 	}
 	onRoster := map[string]bool{}
 	for _, r := range roster {
@@ -333,16 +395,22 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 	config := &g1Config{}
 	models := &g1Models{}
 	costs := &g1Costs{}
+	privacy := &g1Privacy{}
+	history := &g1History{}
+	rosterCancel := &g1RosterCancel{}
 
 	d := &panel.ComposerDispatch{
-		Mode:       mode,
-		Workspace:  workspace,
-		Attachment: attachment,
-		Message:    message,
-		Config:     config,
-		Models:     models,
-		Costs:      costs,
-		Audit:      (&g1Audit{}).fn,
+		Mode:         mode,
+		Workspace:    workspace,
+		Attachment:   attachment,
+		Message:      message,
+		Config:       config,
+		Models:       models,
+		Costs:        costs,
+		Privacy:      privacy,
+		History:      history,
+		RosterCancel: rosterCancel,
+		Audit:        (&g1Audit{}).fn,
 	}
 
 	// each row names the ONE socket that must fire, by key into the all map below.
@@ -358,19 +426,29 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 		{panel.MethodConfigSet},
 		{panel.MethodModelsList},
 		{panel.MethodCostSummary},
+		{panel.MethodPrivacyDeleteOne},
+		{panel.MethodPrivacyPurge},
+		{panel.MethodPrivacyExport},
+		{panel.MethodHistoryPage},
+		{panel.MethodRosterCancel},
 	}
-	if len(rows) != 8 {
-		t.Fatalf("the dispatch table covers %d roster names, want all 8", len(rows))
+	if len(rows) != 13 {
+		t.Fatalf("the dispatch table covers %d roster names, want all 13", len(rows))
 	}
 
 	all := map[string]func() int{
-		"mode":       func() int { return mode.c.calls },
-		"workspace":  func() int { return workspace.c.calls },
-		"attachment": func() int { return attachment.c.calls },
-		"message":    func() int { return message.c.calls },
-		"config":     func() int { return config.c.calls },
-		"models":     func() int { return models.c.calls },
-		"costs":      func() int { return costs.c.calls },
+		"mode":               func() int { return mode.c.calls },
+		"workspace":          func() int { return workspace.c.calls },
+		"attachment":         func() int { return attachment.c.calls },
+		"message":            func() int { return message.c.calls },
+		"config":             func() int { return config.c.calls },
+		"models":             func() int { return models.c.calls },
+		"costs":              func() int { return costs.c.calls },
+		"privacy.delete-one": func() int { return privacy.deleteOne.calls },
+		"privacy.purge":      func() int { return privacy.purge.calls },
+		"privacy.export":     func() int { return privacy.export.calls },
+		"history":            func() int { return history.c.calls },
+		"cancel":             func() int { return rosterCancel.c.calls },
 	}
 
 	dispatched := 0
@@ -401,6 +479,16 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 			ownKey = "models"
 		case panel.MethodCostSummary:
 			ownKey = "costs"
+		case panel.MethodPrivacyDeleteOne:
+			ownKey = "privacy.delete-one"
+		case panel.MethodPrivacyPurge:
+			ownKey = "privacy.purge"
+		case panel.MethodPrivacyExport:
+			ownKey = "privacy.export"
+		case panel.MethodHistoryPage:
+			ownKey = "history"
+		case panel.MethodRosterCancel:
+			ownKey = "cancel"
 		}
 		for k, get := range all {
 			delta := get() - before[k]
@@ -415,8 +503,8 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 		dispatched++
 	}
 
-	if dispatched != 8 {
-		t.Fatalf("dispatched %d roster names, want 8", dispatched)
+	if dispatched != 13 {
+		t.Fatalf("dispatched %d roster names, want 13", dispatched)
 	}
 
 	// Every roster name is also answered by the RUNNING guard. This is the other
@@ -429,5 +517,5 @@ func TestEveryRosterMethodDispatchesToItsOwnHandler35g1(t *testing.T) {
 			t.Errorf("roster method %q is handled by the dispatch table but the running whitelist guard refuses it: %v", r.method, err)
 		}
 	}
-	t.Logf("roster dispatch: %d/%d roster names each reached their own handler exactly once and no other socket moved", dispatched, 8)
+	t.Logf("roster dispatch: %d/%d roster names each reached their own handler exactly once and no other socket moved", dispatched, 13)
 }
