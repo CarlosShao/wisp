@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 修两处反向谎言＋收紧消毒 href（写腿，frontend 写面）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+# 来路：审计腿 `pages5-adversarial-20261117-0953.md` 成立 8/不成立 0/反向谎言 2。
+
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只做三件（⛔ 动别处）：
+1. **`frontend/src/components/security-settings.tsx:58-61` 反向谎言改真话**：现在写「D45 会话授权生产零写入（grant_id 生产逐字传 nil）」—— **已被票 49 证伪**（`internal/agent/approval/gate.go:859 g.grants.Record(...)`、`gate.go:844 rt.RecordTarget(...)`、`internal/session/grants.go:201/274 InsertGrant`、`internal/tools/bridge.go:1445 tc.GrantID = &g`）。改成**真话**：会话授权**生产在写**（session-grant sweep 收口时 revoked 盖章、行保留审计），**面板侧没有 grants 列表读面**（架构禁 Go 入站 grant 路由），操作出口＝console 动词 `grants` / `revoke-grant <编号>`。给 file:line 引用。
+2. **`frontend/src/components/cost-settings.tsx:99-103` 反向谎言**：「没有预算读数就没有预算条」—— 预算读数 Go 侧是活的（`internal/config/schema.go:608-613 [cost]` 阈值、`internal/panel/costbudget.go:103 Judge` 出 80 warn/100 over、`internal/panel/costbook_44.go:147 EvWarn`）。⇒ 改成「**预算判定在 Go 侧已活，但 cost.summary payload 尚未携带该字段**」；**不要造预算数字**（⛔ 假值）。等 `readface1` 把字段加进 payload 后再接（另单）。
+3. **收紧票 36 消毒的 href**：审计发现 `TIGHT_SCHEMA` 只收窄 `protocols.href`，**未禁协议相对 URL** ⇒ `[x](//evil.example/x)` 的 href 存活（开放重定向面）。在 `frontend/src/components/result-history.tsx` 的 `TIGHT_SCHEMA`／`urlTransform` 里**拒掉以 `//` 或 `\` 开头的 href**（只留 `http/https/mailto` 绝对 URL 与 `#` 锚），并在 `render:history36` 仪器里加一枚负控牙：`[x](//evil.example/x)` ⇒ href 必须被剥（红/绿读数）。
+**硬约束**：⛔ 改 `docs/PLAN.md`／`docs/specs/**`／thresholds／golden／allowlist／D43／design 契约文字；⛔ 放宽断言；⛔ push；⛔ 提交 `frontend/dist` 字节（跑完删回 `.gitkeep`）；⛔ UI emoji。
+**串行**：`npm --prefix frontend run build` rc=0＋`typecheck` rc=0＋`lint` rc=0＋`render:history36` rc=0（含新负控）；node 在 `D:\work\server\node24`。
+写面：`frontend/src/components/security-settings.tsx`、`frontend/src/components/cost-settings.tsx`、`frontend/src/components/result-history.tsx`、`frontend/scripts/render-history-36.tsx`、`docs/evidence/s1/pages5-reverselie-*`。
+回话第一行＝commit hash ＋三件各自 file:line＋读数（尤其 href 负控红/绿）＋build/typecheck/lint/render rc。没干完写「未完成，卡在哪」。
