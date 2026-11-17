@@ -11,7 +11,8 @@ package panel
 // been written and assembled with nobody able to ring it. This file is that one
 // hop: raw in, method + args out, one door per whitelisted method. Four when
 // slice A shipped; the two settings doors ticket 248 added make six, ticket
-// 320's fetch route seven, and ticket 194's cost door eight - and the roster
+// 320's fetch route seven, ticket 194's cost door eight, and readface wave 1's
+// three privacy doors (ticket 40 AC#1) eleven - and the roster
 // they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
@@ -148,6 +149,34 @@ type CostSummaryHandler interface {
 	HandleCostSummary(ctx context.Context, req ComposerRequest) (string, error)
 }
 
+// PrivacyRequestHandler answers readface wave 1's three privacy doors (ticket
+// 40 AC#1, landing on internal/memory's privacy layer - the layer SPEC-02 §5
+// names as the only route privacy-relevant data may travel). Three methods,
+// one per roster name, because the three verbs differ in destructiveness and
+// a method-per-verb door cannot be talked into the wrong one by an argument:
+//
+//   - HandlePrivacyDeleteOne: one item out of one domain; the receipt names
+//     the id. Refuses an empty id before the leg is reached.
+//   - HandlePrivacyPurge: one WHOLE domain out; the receipt names the count
+//     the store returned. There is no "purge everything" argument: the domain
+//     selector is required and validated against the five D35 domains by the
+//     leg, so the destructive verb is always scoped.
+//   - HandlePrivacyExport: one domain as indented JSON, carried as the
+//     settings-route shape's payload line (marker + JSON). The export is the
+//     user's own data; the receipt sentence states what was included.
+//
+// The signature is the settings-route shape (sentence out, error out) for the
+// same reason the config doors have it: a privacy receipt has no second voice
+// to defer to, and the count the store returned is the page-visible fact
+// ticket 40 AC#1 measures. nil socket = the same named refusal every
+// unattached door gives (the names are on the whitelist, so a machine with no
+// privacy leg must say so by name).
+type PrivacyRequestHandler interface {
+	HandlePrivacyDeleteOne(ctx context.Context, req ComposerRequest) (string, error)
+	HandlePrivacyPurge(ctx context.Context, req ComposerRequest) (string, error)
+	HandlePrivacyExport(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -176,6 +205,12 @@ type ComposerDispatch struct {
 	// Costs answers ticket 194's read-only cost door. Optional like every socket
 	// above: nil is the named refusal, never a silence.
 	Costs CostSummaryHandler
+	// Privacy answers readface wave 1's three privacy doors (ticket 40 AC#1).
+	// Optional like every socket above: nil is the named refusal, never a
+	// silence - the three names are on the whitelist, so a machine with no
+	// privacy leg attached refuses them by name instead of dropping the
+	// user's delete request on the floor.
+	Privacy PrivacyRequestHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -258,6 +293,21 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.Costs.HandleCostSummary(ctx, req)
+	case MethodPrivacyDeleteOne:
+		if d == nil || d.Privacy == nil {
+			return "", d.unattached(req)
+		}
+		return d.Privacy.HandlePrivacyDeleteOne(ctx, req)
+	case MethodPrivacyPurge:
+		if d == nil || d.Privacy == nil {
+			return "", d.unattached(req)
+		}
+		return d.Privacy.HandlePrivacyPurge(ctx, req)
+	case MethodPrivacyExport:
+		if d == nil || d.Privacy == nil {
+			return "", d.unattached(req)
+		}
+		return d.Privacy.HandlePrivacyExport(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

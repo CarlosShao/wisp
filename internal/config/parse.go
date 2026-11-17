@@ -60,6 +60,18 @@ func buildDecodeType() reflect.Type {
 // and its 1-based line; unknown keys inside a plugin entry are caught during
 // the typed entry rebuild and name the key plus the line within the entry.
 func decodeStrict(data []byte, cfg *Config) error {
+	err := decodeStrictInto(data, cfg)
+	if err != nil {
+		return formatDecodeError(err)
+	}
+	return nil
+}
+
+// decodeStrictInto is decodeStrict without the error formatting: the caller
+// receives the decoder's own error so it can pick between the prose face
+// (formatDecodeError) and the structured rows face (loaderrors_456.go's
+// decodeErrorRows) without decoding twice.
+func decodeStrictInto(data []byte, cfg *Config) error {
 	dv := reflect.New(decodeType).Elem()
 	cv := reflect.ValueOf(cfg).Elem()
 	for i := 0; i < decodeType.NumField(); i++ {
@@ -71,7 +83,7 @@ func decodeStrict(data []byte, cfg *Config) error {
 	dec := toml.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(dv.Addr().Interface()); err != nil {
-		return formatDecodeError(err)
+		return err
 	}
 	for i := 0; i < decodeType.NumField(); i++ {
 		if i == pluginsFieldIdx {
@@ -136,23 +148,22 @@ func buildPlugins(raw map[string]any) (PluginsSection, error) {
 // formatDecodeError turns go-toml errors into D37 config-class errors.
 // Strict (unknown-key) errors carry one DecodeError per offending key with
 // the full key path and its 1-based line; type errors carry position too.
+//
+// Since readface wave 1 (2026-11-17) the prose is BUILT FROM the structured
+// rows decodeErrorRows (loaderrors_456.go) returns - the structured face and
+// this prose are two renderings of one decoding, never two decoders. The
+// joined strings are byte-identical to the pre-refactor prose, which the
+// package's decode tests pin.
 func formatDecodeError(err error) error {
 	var sme *toml.StrictMissingError
-	if errors.As(err, &sme) {
-		parts := make([]string, 0, len(sme.Errors))
-		for _, de := range sme.Errors {
-			row, _ := de.Position()
-			parts = append(parts, fmt.Sprintf("unknown key %q at line %d",
-				strings.Join(de.Key(), "."), row))
+	var de *toml.DecodeError
+	if errors.As(err, &sme) || errors.As(err, &de) {
+		rows := decodeErrorRows(err)
+		parts := make([]string, 0, len(rows))
+		for _, r := range rows {
+			parts = append(parts, r.Message)
 		}
 		return observe.New(observe.ClassConfig, "config.toml: "+strings.Join(parts, "; "))
-	}
-	var de *toml.DecodeError
-	if errors.As(err, &de) {
-		row, col := de.Position()
-		msg := strings.TrimPrefix(de.Error(), "toml: ")
-		return observe.New(observe.ClassConfig,
-			fmt.Sprintf("config.toml: line %d, col %d: %s", row, col, msg))
 	}
 	return observe.Wrap(observe.ClassConfig, err, "config.toml parse")
 }

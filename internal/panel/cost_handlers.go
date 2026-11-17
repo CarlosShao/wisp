@@ -33,6 +33,64 @@ type CostDayRow struct {
 	TokensOut  int64  `json:"tokensOut"`
 	CostMicros int64  `json:"costMicros"`
 	Tasks      int64  `json:"tasks"`
+	// CachedTokens is the per-day cached-token count. Readface wave 1
+	// (2026-11-17): the cost page's IN/OUT/CACHED column set needs the cached
+	// half, and this build's storage does not aggregate it - cost_daily has
+	// no cached column (D35's table, which this leg may not widen), so the
+	// adapter hands 0 here. The payload's CachedKnown flag is the gate: while
+	// it is false the page MUST NOT render this field as a reading - it is
+	// "cached tokens are not aggregated by this build's storage", not "zero
+	// cached tokens". Inventing a number here would be the fabricated-data
+	// failure the 40 page leg's own note refuses on its side too.
+	CachedTokens int64 `json:"cachedTokens"`
+}
+
+// CostAggregateRow is the aggregate face of the cost read (ticket 40 AC#3's
+// Go half, readface wave 1): the month-to-date totals, the [cost] budgets and
+// their verdict, and the pricing version the meter priced against. Integers
+// only; the budget comparison itself happens in internal/observe (basis
+// points, no floats touch money) and arrives here as a word plus the two
+// integer budgets.
+type CostAggregateRow struct {
+	// DayCostMicros is today's own cost_daily row (0 = no tasks today).
+	DayCostMicros int64 `json:"dayCostMicros"`
+	// Month* are the month-to-date aggregates over cost_daily, summed from
+	// the store's own rows (never re-derived per model or guessed from days
+	// the reader did not fetch).
+	MonthTokensIn   int64 `json:"monthTokensIn"`
+	MonthTokensOut  int64 `json:"monthTokensOut"`
+	MonthCostMicros int64 `json:"monthCostMicros"`
+	// DailyBudgetMicros / MonthlyBudgetMicros are the [cost] caps as
+	// configured; 0 = uncapped (the schema's own "0 = no budget" word).
+	DailyBudgetMicros   int64 `json:"dailyBudgetMicros"`
+	MonthlyBudgetMicros int64 `json:"monthlyBudgetMicros"`
+	// BudgetState is the three-state word the page renders the budget bar
+	// from (ticket 40 AC#4): "normal" (<80%), "warn" (>= the alert
+	// threshold, 80% by default), "paused" (>=100% AND over_budget=pause,
+	// i.e. new tasks are actually being refused). The mapping from
+	// observe.BudgetVerdict lives in the adapter (cmd/wisp), which owns the
+	// config read; the handler carries the word through untouched.
+	BudgetState string `json:"budgetState"`
+	// BudgetAllowNewTask mirrors observe.BudgetVerdict.AllowNewTask: the
+	// machine-checkable half of the state (false only at paused).
+	BudgetAllowNewTask bool `json:"budgetAllowNewTask"`
+	// PricingVersion / PricingUpdated identify the price table the meter
+	// priced against (observe's embedded pricing.json version + date): the
+	// cost page's pricing-version footnote. 0/"" = the leg could not read the
+	// table, which the page renders as "unknown", never as a version.
+	PricingVersion int    `json:"pricingVersion"`
+	PricingUpdated string `json:"pricingUpdated"`
+}
+
+// CostAggregateReader is the OPTIONAL second face of the cost leg: an adapter
+// that can also answer the aggregate read. It is a separate interface (not a
+// second method on CostReader) so the existing CostReader implementations and
+// test doubles keep compiling untouched - the same shape the models route's
+// interface took - and the handler asks for it with a type assertion: a reader
+// that answers days only still answers cost.summary, with the aggregate marked
+// known=false.
+type CostAggregateReader interface {
+	CostAggregate(ctx context.Context) (CostAggregateRow, error)
 }
 
 // CostReader is the injected cost leg: one read method, no third. nil reader =
@@ -80,12 +138,35 @@ func (h *CostReadHandler) HandleCostSummary(ctx context.Context, req ComposerReq
 	if days == nil {
 		days = []CostDayRow{}
 	}
+	// The aggregate face is optional (CostAggregateReader): a reader that
+	// answers it extends the payload; one that answers days only still gets
+	// its answer through, with the aggregate marked known=false - a partial
+	// answer that SAYS it is partial, never a silence.
+	var agg *CostAggregateRow
+	aggregateKnown := false
+	if aggReader, ok := h.Reader.(CostAggregateReader); ok {
+		row, aggErr := aggReader.CostAggregate(ctx)
+		if aggErr == nil {
+			agg = &row
+			aggregateKnown = true
+		} else {
+			h.record(req, aggErr, "aggregate-failed")
+		}
+	}
 	h.record(req, nil, "answered")
 	var b strings.Builder
 	fmt.Fprintf(&b, "成本按天共 %d 行（新的一天在前）。", len(days))
+	if !aggregateKnown {
+		b.WriteString(" 本月聚合/预算读数未取到（读取腿没有接聚合面，或读取失败）。")
+	} else {
+		fmt.Fprintf(&b, " 本月累计 %d micro；预算状态 %s。", agg.MonthCostMicros, agg.BudgetState)
+	}
 	b.WriteString("\n" + CostSummaryPayloadMarker + marshalCostPayload(costPayload{
-		Days:  days,
-		Count: len(days),
+		Days:           days,
+		Count:          len(days),
+		CachedKnown:    false,
+		AggregateKnown: aggregateKnown,
+		Aggregate:      agg,
 	}))
 	return b.String(), nil
 }
@@ -121,9 +202,26 @@ const CostSummaryPayloadMarker = "wisp-cost-summary:"
 
 // costPayload is the cost door's wire shape, separate from the view type so a
 // field added to the view does not silently change the page's JSON contract.
+//
+// Readface wave 1 (2026-11-17, ticket 40 AC#3/AC#4's Go half): the payload
+// grows the aggregate/budget/pricing block (optional, gated by AggregateKnown)
+// and the cached-token gate. CachedKnown is FALSE on this build by
+// construction: cost_daily carries no cached-token column and this leg may
+// not widen the D35 table, so the gate travels with the rows and the page
+// renders the CACHED column as "未聚合" while it is false - never as the
+// rows' zero. Aggregate is nil unless the leg answered; omitempty keeps the
+// old payload shape byte-identical for a days-only leg.
 type costPayload struct {
 	Days  []CostDayRow `json:"days"`
 	Count int          `json:"count"`
+	// CachedKnown gates the per-row CachedTokens field: false = this build's
+	// storage does not aggregate cached tokens (see CostDayRow).
+	CachedKnown bool `json:"cachedKnown"`
+	// AggregateKnown gates Aggregate: false = the leg has no aggregate face
+	// or its read failed (the prose says so too); true = Aggregate carries
+	// the month totals, budgets, verdict and pricing version.
+	AggregateKnown bool              `json:"aggregateKnown"`
+	Aggregate      *CostAggregateRow `json:"aggregate,omitempty"`
 }
 
 // marshalCostPayload renders the payload line; the payloadError branch is the

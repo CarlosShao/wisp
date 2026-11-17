@@ -54,10 +54,13 @@ func mustPush(t *testing.T, q *Queue, d tools.Decision) *qitem {
 func assertRow(t *testing.T, got LiveApproval, want tools.Decision, position int) {
 	t.Helper()
 	// Since ticket 148 Ⓑ the row's Decision is panelVerdict's whitelist
-	// projection: the six fields the panel reader names, nothing else. The
-	// correlation id travels on the wrapper (got.CorrelationID), not inside the
-	// Decision, so a row whose Decision still carries an id string is itself a
-	// whitelist breach, not a convenience.
+	// projection: the fields the panel reader names, nothing else. Paths
+	// joined the carried set with readface wave 1 (2026-11-17): the pump's
+	// reader feeds it to approval.CardSummary for the card's batch fields
+	// (ticket 37 AC#5). The correlation id travels on the wrapper
+	// (got.CorrelationID), not inside the Decision, so a row whose Decision
+	// still carries an id string is itself a whitelist breach, not a
+	// convenience.
 	if got.CorrelationID != want.CorrelationID {
 		t.Errorf("CorrelationID=%q，期望 %q", got.CorrelationID, want.CorrelationID)
 	}
@@ -108,9 +111,17 @@ func assertRow(t *testing.T, got LiveApproval, want tools.Decision, position int
 		t.Errorf("%s 的行携带了 Params（%v）：完整工具参数不是面板载荷，票 148 Ⓑ 收窄掉的就是它",
 			want.CorrelationID, d.Params)
 	}
-	if len(d.Paths) != 0 {
-		t.Errorf("%s 的行携带了 Paths（%v）：路径面属 PanelItem 投影，不属这枚行",
-			want.CorrelationID, d.Paths)
+	// Paths is carried since readface wave 1 (card batch fields, ticket 37
+	// AC#5): it must arrive verbatim, through its own backing (cloneBacking).
+	if len(d.Paths) != len(want.Paths) {
+		t.Fatalf("%s 的 Paths=%v，期望原样 %v（聚合卡字段从这枚读）",
+			want.CorrelationID, d.Paths, want.Paths)
+	}
+	for i := range want.Paths {
+		if d.Paths[i] != want.Paths[i] {
+			t.Errorf("%s 的 Paths[%d]=%q，期望原样 %q",
+				want.CorrelationID, i, d.Paths[i], want.Paths[i])
+		}
 	}
 	if len(d.Capabilities) != 0 {
 		t.Errorf("%s 的行携带了 Capabilities（%v）：能力位不是面板载荷", want.CorrelationID, d.Capabilities)

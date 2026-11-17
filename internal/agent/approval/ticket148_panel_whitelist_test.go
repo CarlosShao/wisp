@@ -5,13 +5,14 @@ package approval
 //
 // WHAT THE OWNER APPROVED. Ticket 148 Ⓑ narrows the outward field range to
 // "the fields the panel needs", by name. The name of that set is not a guess:
-// the one production reader of LiveApprovals is cmd/wisp/panel_pump.go's
-// liveVerdicts, and it reads exactly six fields off the row's Decision - Tool,
-// Args (through panelArgs), Level, RulesHit, Reason, SessionOverrideBlocked -
-// plus CorrelationID and Position, which travel on the LiveApproval wrapper.
-// panelVerdict carries those six and nothing else; CorrelationID stays on the
-// wrapper, so a row whose Decision still carries an id string is itself a
-// leak.
+// the production readers of LiveApprovals are cmd/wisp/panel_pump.go's
+// liveVerdicts (and the resident leg's pump over the same function), reading
+// Tool, Args (through panelArgs), Level, RulesHit, Reason,
+// SessionOverrideBlocked - and, since readface wave 1 (2026-11-17), Paths for
+// the card's batch fields (ticket 37 AC#5). CorrelationID and Position travel
+// on the LiveApproval wrapper, so a row whose Decision still carries an id
+// string is itself a leak.
+// panelVerdict carries those seven and nothing else.
 //
 // THE TWO WAYS THIS FILE GOES RED (the ticket's "字段增删即红"):
 //
@@ -53,9 +54,14 @@ import (
 
 // panelVerdictAllowedFields is the whitelist itself, named. Keep it in sync
 // with panelVerdict's literal and with the panel reader it is a census of.
+// Paths joined the carried set with readface wave 1 (2026-11-17): the same
+// reader feeds it to approval.CardSummary for the panel card's batch display
+// fields (ticket 37 AC#5's Go half), through the same cloneBacking copy the
+// other reference slots use.
 var panelVerdictAllowedFields = []string{
 	"Args",
 	"Level",
+	"Paths",
 	"Reason",
 	"RulesHit",
 	"SessionOverrideBlocked",
@@ -64,7 +70,7 @@ var panelVerdictAllowedFields = []string{
 
 // panelVerdictDroppedFields names every other declared field of
 // tools.Decision: the fields the queue keeps. The reference-typed ones among
-// them (Params, Paths, Capabilities, Blacklist) are exactly the slots the
+// them (Params, Capabilities, Blacklist) are exactly the slots the
 // ticket-146 clone guarded; on the panel payload they are gone outright.
 // TargetProcess is ticket 49's input.type binding fact: it rides the NATIVE
 // card (the operator confirms a named application) and PanelItem carries no
@@ -80,7 +86,6 @@ var panelVerdictDroppedFields = []string{
 	"ModeKept",
 	"ModeSilenced",
 	"Params",
-	"Paths",
 	"PluginID",
 	"Provider",
 	"Refusal",

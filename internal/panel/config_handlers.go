@@ -191,6 +191,44 @@ type SettingsView struct {
 	ChatProvider string
 	// Voice is the voice-chain half of the read side (ticket 313 AC#2).
 	Voice VoiceSettingsView
+
+	// ---- readface wave 1 (2026-11-17): ticket 39 AC#1/AC#4's read faces ----
+
+	// Sections is the FULL D36 section tree the leg read (config.SectionRows
+	// in internal/config): one row per leaf with its dotted key path, the
+	// value as the struct holds it, and the tier word the registry gives that
+	// path (hot/reload/restart, "locked" for the four locked sections - the
+	// registry's own words, never a second vocabulary). nil = the leg did not
+	// answer the tree; a non-nil empty list is impossible over a readable
+	// config (the schema always has sections).
+	Sections []ConfigSectionRow
+	// LoadErrors is the errors[]{line,message} face (ticket 39 AC#4): what the
+	// read pipeline found in the file on disk THIS read - unknown keys and
+	// wrong types with their 1-based line, semantic failures with line 0.
+	// nil = the file loads clean (or the leg did not check). The Manager keeps
+	// running on its last good config while the disk file is broken, so this
+	// face is how the editor page sees the breakage without waiting for a
+	// reload.
+	LoadErrors []ConfigLoadError
+}
+
+// ConfigSectionRow is one leaf of the config tree as the wire carries it.
+// Key is the dotted path ("ball.size", "voice.asr.provider"); Value is the
+// value as the struct holds it (composite values as compact JSON); Tier is
+// the registry's tier word for that path.
+type ConfigSectionRow struct {
+	Key   string
+	Value string
+	Tier  string
+}
+
+// ConfigLoadError is one problem the config read pipeline found: Line is the
+// 1-based line the decoder pointed at, 0 when the problem names no line
+// (a read failure or a semantic validation failure - render "no line" for 0,
+// never line 1).
+type ConfigLoadError struct {
+	Line    int
+	Message string
 }
 
 // VoiceSettingsView is the voice half of the read side: the two cloud chains and
@@ -522,7 +560,69 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 		res.Tier = tier
 	}
 	h.record(req, nil, "write-accepted")
-	return renderSettingReceipt(res), nil
+	return renderSettingReceipt(res) + "\n" + renderReloadEvent(res), nil
+}
+
+// ConfigReloadEventMarker starts the machine half of an accepted write's
+// reload event (ticket 39 AC#1's "after save, applied-tier feedback surfaced
+// from the reload events"): the settings-route shape's ONE event line the
+// page finds by the marker and parses as JSON. Same two naming properties as
+// every marker in this family: no `panel.` prefix (the drift instruments key
+// on those literals) and no dot (it is neither a method name nor a route).
+//
+// The event rides the awaited binding reply - the same surface the tier
+// sentence travels on - because this tree's one page-reachable push hop is
+// the receipt the host hands back after HandleConfigRequest returns (the
+// same ruling renderSettingsPayload's marker was placed under). A write that
+// was refused emits no event line: nothing changed, so there is nothing to
+// reload.
+const ConfigReloadEventMarker = "wisp-config-reload:"
+
+// configReloadEvent is the reload event's wire shape: what actually changed
+// on disk (the guarded merge writer's own key paths), the effective tier, and
+// the top-level sections those key paths live in - the page's badge input,
+// derived from the write result and never from a guess.
+type configReloadEvent struct {
+	Event    string   `json:"event"`
+	Tier     string   `json:"tier"`
+	Written  []string `json:"written"`
+	Sections []string `json:"sections"`
+}
+
+// renderReloadEvent renders the machine half of an accepted write: one line
+// beginning with ConfigReloadEventMarker. Written is the write result's own
+// key-path list (may be empty when the file already held the value - the
+// event still fires, with an empty list, because the page asked and the leg
+// answered); sections are the distinct top-level segments of those paths,
+// sorted, never null.
+func renderReloadEvent(r SettingWriteResult) string {
+	sections := []string{}
+	seen := map[string]bool{}
+	for _, k := range r.Written {
+		seg := k
+		if i := strings.IndexByte(k, '.'); i > 0 {
+			seg = k[:i]
+		}
+		if !seen[seg] {
+			seen[seg] = true
+			sections = append(sections, seg)
+		}
+	}
+	sort.Strings(sections)
+	ev := configReloadEvent{
+		Event:    "config.reload",
+		Tier:     string(r.Tier),
+		Written:  append([]string(nil), r.Written...),
+		Sections: sections,
+	}
+	if ev.Written == nil {
+		ev.Written = []string{}
+	}
+	data, err := json.Marshal(ev)
+	if err != nil {
+		return fmt.Sprintf("%s{\"payloadError\":%q}", ConfigReloadEventMarker, err.Error())
+	}
+	return ConfigReloadEventMarker + string(data)
 }
 
 // knownWritableField asks the rosters, not a copy of them. Since ticket 313
@@ -698,6 +798,12 @@ func renderSettingsPayload(v SettingsView) string {
 		ChatModelKnown  bool              `json:"chatModelKnown"`
 		Providers       []providerPayload `json:"providers"`
 		Voice           voicePayload      `json:"voice"`
+		// Readface wave 1 (2026-11-17): ticket 39 AC#1's full section tree and
+		// AC#4's line-numbered errors, both keyed off the read view. omitempty
+		// keeps the payload's old shape for legs that answered neither: a nil
+		// Sections is "this leg did not read the tree", never an empty tree.
+		Sections   []configSectionPayload `json:"sections,omitempty"`
+		LoadErrors []configErrorPayload   `json:"errors,omitempty"`
 	}{
 		Readable:        v.Readable,
 		Credential:      v.Credential,
@@ -708,6 +814,8 @@ func renderSettingsPayload(v SettingsView) string {
 		ChatProvider:    v.ChatProvider,
 		ChatModel:       v.ChatModel,
 		ChatModelKnown:  v.ChatModelKnown,
+		Sections:        configSectionRowsPayload(v.Sections),
+		LoadErrors:      configLoadErrorsPayload(v.LoadErrors),
 		Voice: voicePayload{
 			CloudASRChain:     v.Voice.CloudASRChain,
 			CloudTTSChain:     v.Voice.CloudTTSChain,
@@ -793,6 +901,45 @@ type providerPayload struct {
 type modelCapsPayload struct {
 	AudioIn  bool `json:"audioIn"`
 	AudioOut bool `json:"audioOut"`
+}
+
+// configSectionPayload is the wire shape of one section-tree row (ticket 39
+// AC#1). Separate from ConfigSectionRow so the view type can grow without
+// silently moving the page's JSON - the same rule every payload family in
+// this file follows.
+type configSectionPayload struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+	Tier  string `json:"tier"`
+}
+
+// configErrorPayload is the wire shape of one load error (ticket 39 AC#4):
+// line = 1-based line, 0 = the problem names no line.
+type configErrorPayload struct {
+	Line    int    `json:"line"`
+	Message string `json:"message"`
+}
+
+func configSectionRowsPayload(rows []ConfigSectionRow) []configSectionPayload {
+	if rows == nil {
+		return nil
+	}
+	out := make([]configSectionPayload, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, configSectionPayload{Key: r.Key, Value: r.Value, Tier: r.Tier})
+	}
+	return out
+}
+
+func configLoadErrorsPayload(rows []ConfigLoadError) []configErrorPayload {
+	if rows == nil {
+		return nil
+	}
+	out := make([]configErrorPayload, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, configErrorPayload{Line: r.Line, Message: r.Message})
+	}
+	return out
 }
 
 type voicePayload struct {

@@ -107,11 +107,14 @@ func cloneParamsMap(in map[string]any) map[string]any {
 
 // panelVerdict is the OUTBOUND FIELD WHITELIST of LiveApprovals (ticket 148
 // Ⓑ, owner direction: name the narrowing as "the fields the panel needs"). The
-// set is not a judgement, it is a census of the one production reader:
-// cmd/wisp/panel_pump.go's liveVerdicts reads exactly six fields off the row's
-// Decision - Tool, Args (through panelArgs), Level, RulesHit, Reason and
-// SessionOverrideBlocked - plus CorrelationID and Position, which travel on the
-// LiveApproval wrapper above and are therefore not Decision fields at all.
+// set is not a judgement, it is a census of the production readers:
+// cmd/wisp/panel_pump.go's liveVerdicts reads Tool, Args (through panelArgs),
+// Level, RulesHit, Reason and SessionOverrideBlocked, and - since readface
+// wave 1 (2026-11-17, ticket 37 AC#5's Go half) - Paths, which the same reader
+// feeds to approval.CardSummary so the panel card can carry the batch's
+// display fields (total / affected dirs / first preview). Plus
+// CorrelationID and Position, which travel on the LiveApproval wrapper and are
+// therefore not Decision fields at all.
 // Everything else a tools.Decision carries stays in the queue:
 //
 //   - Params is NOT on the list, and that is the ticket-146 second-level hole's
@@ -122,17 +125,18 @@ func cloneParamsMap(in map[string]any) map[string]any {
 //     hole closes by exclusion. cloneDecision keeps its one-level Params copy
 //     for Queue.replay, whose returned Decision is consumed in-process by the
 //     approval flow, not rendered by the panel.
-//   - Paths, Capabilities, Blacklist, Refusal, Mode*, the id strings and the
+//   - Capabilities, Blacklist, Refusal, Mode*, the id strings and the
 //     timeouts are likewise not panel payload; the untrusted card projection
 //     (PanelItem, queue.go's viewLocked) builds its own bounded view and never
 //     reads them off this row.
 //
-// The two reference slots the whitelist DOES carry (Args, RulesHit) are copied
-// through the same cloneBacking primitive cloneDecision uses, so an in-place
-// write by a reader still cannot reach the queue's record. The instrument that
-// keeps this list honest is ticket148_panel_whitelist_test.go: it walks
-// tools.Decision by reflection, fails closed on a field nobody classified, and
-// goes red when the whitelist and the census drift apart in either direction.
+// The reference slots the whitelist DOES carry (Args, RulesHit, Paths) are
+// copied through the same cloneBacking primitive cloneDecision uses, so an
+// in-place write by a reader still cannot reach the queue's record. The
+// instrument that keeps this list honest is ticket148_panel_whitelist_test.go:
+// it walks tools.Decision by reflection, fails closed on a field nobody
+// classified, and goes red when the whitelist and the census drift apart in
+// either direction.
 func panelVerdict(d tools.Decision) tools.Decision {
 	return tools.Decision{
 		Tool:                   d.Tool,
@@ -141,6 +145,7 @@ func panelVerdict(d tools.Decision) tools.Decision {
 		RulesHit:               cloneBacking(d.RulesHit),
 		Reason:                 d.Reason,
 		SessionOverrideBlocked: d.SessionOverrideBlocked,
+		Paths:                  cloneBacking(d.Paths),
 	}
 }
 

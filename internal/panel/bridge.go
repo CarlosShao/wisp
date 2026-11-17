@@ -105,6 +105,42 @@ const (
 	// teeth - an entry the page starts carrying goes red, and an unregistered
 	// unmirrored name still goes red exactly as before.
 	MethodCostSummary = "cost.summary"
+	// The privacy routes are readface wave 1 (2026-11-17), ticket 40 AC#1's
+	// Go half: the D35 privacy operations (delete-one / purge-all / export)
+	// finally have an inbound door each, landing on internal/memory's
+	// privacy layer (privacy.go's DeletePrivacyItem / PurgePrivacy /
+	// ExportPrivacy - the layer the ticket names as the only route privacy-
+	// relevant data may travel). Three naming facts, the same ones the
+	// settings pair and cost.summary above record:
+	//
+	//   - The spellings follow the spec's own object vocabulary (SPEC-08's
+	//     privacy page, SPEC-02 §5's list/delete/purge/export verbs); no
+	//     fourth vocabulary is minted here. "delete-one" names the ONE-row
+	//     deletion so it can never be read as "delete everything"; the
+	//     everything-word is "purge", SPEC-02 §5's own.
+	//   - No `panel.` prefix and no word of the grant-boundary instrument's
+	//     verdict vocabulary (approve/grant/allow/permit/ratify/
+	//     authorize/decide/decision/verdict - l2_grant_boundary_test.go's
+	//     grantRouteWords): deleting or exporting the user's own data is not
+	//     an approval decision, and the roster's guard answers these the way
+	//     it answers config.get.
+	//   - Each door is a WRITE against the user's data with a DB-countable
+	//     effect (ticket 40 AC#1: "delete-one/purge/export e2e against live
+	//     DB, counts match"), so each carries its own audit line and its
+	//     receipt names the count. purge is the destructive one; it takes a
+	//     domain selector and purges exactly that domain - never "all of
+	//     them" - because a door whose argument can mean everything deletes
+	//     everything by accident.
+	//
+	// The page literal half is REGISTERED, not dodged: the three names sit in
+	// bridge_test.go's rosterPageGapLedger194 with reasons until the page's
+	// privacy leg spells them in frontend/src/lib/panel.ts (this Go leg does
+	// not touch frontend/), and the closed-roster counts in
+	// inbound_roster_253_test.go moved with them (8 -> 11, unprefixed 4 -> 7)
+	// in the same change - the friction those constants were built to produce.
+	MethodPrivacyDeleteOne = "privacy.delete-one"
+	MethodPrivacyPurge     = "privacy.purge"
+	MethodPrivacyExport    = "privacy.export"
 )
 
 // ErrComposerRequest is every way a composer request can fail to be usable.
@@ -164,6 +200,16 @@ type ComposerRequest struct {
 	// roster's gate exactly like the provider/model selectors are carried by
 	// theirs.
 	ConfigPlugin string `json:"configPlugin,omitempty"`
+	// PrivacyDomain / PrivacyItemID are readface wave 1's privacy selectors
+	// (ticket 40 AC#1's three doors): the D35 domain word ("profile" |
+	// "memory" | "task_log" | "tool_call" | "artifacts" - the vocabulary
+	// internal/memory's privacy layer owns and the leg validates against) and
+	// the item id a delete-one addresses. Both are selector-shaped values,
+	// never key paths, the same class as the settings selectors above; the
+	// export and purge doors take the domain only, and a delete-one without
+	// an item id is refused by the handler before the leg is reached.
+	PrivacyDomain string `json:"privacyDomain,omitempty"`
+	PrivacyItemID string `json:"privacyItemId,omitempty"`
 }
 
 // ParseComposerRequest reads one postMessage string. Every refusal is an error
@@ -196,7 +242,7 @@ func knownComposerMethod(m string) bool {
 	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
 	// exact one-line form, so wrapping it would leave real plants replacing
 	// nothing. Appending a constant means extending this line, deliberately.
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport:
 		return true
 	}
 	return false

@@ -75,6 +75,19 @@ import (
 	"github.com/CarlosShao/wisp/internal/streamkey"
 )
 
+// NativeBatchView is one verdict's batch display fields as the host read them
+// off approval.CardSummary (internal/agent/approval): total, affected dirs,
+// the first preview rows, the deferred remainder and the summary sentence.
+// It is a copy of what the card-summary function computed - never a
+// re-derivation here - and nil on every card that is not about a batch.
+type NativeBatchView struct {
+	Total        int
+	AffectedDirs []string
+	First        []string
+	Deferred     int
+	Summary      string
+}
+
 // NativeVerdict is one live approval as the host reads it off its own queue.
 // Every field is a copy of a verdict internal/risk already reached and
 // internal/agent/approval already admitted; nothing here re-assesses, because a
@@ -96,15 +109,22 @@ type NativeVerdict struct {
 	RulesHit               []risk.RuleID
 	Reason                 string
 	SessionOverrideBlocked bool
+	// Batch is the aggregate-card half (ticket 37 AC#5): the display fields
+	// approval.CardSummary computed over the verdict's own Paths. nil = this
+	// card is not about a batch (too few targets, or the taint rule refuses a
+	// summary - the same rule the gate's own aggregation refuses it with).
+	Batch *NativeBatchView
 }
 
 // CardView renders one live verdict as the card the panel shows, through the
 // same pure half NewApprovalCardView uses (approval.go:72) - which is the point:
 // the card in a pushed snapshot and the card the CLI diagnostic prints are the
 // same function over the same verdict, so they cannot disagree about what L2
-// meant.
+// meant. The batch half (ticket 37 AC#5) rides on top of the pure rendering:
+// the verdict's own fields are the card's, and the batch fields are the copy
+// the host read off approval.CardSummary.
 func (v NativeVerdict) CardView() ApprovalCardView {
-	return CardViewFromDecision(
+	card := CardViewFromDecision(
 		ApprovalSubject{
 			CorrelationID: v.CorrelationID,
 			Tool:          v.Tool,
@@ -118,6 +138,14 @@ func (v NativeVerdict) CardView() ApprovalCardView {
 			SessionOverrideBlocked: v.SessionOverrideBlocked,
 		},
 	)
+	if b := v.Batch; b != nil {
+		card.BatchTotal = b.Total
+		card.BatchDirs = append([]string(nil), b.AffectedDirs...)
+		card.BatchFirst = append([]string(nil), b.First...)
+		card.BatchDeferred = b.Deferred
+		card.BatchSummary = b.Summary
+	}
+	return card
 }
 
 // L1WindowWait is one confirmation window the host's gate reports as open right

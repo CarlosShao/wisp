@@ -136,6 +136,16 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 			// 票 452 AC#2: the capability half, from the build shape.
 			AecBuildAvailable: &aecBuildAvailable,
 		},
+		// Readface wave 1 (2026-11-17), ticket 39 AC#1/AC#4: the FULL D36
+		// section tree (config.SectionRows - the registry's own tier words)
+		// and the disk file's structured load errors (the Manager's own
+		// read face, unknown keys / wrong types with their 1-based line).
+		// The tree comes off the config object this read already made; the
+		// errors re-read the FILE, because the Manager keeps running on its
+		// last good config while the disk file is broken - exactly the state
+		// the editor page must see.
+		Sections:   configSectionRows456(cfg),
+		LoadErrors: configLoadErrors456(s.mgr.ParseErrors()),
 	}
 
 	names := make([]string, 0, len(cfg.LLM.Providers))
@@ -566,6 +576,37 @@ func (s *configStore) credentialStatus() panel.CredentialState {
 		return panel.CredentialConfigUnreadable
 	}
 	return view.Credential
+}
+
+// configSectionRows456 maps internal/config's section-tree walk onto the
+// panel's row shape. A copy, not a re-walk: the tree is computed in one place
+// (config.SectionRows) and this leg renders it, so a second walker cannot
+// disagree about what is in the file.
+func configSectionRows456(cfg *config.Config) []panel.ConfigSectionRow {
+	rows := config.SectionRows(cfg)
+	if rows == nil {
+		return nil
+	}
+	out := make([]panel.ConfigSectionRow, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, panel.ConfigSectionRow{Key: r.Key, Value: r.Value, Tier: r.Tier})
+	}
+	return out
+}
+
+// configLoadErrors456 maps internal/config's structured load errors onto the
+// panel's row shape - the same copy-not-rewalk rule as above: the pipeline
+// and its rows are computed in one place (config.ParseErrors*), this leg
+// renders them.
+func configLoadErrors456(rows []config.LoadError) []panel.ConfigLoadError {
+	if rows == nil {
+		return nil
+	}
+	out := make([]panel.ConfigLoadError, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, panel.ConfigLoadError{Line: r.Line, Message: r.Message})
+	}
+	return out
 }
 
 // splitChainValue turns the panel's comma-separated chain value into the element

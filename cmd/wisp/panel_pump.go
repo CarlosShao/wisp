@@ -82,7 +82,7 @@ func nativeVerdictsFromGate(g *approval.Gate) []panel.NativeVerdict {
 	items := g.Queue().LiveApprovals()
 	out := make([]panel.NativeVerdict, 0, len(items))
 	for _, it := range items {
-		out = append(out, panel.NativeVerdict{
+		v := panel.NativeVerdict{
 			CorrelationID:          it.CorrelationID,
 			Tool:                   it.Decision.Tool,
 			Args:                   panelArgs(it.Decision),
@@ -90,7 +90,24 @@ func nativeVerdictsFromGate(g *approval.Gate) []panel.NativeVerdict {
 			RulesHit:               it.Decision.RulesHit,
 			Reason:                 it.Decision.Reason,
 			SessionOverrideBlocked: it.Decision.SessionOverrideBlocked,
-		})
+		}
+		// Readface wave 1 (2026-11-17), ticket 37 AC#5: the aggregate-card
+		// half. approval.CardSummary computes the display fields over the
+		// verdict's own Paths (which panelVerdict now carries, same whitelist
+		// procedure); this mapping copies them, never re-derives them - a
+		// second count here would be a second judge of the batch. nil for a
+		// verdict that is not about a batch (too few targets, or the taint
+		// rule refuses a summary), and the card's JSON stays byte-identical.
+		if s := approval.CardSummary(it.Decision); s != nil {
+			v.Batch = &panel.NativeBatchView{
+				Total:        s.Total,
+				AffectedDirs: s.AffectedDirs,
+				First:        s.First,
+				Deferred:     s.Deferred,
+				Summary:      s.Summary,
+			}
+		}
+		out = append(out, v)
 	}
 	return out
 }

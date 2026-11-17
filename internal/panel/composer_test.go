@@ -232,6 +232,20 @@ func composerTSGapLedger() map[string][]string {
 		"RunErrorRowView":    {"retryable"},
 		"RunSection":         {"running", "usage", "done"},
 		"GitView":            {"uncommitted", "diff"},
+		// Readface wave 1 (2026-11-17), ticket 37 AC#5: the aggregate-card
+		// fields ApprovalCardView now carries (batchTotal/batchDirs/
+		// batchFirst/batchDeferred/batchSummary). The judgement, per the
+		// ledger's own rule: they are REAL wire facts a renderer needs - the
+		// card for a many-target call must say what is in the batch (total,
+		// affected dirs, the first preview rows, the deferred remainder) - and
+		// they are flat omitempty fields so a card that is not about a batch
+		// is byte-identical to its old wire shape. The page half belongs to
+		// the frontend leg (frontend/src/lib/panel.ts is undeclared for them
+		// today and this Go leg must not touch frontend/), so the gap is
+		// REGISTERED here, judged every run both ways: a panel.ts that starts
+		// declaring one of them goes stale-red, Go dropping one goes
+		// dead-red, and any OTHER undeclared key stays unregistered-red.
+		"ApprovalCardView": {"batchTotal", "batchDirs", "batchFirst", "batchDeferred", "batchSummary"},
 	}
 }
 

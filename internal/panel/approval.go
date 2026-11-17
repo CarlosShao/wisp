@@ -56,6 +56,41 @@ type ApprovalCardView struct {
 	// DecidedBy states where the verdict came from. It is always "native" while
 	// the risk gate is native (D33/F2), and the panel has no way to set it.
 	DecidedBy string `json:"decidedBy"`
+
+	// ---- ticket 37 AC#5's aggregate-card fields (readface wave 1, 2026-11-17) ----
+	//
+	// One tool call that touches many targets renders as ONE card with the
+	// batch's display fields on it (D45-1's card shape: total + affected dirs +
+	// the first preview rows + the deferred remainder + the summary sentence).
+	// They are DISPLAY data read off approval.CardSummary (internal/agent/
+	// approval's cardsummary_37.go) by the host's verdict reader; this type
+	// carries them and derives nothing - a card that re-derived a count would
+	// be a second judge of the batch.
+	//
+	// Flat fields, not a nested struct, on purpose: the frontend contract ruler
+	// (TestApprovalCardViewJSONKeysMatchFrontendTypes) needs no new page-side
+	// interface for a shape the page half has not declared yet. Until the
+	// frontend leg declares the five keys, the five names ride the judged-gap
+	// ledger in composer_test.go - the same registration procedure ticket 415
+	// built - so the gap is named every run and closes the moment the page
+	// declares them.
+	//
+	// omitempty keeps a normal card's JSON byte-identical to its pre-field
+	// shape: zero/empty batch fields never reach the wire (a card that is not
+	// about a batch must not wear batch zeros).
+	BatchTotal    int      `json:"batchTotal,omitempty"`
+	BatchDirs     []string `json:"batchDirs,omitempty"`
+	BatchFirst    []string `json:"batchFirst,omitempty"`
+	BatchDeferred int      `json:"batchDeferred,omitempty"`
+	BatchSummary  string   `json:"batchSummary,omitempty"`
+}
+
+// HasBatch reports whether this card carries the aggregate-card fields. A
+// card rendered from a plain decision never does (the decision had too few
+// targets or was tainted), and the page must not render batch chrome from
+// zeros.
+func (v ApprovalCardView) HasBatch() bool {
+	return v.BatchTotal > 0
 }
 
 // NewApprovalCardView runs the real assessor over the subject and renders its

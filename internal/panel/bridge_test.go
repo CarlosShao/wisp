@@ -143,7 +143,19 @@ func TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests(t *testing.T) {
 // 2026-11-17): the page now spells the name in panel.ts, so the stale
 // registration is removed in the same commit, exactly as the two-way audit
 // prescribes.
-var rosterPageGapLedger194 = map[string]string{}
+//
+// Readface wave 1 (2026-11-17) adds the three privacy doors' entries (ticket
+// 40 AC#1's Go half): privacy.delete-one / privacy.purge / privacy.export are
+// answered on the Go side (cmd/wisp lands the handlers over internal/memory's
+// privacy layer) while the page's privacy leg has not landed its panel.ts
+// literals yet, and this Go leg must not touch frontend/. The reasons name
+// the ledger anchor; when the page leg spells the names, the same two-way
+// audit removes these entries in that commit.
+var rosterPageGapLedger194 = map[string]string{
+	"privacy.delete-one": "readface wave 1 (2026-11-17, ticket 40 AC#1): the D35 delete-one door is answered on the Go side; the page literal is pending on the privacy frontend leg and this Go leg must not touch frontend/",
+	"privacy.export":     "readface wave 1 (2026-11-17, ticket 40 AC#1): the D35 export door is answered on the Go side; the page literal is pending on the privacy frontend leg and this Go leg must not touch frontend/",
+	"privacy.purge":      "readface wave 1 (2026-11-17, ticket 40 AC#1): the D35 purge door is answered on the Go side; the page literal is pending on the privacy frontend leg and this Go leg must not touch frontend/",
+}
 
 // TestFrontendComposerRequestsMatchTheEnvelope reads the real frontend source
 // and checks the four method names, the source claim and the requestId are
