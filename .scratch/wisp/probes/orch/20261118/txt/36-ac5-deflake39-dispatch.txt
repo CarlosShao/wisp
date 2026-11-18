@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 36 AC#5：面板隐藏时动画暂停（rAF 计数器实证）＋顺手 deflake 39 整包互扰（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。两件：
+**A. 票 36 AC#5**（`36-result-history-panel.md:47`）：`Hidden-panel animation pause asserted (rAF counters)`。
+1. 找现量：面板是否已有"隐藏即暂停"的机制（`grep -rn "visibilitychange\|hidden\|requestAnimationFrame\|rAF" frontend/src | head -20`）；**没有就做**（主流做法：`document.visibilityState` 变化 ⇒ 停 rAF 循环、恢复再启动）。
+2. **仪器实证**：`frontend/scripts/render-hiddenpause36.tsx`（或 jsdom 级仪器）喂 rAF 计数器：可见态 ⇒ 计数增长；切 hidden ⇒ 计数**停住**（同一 tick 内多次采样相等）；切回 ⇒ 恢复增长。⛔ 用墙钟猜测，用**计数器差值**判。
+3. 牙：①把"隐藏不暂停"变异回去⇒仪器红 ②只停不恢复⇒红（恢复后计数必须再增）。
+**B. deflake 39**：`cmd/wisp/panel_privacy_40_test.go` 或 39 的 e2e（`Test39NativeLooseningCardAcceptedAppliesAndAudits`）在**整包**跑时偶红（audit sink 竞态：dump 里 SECTION-WRITE 还是 `outcome=queued` 就断言了）。修法＝**等审计行确定性到达**（对记录 sink 轮询/通道等待，带明确超时上限），⛔ 放宽断言、⛔ 加 sleep 蒙混。证：该测试定向 `-count=5` 全绿；**再跑一次整包**（载具）确认它在整包里绿（其它既有环境红照实记：33r5／320）。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔UI emoji、⛔墙钟判据。⚠ 别碰他人在飞件（composer-states.html 等 M：只报不动，⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关测试＋整包 ③`go build ./...` rc=0；前端 build/typecheck/lint＋仪器 rc=0。
+写面：`frontend/src/**`、`frontend/scripts/render-*`、`cmd/wisp/**`（唯一）、`internal/panel/**`、`docs/evidence/s1/36-hiddenpause-*`、`docs/evidence/s1/deflake39-*`。
+回话第一行＝commit hash ＋A 牙名/读数 ＋B 定向 5 发/整包读数 ＋d22scan 末行 ＋载具 rc ＋前端 rc。没干完写「卡在哪」。
