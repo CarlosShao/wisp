@@ -892,7 +892,12 @@ export function requestConfigView(): Promise<string | null> {
 
 /** One whitelisted settings write (config.set), value in configValue. The
     credential field must NOT come through here - it has its own function so
-    a value can never be placed on the shared envelope's value key. */
+    a value can never be placed on the shared envelope's value key. baseSHA
+    (ticket 39 AC#4) is the drift handshake's echo: the fingerprint the GUI's
+    freshest config.get answered, sent back on the envelope's configBaseSHA
+    key; undefined leaves the key OFF the envelope byte-identically to the
+    pre-39 shape (a page that never received a fingerprint cannot be accused
+    of holding a stale one). */
 export function requestConfigWrite(write: {
   field: string;
   provider?: string;
@@ -901,6 +906,8 @@ export function requestConfigWrite(write: {
       (rides the envelope's configPlugin key). */
   plugin?: string;
   value?: string;
+  /** Ticket 39 AC#4's drift echo (envelope configBaseSHA). */
+  baseSHA?: string;
 }): Promise<string | null> {
   const envelope: Record<string, unknown> = {
     method: "config.set",
@@ -912,6 +919,7 @@ export function requestConfigWrite(write: {
   if (write.model !== undefined) envelope.configModel = write.model;
   if (write.plugin !== undefined) envelope.configPlugin = write.plugin;
   if (write.value !== undefined) envelope.configValue = write.value;
+  if (write.baseSHA !== undefined && write.baseSHA.trim() !== "") envelope.configBaseSHA = write.baseSHA;
   return requestHostAnswer(envelope);
 }
 

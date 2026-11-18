@@ -315,6 +315,16 @@ type ComposerRequest struct {
 	// roster's gate exactly like the provider/model selectors are carried by
 	// theirs.
 	ConfigPlugin string `json:"configPlugin,omitempty"`
+	// ConfigBaseSHA is ticket 39 AC#4's drift handshake echo: the fingerprint
+	// (internal/config's FileSHA256) the config.get read face handed the
+	// page, sent back verbatim on config.set. It is a page-held fact about
+	// the disk, not a value the page chooses - the write leg compares it
+	// against the file's own hash and refuses with refused-drift on a
+	// mismatch, so a stale form cannot silently replace the external edit it
+	// never saw. Absent = the page has no fingerprint (an older page, a leg
+	// that never answered the half) and the write runs without the drift
+	// check, byte-identically to the pre-39 envelope.
+	ConfigBaseSHA string `json:"configBaseSHA,omitempty"`
 	// PrivacyDomain / PrivacyItemID are readface wave 1's privacy selectors
 	// (ticket 40 AC#1's three doors): the D35 domain word ("profile" |
 	// "memory" | "task_log" | "tool_call" | "artifacts" - the vocabulary

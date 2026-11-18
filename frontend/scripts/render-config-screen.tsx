@@ -566,6 +566,126 @@ check(
   renderToStaticMarkup(<ConfigEditorSection />).includes("正在读取配置文件"),
 );
 
+// ----------------------------------------------------------------------------
+// Ticket 39 AC#4's drift handshake + no-op receipt, instrument half
+// (2026-11-18). The cache, the echo on the envelope, the cache's advance on
+// an accepted write's event, and the two honest sentences (drift refusal,
+// no-op). Each has a bite: lose the echo, the stale fingerprint, the cache
+// advance or the no-op sentence and the matching check goes red.
+// ----------------------------------------------------------------------------
+const baseModule = await import("@/lib/config-base");
+const { rememberConfigBaseSHA, currentConfigBaseSHA } = baseModule;
+const { performConfigWrite } = await import("@/lib/config-actions");
+const { translateWriteReply } = await import("@/lib/config-feedback");
+
+check(
+  "the drift cache must hold and clear the fingerprint it is told (undefined and blank both clear)",
+  (() => {
+    rememberConfigBaseSHA("sha-read-39");
+    const held = currentConfigBaseSHA() === "sha-read-39";
+    rememberConfigBaseSHA("   ");
+    const blankClears = currentConfigBaseSHA() === undefined;
+    rememberConfigBaseSHA(undefined);
+    const undefClears = currentConfigBaseSHA() === undefined;
+    return held && blankClears && undefClears;
+  })(),
+);
+
+// The parse half: the payload's baseSHA rides through, absent stays absent.
+const DRIFT_PAYLOAD = JSON.stringify({
+  readable: true, credential: "none", providers: [], voice: {},
+  baseSHA: "sha-from-read-39",
+});
+const driftParsed = parseConfigReply(`读面 prose\nwisp-config-view:${DRIFT_PAYLOAD}`);
+check(
+  "config.get's parsed view must carry baseSHA through verbatim",
+  driftParsed.kind === "parsed" && driftParsed.view.baseSHA === "sha-from-read-39",
+  JSON.stringify(driftParsed.kind === "parsed" ? driftParsed.view.baseSHA : driftParsed.kind),
+);
+const noDriftPayload = JSON.stringify({ readable: true, credential: "none", providers: [], voice: {} });
+const noDriftParsed = parseConfigReply(`读面 prose\nwisp-config-view:${noDriftPayload}`);
+check(
+  "a payload without baseSHA must parse as NO fingerprint held (undefined), never a fabricated hash",
+  noDriftParsed.kind === "parsed" && noDriftParsed.view.baseSHA === undefined,
+);
+
+// The event half: an accepted write's event carries the post-write
+// fingerprint, and an event without one stays undefined.
+const DRIFT_EVENT_REPLY =
+  '设置已写入。\nwisp-config-reload:{"event":"config.reload","tier":"restart","written":["ball.size"],"sections":["ball"],"baseSHA":"sha-post-write-39"}';
+const driftEv = parseConfigReloadEvent(DRIFT_EVENT_REPLY);
+check(
+  "an accepted write's event must carry the post-write fingerprint through",
+  driftEv !== null && driftEv.baseSHA === "sha-post-write-39",
+  JSON.stringify(driftEv),
+);
+const plainEv = parseConfigReloadEvent(EVENT_REPLY);
+check(
+  "an event without baseSHA must leave the fingerprint undefined (the cache stays where its read put it)",
+  plainEv !== null && plainEv.baseSHA === undefined,
+);
+
+// The cache advance: an accepted write's event moves the cache FIRST, a
+// refusal never moves it.
+rememberConfigBaseSHA("sha-stale-39");
+check(
+  "an accepted write's event must advance the drift cache to the post-write fingerprint",
+  notifyConfigReloadListeners(DRIFT_EVENT_REPLY) && currentConfigBaseSHA() === "sha-post-write-39",
+);
+rememberConfigBaseSHA("sha-stale-39");
+check(
+  "a refused reply must never move the drift cache (the refusal IS the stale view)",
+  !notifyConfigReloadListeners("panel: 配置字段不在可写名册内") && currentConfigBaseSHA() === "sha-stale-39",
+);
+rememberConfigBaseSHA(undefined);
+
+// The envelope half: a fake host door captures the config.set envelope, so
+// the instrument can judge what the write helpers actually put on the wire.
+type capturedEnvelope39 = Record<string, unknown>;
+let captured: capturedEnvelope39 | null = null;
+(globalThis as unknown as { window?: unknown }).window = {
+  wispDispatch: (raw: string) => {
+    captured = JSON.parse(raw) as capturedEnvelope39;
+    return '设置已写入。 实际落盘的键路径：ball.size。 这一项要重启进程并重新运行才算用上。';
+  },
+};
+rememberConfigBaseSHA("sha-from-read-39");
+await performConfigWrite({ field: "ball_size", value: "90" });
+check(
+  "performConfigWrite must echo the held fingerprint on the envelope's configBaseSHA key",
+  captured !== null && captured.configBaseSHA === "sha-from-read-39" && captured.configField === "ball_size",
+  JSON.stringify(captured),
+);
+rememberConfigBaseSHA(undefined);
+captured = null;
+await performConfigWrite({ field: "ball_size", value: "91" });
+check(
+  "with no fingerprint held the envelope must carry NO configBaseSHA key (the pre-39 shape, byte-identical)",
+  captured !== null && !("configBaseSHA" in captured),
+  JSON.stringify(captured),
+);
+(globalThis as unknown as { window?: unknown }).window = undefined;
+
+// The two honest sentences: the drift refusal and the no-op receipt.
+const DRIFT_REFUSAL_REPLY =
+  '面板请求被拒绝 [config.set rid-drift-39]：配置这一步出了问题，先看下面这句具体原因：' +
+  'config: refused-drift：盘上已变——config.toml 在这次读取之后又被改过（外部编辑或另一处写入），' +
+  '这次保存拿的是旧视图，拒绝静默覆盖：一个键都没写。请重读配置确认盘上现值后再保存。';
+const driftFeedback = translateWriteReply(DRIFT_REFUSAL_REPLY);
+check(
+  "the drift refusal must render the one line that says the disk moved (never a generic 保存失败)",
+  driftFeedback.tone === "error" && driftFeedback.text.includes("外部修改") && driftFeedback.text.includes("重新") ,
+  JSON.stringify(driftFeedback),
+);
+const noopFeedback = translateWriteReply(
+  "设置已写入。 本次没有任何键路径发生变化（文件里已经是这个值）。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。",
+);
+check(
+  "a no-op receipt must render 没有变化 (never a green 已保存 that reads as if something was written)",
+  noopFeedback.tone === "neutral" && noopFeedback.text.includes("没有变化"),
+  JSON.stringify(noopFeedback),
+);
+
 if (failures.length > 0) {
   for (const f of failures) console.error("render-config: FAIL " + f);
   console.error(`render-config: FAIL, ${failures.length} check(s) failed`);
@@ -574,5 +694,6 @@ if (failures.length > 0) {
 console.error(
   "render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier words, font_size 缺消费引擎 even fed, page-local rows 仅本次会话, theme names SetTheme; pickers/slider/switch/number fields mounted, snapshot values shown, " +
     "no-reader honest states, write rides the settings door, zero emoji); " +
-    "ticket 39 AC#1/AC#4 consume teeth: 18 sections -> 18 tables with verbatim tier badges (hot x12/reload/restart/locked x4, danger tint on locked), prune-a-section removes its table and its stale value, 未登记档位 for an empty tier, errors under their lines with line 0 as （无行号）, reload event parses verbatim and refused writes notify nobody (zero re-reads), every config.set helper fans the event out",
+    "ticket 39 AC#1/AC#4 consume teeth: 18 sections -> 18 tables with verbatim tier badges (hot x12/reload/restart/locked x4, danger tint on locked), prune-a-section removes its table and its stale value, 未登记档位 for an empty tier, errors under their lines with line 0 as （无行号）, reload event parses verbatim and refused writes notify nobody (zero re-reads), every config.set helper fans the event out; " +
+    "ticket 39 AC#4 drift/no-op teeth: the fingerprint cache holds/clears, config.get's baseSHA parses through (absent stays absent), the reload event carries the post-write fingerprint and advances the cache (a refusal never does), config.set's envelope echoes configBaseSHA (absent when none held), the drift refusal renders 盘上已变's own line and the no-op renders 没有变化",
 );

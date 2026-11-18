@@ -20,6 +20,7 @@ import {
   translateWriteReply,
   type Feedback,
 } from "@/lib/config-feedback";
+import { currentConfigBaseSHA, rememberConfigBaseSHA } from "@/lib/config-base";
 import { parseModelsListReply, parseConfigReloadEvent, type ConfigReloadEventView } from "@/lib/config-view";
 import {
   requestConfigWrite,
@@ -35,6 +36,15 @@ export interface ConfigWireWrite {
   /** Ticket 215a's selector: the plugin id a plugin_enabled write addresses. */
   plugin?: string;
   value?: string;
+  /** Ticket 39 AC#4's drift handshake echo: the fingerprint the GUI's
+      freshest config.get answered, sent back on the envelope's configBaseSHA
+      key. The write leg refuses with refused-drift (盘上已变) when the disk
+      moved since that read, so a stale form never silently replaces the
+      external edit it never saw. Absent (undefined) = no fingerprint held
+      (no read yet, or a leg that did not answer the half) - the envelope
+      carries no key and the write runs without the check, byte-identically
+      to the pre-39 shape. */
+  baseSHA?: string;
 }
 
 /** One model-catalog fetch's answer. Failure carries the sentence to show in
@@ -69,19 +79,26 @@ export function onConfigReloadEvent(listener: (event: ConfigReloadEventView) => 
 
 /** Detect the reload event on one write reply and fan it out. False = no
     event line on this reply (a refused write, a non-config route, null) -
-    zero listener runs, zero re-reads. */
+    zero listener runs, zero re-reads. An event that carries the leg's
+    post-write fingerprint (ticket 39 AC#4's baseSHA) advances the drift
+    cache FIRST, so back-to-back saves never trip the drift check against
+    their own predecessor; an event without one leaves the cache where the
+    GUI's last read put it. */
 export function notifyConfigReloadListeners(reply: string | null): boolean {
   const event = parseConfigReloadEvent(reply);
   if (event === null) return false;
+  if (event.baseSHA !== undefined) rememberConfigBaseSHA(event.baseSHA);
   for (const listener of reloadListeners) listener(event);
   return true;
 }
 
-/** One whitelisted write (config.set), answered as the sentence to show. An
+/** One whitelisted write (config.set), answered as the sentence to show. The
+    write carries the drift handshake's echo (baseSHA = the fingerprint the
+    GUI's freshest read answered; absent = no check, the pre-39 shape). An
     accepted write's reload event fans out to the page subscribers BEFORE the
     receipt is returned; a refused write notifies nobody. */
 export async function performConfigWrite(write: ConfigWireWrite): Promise<Feedback> {
-  const reply = await requestConfigWrite(write);
+  const reply = await requestConfigWrite({ ...write, baseSHA: currentConfigBaseSHA() });
   notifyConfigReloadListeners(reply);
   return translateWriteReply(reply);
 }
@@ -89,9 +106,12 @@ export async function performConfigWrite(write: ConfigWireWrite): Promise<Feedba
 /** The composer row's model switch (ticket 187): one offerable catalog row,
     written as the role_chat_pair field the model page already uses, with the
     receipt keeping the Go receipt's own tier sentence (model writes are
-    restart tier). Same door, same envelope, tiered translation. */
+    restart tier). Same door, same envelope, tiered translation, and the same
+    drift echo as every other write (ticket 39 AC#4). */
 export async function performComposerModelWrite(provider: string, model: string): Promise<Feedback> {
-  const reply = await requestConfigWrite({ field: "role_chat_pair", provider, model });
+  const reply = await requestConfigWrite({
+    field: "role_chat_pair", provider, model, baseSHA: currentConfigBaseSHA(),
+  });
   notifyConfigReloadListeners(reply);
   return translateTieredWriteReply(reply);
 }
@@ -99,9 +119,11 @@ export async function performComposerModelWrite(provider: string, model: string)
 /** The composer row's thinking-tier switch (ticket 187): the value is one of
     the snapshot's own thinkingLevels verbatim - never a fourth word invented
     here - and the receipt keeps the next-task tier sentence the host stamps
-    on this field. */
+    on this field. Same drift echo (ticket 39 AC#4). */
 export async function performComposerThinkingWrite(level: string): Promise<Feedback> {
-  const reply = await requestConfigWrite({ field: "role_chat_thinking", value: level });
+  const reply = await requestConfigWrite({
+    field: "role_chat_thinking", value: level, baseSHA: currentConfigBaseSHA(),
+  });
   notifyConfigReloadListeners(reply);
   return translateTieredWriteReply(reply);
 }
@@ -110,9 +132,13 @@ export async function performComposerThinkingWrite(level: string): Promise<Feedb
     plugin id, written as the plugin_enabled field through the same settings
     door. The receipt keeps the host's own tier sentence and its honest note
     (配置层已生效；引擎未接线；面板侧只能关不能开) - nothing here is optimistic,
-    the row's state is the NEXT snapshot's, exactly like every other write. */
+    the row's state is the NEXT snapshot's, exactly like every other write.
+    Same drift echo (ticket 39 AC#4). */
 export async function performPluginToggleWrite(id: string, on: boolean): Promise<Feedback> {
-  const reply = await requestConfigWrite({ field: "plugin_enabled", plugin: id, value: on ? "true" : "false" });
+  const reply = await requestConfigWrite({
+    field: "plugin_enabled", plugin: id, value: on ? "true" : "false",
+    baseSHA: currentConfigBaseSHA(),
+  });
   notifyConfigReloadListeners(reply);
   return translateTieredWriteReply(reply);
 }

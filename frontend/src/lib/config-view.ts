@@ -66,6 +66,12 @@
                     (internal/panel/config_handlers.go:579); a refused write
                     carries none - the editor page listens for exactly this
                     line and re-reads on it.
+      baseSHA        ticket 39 AC#4's drift handshake read half: the disk
+                     file's sha256 at THIS read (absent = the leg did not
+                     answer - never a fabricated hash). The write helpers
+                     echo it back on config.set's configBaseSHA key; a stale
+                     echo is refused with refused-drift (盘上已变) before
+                     anything is written.
 
    THE HOOK. useConfigView() sends one config.get on mount and exposes reload()
    for after a write: every accepted write re-reads rather than patching a
@@ -77,6 +83,7 @@
    ============================================================================ */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { rememberConfigBaseSHA } from "@/lib/config-base";
 import { requestConfigView } from "@/lib/panel";
 
 /** One declared provider row, as the wire carries it. */
@@ -162,6 +169,13 @@ export interface ConfigView {
       read. Undefined = the key was absent = the file loads clean or the leg
       did not check; a non-empty list is the breakage, verbatim rows. */
   errors?: ConfigLoadErrorView[];
+  /** Ticket 39 AC#4's drift handshake, read half: the disk file's sha256 at
+      THIS read (internal/config FileSHA256 through the payload's baseSHA
+      key). The page echoes it back on config.set (envelope configBaseSHA);
+      the write leg refuses with refused-drift when the disk has moved since.
+      Undefined = the key was ABSENT = this leg did not answer the half - the
+      write then runs without the check, never against a fabricated hash. */
+  baseSHA?: string;
 }
 
 /** One leaf of the config tree, as configSectionPayload carries it
@@ -201,12 +215,15 @@ export const CONFIG_RELOAD_MARKER = "wisp-config-reload:";
     (internal/panel/config_handlers.go:585-590): what actually changed on disk
     (the guarded merge writer's own key paths), the effective tier, and the
     distinct top-level sections those paths live in - all Go's own words,
-    nothing derived here. */
+    nothing derived here. baseSHA (ticket 39 AC#4) is the leg's post-write
+    fingerprint; undefined = the key was absent (the leg did not answer) and
+    the cache stays where its last read put it. */
 export interface ConfigReloadEventView {
   event: string;
   tier: string;
   written: string[];
   sections: string[];
+  baseSHA?: string;
 }
 
 /** Parse one config.set reply for the reload event. Answers null when the
@@ -235,11 +252,15 @@ export function parseConfigReloadEvent(reply: string | null): ConfigReloadEventV
   if (!ev.written.every((k) => typeof k === "string") || !ev.sections.every((k) => typeof k === "string")) {
     return null;
   }
+  // The post-write fingerprint (ticket 39 AC#4): absent on the wire = the leg
+  // did not answer - the cache stays put, never guessed forward.
+  const baseSHA = typeof ev.baseSHA === "string" && ev.baseSHA.trim() !== "" ? ev.baseSHA : undefined;
   return {
     event: ev.event,
     tier: ev.tier,
     written: ev.written as string[],
     sections: ev.sections as string[],
+    ...(baseSHA !== undefined ? { baseSHA } : {}),
   };
 }
 
@@ -342,6 +363,11 @@ export function useConfigView(): {
       }
       const parsed = parseConfigReply(reply);
       if (parsed.kind === "parsed") {
+        // Ticket 39 AC#4: this read just became the GUI's freshest view of
+        // the disk - remember its fingerprint (undefined clears the cache
+        // when this leg did not answer the half). The write helpers echo it
+        // back on config.set.
+        rememberConfigBaseSHA(parsed.view.baseSHA);
         setState({ phase: "ready", view: parsed.view, prose: parsed.prose, raw: reply });
       } else if (parsed.kind === "payload-error") {
         setState({ phase: "payload-error", message: parsed.message, raw: reply });

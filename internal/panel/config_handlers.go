@@ -210,6 +210,15 @@ type SettingsView struct {
 	// face is how the editor page sees the breakage without waiting for a
 	// reload.
 	LoadErrors []ConfigLoadError
+
+	// BaseSHA is the disk file's sha256 as it stood at THIS read (ticket 39
+	// AC#4's third half, internal/config/fingerprint_39.go FileSHA256): the
+	// page echoes it back on config.set and the write leg refuses with
+	// refused-drift when the bytes have moved since. "" = the leg did not
+	// answer (no file, unreadable, or an older leg) - a page that never
+	// received a fingerprint cannot be asked to hold one, so absent means
+	// "no drift check this write", never "the file is verified current".
+	BaseSHA string
 }
 
 // ConfigSectionRow is one leaf of the config tree as the wire carries it.
@@ -384,6 +393,13 @@ type SettingWriteResult struct {
 	Err        error
 	Note       string
 	Credential CredentialSummary
+	// BaseSHAAfter is the disk file's sha256 as it stands AFTER this accepted
+	// write (ticket 39 AC#4): the reload event carries it so the page's
+	// fingerprint cache advances across back-to-back saves without waiting
+	// for the next read. "" = the leg did not answer (older leg, or the write
+	// never landed) - the event's key stays off the wire and the page's cache
+	// stays where its last read put it.
+	BaseSHAAfter string
 }
 
 // CredentialSummary is the credential write's status half: the reference the
@@ -422,8 +438,17 @@ type SettingWrite struct {
 	// addresses, verbatim from the envelope's configPlugin. Empty for every
 	// other field - the gate refuses a plugin-shaped field without one
 	// before the leg is reached.
+	// Plugin    string
 	Plugin    string
 	Value     string
+	// BaseSHA is the page's echo of the fingerprint the read face handed it
+	// (SettingsView.BaseSHA, ticket 39 AC#4's drift handshake). Empty = the
+	// page has no fingerprint to answer for (an older page, a leg that never
+	// answered the fingerprint half) and the write runs without the drift
+	// check - the pre-39 shape, unchanged. Non-empty and stale = refused
+	// before anything is written (refused-drift): a stale form must not
+	// silently replace the external edit it never saw.
+	BaseSHA   string
 	RequestID string
 	Actor     string
 }
@@ -541,6 +566,10 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 	}
 	res, err := h.Store.ApplySetting(ctx, SettingWrite{
 		Field: field, Provider: provider, Model: model, Plugin: pluginID, Value: value,
+		// The page's fingerprint echo rides through untouched: the leg that
+		// owns the file is the one that can judge it (cmd/wisp's configStore),
+		// and this gate never guesses whether the disk moved.
+		BaseSHA:   strings.TrimSpace(req.ConfigBaseSHA),
 		RequestID: req.RequestID, Actor: h.actor(),
 	})
 	if err != nil {
@@ -587,6 +616,12 @@ type configReloadEvent struct {
 	Tier     string   `json:"tier"`
 	Written  []string `json:"written"`
 	Sections []string `json:"sections"`
+	// BaseSHAAfter is the write result's own post-write fingerprint (ticket
+	// 39 AC#4): the page's cache advances to it so the NEXT save's drift
+	// check judges the file as this write left it, not as some earlier read
+	// saw it. Absent (omitempty) = the leg did not answer - the cache stays
+	// where the page's last read put it, never guessed forward.
+	BaseSHAAfter string `json:"baseSHA,omitempty"`
 }
 
 // renderReloadEvent renders the machine half of an accepted write: one line
@@ -610,10 +645,11 @@ func renderReloadEvent(r SettingWriteResult) string {
 	}
 	sort.Strings(sections)
 	ev := configReloadEvent{
-		Event:    "config.reload",
-		Tier:     string(r.Tier),
-		Written:  append([]string(nil), r.Written...),
-		Sections: sections,
+		Event:        "config.reload",
+		Tier:         string(r.Tier),
+		Written:      append([]string(nil), r.Written...),
+		Sections:     sections,
+		BaseSHAAfter: r.BaseSHAAfter,
 	}
 	if ev.Written == nil {
 		ev.Written = []string{}
@@ -804,6 +840,11 @@ func renderSettingsPayload(v SettingsView) string {
 		// Sections is "this leg did not read the tree", never an empty tree.
 		Sections   []configSectionPayload `json:"sections,omitempty"`
 		LoadErrors []configErrorPayload   `json:"errors,omitempty"`
+		// Ticket 39 AC#4's drift handshake read half: the disk file's sha256
+		// at THIS read. omitempty keeps the key off the wire for a leg that
+		// did not answer ("" = no fingerprint to echo back), the same
+		// absent = "this leg did not answer" class sections/errors use.
+		BaseSHA string `json:"baseSHA,omitempty"`
 	}{
 		Readable:        v.Readable,
 		Credential:      v.Credential,
@@ -816,6 +857,7 @@ func renderSettingsPayload(v SettingsView) string {
 		ChatModelKnown:  v.ChatModelKnown,
 		Sections:        configSectionRowsPayload(v.Sections),
 		LoadErrors:      configLoadErrorsPayload(v.LoadErrors),
+		BaseSHA:         v.BaseSHA,
 		Voice: voicePayload{
 			CloudASRChain:     v.Voice.CloudASRChain,
 			CloudTTSChain:     v.Voice.CloudTTSChain,

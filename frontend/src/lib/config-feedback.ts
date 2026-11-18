@@ -90,8 +90,15 @@ export function keyLabel(row: { credentialSet: boolean; credentialError: string 
 
 /** The refusal matcher: sealed sentences, most specific first. Each maps to
     the one line a person can act on. Order matters where two sentences share
-    a word (a model row's "already exists" must not be read as a provider's). */
+    a word (a model row's "already exists" must not be read as a provider's;
+    the drift refusal's 盘上已变 is matched before anything generic could eat
+    it). */
 const REFUSALS: readonly { match: string; text: string }[] = [
+  // Ticket 39 AC#4's drift refusal (cmd/wisp's refused-drift) first: it is
+  // the one refusal that says the DISK moved, and the person must re-read
+  // before saving again - a generic 保存失败 would hide exactly that.
+  { match: "盘上已变", text: "配置文件刚被外部修改过，这次保存没有执行。请重新打开本页读取最新配置后再保存。" },
+  { match: "无法核对盘上是否已变", text: "配置文件现在读不出来，这次保存没有执行。" },
   { match: "没有对应的写入腿", text: "这项暂不支持在界面上保存" },
   { match: "不是面板 composer 通路的能力入口", text: "暂不支持拉取模型列表" },
   { match: "建目录条目必须点名模型 id", text: "请先填入模型 id" },
@@ -126,11 +133,16 @@ function refusalFeedback(reply: string): Feedback {
 }
 
 /** Translate one write reply into the single sentence shown to the user.
-    `null` means no host answered at all. */
+    `null` means no host answered at all. A no-op save (the file already
+    carries the value, ticket 39 AC#4) is its own answer - "没有变化", not a
+    green 已保存 that reads as if something was written. */
 export function translateWriteReply(reply: string | null): Feedback {
   if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
   if (reply.includes("被拒绝")) {
     return refusalFeedback(reply);
+  }
+  if (reply.includes("本次没有任何键路径发生变化")) {
+    return { tone: "neutral", text: "没有变化：文件里已经是这个值。" };
   }
   if (reply.includes("密钥已录入")) {
     return { tone: "ok", text: restartTier(reply) ? "密钥已保存，重启后生效" : "密钥已保存" };
@@ -156,6 +168,9 @@ export function translateTieredWriteReply(reply: string | null): Feedback {
   if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
   if (reply.includes("被拒绝")) {
     return refusalFeedback(reply);
+  }
+  if (reply.includes("本次没有任何键路径发生变化")) {
+    return { tone: "neutral", text: "没有变化：文件里已经是这个值。" };
   }
   if (reply.includes("已写入")) {
     if (reply.includes("下一次任务")) return { tone: "ok", text: "已保存，下一次任务开始时生效" };

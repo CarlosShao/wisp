@@ -42,6 +42,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/audio/aec"
 	"github.com/CarlosShao/wisp/internal/config"
+	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/secret"
 )
@@ -146,6 +147,14 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 		// the editor page must see.
 		Sections:   configSectionRows456(cfg),
 		LoadErrors: configLoadErrors456(s.mgr.ParseErrors()),
+	}
+	// Ticket 39 AC#4's drift handshake, read half: the page needs the disk
+	// file's fingerprint to echo back on config.set. An unreadable file
+	// leaves it "" - the key stays off the wire (absent = this leg did not
+	// answer), and a page that never got a fingerprint cannot be accused of
+	// holding a stale one.
+	if sha, shaErr := s.mgr.FileSHA256(); shaErr == nil {
+		view.BaseSHA = sha
 	}
 
 	names := make([]string, 0, len(cfg.LLM.Providers))
@@ -261,6 +270,28 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied}, fmt.Errorf("设置写入腿没有配置对象，%q 未落盘", w.Field)
 	}
 	res := panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied}
+	// Ticket 39 AC#4's drift handshake, write half: a page that holds a
+	// fingerprint from its last config.get must not silently overwrite what
+	// changed behind it. The echo is compared against the file's OWN hash
+	// right now; a mismatch refuses with refused-drift before anything is
+	// written, and the page is told the disk moved (it re-reads and decides
+	// again). Empty echo = the page has no fingerprint to answer for (an
+	// older page, a leg that never answered the read half) and the write
+	// runs without this check - the pre-39 shape, unchanged.
+	if base := strings.TrimSpace(w.BaseSHA); base != "" {
+		now, shaErr := s.mgr.FileSHA256()
+		switch {
+		case shaErr != nil:
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				observe.New(observe.ClassConfig,
+					"config: refused-drift：config.toml 现在读不出来，无法核对盘上是否已变；这次保存一个键都没写。请先确认文件可读。")
+		case now != base:
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				observe.New(observe.ClassConfig,
+					"config: refused-drift：盘上已变——config.toml 在这次读取之后又被改过（外部编辑或另一处写入），"+
+						"这次保存拿的是旧视图，拒绝静默覆盖：一个键都没写。请重读配置确认盘上现值后再保存。")
+		}
+	}
 	var (
 		written []string
 		err     error
@@ -472,6 +503,14 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied}, err
 	}
 	res.Written = written
+	// Ticket 39 AC#4: the reload event advances the page's fingerprint to
+	// the file as THIS write left it, so back-to-back saves never trip the
+	// drift check against their own predecessor. A hash failure here stays
+	// silent at the wire level ("" = absent key) - the page's next read
+	// refreshes the cache instead.
+	if sha, shaErr := s.mgr.FileSHA256(); shaErr == nil {
+		res.BaseSHAAfter = sha
+	}
 	res.Tier = panel.EffectiveRestart
 	if w.Field == panel.FieldPluginEnabled {
 		// 票 215a 的档位与真话：配置层立即生效（[plugins] 锁定段的收紧在
