@@ -35,6 +35,7 @@
     "render:discovery38": "vite build --ssr scripts/render-discovery38.tsx --outDir node_modules/.tmp/discovery38render --logLevel warn && node node_modules/.tmp/discovery38render/render-discovery38.js",
     "render:forcechip38": "vite build --ssr scripts/render-forcechip38.tsx --outDir node_modules/.tmp/forcechip38render --logLevel warn && node node_modules/.tmp/forcechip38render/render-forcechip38.js",
     "render:cfggolden": "vite build --ssr scripts/render-cfg-golden.tsx --outDir node_modules/.tmp/cfggoldenrender --logLevel warn && node node_modules/.tmp/cfggoldenrender/render-cfg-golden.js",
+    "render:panelfont441": "vite build --ssr scripts/render-panel-font-441.tsx --outDir node_modules/.tmp/panelfont441render --logLevel warn && node node_modules/.tmp/panelfont441render/render-panel-font-441.js",
     "render:stream20036": "vite build --ssr scripts/render-stream200-36.tsx --outDir node_modules/.tmp/stream200render --logLevel warn && node node_modules/.tmp/stream200render/render-stream200-36.js"
   },
   "dependencies": {

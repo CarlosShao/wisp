@@ -36,12 +36,17 @@
      - readerless render: every config row's badge is 未接线, the four wave
        rows say 等快照, NO tier word (能改 / 立即/重启 / 关窗/重启生效 /
        缺消费引擎) appears anywhere, the two page-local rows badge 仅本次
-       会话 (never 即时), and the theme row NAMES its missing engine
-       (SetTheme has no caller, the ball assembly root fills no Theme);
-     - fed render: the badges carry the tier words, and panel.font_size
-       still says 缺消费引擎 even with its section on the pump - the write
-       lands, but no engine consumes the key (census: Panel.FontSize has
-       zero consumers outside internal/config).
+       会话 (never 即时), and the theme row's dormant reason names what
+       landed (ticket 441 AC#2: the ball side now calls SetTheme) and what
+       still waits (the panel page's theme follow);
+     - fed render (TICKET 441 RE-ADJUDICATION, 2026-11-18): the badges carry
+       the tier words for every fed row - panel.font_size now shows its tier
+       word too, because the page consumes the key (App pins the snapshot's
+       fontSize onto the document root, lib/panel-font.ts; the census
+       缺消费引擎 verdict is retired with the wiring that retired it). The
+       badge's noConsumer branch stays in the screen as the generic
+       mechanism (and in BADGE_WORDS) for the next key that needs it; no
+       row carries it today, so 缺消费引擎 counts ZERO in every render.
 
    The appearance wave's four rows (ball.opacity_idle / ball.click_through /
    panel.width / panel.font_size): the live render with no sections asserts
@@ -181,9 +186,9 @@ check(
   `${(live.match(/等快照/g) ?? []).length} occurrences`,
 );
 check(
-  "the theme row must stay 未接线 and NAME its missing engine (census: SetTheme has no caller, the ball assembly root fills no Theme)",
-  live.includes("主题由原生宿主决定，面板只跟随") &&
-    live.includes("SetTheme 暂无调用者") &&
+  "the theme row must stay 未接线 and name both halves (ticket 441 re-cut: the ball side LANDED - the assembly root reads app.theme and calls SetTheme - while the page-follow engine still waits)",
+  live.includes("球侧已接线") &&
+    live.includes("面板页跟随宿主主题的引擎还没接") &&
     live.includes("未接线"),
 );
 check("the live markup must hold zero emoji", !EMOJI_RE.test(live));
@@ -270,27 +275,30 @@ check(
     waveLive.includes('aria-label="面板字号"') &&
     waveLive.includes('value="12"'),
 );
-// The fed pump's badges: tier words where the engine exists, and the census's
-// 缺消费引擎 verdict on the one key nothing consumes - even with its section
-// on the pump (the write lands; the effect does not, and the badge must say
-// so rather than promise 关窗/重启生效).
+// The fed pump's badges, TICKET 441 RE-ADJUDICATION (2026-11-18): the
+// font-size row carries its tier word again - the page now consumes the key
+// (App pins the snapshot's fontSize onto the document root via
+// lib/panel-font.ts; theme.css's html rule maps it onto the rem base), so
+// showing 缺消费引擎 here would be the stale lie. The reverse direction stays
+// pinned: no row carries consumerMissing today, so the census word counts
+// ZERO even with every section on the pump.
 const fontRowStart = waveLive.indexOf("面板正文字号");
-const fontRow = waveLive.slice(fontRowStart, waveLive.indexOf("缺消费引擎", fontRowStart) + 5);
+const fontRow = waveLive.slice(fontRowStart, waveLive.indexOf("关窗/重启生效", fontRowStart) + 7);
 check(
-  "with every section on the pump the font-size row must still badge 缺消费引擎, never its tier word (census: no engine consumes Panel.FontSize)",
-  fontRow.includes("缺消费引擎") && !fontRow.includes("关窗/重启生效"),
+  "with every section on the pump the font-size row must badge its tier word again (ticket 441: the page consumes the key), never the stale 缺消费引擎",
+  fontRow.includes("关窗/重启生效") && !fontRow.includes("缺消费引擎"),
   fontRow.slice(0, 140),
 );
 check(
-  "the fed pump's badges must be the tier words (能改 x2 + the footer's 能改变权限档位 sentence, 关窗/重启生效 x2, 立即/重启 x1, 缺消费引擎 x1)",
+  "the fed pump's badges must be the tier words (能改 x2 + the footer's 能改变权限档位 sentence, 关窗/重启生效 x3, 立即/重启 x1, 缺消费引擎 x0)",
   (waveLive.match(/能改/g) ?? []).length === 3 &&
-    (waveLive.match(/关窗\/重启生效/g) ?? []).length === 2 &&
+    (waveLive.match(/关窗\/重启生效/g) ?? []).length === 3 &&
     (waveLive.match(/立即\/重启/g) ?? []).length === 1 &&
-    (waveLive.match(/缺消费引擎/g) ?? []).length === 1,
+    (waveLive.match(/缺消费引擎/g) ?? []).length === 0,
   `能改 ${(waveLive.match(/能改/g) ?? []).length}, 关窗/重启生效 ${(waveLive.match(/关窗\/重启生效/g) ?? []).length}, 立即/重启 ${(waveLive.match(/立即\/重启/g) ?? []).length}, 缺消费引擎 ${(waveLive.match(/缺消费引擎/g) ?? []).length}`,
 );
 check(
-  "the fully-fed pump's only 未接线 are the theme row's badge (dormant) and the footer's mention - a fed config row must never badge unwired",
+  "the fed pump's only 未接线 are the theme row's badge (dormant page-follow half) and the footer's mention - a fed config row must never badge unwired",
   (waveLive.match(/未接线/g) ?? []).length === 2,
   `${(waveLive.match(/未接线/g) ?? []).length} occurrences`,
 );
@@ -734,7 +742,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.error(
-  "render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier words, font_size 缺消费引擎 even fed, page-local rows 仅本次会话, theme names SetTheme; pickers/slider/switch/number fields mounted, snapshot values shown, " +
+  "render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier words with font_size included per ticket 441 - the page consumes the key, page-local rows 仅本次会话, theme names its landed ball half and its still-waiting page half; pickers/slider/switch/number fields mounted, snapshot values shown, " +
     "no-reader honest states, write rides the settings door, zero emoji); " +
     "ticket 39 AC#1/AC#4 consume teeth: 18 sections -> 18 tables with verbatim tier badges (hot x12/reload/restart/locked x4, danger tint on locked), prune-a-section removes its table and its stale value, 未登记档位 for an empty tier, errors under their lines with line 0 as （无行号）, reload event parses verbatim and refused writes notify nobody (zero re-reads), every config.set helper fans the event out; " +
     "ticket 39 AC#4 drift/no-op teeth: the fingerprint cache holds/clears, config.get's baseSHA parses through (absent stays absent), the reload event carries the post-write fingerprint and advances the cache (a refusal never does), config.set's envelope echoes configBaseSHA (absent when none held), the drift refusal renders 盘上已变's own line and the no-op renders 没有变化; " +

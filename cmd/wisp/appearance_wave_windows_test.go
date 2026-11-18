@@ -2,6 +2,14 @@
 
 package main
 
+// ★ 票 441 AC#3 归属补名（2026-11-18）：本件是「外观波」四枚无票号孤儿件之一
+// （外观波本体出自 7f3177f93，票池只在 180/437 里被提及、从未有自有票号）。
+// 四枚的归属由票 441 认领：本件（cmd/wisp/appearance_wave_windows_test.go，
+// 文件头具名）＋ internal/panel 的 config_write_wave.go、panel_tuning_wave.go、
+// ball_idle_appearance_wave.go（写面不在本腿，按票面判据走台账具名——
+// .scratch/wisp/issues/README.md 的外观波登记条目逐一列出）。
+// 登记条目＝2026-11-18 追加的那一条；孤儿件状态自此不再是「无名件」。
+
 // The appearance wave's wiring teeth, the 65/413/422 shape: the boot seed
 // reads the two [ball] keys the config screen left locked (ball.opacity_idle,
 // ball.click_through), the settings write route lands all four fields through

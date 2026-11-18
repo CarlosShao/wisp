@@ -320,7 +320,7 @@ var hotRowClaims = map[string]string{
 	// chain is built at all, and [session] warm_timeout_sec (:1329) for the
 	// warm plan. The four hot KEYS below still read from nowhere, so the rows
 	// stay no-reader; only the reader-list half of their verdict text changes.
-	"app.theme": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App.THEME - manager.go's planApp compares and copies it, and no component re-skins from it. The SECTION does have one production reader since 票 43: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it - a reader of a different key, so this row stays no-reader",
+	"app.theme": hotClaimOtherProcess + "已接入（票 441 AC#2 重裁，2026-11-18）：boot 种子 cmd/wisp/ball_theme_441_windows.go:51 [switch c.App.Theme] 读 [app].theme，装配根 cmd/wisp/resident_windows.go 拿它调 ball.SetTheme（ball.New 之前）——light/dark 真换渲染器的 ACTIVE C21 palette（internal/ball/renderer_windows.go 的 pal，牙 TestSetTheme441SwitchesTheActivePalette），auto 与读不了的文件不冒充（Warn 具名，dark 默认原地站着）；种子是每次 boot 一发 LoadFile、不读 live Manager，所以已保存的主题随下一次进程启动落到球配色，hot 档的生效节奏如实答 other-process。本行 2026-11-16 的「扫描零命中」判词随这条接线作废——扫描（TestTicket255RosterStillMatchesTheActualReadSites）当场抓到了新读点，这正是它存在的原因。The SECTION's other production reader answers a different key: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it",
 	// 2026-11-05 re-adjudication (ticket 98's C2): ticket 61's cloud catalog
 	// added a production READ SITE for voice.tts.speed, so the old 扫描零命中
 	// wording is no longer literally true - but it did not add a reader that
@@ -408,7 +408,7 @@ var sectionReadSites = map[string][]string{
 	// importing internal/config or naming config.toml would be the dependency edge
 	// AC#4 forbids (TestTicket255HostStillDoesNotParseConfigItself checks both).
 	"Panel": {"cmd/wisp/panel_resident_windows.go"},
-	"App":   {"cmd/wisp/autostart_windows.go", "cmd/wisp/single_instance_boot_180p.go"},
+	"App":   {"cmd/wisp/autostart_windows.go", "cmd/wisp/ball_theme_441_windows.go", "cmd/wisp/single_instance_boot_180p.go"},
 	// 票 43: the resident boot's autostart sync is [app]'s first production
 	// reader outside internal/config - it reads App.Autostart (restart tier,
 	// ticket 233) once per boot and makes HKCU's Run key agree with it. The

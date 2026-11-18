@@ -74,6 +74,7 @@ import {
   sendMessage,
 } from "@/lib/panel";
 import { TIER_NAMES as libTierNames } from "@/lib/tier-names";
+import { applyPanelFontSize } from "@/lib/panel-font";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
@@ -178,6 +179,15 @@ function gitChipView(git: GitView): {
 
 export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) {
   const composer = snapshot.composer ?? EMPTY_COMPOSER;
+
+  // 票 441 AC#1：快照的 panelFontSize 一到就钉上文档根（lib/panel-font 的
+  // applyPanelFontSize）——census-unwired 2026-11-16 点名的缺口正是这里：
+  // 四跳全通但没有一行把 Panel.FontSize 接到页面字号。装配点与读数见
+  // lib/panel-font.ts 的头注释。缺节/非正撤回出厂默认，接线不改默认观感；
+  // 每次快照推送幂等重跑，改值在下一推生效（与 resync-on-show 的节奏一致）。
+  useEffect(() => {
+    applyPanelFontSize(snapshot.panelFontSize?.fontSize ?? null);
+  }, [snapshot.panelFontSize]);
 
   // ONE state object. The gate pins the count, and the reason is in the
   // render-nav header: a gate derived from what it checks cannot catch that

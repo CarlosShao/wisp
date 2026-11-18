@@ -100,6 +100,19 @@
   --stop: var(--danger);
 }
 
+/* ---------- the panel body font size (ticket 441 AC#1) ----------------------
+   panel.font_size 的页面消费（lib/panel-font.ts 在每次快照推送时把快照的
+   fontSize 写到文档根；缺节/非正撤回，这里声明的那份默认原地生效）。
+   映射规则：正文字号就是 text-xs（0.75rem）实排的那个 px——面板正文今天
+   de-facto 的 12px 出自它，所以 rem 基 = 配置值 * 4/3（12 * 4/3 = 16px
+   ＝浏览器默认 html 基准）：出厂默认 12 与接线前排字逐位相同，只有写入
+   的值才移动整页 rem 尺度。判读数＝文档根的 font-size 计算值
+   （12→16px、15→20px）＋ data-wisp-font-size 属性。 */
+html {
+  --wisp-panel-font-size: 12px;
+  font-size: calc(var(--wisp-panel-font-size) * 4 / 3);
+}
+
 /* ---------- the host document ----------------------------------------------
    Normally <body> is a plain block and every app root carries h-screen, so the
    product path is exactly as it was. The attribute is set by main.tsx for the

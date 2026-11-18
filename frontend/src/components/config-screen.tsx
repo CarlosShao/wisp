@@ -100,17 +100,25 @@ the opacity row  WORKS. The frost is a CSS custom property in this
                        directions.
 
      panel.font_size  writes, reads and snapshots ride the four live hops,
-                       but NO engine consumes the key (Panel.FontSize has
-                       zero hits outside internal/config;
-                       panel_host_windows.go 0 hits, census 2026-11-16), so
-                       even with the section on the pump the badge says
-                       缺消费引擎 instead of promising a tier word.
+                       AND the page now consumes the key (ticket 441 AC#1,
+                       2026-11-18): App pins the snapshot's fontSize onto the
+                       document root (lib/panel-font.ts) and theme.css's html
+                       rule maps it onto the rem base. The effect lands on
+                       the next snapshot push (resync-on-show) - the same
+                       cadence the write receipt's Note states - so the
+                       badge shows its tier word again; the census
+                       缺消费引擎 verdict is retired with the wiring that
+                       retired it.
 
-     app.theme        stays 未接线 and NAMES the missing engine: the ball
-                       side's SetTheme (renderer_windows.go:106) has no
-                       caller and the ball assembly root does not fill
-                       Theme. Saying so is the census rule; showing a
-                       live-looking theme row would be the lie.
+     app.theme        the BALL side is now wired too (ticket 441 AC#2):
+                       the assembly root reads [app].theme and calls
+                       ball.SetTheme before ball.New (resident_windows.go),
+                       so the orb's C21 palette follows the config. The
+                       PAGE-side follow is still dormant and still says so:
+                       the panel document follows whatever theme the native
+                       host hands it, and that engine is not wired - the
+                       row keeps its 未接线 badge, now naming what landed
+                       and what still waits.
 
    Spelling note that is load-bearing: the dotted key labels are stored in two
    halves (group / name) and joined only at render time, because
@@ -245,7 +253,7 @@ const APPEARANCE_ROWS: readonly Row[] = [
     source: {
       kind: "dormant",
       reason:
-        "主题由原生宿主决定，面板只跟随；宿主侧的消费引擎还没接线（SetTheme 暂无调用者，球侧装配根也不填 Theme）",
+        "球侧已接线（票 441：装配根现读 app.theme 调 SetTheme，悬浮球配色跟随配置）；面板页跟随宿主主题的引擎还没接——本页主题由原生宿主下发，那一半还没接上",
     },
   },
   {
@@ -263,14 +271,12 @@ const APPEARANCE_ROWS: readonly Row[] = [
   {
     group: "panel",
     name: "font_size",
-    desc: "面板正文字号（px）——写入会落盘，但还没有引擎消费这个键，暂不生效",
+    desc: "面板正文字号（px）——下一次面板显示（下一推快照）起按新值生效",
     source: {
       kind: "config",
       field: "panel_font_size",
       section: "panelFontSize",
       tier: "关窗/重启生效",
-      consumerMissing:
-        "原生宿主未读 Panel.FontSize（panel_host_windows.go 0 命中，census-unwired 2026-11-16）",
     },
   },
   {
@@ -383,7 +389,7 @@ function NumberWriteField({
 
 export function ConfigScreen({
   heading = "设置",
-  lede = "外观一节九行键：两行只改本页自己的样式（不落盘，关掉面板即回默认），六行走设置写入通路落盘，主题一行等原生宿主的消费引擎。",
+  lede = "外观一节九行键：两行只改本页自己的样式（不落盘，关掉面板即回默认），六行走设置写入通路落盘并由页面消费，主题一行的球侧已接线、面板页跟随那一半仍等原生宿主。",
   ballStyle = null,
   ballSize = null,
   ballOpacityIdle = null,

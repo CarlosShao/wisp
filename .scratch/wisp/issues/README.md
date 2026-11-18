@@ -37,6 +37,8 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
    其中"热键随配置重注册"的标的 `RebindHotkeys` 实为全仓零调用者的死代码；
    补裁另有 2 框 FAIL、2 框 PARTIAL。旧报告不追溯改写，但 13 张已 done 票的未决框由票 64 等消化。）
 7. **⛔ 前端（`frontend/**`）由 owner 另行指派的 agent 负责，本编队一律不领、不写、不"顺手修一角"**
+   ⚠ **2026-11-16 机主令作废本条**（全局 AGENTS.md 铁律 4，原话「没有外部前端会话……前端也是你全部接受」）：
+   `frontend/**` 与 `design/**` 由本 agent 全权负责；下面 2026-09-23 的原文**只留档，不再执行**。
    （2026-09-23 09:22 owner 原话：「我是想让别的 agent 干前端部分的」；台账 `A102`）。
    判据**按目录不按票号**：动手前先把要写的文件列出来，**只要有一枚落在 `frontend/` 下就整段停手上报**，
    不许改成"只动一小角"继续干。受影响并被冻结的：票 **77**（余下 AC#1/#3/#4/#6，Status 已改 `blocked`）·
@@ -260,3 +262,14 @@ multi-task concurrency unlocks only at 47 (SPEC-12 §2).
   ⇒ **两次调用静默互相覆盖工件**，先前交给模型的 `Spill.Path` 可能读到别人的输出 = **provenance 破坏（C25）**；
   ②`listArtifactsDir` 的 `if e.IsDir() { continue }` 让游离子目录对 `List/Purge/500MB 配额`**全部隐形**
   ⇒ 500MB 变 2GB 就是这么来的，**"静默忽略"不能靠默认赢**。
+
+- **孤儿件认领（2026-11-18，写腿按票 441 执行）**：**441 appearance-wave-orphans-font-size-and-theme-consumers** ——
+  「外观波」（本体 commit `7f3177f93`；票池此前只在 **180/437** 里被提及，四枚文件没有自有票号）的四枚孤儿件由票 441 认领，
+  ⛔ 继续做无名件：
+  - `cmd/wisp/appearance_wave_windows_test.go` —— **文件头具名**（票 441 AC#3 补名段）；
+  - `internal/panel/config_write_wave.go` · `internal/panel/panel_tuning_wave.go` · `internal/panel/ball_idle_appearance_wave.go`
+    —— 该腿写面不含 `internal/panel/**`，按票面判据「文件头注释**或台账具名**」走**本条台账具名**。
+  同票补上两条悬着的消费接线：`panel.font_size` 页面消费（App 把快照的 fontSize 钉上文档根，`frontend/src/lib/panel-font.ts`
+  ＋ `theme.css` 的 html rem 基规则，仪器 `render:panelfont441`）与 `app.theme` 球侧消费（装配根 `resident_windows.go`
+  现读并调 `ball.SetTheme`——该函数自 `internal/ball/renderer_windows.go:106` 定义以来第一次有生产调用者）。
+  证据：`docs/evidence/s1/441-appearance-wiring-20261118-r1.md`。

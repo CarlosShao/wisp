@@ -443,6 +443,15 @@ func runResident() {
 	if ballStyleOK65 {
 		ball.SetStyle(ballStyleName65)
 	}
+	// 票 441 AC#2：app.theme 的球侧消费在这里接线——SetTheme 的生产调用者
+	// 就是这一行。种子（ballThemeSeed441）读 config.toml 的 [app].theme，
+	// light/dark 换成渲染器的 ACTIVE C21 palette；auto/读不了不调（Warn 具名，
+	// renderer 的 dark 默认原地站着——冒充就是谎报）。时序与上面的 SetStyle
+	// 同一座位：都在 startResidentBall（ball.New）之前，第一帧就画新 palette。
+	ballTheme441, ballThemeOK441 := ballThemeSeed441(rt.Layout.DataDir)
+	if ballThemeOK441 {
+		ball.SetTheme(ballTheme441)
+	}
 	// Ticket 413: the [ball].size seed reads the same per-use shape the style
 	// seed above and hotCfg258 read with - the Manager does not exist yet at
 	// this point of the boot (the 258-a1 census order). Zero means the file was
