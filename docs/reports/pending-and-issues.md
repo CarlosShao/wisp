@@ -37896,3 +37896,8 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - **回归（我造成，非"既有红"）**：`Test313WritableUnionEqualsTheTwoRosters` 现红（`panel_config_313_test.go:259`），真因＝**我 39 AC#1 那枚 `75e6776da` 新增第七名册 `app_language`，未在该测试的 want 里 append `panel.WritableFields39()`**。诊断腿报"HEAD 复跑同样红"是**误判既有**——HEAD 已含 75e6776da，所以"HEAD 红"恰证明是本波回归。已派清理腿修（只加一行 append，⛔ 不放宽）。
 - **教训（写进规矩）**：每波收口**至少跑一次本包全量**（`go test ./cmd/wisp` 经载具一次），不许只跑定向 `^Test39` —— 否则新增名册的跨票测试（313/255 这类并集断言）会漏红。本轮正是靠诊断腿的整包才发现。
 - 腿违令一处：`38cecadca` 未带 pathspec 把 staged 的 197/38/441 旧名删除带入（＝改名，无夹带）；`197-…-done.md` 我本轮显式 pathspec 补收。
+## A1944（11-18 16:5x）：回归修好＋票 49 空牙纯化 `fccf88b26`
+
+我复跑载具：`Test313WritableUnionEqualsTheTwoRosters` PASS 0.00s、`TestTicket49RevokeGrantVerbPopsTheNextCoveredCallBack` PASS 4.52s；d22scan clean；`internal/panel`/`cmd/wisp` 工作树空。
+- #1 313 并集：只加 `want = append(want, panel.WritableFields39()...)`（真名核 `config_write_39.go:42`）＋注；反控摘 39 名册⇒报告 31 vs want 32 精确红在 app_language ⇒ 牙真钉并集。
+- #2 票49 动词牙：两发前各 `os.Remove` 保"新建"形状，唯一变量＝撤销；反控删撤销步⇒红行记成 allow_session_grant、四条断言齐红 ⇒ 牙真咬撤销。
