@@ -32,6 +32,39 @@ func PrivacyDomains() []PrivacyDomain {
 	}
 }
 
+// l0AutoAllowNotice is the honest-by-tier sentence (ticket 40 AC#6): an L0
+// row that reads "allow" must not look like someone said yes. ONE spelling,
+// ONE constructor: the list face appends it to the human detail and the
+// export carries it as the human-readable decision note for the same rows -
+// the two faces must never drift into two wordings.
+const l0AutoAllowNotice = "按档自动放行（L0），未询问任何人"
+
+// isTierAutoAllow reports whether this row was auto-allowed by its risk tier
+// with nobody asked. ONLY L0 qualifies: L1/L2 allow rows have a human or a
+// grant behind them (or a silence timeout - which is still not a tier
+// auto-allow), so saying "自动放行" there would read better than reality.
+func isTierAutoAllow(r ToolCall) bool {
+	return r.RiskLevel == RiskL0 && r.Decision == "allow"
+}
+
+// privacyToolCallDetail builds the human-readable detail string for one
+// tool_call row: level, tool, then the decision as recorded. For an L0+allow
+// row the recorded decision alone would be a bare "allow" that looks like
+// someone approved it, so the honest-by-tier sentence is appended (ticket 40
+// AC#6). The recorded column values are echoed verbatim - this derives the
+// display sentence only (ticket 184 AC#5(a): the forensics columns may not
+// be reworded).
+func privacyToolCallDetail(r ToolCall) string {
+	detail := fmt.Sprintf("%s · %s", r.RiskLevel, r.Tool)
+	if r.Decision != "" {
+		detail += " · " + r.Decision
+	}
+	if isTierAutoAllow(r) {
+		detail += " · " + l0AutoAllowNotice
+	}
+	return detail
+}
+
 // PrivacyItem is one row as the privacy page lists it: a stable ID (row id
 // or artifact file name), a human label, and the record timestamp.
 type PrivacyItem struct {
@@ -96,10 +129,6 @@ func (s *Store) ListPrivacy(ctx context.Context, domain PrivacyDomain) ([]Privac
 		}
 		out := make([]PrivacyItem, 0, len(rows))
 		for _, r := range rows {
-			detail := fmt.Sprintf("%s · %s", r.RiskLevel, r.Tool)
-			if r.Decision != "" {
-				detail += " · " + r.Decision
-			}
 			ts := int64(0)
 			if r.StartedAt != nil {
 				ts = *r.StartedAt
@@ -107,7 +136,7 @@ func (s *Store) ListPrivacy(ctx context.Context, domain PrivacyDomain) ([]Privac
 				ts = *r.DecidedAt
 			}
 			out = append(out, PrivacyItem{
-				ID: strconv.FormatInt(r.ID, 10), Label: r.Tool, Detail: detail,
+				ID: strconv.FormatInt(r.ID, 10), Label: r.Tool, Detail: privacyToolCallDetail(r),
 				Timestamp: ts,
 			})
 		}
@@ -186,17 +215,26 @@ func (s *Store) PurgePrivacy(ctx context.Context, domain PrivacyDomain) (int64, 
 }
 
 // privacyExport is the JSON export envelope (SPEC-02 §5: 导出). Records are
-// the full domain rows — the export is the user's data, not a summary.
+// the full domain rows — the export is the user's data, not a summary. For
+// tool_call the envelope also carries the human-readable decision notes
+// keyed by row id (decisionNotes): the SAME strings the privacy page renders
+// (privacyToolCallDetail, ticket 40 AC#6) — an L0+allow row's export must
+// say it was auto-allowed by tier, in the same sentence the page uses. The
+// records themselves stay the verbatim column values (ticket 184 AC#5(a):
+// the forensics columns may not be reworded); decisionNotes is derived, not
+// stored.
 type privacyExport struct {
-	Domain     string `json:"domain"`
-	ExportedAt string `json:"exported_at"` // RFC3339 UTC wall clock (persisted record)
-	Count      int    `json:"count"`
-	Records    any    `json:"records"`
+	Domain        string           `json:"domain"`
+	ExportedAt    string           `json:"exported_at"` // RFC3339 UTC wall clock (persisted record)
+	Count         int              `json:"count"`
+	Records       any              `json:"records"`
+	DecisionNotes map[int64]string `json:"decision_notes,omitempty"`
 }
 
 // ExportPrivacy renders one domain as indented JSON bytes.
 func (s *Store) ExportPrivacy(ctx context.Context, domain PrivacyDomain) ([]byte, error) {
 	var records any
+	var toolRows []ToolCall
 	switch domain {
 	case PrivacyProfile:
 		rows, err := s.ListProfiles(ctx)
@@ -221,6 +259,7 @@ func (s *Store) ExportPrivacy(ctx context.Context, domain PrivacyDomain) ([]byte
 		if err != nil {
 			return nil, err
 		}
+		toolRows = rows
 		records = nonNilSlice(rows)
 	case PrivacyArtifacts:
 		rows, err := s.ListArtifacts(ctx)
@@ -231,10 +270,18 @@ func (s *Store) ExportPrivacy(ctx context.Context, domain PrivacyDomain) ([]byte
 	default:
 		return nil, fmt.Errorf("memory: unknown privacy domain %q (valid: %v)", domain, PrivacyDomains())
 	}
+	var notes map[int64]string
+	if len(toolRows) > 0 {
+		notes = make(map[int64]string, len(toolRows))
+		for _, r := range toolRows {
+			notes[r.ID] = privacyToolCallDetail(r)
+		}
+	}
 	return json.MarshalIndent(privacyExport{
-		Domain:     string(domain),
-		ExportedAt: observe.WallTimestampUTC(observe.NowWallUTC()),
-		Records:    records,
+		Domain:        string(domain),
+		ExportedAt:    observe.WallTimestampUTC(observe.NowWallUTC()),
+		Records:       records,
+		DecisionNotes: notes,
 	}, "", "  ")
 }
 
