@@ -24,6 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -79,6 +80,17 @@ func TestTicket49RevokeGrantVerbPopsTheNextCoveredCallBack(t *testing.T) {
 
 		// NEGATIVE CONTROL: the grant is live and nothing is revoked, so the
 		// covered call must run silently - zero cards on the production UI.
+		// The file is removed first so this call keeps the CREATE shape:
+		// probed 2026-11-18 (ticket 40 AC#2 fixture, three-covered-calls
+		// reading), a second fs.write OVER an existing file elevates the
+		// verdict beyond L1 - and L2 is never grant-covered (SPEC-06 §8.3/
+		// D45-3) - so an overwrite-shaped "green" call would ask even with
+		// the grant live and the reading would be confounded. Same shape in,
+		// same shape out; the ONLY variable between the two readings is the
+		// revoke.
+		if err := os.Remove(granted); err != nil && !os.IsNotExist(err) {
+			t.Fatalf("pre-green remove: %v", err)
+		}
 		before := rt.windowCount()
 		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"covered, nothing revoked"}`,
 			filepath.ToSlash(granted)))
@@ -105,7 +117,13 @@ func TestTicket49RevokeGrantVerbPopsTheNextCoveredCallBack(t *testing.T) {
 		verbSaid = said
 
 		// RED: the SAME shaped call must ask again - a real card on the real
-		// gate, counted on the same production counter the assembly cell reads.
+		// gate, counted on the same production counter the assembly cell
+		// reads. The remove keeps the create shape (see the negative
+		// control's note: without it the overwrite elevation, not the
+		// revoke, would be what asks - the reading would be vacuous).
+		if err := os.Remove(granted); err != nil && !os.IsNotExist(err) {
+			t.Fatalf("pre-red remove: %v", err)
+		}
 		before = rt.windowCount()
 		args2 := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"after the verb revoked"}`,
 			filepath.ToSlash(granted)))
