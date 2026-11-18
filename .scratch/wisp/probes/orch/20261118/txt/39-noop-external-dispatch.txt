@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 票 39 AC#4：no-op 保存零 diff ＋ 外部改/未知键行号报错（写腿，唯一共享编译面写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只做票 39 **AC#4**（`39-config-editor-gui.md:42-43`）：`Round-trip no-op save produces no diff; external-edit + unknown key shows line-numbered errors`。
+1. **no-op 保存零 diff**：`config.set`（或既有 `commitSectionWrite`）当**新值==盘上现值**时 ⇒ **文件字节不动**（判据用可判事实：写前写后 sha256 相同 + mtime 不变，⛔墙钟猜想），回执明确「无变化」；牙：把 no-op 走成"真重写"⇒用例红（sha 变了）。⚠ 注意保留格式（注释/顺序/空行）——no-op 也不许把文件重排。
+2. **外部改 + 未知键**：用户手改 `config.toml` 加入一个**未知键**（或类型不符）⇒ 读面 `errors[]{line,message}` 必须**带 1-based 行号**且**点名该键**（`loaderrors_456.go` 已有能力，确认真接上）；前端按行号列出（已接，复核）；牙：把行号吞成 0/1⇒红；把未知键吞掉⇒红。
+3. **外部改 + 保存冲突**：外部把某键改了、GUI 还拿旧值保存 ⇒ 不许静默覆盖（要么重算拒绝 `refused-drift`，要么明示"盘上已变"），给读数。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔ 格式化重排既有文件。⛔ 别碰别人工作树改动。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关测试全绿 ③`go build ./...` rc=0；前端 build/typecheck/lint＋仪器 rc=0。
+写面：`internal/config/**`、`internal/panel/**`、`cmd/wisp/**`（唯一）、`frontend/src/**`（若需）、`frontend/scripts/render-*`、`docs/evidence/s1/39-noop-external-*`。
+回话第一行＝commit hash ＋三条各自读数/牙名 ＋d22scan 末行 ＋载具 rc ＋前端 rc。没干完写「卡在哪」。
