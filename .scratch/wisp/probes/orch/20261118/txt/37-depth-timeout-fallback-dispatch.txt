@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 票 37 三格：深度徽章 1→2＋按 correlationId 路由／270s 预告·300s 自动拒·重放可用／面板遮住时原生卡仍可批（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 37 **三格**（`37-approval-ui-l2.md:37-40`；**AC#4 视觉签收不属你**，只读阈值不做）：
+1. **深度徽章＋相关路由**：两发**顺序** L2（用既有 queue 测试模式模拟 pre-47）⇒ 徽章 **1→2**、只显示队头、按 `correlationId` 分别路由；牙：把两发算一发⇒红；按到达序而非 correlationId 答⇒红。
+2. **超时**：用**既有可注入超时/时钟**（先 `grep -rn "270\|300\|WarnAt\|AutoReject" --include=*.go internal/agent/approval internal/panel | head`；⛔ 新造墙钟差、⛔ 真等 300 秒——用注入把小值放大到真常量边界验证）⇒ 证 **270s 出预警、300s 自动拒绝**、拒绝后可重放、球徽章清零。⚠ 270/300 若在 `thresholds.go`＝**冻结**，只许读不许改；牙：把 300 改 299 逻辑等价⇒红（证边界是读来的）。
+3. **降级**：面板运行时被遮（33 fixture 的 native 路径）⇒ L2 **仍能经原生卡批准**；⛔ 面板侧 allow 开口子。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔ UI emoji、⛔ 墙钟当判据。⚠ 别碰他人在飞件（composer-states.html 等 M：只报不动，⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；收口必跑一次本包全量（既有环境红 33r5 照实记）。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关测试全绿 ③`go build ./...` rc=0；前端 build/typecheck/lint＋仪器 rc=0。
+写面：`cmd/wisp/**`（唯一）、`internal/panel/**`、`internal/agent/approval/**`（只读阈值＋测试）、`frontend/src/**`、`frontend/scripts/render-*`、`docs/evidence/s1/37-depth-timeout-fallback-*`。
+回话第一行＝commit hash ＋三格各自牙名/读数 ＋d22scan 末行 ＋载具 rc ＋前端 rc。没干完写「卡在哪」。
