@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 票 441 全部 4 格：font_size/theme 真接消费 ＋ 四枚无名件补票号（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 441 全 4 格（`.scratch/wisp/issues/441-appearance-wave-orphans-font-size-and-theme-consumers.md`）：
+1. **AC#1** `panel.font_size` 真接到页面字号：给装配点 file:line（`panel_host_windows.go` 读 `cfg.Panel.FontSize` 下发到页面；具体走 postMessage/初始化载荷哪条现成路你查），**行为牙**＝改值⇒页面字号真变（可判读数，如页面根的 font-size 计算值/载荷字段），⛔ 只写字段没人读。
+2. **AC#2** `app.theme` 接到球渲染器：`SetTheme` 要有**生产调用者**（现在只有 `internal/ball/renderer_windows.go:106` 定义、`grep` 无外部调用）→ 在装配点读 `cfg` 主题并调用，给 file:line；**行为牙**＝改主题⇒渲染器入参（palette）真变。
+3. **AC#3** 外观波四枚无名文件补票号归属（文件头注释或台账 A## 具名）＋把"外观波"登记进票池索引（`issues/README.md` 或索引文件），⛔ 继续做无名件。先 `git log --oneline -20 -- frontend design` 找出那四枚文件。
+4. **AC#4** 三枚行为牙**互不串**：改 font_size 不动 theme（反向也证一次），⛔ 用同一枚假阳性牙充数。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design 文字、⛔放宽断言、⛔push、⛔提交 dist 字节；⛔ UI emoji。⚠ 一律**别碰**工作树里他人在飞件：`frontend/fixtures/composer-states.html`（M）——**只报不动，⛔ `git restore/checkout`**。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关测试全绿 ③`go build ./...` rc=0；前端 build/typecheck/lint＋仪器 rc=0。
+写面：`cmd/wisp/**`（唯一）、`internal/ball/**`、`frontend/src/**`、`frontend/scripts/render-*`、`docs/evidence/s1/441-*`。
+回话第一行＝commit hash ＋四格各自读数/牙名 ＋d22scan 末行 ＋载具 rc ＋前端 rc。没干完写「卡在哪」。
