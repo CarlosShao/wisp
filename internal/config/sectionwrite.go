@@ -93,6 +93,13 @@ type LoosenRequest struct {
 	// Origin names the route that asked ("panel.settings", "cli.approve", ...),
 	// so the audit line and the card can say who to blame without guessing.
 	Origin string
+	// RequestID is the id the write entry minted for this request (ticket 39
+	// AC#2): the card's correlation id AND the key the pending write is
+	// registered under, so the accepted answer resolves back to exactly this
+	// write. The queue adapter must raise its card under this id and resolve
+	// with it; the entry registers the pending write before QueueLoosen is
+	// called, so the id is resolvable the instant the card exists.
+	RequestID string
 }
 
 // LoosenQueue is the C18 approval queue as this package needs it: hand over one
@@ -246,6 +253,21 @@ func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
 	res.Keys = nil
 	if dir == DirLoosen {
 		res.Keys = keys
+		// Ticket 39 AC#2's registrar pin: every key the auditors call a
+		// loosening must be on the named roster (loosenroster_39.go). A key
+		// the roster does not know is a drift between the auditors and the
+		// roster, and a card raised for a name the roster cannot carry would
+		// resolve into a write nobody can account for - refuse fail-closed.
+		if unknown := unrosteredLoosenKeys(keys); len(unknown) > 0 {
+			m.auditf("config: SECTION-WRITE section=%s key=%s direction=loosen source=%s origin=%s "+
+				"outcome=refused-roster keys=%s detail=%q",
+				w.Section, w.Key, w.Source, w.Origin, strings.Join(unknown, ","),
+				"方向审计判为放宽的键不在具名清单上（清单与审计漂移）；拒绝写入，先修清单")
+			return res, observe.New(observe.ClassConfig,
+				"config: refused to write "+w.Key+": "+strings.Join(unknown, ", ")+" is a loosening "+
+					"the direction auditors emit but the security-loosen roster does not name; "+
+					"nothing was written (fail-closed)")
+		}
 		switch {
 		case w.Source == SourcePanel:
 			m.auditf("config: SECTION-WRITE section=%s key=%s direction=loosen source=%s origin=%s outcome=refused-panel",
@@ -260,13 +282,18 @@ func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
 				"config: refused to write "+w.Key+": "+strings.Join(keys, ", ")+" would loosen "+w.Section+
 					" and no approval queue is wired, so the request has nowhere to go")
 		}
+		token := mintLoosenRequestID()
+		m.registerPendingLoosen(token, w, keys)
 		id, qerr := m.LoosenQueue.QueueLoosen(LoosenRequest{
-			Section: w.Section,
-			Keys:    keys,
-			Source:  w.Source,
-			Origin:  w.Origin,
+			Section:   w.Section,
+			Keys:      keys,
+			Source:    w.Source,
+			Origin:    w.Origin,
+			RequestID: token,
 		})
 		if qerr != nil {
+			// The queue refused the hand-off; the pending entry goes with it.
+			m.takePendingLoosen(token)
 			m.auditf("config: SECTION-WRITE section=%s key=%s direction=loosen source=%s origin=%s outcome=queue-failed err=%v",
 				w.Section, w.Key, w.Source, w.Origin, qerr)
 			return res, observe.Wrap(observe.ClassConfig, qerr,

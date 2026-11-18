@@ -69,6 +69,15 @@ type Manager struct {
 	// nil = the process log.
 	Audit AuditFunc
 
+	// pendingLoosen is ticket 39 AC#2's registry of queued loosening writes
+	// waiting on their L2 card (loosenresolve_39.go): the id the queue was
+	// handed is the resolve key, so an accepted card completes the real write
+	// and a refused one leaves the file untouched. Guarded by its own mutex -
+	// registration and resolution both run outside mu (ruling N9), and taking
+	// mu here would order it against the commit path for no gain.
+	pendingLoosenMu sync.Mutex
+	pendingLoosen   map[string]*pendingLoosen
+
 	mu        sync.Mutex
 	reloadMu  sync.Mutex
 	path      string

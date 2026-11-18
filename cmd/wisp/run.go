@@ -458,6 +458,14 @@ type agentRuntime struct {
 	// no context.
 	reloadRoot   *observe.Root
 	reloadHandle *observe.Handle
+	// loosenRoot / loosenHandle own the ticket 39 AC#2 card goroutines
+	// (config_loosen_gate_39.go): the spawned waiter per queued loosening that
+	// parks on the native L2 card and resolves the pending write with the
+	// verdict. Cancelling the root at close abandons an unanswered card, which
+	// resolves as a deny - shutdown can never be the moment a loosening slips
+	// in (the same posture the reload tick keeps).
+	loosenRoot   *observe.Root
+	loosenHandle *observe.Handle
 	// exemptions is ticket 230 AC#4's ARMED form of cfg.Risk.BlacklistOverrides:
 	// the standing B-tier exemption set the bridge answers with, keyed by
 	// risk.OverrideKey (see cmd/wisp/blacklist_overrides_230.go). It is a
@@ -1547,6 +1555,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// what still does not move mid-run.
 	rt.startConfigReload()
 
+	// The section-write loosening gate (ticket 39 AC#2), after the answer side
+	// for the same reason the tick above is: a loosening write that queues
+	// while nobody can answer cards would fail closed for a reason that has
+	// nothing to do with what the operator wanted. config_loosen_gate_39.go
+	// owns the wiring; a run with no gate stays on the fail-closed refusal.
+	rt.startConfigLoosenGate()
+
 	return rt, 0
 }
 
@@ -1790,6 +1805,12 @@ func (rt *agentRuntime) close() {
 	if rt.reloadRoot != nil {
 		rt.reloadRoot.Cancel()
 	}
+	// Stand the ticket 39 AC#2 card waiters down: cancelling abandons any L2
+	// loosening card still waiting on a human, and an abandoned card resolves
+	// as a deny, so the old values stand (config_loosen_gate_39.go).
+	if rt.loosenRoot != nil {
+		rt.loosenRoot.Cancel()
+	}
 	// The join itself (ticket 228 AC#4), in the order the two goroutines were
 	// started: the answer side first (assembleRuntime attaches it before the
 	// tick), then the tick. Both roots are cancelled above, so what is left is
@@ -1809,6 +1830,11 @@ func (rt *agentRuntime) close() {
 		rt.auditf("close: GOROUTINE-JOIN goroutine=watchdog joined=false reason=budget-expired "+
 			"budget=%s detail=%q", joinOnCloseBudget228,
 			"配置轮询在预算内没有收口：它可能正停在一张等人回答的卡上，进程退出会切断它")
+	}
+	if !joinedWithin228(rt.loosenHandle, joinOnCloseBudget228) {
+		rt.auditf("close: GOROUTINE-JOIN goroutine=config-loosen joined=false reason=budget-expired "+
+			"budget=%s detail=%q", joinOnCloseBudget228,
+			"一张放宽卡的等待协程在预算内没有收口：它可能正停在等人回答的卡上，进程退出会切断它")
 	}
 	// Shut the C20 scheduler's door (ticket 47, D38e step 1): after Close,
 	// Submit answers ErrClosed, so the shutdown sequence can never be followed
