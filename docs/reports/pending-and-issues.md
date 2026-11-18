@@ -37901,3 +37901,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 我复跑载具：`Test313WritableUnionEqualsTheTwoRosters` PASS 0.00s、`TestTicket49RevokeGrantVerbPopsTheNextCoveredCallBack` PASS 4.52s；d22scan clean；`internal/panel`/`cmd/wisp` 工作树空。
 - #1 313 并集：只加 `want = append(want, panel.WritableFields39()...)`（真名核 `config_write_39.go:42`）＋注；反控摘 39 名册⇒报告 31 vs want 32 精确红在 app_language ⇒ 牙真钉并集。
 - #2 票49 动词牙：两发前各 `os.Remove` 保"新建"形状，唯一变量＝撤销；反控删撤销步⇒红行记成 allow_session_grant、四条断言齐红 ⇒ 牙真咬撤销。
+## A1945（11-18 17:5x）：40 AC#6 勾 `fc56a04ea` —— L0 自动放行不再裸写 allow
+
+我复跑 internal/memory 三枚牙 3/3 PASS；d22scan clean。唯一构造点 privacyToolCallDetail：列值逐字＋仅 L0&&allow 追加「按档自动放行（L0），未询问任何人」；导出 decision_notes 同源；列值一字不改。M1–M4 变异全红。

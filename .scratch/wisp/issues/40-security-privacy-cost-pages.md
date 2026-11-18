@@ -55,7 +55,7 @@ summaries + budgets), plus Models and Diagnostics views.
       display; capability-filtered role dropdowns (voice roles hide non-voice models); chain
       drag-order persisted; quota edits enforced ranges.**
 - [ ] Visual sign-off vs the three design screens; zero-emoji + hex scans green.
-- [ ] **Privacy/tool-call rows must not read better than reality: when a row carries
+- [x] **Privacy/tool-call rows must not read better than reality: when a row carries
       `risk_level == "L0"` and `decision == "allow"`, the rendered detail (and the exported
       bundle's human-readable field) must say it was auto-allowed by tier and that nobody was
       asked - not a bare "allow".** Landing point today is the string built in
@@ -206,3 +206,7 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 **尺1** `38cecadca` 在。**尺3 我自己复跑**：载具 `^Test40Diagnostics` **5 RUN/5 PASS/0 FAIL**（`…PreviewEntriesEqualTheZip`／`…ProbesDoNotComeOutTheOtherSide`／`…OneEnumerateSourceNoSecondFileList`／`…GateIsTheCliTotalSwitch`／`…WiringNailInProductionChain`）；`render:diagnostics40` rc=0；`d22scan` clean。
 - **勾 AC#5**：预览与导出**共用同一 enumerate 源**（源级牙禁 `os.ReadDir`/zip writer/`Walk*` ⇒ 预览一套导出另一套那条线钉死）；导出先跑 preview、失败即中止不留半成品；`[privacy] diagnostics_opt_in` 总闸＝CLI 同一把。四类负探针（音频/密钥两形/完整转写）解包后 grep **逐字节 0 命中**，每类带正控（放应包含文件⇒命中）。前端诊断页渲染引擎自报 BundlePreview 逐字（页面不自己写排除句）。
 - ⚠ **腿自报一处违令（我认）**：该 commit 未带 pathspec，把我此前 staged 的 197/38/441 旧名删除一并带入（内容＝改名，无夹带）；另 `197-…-done.md` 仍未跟踪 → 我本轮用显式 pathspec 补收。
+## 编排者收件·AC#6（2026-11-18 17:5x，`fc56a04ea`，件 `docs/evidence/s1/40-l0-honest-20261118.md`）
+
+**尺1** `fc56a04ea` 在（3 件）。**尺3 我自己复跑**：`go test ./internal/memory -run ^(TestPrivacyL0AutoAllowDetailSaysNobodyWasAsked|TestPrivacyL2AllowNeverSaysAutoAllow|TestPrivacyExportDecisionNotesMatchListDetail)$` **3/3 PASS**（0.19s/0.26s/0.16s）；`d22scan` clean。
+- **勾 AC#6**：唯一构造点 `internal/memory/privacy.go` 的 `privacyToolCallDetail`：列值逐字回显 `risk_level · tool · decision`；**当且仅当 L0 && allow** 追加「按档自动放行（L0），未询问任何人」；`ExportPrivacy` 新增派生字段 `decision_notes` **同源**（页面与导出不可能各写一套）；列值一字不改（`Records` 仍整行逐字，派生串不落库）。四枚变异 M1 拿掉 L0 判定／M2 改判 L2／M3 导出另拼／M4 列值改字 —— 全红。
