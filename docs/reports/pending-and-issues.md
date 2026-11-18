@@ -37890,3 +37890,9 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 
 我复跑载具 `^Test40SessionRules` 3/3 PASS（revoke-pops 3.82s）；render:sessionrules40 rc=0；d22scan clean。读面 `session.rules.list`（真字段，命名撞冻结仪器故用同义词）；撤销走票49同一 Revoke 门⇒下一发 L2 真弹卡（绿0卡→撤销→红≥1卡，SQL 复核）。
 - **教训（重要）**：弹卡夹具原为空牙——"覆写已存在文件"把档评抬出 L1，第二次写同路径不撤销也弹卡；修＝两发前各删文件保"新建"形状。**票 49 动词牙（ticket49_verbs_test.go）有同族混淆**，待有写面的腿加两行 os.Remove 纯化。
+## A1943（11-18 16:4x）：40 AC#5 勾 `38cecadca` ＋ **自查抓到我自己的一枚回归（诚实记）**
+
+我复跑载具 `^Test40Diagnostics` 5/5 PASS；render:diagnostics40 rc=0；d22scan clean。诊断包预览＝导出同一 enumerate 源（源级牙禁二次枚举），四类负探针（音频/密钥两形/完整转写）解包 grep 0 命中、每类正控命中。
+- **回归（我造成，非"既有红"）**：`Test313WritableUnionEqualsTheTwoRosters` 现红（`panel_config_313_test.go:259`），真因＝**我 39 AC#1 那枚 `75e6776da` 新增第七名册 `app_language`，未在该测试的 want 里 append `panel.WritableFields39()`**。诊断腿报"HEAD 复跑同样红"是**误判既有**——HEAD 已含 75e6776da，所以"HEAD 红"恰证明是本波回归。已派清理腿修（只加一行 append，⛔ 不放宽）。
+- **教训（写进规矩）**：每波收口**至少跑一次本包全量**（`go test ./cmd/wisp` 经载具一次），不许只跑定向 `^Test39` —— 否则新增名册的跨票测试（313/255 这类并集断言）会漏红。本轮正是靠诊断腿的整包才发现。
+- 腿违令一处：`38cecadca` 未带 pathspec 把 staged 的 197/38/441 旧名删除带入（＝改名，无夹带）；`197-…-done.md` 我本轮显式 pathspec 补收。

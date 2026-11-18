@@ -49,7 +49,7 @@ summaries + budgets), plus Models and Diagnostics views.
       immediately on next gated call.
 - [x] Cost numbers reconcile with cost_daily/task_log to the micro-unit (reconciliation test).
 - [x] Budget states: <80 normal, ≥80 warn, ≥100 paused (fixture by editing aggregates).
-- [ ] Diagnostics preview lists exactly the bundle contents; exported bundle verified to exclude
+- [x] Diagnostics preview lists exactly the bundle contents; exported bundle verified to exclude
       audio/keys/transcript-full.
 - [ ] **Model-management: CRUD round-trip into config.toml; probe button → provider_health
       display; capability-filtered role dropdowns (voice roles hide non-voice models); chain
@@ -201,3 +201,8 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 **尺1** 两提交在。**尺3 我自己复跑**：载具 `^Test40SessionRules` **3 RUN/3 PASS/0 FAIL**（`…WiringNailInProductionChain` 0.01s／`…ReadFaceReflectsTicket49GrantsLive` 2.08s／`…PanelRevokePopsTheNextCoveredCall` 3.82s）；`render:sessionrules40` rc=0；`d22scan` clean。
 - **勾 AC#2**：读面 `session.rules.list`（载荷＝`approval_grant` 真字段逐字，零自造摘要；**没叫 `grants.list`**＝撞冻结 grant-boundary 仪器，依 roster.cancel 先例换同义词，断言零松）；前端"本会话生效中的授权"卡列真行、空库显式「还没有授权」；**撤销走票 49 同一扇 Revoke 门 ⇒ 下一发同工具调用真重新弹卡**（夹具：绿发 0 卡 → 撤销 → 红发 ≥1 卡，SQL 复核绿行 grant_id=<id>/红行 NULL）。
 - ⚠ **重要发现（腿已修，我记一笔）**：弹卡夹具原来**是空牙** —— "覆写已存在文件"会把档评抬出 L1（L2 才受授权覆盖），第二次写同路径即使不撤销也弹卡；修法＝两发前各删文件保持"新建"形状，唯一变量＝撤销；修后 M①（撤销不落库）立刻红。**同族混淆也在票 49 自己的动词牙里**（`ticket49_verbs_test.go` 红发同形）—— 结论大概率成立，但纯化只需加两行 `os.Remove`；记入下一条有写面的腿（非本腿写面）。
+## 编排者收件·AC#5（2026-11-18 16:4x，`38cecadca`，件 `docs/evidence/s1/40-diagnostics-20261118-r1.md`）
+
+**尺1** `38cecadca` 在。**尺3 我自己复跑**：载具 `^Test40Diagnostics` **5 RUN/5 PASS/0 FAIL**（`…PreviewEntriesEqualTheZip`／`…ProbesDoNotComeOutTheOtherSide`／`…OneEnumerateSourceNoSecondFileList`／`…GateIsTheCliTotalSwitch`／`…WiringNailInProductionChain`）；`render:diagnostics40` rc=0；`d22scan` clean。
+- **勾 AC#5**：预览与导出**共用同一 enumerate 源**（源级牙禁 `os.ReadDir`/zip writer/`Walk*` ⇒ 预览一套导出另一套那条线钉死）；导出先跑 preview、失败即中止不留半成品；`[privacy] diagnostics_opt_in` 总闸＝CLI 同一把。四类负探针（音频/密钥两形/完整转写）解包后 grep **逐字节 0 命中**，每类带正控（放应包含文件⇒命中）。前端诊断页渲染引擎自报 BundlePreview 逐字（页面不自己写排除句）。
+- ⚠ **腿自报一处违令（我认）**：该 commit 未带 pathspec，把我此前 staged 的 197/38/441 旧名删除一并带入（内容＝改名，无夹带）；另 `197-…-done.md` 仍未跟踪 → 我本轮用显式 pathspec 补收。
