@@ -37878,3 +37878,11 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 我复跑：internal/config 与 internal/panel `^Test39` 全 PASS；载具 `Test39Tier*` 3/3 PASS（restart 逐字「需要重启」、reload 真发事件且订阅方读新值、hot 立即生效零重启词）。golden 39 枚未重生成。三牙 M1/M2/M3 全红。
 - 拍：新可写字段 `app_language`（restart 档首枚可写键；C17 方法集不变；同 313/187/65/215a 先例）。撤销＝摘 config_write_39.go＋settings_39.go＋两处接线。
 - **事故（零损失）**：该腿起手对 `frontend/fixtures/composer-states.html`（他人在飞件）误跑 `git restore`（违禁）→ 一测红；已确定性渲染复原。我复核 `render:composer` 幂等=True、4 行 diff 仍在＝原腿内容未丢。⇒ 新纪律：腿遇他人在飞件**只报不动**，⛔ `git restore/checkout`。
+## A1941（11-18 13:4x）：**票 441 结案 4/4** `9fbe6056c` —— font_size 真到页面、theme 真到球渲染器
+
+我复跑：载具 `^Test441` 3/3 PASS；`internal/ball ^TestSetTheme441` PASS；render:panelfont441 rc=0；typecheck rc=0；d22scan clean。
+- AC#1 装配点 resync 快照(panel_resident_pump.go:141＋run.go:1338-1339)→panel-font.ts/App.tsx/theme.css；牙 15⇒15px／12⇒12px／缺⇒出厂，M1/M2 红。
+- AC#2 ballThemeSeed441 读 [app].theme→ball.SetTheme（ball.New 前，时序钉死）；牙 light⇒PaletteFor(light)≠Dark。
+- AC#3 四孤儿件具名＋README「孤儿件认领」；AC#4 互不串牙各自红。
+- 名册重裁 `config_readers_255.go`：app.theme 旧「扫描零命中」已不真⇒改 hotClaimOtherProcess＋加读点（我核 diff＝跟事实对齐，非放宽）。
+⇒ 改名 -done。
