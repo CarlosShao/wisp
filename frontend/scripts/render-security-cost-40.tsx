@@ -282,73 +282,97 @@ const secHtml = renderToStaticMarkup(<SecuritySettings mode={MODE} />);
 check("the fed tier must render its display word", secHtml.includes(esc(tierName("ask_high_risk"))));
 check("the vocabulary must carry the raw wire names too", secHtml.includes(esc("ask_every_step")));
 check("the L2 confirm list must render the named transition", secHtml.includes(esc(tierName("auto_approve"))));
-check("every named absence must carry the 未接线 word", (secHtml.match(/未接线/g) ?? []).length >= 5);
+// 2026-11-18, ticket 40 AC#2 (readface wave 4): the 会话授权面板读面 absence
+// row graduated into the REAL card (SessionRulesCard) - four absence rows
+// remain (thresholds / B-list / taint / approval-audit), each still carrying
+// the 未接线 word. The count was re-pinned from >= 5 with this wiring, the
+// same re-pin the census wave made when its own rows went live.
+check("every named absence must carry the 未接线 word", (secHtml.match(/未接线/g) ?? []).length >= 4);
 check("the thresholds absence must name the frozen face", secHtml.includes(esc("internal/risk/thresholds.go")));
 
 /* ---------------------------------------------------------------------------
-   The grants row asserts the NEW truth (fixed 2026-11-17, after dd52313e1
-   turned the census's journal.go:101 claim into the proved fact that
-   production writes ARE live - the old check here had enshrined the census's
-   own claim as if it were the wire's truth, and the page had moved on).
-   The truth the page states now (security-settings.tsx's 会话授权面板读面
-   row):
-     - production IS writing grants: gate.go:859 g.grants.Record /
-       gate.go:844 rt.RecordTarget, landing through
-       internal/session/grants.go:201/274 InsertGrant, the id carried back
-       at tools/bridge.go:1445;
-     - the absence is PANEL-side only: no grants section on the snapshot and
-       no grant route in C17's roster (grants.list/grants.revoke are not
-       admitted) - 面板侧没有 grants 列表读面;
-     - the operating exit is the console verbs: grants / revoke-grant
-       (cmd/wisp/approval_reply.go:415/:474).
+   The grants face asserts the NEW truth (re-pinned 2026-11-18, ticket 40
+   AC#2's page half: the same re-pin dd52313e1 forced after the census's
+   claim was corrected - the panel-side read face WAS the absence, and it is
+   one no longer). The truth the page holds now:
+     - the security page MOUNTS the real card (SessionRulesCard,
+       components/session-rules-settings.tsx) - the absence row is gone;
+     - the card reads session.rules.list and spends session.rules.revoke
+       (the session.rules.* synonym spellings: the frozen grant-boundary
+       instrument bans the spec's grants.list/grants.revoke on the wire -
+       internal/session/grants.go has recorded that death since ticket 224);
+     - the door is the runtime's OWN D45-2 ledger
+       (cmd/wisp/panel_session_rules_40.go), and the console verbs grants /
+       revoke-grant (cmd/wisp/approval_reply.go) remain the operator's
+       second exit;
+     - production writes were already live (gate.go:859 / grants.go:201/274 /
+       bridge.go:1445 - the fact the previous pin correctly asserted).
    POSITIVE control: the truth sentences present in source AND on the
-   rendered page => green. NEGATIVE control: a source reverted to the old
-   lie (生产零写入) must trip the detector - the instrument proves it can
-   still go red, it does not merely assert green.
+   rendered page => green. NEGATIVE control: a source stripped of the wiring
+   (the card unmounted) must trip the detector - the instrument proves it
+   can still go red, it does not merely assert green.
    --------------------------------------------------------------------------- */
 
 const secSrc = readFileSync("src/components/security-settings.tsx", "utf8");
+const rulesCardSrc = readFileSync("src/components/session-rules-settings.tsx", "utf8");
+const rulesLibSrc = readFileSync("src/lib/session-rules-view.ts", "utf8");
 function grantsTruthMissing(src: string): boolean {
   return !(
+    src.includes("SessionRulesCard") &&
     src.includes("gate.go:859") &&
     src.includes("grants.go:201/274") &&
     src.includes("bridge.go:1445") &&
-    src.includes("面板侧没有 grants 列表读面") &&
+    src.includes("session.rules.list") &&
     src.includes("revoke-grant")
   );
 }
 check(
-  "the grants row must state production writes ARE live (gate.go:859, grants.go:201/274, bridge.go:1445)",
+  "the security page must mount the real grants card and state the wiring truth (gate.go:859, grants.go:201/274, bridge.go:1445, session.rules.list, console revoke-grant as the second exit)",
   !grantsTruthMissing(secSrc),
 );
 check(
-  "the rendered grants row must carry the production-writer facts verbatim",
+  "the rendered page must carry the production-writer facts verbatim",
   secHtml.includes(esc("gate.go:859")) &&
-    secHtml.includes(esc("grants.go:201")) &&
+    secHtml.includes(esc("grants.go:201/274")) &&
     secHtml.includes(esc("bridge.go:1445")),
 );
 check(
-  "the rendered grants row must name the console exit verbs (grants / revoke-grant)",
-  secHtml.includes(esc("revoke-grant")),
+  "the rendered page must name the route spellings and the console second exit",
+  secHtml.includes(esc("session.rules.list")) && secHtml.includes(esc("revoke-grant")),
+);
+check(
+  "the card must consume the real doors through lib/panel.ts's two request functions",
+  rulesLibSrc.includes('from "@/lib/panel"') &&
+    rulesLibSrc.includes("requestSessionRules") &&
+    rulesLibSrc.includes("requestSessionRulesRevoke"),
+);
+check(
+  "the card must re-read the list after a revoke receipt (no local ledger copy to patch)",
+  rulesCardSrc.includes("useSessionRulesRevoke(list.reload)"),
+);
+check(
+  "the rendered page must not carry the old absence row (会话授权面板读面) anymore",
+  !secHtml.includes(esc("会话授权面板读面")) && !secSrc.includes("会话授权面板读面"),
 );
 check(
   "the rendered page must not carry the old lie (生产零写入) anywhere",
   !secHtml.includes(esc("生产零写入")) && !secSrc.includes("生产零写入"),
 );
 check(
-  "NEGATIVE control: a source stripped of the truth sentences (the old 生产零写入 lie restored) must trip the truth detector (the tooth still bites)",
+  "NEGATIVE control: a source stripped of the wiring (card unmounted, truth gone) must trip the truth detector (the tooth still bites)",
   grantsTruthMissing(
     secSrc
+      .replace(/SessionRulesCard/g, "")
       .replace(/gate\.go:859/g, "")
       .replace(/grants\.go:201\/274/g, "")
       .replace(/bridge\.go:1445/g, "")
-      .replace(/面板侧没有 grants 列表读面/g, "")
+      .replace(/session\.rules\.list/g, "")
       .replace(/revoke-grant/g, ""),
   ),
 );
 check(
   "the security page must hold zero emoji",
-  !EMOJI_RE.test(secHtml) && !EMOJI_RE.test(secSrc),
+  !EMOJI_RE.test(secHtml) && !EMOJI_RE.test(secSrc) && !EMOJI_RE.test(rulesCardSrc),
 );
 
 // An unreadable mode ("unknown" is the wire's own marker) renders as 档位未知,
@@ -459,5 +483,5 @@ console.error(
     "cachedKnown=false renders 未知 never the structural zero, the aggregate card rides CostAggregateRow verbatim with the schema's own 不封顶 word and the honest 计价版本未知, " +
     "the budget bar lights its state from the WORD alone - normal/warn/paused, never a recomputed percentage, odd words light nothing and ride verbatim, " +
     "fed mode reads back with the shared tier map, the plugins inventory rides verbatim both states, " +
-    "the grants row asserts the post-dd52313e1 truth (production writes live: gate.go:859/grants.go:201/274/bridge.go:1445, panel-side absence named, console verbs the exit) with a negative control that proves the tooth bites, no invented aggregation, zero emoji)",
+    "the grants face asserts the post-AC#2 truth (2026-11-18 re-pin: the real SessionRulesCard is mounted, session.rules.list/session.rules.revoke over the runtime's own D45-2 ledger, production writes live: gate.go:859/grants.go:201/274/bridge.go:1445, console verbs the second exit) with a negative control that proves the tooth bites, no invented aggregation, zero emoji)",
 );

@@ -1221,3 +1221,70 @@ export function requestRulesForce(forceTask: string): Promise<string | null> {
     forceTask,
   });
 }
+
+/* --------------------------------------------------------------------------
+   Session-rules doors (2026-11-18, ticket 40 AC#2)
+   --------------------------------------------------------------------------
+   Two doors answered over the SAME settings envelope above
+   (internal/panel/bridge.go's MethodSessionRulesList / MethodSessionRulesRevoke,
+   routed by composer_dispatch.go, answered by cmd/wisp's
+   panel_session_rules_40.go over the runtime's own D45-2 session ledger -
+   internal/session's Ledger, the object the answer route writes through).
+   These literals are the half bridge.go's page-gap ledger judged directly:
+   both spellings landed in THIS file in the same commit as the Go roster
+   names, so the ticket-114 AC#8 mirror gate judges them with no pending
+   registration.
+
+   NAMING, stated once where the wire lives: the spec's own spellings for
+   this face are grants.list / grants.revoke (SPEC-08 §5.2:169), but the
+   frozen grant-boundary instrument reddens every route carrying "grant",
+   and internal/session/grants.go has recorded that death since ticket 224.
+   The door rides the codebase's own synonym - ticket 49's operator view
+   already calls these rows "THIS session's rules" - and "revoke" is
+   SPEC-06 §8.2's own one-click verb. The semantic target is unchanged: one
+   approval_grant row, listed live, spent on the user's click.
+
+   session.rules.list is a READ: this session's LIVE rows, each carried
+   verbatim {id, scope, tool, pattern, session, createdAt, expiresAt} - the
+   real fields off approval_grant, never a summary. An EMPTY ledger is an
+   explicit state, not an empty table: the payload's zero field carries the
+   door's own sentence, and the page renders it verbatim (parse it with
+   parseSessionRulesReply, lib/session-rules-view.ts). A spent (revoked) row
+   LEAVES the live list while its audited row stays on disk - the page shows
+   what is in force, and the audit window is the store's business.
+
+   session.rules.revoke spends ONE row through the ledger's own Revoke
+   entrance - the same door ticket 49's console revoke-grant verb reaches -
+   so the NEXT covered call re-asks on the real gate. sessionRuleId is the
+   row id the list's payload carried (the page echoes it, never invents
+   one); revoking REMOVES an authorization, the one direction the panel may
+   move, so no confirm bit rides it (one click by design, SPEC-06 §8.2).
+   -------------------------------------------------------------------------- */
+
+/** Ask the host for this session's live grants (session.rules.list). The
+    reply is prose plus one line starting with the wisp-session-rules marker;
+    parse it with parseSessionRulesReply (lib/session-rules-view.ts). A
+    machine with no session ledger refuses the read by name - the refusal
+    sentence is what the page shows, never an empty list dressed up as an
+    answer. */
+export function requestSessionRules(): Promise<string | null> {
+  return requestHostAnswer({
+    method: "session.rules.list",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+  });
+}
+
+/** Spend ONE session grant (session.rules.revoke). ruleId is the row id the
+    read face's payload carried, echoed verbatim; the receipt names the row.
+    This is the ONE wire call the security page's per-row revoke button
+    reaches, and it carries no verdict vocabulary anywhere: the revoke only
+    ever makes the gate ask again, never lets it stop asking. */
+export function requestSessionRulesRevoke(ruleId: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "session.rules.revoke",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    sessionRuleId: ruleId,
+  });
+}

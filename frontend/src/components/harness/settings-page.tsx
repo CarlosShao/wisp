@@ -138,11 +138,15 @@ const CATEGORIES: readonly Category[] = [
     waiting: "按设计不接（D13）：D13 定了 MCP 的取舍，面板不显示 MCP 服务端状态——这不是忘了接，是架构裁定，internal/panel 里也没有任何 MCP 字段。除非裁定被推翻，这一格保持未接线。",
   },
   {
-    // Ticket 40's census re-cut: the tier rides EVERY packet (cmd/wisp/run.go
-    // :1187 -> internal/panel/pump.go:372-373), so the old "还没收到策略
-    // 快照" was a 假免接线. The wired half is the mode; the rest of the
-    // security face (thresholds, grants, B-list, taint history) still has no
-    // read face, and SecuritySettings names each engine it waits for.
+    // Ticket 40's census re-cut, updated 2026-11-18 (AC#2, readface wave 4):
+    // the tier rides EVERY packet (cmd/wisp/run.go:1187 ->
+    // internal/panel/pump.go:372-373), so the old "还没收到策略快照" was a
+    // 假免接线. The wired half is the mode PLUS the live grants card since
+    // wave 4 (session.rules.list / session.rules.revoke over the runtime's
+    // own D45-2 ledger, cmd/wisp/panel_session_rules_40.go); the rest of the
+    // security face (thresholds, B-list, taint history, approval audit)
+    // still has no read face, and SecuritySettings names each engine it
+    // waits for.
     name: "安全",
     purpose: "权限档位、门控阈值、批量授权的边界。",
     waiting: "",

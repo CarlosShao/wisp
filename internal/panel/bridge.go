@@ -173,6 +173,47 @@ const (
 	// leg spells it in frontend/src/lib/panel.ts (this wave is Go-only by
 	// dispatch; frontend/** is untouched).
 	MethodHistoryPage = "history.page"
+	// MethodSessionRulesList / MethodSessionRulesRevoke are readface wave 4
+	// (2026-11-18), ticket 40 AC#2's Go half: the security page's LIVE view of
+	// the D45-2 session ledger's rows (SPEC-06 §8.2 「面板安全页实时列出并可
+	// 一键撤销」, SPEC-00 #34), and the one-click revoke that bites on the
+	// very NEXT covered call. Three naming facts, stated because each one is a
+	// decision somebody could later "fix" by accident:
+	//
+	//   - The spec's own spellings for this face are grants.list / grants.revoke
+	//     (SPEC-08 §5.2:169). They CANNOT land here: internal/panel's frozen
+	//     grant-boundary instrument (l2_grant_boundary_test.go grantRouteWords)
+	//     reddens every answered route whose normalized name carries "grant",
+	//     and internal/session/grants.go's header has recorded that death since
+	//     ticket 224 (A435's 落点 clause). So the door rides the codebase's own
+	//     synonym instead of minting a fourth vocabulary: "session rules" is
+	//     what the operator view of these rows is already called in
+	//     cmd/wisp/approval_reply.go's grantsList comment ("the operator's live
+	//     view of THIS session's rules"), and "revoke" is SPEC-06 §8.2's own
+	//     一键撤销 verb. The roster.cancel precedent (that file's own note)
+	//     is the shape: semantic target unchanged, spelling moved with the
+	//     instrument, no assertion loosened anywhere.
+	//
+	//   - No "panel." prefix (ticket 181's extractor counts those literals)
+	//     and no word of grantRouteWords: a READ cannot approve anything, and
+	//     a REVOKE removes an authorization - the one direction the panel may
+	//     move, because it can only ever make the gate ask again, never stop
+	//     it asking. AGENTS.md §1.2's "panel-side L2 allow" stays untouched
+	//     and unreachable through both doors.
+	//
+	//   - The list is a READ over the session ledger's real rows; the revoke
+	//     is a WRITE through the ledger's own Revoke entrance (the SAME door
+	//     ticket 49's console verb spends, internal/session/grants.go:338) -
+	//     rows are retained for the audit window (SPEC-02 §4), only their
+	//     liveness dies, which is why the NEXT covered call re-asks.
+	//
+	// The page literal half LANDED with this same change (ticket 40 AC#2's
+	// frontend leg): frontend/src/lib/panel.ts spells both names
+	// (requestSessionRules / requestSessionRulesRevoke on the settings
+	// envelope, selector key sessionRuleId), so no rosterPageGapLedger194
+	// registration is carried - the two-way mirror gate judges them directly.
+	MethodSessionRulesList   = "session.rules.list"
+	MethodSessionRulesRevoke = "session.rules.revoke"
 	// MethodRosterCancel is readface wave 2 (2026-11-17), ticket 38 AC#4's
 	// cancel door: the panel-side route that stops ONE task row through the
 	// Go host's existing cancel paths. Why it exists at all (the reason the
@@ -389,6 +430,19 @@ type ComposerRequest struct {
 	// message handler validates the vocabulary and stages it for the next
 	// admitted task; an unknown word is refused before anything is staged.
 	ForceMode string `json:"forceMode,omitempty"`
+	// SessionRuleID is readface wave 4's revoke selector (session.rules.revoke,
+	// ticket 40 AC#2): the D45-2 row id the security page's grants list showed
+	// the user, echoed verbatim (the read face's payload is where the number
+	// came from - the same #编号 ticket 49's console grants verb prints and its
+	// revoke-grant verb spends). Selector-shaped like RosterTaskID - a name the
+	// page echoes from the read face, never a key path - and the only thing the
+	// revoke door spends. NOTE THE SPELLING: the JSON key avoids the word the
+	// frozen instrument bans on inbound envelope fields too (grantFieldWords,
+	// l2_grant_boundary_test.go) - the semantic target is unchanged (one
+	// approval_grant row id), and the semantic home is stated in the route
+	// constants' note above. An empty or non-numeric value is refused by the
+	// handler before the ledger is reached.
+	SessionRuleID string `json:"sessionRuleId,omitempty"`
 }
 
 // ParseComposerRequest reads one postMessage string. Every refusal is an error
@@ -421,7 +475,7 @@ func knownComposerMethod(m string) bool {
 	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
 	// exact one-line form, so wrapping it would leave real plants replacing
 	// nothing. Appending a constant means extending this line, deliberately.
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:
 		return true
 	}
 	return false

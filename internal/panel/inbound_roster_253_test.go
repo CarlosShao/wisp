@@ -90,14 +90,24 @@ const (
 	// the routes and the cmd/wisp handlers. The three page literals are
 	// REGISTERED in bridge_test.go's rosterPageGapLedger194 while pending
 	// (Go-only wave by dispatch), each entry audited both ways.
-	wantFullInboundRosterSize253 = 16
+	// Readface wave 4 (2026-11-18) moved both again: two doors joined -
+	// "session.rules.list" and "session.rules.revoke" (ticket 40 AC#2's live
+	// grants read and one-click revoke; the spec's grants.list/grants.revoke
+	// spellings die on the frozen grant-boundary instrument, see bridge.go's
+	// note on the two constants) - size 16 -> 18 and non-prefixed 12 -> 14,
+	// in the same change that added the routes and the cmd/wisp handler. The
+	// page literal half landed in panel.ts in the SAME change
+	// (requestSessionRules / requestSessionRulesRevoke, selector key
+	// sessionRuleId), so no rosterPageGapLedger194 registration is carried.
+	wantFullInboundRosterSize253 = 18
 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
 	// "panel." prefix, invisible to both old rulers. It was 3 ("config.get",
 	// "config.set", "config.models.list") until ticket 194 added the fourth:
 	// "cost.summary"; readface wave 1 added the three privacy doors (7);
 	// readface wave 2 added history.page and roster.cancel (9); readface
-	// wave 3 added tools.list, tool.launch and rules.force (12).
-	wantNonPanelPrefixedInbound253 = 12
+	// wave 3 added tools.list, tool.launch and rules.force (12); readface
+	// wave 4 added session.rules.list and session.rules.revoke (14).
+	wantNonPanelPrefixedInbound253 = 14
 )
 
 // wantFullInboundRoster253 is the closed roster: every name a page can put in the
@@ -117,6 +127,8 @@ var wantFullInboundRoster253 = []string{
 	"privacy.purge",
 	"roster.cancel",
 	"rules.force",
+	"session.rules.list",
+	"session.rules.revoke",
 	"tool.launch",
 	"tools.list",
 }
@@ -702,7 +714,7 @@ func TestPlantedUnregisteredInboundMethodNameGoesRed(t *testing.T) {
 	// into a copy by replacing that copy's single case line.
 	dir := t.TempDir()
 	path := filepath.Join(dir, "bridge.go")
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is no longer written as one comma-separated clause - re-read knownComposerMethod and rebuild this plant from what is on disk rather than replacing nothing")
 	}
@@ -746,7 +758,7 @@ func TestRegistrationSilencesTheRosterRuler(t *testing.T) {
 		t.Fatalf("read bridge.go: %v", err)
 	}
 	constLine := "\nconst ConfigRegistered253Test = \"config.registered253\"\n"
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is not the one comma-separated clause this plant was written against - re-read knownComposerMethod rather than trusting this line")
 	}

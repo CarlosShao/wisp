@@ -30,32 +30,32 @@
      门控阈值        thresholds are the native frozen face
                      (internal/risk/thresholds.go); no snapshot section, no
                      C17 route (internal/panel/bridge.go's roster).
-     会话授权/撤销    D45 grants production writers are live - the census's
-                     journal.go:101 was the census's claim; ticket 49 proved
-                     production writes ARE live: gate.go:859
-                     g.grants.Record / gate.go:844 rt.RecordTarget, landing
-                     through internal/session/grants.go:201/274 InsertGrant,
-                     with the id carried back to the call face at
-                     tools/bridge.go:1445 (tc.GrantID = &g); session close
-                     stamps revoked_at and keeps the rows for audit
-                     (grants.go:346 RevokeAll). The absence is PANEL-side
-                     only: the snapshot carries no grants section and the
-                     architecture bans Go-inbound grant routes
-                     (grants.list/grants.revoke are not in C17's roster), so
-                     there is no grants list for this page to read. The
-                     operating exit is the console verbs: grants (list this
-                     session's live grants) and revoke-grant <编号>
-                     (cmd/wisp/approval_reply.go:415/:474).
      B-list 覆盖行    no snapshot section.
      taint-hit 历史  the tool_call table exists (internal/memory), but no
                      panel read face names it.
      审批审计浏览     the [audit] lines exist, but there is no read route that
                      joins them by correlationId.
 
+   WHAT JOINED THE WIRED FACE (2026-11-18, ticket 40 AC#2, readface wave 4):
+   the session-grants absence row is GONE - it graduated into the real card
+   this file mounts (SessionRulesCard, components/session-rules-settings.tsx):
+   the two roster doors session.rules.list / session.rules.revoke are answered
+   over the runtime's own D45-2 ledger (cmd/wisp/panel_session_rules_40.go),
+   so the page lists the live rows and spends them with one click. The route
+   spellings ride the session.rules.* synonym because the frozen
+   grant-boundary instrument bans the spec's grants.list / grants.revoke on
+   the wire; the console verbs grants / revoke-grant
+   (cmd/wisp/approval_reply.go) remain the operator's second exit. Production
+   writes were already live (gate.go:859 g.grants.Record / gate.go:844
+   rt.RecordTarget, landing through internal/session/grants.go:201/274
+   InsertGrant, the id carried back at tools/bridge.go:1445) - the panel-side
+   read face was the absence, and it is one no longer.
+
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
 import { SettingsCard, StateTag } from "@/components/settings-controls";
+import { SessionRulesCard } from "@/components/session-rules-settings";
 import { tierName } from "@/lib/tier-names";
 import type { ComposerMode } from "@/lib/panel";
 
@@ -66,11 +66,6 @@ const ABSENCES: readonly { label: string; reason: string }[] = [
     label: "门控阈值",
     reason:
       "阈值表是原生冻结面（internal/risk/thresholds.go）：快照没有对应节，C17 名册（internal/panel/bridge.go:41-107）也没有读取路由。",
-  },
-  {
-    label: "会话授权面板读面",
-    reason:
-      "会话授权生产在写（gate.go:859 g.grants.Record / gate.go:844 RecordTarget，落库走 internal/session/grants.go:201/274 InsertGrant，tools/bridge.go:1445 把 grant_id 带回调用面；会话收口盖 revoked_at、行保留审计，grants.go:346）。面板侧没有 grants 列表读面：快照无 grants 节，架构也禁 Go 入站 grant 路由（grants.list/grants.revoke 不在 C17 名册）。操作出口＝console 动词 grants（列本会话生效授权）/ revoke-grant <编号>（cmd/wisp/approval_reply.go:415/:474）。",
   },
   {
     label: "B-list 覆盖与审计行",
@@ -149,6 +144,13 @@ export function SecuritySettings({
             <p className="text-[12px] leading-[1.7] text-ink-2">{l2Transitions}</p>
           )}
         </SettingsCard>
+
+        {/* Ticket 40 AC#2 (readface wave 4, 2026-11-18): the LIVE grants card
+            - the read face and the one-click revoke over the runtime's own
+            D45-2 ledger. Mounted here, not drawn here: the card's rows are
+            the door's payload verbatim, and its empty state is the door's
+            own zero sentence. */}
+        <SessionRulesCard />
 
         <SettingsCard title="这一页还没接的面" description="每行写明它缺哪台引擎；画一个没有读口的控件，等于让改不动的旋钮看起来像能改。">
           <div className="flex flex-col">

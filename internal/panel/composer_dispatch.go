@@ -13,9 +13,11 @@ package panel
 // slice A shipped; the two settings doors ticket 248 added make six, ticket
 // 320's fetch route seven, ticket 194's cost door eight, readface wave 1's
 // three privacy doors (ticket 40 AC#1) eleven, readface wave 2's two doors
-// (ticket 36 AC#3's history read, ticket 38 AC#4's cancel door) thirteen, and
+// (ticket 36 AC#3's history read, ticket 38 AC#4's cancel door) thirteen,
 // readface wave 3's three doors (ticket 38 AC#3's tools.list read and
-// tool.launch door, ticket 38 AC#5's rules.force read) sixteen - and
+// tool.launch door, ticket 38 AC#5's rules.force read) sixteen, and
+// readface wave 4's two doors (ticket 40 AC#2's session-rules live read and
+// its one-click revoke) eighteen - and
 // the roster they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
@@ -240,6 +242,35 @@ type RulesForceHandler interface {
 	HandleRulesForce(ctx context.Context, req ComposerRequest) (string, error)
 }
 
+// SessionRulesHandler answers readface wave 4 (2026-11-18, ticket 40 AC#2):
+// the security page's LIVE view of the D45-2 session ledger plus its
+// one-click revoke. Two methods, one per roster name, the privacy trio's
+// reason restated: the verbs differ in kind, and a method-per-verb door
+// cannot be talked into the wrong one by an argument.
+//
+//   - HandleSessionRulesList: the live rows of THIS session's ledger, each
+//     carried verbatim {id, scope, tool, pattern, session, createdAt,
+//     expiresAt} - the real fields off approval_grant, never a summary.
+//     Zero live rows is an EXPLICIT state: the payload carries the door's
+//     own zero-row sentence (the page renders it verbatim and never draws
+//     an empty table dressed up as a reading). Settings-route shape: one
+//     prose sentence plus one payload line behind the door's marker.
+//   - HandleSessionRulesRevoke: ONE row spent through the ledger's own
+//     Revoke entrance (internal/session/grants.go:338 - the same door
+//     ticket 49's console verb reaches), so the NEXT covered call re-asks
+//     on the real gate. The receipt names the row; an empty or non-numeric
+//     selector is refused before the ledger is reached. Revoking REMOVES an
+//     authorization - the one direction the panel may move - so no confirm
+//     bit rides it (SPEC-06 §8.2's 一键撤销, one click by design).
+//
+// The spellings are NOT the spec's grants.list / grants.revoke: the frozen
+// grant-boundary instrument reddens those (see bridge.go's note on the two
+// constants). nil socket = the named refusal every unattached door gives.
+type SessionRulesHandler interface {
+	HandleSessionRulesList(ctx context.Context, req ComposerRequest) (string, error)
+	HandleSessionRulesRevoke(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -291,6 +322,12 @@ type ComposerDispatch struct {
 	// Rules answers readface wave 3's force-rules read (ticket 38 AC#5).
 	// Optional like every socket above; nil refuses by name.
 	Rules RulesForceHandler
+	// SessionRules answers readface wave 4 (2026-11-18, ticket 40 AC#2): the
+	// security page's live grants list and its one-click revoke. Optional
+	// like every socket above; nil refuses by name - a revoke request that
+	// reaches a machine with no session-rules leg attached must be told so,
+	// not dropped.
+	SessionRules SessionRulesHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -413,6 +450,16 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.Rules.HandleRulesForce(ctx, req)
+	case MethodSessionRulesList:
+		if d == nil || d.SessionRules == nil {
+			return "", d.unattached(req)
+		}
+		return d.SessionRules.HandleSessionRulesList(ctx, req)
+	case MethodSessionRulesRevoke:
+		if d == nil || d.SessionRules == nil {
+			return "", d.unattached(req)
+		}
+		return d.SessionRules.HandleSessionRulesRevoke(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

@@ -579,6 +579,14 @@ func runResident() {
 	// the seams stay nil and the doors keep refusing by name.
 	bindPanelDiscoveryForce(rp, src)
 
+	// Readface wave 4 (2026-11-18, ticket 40 AC#2): the session-rules doors'
+	// seam, late-bound on the same first line where both objects exist. The
+	// bind hands the door the runtime's own session ledger (the object the
+	// answer route writes through), so the page's grants view and the gate's
+	// "已授权过吗" question read the same rows. Absent either side, the seam
+	// stays nil and the doors keep refusing by name - not a silent drop.
+	bindPanelSessionRules(rp, src)
+
 	// Ticket 228 AC#2/AC#3: the two hops this slice adds, both on the first line
 	// where the runtime (and therefore the card ledger and the answer surface)
 	// exists:
