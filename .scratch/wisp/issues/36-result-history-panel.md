@@ -44,7 +44,7 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 - [x] Long-task stream: 200-chunk golden replay renders with merge (no jank), token counter
       accurate.
   〔**10-08 12:0x 编排者就地裁冲突，来源＝只读普查腿 `197-a1`（件 `.scratch/wisp/probes/197/a1/sweep.md`）；⛔ 本框保持未勾、⛔ 不改判据要什么**：那句 **"renders with merge" 与盘上已重裁的规则方向相反**——产码 `internal/panel/pump.go:397-409` 逐字 `Overflow TRUNCATES and never merges`，是**票 197 leg B 重裁**（判据 票 197 `:32`＋未勾 `AC#3 :39`；裁处 `docs/evidence/s1/197-subagent-stream-r2.md:41-54` §1「乙」；批准＝台账 **`A406`**；代码＝`94ea50f7` 删掉 `mergeOverflowLocked`，现 0 命中）。⇒ 落地时这一格只能按**截断**那形写判据；⛔ **任何程都不许为了对上"merge"这个词去改 pump**（那是把一枚已裁的规则倒回去，要改必须先经人工批准）。另两处同名不同链具名排除：`cmd/wisp/panel_pump.go:397` 与 `internal/panel/pump.go:397` **行号相同、文件不同、说的相反**，引号必须先报文件；`internal/subagent_197.go:274` 那句「把任务并成一枚子代理」是**用户文案**、与本链无关。〕
-- [ ] Hidden-panel animation pause asserted (rAF counters).
+- [x] Hidden-panel animation pause asserted (rAF counters).
 
 ## Progress log (append-only, newest last)
 
@@ -98,3 +98,8 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 **尺1** 两提交在。**尺3 我自己复跑**：`render:stream20036` rc=0；build/typecheck/lint rc=0；`internal/panel -run Stream|Usage|Token|Result` ok 6.559s；dist 归 `.gitkeep`。
 - **勾 AC#4（按 10-08 重裁的「截断」形写判据，⛔ 不是 merge）**：① **token 对账** 32/32 行 usage 五字段与 golden 逐字段相等；32/32 行 wire 上无 usage 键＝**未知≠假 0**（`ResultChunk` 第 4 枚键 `usage` 只附着真 EvUsage）② **200 块无 jank（可判事实）** 900 发布恰＝900 步、每包 ≤64 行硬顶、每包每行恰一枚自有标记（合并当步即红）、消失全走逐出台账（136 逐出/64 具名）③ **两枚牙**：MUT-A 旧 fold（合并两块）⇒ 红（`two chunks merged into one row`）；MUT-B 字符数估算 ⇒ 红（usage 对不上、长流伪造行）；还原同树复绿。
 - `pump.go` 截断规则**零字节改动**（符合 A406）。变异全在仓外导出树，真仓零残留。
+## 编排者收件·AC#5＋顺手 deflake（2026-11-18 23:5x，`3de613364`＋`5b5ea2636`，件 `docs/evidence/s1/36-hiddenpause-deflake39-20261118.md`）
+
+**尺1** 两提交在。**尺3 我自己复跑**：`render:hiddenpause36` rc=0（读数「rAF counters judge the pause by deltas (visible 1->2 grows, hidden frozen 2/2/2 equal, resume grows)」）；`typecheck` rc=0；载具 `^Test39NativeLooseningCard` **-count=3 九发全 PASS**（accepted 0.07/0.03/0.04s）；`d22scan` clean。
+- **勾 AC#5**：面板原来**根本没有隐藏暂停机制**（普查只有 react-bits 装饰循环）⇒ 新建 `frontend/src/lib/panel-visibility.ts`（`document.visibilityState` 变 ⇒ 停 rAF 循环、恢复再启），真实动画源（RevealText 流式梯子）隐藏时零 timer、切回从冻结处续走。仪器 **用计数器差值判**（visible 1→2 增／hidden 2/2/2 相等／resume 2→4 增），零墙钟。MUT-A 隐藏不暂停⇒红、MUT-B 只停不恢复⇒红。
+- **顺手 deflake**：`Test39NativeLoosening…` 整包偶红真因＝写提交在先、审计行在后（整包把窗口拉宽）＋共享 bytes.Buffer 无锁并发写；修＝互斥捕获＋`waitForAuditCount39` 带 5s 上限轮询，**断言一字未放宽**；整包第 2 发 RUN=1000/PASS=757/FAIL=1（唯一红＝A1876 名册 33r5 环境红），该测试整包 PASS 0.03s。

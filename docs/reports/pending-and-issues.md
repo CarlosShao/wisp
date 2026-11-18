@@ -37920,3 +37920,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 
 我复跑：载具四枚 PASS；approval 包边界牙 PASS；render:approval37 rc=0；d22scan clean。270/300 读自 queue.go:125 冻结默认（不在 thresholds.go，零动；300→299 两面红）；降级走 Replies.Allow 生产路径、面板 allow 结构性拒。**37 = 5/6，只剩 AC#6 人眼签收。**
 - ⚠ 整包新红 `Test39NativeLoosening…` 不在台账名册；我单跑 **3/3 全绿** ⇒ 整包内 sink 互扰（与 320 同族），已派 deflake 腿（不勾红名册、先修同步）。
+## A1949（11-18 23:5x）：36 AC#5 勾 `3de613364`/`5b5ea2636` ＋ 39 整包互扰 deflake
+
+我复跑 render:hiddenpause36 rc=0、typecheck rc=0、载具 ^Test39NativeLooseningCard -count=3 九发全 PASS、d22scan clean。面板原无隐藏暂停机制⇒新建 panel-visibility.ts（visibilityState⇒停/启 rAF），仪器用计数器差值判（零墙钟）；MUT-A/B 各红。deflake：写提交先/审计行后＋共享 buffer 无锁并发写⇒互斥捕获＋waitForAuditCount39（5s 上限轮询），断言零放宽；整包唯一红仍是 33r5 环境红。**36 = 4/6（剩 AC#1 视觉、AC#3 真窗 60fps 皆机主/环境）。**
