@@ -576,7 +576,7 @@ check(
 const baseModule = await import("@/lib/config-base");
 const { rememberConfigBaseSHA, currentConfigBaseSHA } = baseModule;
 const { performConfigWrite } = await import("@/lib/config-actions");
-const { translateWriteReply } = await import("@/lib/config-feedback");
+const { translateWriteReply, translateTieredWriteReply } = await import("@/lib/config-feedback");
 
 check(
   "the drift cache must hold and clear the fingerprint it is told (undefined and blank both clear)",
@@ -646,7 +646,7 @@ let captured: capturedEnvelope39 | null = null;
 (globalThis as unknown as { window?: unknown }).window = {
   wispDispatch: (raw: string) => {
     captured = JSON.parse(raw) as capturedEnvelope39;
-    return '设置已写入。 实际落盘的键路径：ball.size。 这一项要重启进程并重新运行才算用上。';
+    return '设置已写入。 实际落盘的键路径：ball.size。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。';
   },
 };
 rememberConfigBaseSHA("sha-from-read-39");
@@ -678,12 +678,54 @@ check(
   JSON.stringify(driftFeedback),
 );
 const noopFeedback = translateWriteReply(
-  "设置已写入。 本次没有任何键路径发生变化（文件里已经是这个值）。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。",
+  "设置已写入。 本次没有任何键路径发生变化（文件里已经是这个值）。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。",
 );
 check(
   "a no-op receipt must render 没有变化 (never a green 已保存 that reads as if something was written)",
   noopFeedback.tone === "neutral" && noopFeedback.text.includes("没有变化"),
   JSON.stringify(noopFeedback),
+);
+
+// ----------------------------------------------------------------------------
+// Ticket 39 AC#1's tier-events teeth, page half (2026-11-18). The Go route
+// teeth (cmd/wisp/tier_events_39_test.go) prove the three tiers behave per
+// registry; here the TIER LINES the page actually shows are pinned word for
+// word, off the receipts the Go side is pinned to send:
+//   restart -> "已保存，需要重启后生效"  (需要重启 VERBATIM on screen - the
+//              restart-required line this ticket's AC names; lose the word or
+//              the tier matcher and this check reds);
+//   hot     -> "已保存" with NO restart wording anywhere (无要重启字样 - a
+//              hot save must never say 需要重启);
+//   tiered  -> "已保存，重启进程后生效" for the tiered receipt family.
+// Each feeds on the SAME Go sentences the route teeth assert verbatim.
+// ----------------------------------------------------------------------------
+const RESTART_RECEIPT_39 =
+  '设置已写入。 实际落盘的键路径：app.language。 ' +
+  '这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。';
+const restartFeedback39 = translateWriteReply(RESTART_RECEIPT_39);
+check(
+  "the restart-required line on screen must carry 需要重启 verbatim (已保存，需要重启后生效)",
+  restartFeedback39.tone === "ok" &&
+    restartFeedback39.text === "已保存，需要重启后生效" &&
+    restartFeedback39.text.includes("需要重启"),
+  JSON.stringify(restartFeedback39),
+);
+const HOT_RECEIPT_39 = '设置已写入。 实际落盘的键路径：ball.style。 这一项立即生效。';
+const hotFeedback39 = translateWriteReply(HOT_RECEIPT_39);
+check(
+  "the hot line on screen must say 已保存 with zero restart wording (无要重启字样)",
+  hotFeedback39.tone === "ok" && hotFeedback39.text === "已保存" && !HOT_RECEIPT_39.includes("重启"),
+  JSON.stringify(hotFeedback39),
+);
+const tieredFeedback39 = translateTieredWriteReply(RESTART_RECEIPT_39);
+check(
+  "the tiered receipt family must keep its own restart line (已保存，重启进程后生效)",
+  tieredFeedback39.tone === "ok" && tieredFeedback39.text === "已保存，重启进程后生效",
+  JSON.stringify(tieredFeedback39),
+);
+check(
+  "a receipt whose tier sentence went restart-less must NOT show a restart line (the matcher reads the receipt, never assumes)",
+  translateTieredWriteReply(HOT_RECEIPT_39).text === "已保存",
 );
 
 if (failures.length > 0) {
@@ -695,5 +737,6 @@ console.error(
   "render-config: OK, badge reads the pump (census tooth both directions: readerless rows badge 未接线 + 等快照, fed rows badge their tier words, font_size 缺消费引擎 even fed, page-local rows 仅本次会话, theme names SetTheme; pickers/slider/switch/number fields mounted, snapshot values shown, " +
     "no-reader honest states, write rides the settings door, zero emoji); " +
     "ticket 39 AC#1/AC#4 consume teeth: 18 sections -> 18 tables with verbatim tier badges (hot x12/reload/restart/locked x4, danger tint on locked), prune-a-section removes its table and its stale value, 未登记档位 for an empty tier, errors under their lines with line 0 as （无行号）, reload event parses verbatim and refused writes notify nobody (zero re-reads), every config.set helper fans the event out; " +
-    "ticket 39 AC#4 drift/no-op teeth: the fingerprint cache holds/clears, config.get's baseSHA parses through (absent stays absent), the reload event carries the post-write fingerprint and advances the cache (a refusal never does), config.set's envelope echoes configBaseSHA (absent when none held), the drift refusal renders 盘上已变's own line and the no-op renders 没有变化",
+    "ticket 39 AC#4 drift/no-op teeth: the fingerprint cache holds/clears, config.get's baseSHA parses through (absent stays absent), the reload event carries the post-write fingerprint and advances the cache (a refusal never does), config.set's envelope echoes configBaseSHA (absent when none held), the drift refusal renders 盘上已变's own line and the no-op renders 没有变化; " +
+    "ticket 39 AC#1 tier-events teeth: the restart-required line on screen says 需要重启 verbatim (已保存，需要重启后生效), the hot line says 已保存 with zero restart wording, the tiered family keeps its own restart line, and a restart-less receipt shows no restart line",
 );

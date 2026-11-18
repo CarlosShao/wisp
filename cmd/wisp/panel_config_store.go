@@ -493,6 +493,13 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 				fmt.Errorf("字段 %q 要的是 true/false，收到的值解析不了", w.Field)
 		}
 		written, err = s.mgr.SetPluginEnabled(w.Plugin, on, config.SourcePanel, "panel.config.set")
+	case panel.FieldAppLanguage:
+		// 票 39 AC#1：重启档代表键。值＝界面语言标签的字符串（schema 无枚举，
+		// 门已拒空值）；写入走受守路径 SetAppLanguage。档位不在这里盖——下面
+		// 由 registryEffectiveTier39 问 TierRegistry 答（app.language 的
+		// per-key restart 行），行为半（只落盘、内存保开机值）在
+		// internal/config 的 tier-aware 写路径里。
+		written, err = s.mgr.SetAppLanguage(strings.TrimSpace(w.Value))
 	case panel.FieldProviderCredential:
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
 			fmt.Errorf("凭据值不走这条写入路径（它只写不回显，必须走 StoreCredential），字段 %q 未落盘", w.Field)
@@ -512,6 +519,16 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		res.BaseSHAAfter = sha
 	}
 	res.Tier = panel.EffectiveRestart
+	if w.Field == panel.FieldAppLanguage {
+		// 票 39 AC#1：档位与注册表同源。app.language 的档是 tiers.go 的
+		// per-key 行答的（TierOf），不是这里硬写；本字段是这张映射的第一枚
+		// 生产消费者，旧字段的实测档位戳（187/65/422 的名册）刻意不动。
+		if len(written) > 0 {
+			if t, ok := registryEffectiveTier39(written[0]); ok {
+				res.Tier = t
+			}
+		}
+	}
 	if w.Field == panel.FieldPluginEnabled {
 		// 票 215a 的档位与真话：配置层立即生效（[plugins] 锁定段的收紧在
 		// manager.go 走同一条「hot-applied」路），但 Note 必须把「谁消费它」

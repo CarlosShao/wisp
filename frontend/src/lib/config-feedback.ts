@@ -13,7 +13,7 @@
         (answered: nothing set), 已配置 (answered: something set) - and an
         error says what the user can do, never which subsystem failed.
      2. A write's answer is TRANSLATED, not echoed: the receipt's key paths and
-        tier wording become one plain sentence ("已保存，重启后生效"), and a
+        tier wording become one plain sentence ("已保存，需要重启后生效"), and a
         refusal becomes the one line a person can act on. The raw reply is
         never rendered.
 
@@ -145,10 +145,13 @@ export function translateWriteReply(reply: string | null): Feedback {
     return { tone: "neutral", text: "没有变化：文件里已经是这个值。" };
   }
   if (reply.includes("密钥已录入")) {
-    return { tone: "ok", text: restartTier(reply) ? "密钥已保存，重启后生效" : "密钥已保存" };
+    return { tone: "ok", text: restartTier(reply) ? "密钥已保存，需要重启后生效" : "密钥已保存" };
   }
   if (reply.includes("已写入")) {
-    return { tone: "ok", text: restartTier(reply) ? "已保存，重启后生效" : "已保存" };
+    // Ticket 39 AC#1: the restart-required line on screen carries 需要重启
+    // verbatim - the same word the Go receipt's restart sentence is pinned by
+    // (tierSentence), so the page and the receipt say one thing word for word.
+    return { tone: "ok", text: restartTier(reply) ? "已保存，需要重启后生效" : "已保存" };
   }
   // Anything that is neither a known receipt nor a refusal: say so plainly
   // rather than claim a save.
@@ -185,6 +188,7 @@ export function translateTieredWriteReply(reply: string | null): Feedback {
 function restartTier(reply: string): boolean {
   return reply.includes("重启");
 }
+
 
 /** The model-list fetch's answer when it did not carry a payload: a refusal
     gets its matched human line; anything else (the host's D37 prose) is shown

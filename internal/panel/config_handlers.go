@@ -439,8 +439,8 @@ type SettingWrite struct {
 	// other field - the gate refuses a plugin-shaped field without one
 	// before the leg is reached.
 	// Plugin    string
-	Plugin    string
-	Value     string
+	Plugin string
+	Value  string
 	// BaseSHA is the page's echo of the fingerprint the read face handed it
 	// (SettingsView.BaseSHA, ticket 39 AC#4's drift handshake). Empty = the
 	// page has no fingerprint to answer for (an older page, a leg that never
@@ -663,16 +663,15 @@ func renderReloadEvent(r SettingWriteResult) string {
 
 // knownWritableField asks the rosters, not a copy of them. Since ticket 313
 // there are two rosters (the ticket-248 table here and the 313 additions in
-// config_write_313.go), since ticket 187 a third (config_write_187.go), since
-// ticket 65 a fourth (config_write_65.go), since the appearance wave a fifth
-// (config_write_wave.go), and since ticket 215a a sixth (config_write_215.go);
-// this is the one place the door asks all six: a field is writable when any
-// roster carries it, and the frozen 248 pin keeps describing the 248 table
-// alone.
+// config_write_313.go), since ticket 187 a third (config_write_187.go), since ticket 65 a fourth (config_write_65.go), since the appearance wave a fifth
+// (config_write_wave.go), since ticket 215a a sixth (config_write_215.go), and
+// since ticket 39 a seventh (config_write_39.go); this is the one place the
+// door asks all seven: a field is writable when any roster carries it, and the
+// frozen 248 pin keeps describing the 248 table alone.
 func knownWritableField(field string) bool {
 	return listedWritableField(field) || additionalWritableField(field) ||
 		writableField187(field) || writableField65(field) ||
-		writableFieldWave(field) || writableField215(field)
+		writableFieldWave(field) || writableField215(field) || writableField39(field)
 }
 
 // listedWritableField is the ticket-248 table's own lookup, unchanged in shape.
@@ -743,7 +742,12 @@ func tierSentence(t EffectiveTier) string {
 	case EffectiveNextTask:
 		return "这一项在下一次任务开始时生效。"
 	case EffectiveRestart:
-		return "这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。"
+		// Ticket 39 AC#1 (tier-events): the restart sentence carries 需要重启
+		// VERBATIM - the page-visible restart-required line the route teeth
+		// assert word for word, and the frontend's restartTier() matcher reads
+		// the same word. The wording change is additive: every Contains-style
+		// pin on the old sentence still holds.
+		return "这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。"
 	case EffectiveNotApplied:
 		return "这一项没有被应用。"
 	default:

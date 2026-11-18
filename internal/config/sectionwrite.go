@@ -239,6 +239,13 @@ func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
 				strings.Join(changed, ", ")+"; refusing a write that carries keys outside the one it owns")
 	}
 
+	// TICKET 39 AC#1: the key's own D36 tier, asked of the ONE machine-readable
+	// table (tiers.go's TierRegistry via TierOf) - never a second vocabulary
+	// here. Only the per-key rows ([app].*/[voice].*) answer ok; whole-section
+	// writes keep the pre-39 shape (memory applies, no reload event), which is
+	// exactly how plan()'s whole-section hot walk behaves.
+	keyTier, keyTiered := TierOf(w.Key)
+
 	// (3) Ticket 248's AC#7 gate: the SAME validate() the start-up path runs,
 	// over the base the write would produce, before a single byte is written.
 	if err := validate(candidate); err != nil {
@@ -310,7 +317,24 @@ func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
 	// The tightening audit line is written AFTER this returns, because
 	// "outcome=written" before the merge writer has answered would be the one
 	// lie an audit line must never tell.
-	res, err = m.commitSectionWrite(w, base, exists, res)
+	//
+	// TICKET 39 AC#1 (tier-events, 2026-11-18): the write now honors the key's
+	// registered D36 tier (TierOf -> tiers.go, the one machine-readable answer)
+	// before it touches memory:
+	//
+	//   - restart tier (the [app] per-key rows): the FILE is written but
+	//     memory is NOT - the old value stays active until process restart,
+	//     exactly what planApp enforces for a hand edit of the same key. The
+	//     divergence this leaves between memory and file is deliberate:
+	//     mergeWrite does not adopt the stat for a diverged file (its AC#3
+	//     rule), so the next reload reads the change back and books it in
+	//     Report.Restart - OnRestartPending says 需要重启 out loud (the same
+	//     surface an external edit lands on). A restart write that hot-applied
+	//     to memory would be the "restart 当 hot" lie this ticket's tooth
+	//     catches.
+	//   - hot and reload tiers: memory applies as always (reload additionally
+	//     fires Manager.OnReload below, once the write is confirmed).
+	res, err = m.commitSectionWrite(w, base, exists, res, keyTiered && keyTier == string(TierRestart))
 	if err != nil {
 		return res, err
 	}
@@ -322,6 +346,16 @@ func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
 		m.auditf("config: SECTION-WRITE section=%s key=%s direction=tighten source=%s origin=%s outcome=%s keys=%s",
 			w.Section, w.Key, w.Source, w.Origin, outcome, strings.Join(res.Keys, ","))
 	}
+	// Reload tier (TierReload rows in tiers.go): the write applied to memory
+	// and the file, so the owning subsystem is told NOW - the same event
+	// CheckAndReload fires for a hand edit of a reload-tier section (values
+	// already applied, manager.go's OnReload contract). No-op writes fire
+	// nothing: nothing changed, so there is nothing to reload. CheckAndReload
+	// cannot double-fire for this write: memory and file agree, so its own
+	// stat adoption (mergeWrite's AC#3 rule) makes the next poll a no-op.
+	if keyTiered && keyTier == string(TierReload) && res.Written && m.OnReload != nil {
+		m.OnReload([]string{sectionOfKey(w.Key)})
+	}
 	return res, nil
 }
 
@@ -329,8 +363,15 @@ func (m *Manager) WriteSection(w SectionWrite) (SectionWriteResult, error) {
 // apply, the guarded merge write, and the rollback that keeps memory and file
 // from diverging on a failed write. The direction verdict, the validation and
 // the file pre-read all happened before this was called (ruling N9).
+//
+// restartTier is ticket 39 AC#1's D36 verdict for the key (computed by the
+// caller from TierOf, never guessed here): a restart-tier key writes the FILE
+// only - memory keeps the value this process started with, which is what makes
+// "改了 -> 不重启 -> 旧值还在" observable and what leaves the memory/file
+// divergence for the next reload to book as Report.Restart. Caller holds no
+// lock; this function takes m.mu.
 func (m *Manager) commitSectionWrite(w SectionWrite, base *Config, exists bool,
-	res SectionWriteResult,
+	res SectionWriteResult, restartTier bool,
 ) (SectionWriteResult, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -339,9 +380,11 @@ func (m *Manager) commitSectionWrite(w SectionWrite, base *Config, exists bool,
 	if memOld == nil {
 		return res, observe.New(observe.ClassConfig, "config: no loaded config in this Manager, refusing to write one")
 	}
-	if err := w.Apply(m.cur); err != nil {
-		m.cur = memOld
-		return res, err
+	if !restartTier {
+		if err := w.Apply(m.cur); err != nil {
+			m.cur = memOld
+			return res, err
+		}
 	}
 	var applyErr error
 	if err := m.mergeWrite(w.Key, func(b *Config) { applyErr = w.Apply(b) }); err != nil {

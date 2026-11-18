@@ -191,31 +191,33 @@ func additionalWritableField(field string) bool {
 	return false
 }
 
-// acceptedWritableFields is the union of all six rosters, sorted, for the
+// acceptedWritableFields is the union of all seven rosters, sorted, for the
 // refusal text: a page told "可写的只有 ..." must be told about every name the
 // door would actually accept, or the sentence sends it chasing the wrong list.
 // (Ticket 187's roster joined the two older ones, ticket 65's joined the same
 // way, the appearance wave's roster (config_write_wave.go) joined the same way
-// again, and ticket 215a's plugin roster (config_write_215.go) joined the same
-// way once more; the union grew with each.)
+// again, ticket 215a's plugin roster (config_write_215.go) joined the same way
+// once more, and ticket 39's app_language roster (config_write_39.go) joined
+// the same way again; the union grew with each.)
 func acceptedWritableFields() []string {
 	out := append(WritableFields(), AdditionalWritableFields()...)
 	out = append(out, WritableFields187()...)
 	out = append(out, WritableFields65()...)
 	out = append(out, WritableFieldsWave()...)
 	out = append(out, WritableFields215()...)
+	out = append(out, WritableFields39()...)
 	sort.Strings(out)
 	return out
 }
 
 // needsProviderFor / needsModelFor / needsPluginFor / takesValueFor answer one
-// selector question across all six rosters, so the gate's checks stay one
+// selector question across all seven rosters, so the gate's checks stay one
 // loop-shaped question each instead of growing a second branch per column.
-// The 187 roster (config_write_187.go), the 65 roster (config_write_65.go)
-// and the appearance wave's roster (config_write_wave.go) join the selector
-// maps below; none carries a provider/model/plugin selector and all take the
-// plain value half. Ticket 215a's roster (config_write_215.go) introduces the
-// plugin selector column.
+// The 187 roster (config_write_187.go), the 65 roster (config_write_65.go),
+// the appearance wave's roster (config_write_wave.go) and ticket 39's roster
+// (config_write_39.go) join the selector maps below; none carries a
+// provider/model/plugin selector and all take the plain value half. Ticket
+// 215a's roster (config_write_215.go) introduces the plugin selector column.
 func needsProviderFor(field string) bool {
 	return fieldNeedsProvider[field] || fields313NeedsProvider[field]
 }
@@ -234,5 +236,6 @@ func needsPluginFor(field string) bool {
 func takesValueFor(field string) bool {
 	return fieldTakesValue[field] || fields313TakesValue[field] ||
 		fields187TakesValue[field] || fields65TakesValue[field] ||
-		fieldsWaveTakesValue[field] || fields215TakesValue[field]
+		fieldsWaveTakesValue[field] || fields215TakesValue[field] ||
+		fields39TakesValue[field]
 }

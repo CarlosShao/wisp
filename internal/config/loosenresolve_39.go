@@ -201,8 +201,11 @@ func (m *Manager) ResolveQueuedLoosen(id string, approved bool) (SectionWriteRes
 	}
 
 	// The commit itself is the same under-lock path every section write uses:
-	// memory first, guarded merge write, rollback on failure.
-	res, err = m.commitSectionWrite(w, base, exists, res)
+	// memory first, guarded merge write, rollback on failure. restartTier is
+	// false here on purpose (ticket 39 AC#1): these keys live in the four
+	// LOCKED sections, whose TierRegistry marker is "locked" - not a reload
+	// tier - so a completed card applies to memory exactly as before.
+	res, err = m.commitSectionWrite(w, base, exists, res, false)
 	if err != nil {
 		return res, err
 	}
