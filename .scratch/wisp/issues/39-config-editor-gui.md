@@ -35,7 +35,7 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 ## Acceptance criteria
 - [ ] Every D36 section renders from schema (golden snapshot per section); edit → save →
       hot/reload/restart behavior matches tier (events observed).
-- [ ] Security loosening → native L2 confirm → accept applies + logs; reject keeps old
+- [x] Security loosening → native L2 confirm → accept applies + logs; reject keeps old
       (e2e with 21's card).
 - [ ] api_key write-only + last-4 display + ref creation verified; plaintext never rendered
       or stored by GUI.
@@ -143,3 +143,9 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 **尺1** `d58dceb5a` 在（23 件）。**尺3 我自己复跑**：18 枚 `.html` 在盘；`npm run render:cfggolden` **校 rc=0**（`18 sections x 115 rows byte-verified`）；build/typecheck/lint rc=0；dist 归 `.gitkeep`。
 - **正控**：改 `ball.size 56→90` ⇒ rc=1 且点名 `[drifted: ball]`；**负控**：改回 ⇒ rc=0。快照输入是真 wire 形（`NewDefaults()` 值＋`TierRegistry` tier 逐字 hot×80/reload×17/restart×3/locked×15），零造数据；`.gitattributes * -text` 防 CRLF 假红。
 - AC#1 **仍不整勾**：golden-per-section 半格已证；「edit → save → 按 tier 生效」半格需真宿主 e2e。
+
+## 编排者收件·AC#2（2026-11-18 11:1x，`91b245b57`，件 `docs/evidence/s1/39-security-l2-r1.md`）
+
+**尺1** `91b245b57` 在（10 件）。**尺3 我自己复跑**（载具）：`^Test39` **16 RUN/13 PASS/0 FAIL**，其中四枚 e2e 全绿 —— `Test39NativeLooseningCardAcceptedAppliesAndAudits` 0.03s／`…RejectedKeepsOldValue` 0.01s／`…TimeoutKeepsOldValue` 0.31s／`Test39LooseningWithoutGateFailsClosed` 0.01s。
+- **勾 AC#2**：①具名清单 **18 行**（13 静态键 + 5 plugins 动态族），逐键来源＝`manager.go` 四个 D36 方向审计函数的 append 行（⛔自造分类；四枚测试现读源码钉 Pin）②**写门**：放宽键 ⇒ 铸造 request id 先登记 pending 再交队列（无竞态窗）⇒ **票 21 那张 L2 卡**（`config.loosen`，非第二套）⇒ 接受＝重算+validate+方向复裁+单键所有权复核 ⇒ 真写 + **恰一条**审计 `SECTION-WRITE … outcome=written card=<id> changes=<key:old->new>`；拒绝/超时＝`outcome=denied` 零写入 ③三牙：M1 摘门⇒红／M2 接受不写审计⇒红／M3 拒绝仍写入⇒红（变异仓外）。面板来源放宽仍被 `ErrPanelLoosenRefused` 结构性拒（零面板侧 allow），**无新 C17 方法**。
+- 装配根：`Manager.LoosenQueue` 接真 C18 gate（票 195 证据 §7 欠账）；等待协程走 `observe.Default.Spawn("approval-waiter",…)`（非裸协程）；`close()` cancel+join。
