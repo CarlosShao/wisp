@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 40 AC#2：授权页真读 49 的 grants（活）＋撤销立刻在下一发门控调用生效（写腿，唯一共享编译面写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 40 **AC#2**（`40-security-privacy-cost-pages.md:48-49`）：`Grants view reflects 49's grants live (integration fixture); revoke takes effect immediately on next gated call`。
+要做：
+1. **读面**：确认 49 的 `grants` 已能真读库（`cmd/wisp` 里 ticket49 verbs，**先 grep 现跑**）；面板给它一条读方法（若已有就复用，别造第二条），下行载荷＝每枚授权 `{id,mode/scope,tool,expiresAt,createdAt}` 真字段，⛔ 自造摘要。
+2. **前端授权页**：列真行（空库⇒显式"还没有授权"而非空白/假数据）。
+3. **撤销即时生效**：调 `revoke-grant` ⇒ **下一次同工具的 L2 调用必须重新弹卡**（integration fixture：先"本会话允许"⇒一发不弹卡→撤销→再发⇒真弹卡），给两发读数。
+4. **牙**：①撤销不真删行（只改 UI）⇒ 第二发仍不弹卡⇒红 ②读面把空库画成 0 行"正常"⇒红 ③撤销后读面仍列出该行⇒红。变异仓外。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔ 面板侧 L2 allow、⛔ UI emoji。⚠ 别碰他人在飞件（`frontend/fixtures/composer-states.html` M 只报不动，⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关测试全绿 ③`go build ./...` rc=0；前端 build/typecheck/lint＋仪器 rc=0。
+写面：`cmd/wisp/**`（唯一）、`internal/panel/**`、`internal/tools/**`（若读面在此）、`frontend/src/**`、`frontend/scripts/render-*`、`docs/evidence/s1/40-grants-view-*`。
+回话第一行＝commit hash ＋三枚牙名/读数 ＋d22scan 末行 ＋载具 rc ＋前端 rc。没干完写「卡在哪」。
