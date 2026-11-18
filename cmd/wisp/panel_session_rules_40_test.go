@@ -46,6 +46,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -404,6 +405,16 @@ func Test40SessionRulesPanelRevokePopsTheNextCoveredCall(t *testing.T) {
 		// READING 1 (negative control): the grant is live and nothing is
 		// revoked, so the covered call must run silently - zero cards on the
 		// production UI.
+		// The file is removed first so this call keeps the CREATE shape:
+		// probed 2026-11-18 (mutation lab, three-covered-calls reading), a
+		// second fs.write OVER an existing file elevates the verdict beyond
+		// L1 - and L2 is never grant-covered (SPEC-06 §8.3/D45-3) - so an
+		// overwrite-shaped "red" call would ask even with the grant live and
+		// the reading would be confounded. Same shape in, same shape out;
+		// the ONLY variable between the two readings is the revoke.
+		if err := os.Remove(granted); err != nil && !os.IsNotExist(err) {
+			t.Fatalf("pre-green remove: %v", err)
+		}
 		before := rt.windowCount()
 		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"covered, nothing revoked"}`,
 			filepath.ToSlash(granted)))
@@ -427,7 +438,13 @@ func Test40SessionRulesPanelRevokePopsTheNextCoveredCall(t *testing.T) {
 
 		// READING 2 (red): the SAME shaped call must ask again - a real card
 		// on the real gate, counted on the same production counter the
-		// ticket-49 cells read.
+		// ticket-49 cells read. The remove keeps the create shape (see the
+		// negative control's note: without it the overwrite elevation, not
+		// the revoke, would be what asks - the mutation lab proved that
+		// reading vacuous, 2026-11-18).
+		if err := os.Remove(granted); err != nil && !os.IsNotExist(err) {
+			t.Fatalf("pre-red remove: %v", err)
+		}
 		before = rt.windowCount()
 		args2 := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"after the panel revoked"}`,
 			filepath.ToSlash(granted)))
