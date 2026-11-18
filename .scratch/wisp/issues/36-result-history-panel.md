@@ -41,7 +41,7 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
       asserts zero violations).
 - [x] dangerouslySetInnerHTML grep = 0; sanitizer whitelist config reviewed + committed.
 - [ ] History: 1000-row fixture scrolls at 60fps; delete-one/purge/export verified against DB.
-- [ ] Long-task stream: 200-chunk golden replay renders with merge (no jank), token counter
+- [x] Long-task stream: 200-chunk golden replay renders with merge (no jank), token counter
       accurate.
   〔**10-08 12:0x 编排者就地裁冲突，来源＝只读普查腿 `197-a1`（件 `.scratch/wisp/probes/197/a1/sweep.md`）；⛔ 本框保持未勾、⛔ 不改判据要什么**：那句 **"renders with merge" 与盘上已重裁的规则方向相反**——产码 `internal/panel/pump.go:397-409` 逐字 `Overflow TRUNCATES and never merges`，是**票 197 leg B 重裁**（判据 票 197 `:32`＋未勾 `AC#3 :39`；裁处 `docs/evidence/s1/197-subagent-stream-r2.md:41-54` §1「乙」；批准＝台账 **`A406`**；代码＝`94ea50f7` 删掉 `mergeOverflowLocked`，现 0 命中）。⇒ 落地时这一格只能按**截断**那形写判据；⛔ **任何程都不许为了对上"merge"这个词去改 pump**（那是把一枚已裁的规则倒回去，要改必须先经人工批准）。另两处同名不同链具名排除：`cmd/wisp/panel_pump.go:397` 与 `internal/panel/pump.go:397` **行号相同、文件不同、说的相反**，引号必须先报文件；`internal/subagent_197.go:274` 那句「把任务并成一枚子代理」是**用户文案**、与本链无关。〕
 - [ ] Hidden-panel animation pause asserted (rAF counters).
@@ -92,3 +92,9 @@ stuck cards), plus the history & transcript browser over SQLite with privacy con
 ## 编排者更正（2026-11-17 14:4x，同上审计）
 
 若上文涉及「终态 Stopped」字样，一律更正为 **`Muted`**（D43 无 Stopped 一词）。
+
+## 编排者收件·AC#4（2026-11-18 10:0x，`f8b0bc2a8` 产码＋`077caf9ec` 证据，件 `docs/evidence/s1/36-stream-token-golden-20261117-r1.md`）
+
+**尺1** 两提交在。**尺3 我自己复跑**：`render:stream20036` rc=0；build/typecheck/lint rc=0；`internal/panel -run Stream|Usage|Token|Result` ok 6.559s；dist 归 `.gitkeep`。
+- **勾 AC#4（按 10-08 重裁的「截断」形写判据，⛔ 不是 merge）**：① **token 对账** 32/32 行 usage 五字段与 golden 逐字段相等；32/32 行 wire 上无 usage 键＝**未知≠假 0**（`ResultChunk` 第 4 枚键 `usage` 只附着真 EvUsage）② **200 块无 jank（可判事实）** 900 发布恰＝900 步、每包 ≤64 行硬顶、每包每行恰一枚自有标记（合并当步即红）、消失全走逐出台账（136 逐出/64 具名）③ **两枚牙**：MUT-A 旧 fold（合并两块）⇒ 红（`two chunks merged into one row`）；MUT-B 字符数估算 ⇒ 红（usage 对不上、长流伪造行）；还原同树复绿。
+- `pump.go` 截断规则**零字节改动**（符合 A406）。变异全在仓外导出树，真仓零残留。

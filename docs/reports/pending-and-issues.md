@@ -37847,3 +37847,13 @@ VPN 断线后死腿半成品经 `wauditfix2` 收口（`22b4568ba`，8 件）。*
 - 接受腿的一处偏离：`TestWave3PageGapLedgerRegistersTheThreeNames` 永真断言与双向审计互斥 ⇒ 重裁为"再登记即红"（增强）。
 - ⚠ 遗留小账：`bridge.go:226/242/256` 与 `inbound_roster_253_test.go:90-92` 的 「REGISTERED while pending」注释过期 —— 待有写面的腿顺手更（不影响行为）。
 - **票 38 改名 `-done`**（6/6）。
+## A1935（11-17 22:5x）：**票 197 结案 7/7** —— AC#0 用票内既有裁定落笔（S5 为家 / S7 为闸）
+
+AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7、`internal/tools/task.go:123/139/152` 名册已在跑多任务），改判落 A399/A382/A391、PLAN 与 specs 零改。⇒ 勾 AC#0，改名 `-done`。前 6 格（实体层/名册同源/每代理一条流/阻塞态/界面读得到/…）早前已勾并由非实现者裁过。
+## A1936（11-18 10:0x）：36 AC#4 勾（截断形＋token 真线）`f8b0bc2a8`/`077caf9ec`
+
+我复跑：render:stream20036 rc=0；build/typecheck/lint rc=0；internal/panel 相关 ok 6.559s。
+- token 计数上真线：`ResultChunk` 第 4 键 `usage`（只附真 EvUsage，无事件⇒无键＝未知≠假 0）；对账 32/32。
+- 200 块回放按**截断**判（`pump.go:397-409` 零改，符合 A406）：900 发布=900 步、每包≤64 行、合并当步即红、逐出台账 136/64。
+- 牙：MUT-A 合并⇒红；MUT-B 字符数估算⇒红；还原复绿。变异仓外。
+- 36 剩 3 格均环境/机主门（AC#1 视觉签收／AC#3 60fps 真窗／AC#5 rAF 真窗）。
