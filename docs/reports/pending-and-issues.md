@@ -37857,3 +37857,10 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - 200 块回放按**截断**判（`pump.go:397-409` 零改，符合 A406）：900 发布=900 步、每包≤64 行、合并当步即红、逐出台账 136/64。
 - 牙：MUT-A 合并⇒红；MUT-B 字符数估算⇒红；还原复绿。变异仓外。
 - 36 剩 3 格均环境/机主门（AC#1 视觉签收／AC#3 60fps 真窗／AC#5 rAF 真窗）。
+## A1937（11-18 10:1x）：`tool.launch` 审计定论 = **不是后门**（`03a102…`/件 launch-adversarial-20261118.md）
+
+- 机械事实：`cmd/wisp/panel_tools_discovery.go:30-42` import 清单**无 `internal/tools`** ⇒ 本门**不持桥、不构造 ToolRequest、不调 Execute**；执行只发生在 `internal/agent/loop.go:786` 唯一构造点（AST 尺 `toolrequest_nail_309_test.go:359` 钉总数=1）→ `tools.Bridge.Execute` → C19 judge/权限档/route。`cmd/wisp/**` 生产 `.Execute(` 零命中。
+- L1「零卡」**说法要精确**：不是零卡，是**零张 L2 卡＋一张 2–3s 可否决的 L1 窗口**（`SPEC-06:18`＋`gate.go:423-447` 到点执行／否决即拒）；取证 tool_call 行照落（L1/allow）。
+- L2：真弹宿主自己的卡（`bridge.go:624-652`，超时＝拒绝）；本门不造卡不答卡（16 方法里无 approval.decide/current/queue）。
+- 封套 source 串是可复制常量 ⇒ **同页脚本可伪造**，但这是全部 16 个面板方法的既有面（父提交 13 方法校验逐字未变），**本门未扩大**；不是真授权（`bridge.go:12-18` 自述 "NOT an authority grant"）。残余风险＝「面板页被注入任意脚本」，属 C25/sanitizer 信任模型。
+⇒ **结论：新开后门＝否；无需回滚，不加限制。**
