@@ -1,0 +1,9 @@
+# 派单存档（先存档再发）—— 清理腿：修 Test313 并集（app_language 名册漏 append）＋纯化票49动词牙（去覆写混淆）（写腿，唯一共享编译面写腿）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。两件小事，都在 `cmd/wisp`：
+1. **修回归**：`cmd/wisp/panel_config_313_test.go:249-256` 的 `want` 未 append 第七名册 ⇒ 现红（`the door reports the union […app_language…]`）。**只加** `want = append(want, panel.WritableFields39()...)`（找真名：`git grep -n "func WritableFields39" internal/panel`；若名为 `WritableFieldsAppLang39` 用真名），位置与 215 同形并写一行注。⛔ 不许删/改任何既有 append、⛔ 放宽 `reflect.DeepEqual`。改后该测试必须绿；再做一枚**反向正控**：临时把 door 的 39 名册从并集摘掉 ⇒ 该测试必须红（证明它真钉并集，不是恒等），验完还原。
+2. **纯化票 49 动词牙**：`cmd/wisp/ticket49_verbs_test.go` 里"撤销后下一发重新弹卡"那发，红/绿两发若写**同一路径**，第二次写＝覆写会把档评抬出 L1（L2 才受授权覆盖）⇒ 空牙。按 40 AC#2 夹具的修法：两发前各 `os.Remove` 目标文件，保持"新建"形状，唯一变量＝撤销。改后该测试仍绿；再临时把撤销步骤删掉 ⇒ 必须红（证牙真咬），验完还原。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔ 提交 dist 字节。
+**串行**：`go test ./cmd/wisp` **只能经载具**一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具跑 `^(Test313WritableUnionEqualsTheTwoRosters|TestTicket49.*)$` 全绿 ③`go build ./...` rc=0。
+写面：`cmd/wisp/panel_config_313_test.go`、`cmd/wisp/ticket49_verbs_test.go`、`docs/evidence/s1/cleanup-313-49-*`。
+回话第一行＝commit hash ＋两枚改动各自"绿＋反向正控红"读数 ＋d22scan 末行 ＋载具 rc。没干完写「卡在哪」。
