@@ -37886,3 +37886,7 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - AC#3 四孤儿件具名＋README「孤儿件认领」；AC#4 互不串牙各自红。
 - 名册重裁 `config_readers_255.go`：app.theme 旧「扫描零命中」已不真⇒改 hotClaimOtherProcess＋加读点（我核 diff＝跟事实对齐，非放宽）。
 ⇒ 改名 -done。
+## A1942（11-18 15:0x）：40 AC#2 勾 `e97a8f46f`/`afab2ce7a` —— 授权页读真行、撤销下一发即重新弹卡
+
+我复跑载具 `^Test40SessionRules` 3/3 PASS（revoke-pops 3.82s）；render:sessionrules40 rc=0；d22scan clean。读面 `session.rules.list`（真字段，命名撞冻结仪器故用同义词）；撤销走票49同一 Revoke 门⇒下一发 L2 真弹卡（绿0卡→撤销→红≥1卡，SQL 复核）。
+- **教训（重要）**：弹卡夹具原为空牙——"覆写已存在文件"把档评抬出 L1，第二次写同路径不撤销也弹卡；修＝两发前各删文件保"新建"形状。**票 49 动词牙（ticket49_verbs_test.go）有同族混淆**，待有写面的腿加两行 os.Remove 纯化。
