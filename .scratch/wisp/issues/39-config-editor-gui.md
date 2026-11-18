@@ -39,7 +39,7 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
       (e2e with 21's card).
 - [ ] api_key write-only + last-4 display + ref creation verified; plaintext never rendered
       or stored by GUI.
-- [ ] Round-trip no-op save produces no diff; external-edit + unknown key shows line-numbered
+- [x] Round-trip no-op save produces no diff; external-edit + unknown key shows line-numbered
       errors.
 - [ ] Visual sign-off vs design/screens/config.html (lock icons on security sections).
 
@@ -149,3 +149,9 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 **尺1** `91b245b57` 在（10 件）。**尺3 我自己复跑**（载具）：`^Test39` **16 RUN/13 PASS/0 FAIL**，其中四枚 e2e 全绿 —— `Test39NativeLooseningCardAcceptedAppliesAndAudits` 0.03s／`…RejectedKeepsOldValue` 0.01s／`…TimeoutKeepsOldValue` 0.31s／`Test39LooseningWithoutGateFailsClosed` 0.01s。
 - **勾 AC#2**：①具名清单 **18 行**（13 静态键 + 5 plugins 动态族），逐键来源＝`manager.go` 四个 D36 方向审计函数的 append 行（⛔自造分类；四枚测试现读源码钉 Pin）②**写门**：放宽键 ⇒ 铸造 request id 先登记 pending 再交队列（无竞态窗）⇒ **票 21 那张 L2 卡**（`config.loosen`，非第二套）⇒ 接受＝重算+validate+方向复裁+单键所有权复核 ⇒ 真写 + **恰一条**审计 `SECTION-WRITE … outcome=written card=<id> changes=<key:old->new>`；拒绝/超时＝`outcome=denied` 零写入 ③三牙：M1 摘门⇒红／M2 接受不写审计⇒红／M3 拒绝仍写入⇒红（变异仓外）。面板来源放宽仍被 `ErrPanelLoosenRefused` 结构性拒（零面板侧 allow），**无新 C17 方法**。
 - 装配根：`Manager.LoosenQueue` 接真 C18 gate（票 195 证据 §7 欠账）；等待协程走 `observe.Default.Spawn("approval-waiter",…)`（非裸协程）；`close()` cancel+join。
+## 编排者收件·AC#4（2026-11-18 11:4x，`36ae9aa8b`，件 `docs/evidence/s1/39-noop-external-20261118-r1.md`）
+
+**尺1** `36ae9aa8b` 在（14 件）。**尺3 我自己复跑**（载具 `^Test39`）：**19 RUN/16 PASS/0 FAIL**，含三枚新牙 `Test39NoopSaveLeavesFileByteIdenticalAndSaysSo` 0.01s／`Test39ExternalEditErrorsCarryRealLinesAndNameTheKeys` 0.01s／`Test39ExternalDriftRefusesTheStaleSave` 0.02s；`d22scan` clean；前端 build/typecheck/lint＋仪器 rc=0。
+- **勾 AC#4**：① **no-op 零 diff**（真 sha256＋mtime 都不变、字节逐位同、手写注释全在；正控改成真改写⇒sha 变）② **未知键带真行号**（line=5 点名 `bogus_key`；类型错 line=4；行号吞成 0/1⇒红）③ **外部改+保存冲突**（新落乐观并发 `baseSHA`/`configBaseSHA`：指纹不符⇒`refused-drift` 零写入，盘上字节仍是外部版本、mtime 不动）。
+- 记录一处协议扩展（我拍）：`config.get` 载荷新增 `baseSHA`、`config.set` 信封回声 `configBaseSHA`（If-Match 形状）；**C17 方法集不变**，旧页无指纹照旧可用（pre-39 形钉成故意）。
+- 边界（腿诚实报）：真写仍按票 226 既定代价重排 canonical（丢注释）—— 那是既有 mergeWrite 行为，本票没动；no-op 因为不写所以格式必保。

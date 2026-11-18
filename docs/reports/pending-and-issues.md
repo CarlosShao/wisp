@@ -37867,3 +37867,9 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1938（11-18 11:1x）：39 AC#2 勾 `91b245b57` —— 安全放宽必须过 L2 卡（接受写入+审计，拒绝/超时保持旧值）
 
 我复跑载具 `^Test39` 16 RUN/13 PASS/0 FAIL（四枚 e2e 全绿）。清单 18 行（13 静态+5 动态族，来源 manager.go 四审计函数）；写门→票 21 L2 卡（config.loosen，非第二套）→接受真写+恰一条 audit（old->new）／拒绝超时零写入；三牙 M1/M2/M3 全红。面板来源放宽结构性拒（零面板 allow），无新 C17。等待协程 observe.Spawn、close join。
+## A1939（11-18 11:4x）：39 AC#4 勾 `36ae9aa8b` —— no-op 零 diff（sha+mtime）、未知键真行号、外部改拒静默覆盖
+
+我复跑载具 `^Test39` 19 RUN/16 PASS/0 FAIL；d22scan clean；前端全 rc=0。
+- no-op：sha256/mtime/字节三重不变（正控真改写⇒sha 变）。
+- 未知键：line=5 点名 bogus_key、类型错 line=4（吞成 0/1⇒红）。
+- 外部漂移：新增乐观并发 `baseSHA`(config.get)/`configBaseSHA`(config.set 回声)，不符⇒refused-drift 零写、外部字节保原。协议载荷扩展（C17 方法集不变）＝我拍的。
