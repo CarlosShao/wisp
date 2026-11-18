@@ -33,7 +33,7 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
   heavy UX (40 covers listing).
 
 ## Acceptance criteria
-- [ ] Every D36 section renders from schema (golden snapshot per section); edit → save →
+- [x] Every D36 section renders from schema (golden snapshot per section); edit → save →
       hot/reload/restart behavior matches tier (events observed).
 - [x] Security loosening → native L2 confirm → accept applies + logs; reject keeps old
       (e2e with 21's card).
@@ -155,3 +155,9 @@ strict single-source-of-truth discipline (GUI holds nothing TOML doesn't).
 - **勾 AC#4**：① **no-op 零 diff**（真 sha256＋mtime 都不变、字节逐位同、手写注释全在；正控改成真改写⇒sha 变）② **未知键带真行号**（line=5 点名 `bogus_key`；类型错 line=4；行号吞成 0/1⇒红）③ **外部改+保存冲突**（新落乐观并发 `baseSHA`/`configBaseSHA`：指纹不符⇒`refused-drift` 零写入，盘上字节仍是外部版本、mtime 不动）。
 - 记录一处协议扩展（我拍）：`config.get` 载荷新增 `baseSHA`、`config.set` 信封回声 `configBaseSHA`（If-Match 形状）；**C17 方法集不变**，旧页无指纹照旧可用（pre-39 形钉成故意）。
 - 边界（腿诚实报）：真写仍按票 226 既定代价重排 canonical（丢注释）—— 那是既有 mergeWrite 行为，本票没动；no-op 因为不写所以格式必保。
+## 编排者收件·AC#1 后半（2026-11-18 12:4x，`75e6776da`，件 `docs/evidence/s1/39-tier-events-20261118-r1.md`）
+
+**尺1** `75e6776da` 在（15 件，golden 39 枚未重生成）。**尺3 我自己复跑**：`go test ./internal/config -run ^Test39` 全 PASS；`./internal/panel -run ^Test39` ok（含 `Test39TierHot/Reload/Restart…`）；载具 `Test39Tier*`（cmd/wisp）**3 RUN/3 PASS/0 FAIL**：`TierRestartWriteDemandsRestartOnThePage` 0.02s／`TierReloadWriteFiresTheReloadEventAndTheSubscriberReadsIt` 0.01s／`TierHotWriteAppliesNowAndSaysNoRestart` 0.02s。
+- **勾 AC#1**：三档按 `TierRegistry`(tiers.go:34/:110) 真值实测 —— **hot** `ball.style` 立即生效、收据零重启词；**reload** `voice.aec.enabled` 发 reload 标记事件＋`OnReload` 恰一次、钩子内读新值；**restart** `app.language` 收据逐字「需要重启：本次运行不会读取新值」、内存保旧值·盘上新值、下次 reload 记 `OnRestartPending`。三牙 M1/M2/M3 全红（变异仓外）。
+- **我拍的一处协议扩张**：新增可写字段 `app_language`（restart 档第一枚可写键；C17 方法集未变，仍是 config.get/set 两名；名册扩张同 313/187/65/215a 先例）。**撤销口令**：摘 `config_write_39.go`＋`settings_39.go`＋两处接线；restart 档机制与 config 层牙不依赖新字段。
+- ⚠ **事故记录（腿自报，我核过无损失）**：本腿起手误判 `frontend/fixtures/composer-states.html` 为自己的副作用，跑了 `git restore`（**违禁命令**）打回 HEAD 旧版、导致 `TestComposerRenderFixtureTellsTheTruth` 红；已用同一确定性渲染器复原。我复核：`render:composer` **幂等=True**（盘上这版就是确定性输出），4 行 diff 是别的腿的待提交内容仍在 ⇒ **零损失**；该文件仍留作未提交、归原腿收。教训已记：腿手⛔ 跑 `git restore/checkout`，遇他人在飞件只报不动。

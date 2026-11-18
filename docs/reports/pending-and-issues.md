@@ -37873,3 +37873,8 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - no-op：sha256/mtime/字节三重不变（正控真改写⇒sha 变）。
 - 未知键：line=5 点名 bogus_key、类型错 line=4（吞成 0/1⇒红）。
 - 外部漂移：新增乐观并发 `baseSHA`(config.get)/`configBaseSHA`(config.set 回声)，不符⇒refused-drift 零写、外部字节保原。协议载荷扩展（C17 方法集不变）＝我拍的。
+## A1940（11-18 12:4x）：39 AC#1 勾 `75e6776da` —— hot/reload/restart 三档实测按档表态
+
+我复跑：internal/config 与 internal/panel `^Test39` 全 PASS；载具 `Test39Tier*` 3/3 PASS（restart 逐字「需要重启」、reload 真发事件且订阅方读新值、hot 立即生效零重启词）。golden 39 枚未重生成。三牙 M1/M2/M3 全红。
+- 拍：新可写字段 `app_language`（restart 档首枚可写键；C17 方法集不变；同 313/187/65/215a 先例）。撤销＝摘 config_write_39.go＋settings_39.go＋两处接线。
+- **事故（零损失）**：该腿起手对 `frontend/fixtures/composer-states.html`（他人在飞件）误跑 `git restore`（违禁）→ 一测红；已确定性渲染复原。我复核 `render:composer` 幂等=True、4 行 diff 仍在＝原腿内容未丢。⇒ 新纪律：腿遇他人在飞件**只报不动**，⛔ `git restore/checkout`。
