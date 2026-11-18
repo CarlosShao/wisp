@@ -37904,3 +37904,12 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1945（11-18 17:5x）：40 AC#6 勾 `fc56a04ea` —— L0 自动放行不再裸写 allow
 
 我复跑 internal/memory 三枚牙 3/3 PASS；d22scan clean。唯一构造点 privacyToolCallDetail：列值逐字＋仅 L0&&allow 追加「按档自动放行（L0），未询问任何人」；导出 decision_notes 同源；列值一字不改。M1–M4 变异全红。
+## A1946（11-18 18:4x）：40 AC#3 前两半落库 `9acf4160a`（CRUD 往返＋真探针），后三半在派
+
+我复跑载具 `^(Test40ModelMgmt|Test40ModelProbe)` **7/7 PASS**（含死端点真错 58.75s、mismatch 原文、unconfigured 拒句）；render:model-settings rc=0；d22scan clean。
+- CRUD：增/改/删每步 fresh `LoadFile` 读盘九字段逐字段相等；M1 只改内存⇒红、M2 写盘不回读⇒红。
+- 探针：新路由 `config.model.probe`→`llm.RunProbeSuite`→真写 provider_health；回显 p50 真延迟/逐能力词对/失败原文；⛔空转回 OK（M3 红）。
+- 档位：endpoint 类写回执逐字「需要重启：本次运行不会读取新值。」；探针回执零档位句（只测不存）。
+- 255 尺逮到新 `[llm]` 读口，已按 441 先例登记（定向 3/3 绿）。
+- ⚠ 全量唯一红＝既有 `TestAC4FocusReturnToPriorWindowGap33r5`（活窗 planted-thread，441 全量同枚已红，非本腿）。
+- AC#3 **仍未勾**（后三半在派 `w40modelb`）。
