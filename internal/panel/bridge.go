@@ -73,6 +73,19 @@ const (
 	// local signed model repository (SPEC-08 sec 5.2, ticket 29/D26), so the
 	// settings namespace is where this route belongs.
 	MethodModelsList = "config.models.list"
+	// MethodModelProbe is ticket 40 AC#3's probe door: "measure one catalog
+	// model against its real provider" - the page's 测试 button finally calls
+	// the llm probe machinery (RunProbeSuite) instead of a stub sentence, and
+	// the verdicts land in provider_health through ticket 09's sink. The same
+	// three naming facts the settings pair above records hold here: no
+	// `panel.` prefix, no approval vocabulary (a probe measures; it approves
+	// nothing), and it is deliberately NOT spelled `models.probe` - the
+	// models.* namespace belongs to the local signed model repository, so the
+	// settings namespace is where this route belongs (the config.models.list
+	// precedent). The receipt this door answers with carries NO tier sentence:
+	// a probe writes no config key, so "需要重启"/"立即生效" wording would both
+	// be lies (the CRUD writes beside it own the restart sentence).
+	MethodModelProbe = "config.model.probe"
 	// MethodCostSummary is ticket 194's one landed roster name (batch 1): the
 	// read-only cost door from docs/specs/SPEC-08-ui-ball-panel.md:166, the spec
 	// table this ticket was filed to align the code with (owner ruling A381).
@@ -519,7 +532,7 @@ func knownComposerMethod(m string) bool {
 	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
 	// exact one-line form, so wrapping it would leave real plants replacing
 	// nothing. Appending a constant means extending this line, deliberately.
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodModelProbe, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:
 		return true
 	}
 	return false

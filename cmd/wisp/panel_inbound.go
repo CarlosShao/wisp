@@ -345,6 +345,12 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// same secret store as the settings leg above, so "拉取模型列表" and the
 	// writes it feeds cannot disagree about which row or which key they mean.
 	modelsList := &modelsListHandler320{mgr: mgr, secrets: secrets}
+	// Ticket 40 AC#3 (2026-11-18): the probe leg. It runs the REAL llm probe
+	// machinery (RunProbeSuite -> provider_health) over the same Manager and
+	// the same secret store the legs above use, so the page's 测试 button
+	// measures exactly the row the page shows. The wiring nail in
+	// panel_modelmgmt_40_test.go reddens if this field is unplugged.
+	probes := newModelProbeHandler40(dir, mgr, secrets, auditf, actor)
 	// Ticket 194 (ledger A1681): the read-only cost door is answered by the real
 	// leg - panel_cost_194.go's adapter over memory.Store.ListCostDaily on THIS
 	// data root, opened per read (sessions.go's outlet shape) so a chain that
@@ -434,6 +440,8 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Config: configWrites,
 		// Ticket 320 AC#4's read-only door is answered by the fetch leg above.
 		Models: modelsList,
+		// Ticket 40 AC#3 (2026-11-18): the probe door's real leg, wired above.
+		ModelProbes: probes,
 		// Ticket 194 (A1681): the cost door's real reader, wired above.
 		Costs: costs,
 		// Readface wave 1 (2026-11-17, ticket 40 AC#1): the privacy doors'

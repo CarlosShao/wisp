@@ -18,8 +18,9 @@ package panel
 // tool.launch door, ticket 38 AC#5's rules.force read) sixteen, and
 // readface wave 4's two doors (ticket 40 AC#2's session-rules live read and
 // its one-click revoke) eighteen, and readface wave 5's two doors (ticket 40
-// AC#5's diagnostics preview / export pair over the ticket-45 engine) twenty -
-// and
+// AC#5's diagnostics preview / export pair over the ticket-45 engine) twenty,
+// and ticket 40 AC#3's probe door (config.model.probe, the model page's 测试
+// button over the real llm probe machinery) twenty-one - and
 // the roster they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
@@ -137,6 +138,21 @@ type ConfigRequestHandler interface {
 // name is on the whitelist, so an assembly with no fetch leg must say so by name).
 type ModelsListRequestHandler interface {
 	HandleModelsListRequest(ctx context.Context, req ComposerRequest) (string, error)
+}
+
+// ModelProbeHandler answers ticket 40 AC#3's probe door (config.model.probe).
+// It returns the receipt the page renders, settings-route shape: one prose
+// sentence (the measured p50 latency, one verdict word per attempted
+// capability, every mismatch's frozen label and its detail原文) plus one
+// payload line behind ModelProbePayloadMarker. Separate interface for the same
+// reason the two above record: the settings legs' spies implement the
+// interface they were built against, and this door's leg lives in cmd/wisp
+// (only the assembly root can reach the catalog, the key store and the llm
+// probe machinery). nil means the same named refusal every unattached door
+// gives. The receipt carries NO tier sentence: a probe measures, it never
+// saves, and tier wording would be the wrong-tier lie in this direction.
+type ModelProbeHandler interface {
+	HandleModelProbe(ctx context.Context, req ComposerRequest) (string, error)
 }
 
 // CostSummaryHandler answers ticket 194's read-only cost door (cost.summary). It
@@ -326,6 +342,9 @@ type ComposerDispatch struct {
 	// Models answers ticket 320 AC#4's fetch route. Optional in the same way:
 	// nil is a refusal that names the door, not a silence.
 	Models ModelsListRequestHandler
+	// ModelProbes answers ticket 40 AC#3's probe door. Optional like every
+	// socket above: nil refuses by name, never a silence.
+	ModelProbes ModelProbeHandler
 	// Costs answers ticket 194's read-only cost door. Optional like every socket
 	// above: nil is the named refusal, never a silence.
 	Costs CostSummaryHandler
@@ -441,6 +460,11 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.Models.HandleModelsListRequest(ctx, req)
+	case MethodModelProbe:
+		if d == nil || d.ModelProbes == nil {
+			return "", d.unattached(req)
+		}
+		return d.ModelProbes.HandleModelProbe(ctx, req)
 	case MethodCostSummary:
 		if d == nil || d.Costs == nil {
 			return "", d.unattached(req)

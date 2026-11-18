@@ -951,6 +951,25 @@ export function requestProviderModels(provider: string): Promise<string | null> 
   });
 }
 
+/** Ask the host to measure one catalog model against its real provider
+    (config.model.probe, ticket 40 AC#3's probe door; the Go half runs the
+    llm probe machinery - RunProbeSuite - and records the verdicts into
+    provider_health). The reply is prose plus one line starting with the
+    wisp-model-probe marker; parse it with parseModelProbeReply
+    (lib/config-view.ts). A refusal (an unknown pair, a key that will not
+    resolve) comes back as the host's own sentence with the cause原文 - shown
+    in place, never turned into a success. A probe MEASURES: it writes no
+    config key, so unlike config.set its reply carries no tier sentence. */
+export function requestModelProbe(provider: string, model: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "config.model.probe",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    configProvider: provider,
+    configModel: model,
+  });
+}
+
 /** Ask the host for the per-day cost summary (cost.summary, ticket 194's
     read-only door; the Go half has been live since ledger A1681 - the page
     literal is what ticket 40's census called the missing half: "数据在门口

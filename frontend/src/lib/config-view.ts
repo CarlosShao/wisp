@@ -299,6 +299,132 @@ export function parseModelsListReply(reply: string): ModelsListReply {
   return { kind: "parsed", provider, models };
 }
 
+/** The model-probe marker (ticket 40 AC#3's config.model.probe; the Go half
+    runs the llm probe machinery and writes provider_health). Same shape as
+    the view marker: prose, then exactly one line. */
+export const MODEL_PROBE_MARKER = "wisp-model-probe:";
+
+/** One capability's verdict as the probe payload carries it. detail is the
+    probe's own failure text VERBATIM (empty on a pass); attempted=false means
+    no request could be sent and ok carries no verdict. */
+export interface ModelProbeOutcomeView {
+  capability: string;
+  declared: boolean;
+  ok: boolean;
+  attempted: boolean;
+  detail?: string;
+}
+
+/** One 「声明可用，实测不可用」 fact; label is the Go side's frozen sentence,
+    detail the raw failure text. Both render verbatim - the page never
+    re-words a probe answer. */
+export interface ModelProbeMismatchView {
+  capability: string;
+  detail: string;
+  label: string;
+}
+
+/** What one probe run measured (internal/panel probe_40.go
+    ModelProbeResult). error is the run-level failure原文 when the suite
+    could not complete; written=false means nothing reached provider_health
+    - a state, never folded into "measured fine". */
+export interface ModelProbeResultView {
+  provider: string;
+  model: string;
+  latencyMS: number;
+  allOK: boolean;
+  written: boolean;
+  outcomes: ModelProbeOutcomeView[];
+  mismatches: ModelProbeMismatchView[];
+  error?: string;
+}
+
+/** What one config.model.probe reply turned out to be. */
+export type ModelProbeReply =
+  | { kind: "parsed"; result: ModelProbeResultView }
+  | { kind: "payload-error"; message: string; raw: string }
+  | { kind: "no-payload"; raw: string };
+
+/** Parse one config.model.probe reply. The prose half is never parsed (on a
+    refusal it is the host's own sentence, shown verbatim); the structured
+    half is the marker line. Outcomes and mismatches are arrays on the wire;
+    a payload missing its identity fields (provider/model) or carrying
+    non-numeric latency is malformed and answers no-payload - the page then
+    shows the prose instead of drawing zeros that look like measurements. */
+export function parseModelProbeReply(reply: string): ModelProbeReply {
+  const at = reply.indexOf(MODEL_PROBE_MARKER);
+  if (at < 0) return { kind: "no-payload", raw: reply };
+  const afterMarker = reply.slice(at + MODEL_PROBE_MARKER.length);
+  const line = afterMarker.split("\n", 1)[0] ?? "";
+  let data: unknown;
+  try {
+    data = JSON.parse(line);
+  } catch {
+    return { kind: "no-payload", raw: reply };
+  }
+  if (typeof data !== "object" || data === null) return { kind: "no-payload", raw: reply };
+  const err = (data as { payloadError?: unknown }).payloadError;
+  if (typeof err === "string" && err !== "") {
+    return { kind: "payload-error", message: err, raw: reply };
+  }
+  const payload = data as Record<string, unknown>;
+  const provider = payload.provider;
+  const model = payload.model;
+  const latencyMS = payload.latencyMS;
+  const allOK = payload.allOK;
+  const written = payload.written;
+  if (typeof provider !== "string" || provider === "") return { kind: "no-payload", raw: reply };
+  if (typeof model !== "string" || model === "") return { kind: "no-payload", raw: reply };
+  if (typeof latencyMS !== "number" || !Number.isFinite(latencyMS) || latencyMS < 0) {
+    return { kind: "no-payload", raw: reply };
+  }
+  if (typeof allOK !== "boolean" || typeof written !== "boolean") {
+    return { kind: "no-payload", raw: reply };
+  }
+  const outcomes: ModelProbeOutcomeView[] = [];
+  if (Array.isArray(payload.outcomes)) {
+    for (const o of payload.outcomes) {
+      if (typeof o !== "object" || o === null) continue;
+      const om = o as Record<string, unknown>;
+      if (typeof om.capability !== "string" || om.capability === "") continue;
+      if (typeof om.declared !== "boolean" || typeof om.ok !== "boolean" || typeof om.attempted !== "boolean") {
+        continue;
+      }
+      outcomes.push({
+        capability: om.capability,
+        declared: om.declared,
+        ok: om.ok,
+        attempted: om.attempted,
+        ...(typeof om.detail === "string" && om.detail !== "" ? { detail: om.detail } : {}),
+      });
+    }
+  }
+  const mismatches: ModelProbeMismatchView[] = [];
+  if (Array.isArray(payload.mismatches)) {
+    for (const m of payload.mismatches) {
+      if (typeof m !== "object" || m === null) continue;
+      const mm = m as Record<string, unknown>;
+      if (typeof mm.capability !== "string" || typeof mm.detail !== "string" || typeof mm.label !== "string") {
+        continue;
+      }
+      mismatches.push({ capability: mm.capability, detail: mm.detail, label: mm.label });
+    }
+  }
+  return {
+    kind: "parsed",
+    result: {
+      provider,
+      model,
+      latencyMS,
+      allOK,
+      written,
+      outcomes,
+      mismatches,
+      ...(typeof payload.error === "string" && payload.error !== "" ? { error: payload.error } : {}),
+    },
+  };
+}
+
 /** What one reply turned out to be. */
 export type ConfigReply =
   | { kind: "parsed"; view: ConfigView; prose: string }

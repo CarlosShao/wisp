@@ -25,7 +25,7 @@ import type { ReactNode } from "react";
 import { ModelSettingsView } from "@/components/model-settings";
 import { VoiceSettingsView } from "@/components/voice-settings";
 import type { ConfigView } from "@/lib/config-view";
-import { performConfigWrite, performCredentialWrite } from "@/lib/config-actions";
+import { performConfigWrite, performCredentialWrite, performModelProbe } from "@/lib/config-actions";
 import "../styles/theme.css";
 
 /* The real path, bound the way the containers bind it (lib/config-actions.ts).
@@ -180,6 +180,7 @@ export function Preview() {
             onReload={noReload}
             performCredential={performCredential}
             performFetchModels={performFetchModels}
+            performProbe={performModelProbe}
             performWrite={performWrite}
             view={UNCONFIGURED}
           />
@@ -190,6 +191,7 @@ export function Preview() {
             onReload={noReload}
             performCredential={performCredential}
             performFetchModels={performFetchModels}
+            performProbe={performModelProbe}
             performWrite={performWrite}
             view={CONFIGURED}
           />
@@ -201,6 +203,7 @@ export function Preview() {
               onReload={noReload}
               performCredential={performCredential}
               performFetchModels={performFetchModels}
+            performProbe={performModelProbe}
               performWrite={performWrite}
               view={CONFIGURED}
             />
@@ -212,6 +215,7 @@ export function Preview() {
             onReload={noReload}
             performCredential={performCredential}
             performFetchModels={performFetchModels}
+            performProbe={performModelProbe}
             performWrite={performWrite}
             view={UNREADABLE}
           />

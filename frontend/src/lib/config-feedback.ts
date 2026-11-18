@@ -213,7 +213,6 @@ export const COPY = {
   chainSegmentMissing: "每一段都要同时选好供应商和模型",
   chainEmpty: "至少保留一段；链不能为空",
   chatPairMissing: "供应商与模型都要选好再保存",
-  testConnectionUnavailable: "暂不支持连接测试",
   testKeyUnavailable: "暂不支持密钥测试",
   deleteUnavailable: "暂不支持删除供应商",
   editUnavailable: "暂不支持编辑",

@@ -463,7 +463,14 @@ var sectionReadSites = map[string][]string{
 	// execute() - and 票 61's internal/speech/cloudcatalog.go (the provider
 	// entry a cloud chain element names). The verdict does not move: the claim
 	// still rests on the live re-readers already cited.
-	"LLM": {"cmd/wisp/panel_config_store.go", "cmd/wisp/panel_models_320.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/agent/costbook_44.go", "internal/agent/quota_44r4.go", "internal/llm/resolver.go", "internal/speech/cloudcatalog.go"},
+	// 2026-11-18 re-adjudication (票 40 AC#3's probe door): cmd/wisp/
+	// panel_probe_40.go's HandleModelProbe takes `cfg := h.mgr.Config()` on the
+	// request hop and reads `cfg.LLM.Providers[provider]` plus the model's
+	// Capabilities off that answer - the same class as panel_models_320.go
+	// above (live Manager at use time; a hand-edited row is what the NEXT
+	// probe measures, with no restart). The tier does not move: the claim
+	// still rests on the live re-readers already cited.
+	"LLM": {"cmd/wisp/panel_config_store.go", "cmd/wisp/panel_models_320.go", "cmd/wisp/panel_probe_40.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/agent/costbook_44.go", "internal/agent/quota_44r4.go", "internal/llm/resolver.go", "internal/speech/cloudcatalog.go"},
 	// Ticket 258 moved the shipped reader into the resident leg: the
 	// construction chain lives in resident_windows.go (it maps [hotkey] into
 	// ball.HotkeyConfig), while resident_ball_windows.go only receives the

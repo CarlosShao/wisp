@@ -110,7 +110,13 @@ const (
 	// registration is carried. The 35g1 fuzz table's "diagnostics.export"
 	// near-miss row was re-adjudicated out in the same change (the
 	// privacy.purge/privacy.export precedent on that table).
-	wantFullInboundRosterSize253 = 20
+	// Ticket 40 AC#3 (2026-11-18) moved both a seventh time: one door joined -
+	// "config.model.probe" (the model page's 测试 button over the real llm
+	// probe machinery; the receipt measures and never saves) - size 20 -> 21
+	// and non-prefixed 16 -> 17, in the same change that added the route, the
+	// cmd/wisp handler, and the page literal (requestModelProbe), so again no
+	// rosterPageGapLedger194 registration is carried.
+	wantFullInboundRosterSize253 = 21
 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
 	// "panel." prefix, invisible to both old rulers. It was 3 ("config.get",
 	// "config.set", "config.models.list") until ticket 194 added the fourth:
@@ -118,14 +124,16 @@ const (
 	// readface wave 2 added history.page and roster.cancel (9); readface
 	// wave 3 added tools.list, tool.launch and rules.force (12); readface
 	// wave 4 added session.rules.list and session.rules.revoke (14); readface
-	// wave 5 added diagnostics.preview and diagnostics.export (16).
-	wantNonPanelPrefixedInbound253 = 16
+	// wave 5 added diagnostics.preview and diagnostics.export (16); ticket 40
+	// AC#3 added config.model.probe (17).
+	wantNonPanelPrefixedInbound253 = 17
 )
 
 // wantFullInboundRoster253 is the closed roster: every name a page can put in the
 // "method" field of a composer envelope that this package's inbound door answers.
 var wantFullInboundRoster253 = []string{
 	"config.get",
+	"config.model.probe",
 	"config.models.list",
 	"config.set",
 	"cost.summary",
@@ -728,7 +736,7 @@ func TestPlantedUnregisteredInboundMethodNameGoesRed(t *testing.T) {
 	// into a copy by replacing that copy's single case line.
 	dir := t.TempDir()
 	path := filepath.Join(dir, "bridge.go")
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodModelProbe, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is no longer written as one comma-separated clause - re-read knownComposerMethod and rebuild this plant from what is on disk rather than replacing nothing")
 	}
@@ -772,7 +780,7 @@ func TestRegistrationSilencesTheRosterRuler(t *testing.T) {
 		t.Fatalf("read bridge.go: %v", err)
 	}
 	constLine := "\nconst ConfigRegistered253Test = \"config.registered253\"\n"
-	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:"
+	guardLine := "\tcase MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodModelProbe, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:"
 	if !strings.Contains(string(src), guardLine) {
 		t.Fatalf("bridge.go's guard case list is not the one comma-separated clause this plant was written against - re-read knownComposerMethod rather than trusting this line")
 	}

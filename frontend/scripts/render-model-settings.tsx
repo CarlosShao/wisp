@@ -42,7 +42,9 @@ import {
 import { VoiceSettingsView } from "@/components/voice-settings";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
 import type { Feedback } from "@/lib/config-feedback";
-import type { ModelsFetchResult } from "@/lib/config-actions";
+import type { ModelProbeResultView } from "@/lib/config-view";
+import { ModelProbeResultCard } from "@/components/model-settings";
+import type { ModelsFetchResult, ModelProbeRun } from "@/lib/config-actions";
 
 const failures: string[] = [];
 function check(label: string, ok: boolean, detail = ""): void {
@@ -135,6 +137,18 @@ const performFetchModels = async (): Promise<ModelsFetchResult> => ({
   ok: true,
   models: ["示例模型-3"],
 });
+const performProbe = async (): Promise<ModelProbeRun> => ({
+  ok: true,
+  result: {
+    provider: "stepfun",
+    model: "示例模型-1",
+    latencyMS: 421,
+    allOK: true,
+    written: true,
+    outcomes: [],
+    mismatches: [],
+  },
+});
 const run = async (_key: string, fn: () => Promise<Feedback>): Promise<Feedback> => fn();
 const noop = (): void => undefined;
 
@@ -223,7 +237,15 @@ check(
 );
 check("the no-default markup must hold zero emoji", !EMOJI_RE.test(addNoDefault));
 
-const chatView = renderToStaticMarkup(<ModelSettingsView performCredential={performCredential} performFetchModels={performFetchModels} performWrite={performWrite} view={CONFIGURED} />);
+const chatView = renderToStaticMarkup(
+  <ModelSettingsView
+    performCredential={performCredential}
+    performFetchModels={performFetchModels}
+    performProbe={performProbe}
+    performWrite={performWrite}
+    view={CONFIGURED}
+  />,
+);
 check(
   "the chat card must show the user's saved pair verbatim (user wins on read)",
   chatView.includes("stepfun / 示例模型-1"),
@@ -252,6 +274,7 @@ const rowEditing = renderToStaticMarkup(
     onFeedback={noop}
     performCredential={performCredential}
     performFetchModels={performFetchModels}
+    performProbe={performProbe}
     performWrite={performWrite}
     row={ROW_NOKEY}
     run={run}
@@ -287,6 +310,7 @@ check(
       onFeedback={noop}
       performCredential={performCredential}
       performFetchModels={performFetchModels}
+    performProbe={performProbe}
       performWrite={performWrite}
       row={ROW}
       run={run}
@@ -511,6 +535,7 @@ const absentCapsRowEdit = renderToStaticMarkup(
     onFeedback={noop}
     performCredential={performCredential}
     performFetchModels={performFetchModels}
+    performProbe={performProbe}
     performWrite={performWrite}
     row={wireAbsentCapsRow}
     run={run}
@@ -540,6 +565,7 @@ const rowEditPage = renderToStaticMarkup(
     onFeedback={noop}
     performCredential={performCredential}
     performFetchModels={performFetchModels}
+    performProbe={performProbe}
     performWrite={performWrite}
     row={ROW}
     run={run}
@@ -628,6 +654,112 @@ check(
 check("the all-pass markup must hold zero emoji", !EMOJI_RE.test(allPassPage));
 
 /* ---------------------------------------------------------------------------
+   Tooth 7 - the probe card (ticket 40 AC#3, 2026-11-18).
+   --------------------------------------------------------------------------- */
+
+// A REAL-shaped measured answer: mixed verdicts, one raw failure detail, one
+// frozen mismatch label. Every word below must ride to the screen verbatim -
+// the page computes no verdict of its own (the 空转返回OK shape has no markup
+// it can wear: an outcome that says 实测不可用 cannot render as anything else).
+const PROBE_FIXTURE: ModelProbeResultView = {
+  provider: "stepfun",
+  model: "示例模型-1",
+  latencyMS: 421,
+  allOK: false,
+  written: true,
+  outcomes: [
+    { capability: "fc", declared: true, ok: true, attempted: true },
+    { capability: "vision", declared: true, ok: false, attempted: true, detail: "provider (502): HTTP 502" },
+    { capability: "thinking", declared: false, ok: true, attempted: true },
+  ],
+  mismatches: [
+    {
+      capability: "vision",
+      detail: "provider (502): HTTP 502",
+      label: "能力实测不符：stepfun/示例模型-1 声明支持 vision，实测不可用",
+    },
+  ],
+};
+
+const probeDone = renderToStaticMarkup(
+  <ModelProbeResultCard onDismiss={noop} probe={{ phase: "done", model: "示例模型-1", result: PROBE_FIXTURE }} />,
+);
+check(
+  "probe tooth 1: the measured latency rides verbatim (p50 number, not a badge)",
+  probeDone.includes("stepfun/示例模型-1 实测 p50 421ms"),
+  "latency line",
+);
+check(
+  "probe tooth 2: a passing capability renders its declared/measured pairing as words",
+  probeDone.includes("fc：声明可用，实测可用") && probeDone.includes("thinking：未声明，实测可用"),
+  "paired words",
+);
+check(
+  "probe tooth 3: a failed capability carries its RAW detail verbatim - never paraphrased",
+  probeDone.includes("vision：声明可用，实测不可用") && probeDone.includes("（细节：provider (502): HTTP 502）"),
+  "raw detail",
+);
+check(
+  "probe tooth 4: the frozen mismatch label renders verbatim",
+  probeDone.includes("能力实测不符：stepfun/示例模型-1 声明支持 vision，实测不可用"),
+  "label",
+);
+check(
+  "probe tooth 5: the provider_health half is stated (written=true), and the no-save fact with it",
+  probeDone.includes("判定已写入 provider_health；探测不改配置，不落 config.toml。"),
+  "written sentence",
+);
+check("the probe-done markup must hold zero emoji", !EMOJI_RE.test(probeDone));
+check(
+  "probe tooth 6: a probe result must not carry any save/tier wording (it measures, never saves)",
+  !probeDone.includes("需要重启") && !probeDone.includes("立即生效") && !probeDone.includes("设置已写入"),
+  "no tier wording",
+);
+
+const PROBE_REFUSAL = "面板请求被拒绝 [config.model.probe r-1]：身份或密钥没有通过，先检查密钥配置：auth: llm: resolving api_key_ref for provider \"stepfun\" failed (Unconfigured)";
+const probeFailed = renderToStaticMarkup(
+  <ModelProbeResultCard onDismiss={noop} probe={{ phase: "failed", model: "示例模型-1", text: PROBE_REFUSAL }} />,
+);
+check(
+  "probe tooth 7: a refusal's prose rides VERBATIM (the error原文 is the answer, not a summary)",
+  // React escapes `"` in text content, so the verbatim comparison is against
+  // the escaped rendering of the same string - still word-for-word.
+  probeFailed.includes(PROBE_REFUSAL.replaceAll('"', "&quot;")),
+  "refusal verbatim",
+);
+check(
+  "probe tooth 8: a refusal must not read as a measurement (no 实测 p50, no verdict words)",
+  !probeFailed.includes("实测 p50") && !probeFailed.includes("实测可用"),
+  "no fake verdict",
+);
+check("the probe-failed markup must hold zero emoji", !EMOJI_RE.test(probeFailed));
+
+// Source-level: the old stub sentence is gone, the button rides the door, and
+// the route literal lives ONLY in panel.ts (the renderer holds exactly one
+// door to the host).
+check(
+  "probe tooth 9: the honest-stub sentence 暂不支持连接测试 must be gone from the page",
+  !modelSrc.includes("暂不支持连接测试"),
+  "stub removed",
+);
+check(
+  "probe tooth 10: the page's 测试 button must ride the performProbe door, not invent a route",
+  modelSrc.includes("performProbe(row.name, id)"),
+  "door call",
+);
+check(
+  "probe tooth 11: the route literal must live only in the door file (panel.ts)",
+  modelSrc.includes("config.model.probe") === false &&
+    readFileSync("src/lib/panel.ts", "utf8").includes('"config.model.probe"'),
+  "literal home",
+);
+check(
+  "probe tooth 12: the probe block must not compute a second verdict (no local ok-guess)",
+  modelSrc.includes("probeOutcomeWord") && !/probe\s*===\s*"done"\s*\?\s*"可用/.test(modelSrc),
+  "no second judge",
+);
+
+/* ---------------------------------------------------------------------------
    The verdict.
    --------------------------------------------------------------------------- */
 
@@ -644,5 +776,8 @@ console.error(
     "split; residual 1: absent-key rows render 等快照 / 装配未判 without throwing and answered " +
     "bits show their real states; residual 2: the three assembles-illusions (nokey, " +
     "credentialError, enabled=false) each refuse the wired tag and only the all-gates-pass " +
-    "chain may say 已接入·重启生效",
+    "chain may say 已接入·重启生效; ticket 40 AC#3: the probe card rides the measured payload " +
+    "verbatim (p50 number, paired verdict words, raw details, frozen labels, provider_health " +
+    "half, no tier wording) and the refusal prose verbatim, with the stub sentence gone and " +
+    "the route literal only in panel.ts",
 );

@@ -21,10 +21,17 @@ import {
   type Feedback,
 } from "@/lib/config-feedback";
 import { currentConfigBaseSHA, rememberConfigBaseSHA } from "@/lib/config-base";
-import { parseModelsListReply, parseConfigReloadEvent, type ConfigReloadEventView } from "@/lib/config-view";
+import {
+  parseModelProbeReply,
+  parseModelsListReply,
+  parseConfigReloadEvent,
+  type ConfigReloadEventView,
+  type ModelProbeResultView,
+} from "@/lib/config-view";
 import {
   requestConfigWrite,
   requestCredentialWrite,
+  requestModelProbe,
   requestProviderModels,
 } from "@/lib/panel";
 
@@ -158,4 +165,33 @@ export async function performModelsFetch(provider: string): Promise<ModelsFetchR
     return { ok: true, models: parsed.models };
   }
   return { ok: false, feedback: translateFetchReply(reply) };
+}
+
+/** What one model probe (config.model.probe) turned out to be. ok=true
+    carries the MEASURED result verbatim (latency, per-capability verdicts,
+    mismatch labels, the raw error text) - it is not a success badge: a run
+    against a dead endpoint also measures, with every capability failed.
+    ok=false carries the sentence to show in place: no host (nothing was
+    sent), a malformed payload, or the host's own refusal prose verbatim. */
+export type ModelProbeRun =
+  | { ok: true; result: ModelProbeResultView }
+  | { ok: false; feedback: Feedback };
+
+/** Probe one catalog model (config.model.probe, ticket 40 AC#3). A probe
+    measures and never saves - there is no reload event on this reply, and
+    none is looked for. */
+export async function performModelProbe(provider: string, model: string): Promise<ModelProbeRun> {
+  const reply = await requestModelProbe(provider, model);
+  if (reply === null) {
+    return { ok: false, feedback: { tone: "error", text: "未连接到本机服务，探测没有发生" } };
+  }
+  const parsed = parseModelProbeReply(reply);
+  if (parsed.kind === "parsed") {
+    return { ok: true, result: parsed.result };
+  }
+  if (parsed.kind === "payload-error") {
+    return { ok: false, feedback: { tone: "error", text: `探测载荷损坏：${parsed.message}` } };
+  }
+  const prose = parsed.raw.trim();
+  return { ok: false, feedback: { tone: "error", text: prose === "" ? "探测失败" : prose } };
 }

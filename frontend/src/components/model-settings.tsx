@@ -37,10 +37,13 @@ import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
 import {
   performConfigWrite,
   performCredentialWrite,
+  performModelProbe,
   performModelsFetch,
   type ConfigWireWrite,
+  type ModelProbeRun,
   type ModelsFetchResult,
 } from "@/lib/config-actions";
+import type { ModelProbeResultView } from "@/lib/config-view";
 import {
   EmptyState,
   FeedbackLine,
@@ -71,6 +74,9 @@ export interface ModelSettingsViewProps {
   performCredential: (provider: string, value: string) => Promise<Feedback>;
   /** Fetch one provider's model catalog (config.models.list). */
   performFetchModels: (provider: string) => Promise<ModelsFetchResult>;
+  /** Probe one catalog model (ticket 40 AC#3's probe door): the real
+      llm probe machinery over provider_health, answered verbatim. */
+  performProbe: (provider: string, model: string) => Promise<ModelProbeRun>;
   /** Re-read the config (after every accepted write). */
   onReload: () => void;
 }
@@ -86,12 +92,13 @@ export function ModelSettings({
     <section aria-label="模型" className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
-      <ConfigReadGate>
+        <ConfigReadGate>
         {(view, _prose, reload) => (
           <ModelSettingsView
             onReload={reload}
             performCredential={performCredentialWrite}
             performFetchModels={performModelsFetch}
+            performProbe={performModelProbe}
             performWrite={performConfigWrite}
             view={view}
           />
@@ -110,6 +117,7 @@ export function ModelSettingsView({
   performWrite,
   performCredential,
   performFetchModels,
+  performProbe,
   onReload,
 }: ModelSettingsViewProps) {
   const status = configStatus(view);
@@ -159,6 +167,7 @@ export function ModelSettingsView({
             onFeedback={setProvidersFeedback}
             performCredential={performCredential}
             performFetchModels={performFetchModels}
+            performProbe={performProbe}
             performWrite={performWrite}
             run={run}
             setAddOpen={setAddOpen}
@@ -203,6 +212,7 @@ function ProvidersCard({
   performWrite,
   performCredential,
   performFetchModels,
+  performProbe,
   run,
 }: {
   view: ConfigView;
@@ -216,6 +226,7 @@ function ProvidersCard({
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
   performFetchModels: (provider: string) => Promise<ModelsFetchResult>;
+  performProbe: (provider: string, model: string) => Promise<ModelProbeRun>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const rows = view.providers;
@@ -252,6 +263,7 @@ function ProvidersCard({
               onFeedback={onFeedback}
               performCredential={performCredential}
               performFetchModels={performFetchModels}
+              performProbe={performProbe}
               performWrite={performWrite}
               row={row}
               run={run}
@@ -305,6 +317,23 @@ type FetchState =
   | { phase: "error"; feedback: Feedback }
   | { phase: "ready"; models: string[] };
 
+/** The per-model probe's four states (ticket 40 AC#3). done carries the
+    MEASURED result verbatim - it is not a pass badge: a dead endpoint also
+    measures (every capability failed, details verbatim). failed carries the
+    host's own refusal prose (or the no-host sentence) verbatim. */
+type ProbeState =
+  | { phase: "idle" }
+  | { phase: "loading"; model: string }
+  | { phase: "done"; model: string; result: ModelProbeResultView }
+  | { phase: "failed"; model: string; text: string };
+
+/** One capability's verdict word. Words, never glyphs (the emoji ban): the
+    pairing the ticket asks for ("declared vs measured") said in text. */
+function probeOutcomeWord(outcome: { attempted: boolean; ok: boolean }): string {
+  if (!outcome.attempted) return "未实测";
+  return outcome.ok ? "实测可用" : "实测不可用";
+}
+
 /** Exported for the render instrument (scripts/render-model-settings.tsx):
     the key row's markup (type="password", value never in state) is asserted
     on this piece directly. */
@@ -319,6 +348,7 @@ export function ProviderRow({
   performWrite,
   performCredential,
   performFetchModels,
+  performProbe,
   run,
 }: {
   row: ConfigViewProvider;
@@ -331,6 +361,7 @@ export function ProviderRow({
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
   performFetchModels: (provider: string) => Promise<ModelsFetchResult>;
+  performProbe: (provider: string, model: string) => Promise<ModelProbeRun>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const key = keyLabel(row);
@@ -400,13 +431,6 @@ export function ProviderRow({
         </span>
         <div className="flex shrink-0 items-center gap-0.5">
           <Button
-            onClick={() => onFeedback({ tone: "neutral", text: COPY.testConnectionUnavailable })}
-            size="xs"
-            variant="quiet"
-          >
-            测试连接
-          </Button>
-          <Button
             aria-busy={fetch.phase === "loading"}
             disabled={fetch.phase === "loading" || busy !== null}
             onClick={startFetch}
@@ -449,11 +473,77 @@ export function ProviderRow({
           onDismissFetch={() => setFetch({ phase: "idle" })}
           onFeedback={onFeedback}
           performCredential={performCredential}
+          performProbe={performProbe}
           performWrite={performWrite}
           row={row}
           run={run}
         />
       ) : null}
+    </div>
+  );
+}
+
+/** Exported for the render instrument (scripts/render-model-settings.tsx):
+    the probe blocks are state-gated inside ProviderEdit (they exist only
+    after a click), so the instrument mounts this piece directly to pin what
+    a real answer renders. Pure: props in, markup out, no state - the block
+    renders the payload's words verbatim and computes no verdict of its own. */
+export function ModelProbeResultCard({
+  probe,
+  onDismiss,
+}: {
+  probe:
+    | { phase: "done"; model: string; result: ModelProbeResultView }
+    | { phase: "failed"; model: string; text: string };
+  onDismiss: () => void;
+}) {
+  if (probe.phase === "failed") {
+    return (
+      <div className="flex flex-col gap-1 rounded-control bg-inset p-2.5">
+        <p className="text-[11.5px] text-ink-2">{probe.model} 的探测没有完成：</p>
+        <p className="whitespace-pre-wrap font-mono text-[11px] text-ink-2">{probe.text}</p>
+        <div>
+          <Button onClick={onDismiss} size="xs" variant="quiet">
+            知道了
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  const result = probe.result;
+  return (
+    <div className="flex flex-col gap-1.5 rounded-control bg-inset p-2.5">
+      <p className="text-[11.5px] text-ink-2">
+        {result.provider}/{result.model} 实测 p50 {result.latencyMS}ms
+        {result.error ? `；探测未完成：${result.error}` : ""}
+      </p>
+      {result.outcomes.map((o) => (
+        <p className="text-[11.5px] text-ink-2" key={o.capability}>
+          {o.capability}：{o.declared ? "声明可用" : "未声明"}，{probeOutcomeWord(o)}
+          {o.detail && !o.ok ? (
+            <span className="font-mono text-[10.5px] text-ink-3">（细节：{o.detail}）</span>
+          ) : null}
+        </p>
+      ))}
+      {result.outcomes.length === 0 && !result.error ? (
+        <p className="text-[11.5px] text-ink-3">本次没有任何能力发出实测请求。</p>
+      ) : null}
+      {result.mismatches.map((m) => (
+        <p className="text-[11.5px] text-ink-2" key={m.capability}>
+          {m.label}
+          <span className="font-mono text-[10.5px] text-ink-3">（细节：{m.detail}）</span>
+        </p>
+      ))}
+      <p className="text-[11px] text-ink-3">
+        {result.written
+          ? "判定已写入 provider_health；探测不改配置，不落 config.toml。"
+          : "判定没有写入 provider_health（本次只测未录）；探测不改配置。"}
+      </p>
+      <div>
+        <Button onClick={onDismiss} size="xs" variant="quiet">
+          收起
+        </Button>
+      </div>
     </div>
   );
 }
@@ -466,6 +556,7 @@ function ProviderEdit({
   onFeedback,
   performWrite,
   performCredential,
+  performProbe,
   run,
 }: {
   row: ConfigViewProvider;
@@ -475,6 +566,7 @@ function ProviderEdit({
   onFeedback: (next: Feedback | null) => void;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
+  performProbe: (provider: string, model: string) => Promise<ModelProbeRun>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const [baseURL, setBaseURL] = useState("");
@@ -484,6 +576,22 @@ function ProviderEdit({
   // lists are shown as 已有 and cannot be ticked again.
   const [ticked, setTicked] = useState<ReadonlySet<string>>(new Set());
   const keyInputRef = useRef<HTMLInputElement>(null);
+  // The probe (ticket 40 AC#3): one state block under the catalog, answered
+  // by the host's own measurement. No local verdict is ever computed - the
+  // block renders what came back, verbatim.
+  const [probe, setProbe] = useState<ProbeState>({ phase: "idle" });
+
+  function probeModel(id: string) {
+    if (probe.phase === "loading" || busy !== null) return;
+    setProbe({ phase: "loading", model: id });
+    void performProbe(row.name, id).then((run40) => {
+      if (run40.ok) {
+        setProbe({ phase: "done", model: id, result: run40.result });
+      } else {
+        setProbe({ phase: "failed", model: id, text: run40.feedback.text });
+      }
+    });
+  }
 
   const existing = new Set(row.models ?? []);
   const fetchedNew = fetch.phase === "ready" ? fetch.models.filter((id) => !existing.has(id)) : [];
@@ -722,6 +830,15 @@ function ProviderEdit({
                     <StateTag text="等快照" tone="neutral" />
                   )}
                   <span className="min-w-0 flex-1" />
+                  <Button
+                    aria-busy={probe.phase === "loading" && probe.model === id}
+                    disabled={busy !== null || (probe.phase === "loading" && probe.model === id)}
+                    onClick={() => probeModel(id)}
+                    size="xs"
+                    variant="quiet"
+                  >
+                    {probe.phase === "loading" && probe.model === id ? "探测中…" : "测试"}
+                  </Button>
                   <button
                     aria-label={`删除模型 ${id}`}
                     className="rounded-full px-1 text-[13px] leading-none text-ink-3 hover:text-ink disabled:opacity-40"
@@ -744,6 +861,21 @@ function ProviderEdit({
           能力位 audio in / audio out 是语音装配的门槛：听写链要求该模型勾上 audio in，朗读链要求
           audio out（默认关，保存后重启生效）。
         </p>
+
+        {/* The probe block (ticket 40 AC#3): the host's own measurement,
+            verbatim. No local verdict is computed anywhere in this block -
+            every word comes from the payload. */}
+        {probe.phase === "loading" ? (
+          <p className="flex items-center gap-1.5 text-[11.5px] text-ink-3">
+            <LoaderCircle aria-hidden="true" className="animate-spin" size={11} strokeWidth={2} />
+            正在实测 {row.name}/{probe.model}（向上游发探测请求，可能要几十秒）…
+          </p>
+        ) : probe.phase === "failed" || probe.phase === "done" ? (
+          <ModelProbeResultCard
+            onDismiss={() => setProbe({ phase: "idle" })}
+            probe={probe.phase === "failed" ? { phase: "failed", model: probe.model, text: probe.text } : { phase: "done", model: probe.model, result: probe.result }}
+          />
+        ) : null}
 
         {fetch.phase === "loading" ? (
           <p className="flex items-center gap-1.5 text-[11.5px] text-ink-3">
