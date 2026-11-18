@@ -51,7 +51,7 @@ summaries + budgets), plus Models and Diagnostics views.
 - [x] Budget states: <80 normal, ≥80 warn, ≥100 paused (fixture by editing aggregates).
 - [x] Diagnostics preview lists exactly the bundle contents; exported bundle verified to exclude
       audio/keys/transcript-full.
-- [ ] **Model-management: CRUD round-trip into config.toml; probe button → provider_health
+- [x] **Model-management: CRUD round-trip into config.toml; probe button → provider_health
       display; capability-filtered role dropdowns (voice roles hide non-voice models); chain
       drag-order persisted; quota edits enforced ranges.**
 - [ ] Visual sign-off vs the three design screens; zero-emoji + hex scans green.
@@ -210,3 +210,8 @@ Go 读/写面先落地；可视对照（design 三屏）不在本腿射程。
 
 **尺1** `fc56a04ea` 在（3 件）。**尺3 我自己复跑**：`go test ./internal/memory -run ^(TestPrivacyL0AutoAllowDetailSaysNobodyWasAsked|TestPrivacyL2AllowNeverSaysAutoAllow|TestPrivacyExportDecisionNotesMatchListDetail)$` **3/3 PASS**（0.19s/0.26s/0.16s）；`d22scan` clean。
 - **勾 AC#6**：唯一构造点 `internal/memory/privacy.go` 的 `privacyToolCallDetail`：列值逐字回显 `risk_level · tool · decision`；**当且仅当 L0 && allow** 追加「按档自动放行（L0），未询问任何人」；`ExportPrivacy` 新增派生字段 `decision_notes` **同源**（页面与导出不可能各写一套）；列值一字不改（`Records` 仍整行逐字，派生串不落库）。四枚变异 M1 拿掉 L0 判定／M2 改判 L2／M3 导出另拼／M4 列值改字 —— 全红。
+## 编排者收件·AC#3（2026-11-18 20:3x，`9acf4160a`＋`98e566401`，件 `docs/evidence/s1/40-modelmgmt-crud-probe-20261118.md`／`40-modelmgmt-b-20261118.md`）
+
+**尺1** 两提交在。**尺3 我自己复跑**：载具 `^(Test40ModelMgmt|Test40ModelProbe)` **7/7 PASS**（含死端点真错 58.75s）；载具四枚后半 **4/4 PASS**（chain 换序读回同序 0.08s／quota 越界拒 0.02s／quota 在范围内往返 0.07s／读面带 realtime 位 0.01s）；`render:model-settings`、`render:modelmgmt40b` rc=0；`d22scan` clean。
+- **勾 AC#3**：①CRUD 往返真落 `config.toml`（fresh LoadFile 九字段逐字段；M1 只改内存⇒红、M2 写盘不回读⇒红）②"测试"按钮真调 `config.model.probe`→`RunProbeSuite`→真写 provider_health（p50 真延迟/逐能力词对/失败原文；空转回 OK⇒红）③capability 过滤（每模型第三枚真位 `realtime`，`voiceModelCandidates` 纯函数，位假剔除/没答不过滤，前端零硬编码）④chain 拖拽序落盘重启同序（幽灵元素仍拒）⑤quota 按现量 `[0,int64max]` micro-USD 校验，负数具名拒绝、越界一字节不落盘；endpoint 类写回执逐字「需要重启」。
+- 全量唯一红＝既有环境红 `TestAC4FocusReturnToPriorWindowGap33r5`（前台窗锁；单发复跑同红；与本腿改动面零重叠）。

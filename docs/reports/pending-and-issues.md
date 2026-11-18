@@ -37913,3 +37913,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - 255 尺逮到新 `[llm]` 读口，已按 441 先例登记（定向 3/3 绿）。
 - ⚠ 全量唯一红＝既有 `TestAC4FocusReturnToPriorWindowGap33r5`（活窗 planted-thread，441 全量同枚已红，非本腿）。
 - AC#3 **仍未勾**（后三半在派 `w40modelb`）。
+## A1947（11-18 20:3x）：40 AC#3 勾（`9acf4160a`＋`98e566401`）—— 模型页 CRUD/探针/过滤/链序/额度全落地
+
+我复跑：载具 7/7 PASS ＋ 后半 4/4 PASS；两枚仪器 rc=0；d22scan clean。capability 读面补真位 `realtime`；chain 换序 fresh LoadFile 同序；quota `[0,int64max]` micro-USD 负数具名拒、越界零落盘。全量唯一红＝既有环境红 33r5（前台窗锁）。**票 40 = 7/8，只剩 AC#7 视觉签收（机主）。**
