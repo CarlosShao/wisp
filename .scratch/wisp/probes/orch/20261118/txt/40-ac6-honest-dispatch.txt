@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 40 AC#6：L0+allow 的行不许比现实好看（真话＝按档自动放行、没问过任何人）（写腿，**不碰 cmd/wisp 与 internal/panel**，与 40-modelmgmt-a 并行不撞编译面）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。只做票 40 **AC#6**（`40-security-privacy-cost-pages.md:58-63`）：
+1. **落点**：`internal/memory/privacy.go` 里由 `r.Decision` 拼的人读串（尺：`grep -n "r.Decision" internal/memory/privacy.go`）。当 `risk_level=="L0" && decision=="allow"` ⇒ 人读详情必须写清**「按档自动放行（L0），未询问任何人」**，⛔ 只写裸 "allow"。
+2. **导出包人读字段**同一句（同一构造点，⛔ 两处各写一套）。
+3. **列值本身一字不改**（票 184 AC#5(a)：取证面不许改字）—— 只改"人读详情"派生串；牙：把列值改字⇒红。
+4. **牙**：①L0+allow 渲染成裸 allow⇒红 ②L2+allow 被误写"自动放行"⇒红（反向：只有 L0 才说自动）③导出与页面两处不一致⇒红。变异仓外。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔ UI emoji。⚠ **不要碰 `cmd/wisp/**`、`internal/panel/**`**（那两处是本波另一条腿的编译面）；⚠ 别碰他人在飞件（composer-states.html M 只报不动，⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` **不用跑**（写面外）；跑 `go test ./internal/memory -run <相关> -v`；前端**只跑 `npm --prefix frontend run typecheck`**（⚠ 不跑 `npm run build`，避免与并行腿抢 dist）。
+三样现跑：①`sh scripts/d22scan.sh` 0 findings ②`go test ./internal/memory` 相关全绿 ③`go build ./...` rc=0。
+写面：`internal/memory/privacy.go`（及测试）、`frontend/src/**`（若人读串在前端拼）、`docs/evidence/s1/40-l0-honest-*`。
+回话第一行＝commit hash ＋三枚牙名/读数 ＋d22scan 末行 ＋memory 测试 rc ＋typecheck rc。没干完写「卡在哪」。
