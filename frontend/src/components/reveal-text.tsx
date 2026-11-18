@@ -16,6 +16,7 @@
 
 import { useEffect, useState } from "react";
 import { revealSegments } from "@/lib/reveal";
+import { panelWorkAllowed, usePanelVisibilityTick } from "@/lib/panel-visibility";
 
 const SEGMENT_MS = 46;
 
@@ -24,6 +25,15 @@ export function RevealText({ text }: { text: string }) {
   const [count, setCount] = useState(0);
   const done = count >= segments.length;
 
+  // Ticket 36 AC#5: the reveal ladder is animation work, so it rides the
+  // panel's visibility pause (lib/panel-visibility.ts). The visibility tick
+  // re-runs this effect on every visibilitychange; the gate declines to
+  // schedule while the panel is hidden, so no timer exists at all (the wake
+  // source is gone) and the counter freezes mid-stream; on visible again the
+  // tick re-opens the gate and the ladder continues from the frozen count -
+  // one segment per cadence, never a catch-up burst.
+  const visTick = usePanelVisibilityTick();
+
   // No reset when `text` grows: an arriving SSE chunk extends the answer, and
   // rewinding would blank out what the reader has already read. The atom did
   // exactly that (its setCount(0) fires on every text change); whether it ever
@@ -31,9 +41,10 @@ export function RevealText({ text }: { text: string }) {
   // chunks, which is not decided on disk yet.
   useEffect(() => {
     if (done) return;
+    if (!panelWorkAllowed()) return;
     const timer = setTimeout(() => setCount((c) => c + 1), SEGMENT_MS);
     return () => clearTimeout(timer);
-  }, [count, done]);
+  }, [count, done, visTick]);
 
   return (
     <>

@@ -75,6 +75,7 @@ import {
 } from "@/lib/panel";
 import { TIER_NAMES as libTierNames } from "@/lib/tier-names";
 import { applyPanelFontSize } from "@/lib/panel-font";
+import { panelWorkAllowed } from "@/lib/panel-visibility";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
@@ -915,6 +916,31 @@ function useNarrow(): boolean {
     return () => window.removeEventListener("resize", onResize);
   }, [read]);
   return narrow;
+}
+
+/**
+ * The panel's animation-pause tracker (ticket 36 AC#5): a display:none span
+ * that only reports the visibility fact this App runs under. App has no JS
+ * loop of its own to gate - the CSS keyframes are the compositor's to park
+ * on a hidden document, and the JS-driven sources (RevealText's ladder, any
+ * loop mounted on panelAnimationLoops via panel-root.tsx's
+ * installPanelVisibilityPause) gate on the same fact inside their own
+ * modules. The span exists so the whole-panel instrument
+ * (scripts/render-hiddenpause36.tsx) can assert the WIRING at the App level
+ * - that the panel root carries the pause state - without inventing an
+ * animation App does not have.
+ */
+export function PanelHiddenPauseProbe({
+  doc = typeof document === "undefined" ? null : document,
+}: {
+  /** Injectable document: the instrument feeds the same fake the panel root's
+      subscription rides, so one source of truth per run. Production leaves
+      the default. */
+  doc?: Document | null;
+}): React.ReactElement {
+  return (
+    <span data-panel-hidden-pause={panelWorkAllowed(doc) ? "running" : "paused"} style={{ display: "none" }} />
+  );
 }
 
 /* ---------------------------------------------------------------------------

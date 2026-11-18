@@ -28,6 +28,7 @@
 import { useEffect, useState } from "react";
 import App from "@/App";
 import { installPanelSnapshotReceiver, type PanelSnapshot } from "@/lib/panel";
+import { installPanelVisibilityPause, panelAnimationLoops } from "@/lib/panel-visibility";
 
 export function PanelRoot() {
   const [snapshot, setSnapshot] = useState<PanelSnapshot | null>(null);
@@ -35,5 +36,14 @@ export function PanelRoot() {
   // mount/unmount cycle and a real unmount (the global dies with the page
   // anyway, but leaving it pointing at a dead setter would be a lie).
   useEffect(() => installPanelSnapshotReceiver(window, setSnapshot), []);
+  // Ticket 36 AC#5: the panel's animation work pauses when the document
+  // hides and resumes when it shows again (36-result-history-panel.md:32,
+  // the CPU rule). One subscription at the mount point drives every loop on
+  // panelAnimationLoops together; the cleanup below covers StrictMode's
+  // double mount, same as the receiver above.
+  useEffect(() => {
+    const pause = installPanelVisibilityPause(document, panelAnimationLoops);
+    return () => pause.uninstall();
+  }, []);
   return <App snapshot={snapshot ?? undefined} />;
 }

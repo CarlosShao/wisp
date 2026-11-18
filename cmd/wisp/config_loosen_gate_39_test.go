@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -40,7 +41,7 @@ const loosen39Fixture = "[risk]\npermission_mode = \"ask_every_step\"\n" +
 // config.toml on a real Manager, a real gate over the scripted native surface,
 // and the wiring cmd/wisp's assembly root runs - nothing assigned by hand that
 // startConfigLoosenGate assigns in production.
-func newLoosen39Runtime(t *testing.T, timeout time.Duration) (*agentRuntime, string, *nativeCard371, *bytes.Buffer) {
+func newLoosen39Runtime(t *testing.T, timeout time.Duration) (*agentRuntime, string, *nativeCard371, *auditCapture39) {
 	t.Helper()
 	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, configFileName)
@@ -52,16 +53,19 @@ func newLoosen39Runtime(t *testing.T, timeout time.Duration) (*agentRuntime, str
 		t.Fatalf("config.NewManager: %v", err)
 	}
 	ui := newNativeCard371()
-	var audit bytes.Buffer
 	// The Manager's own adjudication lines (SECTION-WRITE) and this runtime's
 	// lines share one capture, shaped the way auditf spells them - the same
-	// audit trail a run keeps, one buffer for the joins the cases read.
-	mgr.Audit = func(f string, a ...any) {
-		fmt.Fprintf(&audit, "[audit] "+f+"\n", a...)
-	}
+	// audit trail a run keeps, one buffer for the joins the cases read. The
+	// capture is lock-serialized (the deflake half of the 2026-11-18 leg):
+	// the Manager audit runs on the caller's goroutine while the resolver's
+	// lines arrive on the spawned approval-waiter goroutine, and a shared
+	// unsynchronized bytes.Buffer was both a race detector red and the reason
+	// a torn line could be unread while a case was already judging the dump.
+	audit := newAuditCapture39()
+	mgr.Audit = audit.auditf
 	rt := &agentRuntime{
 		spec:   runSpec{dataDir: dir},
-		stderr: &audit,
+		stderr: audit,
 		mgr:    mgr,
 		gate: approval.New(approval.Options{
 			UI:              ui,
@@ -73,7 +77,45 @@ func newLoosen39Runtime(t *testing.T, timeout time.Duration) (*agentRuntime, str
 	if mgr.LoosenQueue == nil {
 		t.Fatal("startConfigLoosenGate did not wire the loosening queue; the gate is unwired")
 	}
-	return rt, path, ui, &audit
+	return rt, path, ui, audit
+}
+
+// auditCapture39 is this file's shared audit sink. fmt.Fprintf to an
+// io.Writer is not atomic and a bytes.Buffer is not thread-safe: two
+// goroutines write here (the Manager's SECTION-WRITE lines on the test's own
+// goroutine, the adapter's LOOSEN-GATE lines on the approval-waiter spawned
+// by QueueLoosen - cmd/wisp/config_loosen_gate_39.go), so every access takes
+// the lock. This is the deterministic-arrival fix, not an assertion
+// relaxation: nothing is skipped, nothing is reworded, every line still
+// lands, and the waiters below now read whole lines instead of racing the
+// writer mid-Flush.
+type auditCapture39 struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func newAuditCapture39() *auditCapture39 { return &auditCapture39{} }
+
+// auditf is the Manager.Audit hook shape (internal/config sectionwrite.go's
+// own call shape, [audit]-prefixed the way auditf spells it).
+func (c *auditCapture39) auditf(f string, a ...any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	fmt.Fprintf(&c.buf, "[audit] "+f+"\n", a...)
+}
+
+// Write is the io.Writer half agentRuntime.auditf rides (fmt.Fprint(rt.stderr, ...)).
+func (c *auditCapture39) Write(p []byte) (int, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.buf.Write(p)
+}
+
+// String snapshots the capture under the same lock.
+func (c *auditCapture39) String() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.buf.String()
 }
 
 // readZedEnabled reads the ONE field this ticket owns back off the disk - the
@@ -103,7 +145,7 @@ func waitForZed(t *testing.T, path string, want bool) {
 }
 
 // auditLines39 returns the audit lines matching every needle.
-func auditLines39(audit *bytes.Buffer, needles ...string) []string {
+func auditLines39(audit *auditCapture39, needles ...string) []string {
 	var out []string
 	for _, l := range strings.Split(audit.String(), "\n") {
 		ok := true
@@ -120,20 +162,53 @@ func auditLines39(audit *bytes.Buffer, needles ...string) []string {
 	return out
 }
 
+// auditWaitBudget39 is the explicit upper bound of every audit wait in this
+// file. The waiters are polls-with-deadline, never a bare check, never a
+// sleep: the timeout IS the determinism ceiling the dispatch names, and on
+// expiry the dump is printed whole so the red names what arrived.
+const auditWaitBudget39 = 5 * time.Second
+
 // waitForAudit39 polls the capture until one line matches every needle or the
 // budget ends - the resolver writes its lines on its own goroutine, so the
 // test waits for the record instead of sleeping a guess.
-func waitForAudit39(t *testing.T, audit *bytes.Buffer, needles ...string) []string {
+func waitForAudit39(t *testing.T, audit *auditCapture39, needles ...string) []string {
 	t.Helper()
-	deadline := time.Now().Add(5 * time.Second)
-	for time.Now().Before(deadline) {
+	deadline := time.Now().Add(auditWaitBudget39)
+	for {
 		if rows := auditLines39(audit, needles...); len(rows) > 0 {
 			return rows
 		}
+		if !time.Now().Before(deadline) {
+			t.Fatalf("no audit line matching %v within the budget:\n%s", needles, audit.String())
+		}
 		time.Sleep(20 * time.Millisecond)
 	}
-	t.Fatalf("no audit line matching %v within the budget:\n%s", needles, audit.String())
-	return nil
+}
+
+// waitForAuditCount39 is the count-shaped wait: poll until at least `want`
+// lines match every needle, or the budget ends. The accepted case uses this
+// for its exactly-one assertion: the resolver goroutine books the accepted
+// SECTION-WRITE line after waitForZed's disk read-back can already see the
+// applied value (the write commits before the audit line is printed), so
+// waiting on the disk alone was the race the whole-package runs hit
+// (docs/evidence/s1/37-depth-timeout-fallback-20261118.md: the dump showed
+// outcome=queued while the case was already counting lines). Asserting
+// >= want here and exactly-one after is the same assertion, arrived at
+// deterministically - not a relaxation.
+func waitForAuditCount39(t *testing.T, audit *auditCapture39, want int, needles ...string) []string {
+	t.Helper()
+	deadline := time.Now().Add(auditWaitBudget39)
+	for {
+		rows := auditLines39(audit, needles...)
+		if len(rows) >= want {
+			return rows
+		}
+		if !time.Now().Before(deadline) {
+			t.Fatalf("audit lines matching %v reached %d, want at least %d, within the budget:\n%s",
+				needles, len(rows), want, audit.String())
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
 }
 
 // AC#2, accepted arm, production seam: the native ON toggle queues, the card
@@ -164,7 +239,13 @@ func Test39NativeLooseningCardAcceptedAppliesAndAudits(t *testing.T) {
 	}
 	waitForZed(t, path, true)
 
-	rows := auditLines39(audit, "SECTION-WRITE", "outcome=written", "card="+cardID)
+	// The resolver books the accepted SECTION-WRITE line on its own goroutine
+	// AFTER the commit, so the read-back above can already see the applied
+	// value while the line is still in flight - the whole-package flake
+	// (the 37-leg close run: the dump showed outcome=queued at judge time).
+	// Wait for the record deterministically (poll with the explicit budget),
+	// then judge exactly-one on the same set.
+	rows := waitForAuditCount39(t, audit, 1, "SECTION-WRITE", "outcome=written", "card="+cardID)
 	if len(rows) != 1 {
 		t.Fatalf("accepted SECTION-WRITE lines = %d, want exactly 1:\n%s",
 			len(rows), audit.String())
@@ -177,7 +258,7 @@ func Test39NativeLooseningCardAcceptedAppliesAndAudits(t *testing.T) {
 			t.Errorf("the accepted write's audit line is missing %q:\n%s", want, rows[0])
 		}
 	}
-	if lines := auditLines39(audit, "LOOSEN-GATE state=answered card="+cardID+" ", "result=allow"); len(lines) != 1 {
+	if lines := waitForAuditCount39(t, audit, 1, "LOOSEN-GATE state=answered card="+cardID+" ", "result=allow"); len(lines) != 1 {
 		t.Errorf("no single LOOSEN-GATE allow line joins card %s:\n%s", cardID, audit.String())
 	}
 }
