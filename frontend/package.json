@@ -31,6 +31,7 @@
     "render:security40": "vite build --ssr scripts/render-security-cost-40.tsx --outDir node_modules/.tmp/security40render --logLevel warn && node node_modules/.tmp/security40render/render-security-cost-40.js",
     "render:privacy40": "vite build --ssr scripts/render-privacy-40.tsx --outDir node_modules/.tmp/privacy40render --logLevel warn && node node_modules/.tmp/privacy40render/render-privacy-40.js",
     "render:sessionrules40": "vite build --ssr scripts/render-sessionrules-40.tsx --outDir node_modules/.tmp/sessionrules40render --logLevel warn && node node_modules/.tmp/sessionrules40render/render-sessionrules-40.js",
+    "render:diagnostics40": "vite build --ssr scripts/render-diagnostics-40.tsx --outDir node_modules/.tmp/diagnostics40render --logLevel warn && node node_modules/.tmp/diagnostics40render/render-diagnostics-40.js",
     "render:historypage36": "vite build --ssr scripts/render-history-page-36.tsx --outDir node_modules/.tmp/historypage36render --logLevel warn && node node_modules/.tmp/historypage36render/render-history-page-36.js",
     "render:taskcard38": "vite build --ssr scripts/render-taskcard-38.tsx --outDir node_modules/.tmp/taskcard38render --logLevel warn && node node_modules/.tmp/taskcard38render/render-taskcard-38.js",
     "render:discovery38": "vite build --ssr scripts/render-discovery38.tsx --outDir node_modules/.tmp/discovery38render --logLevel warn && node node_modules/.tmp/discovery38render/render-discovery38.js",

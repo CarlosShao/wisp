@@ -1288,3 +1288,63 @@ export function requestSessionRulesRevoke(ruleId: string): Promise<string | null
     sessionRuleId: ruleId,
   });
 }
+
+/* --------------------------------------------------------------------------
+   Diagnostics doors (2026-11-18, ticket 40 AC#5)
+   --------------------------------------------------------------------------
+   Two doors answered over the SAME settings envelope above
+   (internal/panel/bridge.go's MethodDiagnosticsPreview /
+   MethodDiagnosticsExport, routed by composer_dispatch.go, answered by
+   cmd/wisp's panel_diagnostics_40.go over the ticket-45 engine - the SAME
+   diagnosticsBundleOptions180P assembler and the SAME Preview/Build pair the
+   `wisp diagnostics` CLI uses, under the SAME [privacy] diagnostics_opt_in
+   total switch). These literals are the half bridge.go's page-gap ledger
+   judged directly: both spellings landed in THIS file in the same commit as
+   the Go roster names, so the ticket-114 AC#8 mirror gate judges them with
+   no pending registration. "diagnostics.export" is the SPEC-08 §5.2:173
+   spelling itself.
+
+   diagnostics.preview is a READ: the engine's own BundlePreview - the exact
+   zip entry list, every category with its policy and its items (name,
+   bytes, redacted head, excluded reason), nothing written. The page NEVER
+   derives an entry of its own: the list it draws is the payload's entries,
+   and the excluded categories ride the payload with the engine's own
+   reasons verbatim (parse it with parseDiagnosticsPreviewReply,
+   lib/diagnostics-view.ts). A machine with the switch off refuses by name
+   naming diagnostics_opt_in - the refusal sentence is what the page shows,
+   never an empty list dressed up as a reading.
+
+   diagnostics.export runs the SAME options with a real output path, the
+   preview FIRST (a failure aborts before anything is written), then the
+   builder; the receipt names the path it wrote and the payload is the same
+   preview JSON whose out_path is now the real target. The user has already
+   seen the list (the preview card) - this button ships exactly what that
+   list said, which is the AC's whole claim.
+   -------------------------------------------------------------------------- */
+
+/** Ask the host what a diagnostics bundle WOULD carry (diagnostics.preview).
+    The reply is prose plus one line starting with the wisp-diagnostics-preview
+    marker; parse it with parseDiagnosticsPreviewReply
+    (lib/diagnostics-view.ts). The switch-off refusal names diagnostics_opt_in
+    - shown verbatim, never an empty list that reads as "nothing to export". */
+export function requestDiagnosticsPreview(): Promise<string | null> {
+  return requestHostAnswer({
+    method: "diagnostics.preview",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+  });
+}
+
+/** Build and write the diagnostics bundle (diagnostics.export). The reply is
+    prose naming the written path plus one line starting with the
+    wisp-diagnostics-export marker; parse it with
+    parseDiagnosticsExportReply (lib/diagnostics-view.ts). The zip stays on
+    disk at the path the receipt names - the bundle is a file the user opens,
+    not bytes over this bridge. */
+export function requestDiagnosticsExport(): Promise<string | null> {
+  return requestHostAnswer({
+    method: "diagnostics.export",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+  });
+}

@@ -48,6 +48,7 @@ import { SecuritySettings } from "@/components/security-settings";
 import { PrivacySettings } from "@/components/privacy-settings";
 import { CostSettings } from "@/components/cost-settings";
 import { SkillsSettings } from "@/components/skills-settings";
+import { DiagnosticsSettings } from "@/components/diagnostics-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 import type {
@@ -71,7 +72,7 @@ interface Category {
       category has real controls. */
   waiting: string;
   /** Which real component draws this category when `waiting` is empty. */
-  control?: "config" | "model" | "voice" | "security" | "privacy" | "cost" | "skills";
+  control?: "config" | "model" | "voice" | "security" | "privacy" | "cost" | "skills" | "diagnostics";
 }
 
 const CATEGORIES: readonly Category[] = [
@@ -181,6 +182,21 @@ const CATEGORIES: readonly Category[] = [
     purpose: "每轮花费、本月累计、预算与超支提醒。",
     waiting: "",
     control: "cost",
+  },
+  {
+    // Ticket 40 AC#5 (readface wave 5, 2026-11-18): the diagnostics doors
+    // went live on the Go side (bridge.go's diagnostics.preview /
+    // diagnostics.export - the export spelling is SPEC-08 §5.2:173's own -
+    // composer_dispatch.go's table, panel_inbound.go's wiring,
+    // panel_diagnostics_40.go over the ticket-45 engine), so this category
+    // mounts the preview card (review BEFORE export) and the real export
+    // button. The bundle's exclusions ride the payload with the engine's own
+    // reasons verbatim; the gate is the CLI's own [privacy]
+    // diagnostics_opt_in, and a switch-off refusal renders verbatim.
+    name: "诊断",
+    purpose: "诊断包的预览清单与一键导出。",
+    waiting: "",
+    control: "diagnostics",
   },
   {
     name: "引导",
@@ -370,6 +386,12 @@ export function SettingsPage({
                category. Null (no reader on this pump) stays the honest
                waiting sentence, never an empty list. */
             <SkillsSettings heading={cat.name} lede={cat.purpose} section={plugins ?? null} />
+          ) : cat.control === "diagnostics" ? (
+            /* Ticket 40 AC#5: the diagnostics doors' page half. The preview
+                card fetches diagnostics.preview itself (the settings door),
+                the export button walks the real export, and every excluded
+                category's statement rides the payload verbatim. */
+            <DiagnosticsSettings heading={cat.name} lede={cat.purpose} />
           ) : (
             <section aria-label={cat.name} className="flex min-w-0 flex-col gap-1">
               <h2 className="text-[15px] font-semibold text-ink">{cat.name}</h2>

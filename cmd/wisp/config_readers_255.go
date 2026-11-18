@@ -383,7 +383,15 @@ var sectionReadSites = map[string][]string{
 	// (cmd/wisp/logsink.go); the retention window helper reads both
 	// l3_retention_days and privacy.retention_days and run.go feeds l1_max
 	// into memory.Open (cmd/wisp/memory_retention_180k.go + cmd/wisp/run.go).
-	"Privacy": {"cmd/wisp/logsink.go", "cmd/wisp/memory_retention_180k.go", "cmd/wisp/diagnostics_cmd.go"},
+	// 2026-11-18 re-adjudication (readface wave 5, ticket 40 AC#5): the
+	// diagnostics doors' panel leg reads the SAME total switch the CLI gate
+	// reads - cmd/wisp/panel_diagnostics_40.go's gate40 consults [privacy]
+	// diagnostics_opt_in (and diagnosticsBundleOptions180P consumes
+	// redact_paths) per request hop, the same key diagnostics_cmd.go already
+	// reads for the `wisp diagnostics` face. The [privacy] roster row's
+	// verdict is untouched: the read stays a boot/request-time LoadFile pass
+	// that never re-reads the live Manager.
+	"Privacy": {"cmd/wisp/logsink.go", "cmd/wisp/memory_retention_180k.go", "cmd/wisp/diagnostics_cmd.go", "cmd/wisp/panel_diagnostics_40.go"},
 	"Memory":  {"cmd/wisp/memory_retention_180k.go", "cmd/wisp/run.go"},
 	// 2026-11-05 re-adjudication (ticket 98's C2): ticket 44 landed the C23
 	// money path, and both of its adapters read the four [cost] leaves off a

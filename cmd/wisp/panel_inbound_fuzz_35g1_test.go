@@ -262,7 +262,14 @@ func g1ForbiddenNames() []string {
 		"privacy.delete-all",
 		"privacy.export.all",
 		"models.delete",
-		"diagnostics.export",
+		// 2026-11-18 re-adjudication (readface wave 5, ticket 40 AC#5):
+		// diagnostics.export joined the whitelist with this wave
+		// (SPEC-08 §5.2:173's own spelling, see bridge.go's note on the two
+		// constants) - the row leaves the table by the same
+		// privacy.purge/privacy.export precedent and rejoins as a fresh
+		// near-miss shape so the table stays exactly 50; diagnostics.preview
+		// was minted off-table, so nothing else moves.
+		"diagnostics.export.all",
 		// near-misses of the eight roster names
 		"panel.mode.request2",
 		"panel.mode.Request",

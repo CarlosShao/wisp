@@ -17,7 +17,9 @@ package panel
 // readface wave 3's three doors (ticket 38 AC#3's tools.list read and
 // tool.launch door, ticket 38 AC#5's rules.force read) sixteen, and
 // readface wave 4's two doors (ticket 40 AC#2's session-rules live read and
-// its one-click revoke) eighteen - and
+// its one-click revoke) eighteen, and readface wave 5's two doors (ticket 40
+// AC#5's diagnostics preview / export pair over the ticket-45 engine) twenty -
+// and
 // the roster they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
@@ -271,6 +273,34 @@ type SessionRulesHandler interface {
 	HandleSessionRulesRevoke(ctx context.Context, req ComposerRequest) (string, error)
 }
 
+// DiagnosticsHandler answers readface wave 5 (2026-11-18, ticket 40 AC#5):
+// the diagnostics view's review-before-export pair. Two methods, one per
+// roster name, the privacy trio's reason restated: preview and export differ
+// in effect (one writes nothing, one writes a zip to the data root), and a
+// method-per-verb door cannot be talked into the wrong one by an argument.
+//
+//   - HandleDiagnosticsPreview: what a bundle WOULD carry, as the engine's own
+//     BundlePreview - the exact zip entry list, every category with its
+//     policy and its items (name, bytes, redacted head, excluded reason).
+//     AC#5's "preview lists exactly the bundle contents" rests on this being
+//     the SAME Preview function over the SAME BundleOptions the export
+//     builds from - the handler owns no entry list of its own.
+//   - HandleDiagnosticsExport: the same options with a real OutPath, the
+//     preview run FIRST (a failure aborts the export before anything is
+//     written - the builder is fail-closed and leaves no half zip), then the
+//     builder. The receipt names the path it wrote; the payload is the same
+//     preview JSON, whose out_path is now the real target.
+//
+// Both doors are gated upstream of the engine by [privacy] diagnostics_opt_in
+// - the SAME total switch the CLI's diagnostics command consults (the handler
+// re-reads the same key from the same config file; a gate that answered the
+// panel differently from the CLI would be two privacy postures wearing one
+// name). nil socket = the named refusal every unattached door gives.
+type DiagnosticsHandler interface {
+	HandleDiagnosticsPreview(ctx context.Context, req ComposerRequest) (string, error)
+	HandleDiagnosticsExport(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -328,6 +358,12 @@ type ComposerDispatch struct {
 	// reaches a machine with no session-rules leg attached must be told so,
 	// not dropped.
 	SessionRules SessionRulesHandler
+	// Diagnostics answers readface wave 5 (2026-11-18, ticket 40 AC#5): the
+	// diagnostics view's preview / export pair over the ticket-45 engine.
+	// Optional like every socket above; nil refuses by name - an export
+	// request that reaches a machine with no diagnostics leg attached must be
+	// told so, never dropped, and never faked with a success line.
+	Diagnostics DiagnosticsHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -460,6 +496,16 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.SessionRules.HandleSessionRulesRevoke(ctx, req)
+	case MethodDiagnosticsPreview:
+		if d == nil || d.Diagnostics == nil {
+			return "", d.unattached(req)
+		}
+		return d.Diagnostics.HandleDiagnosticsPreview(ctx, req)
+	case MethodDiagnosticsExport:
+		if d == nil || d.Diagnostics == nil {
+			return "", d.unattached(req)
+		}
+		return d.Diagnostics.HandleDiagnosticsExport(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

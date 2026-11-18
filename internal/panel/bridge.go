@@ -297,6 +297,50 @@ const (
 	// no grant-boundary verdict word, and the page literal half is
 	// REGISTERED in rosterPageGapLedger194 while pending.
 	MethodRulesForce = "rules.force"
+	// MethodDiagnosticsPreview / MethodDiagnosticsExport are readface wave 5
+	// (2026-11-18), ticket 40 AC#5's Go half: the diagnostics view's
+	// review-before-export pair. Three naming facts, each one a decision
+	// somebody could later "fix" by accident:
+	//
+	//   - The export spelling IS the spec's own: SPEC-08 §5.2:173 lists
+	//     `diagnostics.export` for this face, and ticket 194's roster census
+	//     (docs/evidence/s1/194-method-roster-census-c1.md #18) recorded it as
+	//     "engine in, delivery hop missing" - the engine has answered since
+	//     ticket 45 (internal/observe's PreviewDiagnosticsBundle /
+	//     BuildDiagnosticsBundle pair, which share the one BundleOptions source),
+	//     the CLI face since deferred disposition 20261110 #5
+	//     (diagnostics_cmd.go), and the panel had neither. `diagnostics.preview`
+	//     is the same face's review half, named after the CLI's own subcommand
+	//     verb - the pair is one flow (preview what WOULD ship, then ship it),
+	//     not two features.
+	//
+	//   - No "panel." prefix (ticket 181's extractor counts those literals) and
+	//     no word of the grant-boundary instrument's verdict vocabulary: a
+	//     diagnostics bundle answers "what would leave this machine", never
+	//     "what is allowed next". The bundle's own privacy posture is
+	//     fail-closed upstream of this door - [privacy] diagnostics_opt_in, the
+	//     same total switch the CLI gate consults, and the builder's
+	//     default-excluded transcript, watchdog-snapshot and audio categories.
+	//     The door adds no second gate and no second enumeration: the handler
+	//     assembles the SAME BundleOptions the CLI assembles
+	//     (diagnosticsBundleOptions180P) and hands it to the SAME Preview/Build
+	//     pair, so the panel preview and the panel zip cannot drift from the
+	//     CLI's - one enumerate source.
+	//
+	//   - The page literal half LANDED with this same change (ticket 40 AC#5's
+	//     frontend leg): frontend/src/lib/panel.ts spells both names
+	//     (requestDiagnosticsPreview / requestDiagnosticsExport on the settings
+	//     envelope), so no rosterPageGapLedger194 registration is carried - the
+	//     two-way mirror gate judges them directly.
+	//
+	// The 35g1 fuzz table's "diagnostics.export" near-miss row was
+	// re-adjudicated out of the forbidden table in the same change that added
+	// the route (the privacy.purge/privacy.export precedent at that table's own
+	// note): a name the whitelist answers is by definition not a fuzz-table
+	// member, and the row joined as a fresh near-miss shape so the table stays
+	// exactly 50.
+	MethodDiagnosticsPreview = "diagnostics.preview"
+	MethodDiagnosticsExport  = "diagnostics.export"
 )
 
 // ErrComposerRequest is every way a composer request can fail to be usable.
@@ -475,7 +519,7 @@ func knownComposerMethod(m string) bool {
 	// plants (inbound_roster_253_test.go) both anchor their guard copy on this
 	// exact one-line form, so wrapping it would leave real plants replacing
 	// nothing. Appending a constant means extending this line, deliberately.
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList, MethodCostSummary, MethodPrivacyDeleteOne, MethodPrivacyPurge, MethodPrivacyExport, MethodHistoryPage, MethodSessionRulesList, MethodSessionRulesRevoke, MethodRosterCancel, MethodToolsList, MethodToolLaunch, MethodRulesForce, MethodDiagnosticsPreview, MethodDiagnosticsExport:
 		return true
 	}
 	return false

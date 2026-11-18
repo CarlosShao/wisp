@@ -385,6 +385,14 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// until bindPanelSessionRules hands them the runtime's own session ledger
 	// - never a second copy of the grant state.
 	sessionRules := newSessionRulesDoor40(auditf, actor)
+	// Readface wave 5 (2026-11-18, ticket 40 AC#5): the diagnostics doors.
+	// Both handlers assemble the SAME BundleOptions the CLI's diagnostics
+	// command assembles (diagnosticsBundleOptions180P over THIS data root) and
+	// hand it to the SAME Preview/Build pair internal/observe owns, under the
+	// SAME [privacy] diagnostics_opt_in total switch - one enumerate source,
+	// one gate, no second file list anywhere. The wiring nail in
+	// panel_diagnostics_40_test.go reddens if this field is unplugged.
+	diagnostics := newDiagnosticsDoor40(dir, auditf, actor)
 	// Ticket 186's leg, attached only where a runtime scope was handed over (see
 	// the signature note). The interface is left nil rather than holding a typed
 	// nil pointer, because the router's refusal is decided by a nil interface
@@ -445,7 +453,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		// Readface wave 4 (2026-11-18, ticket 40 AC#2): the session-rules
 		// doors, seam nil until the boot binds it (see the door's own note).
 		SessionRules: sessionRules,
-		Audit:        auditf,
+		// Readface wave 5 (2026-11-18, ticket 40 AC#5): the diagnostics
+		// doors' real leg, wired above - one options assembler and one
+		// Preview/Build pair shared with the CLI.
+		Diagnostics: diagnostics,
+		Audit:       auditf,
 	}, mgr, nil
 }
 
