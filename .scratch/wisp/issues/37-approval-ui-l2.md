@@ -136,3 +136,30 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 **尺1** `f392f34a2` 在（16 件）。**尺3 我自己复跑**：`render:approval37` rc=0；`go test ./internal/agent/approval -run 'TestR7…|TestBatch'` **ok 0.052s**；build/typecheck/lint rc=0。
 - **勾 AC#5**：①10 操作 ⇒ **一张卡**（「需要你的确认」×1）＋五字段逐字（batchSummary 原句／本批共 10 项／余 7 项／目录×2／预览×3），普通卡零 batch 痕、batch 块**零 allow 形控件**；②50+ 升级 L2 **不聚合** —— Go 侧 `internal/agent/approval/batch_test.go:87 TestR7SizedBatchEscalatesToL2Unaggregated` 现跑 PASS（断言 level=L2、不得聚合、`rules_hit` 带 R7）。
 - 留白：AC#1 深度 1→2 e2e（需宿主）、AC#2 270/300 倒计时＋球徽标（球侧）、AC#3 原生回退卡（33 夹具/宿主）、AC#6 人眼签收（机主）。
+
+## 写腿收件·三格 Go 侧（2026-11-18 21:x，写腿 agent-139；只追加不勾框）
+
+证据件：`docs/evidence/s1/37-depth-timeout-fallback-20261118.md`（三格读数、三枚变异牙红 log、门禁全读数）。
+新牙：`cmd/wisp/approval_depth_timeout_fallback_37_windows_test.go`（四枚）＋
+`internal/agent/approval/ticket37_timeout_boundary_37_test.go`（两枚边界读数牙）。
+- **AC#1（Go/球侧半格）**：两发顺序 L2（票 43/48 的 raise-and-wait-for-depth queue 测试模式）⇒ 徽章输入
+  1→2（`Prompt.Depth` 逐字 1、2，`approvalDepthBadge` 映射钉）、队头单显、按 corr 分别路由（先答第二发
+  ⇒ B 醒 A 不醒；跨卡花 grant ⇒ ErrBadGrant）；票 87 R-3 键对账（签发键＝卡 corr＝面板 verdict corr）与
+  「两卡共存取消其一绝不能命中另一张」（共享名歧义 ⇒ ErrUnknownCorrelation、精确键 ⇒ 仅命中己卡）都钉进
+  `Test37TwoCardsCoexistingCancelOneNeverHitsTheOther`。牙：两发算一发（Depth 钉 1）⇒红、按到达序答
+  （reject 无视 corr 命中队头）⇒红，均载具现跑现还原。
+- **AC#2（Go/球侧半格）**：注入 Clock 走 `approval.Clock` 缝（⛔墙钟判据），gate 零超时选项 ⇒ 300s/30s
+  来自 `queue.go` 冻结默认：270s 一枚 Warning（Remaining 30s、「30 秒后自动拒绝」）、300s `AnswerTimeout`
+  （why 含 300＋拒绝）、深度 0＋ledger 空＋`AwaitingHuman()==false`＋真实走 `ballCardUI.Update` 的
+  settle/syncBadge 分支；`Gate.Replay` 新 corr 新 grant、死 grant 打不开重放卡、新 grant 补完原请求。
+  牙：`DefaultApprovalTimeout` 300→299 ⇒ approval 包直跑红（`Queue().Timeout()=4m59s`）＋载具红
+  （卡 Deadline 读数 4m59s），证边界是读来的；⚠ 270/300 不在 `internal/observe/thresholds.go`，真源头
+  `internal/agent/approval/queue.go:125`（冻结常量，只读未改，变异为临时探针已还原）。
+- **AC#3**：复用票 33 AC#5 fixture 本体（`withMaskedRuntime`）⇒ 按名拒绝＋`panel.unavailable`＋
+  `Unavailable()==(true,reason)`，被遮世界里两发 L2 经 `Replies.Allow`（原生卡/托盘动词）先后批准、
+  徽章 2→0；负向：活 grant 走面板路由报允许 ⇒ `ErrPanelAllow`＋`PANEL-ALLOW-REJECTED`＋nonce 烧毁
+  （原生再花 ⇒ ErrBadGrant）；拒绝方向仍通。⛔ 未给面板侧开 allow 口子。
+- **门禁**：d22scan 0 findings（末行 OK）；载具相关族 rc=0；`go build ./...` rc=0；前端 build/typecheck/
+  lint＋`render:approval37` 全 rc=0；载具整包收口一发读数见证据件。
+- **留白不变**：AC#6 人眼签收（机主）；重放面板一键按钮仍缺 C17 白名单 verb（改契约须人工批）；
+  Win32 实球 posting 的实窗核验仍归 winlive 档（AST census 牙继续钉接线）。
