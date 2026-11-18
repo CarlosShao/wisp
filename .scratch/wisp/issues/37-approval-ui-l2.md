@@ -34,10 +34,10 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
 - Session-grant options in card (49 adds the third option); multi-task scheduler itself (47).
 
 ## Acceptance criteria
-- [ ] E2E: two sequential L2 requests → depth badge 1→2 (simulated pre-47 via queue test mode),
+- [x] E2E: two sequential L2 requests → depth badge 1→2 (simulated pre-47 via queue test mode),
       head-only display, decision routing by correlationId.
-- [ ] Timeout: card warning at 270s → auto-reject at 300s → replay works; ball badge clears.
-- [ ] Fallback: with panel runtime masked, L2 still approvable via native card (33 fixture).
+- [x] Timeout: card warning at 270s → auto-reject at 300s → replay works; ball badge clears.
+- [x] Fallback: with panel runtime masked, L2 still approvable via native card (33 fixture).
 - [x] No-allow invariant: panel card markup contains no allow action wired to decision API
       (DOM + bridge double test).
 - [x] Batch view: 10-op batch renders aggregated card; 50+ upgrades to L2 card (R7).
@@ -163,3 +163,9 @@ path when the panel is unavailable — with the ball depth-badge as the always-v
   lint＋`render:approval37` 全 rc=0；载具整包收口一发读数见证据件。
 - **留白不变**：AC#6 人眼签收（机主）；重放面板一键按钮仍缺 C17 白名单 verb（改契约须人工批）；
   Win32 实球 posting 的实窗核验仍归 winlive 档（AST census 牙继续钉接线）。
+
+## 编排者收件·三格（2026-11-18 21:4x，`64dfe1290`，件 `docs/evidence/s1/37-depth-timeout-fallback-20261118.md`）
+
+**尺1** `64dfe1290` 在（4 件）。**尺3 我自己复跑**：载具四枚 PASS（Badge1→2 0.01s／TwoCardsCoexisting 0.01s／Timeout270-300-Replay 0.02s／MaskedNativeCard 0.02s）；`internal/agent/approval ^Test37TimeoutBoundaryIsReadFromTheContractConstants` PASS 0.01s；`render:approval37` rc=0；`d22scan` clean。
+- **勾三格**：①徽章 1→2（卡面 Depth 逐字 1,2）、恒队头、**按 correlationId 分别答**（先答 B 只醒 B；跨卡 grant=ErrBadGrant；R-3 精确键只中己卡、歧义名=ErrUnknownCorrelation）②**270s 预警（"30 秒后自动拒绝"）／300s AnswerTimeout 自动拒／重放换新 corr 能补完／球徽章清零**，边界值读自 `queue.go:125` 冻结默认（270/300 **不在 thresholds.go**，该文件零动；变异 300→299 两面红）③面板被遮 ⇒ 原生卡经 `Replies.Allow`（球/托盘生产路径）两发先后批准；面板 allow=ErrPanelAllow+PANEL-ALLOW-REJECTED、nonce 烧毁。
+- ⚠ 整包 3 红分诊：33r5／320（台账在册环境红）＋`Test39NativeLooseningCardAcceptedAppliesAndAudits`（**不在名册**；我单跑 3/3 全绿 ⇒ 整包内互扰，非产品红；见下一条处置腿）。
