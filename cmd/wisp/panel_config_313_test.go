@@ -257,6 +257,10 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 	// Ticket 39: the seventh roster joined the union the same way every
 	// roster before it did - one append here, so a one-sided drop still moves this test.
 	want = append(want, panel.WritableFields39()...)
+	// Ticket 40's quota roster: the eighth roster joined the union the same way
+	// every roster before it did - one append here, so a one-sided drop still
+	// moves this test.
+	want = append(want, panel.WritableFields40Quota()...)
 	sort.Strings(want)
 	if !reflect.DeepEqual(reported, want) {
 		t.Errorf("the door reports the union %v; the two rosters say %v (A881: union == table1 + table2)", reported, want)

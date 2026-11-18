@@ -260,7 +260,14 @@ export function BallStylePicker({
 /** The model half of a pair: the catalog list when the read has one, a typed id
     when it does not (`manualFallback`), and the reason printed when neither can
     produce a value. The typed id is the SECONDARY path - it exists because a
-    provider nobody has configured yet cannot have a catalog list. */
+    provider nobody has configured yet cannot have a catalog list.
+
+    `modelCandidates` (ticket 40's capability-filtered role dropdowns) is the
+    caller's filter over one provider row, answered as the candidate list to
+    offer. The page passes the bit's own filter (voice-settings.tsx's
+    voiceModelCandidates); null = the read face could not judge (等快照) and
+    the full catalog stays offered - filtering an unanswered read into "nothing
+    is a candidate" would fold "没答" into "全员 false", the residual-1 lie. */
 export function ModelField({
   row,
   provider,
@@ -269,6 +276,7 @@ export function ModelField({
   onChange,
   onManual,
   manualFallback,
+  modelCandidates,
   className,
 }: {
   row: ConfigViewProvider | null;
@@ -280,9 +288,18 @@ export function ModelField({
   /** Whether a typed id is offered at all (an existing provider's catalog is
       authoritative, so its pair pickers do not offer one). */
   manualFallback: boolean;
+  /** The caller's capability filter over the row; undefined/null = unfiltered
+      (every model stays a candidate). */
+  modelCandidates?: (row: ConfigViewProvider | null) => string[] | null;
   className?: string;
 }) {
-  const models = row !== null && row.models !== null && row.models.length > 0 ? row.models : null;
+  const all = row !== null && row.models !== null && row.models.length > 0 ? row.models : null;
+  // The filter runs only over a catalog that answered; an unanswered read face
+  // keeps the full list (never a guessed exclusion).
+  const models =
+    all !== null && modelCandidates !== undefined ? (modelCandidates(row) ?? all) : all;
+  const filteredEmpty =
+    modelCandidates !== undefined && models !== null && models.length === 0 && all !== null && all.length > 0;
 
   if (models !== null && !manual) {
     const options: PickerOption[] = [
@@ -293,6 +310,7 @@ export function ModelField({
       <Picker
         ariaLabel="模型"
         className={className}
+        emptyText={filteredEmpty ? "这一行还没有声明该能力的模型" : "没有可选项"}
         onSelect={(next) => {
           if (next === MANUAL_ENTRY) {
             onManual();
@@ -336,7 +354,9 @@ export function ModelField({
 }
 
 /** Provider + model as one control. Owns only the manual/automatic flip; both
-    values are the parent's (a saved pair must stay visible after a reload). */
+    values are the parent's (a saved pair must stay visible after a reload).
+    `modelCandidates` passes through to the model half - ticket 40's voice role
+    dropdowns hand in the bit's own filter; undefined = unfiltered. */
 export function PairFields({
   providers,
   provider,
@@ -344,6 +364,7 @@ export function PairFields({
   onProvider,
   onModel,
   manualFallback,
+  modelCandidates,
   providerLabel = "供应商",
 }: {
   providers: readonly ConfigViewProvider[];
@@ -352,6 +373,9 @@ export function PairFields({
   onProvider: (next: string) => void;
   onModel: (next: string) => void;
   manualFallback: boolean;
+  /** The capability filter the model half offers (voice roles only; see
+      ModelField). */
+  modelCandidates?: (row: ConfigViewProvider | null) => string[] | null;
   providerLabel?: string;
 }) {
   // Which provider the manual flag belongs to. Switching providers therefore
@@ -380,6 +404,7 @@ export function PairFields({
         manual={manual}
         manualFallback={manualFallback}
         model={model}
+        modelCandidates={modelCandidates}
         onChange={onModel}
         onManual={() => setManualFor(provider)}
         provider={provider}

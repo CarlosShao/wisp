@@ -100,15 +100,29 @@ export interface ConfigViewProvider {
   billing: string;
   modelCount: number;
   models: string[] | null;
-  /** The per-model capability bits (audit R1/P3), keyed by model id: the two
-      audio bits the voice assembly refuses on (cloudcatalog.go's "lacks
-      capabilities.audio_in / audio_out"). Go's own json tag is
-      `modelCapabilities`; nil there = the leg did not answer, and the key
-      stays OFF the wire, so `null` here is "等快照" - never folded into
-      "everything is false". A non-null record answers BOTH bits for every
-      listed model (probe-first default false is a real answer, not an
-      absence). */
-  modelCapabilities: Record<string, { audioIn: boolean; audioOut: boolean }> | null;
+  /** The per-model capability bits (audit R1/P3), keyed by model id: the three
+      bits the voice role dropdowns filter on (cloudcatalog.go's "lacks
+      capabilities.audio_in / audio_out" plus the realtime head's realtime
+      bit, which joined with ticket 40's capability-filtered role dropdowns).
+      Go's own json tag is `modelCapabilities`; nil there = the leg did not
+      answer, and the key stays OFF the wire, so `null` here is "等快照" -
+      never folded into "everything is false". A non-null record answers EVERY
+      bit for every listed model (probe-first default false is a real answer,
+      not an absence). */
+  modelCapabilities: Record<string, { audioIn: boolean; audioOut: boolean; realtime: boolean }> | null;
+  /** The per-model spend caps (ticket 40's quota-editing half), keyed by model
+      id: the quota_daily_micro / quota_monthly_micro leaves the C23 gate
+      consumes, carried so the quota editor shows the CURRENT value instead of
+      overwriting blind. Go's own json tag is `modelQuotas`; nil/absent there =
+      the leg did not answer, so `undefined` here is "等快照" - never folded
+      into "every quota is zero". 0 inside an answered entry = uncapped, a real
+      answered value (the schema's own semantics). */
+  modelQuotas?: Record<string, { dailyMicro: number; monthlyMicro: number }> | null;
+  /** The row's plan_credit_total_micro (ticket 40's quota-editing half), the
+      plan-billing credit total the C23 balance is bookkeeping against. Plain
+      number, no omitempty on the Go side: 0 = "not entered" is an ANSWERED
+      value (quota_44.go's reading), never an absence. */
+  planCreditTotalMicro?: number;
   /** The per-model enabled flags (R1-recheck residual 2's read surface), keyed
       by model id: the third boot gate (the voice boot refuses a chain element
       naming an enabled=false model, cloudcatalog.go:87-90; the first two ride

@@ -74,8 +74,8 @@
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
-import { useState } from "react";
-import { Plus, RefreshCw, X } from "lucide-react";
+import { useState, useRef } from "react";
+import { ChevronDown, ChevronUp, Plus, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
 import { Switch } from "@/components/ai-native/switch";
 import { ConfigReadGate } from "@/components/config-read-state";
@@ -135,6 +135,49 @@ function enabledOf(row: ConfigViewProvider): Record<string, boolean> | null {
 
 function enabledOfModel(enabled: Record<string, boolean> | null, model: string): boolean | null {
   return enabled === null ? null : (enabled[model] ?? null);
+}
+
+/* ---------------------------------------------------------------------------
+   票 40 AC#3 半一：capability 过滤的语音角色下拉（voice roles hide non-voice
+   models）。位来源＝模型行的真字段（读面 modelCapabilities，Go 侧从
+   spec.Capabilities.* 原样搬来），前端硬编码名单是禁区——本文件里没有任何
+   模型名清单，候选只由这一位的真假决定。
+
+   三态纪律沿用本文件 residual-1 的裁定：
+     - 位已答 true  ⇒ 候选；
+     - 位已答 false ⇒ 剔除（塞进语音角色的那个非语音模型就是它，剔除才不红）；
+     - 位没答（模型条目缺） ⇒ 留在候选里——没答不是 false，把没答折成
+       "非语音"正是 residual-1 禁的那一类猜；
+     - 整张能力图没答（腿没答/等快照） ⇒ 返回 null，调用方不过滤：
+       全隐藏＝把"没答"读成"全员 false"，同样禁。
+   --------------------------------------------------------------------------- */
+
+export type VoiceBit = "audioIn" | "audioOut" | "realtime";
+
+export function voiceModelCandidates(
+  row: ConfigViewProvider | null,
+  bit: VoiceBit,
+): string[] | null {
+  if (row === null || row.models === null) return null;
+  const caps = row.modelCapabilities ?? null;
+  if (caps === null) return null;
+  return row.models.filter((id) => {
+    const bits = caps[id];
+    if (!bits) return true;
+    return bits[bit];
+  });
+}
+
+/** One reorder of the chain draft: segment `from` moved to index `to`, both
+    clamped, every other segment keeping its relative order. Exported pure for
+    the render instrument; the drag handles and the two move buttons both land
+    here, so there is exactly one reorder rule and no second one to drift. */
+export function moveChainSegment(all: ChainSegment[], from: number, to: number): ChainSegment[] {
+  if (from < 0 || from >= all.length || to < 0 || to >= all.length || from === to) return all;
+  const next = [...all];
+  const [moved] = next.splice(from, 1);
+  next.splice(to, 0, moved);
+  return next;
 }
 
 /** The assembly verdict for one SAVED chain, judged off the read face against
@@ -319,7 +362,7 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
-            description="已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎。门槛：链里每个模型都要在能力位里勾上 audio in（「模型」页的模型行），保存后重启生效。"
+            description="已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎。链段可拖动（或上移/下移）重排，保存按现序写入配置文件，重启后按同序读回。门槛：链里每个模型都要在能力位里勾上 audio in（「模型」页的模型行），保存后重启生效。"
             direction="asr"
             field="voice_cloud_asr_chain"
             initial={view.voice.cloudASRChain}
@@ -331,7 +374,7 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
-            description="已接入：常驻语音启动时按这条链的顺序装配云端朗读，链尽回退本地引擎。门槛：链里每个模型都要在能力位里勾上 audio out（「模型」页的模型行），保存后重启生效。"
+            description="已接入：常驻语音启动时按这条链的顺序装配云端朗读，链尽回退本地引擎。链段可拖动（或上移/下移）重排，保存按现序写入配置文件，重启后按同序读回。门槛：链里每个模型都要在能力位里勾上 audio out（「模型」页的模型行），保存后重启生效。"
             direction="tts"
             field="voice_cloud_tts_chain"
             initial={view.voice.cloudTTSChain}
@@ -457,6 +500,17 @@ function ChainEditor({
     setSegments((all) => all.map((seg, i) => (i === index ? { ...seg, ...next } : seg)));
   }
 
+  // 票 40 AC#3 半二：拖拽排序。dragging ref 存起拖的那一段的下标，drop 时经
+  // moveChainSegment 重排；数组顺序就是保存时写进 config.toml 的链顺序（save
+  // 照 segments 的现序逐段拼值走既有写门），拖完不保存不改盘上。上移/下移
+  // 按钮是同一条重排规则的第二个入口（键盘可达，仪器钉得住）。
+  const dragFrom = useRef<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
+
+  function moveTo(from: number, to: number) {
+    setSegments((all) => moveChainSegment(all, from, to));
+  }
+
   function save() {
     if (segments.length === 0) {
       setFeedback({ tone: "error", text: COPY.chainEmpty });
@@ -525,16 +579,65 @@ function ChainEditor({
         </div>
         <div className="flex flex-col gap-1.5">
           {segments.map((seg, index) => (
-            <div className="flex flex-wrap items-center gap-2" key={`${index}-${seg.provider}`}>
-              <span className="w-8 shrink-0 font-mono text-[11px] text-ink-3">{index + 1}</span>
+            <div
+              className={
+                "flex flex-wrap items-center gap-2 rounded-control px-1 py-0.5" +
+                (dragOver === index && dragFrom.current !== null && dragFrom.current !== index
+                  ? " bg-inset"
+                  : "")
+              }
+              data-chain-segment={index + 1}
+              draggable
+              key={`${index}-${seg.provider}-${seg.model}`}
+              onDragEnd={() => {
+                dragFrom.current = null;
+                setDragOver(null);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(index);
+              }}
+              onDragStart={() => {
+                dragFrom.current = index;
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const from = dragFrom.current;
+                dragFrom.current = null;
+                setDragOver(null);
+                if (from !== null) moveTo(from, index);
+              }}
+            >
+              <span className="w-8 shrink-0 cursor-grab font-mono text-[11px] text-ink-3" title="拖动调整顺序">
+                {index + 1}
+              </span>
               <PairFields
                 manualFallback={false}
                 model={seg.model}
+                modelCandidates={(row) => voiceModelCandidates(row, DIRECTION_BIT[direction])}
                 onModel={(next) => update(index, { model: next })}
                 onProvider={(next) => update(index, { provider: next, model: "" })}
                 provider={seg.provider}
                 providers={providers}
               />
+              <Button
+                aria-label={`第 ${index + 1} 段上移`}
+                disabled={index === 0 || busy !== null}
+                onClick={() => moveTo(index, index - 1)}
+                size="xs"
+                variant="quiet"
+              >
+                <ChevronUp aria-hidden="true" size={12} strokeWidth={2} />
+              </Button>
+              <Button
+                aria-label={`第 ${index + 1} 段下移`}
+                disabled={index === segments.length - 1 || busy !== null}
+                onClick={() => moveTo(index, index + 1)}
+                size="xs"
+                variant="quiet"
+              >
+                <ChevronDown aria-hidden="true" size={12} strokeWidth={2} />
+              </Button>
               <Button
                 aria-label={`移除第 ${index + 1} 段`}
                 onClick={() => setSegments((all) => all.filter((_, i) => i !== index))}
@@ -789,6 +892,9 @@ function RealtimeCard({
           <PairFields
             manualFallback
             model={model}
+            // 票 40 AC#3 半一：realtime 也是语音角色，候选只列声明 realtime 位
+            // 的模型（位来源＝读面 modelCapabilities，非硬编码名单）。
+            modelCandidates={(row) => voiceModelCandidates(row, "realtime")}
             onModel={setModel}
             onProvider={(next) => {
               setProvider(next);

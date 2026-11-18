@@ -192,10 +192,16 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 		if len(p.Models) > 0 {
 			caps := make(map[string]panel.ModelCapabilityBits, len(p.Models))
 			enabled := make(map[string]bool, len(p.Models))
+			quotas := make(map[string]panel.ModelQuotaLimits, len(p.Models))
 			for id, spec := range p.Models {
 				caps[id] = panel.ModelCapabilityBits{
 					AudioIn:  spec.Capabilities.AudioIn,
 					AudioOut: spec.Capabilities.AudioOut,
+					// 票 40 AC#3：realtime 角色下拉的过滤位。实时语音头是语音角色，
+					// 它的过滤位此前没有读面（两个 audio 位自 R1/P3 起就在这张
+					// 图上）；位来源＝模型行的真字段 spec.Capabilities.Realtime，
+					// 不是页面造的名单。
+					Realtime: spec.Capabilities.Realtime,
 				}
 				// R1-recheck residual 2's third gate: the model's enabled flag,
 				// the same specs the names and bits above come from. The boot
@@ -203,10 +209,19 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 				// (internal/speech/cloudcatalog.go:87-90); without this read
 				// face the page could only judge the gate by guessing.
 				enabled[id] = spec.Enabled
+				// 票 40 AC#3 的 quota 编辑半边读口：当前额度值。页面要改一行额度
+				// 就得先知道它现在是多少——没有这个读面，编辑框就是蒙着眼覆盖。
+				// 0 = 不封顶是真答案（schema 的语义），不折成"没答"。
+				quotas[id] = panel.ModelQuotaLimits{
+					DailyMicro:   spec.QuotaDailyMicro,
+					MonthlyMicro: spec.QuotaMonthlyMicro,
+				}
 			}
 			row.ModelCapabilities = caps
 			row.ModelsEnabled = enabled
+			row.ModelQuotas = quotas
 		}
+		row.PlanCreditTotalMicro = p.PlanCreditTotalMicro
 		ref := strings.TrimSpace(p.APIKeyRef)
 		if ref != "" {
 			declared++
@@ -336,6 +351,26 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 				fmt.Errorf("字段 %q 要的是每 1M token 的 micro-USD 数字，收到的值解析不了", w.Field)
 		}
 		written, err = s.mgr.SetModelPriceOut(w.Provider, w.Model, f)
+	case panel.FieldModelQuotaDaily, panel.FieldModelQuotaMonthly, panel.FieldProviderPlanCredit:
+		// 票 40 AC#3 的 quota 编辑半边（后三半派单的第三半）：值＝micro-USD 的
+		// 整数字符串。带的上限＝int64 自身（ParseInt 是它的执行者，越界解析
+		// 即拒），下限＝0，负数由 internal/config 的 setter 具名拒绝（0 = 不
+		// 封顶/未录入是合法值，schema 与 quota_44 的现量语义，这里不另造上限
+		// 数字）；这里只替它答一句形状话（上面数值字段的同款）。档位沿用
+		// [llm] 各写入腿的 restart 盖章（下面默认盖）。
+		n, perr := strconv.ParseInt(strings.TrimSpace(w.Value), 10, 64)
+		if perr != nil {
+			return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
+				fmt.Errorf("字段 %q 要的是 micro-USD 的整数（0 = 不封顶/未录入），收到的值解析不了", w.Field)
+		}
+		switch w.Field {
+		case panel.FieldModelQuotaDaily:
+			written, err = s.mgr.SetModelQuotaDaily(w.Provider, w.Model, n)
+		case panel.FieldModelQuotaMonthly:
+			written, err = s.mgr.SetModelQuotaMonthly(w.Provider, w.Model, n)
+		default:
+			written, err = s.mgr.SetProviderPlanCreditTotal(w.Provider, n)
+		}
 	case panel.FieldRoleChatModel:
 		written, err = s.mgr.SetRoleChatModel(w.Value)
 	case panel.FieldRoleChatThinking:

@@ -78,8 +78,8 @@ const ROW: ConfigViewProvider = {
   // keys off only when the leg did not answer (omitempty), and tooth 6 feeds
   // that absent shape explicitly.
   modelCapabilities: {
-    "示例模型-1": { audioIn: true, audioOut: false },
-    "示例模型-2": { audioIn: false, audioOut: false },
+    "示例模型-1": { audioIn: true, audioOut: false, realtime: false },
+    "示例模型-2": { audioIn: false, audioOut: false, realtime: false },
   },
   modelsEnabled: { "示例模型-1": true, "示例模型-2": true },
   credentialSet: true,

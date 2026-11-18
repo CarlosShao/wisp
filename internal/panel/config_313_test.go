@@ -180,6 +180,19 @@ func Test313AdditionalFieldNamesCarryNoApprovalWordAndNoLockedFamily(t *testing.
 			t.Errorf("313 field %q fell into the locked family %s (%s)", f, family, why)
 		}
 	}
+	// Ticket 40's quota roster joins the same two bans (2026-11-18): the quota
+	// names are money vocabulary, never grant vocabulary, and none of them may
+	// reach a locked family either.
+	for _, f := range WritableFields40Quota() {
+		for _, w := range grantWords {
+			if strings.Contains(strings.ToLower(f), w) {
+				t.Errorf("quota field %q carries the approval word %q (AGENTS.md §1.2)", f, w)
+			}
+		}
+		if family, why := refusedLockedFamily(f); family != "" {
+			t.Errorf("quota field %q fell into the locked family %s (%s)", f, family, why)
+		}
+	}
 	leg := &cfg248Leg{}
 	if _, err := cfg248Dispatch(leg).Handle(context.Background(), cfg248Raw(t, map[string]any{
 		"method": MethodConfigSet, "requestId": "r-313-lock", "source": ComposerRequestSource,
@@ -341,6 +354,14 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 			// face answers alongside the bits - enabled=true, the schema's
 			// catalog default (schema.go:393), in the same fixture.
 			ModelsEnabled: map[string]bool{"m": true},
+			// Ticket 40's quota-editing read face (2026-11-18) answers the same
+			// way - one entry per listed model, so the pin sees the key in its
+			// wire spelling; 1000000 rides so the answered value is visible in
+			// the byte-level pin below.
+			ModelQuotas: map[string]ModelQuotaLimits{"m": {DailyMicro: 1000000}},
+			// planCreditTotalMicro rides as the answered 0 (not entered) - the
+			// no-omitempty value the page must show as 未录入, not as absence.
+			PlanCreditTotalMicro: 0,
 		}},
 		Voice: VoiceSettingsView{
 			AecEnabled: &aecOn, InputDevice: &device, SampleRate: &rate,
@@ -380,11 +401,15 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	// The R1-recheck residual-2 addition (2026-11-16): modelsEnabled joins the
 	// row the same way - the enabled=false gate the voice boot refuses on
 	// (cloudcatalog.go:87-90) had no read face at all, and this key is the
-	// page's one channel to it. Both pins still byte-pin the key set, so this
-	// is a re-adjudication to the new true state with each addition named, not
-	// a loosening: the key set is still exact-match, and the
-	// no-value-bearing-keys property is re-checked below over the grown set.
-	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCapabilities","modelCount","models","modelsEnabled","name","protocol"]`
+	// page's one channel to it. The ticket-40 quota-editing additions
+	// (2026-11-18): modelQuotas (the per-model spend caps the page's quota
+	// editor reads before it writes one) and planCreditTotalMicro (the row's
+	// plan credit total) join the row the same way. All pins still byte-pin
+	// the key set, so this is a re-adjudication to the new true state with
+	// each addition named, not a loosening: the key set is still exact-match,
+	// and the no-value-bearing-keys property is re-checked below over the
+	// grown set.
+	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCapabilities","modelCount","modelQuotas","models","modelsEnabled","name","planCreditTotalMicro","protocol"]`
 	if got := `["` + strings.Join(rowKeys, `","`) + `"]`; got != wantRow {
 		t.Errorf("provider row keys = %s, want %s", got, wantRow)
 	}
@@ -424,9 +449,12 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		t.Errorf("the answered voice object = %s, want the byte-pinned %s", got, wantVoiceJSON)
 	}
 	// Audit R1/P3: the answered capability map rides the row with its own byte
-	// shape - one entry per model, two plain-bool keys, the ASR bit true and
-	// the TTS bit false exactly as the fixture set them.
-	if got := string(rows[0]["modelCapabilities"]); got != `{"m":{"audioIn":true,"audioOut":false}}` {
+	// shape - one entry per model, plain-bool keys, the ASR bit true and the
+	// TTS bit false exactly as the fixture set them. Ticket 40's realtime bit
+	// joined the entry (2026-11-18): the realtime head is a voice role and its
+	// filter bit needed a read face; false here is the fixture's own unset bit,
+	// a real answer in the same plain-bool class.
+	if got := string(rows[0]["modelCapabilities"]); got != `{"m":{"audioIn":true,"audioOut":false,"realtime":false}}` {
 		t.Errorf("the provider row's modelCapabilities = %s, want the byte-pinned map", got)
 	}
 	// R1-recheck residual 2: the answered enabled map rides the row with its
@@ -435,6 +463,19 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 	// (omitempty), the absent = "the leg did not answer" class.
 	if got := string(rows[0]["modelsEnabled"]); got != `{"m":true}` {
 		t.Errorf("the provider row's modelsEnabled = %s, want the byte-pinned map", got)
+	}
+	// Ticket 40's quota-editing read face: the answered quota map rides the row
+	// with its own byte shape - one entry per model, two plain-int64 keys, the
+	// fixture's 1000000 daily and the 0 monthly (0 = uncapped, a real answered
+	// value). A leg that never answered leaves the whole key off the wire, the
+	// same absent class as the two maps above.
+	if got := string(rows[0]["modelQuotas"]); got != `{"m":{"dailyMicro":1000000,"monthlyMicro":0}}` {
+		t.Errorf("the provider row's modelQuotas = %s, want the byte-pinned map", got)
+	}
+	// The no-omitempty credit total: the answered 0 travels verbatim (0 =
+	// not entered, an answer - never folded into an absence).
+	if got := string(rows[0]["planCreditTotalMicro"]); got != "0" {
+		t.Errorf("the provider row's planCreditTotalMicro = %s, want the answered 0", got)
 	}
 	// No travelled key is a value-bearing name (exact match: apiKeyRef is the
 	// reference the schema writes, and it is a different name from any value key).

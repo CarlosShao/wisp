@@ -318,6 +318,23 @@ type ProviderSettings struct {
 	// non-nil map answers EVERY listed model (both bits ride as plain bools,
 	// the schema's own probe-first defaults included).
 	ModelCapabilities map[string]ModelCapabilityBits
+	// ModelQuotas is the read face of each catalog model's spend caps (ticket
+	// 40 AC#3's quota-editing half): one entry per catalog model, the
+	// quota_daily_micro / quota_monthly_micro leaves the C23 pre-dispatch gate
+	// consumes (internal/observe/quota_44.go). The page needs the CURRENT
+	// values to edit them - a quota editor without a reader would be a control
+	// guessing what it is overwriting. nil = the leg did not answer this half,
+	// the same absent class as ModelCapabilities; a non-nil map answers EVERY
+	// listed model (0 = uncapped rides as a real answered value, the schema's
+	// own semantics - it is never folded into "not answered").
+	ModelQuotas map[string]ModelQuotaLimits
+	// PlanCreditTotalMicro is the row's own plan_credit_total_micro (ticket 40
+	// AC#3's quota-editing half: the plan-billing credit total, manually
+	// entered per the schema, the C23 balance's bookkeeping base). Plain int64,
+	// no omitempty: 0 = "not entered" is an ANSWERED value (quota_44.go's own
+	// reading - "zero means not entered and gates nothing"), never an absence;
+	// absence is what a leg that answered no row at all looks like.
+	PlanCreditTotalMicro int64
 	// ModelsEnabled is the read face of each catalog model's enabled flag (the
 	// R1-recheck residual-2 read surface): the voice boot refuses a chain
 	// element whose model is enabled=false by name (cloudcatalog.go:87-90,
@@ -340,14 +357,28 @@ type ProviderSettings struct {
 	Billing  string
 }
 
-// ModelCapabilityBits is one catalog model's two audio capability bits, as the
-// read face carries them (audit R1/P3). Plain bools: the leg that answers the
-// map answers both bits for every model in it - there is no per-bit nil gate
-// here because the schema itself has no "unknown" state for a declared bit
-// (probe-first means default false, which is a real answer, not a missing one).
+// ModelCapabilityBits is one catalog model's capability bits, as the read face
+// carries them (audit R1/P3). Plain bools: the leg that answers the map answers
+// every bit for every model in it - there is no per-bit nil gate here because
+// the schema itself has no "unknown" state for a declared bit (probe-first means
+// default false, which is a real answer, not a missing one). Realtime joined
+// with ticket 40 AC#3's capability-filtered role dropdowns: the realtime head
+// is a voice role, and its filter bit had no read face until now (the two audio
+// bits rode this map since audit R1/P3).
 type ModelCapabilityBits struct {
 	AudioIn  bool `json:"audioIn"`
 	AudioOut bool `json:"audioOut"`
+	Realtime bool `json:"realtime"`
+}
+
+// ModelQuotaLimits is one catalog model's spend caps, as the read face carries
+// them (ticket 40 AC#3's quota-editing half). Plain int64 micro-USD; 0 =
+// uncapped is a real answered value (schema.go's own semantics), so there is no
+// pointer gate inside the entry - the answered/not-answered gate is the map's
+// presence, exactly like ModelCapabilities.
+type ModelQuotaLimits struct {
+	DailyMicro   int64 `json:"dailyMicro"`
+	MonthlyMicro int64 `json:"monthlyMicro"`
 }
 
 // CredentialState is the read side's whole vocabulary about credentials.
@@ -664,14 +695,16 @@ func renderReloadEvent(r SettingWriteResult) string {
 // knownWritableField asks the rosters, not a copy of them. Since ticket 313
 // there are two rosters (the ticket-248 table here and the 313 additions in
 // config_write_313.go), since ticket 187 a third (config_write_187.go), since ticket 65 a fourth (config_write_65.go), since the appearance wave a fifth
-// (config_write_wave.go), since ticket 215a a sixth (config_write_215.go), and
-// since ticket 39 a seventh (config_write_39.go); this is the one place the
-// door asks all seven: a field is writable when any roster carries it, and the
-// frozen 248 pin keeps describing the 248 table alone.
+// (config_write_wave.go), since ticket 215a a sixth (config_write_215.go),
+// since ticket 39 a seventh (config_write_39.go), and since ticket 40's
+// quota-editing half an eighth (config_write_40quota.go); this is the one
+// place the door asks all eight: a field is writable when any roster carries
+// it, and the frozen 248 pin keeps describing the 248 table alone.
 func knownWritableField(field string) bool {
 	return listedWritableField(field) || additionalWritableField(field) ||
 		writableField187(field) || writableField65(field) ||
-		writableFieldWave(field) || writableField215(field) || writableField39(field)
+		writableFieldWave(field) || writableField215(field) || writableField39(field) ||
+		writableField40Quota(field)
 }
 
 // listedWritableField is the ticket-248 table's own lookup, unchanged in shape.
@@ -877,21 +910,27 @@ func renderSettingsPayload(v SettingsView) string {
 	for _, p := range v.Providers {
 		caps := make(map[string]modelCapsPayload, len(p.ModelCapabilities))
 		for id, bits := range p.ModelCapabilities {
-			caps[id] = modelCapsPayload{AudioIn: bits.AudioIn, AudioOut: bits.AudioOut}
+			caps[id] = modelCapsPayload{AudioIn: bits.AudioIn, AudioOut: bits.AudioOut, Realtime: bits.Realtime}
+		}
+		quotas := make(map[string]modelQuotaPayload, len(p.ModelQuotas))
+		for id, limits := range p.ModelQuotas {
+			quotas[id] = modelQuotaPayload{DailyMicro: limits.DailyMicro, MonthlyMicro: limits.MonthlyMicro}
 		}
 		payload.Providers = append(payload.Providers, providerPayload{
-			Name:              p.Name,
-			APIKeyRef:         p.APIKeyRef,
-			HasBaseURL:        p.HasBaseURL,
-			BaseURL:           p.BaseURL,
-			Protocol:          p.Protocol,
-			Billing:           p.Billing,
-			ModelCount:        p.ModelCount,
-			Models:            p.Models,
-			ModelCapabilities: caps,
-			ModelsEnabled:     p.ModelsEnabled,
-			CredentialSet:     p.CredentialSet,
-			CredentialError:   p.CredentialError,
+			Name:                 p.Name,
+			APIKeyRef:            p.APIKeyRef,
+			HasBaseURL:           p.HasBaseURL,
+			BaseURL:              p.BaseURL,
+			Protocol:             p.Protocol,
+			Billing:              p.Billing,
+			ModelCount:           p.ModelCount,
+			Models:               p.Models,
+			ModelCapabilities:    caps,
+			ModelQuotas:          quotas,
+			PlanCreditTotalMicro: p.PlanCreditTotalMicro,
+			ModelsEnabled:        p.ModelsEnabled,
+			CredentialSet:        p.CredentialSet,
+			CredentialError:      p.CredentialError,
 		})
 	}
 	if payload.Providers == nil {
@@ -937,16 +976,36 @@ type providerPayload struct {
 	// enabled" (that folding is exactly the 能装配假象 residual 2 exists to
 	// kill).
 	ModelsEnabled   map[string]bool `json:"modelsEnabled,omitempty"`
-	CredentialSet   bool            `json:"credentialSet"`
-	CredentialError string          `json:"credentialError"`
+	// ModelQuotas is the quota-editing read face (ticket 40 AC#3): one entry
+	// per catalog model, the two spend-cap leaves the C23 gate consumes. Same
+	// omitempty class as the maps above: nil map = the leg did not answer, and
+	// the key stays OFF the wire - the page renders its waiting state there
+	// instead of "every quota is zero".
+	ModelQuotas map[string]modelQuotaPayload `json:"modelQuotas,omitempty"`
+	// PlanCreditTotalMicro is the row's plan_credit_total_micro (ticket 40's
+	// quota-editing half). No omitempty on purpose: 0 = "not entered" is an
+	// answered value the page must show as 未设, never as "the leg did not
+	// answer" (that state is the whole row's absence).
+	PlanCreditTotalMicro int64          `json:"planCreditTotalMicro"`
+	CredentialSet        bool           `json:"credentialSet"`
+	CredentialError      string         `json:"credentialError"`
 }
 
-// modelCapsPayload is the wire shape of one model's two audio bits; separate
+// modelCapsPayload is the wire shape of one model's capability bits; separate
 // from ModelCapabilityBits so the view type can grow without silently moving
-// the page's JSON.
+// the page's JSON. Realtime joined with ticket 40's capability-filtered role
+// dropdowns (the realtime head's filter bit).
 type modelCapsPayload struct {
 	AudioIn  bool `json:"audioIn"`
 	AudioOut bool `json:"audioOut"`
+	Realtime bool `json:"realtime"`
+}
+
+// modelQuotaPayload is the wire shape of one model's spend caps (ticket 40's
+// quota-editing half), the same separation rule modelCapsPayload keeps.
+type modelQuotaPayload struct {
+	DailyMicro   int64 `json:"dailyMicro"`
+	MonthlyMicro int64 `json:"monthlyMicro"`
 }
 
 // configSectionPayload is the wire shape of one section-tree row (ticket 39

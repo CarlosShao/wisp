@@ -548,6 +548,192 @@ export function ModelProbeResultCard({
   );
 }
 
+/* ---------------------------------------------------------------------------
+   票 40 AC#3 半三：quota 编辑（per-model daily/monthly micro ＋ provider 级
+   plan credit total）。
+   --------------------------------------------------------------------------- */
+
+/** One quota leaf's editor row: the CURRENT value read off the config read
+    face verbatim (0 renders as 未设, the schema's own "uncapped / not
+    entered" reading - never folded into a guessed number), an input, and one
+    save that sends the typed value through the whitelisted field. The page
+    adds NO range ruler of its own: the range's single source is the Go setter
+    (negative refused by name, 0 legal, int64 the ceiling via the parse) - a
+    second page-side judge would be the invented number the dispatch forbids,
+    and the host's refusal sentence lands here verbatim either way. */
+function QuotaLeafInput({
+  ariaLabel,
+  caption,
+  current,
+  currentWord,
+  field,
+  label,
+  model,
+  onFeedback,
+  performWrite,
+  provider,
+  run,
+  busy,
+}: {
+  ariaLabel: string;
+  /** The leaf's own unit line, shown under the input. */
+  caption: string;
+  /** The answered current value; undefined = the row answered but this leaf's
+      entry is somehow missing - render 等快照, never 0. */
+  current?: number;
+  /** The word 0 renders as (the leaf's own "uncapped"/"not entered" reading). */
+  currentWord: string;
+  field: string;
+  label: string;
+  model?: string;
+  onFeedback: (next: Feedback | null) => void;
+  performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
+  provider: string;
+  run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
+  busy: string | null;
+}) {
+  const [draft, setDraft] = useState("");
+  const currentText =
+    current === undefined ? "等快照" : current === 0 ? currentWord : `${current}`;
+  function save() {
+    const v = draft.trim();
+    if (v === "") {
+      onFeedback({ tone: "error", text: "请先填入额度数值（micro-USD 整数；0 = 不封顶/未录入）" });
+      return;
+    }
+    void run(`${field}:${provider}:${model ?? "-"}`, () =>
+      performWrite({
+        field,
+        provider,
+        ...(model !== undefined ? { model } : {}),
+        value: v,
+      }),
+    ).then((fb) => {
+      onFeedback(fb);
+      if (fb.tone === "ok") setDraft("");
+    });
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="w-14 shrink-0 text-[11px] text-ink-3">{label}</span>
+      <input
+        aria-label={ariaLabel}
+        className="h-[30px] w-[160px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
+        onChange={(e) => setDraft(e.currentTarget.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") save();
+        }}
+        placeholder={currentText}
+        value={draft}
+      />
+      <Button disabled={busy !== null} onClick={save} size="xs" variant="secondary">
+        保存
+      </Button>
+      <span className="text-[11px] text-ink-3">
+        当前：{currentText}（{caption}）
+      </span>
+    </div>
+  );
+}
+
+/** The quota editor card (ticket 40 AC#3's quota-editing half): one row per
+    catalog model (日额度 quota_daily_micro / 月额度 quota_monthly_micro) plus
+    the provider's plan credit total (plan_credit_total_micro). Exported for
+    the render instrument. The read face's modelQuotas is the gate: absent or
+    null = the leg did not answer = the card renders 等快照 and draws no input
+    (a quota editor that cannot see the current value would be overwriting
+    blind). Every write rides the one settings door; the range's refusals are
+    the Go setter's own sentences, surfaced verbatim. */
+export function ModelQuotaEditor({
+  row,
+  busy,
+  run,
+  performWrite,
+  onFeedback,
+}: {
+  row: ConfigViewProvider;
+  busy: string | null;
+  run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
+  performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
+  onFeedback: (next: Feedback | null) => void;
+}) {
+  const quotas = row.modelQuotas ?? null;
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[11.5px] text-ink-3">额度（quota）</span>
+      {row.models !== null && row.models.length > 0 ? (
+        row.models.map((id) => {
+          const limits = quotas === null ? undefined : (quotas[id] ?? undefined);
+          if (limits === undefined) {
+            return (
+              <div className="flex flex-wrap items-center gap-2" key={`quota-${id}`}>
+                <span className="font-mono text-[11px] text-ink-2">{id}</span>
+                <StateTag text="等快照" tone="neutral" />
+              </div>
+            );
+          }
+          return (
+            <div className="flex flex-col gap-1.5 rounded-control bg-surface/60 px-2 py-1.5" key={`quota-${id}`}>
+              <span className="font-mono text-[11px] text-ink-2">{id}</span>
+              <QuotaLeafInput
+                ariaLabel={`${id} 的日额度`}
+                busy={busy}
+                caption="micro-USD/天，0 = 不封顶"
+                current={limits.dailyMicro}
+                currentWord="未设（0 = 不封顶）"
+                field="model_quota_daily_micro"
+                label="日额度"
+                model={id}
+                onFeedback={onFeedback}
+                performWrite={performWrite}
+                provider={row.name}
+                run={run}
+              />
+              <QuotaLeafInput
+                ariaLabel={`${id} 的月额度`}
+                busy={busy}
+                caption="micro-USD/月，0 = 不封顶"
+                current={limits.monthlyMicro}
+                currentWord="未设（0 = 不封顶）"
+                field="model_quota_monthly_micro"
+                label="月额度"
+                model={id}
+                onFeedback={onFeedback}
+                performWrite={performWrite}
+                provider={row.name}
+                run={run}
+              />
+            </div>
+          );
+        })
+      ) : (
+        <span className="text-[11.5px] text-ink-3">
+          {row.models === null ? "暂时读不到模型清单，额度读不到当前值" : "暂无模型"}
+        </span>
+      )}
+      <div className="flex flex-col gap-1.5 rounded-control bg-surface/60 px-2 py-1.5">
+        <span className="font-mono text-[11px] text-ink-2">{row.name} 的套餐 credit 总额</span>
+        <QuotaLeafInput
+          ariaLabel={`${row.name} 的套餐 credit 总额`}
+          busy={busy}
+          caption="micro-USD，0 = 未录入（未录入不拦派发）"
+          current={row.planCreditTotalMicro}
+          currentWord="未录入（0）"
+          field="provider_plan_credit_total_micro"
+          label="总额"
+          onFeedback={onFeedback}
+          performWrite={performWrite}
+          provider={row.name}
+          run={run}
+        />
+      </div>
+      <p className="text-[11.5px] leading-[1.6] text-ink-3">
+        额度写保存后重启生效；范围（不能为负，0 = 不封顶）由配置写入腿按名拒绝，越界值不会落盘。
+      </p>
+    </div>
+  );
+}
+
 function ProviderEdit({
   row,
   fetch,
@@ -979,6 +1165,17 @@ function ProviderEdit({
           </Button>
         </div>
       </div>
+
+      {/* 票 40 AC#3 半三：quota 编辑（逐模型日/月额度＋套餐 credit 总额）。读面
+          modelQuotas 没答＝整卡等快照，不画输入框；范围拒绝是配置写入腿的原话，
+          原样上屏。 */}
+      <ModelQuotaEditor
+        busy={busy}
+        onFeedback={onFeedback}
+        performWrite={performWrite}
+        row={row}
+        run={run}
+      />
     </div>
   );
 }

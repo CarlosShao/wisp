@@ -93,11 +93,12 @@ const CONFIGURED: ConfigView = {
       billing: "plan",
       modelCount: 2,
       models: ["示例模型-1", "示例模型-2"],
-      // audit R1/P3's read face, answered: two bits per model, the same
+      // audit R1/P3's read face, answered: three bits per model (realtime
+      // joined with ticket 40's capability-filtered role dropdowns), the same
       // shapes the Go payload carries (audio in declared on the first).
       modelCapabilities: {
-        "示例模型-1": { audioIn: true, audioOut: false },
-        "示例模型-2": { audioIn: false, audioOut: false },
+        "示例模型-1": { audioIn: true, audioOut: false, realtime: false },
+        "示例模型-2": { audioIn: false, audioOut: false, realtime: false },
       },
       // R1-recheck residual 2's read face, answered: both models enabled.
       modelsEnabled: { "示例模型-1": true, "示例模型-2": true },
