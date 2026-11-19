@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 票 193 界面半（AC#5＋AC#4 前端尺）：panel.ts 声明＋开关 UI＋"关闭档真停"尺（写面 frontend/**）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 193 的**界面半**（AC#5＋AC#4 的前端判据）。Go 侧已交付 `f34210795`（字段 `panel.animation`＝`full|reduce|off`，档位 hot，读面载体在 `internal/panel/panel_animation_193.go`＋`composer.go`）。要点：
+1. **AC#5 声明**：`frontend/src/lib/panel.ts` 加 `panelAnimation` 声明（键集与 Go 载体 json tag **逐字一致**；走该文件既有的对账/缺口台账程序登记，⛔ 不许自造字段、⛔ 跳过登记）。
+2. **AC#5 开关 UI**：设置页给三档（全开／减少／关闭）；**默认值＝待 owner 拍**（Go 侧占位"减少"，UI 上该档标"（默认，待定）"字样，⛔ 不许写死成定案）；写走现成 `config.set` 门（字段名与 Go 侧读面/写面同名），⛔ 自造第二条写路；拒绝原话逐字上屏（同 407 的做法）。
+3. **AC#4 前端尺**：仪器 `render:animation193`（新 npm script）证明"关闭档真停"：off ⇒ `getAnimations()` 长度＝0 且零活跃 rAF 句柄；reduce ⇒ 保留既有无循环边界；full ⇒ 有动画。**牙**：off 档下仍注册 rAF ⇒ 红；把 off 当 prefers-reduced-motion ⇒ 红。
+4. **未知即未知**：读面没发 `panelAnimation` 键 ⇒ UI 显「未知」，⛔ 不许默认成"关闭"或"全开"（Go 侧已有"不发键≠off"的牙，界面侧对齐）。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔UI emoji（仪器在 `TestFrontendHasNoEmoji` 射程）、⛔ 动 `cmd/wisp/**`／`internal/**` 产码（Go 已交付；若发现缺口只报）。
+三样现跑：①`sh scripts/d22scan.sh` 0 findings ②`npm run typecheck`／`npm run build` rc=0 ③新仪器 rc=0。
+写面：`frontend/**`、`docs/evidence/s1/193-animation-ui-*`。
+回话第一行＝commit hash ＋四枚牙读数 ＋instrument rc ＋typecheck rc ＋d22scan 末行。
