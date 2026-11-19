@@ -1,0 +1,8 @@
+# 派单存档（先存档再发）—— 只读审计腿#2：把上一轮三枚"可疑（口径诚实）"逐条查清（审计路由，不写一行）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何其它 model、⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读**（⛔ commit、⛔ 改文件、⛔ push；临时件只落 D:\tmp\wisp\20261119\audit2）。
+上一轮审计把这三枚判为"可疑（⑤口径诚实）"，但细节没给全。请**逐条查清并给原文行号**：
+1. `3de613364`（36 AC#5）对 `docs/evidence/s1/36-hiddenpause-deflake39-20261118.md`：证据件声称的 rAF 读数（visible 1→2、hidden 2/2/2、resume 2→4）与 `frontend/scripts/render-hiddenpause36.tsx` 实际打印是否一致；声称"面板原来根本没有隐藏暂停机制"是否可核（`git diff 3de613364~1 3de613364 --name-only` 里是否新建 `panel-visibility.ts`；此前树里 grep `visibilitychange` 是否 0）。
+2. `c0b7a96d8`（248 AC#8）对 `docs/evidence/s1/248-ac8-20261119-r1.md`：证据件声称"禁话术普查：`立即生效` 命中逐枚核身份全非 [llm]/endpoint 承诺"——**自己现跑** `grep -rn "立即生效" frontend/src cmd internal --include=*.tsx --include=*.ts --include=*.go | grep -v _test` 并把每一处原文列出来，判它是否真不是对 [llm]/endpoint 的承诺；再核证据件里"8 check"与 `render-config-screen.tsx` 实际 `check(` 枚数与断言内容对得上。
+3. `e1049dbf5`（167 AC#2/3）对 `docs/evidence/s1/167-occupancy-queue-a.md`：证据件声称"四枚出口全是源在接线断（`RunFeed.Usage`／`llm.Endpoint.ContextWindow`＋loop.go:237-239／`qitem.Seq`／`position()`）"——逐枚现跑 `grep -n` 给 file:line 原文；并核"未造第二套"是否成立（有没有两处独立算占用/排队的代码）。
+输出：三条各一节，**每条给"证据件原文 ↔ 盘上原文"对照**，结论写 `成立 / 夸大 / 与代码不符`（三选一，⛔ 不许写"基本成立"这种模糊话）。⛔ 不要建议放宽。回话第一行＝三枚各一句结论（如「36:成立／248:夸大／167:成立」）。
