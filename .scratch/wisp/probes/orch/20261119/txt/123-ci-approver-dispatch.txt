@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 票 123：CI 上 4 枚 cmd/wisp 用例因"无人确认⇒超时判拒"而红；把确认做成测试内可编程注入腿（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 123（`.scratch/wisp/issues/123-*.md:41-56` 六格，逐条读正文）。
+1. **AC#1 定因到行**：在本机模拟"无人确认"（把确认腿置为永不确认/等待超 300ms）复现这 4 枚红，逐枚给**等 `Confirm` 的那一行**（file:line＋原文）；⛔ 不许把"本机能绿"当已修。
+2. **AC#2 修法只许测试内可编程注入腿**：给测试一个可编程确认注入（如 testing 钩子/依赖注入 seam），生产代码的装配路径**不改默认行为**；⛔ 用"全局变量改默认放行"这种形状。
+3. **AC#3 反半边**：生产装配里那条真确认腿**必须还在**（给齿：删掉/绕开它⇒红）。
+4. **AC#4 真读数**：本机载具整跑一次 `cmd/wisp` 全部用例，给 `PASS=?/FAIL=?/SKIP=?` 逐数；目标是 **FAIL=0**（若仍有 3 枚既有环境红——`TestAC4FocusReturnToPriorWindowGap33r5`／`Test320FetchLegWritesTheKeyNowhereOnDisk`／`TestAC246DevLeg…`——**具名列出并给数字**，⛔ 算进本票的绿）。
+5. **AC#5 未记账 skip**：同一次取证量到的 windows 腿 skip，**具名＋数字**记账。
+6. **AC#6 门禁**：`cmd/wisp` 与受影响包 `-count=2`（不缓存）逐数点名；`sh scripts/d22scan.sh` 0 findings。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言（**不许把超时判拒改成默认放行**）、⛔push、⛔UI emoji、⛔ 跨会话工具。⚠ 别碰他人在飞件（⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）。
+写面：`cmd/wisp/**`（唯一）、必要时 `internal/agent/**` 测试 seam（若有缺口先报）、`docs/evidence/s1/123-ci-approver-*`。
+回话第一行＝commit hash ＋4 枚定因行 ＋载具四数 ＋d22scan 末行 ＋-count=2 读数。
