@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 票 407 收可疑①/②（前端写面；audit407 判 7 通过/1 可疑/0 不通过）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。审计腿对 `1d08513ec` 指出两处可疑，请收（**只动 `frontend/**`**）：
+1. **可疑① `rows` 缺未知守卫**：`frontend/src/components/plugins-screen.tsx:146` 直读 `section.rows.length`——读面缺席 `rows` 键时页面**抛异常**（审计现跑 `Cannot read properties of undefined (reading 'length')`）。**裁定＝加守卫＋未知分支**（⛔ 不改任何契约/注释文字为"契约"，用代码把话说清）：`rows` 缺席/非数组 ⇒ 该页显示「**未知**（读面没有给清单）」，零表格；`rows===[]` 才显「还没有插件」。**牙**：两发变异 ①删 `rows` 键⇒必须显示"未知"不得抛 ②`rows: null`⇒同上；另 `rows: []` ⇒ "还没有插件"（正控不许退化成未知）。
+2. **可疑② 牙 3 的缝**：`frontend/scripts/render-pluginpage407.tsx` 的拒绝 fixture 是**手抄**（`:155-156`，少一段 `panel: 配置字段不在可写名册内:` 前缀），且翻译器**下游**折成"保存失败"时仪器全绿。补两条：①fixture 改为**从 Go 载体现读**——仪器启动时读 `cmd/wisp/../internal/panel/config_handlers.go` 那段字面量（或由 Go 侧导出一枚常量再在仪器里引用），⛔ 不许再手抄 ②在 `performPluginToggleWrite`（或等价返回点）断言 `tone==="error"` 时 `text` **≠**「保存失败」。**牙**：把结果折成"保存失败"⇒红。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔UI emoji（仪器在 `TestFrontendHasNoEmoji` 射程）、⛔ 动 `cmd/wisp/**`／`internal/panel/**` 产码（若需 Go 侧常量，**只许新增一枚只读导出**并在证据件说明）。⚠ 别碰他人在飞件。
+**串行**：`go test ./cmd/wisp` 不用跑（本腿不碰 cmd/wisp）；前端 `npm run typecheck`／`npm run build` 必绿；`go test ./internal/panel -run '^TestFrontendHasNoEmoji$'` 必绿。
+三样现跑：①`sh scripts/d22scan.sh` 0 findings ②仪器 `render:pluginpage407` rc=0（含新牙）③typecheck rc=0。
+写面：`frontend/**`、`docs/evidence/s1/407-plugin-panel-*`。
+回话第一行＝commit hash ＋四发新牙读数（rows 缺/null/空/折保存失败）＋instrument rc ＋typecheck rc ＋d22scan 末行。
