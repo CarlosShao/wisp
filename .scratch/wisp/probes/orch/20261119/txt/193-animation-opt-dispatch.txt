@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 193：轻量级不再约束前端动画（Go 侧字段＋生效链＋门禁清单；写面 internal/config＋internal/panel）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 193（`.scratch/wisp/issues/193-*.md:11-18` 七格，逐条读正文）。**本票只做 Go 侧**（界面半不归本票写面，见 AC#5）。
+1. **AC#0 只报不动**：`go test ./internal/panel -run '^TestTokensFourWay'` 现跑给读数与**红因原文**；若红因确为 `design/assets/tokens.css` 缺失／被删，**只报**（列 `git status --porcelain design/` 与 `git log --oneline -3 -- design/assets/tokens.css`），⛔ 不 restore、⛔ 不编辑 `tokens_fourway_test.go`（owner 09-25 亲自按住"一字不动"）。
+2. **AC#2 门禁清单**：`grep -rn "轻量\|lightweight\|D1\b\|D32" --include=*.go internal frontend tools scripts | grep -v _test` 现量，逐枚给"放开／保留"建议并落 `A##`；预判：放开＝把 D1／D32 数当动画/过渡/视觉约束的条款引用；保留＝零 emoji、ban #6 面板侧不得成批准/执行入口。
+3. **AC#3 字段与生效链**：`[panel]` 动画三档字段（全开／减少／关闭）落 `config.toml` 的 `[panel]` 节，**现量该节今天有几枚读者**（`grep -rn "PanelSection\." --include=*.go internal cmd | grep -v _test`），按 D36 定档（hot/reload/restart）并给理由；默认值＝**待 owner 定**，先按"最保守＝减少"占位并**在证据件明写"默认值待 owner 拍"**（⛔ 不许当已定）。
+4. **AC#4 关闭档可证**：给一枚可重跑的尺，能区分"动画真停"与"还在跑只是看不见"（例：关闭档下 rAF 不注册／transition 不挂 —— 给 Go 侧对应开关的读数；前端那半给清单让界面腿接）。
+5. **AC#6 契约轴**：⛔ 不改 `PLAN.md` 一字、⛔ 动 `thresholds.go`／golden／SLO 阈值。
+6. **AC#7 门禁**：`sh scripts/d22scan.sh`（0 findings）＋`go test -count=1 ./internal/config/ ./internal/panel/` 给四数＋`sh scripts/gate-clauses.sh` 若存在给读数。
+**硬约束**：⛔ `cmd/wisp/**`（本腿不碰）、⛔ `tokens_fourway_test.go`、⛔ 放宽断言、⛔push、⛔UI emoji、⛔ `frontend/**` 产码（只给清单）、⛔ 跨会话工具。⚠ 别碰他人在飞件（`frontend/fixtures/composer-states.html` 等 M 只报不动）。
+写面：`internal/config/**`、`internal/panel/**`、`docs/evidence/s1/193-animation-opt-*`。
+回话第一行＝commit hash ＋AC#0 红因 ＋AC#2 放开/保留枚数 ＋AC#3 档位与现量读者数 ＋d22scan 末行 ＋两包四数。
