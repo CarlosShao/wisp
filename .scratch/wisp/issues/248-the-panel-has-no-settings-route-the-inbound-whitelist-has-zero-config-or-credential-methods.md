@@ -53,7 +53,7 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 ## 2c. 新补判据（10-01 00:0x 编排者追加；勾仍归非实现者）
 
 - [x] **AC#7（写前必校验，来路＝`248-a1` ①.5）**：任何经面板发起的配置写，**落盘前必须过一遍启动时那同一套校验**（`validate()` 的现成实现），校验不过 ⇒ 拒写＋把原因回给页面＋留审计。判据＝**种一发非法值**（例如把上下文档位写成非数）⇒ 磁盘上的 `config.toml` **必须逐字节不变**、下一次启动仍起得来。⚠ 它申报这条是**从函数体读出的结构判断、没实跑过**（本腿禁跑测试），所以读数必须由落地腿自己种一次才算数。
-- [ ] **AC#8（归口"重建那一跳"）**：`[llm]`／endpoint 类字段在同一次运行内不重建（J9 现量），故 AC#4 只按"重启后生效"判；本格判据＝票面与回执文案**不许出现"保存即生效"**，且"要重启"必须到达**页面可见面**。⛔ 本票不许新增重建跳（票 223 地界）。
+- [x] **AC#8（归口"重建那一跳"）**：`[llm]`／endpoint 类字段在同一次运行内不重建（J9 现量），故 AC#4 只按"重启后生效"判；本格判据＝票面与回执文案**不许出现"保存即生效"**，且"要重启"必须到达**页面可见面**。⛔ 本票不许新增重建跳（票 223 地界）。
 - [x] **AC#9（宿主在、内容不在这一族）**：设置页要真能点出来，前提是 `//go:embed all:dist` 真匹配到**一包页面产物**。判据形状＝能力型、不问文案、**不问构建退出码**：embed 之后的文件系统里**条目数与关键入口文件必须真存在**（⛔ 一枚 `.gitkeep` 就能让 `go build` 绿，那不算证据）。⚠ 产物由界面侧那枚 agent 产出，本编队不写 `frontend/**` ⇒ 这一格在"谁把 dist 填上"落定前**勾不了**，具名交 owner 带话（要带的话在 §5）。
 
 - [x] **AC#10（新补，10-01 09:5x 编排者追加，来路＝`246-v2` §3.B＋§5 第 6 条 ⇒ 账 `A488`）**：**常驻那条腿今天吃不到 `[risk]` 那两项配置，本票要么接上、要么在票面写明它是常量——⛔ 不许留成"配置页改了它就变了"的错觉**。现量（`246-v2` 自取，我复认）：`approval/gate.go:139-145` 的钳位 `win <= 0 → DefaultL1Window`；`approval/queue.go:107/115/122`＝`DefaultApprovalTimeout = 300s`／`DefaultL1Window = 3s`／`MaxL1Window = 3s`。常驻那枚 `approval.New`（`resident_approval_windows.go:109`）建在会话账本之前 ⇒ 两处真实代价：① `Options.Grants` 为 nil ⇒「本会话内允许」**放行但不落盘**并写 `GRANT-DROPPED`（这条与票 224 那套会话授权直接冲突——用户在球上按了"本次会话内允许"，今天**不生效**，只有日志里有）；② `l1_window_sec`／`confirm_timeout_sec` 改动对常驻腿**无影响**（窗口那项即便接了也钳在 3s ⇒ **只有超时是真差异**）。
@@ -193,3 +193,10 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 3. 「8 check」实为 **9 处 `check(` 调用点／9 枚 tooth**（往严了报，但与代码不符）；另 `config_route_248_test.go:392` 实为 `:391`，普查尺少 `-E`（BRE 下 `|` 是字面量）。
 **成立的部分**（不抹）：收据层 `[llm]`/endpoint 全 restart（`panel_config_store.go:556/:654` 等逐条验）；仪器 9 枚断言内容全对且现跑 rc=0；`保存即生效` 产码 **0 命中**（票面判据字面未被违反）。
 ⇒ **AC#8 撤回**：`config_reload.go:219` 那行 stdout 真在向用户宣告 `[llm]` 已立即生效 —— 属"回执文案读得比现实好"，必须改（改成按档分列/带"含 restart 档需重启"或把 restart 档段剔出"已立即生效"名单），改完再勾。修腿待 `w407` 结束后派（同一 `cmd/wisp` 写面不并发）。
+## 编排者收件·AC#8 复勾（2026-11-19 18:4x，`154991465`，件 `docs/evidence/s1/248-receipt-tiers-fix-20261119-r1.md`＋r2 更正 `248-ac8-20261119-r1.md`）
+
+**尺1** `154991465` 在（8 件：`config_reload.go`／`config_readers_255.go`／`config_receipt_255_test.go`／两张证据件／`pump_queue_seq_167.go` 注释／7 台件）。**尺3 我自己复跑**：载具 `^(Test248Receipt|TestTicket223|Test255)` **25 RUN / 25 PASS / 0 FAIL**；`d22scan` clean；`go build ./...` rc=0。
+- **假话已修**：`config_reload.go:225` hot 句现在只剩 `[audio] [agent] [cost]`；`[llm]` 进新句（`:235-237`）「…写进本进程内存（热应用），但它们的写入字段**需要重启进程**才生效（D36 重启档）…涉及字段：api_key_ref / base_url / context_window / price.in/out / roles.chat.model」。rest 档诚实句未删；`internal/config/tiers.go` 一字未动。
+- **收紧声明**：4 条既有断言**往严里改**（`claimable=="audio llm agent cost"`→`"audio agent cost"`＋[llm] 必须在 restart 列＋双列互斥），零放宽；新增两枚牙（`Test248ReceiptSentencePutsLlmInRestartColumnNotHot`／`Test248ReceiptRestartColumnIsExclusivelLmWithFieldNames`）。
+- **证据件 r2 更正**：`autostart_windows.go` 三行从命中列撤下；普查真实 **25 行**（r1 只列 6 ⇒ **漏 19**）逐行转录；「8 check」→**9 处**（附逐枚行号）；`:392`→`:391`；补 `-E`；绝对句删除并具名撤回。
+- 该腿另把 `167-occupancy-queue-a.md` 加「现状」节＋`pump_queue_seq_167.go` 文件头补两套编号器语义差注释（A1956 裁定的欠账已清）。
