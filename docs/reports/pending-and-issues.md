@@ -37923,3 +37923,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1949（11-18 23:5x）：36 AC#5 勾 `3de613364`/`5b5ea2636` ＋ 39 整包互扰 deflake
 
 我复跑 render:hiddenpause36 rc=0、typecheck rc=0、载具 ^Test39NativeLooseningCard -count=3 九发全 PASS、d22scan clean。面板原无隐藏暂停机制⇒新建 panel-visibility.ts（visibilityState⇒停/启 rAF），仪器用计数器差值判（零墙钟）；MUT-A/B 各红。deflake：写提交先/审计行后＋共享 buffer 无锁并发写⇒互斥捕获＋waitForAuditCount39（5s 上限轮询），断言零放宽；整包唯一红仍是 33r5 环境红。**36 = 4/6（剩 AC#1 视觉、AC#3 真窗 60fps 皆机主/环境）。**
+## A1950（11-19 10:0x）：248 AC#8 勾 `c0b7a96d8` —— "需要重启"必须画到页面上，禁"保存即生效"
+
+我复跑载具两枚 2/2 PASS；render-config-screen（手动 vite --ssr，npm 无 script）rc=0 且输出含 AC#8 节；d22scan clean。补上第二张 restart 收据族（renderCredentialReceipt）的真腿钉；禁话术普查零真命中；页面面断言 FeedbackLine 的可见 markup。**248 = 1 格（AC#4 真机链，等票 33＋机主点一次设置）。** 另记：`render-config-screen` 无 npm script，须手动 `npx vite build --ssr scripts/render-config-screen.tsx --outDir node_modules/.tmp/cfgrender && node node_modules/.tmp/cfgrender/render-config-screen.js`。

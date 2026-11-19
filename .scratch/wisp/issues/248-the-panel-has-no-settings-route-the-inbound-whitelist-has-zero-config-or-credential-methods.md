@@ -53,7 +53,7 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 ## 2c. 新补判据（10-01 00:0x 编排者追加；勾仍归非实现者）
 
 - [x] **AC#7（写前必校验，来路＝`248-a1` ①.5）**：任何经面板发起的配置写，**落盘前必须过一遍启动时那同一套校验**（`validate()` 的现成实现），校验不过 ⇒ 拒写＋把原因回给页面＋留审计。判据＝**种一发非法值**（例如把上下文档位写成非数）⇒ 磁盘上的 `config.toml` **必须逐字节不变**、下一次启动仍起得来。⚠ 它申报这条是**从函数体读出的结构判断、没实跑过**（本腿禁跑测试），所以读数必须由落地腿自己种一次才算数。
-- [ ] **AC#8（归口"重建那一跳"）**：`[llm]`／endpoint 类字段在同一次运行内不重建（J9 现量），故 AC#4 只按"重启后生效"判；本格判据＝票面与回执文案**不许出现"保存即生效"**，且"要重启"必须到达**页面可见面**。⛔ 本票不许新增重建跳（票 223 地界）。
+- [x] **AC#8（归口"重建那一跳"）**：`[llm]`／endpoint 类字段在同一次运行内不重建（J9 现量），故 AC#4 只按"重启后生效"判；本格判据＝票面与回执文案**不许出现"保存即生效"**，且"要重启"必须到达**页面可见面**。⛔ 本票不许新增重建跳（票 223 地界）。
 - [x] **AC#9（宿主在、内容不在这一族）**：设置页要真能点出来，前提是 `//go:embed all:dist` 真匹配到**一包页面产物**。判据形状＝能力型、不问文案、**不问构建退出码**：embed 之后的文件系统里**条目数与关键入口文件必须真存在**（⛔ 一枚 `.gitkeep` 就能让 `go build` 绿，那不算证据）。⚠ 产物由界面侧那枚 agent 产出，本编队不写 `frontend/**` ⇒ 这一格在"谁把 dist 填上"落定前**勾不了**，具名交 owner 带话（要带的话在 §5）。
 
 - [x] **AC#10（新补，10-01 09:5x 编排者追加，来路＝`246-v2` §3.B＋§5 第 6 条 ⇒ 账 `A488`）**：**常驻那条腿今天吃不到 `[risk]` 那两项配置，本票要么接上、要么在票面写明它是常量——⛔ 不许留成"配置页改了它就变了"的错觉**。现量（`246-v2` 自取，我复认）：`approval/gate.go:139-145` 的钳位 `win <= 0 → DefaultL1Window`；`approval/queue.go:107/115/122`＝`DefaultApprovalTimeout = 300s`／`DefaultL1Window = 3s`／`MaxL1Window = 3s`。常驻那枚 `approval.New`（`resident_approval_windows.go:109`）建在会话账本之前 ⇒ 两处真实代价：① `Options.Grants` 为 nil ⇒「本会话内允许」**放行但不落盘**并写 `GRANT-DROPPED`（这条与票 224 那套会话授权直接冲突——用户在球上按了"本次会话内允许"，今天**不生效**，只有日志里有）；② `l1_window_sec`／`confirm_timeout_sec` 改动对常驻腿**无影响**（窗口那项即便接了也钳在 3s ⇒ **只有超时是真差异**）。
@@ -180,3 +180,8 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 **我亲读的落点**：`config.get`／`config.set`＝`internal/panel/bridge.go:66-67`（名册 `:193`）；DPAPI＝`cmd/wisp/panel_inbound.go:321`；派发表 `:325-329`／`:397`；`StoreCredential`＝`panel_config_store.go:450`（config.toml 只落 `api_key_ref = 'dpapi:<id>'`），档位＝**restart**（`panel_config_store.go:412`）。
 **本波翻**：AC#2、AC#9、AC#10（我复核 `newResidentApprovalWithConfig` 真读 `[risk]`）。⇒ **10 勾 / 2 未勾**。
 **仍开**：`AC#4`（真机点击那一发，须机主；依赖票 33 链）／`AC#8`（文案整格卡票面 §8 两道外部前置；生产面"保存即生效"今日 0 命中）。
+
+## 编排者收件·AC#8（2026-11-19 10:0x，`c0b7a96d8`，件 `docs/evidence/s1/248-ac8-20261119-r1.md`）
+
+**尺1** `c0b7a96d8` 在（5 件）。**尺3 我自己复跑**：载具 `^(TestAC8CredentialReceiptSaysRestartVerbatim|TestAC2Credential)` **2/2 PASS**（0.03s/0.05s）；`render-config-screen`（手动 vite --ssr 建＋node 跑，**npm 无此 script**）rc=0，输出含「ticket 248 AC#8 page-visible teeth: … 需要重启 verbatim in markup, zero live-save wording painted …」；`d22scan` clean。
+- **勾 AC#8**：`renderCredentialReceipt` 是第二张 restart 收据族（`tierSentence` 单点盖不到）⇒ 补真腿级＋路由级两枚钉；禁话术普查：`保存即生效` 产码 0 命中、`立即生效` 命中逐枚核身份全非 [llm]/endpoint 承诺、`立即应用` 0；页面可见面断言 `FeedbackLine` 渲染 markup（非 console/审计），删提示⇒仪器红；[llm]/endpoint 收据全归 restart 档（`tiers.go` 段级 `"llm": TierHot` 是 255 名册现状，一字未动）。
