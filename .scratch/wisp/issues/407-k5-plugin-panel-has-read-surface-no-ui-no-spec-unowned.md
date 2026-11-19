@@ -10,3 +10,18 @@
 
 ## 建议
 前端 UI 现由本编队做；先把「插件面板该显示什么」的规格写清（可用 C17/面板既有形态），再接线。Go 侧若缺 bridge 读口，另开一条本编队可做的子票。
+
+## 规格（2026-11-19 编排者补：机主 2026-11-16 铁律 4 后前端归本编队，本票可做）
+
+**显示什么**（数据源只许用现成读面，⛔ 自造）：
+- 来源＝`internal/panel/composer.go:223` 的 `Plugins *PluginInventorySection`（215a 载体，`plugins_inventory_215.go` 定形状）；写面＝`config.set` 的 `plugin_enabled`（`config_write_215.go`，须带 `configPlugin=<id>`，`config_handlers.go:575-579` 缺 id 即拒）。
+- 每行：`<id>`、启用/停用、来源/锁定说明、以及**读面给了才显示**的其余字段（没给的字段**显示"未知"**，⛔ 编造）。
+- 空清单：显式说"**还没有插件**"（零表格），⛔ 画 0 行假表。
+
+## AC
+
+- [ ] **AC#1 规格落地**：插件页渲染上面那张表；每枚字段**逐字来自 `PluginInventorySection`**（⛔ 页面自造字段名/默认值）；空清单显示"还没有插件"，零表格。
+- [ ] **AC#2 开关走现成门**：启用/停用走 `config.set`（`plugin_enabled`＋`configPlugin`），⛔ 自造第二条写路；缺 `configPlugin` 的拒绝句原话上屏（`config_handlers.go:575-579`）。
+- [ ] **AC#3 缺失即未知**：读面未给某字段 ⇒ 该格显示"未知"，**两发变异**：①把缺字段当默认 true/false ⇒ 红 ②空清单画表 ⇒ 红。
+- [ ] **AC#4 仪器**：`render:pluginpage407` rc=0，出**两张**静态 markup（空态＋有插件态），零 emoji（`TestFrontendHasNoEmoji` 绿，仪器文件也在射程内）。
+- [ ] **AC#5 牙**：①页面引用 `PluginInventorySection` 里不存在的字段 ⇒ 红（源级/形状尺）②开关未走 `config.set`（自造写路）⇒ 红 ③写面回执把"需要重启"吞掉 ⇒ 红。
