@@ -65,9 +65,13 @@
    ============================================================================ */
 
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { ConfigScreen } from "@/components/config-screen";
 import { ConfigEditorSection, ConfigErrorList, ConfigSectionTables } from "@/components/config-editor";
+import { FeedbackLine } from "@/components/settings-controls";
 import { notifyConfigReloadListeners, onConfigReloadEvent } from "@/lib/config-actions";
+import { translateTieredWriteReply, translateWriteReply } from "@/lib/config-feedback";
 import { parseConfigReply, parseConfigReloadEvent, type ConfigLoadErrorView, type ConfigSectionRowView } from "@/lib/config-view";
 import type {
   BallClickThroughSection,
@@ -307,7 +311,6 @@ check("the wave-bearing markup must hold zero emoji", !EMOJI_RE.test(waveLive));
 // --- the write half is a source-level fact --------------------------------
 // The receipt flows through lib/config-actions' one write door; the field
 // name is the Go side's admission word, so it is checked where it is sent.
-import { readFileSync } from "node:fs";
 const screenSrc = readFileSync("src/components/config-screen.tsx", "utf8");
 check(
   "the ball.style write must ride config.set's ball_style field",
@@ -736,6 +739,125 @@ check(
   translateTieredWriteReply(HOT_RECEIPT_39).text === "已保存",
 );
 
+// ----------------------------------------------------------------------------
+// TICKET 248 AC#8's page-visible half (2026-11-19). The Go route teeth pin the
+// receipt the settings/credential writes answer with (tierSentence's restart
+// sentence verbatim, no live-save wording); the checks above pin the
+// TRANSLATOR. What neither can see is the sentence landing on the screen, so
+// this section renders the ONE feedback component both settings pages draw
+// (FeedbackLine) fed the translators' output, and pins three things:
+//
+//   1. the restart-required line reaches VISIBLE markup carrying 需要重启
+//      verbatim - for all three receipt families the pages actually show
+//      (settings write, credential write, composer tiered write) - and the
+//      painted markup never carries a live-save promise on either forbidden
+//      spelling;
+//   2. the pages really mount the feedback line (source pins on the exact
+//      mount spellings): deleting the page hint reds check 4/5/6 - the
+//      translator could be perfect and the person would still see nothing;
+//   3. the page's own copy never promises an immediate effect: a walk of
+//      frontend/src finds zero 保存即生效/立即生效/立即应用 anywhere. The
+//      only tier words the page carries are the registry's own badge words
+//      (立即/重启 on a measured now-or-restart row) - different strings, and
+//      the scan below is exact-phrase on purpose, so it cannot read that badge
+//      as a promise about a saved key.
+// ----------------------------------------------------------------------------
+const CREDENTIAL_RECEIPT_248 =
+  '密钥已录入（只写不回显：这一页任何时候都不会再显示它的值，只会显示已录入/未录入）。' +
+  ' 服务商 deepseek。 记录的是引用 dpapi:248ac8ref。 实际落盘的键路径：llm.providers.deepseek.api_key_ref。' +
+  ' 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。';
+const visibleRestart = renderToStaticMarkup(
+  <FeedbackLine feedback={translateWriteReply(RESTART_RECEIPT_39)} />,
+);
+const visibleCredential = renderToStaticMarkup(
+  <FeedbackLine feedback={translateWriteReply(CREDENTIAL_RECEIPT_248)} />,
+);
+const visibleTiered = renderToStaticMarkup(
+  <FeedbackLine feedback={translateTieredWriteReply(RESTART_RECEIPT_39)} />,
+);
+check(
+  "AC#8 tooth 1: the settings write's restart line must reach the visible feedback markup carrying 需要重启 verbatim",
+  visibleRestart.includes(esc("已保存，需要重启后生效")) && visibleRestart.includes(esc("需要重启")),
+  visibleRestart,
+);
+check(
+  "AC#8 tooth 2: the credential write's restart line must reach the visible feedback markup the same way",
+  visibleCredential.includes(esc("密钥已保存，需要重启后生效")),
+  visibleCredential,
+);
+check(
+  "AC#8 tooth 3: the composer tiered write's restart line must reach the visible feedback markup too",
+  visibleTiered.includes(esc("已保存，重启进程后生效")),
+  visibleTiered,
+);
+check(
+  "AC#8 tooth 3b: no painted feedback markup carries a live-save promise (either forbidden spelling)",
+  !visibleRestart.includes("立即生效") &&
+    !visibleRestart.includes("保存即生效") &&
+    !visibleCredential.includes("立即生效") &&
+    !visibleCredential.includes("保存即生效") &&
+    !visibleTiered.includes("立即生效") &&
+    !visibleTiered.includes("保存即生效"),
+);
+check(
+  "AC#8 tooth 4: the appearance page must mount the visible feedback line off the write's own answer (source pin; deleting the hint reds here)",
+  readFileSync("src/components/config-screen.tsx", "utf8").includes(
+    "<FeedbackLine feedback={writeFeedback} />",
+  ),
+  "src/components/config-screen.tsx: the writeFeedback mount is gone",
+);
+for (const [file, prop] of [
+  ["src/components/model-settings.tsx", "feedback"],
+  ["src/components/voice-settings.tsx", "feedback"],
+] as const) {
+  check(
+    `AC#8 tooth 5: ${file} must mount the visible feedback line for its writes (source pin)`,
+    (readFileSync(file, "utf8").match(new RegExp(`<FeedbackLine feedback={${prop}} />`, "g")) ?? [])
+      .length >= 1,
+    `${file}: no <FeedbackLine feedback={${prop}} /> mount`,
+  );
+}
+check(
+  "AC#8 tooth 5b: the feedback component itself must paint the text it is handed (a FeedbackLine that drops its text would silence every pin above)",
+  renderToStaticMarkup(
+    <FeedbackLine feedback={{ tone: "ok", text: "已保存，需要重启后生效" }} />,
+  ).includes(esc("已保存，需要重启后生效")),
+);
+check(
+  "AC#8 tooth 6: the translators must still produce the restart wording at source (the page speaks only what config-feedback.ts spells)",
+  readFileSync("src/lib/config-feedback.ts", "utf8").includes("需要重启"),
+  "src/lib/config-feedback.ts lost the restart wording",
+);
+// The page-copy ban, walked over every src file the bundle can ship (same
+// extension set the repo's own frontend walks use). Exact phrases only: the
+// measured-tier badge 立即/重启 is registry vocabulary on a ball row, not a
+// promise about a saved [llm] key, and the scan must not mistake one for the
+// other.
+{
+  const banned = ["保存即生效", "立即生效", "立即应用"];
+  const hits: string[] = [];
+  const walk = (dir: string): void => {
+    for (const e of readdirSync(dir)) {
+      const p = join(dir, e);
+      if (statSync(p).isDirectory()) {
+        walk(p);
+        continue;
+      }
+      if (!/\.(ts|tsx)$/.test(e)) continue;
+      const data = readFileSync(p, "utf8");
+      for (const phrase of banned) {
+        if (data.includes(phrase)) hits.push(`${p}: ${phrase}`);
+      }
+    }
+  };
+  walk("src");
+  check(
+    "AC#8 tooth 7: frontend/src carries zero live-save promise wording (保存即生效/立即生效/立即应用), walked over every src .ts/.tsx",
+    hits.length === 0,
+    hits.join("; "),
+  );
+}
+
 if (failures.length > 0) {
   for (const f of failures) console.error("render-config: FAIL " + f);
   console.error(`render-config: FAIL, ${failures.length} check(s) failed`);
@@ -746,5 +868,6 @@ console.error(
     "no-reader honest states, write rides the settings door, zero emoji); " +
     "ticket 39 AC#1/AC#4 consume teeth: 18 sections -> 18 tables with verbatim tier badges (hot x12/reload/restart/locked x4, danger tint on locked), prune-a-section removes its table and its stale value, 未登记档位 for an empty tier, errors under their lines with line 0 as （无行号）, reload event parses verbatim and refused writes notify nobody (zero re-reads), every config.set helper fans the event out; " +
     "ticket 39 AC#4 drift/no-op teeth: the fingerprint cache holds/clears, config.get's baseSHA parses through (absent stays absent), the reload event carries the post-write fingerprint and advances the cache (a refusal never does), config.set's envelope echoes configBaseSHA (absent when none held), the drift refusal renders 盘上已变's own line and the no-op renders 没有变化; " +
-    "ticket 39 AC#1 tier-events teeth: the restart-required line on screen says 需要重启 verbatim (已保存，需要重启后生效), the hot line says 已保存 with zero restart wording, the tiered family keeps its own restart line, and a restart-less receipt shows no restart line",
+    "ticket 39 AC#1 tier-events teeth: the restart-required line on screen says 需要重启 verbatim (已保存，需要重启后生效), the hot line says 已保存 with zero restart wording, the tiered family keeps its own restart line, and a restart-less receipt shows no restart line; " +
+    "ticket 248 AC#8 page-visible teeth: the restart line rides the ONE feedback component both settings pages draw (settings/credential/tiered families painted through FeedbackLine, 需要重启 verbatim in markup, zero live-save wording painted), the three pages' mounts are pinned at source (deleting the hint reds), FeedbackLine paints what it is handed, the translators still spell the restart wording, and frontend/src walks zero 保存即生效/立即生效/立即应用",
 );

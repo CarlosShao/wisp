@@ -377,7 +377,18 @@ func TestAC2CredentialRouteNeverEchoesTheValueItWasGiven(t *testing.T) {
 	if !strings.Contains(reply, "dpapi:248canaryblob01") || !strings.Contains(reply, "只写不回显") {
 		t.Errorf("the receipt neither names the reference nor says write-only: %q", reply)
 	}
-	if strings.Contains(reply, "保存即生效") {
+	// AC#8's second receipt family (2026-11-19): the credential write is the
+	// api_key_ref half of an [llm] row, so its receipt owes the same restart
+	// wording the settings receipt is pinned by - the tierSentence sentence
+	// VERBATIM (需要重启 rides on it), and never a live-save wording on
+	// EITHER forbidden spelling. The stub leg stamps EffectiveRestart, which
+	// is what cmd/wisp's real StoreCredential stamps; a receipt that dropped
+	// the tier sentence, or claimed the key went live, reds here before any
+	// real-leg run has to.
+	if !strings.Contains(reply, tierSentence(EffectiveRestart)) {
+		t.Errorf("the credential receipt lost the verbatim restart sentence:\n%s", reply)
+	}
+	if strings.Contains(reply, "立即生效") || strings.Contains(reply, "保存即生效") {
 		t.Errorf("the credential receipt claims a live save: %q", reply)
 	}
 }

@@ -322,6 +322,44 @@ func refFromReceipt248(t *testing.T, reply string) string {
 	return ""
 }
 
+// TestAC8CredentialReceiptSaysRestartVerbatim (ticket 248 AC#8, 2026-11-19): the
+// credential write is the api_key_ref half of an [llm] row, so the receipt the
+// page is shown must say restart exactly the way the settings receipt's family
+// does - the 39 AC#1 sentence VERBATIM (需要重启：本次运行不会读取新值。 rides
+// on it) and never a live-save wording on either forbidden spelling. The
+// settings-route twin of this pin is Test40ModelMgmtEndpointWriteSaysRestartVerbatim;
+// this is the second receipt family (renderCredentialReceipt), which the
+// tierSentence pins alone do not reach. The canary is this test's own, kept
+// separate from canary248 so the leak ruler's sentinel is not spent here; the
+// no-echo half rides along because a receipt that says restart AND repeats the
+// value would fail both this ticket and AC#2's ruler.
+func TestAC8CredentialReceiptSaysRestartVerbatim(t *testing.T) {
+	const canary248ac8 = "{{API_KEY_248ac8w0rd}}"
+	dir := settingsDir248(t)
+	var audit []string
+	disp, _ := newRealSettingsLeg(t, dir, &audit, nil)
+
+	raw := `{"method":"config.set","requestId":"r-248-ac8-cred","source":"panel-composer",` +
+		`"configField":"provider_credential","configProvider":"deepseek","` + credentialValueKey + `":"` + canary248ac8 + `"}`
+	reply, err := disp.Handle(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("credential write through the real leg: %v", err)
+	}
+	const wantRestartAC8 = "这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。"
+	if !strings.Contains(reply, wantRestartAC8) {
+		t.Errorf("the credential receipt lost the verbatim restart sentence:\n%q\nwant it to contain %q", reply, wantRestartAC8)
+	}
+	if strings.Contains(reply, "立即生效") || strings.Contains(reply, "保存即生效") {
+		t.Errorf("the credential receipt claims a live save:\n%q", reply)
+	}
+	if strings.Contains(reply, canary248ac8) {
+		t.Errorf("the receipt echoes the credential value:\n%q", reply)
+	}
+	if !strings.Contains(reply, "dpapi:") {
+		t.Errorf("the receipt does not name the reference it minted:\n%q", reply)
+	}
+}
+
 // AC#2's structural half, and the reason the ruler above is not a coincidence: the
 // shared envelope must not declare the key the credential value is bound from. A
 // planted envelope that DOES declare it has to be caught by the same comparison,
