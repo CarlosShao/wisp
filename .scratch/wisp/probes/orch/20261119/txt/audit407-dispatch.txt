@@ -1,0 +1,13 @@
+# 派单存档（先存档再发）—— 只读审计腿：对抗验收票 407（插件面板页，`1d08513ec`）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何其它 model、⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读**（⛔ commit、⛔ 改文件、⛔ push；临时件只落 D:\tmp\wisp\20261119\audit407）。
+审 `1d08513ec`（票 407，AC 见 `.scratch/wisp/issues/407-*.md`）。逐条给读数不要形容词：
+1. **字段逐字来自读面**：`frontend/src/components/plugins-screen.tsx` 里出现的每个字段名，是否都能在 `internal/panel/plugins_inventory_215.go`（`PluginInventorySection`/`PluginRow` 的 json tag）找到；**列出页面有、读面没有的字段**（应为 0）。
+2. **空清单**：从 `docs/evidence/s1/407-plugin-panel-markup-empty.html` 现读，确认有「还没有插件」且 **`<table`/`<tr`/`<td` 计数＝0**（给计数）。
+3. **未知规则**：`enabled` 缺省时该格是"未知"还是被默认 false？现读 `plugins-screen.tsx` 相关分支给 file:line。
+4. **写面零新路**：全仓搜 `plugin_enabled` 的写入点枚数（`git grep -n "plugin_enabled"`）；确认开关只经 `config.set`，没有第二条路径（给枚数与 file:line）。
+5. **拒绝原话上屏**：`frontend/src/lib/config-feedback.ts` 的 `translatePluginToggleReply` 是否真把 `config_handlers.go:575-579` 那句拒绝**逐字**保留；是否把"必须指名插件 id（configPlugin＝…）"折成通用"保存失败"（折了＝不通过）。
+6. **零 emoji**：`go test ./internal/panel -run '^TestFrontendHasNoEmoji$'` 现跑；另扫 `render-pluginpage407.tsx` 与两份 markup 有无 `U+2600-27BF`/`1F000-1FAFF`/`FE0F`。
+7. **仪器真跑**：`cd frontend && npx vite build --ssr scripts/render-pluginpage407.tsx --outDir node_modules/.tmp/audit407 && node node_modules/.tmp/audit407/render-pluginpage407.js`，给 rc 与末行。
+8. **牙是否可红**：读证据件 `docs/evidence/s1/407-plugin-panel-impl.md` §4 的五发变异读数，逐发判断**该变异是否真能导致该齿红**（类型错/自造字段/默认 false/空态画表/吞句）——给"可信/不可信"逐发结论，并指出你亲跑验证了哪几发。
+输出：一张表（八项 × 通过/不通过/可疑），不通过逐条 file:line＋原文。回话第一行＝「N 通过 / M 可疑 / K 不通过」。
