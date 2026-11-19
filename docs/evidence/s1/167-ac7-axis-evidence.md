@@ -21,7 +21,7 @@
 
 ## 3. AC#7 轴实证 — `git diff --name-only e1049dbf5~1 <commit>` 逐面实测
 
-> 本节读数＝提交前对暂存树现跑（`git diff --name-only e1049dbf5~1`，与提交后的 diff 逐枚相同；总 33 枚，其中上一腿占 28＋台账 1，本腿只落 5＋证据件 1）：
+> 本节读数＝提交后现跑（`git diff --name-only e1049dbf5~1 427dd7955`）：**总 28 枚**，逐面拆账——`internal/agent/approval/**` **0**；禁改面（PLAN/specs/internal/risk/thresholds/golden/allowlist/design）grep 计数 **0**；`internal/panel/**` 6 枚、`cmd/wisp/**` 13 枚、docs 4 枚（两腿证据件＋台账＋本件）、`.scratch/**` 5 枚（票面＋三份派单/载具存档，`.scratch` 不在 AC#7 射程）、`frontend/scripts/render-hiddenpause36.tsx` 1 枚（**上一腿提交里的、本腿零字节碰**——本腿 commit 自身 `git show 427dd7955 --name-only` 的 frontend 枚数＝**0**，AC#7 对 frontend 的零字节约束由本腿的 commit 本体逐字满足；该枚是 e1049dbf5~1..HEAD 区间历史，归上一腿自己的轴账）。
 
 - `internal/agent/approval/**`：**0 枚**（逐字目标达成）
 - `docs/PLAN.md`：0 枚 · `docs/specs/**`：0 枚 · `internal/risk/**`：0 枚 · `thresholds.go`：0 枚 · golden：0 枚 · `allowlist.txt`：0 枚 · `design/**`：0 枚（该面 grep 计数＝0）
@@ -35,7 +35,7 @@
 - `cmd/wisp/**` 全 13 枚（共享编译面逐枚；前 12 枚＝上一两腿的，`panel_pump.go` 同时含本腿唯一改动——撤 `QueueSeq: it.Seq` 一行＋注释改写，只减不增键；`panel_occupancy_queue_167_windows_test.go` 含本腿改测法）：`crash_selfrescue_167.go`/`_test.go`、`doctor.go`、`panel_failedsend_167.go`/`_test.go`、`panel_message_453.go`/`_windows.go`、`panel_occupancy_queue_167_windows_test.go`、`panel_pump.go`、`panel_resident_pump.go`、`panel_stop_tail_167_test.go`、`resident_windows.go`、`run.go`
 - docs 4 枚：两腿证据件＋台账追加＋本件。
 
-## 4. 牙与读数 — 三样现跑（本腿会话内，2026-11-19）
+## 5. 三样现跑读数（全在本腿会话内，2026-11-19）
 
 1. **d22scan**（`./scripts/d22scan.sh`，含正控自测）：**0 findings**，末行 `d22scan.sh: OK - control rc=0, scan rc=0`，rc=0。
 2. **载具**（`scripts/wisp-cli-staged-tests.sh`，串行一次一发，跑前 `Get-Process wisp.test` 确认空车道；bash 用 `D:\work\soft\Git\bin\bash.exe`）：
@@ -45,14 +45,14 @@
 4. **panel**（`go test ./internal/panel -run '^Test167|^TestOccupancy' -count=1`）⇒ `ok ... 0.062s` rc=0；`TestQueueNumbersTravelAndZeroStaysHome` 单发 −v ⇒ PASS（正向：泵铸 seq=1/位=2 上线；重建同号=1；无 id ⇒ 双键缺席——**断言未放宽**：缺席方向从"队列没编过号"改为"无 id 可铸"，都还钉 0/缺席形状）。
 5. **整包复跑**：`go test ./internal/agent/approval -count=1` ⇒ `ok ... 5.952s` rc=0（**还原后的 approval 包原样全绿**）；`go test ./internal/panel -count=1` ⇒ `ok ... 23.935s` rc=0（reconciliation 两把尺带在册键全绿）。
 
-## 5. 断言未放宽 — 逐枚对照
+## 6. 断言未放宽 — 逐枚对照
 
 - `Test167QueueSeqStableAcrossCancel`：**原有逐条全保留**（深度 3→取消→live=2 不丢条；card 3 seq==3 不重排；pos==2 会动；card 1 1/1；wire `seq:3`/`position:2` 在线）。**新增**（更强，不是更弱）：取消前先验三卡铸号 1/2/3；同一泵重建 seq 不变（重排即红的正向钉）。读法从 `LiveApprovals().Seq` 改为泵出向（机制搬家，被测命题不变：**取消第 2 条后第 3 条仍是 3**）。
 - `TestQueueNumbersTravelAndZeroStaysHome`：双向钉都还在——带 id 卡 seq/position 都上线（值 1/2），无 id 卡双键缺席；**加了**重建同号钉。没有一条断言被删或放宽。
 - `TestOccupancy*` 三发：本腿零字节碰，读数照旧。
 - 变异（钉的证明）：撤掉泵里的 `card.Seq = p.seqs.Assign(...)` 铸号行即红（wire seq 缺席/重排钉都咬）；未单独跑变异发，钉句在测试正文可逐字读。
 
-## 6. 边界（本腿没做、也不许做的）
+## 7. 边界（本腿没做、也不许做的）
 
 - `internal/agent/approval/**`：**0 字节改动**（还原后 blob 相等实证）。队列自己的 admission 计数器（`qitem.Seq`，queue.go 内部）与 `LiveApprovals` 白名单面全部保持原状——panel 的 ledger 不是它的替身，也不碰它的状态。
 - `frontend/**` 零字节（composer_test.go 在册的 judged page-side gap 原样：页面侧声明仍是界面腿的活）。
