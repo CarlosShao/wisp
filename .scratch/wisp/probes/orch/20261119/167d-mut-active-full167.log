@@ -1,0 +1,54 @@
+time=2026-11-19T15:53:21.395+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test167AC6DoctorFindsTheCrashSceneAndSaysWhatToDo
+--- PASS: Test167AC6DoctorFindsTheCrashSceneAndSaysWhatToDo (0.01s)
+=== RUN   Test167AC6QuietWhenNoCrashOnFile
+--- PASS: Test167AC6QuietWhenNoCrashOnFile (0.01s)
+=== RUN   Test167AC6NewestFileWins
+--- PASS: Test167AC6NewestFileWins (0.01s)
+=== RUN   Test167AC6DoctorCarriesTheCrashSceneCheck
+--- PASS: Test167AC6DoctorCarriesTheCrashSceneCheck (0.00s)
+=== RUN   Test167AC5FailedSendKeepsItsOwnWordsSeparately
+--- PASS: Test167AC5FailedSendKeepsItsOwnWordsSeparately (0.00s)
+=== RUN   Test167AC5FailureTouchesNoOtherComposerField
+--- PASS: Test167AC5FailureTouchesNoOtherComposerField (0.00s)
+=== RUN   Test167AC5WireShapeIsReaderGated
+--- PASS: Test167AC5WireShapeIsReaderGated (0.00s)
+=== RUN   Test167AC5FailedSendFacesAreWiredAtBothPumps
+--- PASS: Test167AC5FailedSendFacesAreWiredAtBothPumps (0.01s)
+=== RUN   Test167QueueSeqStableAcrossCancel
+    panel_occupancy_queue_167_windows_test.go:189: card 3 after the cancel = seq 2 pos 2, want seq 3 (NOT renumbered to 2) pos 2
+    panel_occupancy_queue_167_windows_test.go:217: wire seq = 2 (present true), want 3
+--- FAIL: Test167QueueSeqStableAcrossCancel (0.02s)
+=== RUN   Test167SeqReadTwiceFromTheOutboundPayload
+--- PASS: Test167SeqReadTwiceFromTheOutboundPayload (0.02s)
+=== RUN   Test167MutationRenumberOnEverySnapshot
+    panel_occupancy_queue_167_windows_test.go:310: repair-leg mutation carrier: runs only under the WISP167D_RENUMBER=1 GOFLAGS-overlay mutation; the tree on disk stays at the repaired shape
+--- SKIP: Test167MutationRenumberOnEverySnapshot (0.00s)
+=== RUN   Test167OccupancyReaderStaysUnknownUntilBothHalvesAreMeasured
+--- PASS: Test167OccupancyReaderStaysUnknownUntilBothHalvesAreMeasured (0.00s)
+=== RUN   Test167AC4BusyStopLandsAndLeavesNoWritingTail
+time=2026-11-19T15:53:24.026+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 15:53:24 mockllm: serving on http://127.0.0.1:49887 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T15:53:24.134+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=2 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\\002, 44111024128 bytes free at install, threshold 209715200"
+time=2026-11-19T15:53:24.177+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T15:53:24.190+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T07:53:24Z duration_ms=11
+time=2026-11-19T15:53:24.201+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T15:53:24.211+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T07:53:24Z duration_ms=9
+time=2026-11-19T15:53:24.222+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T15:53:24.229+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T07:53:24Z duration_ms=6
+time=2026-11-19T15:53:24.243+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T15:53:24.256+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T07:53:24Z duration_ms=10
+time=2026-11-19T15:53:24.257+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T15:53:24.273+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T15:53:24.283+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T07:53:24Z duration_ms=9
+time=2026-11-19T15:53:24.297+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail2765911342\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T15:53:24.307+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T07:53:24Z duration_ms=10
+time=2026-11-19T15:53:24.316+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T15:53:24.320+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T15:53:24.320+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T15:53:24.773+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=2d0eddcc-f9d3-4f5b-988f-815481dce8e4
+time=2026-11-19T15:53:24.776+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T15:53:24.783+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-19T15:53:24.850+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test167AC4BusyStopLandsAndLeavesNoWritingTail (3.99s)
+FAIL

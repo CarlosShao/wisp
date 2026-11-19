@@ -26,6 +26,21 @@ package main
 //     boot whose endpoint and provider declare no window. The mutation
 //     "invent the denominator" (fall back to a constant window) reds
 //     Test167OccupancyReaderStaysUnknownUntilBothHalvesAreMeasured.
+//
+// THE 167-d REPAIR LEG (2026-11-19 afternoon, after the morning audit): the
+// audit named the panel mint's original one-call shape (Assign per card, in
+// traversal order) CONSTRUCTIVELY GREEN - a ledger that renumbered every
+// snapshot (casting 1..n by the current order) was indistinguishable from the
+// real one through any pump-driven test. The repair separates the mint into
+// two calls (castAll hands the ledger the WHOLE pending set of one snapshot,
+// then each card recalls its number), and this file gains two teeth:
+// Test167SeqReadTwiceFromTheOutboundPayload reads the proposition twice off
+// the pump's OUTBOUND payload (before/after the cancel; corr 3 same number,
+// corr 1 unchanged), and Test167MutationRenumberOnEverySnapshot injects the
+// "renumber 1..n by current order" mutation through GOFLAGS -overlay (the
+// tree on disk stays at the repaired shape) and MUST go red with the named
+// reading (card 3's seq falls from 3 to 2); restore then greens. Both
+// readings are booked in docs/evidence/s1/167-tooth-repair-d.md.
 
 import (
 	"context"
@@ -202,6 +217,144 @@ func Test167QueueSeqStableAcrossCancel(t *testing.T) {
 	}
 	if v, ok := card3["position"]; !ok || string(v) != "2" {
 		t.Errorf("wire position = %s (present %v), want 2", v, ok)
+	}
+}
+
+// Test167SeqReadTwiceFromTheOutboundPayload is the independent support tooth
+// the repair leg adds (2026-11-19 167-d): the stable-number proposition read
+// TWICE from the pump's OUTBOUND payload (the Snapshot the page is rendered
+// from), never from any ledger field - the ledger's map and counter are
+// private, and this case cannot see them even if it wanted to. The two reads
+// bracket the cancel: before card 2 leaves, corr 3 reads A; after, corr 3
+// reads the SAME A and corr 1 still reads its own number.
+func Test167SeqReadTwiceFromTheOutboundPayload(t *testing.T) {
+	g := newGate167()
+	corrOf := func(i int) string { return fmt.Sprintf("task167-p%d#call-167-%d", i, i) }
+	askDone := make(chan tools.Answer, 8)
+	raiseThreeL2For167(t, g, corrOf, askDone)
+
+	verdicts := nativeVerdictsFromGate(g)
+	if len(verdicts) != 3 {
+		t.Fatalf("pump verdicts = %d, want 3", len(verdicts))
+	}
+	pump := panel.NewSnapshotPump(panel.PumpSources{
+		Verdicts: func() []panel.NativeVerdict { return verdicts },
+	})
+
+	// The outbound-payload reader: one snapshot's pending section, keyed by
+	// correlation id. Seq here is whatever the pump put on the packet, which is
+	// the whole claim - the page's number is this number.
+	payloadSeq := func(t *testing.T, p *panel.SnapshotPump, corr string) uint64 {
+		t.Helper()
+		for _, c := range p.Snapshot().Pending {
+			if c.CorrelationID == corr {
+				return c.Seq
+			}
+		}
+		t.Fatalf("card %q not in the outbound payload's pending section", corr)
+		return 0
+	}
+
+	// Read 1, BEFORE the cancel: corr 3's display number A comes off the
+	// payload, not off the queue and not off any ledger field.
+	seqA := payloadSeq(t, pump, corrOf(3))
+	if seqA == 0 {
+		t.Fatalf("card 3's payload seq before the cancel = 0: the outbound card travels without a number, nothing downstream is pinned")
+	}
+	if seq1 := payloadSeq(t, pump, corrOf(1)); seq1 == 0 {
+		t.Fatalf("card 1's payload seq before the cancel = 0, nothing downstream is pinned")
+	}
+
+	// The cancel: card 2 (the middle one) leaves through the production native
+	// refusal route - exactly what a user's dismiss does.
+	if err := g.DecideFromNative(context.Background(), approval.Request{
+		CorrelationID: corrOf(2), Allow: false, Reason: "票 167 出向载荷牙：取消第 2 条",
+	}); err != nil {
+		t.Fatalf("cancel %q: %v", corrOf(2), err)
+	}
+	select {
+	case a := <-askDone:
+		if a != tools.AnswerReject {
+			t.Errorf("cancelled card answered %s, want reject", a)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the cancelled card's parked ask never woke")
+	}
+	if live := g.Queue().LiveApprovals(); len(live) != 2 {
+		t.Fatalf("live rows after the cancel = %d, want 2", len(live))
+	}
+
+	// Read 2, AFTER the cancel, from a fresh payload of the SAME pump: corr 3
+	// must read the SAME number A (取消不重排, read off the packet the page
+	// gets) and corr 1 must still read its own number.
+	if seq3 := payloadSeq(t, pump, corrOf(3)); seq3 != seqA {
+		t.Errorf("card 3 payload seq after the cancel = %d, want the SAME %d it read before (renumbering a survivor is the lie AC#3 forbids)", seq3, seqA)
+	}
+	if seq1 := payloadSeq(t, pump, corrOf(1)); seq1 == 0 {
+		t.Errorf("card 1 payload seq after the cancel = 0, want its own cast number unchanged")
+	}
+}
+
+// Test167MutationRenumberOnEverySnapshot is the repair leg's mutation tooth
+// (2026-11-19 167-d): with the ledger mutated to renumber 1..n by the current
+// order on every snapshot, the end-to-end cancel read MUST go red with the
+// named reading (card 3's seq falls from 3 to 2) - proving the packet-borne
+// teeth above can actually fail. The mutation is injected via GOFLAGS
+// -overlay (the same shape evidence file 219-ac5-reason-findback.md §8
+// books), so the tree on disk stays at the repaired shape for every run;
+// restored, this case is a plain green tooth over the packet. Both readings
+// are booked in docs/evidence/s1/167-tooth-repair-d.md.
+func Test167MutationRenumberOnEverySnapshot(t *testing.T) {
+	g := newGate167()
+	corrOf := func(i int) string { return fmt.Sprintf("task167-p%d#call-167-%d", i, i) }
+	askDone := make(chan tools.Answer, 8)
+	raiseThreeL2For167(t, g, corrOf, askDone)
+
+	verdicts := nativeVerdictsFromGate(g)
+	if len(verdicts) != 3 {
+		t.Fatalf("pump verdicts = %d, want 3", len(verdicts))
+	}
+	pump := panel.NewSnapshotPump(panel.PumpSources{
+		Verdicts: func() []panel.NativeVerdict { return verdicts },
+	})
+	cardSeq := func(t *testing.T, p *panel.SnapshotPump, corr string) uint64 {
+		t.Helper()
+		for _, c := range p.Snapshot().Pending {
+			if c.CorrelationID == corr {
+				return c.Seq
+			}
+		}
+		t.Fatalf("card %q not in the packet's pending section", corr)
+		return 0
+	}
+	if seq := cardSeq(t, pump, corrOf(3)); seq != 3 {
+		t.Fatalf("card 3 payload seq before the cancel = %d, want 3", seq)
+	}
+
+	if err := g.DecideFromNative(context.Background(), approval.Request{
+		CorrelationID: corrOf(2), Allow: false, Reason: "票 167 变异载具：取消第 2 条",
+	}); err != nil {
+		t.Fatalf("cancel %q: %v", corrOf(2), err)
+	}
+	select {
+	case a := <-askDone:
+		if a != tools.AnswerReject {
+			t.Errorf("cancelled card answered %s, want reject", a)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the cancelled card's parked ask never woke")
+	}
+
+	verdicts = nativeVerdictsFromGate(g)
+	if len(verdicts) != 2 {
+		t.Fatalf("pump verdicts after the cancel = %d, want 2", len(verdicts))
+	}
+	// THE MUTATION-SENSITIVE READ: under the renumber-every-snapshot mutation
+	// the two survivors renumber to 1 and 2 by their current order, so card 3
+	// reads 2 here and this test - the same proposition the packet teeth pin -
+	// goes RED. Under the repaired ledger it reads 3 and the test is GREEN.
+	if seq := cardSeq(t, pump, corrOf(3)); seq != 3 {
+		t.Errorf("card 3 payload seq after the cancel = %d, want 3 (the mutation made it fall to 2: 取消不重排 is broken and this tooth catches it)", seq)
 	}
 }
 

@@ -1,0 +1,8 @@
+time=2026-11-19T16:04:57.590+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test167QueueSeqLedgerNumberSurvivesSetShrinkage
+    pump_queue_seq_167_test.go:35: corr-3 after the shrink = 2, want 3 (NOT renumbered to 2 by its new place - the renumber this ledger exists to refuse; under the repair leg's renumber-every-snapshot mutation this reads 2)
+    pump_queue_seq_167_test.go:42: corr-4 first cast = 1, want 4 (the cancelled card's number 2 stays retired, never reused)
+--- FAIL: Test167QueueSeqLedgerNumberSurvivesSetShrinkage (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.058s
+FAIL

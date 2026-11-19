@@ -1,0 +1,5 @@
+time=2026-11-19T16:05:00.072+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test167QueueSeqLedgerNumberSurvivesSetShrinkage
+--- PASS: Test167QueueSeqLedgerNumberSurvivesSetShrinkage (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.070s

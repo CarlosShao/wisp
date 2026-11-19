@@ -460,17 +460,25 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		pending = p.src.Verdicts()
 	}
 	cards := make([]ApprovalCardView, 0, len(pending))
+	// Ticket 167 AC#3's stable number, cast on the panel side in two calls:
+	// the pump first hands the ledger the WHOLE pending set of THIS snapshot
+	// (castAll - the pass boundary is the call, so a cancel reaches the ledger
+	// as a smaller set and "the survivors keep their numbers" is exercisable on
+	// its own instead of being fused into the per-card traversal), then each
+	// card recalls its number (number). The ledger never renumbers a seen id,
+	// so a cancelled card leaves the numbers behind it untouched (AC#7 moved
+	// this mint off internal/agent/approval - the contract axis keeps that
+	// package at zero changed bytes). An id-less verdict casts nothing and the
+	// card travels without the seq key (omitempty), the same absent-fact rule
+	// the other optional keys follow.
+	ids := make([]string, 0, len(pending))
+	for _, v := range pending {
+		ids = append(ids, v.CorrelationID)
+	}
+	p.seqs.castAll(ids)
 	for _, v := range pending {
 		card := v.CardView()
-		// Ticket 167 AC#3's stable number, cast on the panel side: the pump's
-		// ledger assigns the next monotone number on first sight of the
-		// correlation id and never renumbers, so a cancelled card leaves the
-		// numbers behind it untouched (AC#7 moved this mint off
-		// internal/agent/approval - the contract axis keeps that package at
-		// zero changed bytes). An id-less verdict casts nothing and the card
-		// travels without the seq key (omitempty), the same absent-fact rule
-		// the other optional keys follow.
-		card.Seq = p.seqs.Assign(v.CorrelationID)
+		card.Seq = p.seqs.number(v.CorrelationID)
 		cards = append(cards, card)
 	}
 

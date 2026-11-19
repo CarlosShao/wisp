@@ -1,0 +1,8 @@
+# 167-d 修牙腿 d22scan 首跑读数（2026-11-19 16:0x，终跑前）
+
+- 命令：`sh scripts/d22scan.sh`（仓根）
+- rc=1，control rc=0（正控自证绿），scan rc=1
+- 唯一 finding（逐字）：
+  `internal/panel/pump_queue_seq_167.go:38: [phantom-citation] comment cites repo path "docs/evidence/s1/167-tooth-repair-d.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation`
+- 定性：收口顺序问题（代码注释先引用了证据件、证据件后落盘），非产码违规。证据件落盘后终跑 rc=0，见 `167d-d22scan-final.log`。
+- 首跑时盘上其余 finding：0 枚。

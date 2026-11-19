@@ -1,0 +1,51 @@
+time=2026-11-19T15:58:32.214+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test167AC6DoctorFindsTheCrashSceneAndSaysWhatToDo
+--- PASS: Test167AC6DoctorFindsTheCrashSceneAndSaysWhatToDo (0.00s)
+=== RUN   Test167AC6QuietWhenNoCrashOnFile
+--- PASS: Test167AC6QuietWhenNoCrashOnFile (0.00s)
+=== RUN   Test167AC6NewestFileWins
+--- PASS: Test167AC6NewestFileWins (0.00s)
+=== RUN   Test167AC6DoctorCarriesTheCrashSceneCheck
+--- PASS: Test167AC6DoctorCarriesTheCrashSceneCheck (0.00s)
+=== RUN   Test167AC5FailedSendKeepsItsOwnWordsSeparately
+--- PASS: Test167AC5FailedSendKeepsItsOwnWordsSeparately (0.00s)
+=== RUN   Test167AC5FailureTouchesNoOtherComposerField
+--- PASS: Test167AC5FailureTouchesNoOtherComposerField (0.00s)
+=== RUN   Test167AC5WireShapeIsReaderGated
+--- PASS: Test167AC5WireShapeIsReaderGated (0.00s)
+=== RUN   Test167AC5FailedSendFacesAreWiredAtBothPumps
+--- PASS: Test167AC5FailedSendFacesAreWiredAtBothPumps (0.00s)
+=== RUN   Test167QueueSeqStableAcrossCancel
+--- PASS: Test167QueueSeqStableAcrossCancel (0.02s)
+=== RUN   Test167SeqReadTwiceFromTheOutboundPayload
+--- PASS: Test167SeqReadTwiceFromTheOutboundPayload (0.02s)
+=== RUN   Test167MutationRenumberOnEverySnapshot
+--- PASS: Test167MutationRenumberOnEverySnapshot (0.02s)
+=== RUN   Test167OccupancyReaderStaysUnknownUntilBothHalvesAreMeasured
+--- PASS: Test167OccupancyReaderStaysUnknownUntilBothHalvesAreMeasured (0.00s)
+=== RUN   Test167AC4BusyStopLandsAndLeavesNoWritingTail
+time=2026-11-19T15:58:33.967+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 15:58:33 mockllm: serving on http://127.0.0.1:64803 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T15:58:34.020+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=2 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\\002, 44104155136 bytes free at install, threshold 209715200"
+time=2026-11-19T15:58:34.063+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T15:58:34.077+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T07:58:34Z duration_ms=14
+time=2026-11-19T15:58:34.086+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T15:58:34.092+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T07:58:34Z duration_ms=6
+time=2026-11-19T15:58:34.103+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T15:58:34.113+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T07:58:34Z duration_ms=8
+time=2026-11-19T15:58:34.124+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T15:58:34.135+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T07:58:34Z duration_ms=10
+time=2026-11-19T15:58:34.135+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T15:58:34.148+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T15:58:34.161+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T07:58:34Z duration_ms=10
+time=2026-11-19T15:58:34.178+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test167AC4BusyStopLandsAndLeavesNoWritingTail3352091338\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T15:58:34.187+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T07:58:34Z duration_ms=8
+time=2026-11-19T15:58:34.193+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T15:58:34.197+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T15:58:34.198+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T15:58:34.599+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=c5d76d29-ef25-466d-88a4-89c03cef740b
+time=2026-11-19T15:58:34.602+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T15:58:34.606+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-11-19T15:58:34.631+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test167AC4BusyStopLandsAndLeavesNoWritingTail (2.96s)
+PASS
