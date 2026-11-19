@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 修 248 回执"读得比现实好"＋两张证据件改准（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。审计腿#2 判 **248=夸大 / 167 证据与代码不符**，按下面三件修（逐条要有可红牙）：
+1. **`cmd/wisp/config_reload.go:219`**：它把 `[llm]` 印进「已立即生效（D36 立即档）: [audio] [llm] [agent] [cost]」，**而 `[llm]` 的 endpoint/模型字段是 restart 档** ⇒ 用户看见的是假话。改法（主流做法）：这一行**按档分列**——只把"整节全为 hot 档"的段放进「已立即生效」，含 restart 档的段进「**需重启**」列（`[llm]` 归后者，并把 restart 字段名点出来）；⛔ 不许只加长免责句了事，⛔ 不许删掉 rest 档字段的提示。**牙**：把 `[llm]` 放回"已立即生效"⇒红（指名 `[llm]` 出现在 hot 列即失败）。
+2. **重写 `docs/evidence/s1/248-ac8-20261119-r1.md`**：改准三处 —— ①`autostart_windows.go:76/:87/:103` 不是"立即生效"命中（该词 0 命中，原文是"需要重启后重试"）②补列普查真实返回的 **19 行**（自己现跑 `git grep -n "立即生效" <锚>` 逐行转录，锚点用最新 commit）③「8 check」实为 **9 处 `check(`**／9 枚牙；`config_route_248_test.go:392` 实为 **`:391`**；普查尺补 `-E`（BRE 下 `|` 是字面量）。⛔ 不许保留任何"没有一枚是对 [llm] 的承诺"这类绝对句（它已被证伪，改成事实描述＋指向第 1 件的修正）。
+3. **重写 `docs/evidence/s1/167-occupancy-queue-a.md`**：加一节「**现状（`427dd7955` 之后）**」并给 §1/§2/§3 逐节加"已被 `427dd7955` 取代"标注：`pending_read.go` 的 `Seq` 导出已逐字节撤回（blob `ef71c2451`）；**HEAD 上两套编号器并存**——队列 `internal/agent/approval/queue.go:165 q.seq++`（`:174` 铸 `qitem.Seq`、`:180` 被 `bindDigest` 读，仅供绑定）＋面板 `internal/panel/pump_queue_seq_167.go` `QueueSeqLedger`（`pump.go:481` 铸卡面 `Seq`，**这才是用户看见的号**）。另在 `pump_queue_seq_167.go` 文件头补一句注释写清这个语义差。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔ 放宽断言（改 `config_receipt_255_test.go` 里"claimable==audio llm agent cost"那条时**只能往严里改**，并在证据件写清为什么这是收紧）、⛔push、⛔UI emoji、⛔ 跨会话工具。⚠ 别碰他人在飞件。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；另跑 `go test ./internal/panel -run '^Test167'`。
+三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关全绿 ③`go build ./...` rc=0。
+写面：`cmd/wisp/**`（唯一）、`internal/panel/**`（只注释）、`docs/evidence/s1/248-ac8-20261119-r1.md`、`docs/evidence/s1/167-occupancy-queue-a.md`、新产品：`docs/evidence/s1/248-receipt-tiers-*`。
+回话第一行＝commit hash ＋"`[llm]` 放回 hot 列⇒红／还原绿"两发读数 ＋载具四数 ＋d22scan 末行。
