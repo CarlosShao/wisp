@@ -1,0 +1,9 @@
+# 派单存档（先存档再发）—— 票 167 片A：占用"未知"具名态 ＋ 排队序号/当前第几条（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 167 **AC#2＋AC#3**（`.scratch/wisp/issues/167-*.md:26-27`）。**先量后写**：AC#1 已勾，但你要先 `grep -rn "occupancy\|context.*token\|ContextWindow\|queued\|queue" --include=*.go internal cmd | grep -v _test | head -30` 现量这四枚今天的出口（有／无／有但没接），**已存在就报回不许硬造第二套**。
+1. **AC#2 占用**：分子（已用 token）或分母（总窗口）任一未知 ⇒ 出口必须是**具名"未知"状态**（如 `unknown` 枚举/字段），⛔ 退化成 0 或空串、⛔ 画 0%。牙两发：①把分子填 0 ⇒ 红 ②把分母当已知（编个数）⇒ 红。
+2. **AC#3 排队**：忙时进来的请求要有**序号**与"当前第几条"的可读出口；**取消排队不许把后面的挤掉**（取消第 2 条后第 3 条不变第 2 条）。牙：取消后序号重排/丢条 ⇒ 红。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design（D32 只读）、⛔放宽断言、⛔push、⛔UI emoji、⛔ 在 `frontend/**` 落任何文件（本票只做 Go 侧出口；界面不在本票）。⚠ 别碰他人在飞件（composer-states.html 等 M：只报不动，⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；收口跑本包相关＋`go build ./...`。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关测试全绿 ③`go build ./...` rc=0。
+写面：`cmd/wisp/**`（唯一）、`internal/panel/**`、`internal/agent/**`（只读/出口）、`docs/evidence/s1/167-occupancy-queue-*`。
+回话第一行＝commit hash ＋AC#2/AC#3 牙名/读数 ＋现量到的既有出口清单 ＋d22scan 末行 ＋载具 rc。没干完写「卡在哪」。
