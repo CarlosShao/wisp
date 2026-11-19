@@ -35,6 +35,7 @@ func validate(c *Config) error {
 		validateCost(c),
 		validateObserve(c),
 		validateNet(c),
+		validatePanelAnimation(c),
 		validateAPIKeyRefs(c),
 		validateRolesIntensity(c),
 		validateCatalog(c),
@@ -254,6 +255,32 @@ func validateNet(c *Config) error {
 	if !slices.Contains(proxyModes, c.Net.Proxy.Mode) {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(
 			"config.toml: net.proxy.mode %q must be one of %s", c.Net.Proxy.Mode, vocabList(proxyModes)))
+	}
+	return nil
+}
+
+// panelAnimationVocabulary is the animation switch's three words (ticket 193:
+// 全开／减少／关闭, owner 09-28 ruling A373). One list, two gates: the load
+// gate below and the write gate (settings_animation_193.go's SetPanelAnimation)
+// both judge a value against THIS slice, so the page can offer exactly what
+// the loader accepts.
+var panelAnimationVocabulary = []string{"full", "reduce", "off"}
+
+// panelAnimationEnumError is the ONE out-of-vocabulary refusal for
+// panel.animation: both gates hand out this same sentence (the 65/413
+// one-sentence rule), never two copies that can drift.
+func panelAnimationEnumError(v string) error {
+	return observe.New(observe.ClassConfig, fmt.Sprintf(
+		"config.toml: panel.animation %q must be one of %s; off means the panel REALLY stops animating, not that it runs unseen", v, vocabList(panelAnimationVocabulary)))
+}
+
+// validatePanelAnimation checks the [panel] animation switch's enum (ticket
+// 193). An unknown word is a load error, never a fallback - the default
+// ("reduce", the owner-pending placeholder) is the schema tag's job, not this
+// gate's to guess toward.
+func validatePanelAnimation(c *Config) error {
+	if !slices.Contains(panelAnimationVocabulary, c.Panel.Animation) {
+		return panelAnimationEnumError(c.Panel.Animation)
 	}
 	return nil
 }

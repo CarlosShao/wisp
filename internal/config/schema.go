@@ -601,6 +601,26 @@ type PanelSection struct {
 	// (PLAN.md:2753) and SPEC-03 sec 3 does NOT name this key yet; the row's
 	// contract text is that approval's to carry, not this file's to write.
 	FontSize int `toml:"font_size" default:"12"`
+	// Animation is the panel animation switch (ticket 193; owner 09-28 ruling
+	// A373, ledger A378): "full" | "reduce" | "off" - 全开／减少／关闭. The
+	// D1/D32 citation rewrite this ticket stands on means the switch is NOT a
+	// resource budget: off is a user choice that must make the page REALLY
+	// stop animating (no rAF, no transitions attached), never "runs but
+	// invisible"; the Go side carries the tier verbatim and schedules nothing
+	// (zero timers for this key). An unknown word is a load error
+	// (validatePanel), not a fallback - the same shape as risk.permission_mode.
+	// Tier: hot - the whole [panel] section is registered TierHot (tiers.go)
+	// and D36's [panel] row is hot, so a written tier is readable by the
+	// readers and the snapshot carrier without a process restart; there is no
+	// Go-side applier on purpose (the same honest shape panel.width /
+	// panel.font_size ride, config_write_wave.go's tier note).
+	//
+	// DEFAULT IS NOT SETTLED. The ticket says 默认值由 owner 定 and the
+	// dispatch ordered the most conservative PLACEHOLDER (reduce) until the
+	// owner picks; nothing in this tree may treat "reduce" as decided. The
+	// evidence file docs/evidence/s1/193-animation-opt-r1.md carries the
+	// owner-pending line verbatim.
+	Animation string `toml:"animation" default:"reduce"`
 }
 
 // CostSection is [cost]. Budgets are micro-USD; 0 = no budget. Reaching 100%

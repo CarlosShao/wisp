@@ -369,6 +369,13 @@ type PumpSources struct {
 	// wave): panel.font_size as the live config holds it, internal/config's
 	// PanelFontSizeOptions the production reader. Same reader-gated absence.
 	PanelFontSize func() PanelFontSizeSection
+	// PanelAnimation reads the snapshot's animation-switch dimension (ticket
+	// 193): panel.animation as the live config holds it, internal/config's
+	// PanelAnimationOptions the production reader. Same reader-gated absence
+	// as the field above; the cmd/wisp assembly root wires it with the same
+	// line the wave's two [panel] readers already have, and until that wiring
+	// lands the packet carries no panelAnimation key at all.
+	PanelAnimation func() PanelAnimationSection
 	// Run reads the working-state section (ticket 145): the ended tool rows,
 	// accumulated reasoning, last classified error and stuck sentence the
 	// assembly root's RunFeed holds. The console sink's event switch already
@@ -672,6 +679,14 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 	if p.src.PanelFontSize != nil {
 		sec := p.src.PanelFontSize()
 		snap.PanelFontSize = &sec
+	}
+	if p.src.PanelAnimation != nil {
+		// Ticket 193: same reader-gated rule one block up - a reader that
+		// exists always sends the key. The tier word travels verbatim from
+		// the config side; the pump invents nothing (an empty Tier from a
+		// nil-Manager read is the page's "unset", never "off").
+		sec := p.src.PanelAnimation()
+		snap.PanelAnimation = &sec
 	}
 	if p.src.Run != nil {
 		// Ticket 145: same reader-gated rule one block up - a reader that

@@ -188,6 +188,15 @@ type Snapshot struct {
 	// with the frontend wiring leg. Same reader-gated shape; the write half
 	// rides config.set's panel_font_size field (config_write_wave.go).
 	PanelFontSize *PanelFontSizeSection `json:"panelFontSize,omitempty"`
+	// PanelAnimation is ticket 193's carrier, panel half: the animation switch
+	// (panel.animation, the schema key the same ticket's config leg added -
+	// full|reduce|off, the default is the owner's call and is NOT settled, see
+	// schema.go's PanelSection.Animation) the live config holds, consumed by
+	// the panel page with the frontend wiring leg. Same reader-gated shape;
+	// the cmd/wisp pump-source wiring is the wiring leg's to land, and the
+	// key is a judged gap in composerTSGapLedger until panel.ts declares it.
+	// See panel_animation_193.go for the shape and the off-proof split.
+	PanelAnimation *PanelAnimationSection `json:"panelAnimation,omitempty"`
 	// Run is ticket 145's working-state carrier: the tool calls that ended
 	// (with their booked args), the calls in flight right now, the task's
 	// cumulative usage, the reasoning streamed so far, the last classified

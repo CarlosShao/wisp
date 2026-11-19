@@ -185,13 +185,13 @@ func composerTSNameMap() map[string]string {
 		// currency) from here on. RunSection.usage stays a registered gap
 		// (the ledger below), so this translation is reached exactly once,
 		// through TaskRowView.costToDate.
-		"RunUsageRow":             "RunUsageRow",
-		"RunErrorRow":             "RunErrorRowView",
-		"RunStuckRow":             "RunStuckRowView",
-		"PluginInventorySection":  "PluginsSection",
-		"PluginRow":               "PluginRowView",
-		"GitView":                 "GitView",
-		"GitWorktree":             "GitWorktree",
+		"RunUsageRow":            "RunUsageRow",
+		"RunErrorRow":            "RunErrorRowView",
+		"RunStuckRow":            "RunStuckRowView",
+		"PluginInventorySection": "PluginsSection",
+		"PluginRow":              "PluginRowView",
+		"GitView":                "GitView",
+		"GitWorktree":            "GitWorktree",
 	}
 }
 
@@ -280,6 +280,18 @@ func composerTSGapLedger() map[string][]string {
 			// failed words travel under their own keys and no other composer
 			// field moves when a send fails (cmd/wisp's 167 teeth pin that).
 			"failedSendKnown", "failedSendText"},
+		// Ticket 193 (2026-11-19): the animation switch is REGISTERED the same
+		// way - panelAnimation is a real wire fact (the page's animation
+		// option needs the exact tier word full/reduce/off to honour "off
+		// really stops animating", owner ruling A373), the Go side emits it
+		// through the reader-gated carrier (panel_animation_193.go, judged gap
+		// until the cmd/wisp pump-source wiring lands), and the page-side
+		// declaration is the UI leg's to land later. When panel.ts declares
+		// panelAnimation this entry goes stale-red on purpose: delete it, add
+		// composerTSNameMap's PanelAnimationSection translation, and let the
+		// ordinary two-way comparison judge the key from then on - the same
+		// close-out the appearance wave's four keys followed (4017962b3).
+		"PanelSnapshot": {"panelAnimation"},
 	}
 }
 
