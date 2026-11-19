@@ -109,3 +109,15 @@
 - **勾 AC#7**：`internal/agent/approval/**` 零字节（blob 级同枚）；PLAN/specs/internal/risk/thresholds/golden/allowlist/design 0 枚。`internal/panel/**` 6 枚全在票 145 已批的 composer/pump/panel_pump 族内、只新增字段/新增一枚私有文件（`pump_queue_seq_167.go`，不存条目、不判事、不放行，无路进审批面）；`cmd/wisp` 本腿只 2 枚（`panel_pump.go` 只减一行 `QueueSeq`，只减不增键）。
 - 编号改到面板侧铸：`QueueSeqLedger` 一泵一簿（correlationId→seq 单调、首次铸号、同泵重建同号、空 id 铸 0）；牙保留全部原断言（live=2 不丢、card3 seq==3、pos==2、wire `seq:3/position:2`）并**新增**两枚正向钉。
 - ⚠ 总 diff 里 `frontend/scripts/render-hiddenpause36.tsx` 一枚属**我 36 的卫生修**（撤 emoji），非 167 实现；本腿 commit 本体 frontend 枚数 0。
+## 只读审计腿复核（2026-11-19 14:5x，`audnight`，12 枚提交逐条）= **8 通过 / 3 可疑 / 1 不通过**
+
+**不通过＝`427dd7955`**：①它**删掉**了队列自己的 admission 号断言（`it.Seq != uint64(i+1)`、`live[1].Seq != 3`、`live[1].Position != 2`、`live[0].Seq/Position != 1/1` 四处被删），把命题换到另一枚铸号器上；②新牙 `Test167QueueSeqStableAcrossCancel` 的 seq 取自测试自建的泵＋`QueueSeqLedger` 首次见即铸 ⇒ **构造性为真、无法红**。
+⇒ **本票撤回 -done，重开**：已派 `w167d` 修牙（先证"变异重排⇒红"再证还原绿；另补一发从**对外载荷**读两次 seq 的独立用例）；并在证据件如实写：`internal/agent/approval/queue.go:165 q.seq++` 的 admission 不重排性质**因 AC#7 零字节轴在包内零测试覆盖**（轴要求的取舍，不是放宽）。
+- 可疑三枚（`3de613364`／`c0b7a96d8`／`e1049dbf5`）＝口径诚实项，待我逐条核证据件与代码后处理。
+- 冻结面 12 枚全 0 枚、`frontend/dist` 12 枚全 0（仅 `.gitkeep`）——这两项审计确认干净。
+## 编排者收件·假牙修复（2026-11-19 16:1x，`4ae5d1557`，件 `docs/evidence/s1/167-tooth-repair-d.md`）—— 复结
+
+**尺1** `4ae5d1557` 在（`git show --name-only | grep -c agent/approval` = **0**）。**尺3 我自己复跑**：载具 `^Test167` **13 RUN / 13 PASS / 0 FAIL / 0 SKIP**（含新增 `Test167SeqReadTwiceFromTheOutboundPayload`、`Test167MutationRenumberOnEverySnapshot`）；`internal/panel ^Test167` ok 0.045s；`d22scan` clean。
+- **牙真能红了**：`pump_queue_seq_167.go` 拆成 `castAll(整组)`＋`number(id)`，"取消＝集合收缩、幸存者保号"从此可独立行使；变异"每次 Snapshot 重排 1..n"⇒ `card 3 payload seq after the cancel = 2, want 3` **红**；还原 13 枚全绿。改形前旧牙对同一变异恒真、改形后**旧牙也当场咬住**（`seq 2 pos 2`＋`wire seq = 2`）＝指控被修复的直接反证。
+- 新增独立用例 `Test167SeqReadTwiceFromTheOutboundPayload`：**从对外载荷**取两次号（非私有字段）。
+- 如实笔：`internal/agent/approval/queue.go:165 q.seq++` 的 admission 不重排性质**因 AC#7 零字节轴包内零覆盖**（取舍非放宽）；中间形曾有 env 门致 SKIP，**skip≠绿**，已去门重取两发终态。

@@ -37946,3 +37946,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - 可疑 3（`3de613364`/`c0b7a96d8`/`e1049dbf5`）＝口径诚实项，逐条核后再裁。
 - 干净两项：冻结面 12 枚全 0、`frontend/dist` 12 枚全 0（仅 .gitkeep）。
 **教训**：**"把断言搬到新机制"等于删断言**；新牙必须自问"什么变异能让它红"，答不出就是假牙。此条入派单模板。
+## A1955（11-19 16:1x）：167 假牙修好复结 `4ae5d1557`（13/13 PASS）
+
+变异"每次 Snapshot 重排"⇒ `card 3 payload seq after the cancel = 2, want 3` 红；还原 13 枚全绿（0 SKIP）。`castAll`＋`number` 分离让"取消＝集合收缩、幸存者保号"可独立行使；新增 `Test167SeqReadTwiceFromTheOutboundPayload`（对外载荷取两次号）。`git show --name-only 4ae5d1557 | grep -c agent/approval` = 0。**票 167 复结。票池 402 已结 / 42 未结。**
