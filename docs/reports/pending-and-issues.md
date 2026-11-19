@@ -37926,3 +37926,7 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1950（11-19 10:0x）：248 AC#8 勾 `c0b7a96d8` —— "需要重启"必须画到页面上，禁"保存即生效"
 
 我复跑载具两枚 2/2 PASS；render-config-screen（手动 vite --ssr，npm 无 script）rc=0 且输出含 AC#8 节；d22scan clean。补上第二张 restart 收据族（renderCredentialReceipt）的真腿钉；禁话术普查零真命中；页面面断言 FeedbackLine 的可见 markup。**248 = 1 格（AC#4 真机链，等票 33＋机主点一次设置）。** 另记：`render-config-screen` 无 npm script，须手动 `npx vite build --ssr scripts/render-config-screen.tsx --outDir node_modules/.tmp/cfgrender && node node_modules/.tmp/cfgrender/render-config-screen.js`。
+## A1951（11-19 11:4x）：167 AC#2/AC#3 勾 `e1049dbf5` ＋ 我自己仪器里的 emoji 当场修
+
+我复跑：载具 2/2 PASS、panel 两枚占用牙 2/2 PASS、TestFrontendHasNoEmoji ok 0.373s、d22scan clean。占用"未知"具名态（分子/分母任一缺⇒整枚未知，变异填 0／编 128000 各红）；排队 seq/position（取消不重排、不丢条，各红）。四枚出口皆复用现源接线。
+- **记一笔**：36 AC#5 的仪器 `frontend/scripts/render-hiddenpause36.tsx:7` 有 `⛔` 字 ⇒ `TestFrontendHasNoEmoji` 红（仪器文件也在射程内，不只 `src/`）。我已改"禁止"，现绿。撤销口令：把那行改回 `⛔`（不建议）。

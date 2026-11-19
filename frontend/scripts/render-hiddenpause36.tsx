@@ -4,7 +4,7 @@
    WHAT THIS FILE PROVES. The AC's sentence is "Hidden-panel animation pause
    asserted (rAF counters)" (36-result-history-panel.md:47), and the dispatch
    spells the judgement: 可见态 => 计数增长；切 hidden => 计数停住（同一 tick
-   多次采样相等）；切回 => 恢复增长。⛔ 墙钟猜测，用计数器差值判. So every
+   多次采样相等）；切回 => 恢复增长。禁止墙钟猜测，用计数器差值判. So every
    reading below is a COUNTER DELTA:
 
      - the engine: a parser-level, browser-class rAF implementation (this
