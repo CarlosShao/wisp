@@ -86,19 +86,21 @@ type ApprovalCardView struct {
 
 	// ---- ticket 167 AC#3's two queue numbers ----
 	//
-	// Seq is the queue's own ADMISSION number (the queue's qitem.Seq, read off
-	// LiveApproval.Seq by the host's verdict reader): stamped once when the card
-	// was queued, never rewritten - cancelling an earlier card does not renumber
-	// the ones behind it, which is the 取消不重排 rule the ticket pins. Position
-	// is the card's 1-based place in the FIFO RIGHT NOW (the depth badge), and it
-	// moves as the queue drains - that is the honest "当前第几条", deliberately a
-	// separate key from the stable one so the page can show both without either
-	// lying for the other.
+	// Seq is the card's stable DISPLAY sequence, cast on the panel side since
+	// AC#7's contract axis moved the mint here (pump_queue_seq_167.go): the
+	// pump's ledger assigns a monotone number on first sight of the card's
+	// correlation id and never renumbers - cancelling an earlier card does not
+	// touch the numbers behind it, which is the 取消不重排 rule the ticket pins.
+	// Position is the card's 1-based place in the FIFO RIGHT NOW (the depth
+	// badge), read verbatim off the queue's own record by the host's mapping,
+	// and it moves as the queue drains - that is the honest "当前第几条",
+	// deliberately a separate key from the stable one so the page can show both
+	// without either lying for the other.
 	//
 	// Both are omitempty for the reason Q-51 already measured: an int without it
 	// always emits 0, and the CLI card path (`wisp panel-assets`) renders cards
-	// the queue never numbered - a "seq":0/"position":0 there would be the
-	// degenerate shape the ticket forbids. Zero = unread, and the key stays home.
+	// outside any pump - a "seq":0/"position":0 there would be the degenerate
+	// shape the ticket forbids. Zero = uncast/unread, and the key stays home.
 	Seq      uint64 `json:"seq,omitempty"`
 	Position int    `json:"position,omitempty"`
 }

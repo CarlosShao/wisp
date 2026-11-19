@@ -114,16 +114,11 @@ type NativeVerdict struct {
 	// card is not about a batch (too few targets, or the taint rule refuses a
 	// summary - the same rule the gate's own aggregation refuses it with).
 	Batch *NativeBatchView
-	// QueueSeq is the queue's own admission number for this item (LiveApproval.Seq,
-	// ticket 167 AC#3): stamped once at push, never rewritten - a cancel or expiry
-	// does not renumber the cards behind it. Zero = the host read no sequence
-	// number for this verdict, and the card then travels without the key
-	// (omitempty) rather than with a fake 0.
-	QueueSeq uint64
 	// Position is the item's 1-based place in the FIFO right now (the depth badge
-	// the queue computes live). Zero = unread; the key then stays absent the same
-	// way. Unlike QueueSeq it MOVES as the queue drains - that is the honest
-	// "当前第几条", and the pair is what keeps it distinct from the stable number.
+	// the queue computes live), read verbatim off the host's mapping. Zero = unread; the key then stays absent the same
+	// way. Unlike the pump-cast stable number it MOVES as the queue drains - that
+	// is the honest "当前第几条", and the pair is what keeps it distinct from the
+	// stable one.
 	Position int
 }
 
@@ -133,7 +128,9 @@ type NativeVerdict struct {
 // same function over the same verdict, so they cannot disagree about what L2
 // meant. The batch half (ticket 37 AC#5) rides on top of the pure rendering:
 // the verdict's own fields are the card's, and the batch fields are the copy
-// the host read off approval.CardSummary.
+// the host read off approval.CardSummary. The two queue keys are NOT set here:
+// Position and the panel-cast stable number are applied by the pump (which
+// owns the mint), never by this method.
 func (v NativeVerdict) CardView() ApprovalCardView {
 	card := CardViewFromDecision(
 		ApprovalSubject{
@@ -156,11 +153,10 @@ func (v NativeVerdict) CardView() ApprovalCardView {
 		card.BatchDeferred = b.Deferred
 		card.BatchSummary = b.Summary
 	}
-	// Ticket 167 AC#3: the two queue numbers ride verbatim. Both are omitempty
-	// on the view, so a card rendered from a verdict the host never queued (the
-	// CLI probe path) carries neither key - a 0 would be the exact degenerate
-	// shape Q-51 named for an untagged-int carrier.
-	card.Seq = v.QueueSeq
+	// The two queue keys are applied by the pump, not here: Position is read
+	// off the verdict, and the stable number is the pump's own mint (which owns
+	// the ledger). A card outside a pump (the CLI probe path) carries neither
+	// key - the degenerate-0 shape Q-51 named stays unreachable.
 	card.Position = v.Position
 	return card
 }
@@ -436,6 +432,12 @@ type PumpSources struct {
 type SnapshotPump struct {
 	src PumpSources
 
+	// seqs is ticket 167 AC#3's display-sequence ledger (pump_queue_seq_167.go),
+	// owned by THIS pump: the 取消不重排 number is minted on the panel side, once
+	// per pending item on first sight, and survives a cancel untouched. It is
+	// per-pump by design - each pump numbers the history its own page has seen.
+	seqs *QueueSeqLedger
+
 	mu        sync.Mutex
 	publishes int
 }
@@ -445,7 +447,7 @@ type SnapshotPump struct {
 // "unknown" and whose lists are empty - a packet that states what it does not
 // know, which is the AC#4 rule this file inherits.
 func NewSnapshotPump(src PumpSources) *SnapshotPump {
-	return &SnapshotPump{src: src}
+	return &SnapshotPump{src: src, seqs: NewQueueSeqLedger()}
 }
 
 // Snapshot builds the whole truth as of this instant.
@@ -459,7 +461,17 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 	}
 	cards := make([]ApprovalCardView, 0, len(pending))
 	for _, v := range pending {
-		cards = append(cards, v.CardView())
+		card := v.CardView()
+		// Ticket 167 AC#3's stable number, cast on the panel side: the pump's
+		// ledger assigns the next monotone number on first sight of the
+		// correlation id and never renumbers, so a cancelled card leaves the
+		// numbers behind it untouched (AC#7 moved this mint off
+		// internal/agent/approval - the contract axis keeps that package at
+		// zero changed bytes). An id-less verdict casts nothing and the card
+		// travels without the seq key (omitempty), the same absent-fact rule
+		// the other optional keys follow.
+		card.Seq = p.seqs.Assign(v.CorrelationID)
+		cards = append(cards, card)
 	}
 
 	var results []ResultChunk

@@ -8,15 +8,18 @@ package main
 //   - AC#3's cancel tooth (取消排队不许把后面的挤掉): a REAL queue (approval.New,
 //     the same options shape ticket 48's panel join uses), three REAL L2 cards
 //     parked through the exported production entry (PendingApproval), then card
-//     2 cancelled. The teeth the dispatch names are both aimed at the queue's
-//     own record as LiveApprovals carries it:
-//       重排 ⇒ 红  - card 3's ADMISSION number must still be 3 (not 2) after
-//         card 2 leaves; a LiveApprovals that derives Seq from the live FIFO
-//         place reds this test (mutation M-seq).
+//     2 cancelled. The teeth the dispatch names are aimed at the DISPLAY
+//     number the panel's pump casts: since AC#7's contract axis the stable
+//     number is minted on the panel side (panel.QueueSeqLedger, one per pump,
+//     first sight of a correlation id), NOT carried on LiveApprovals - so the
+//     test drives the same mapping production renders through
+//     (nativeVerdictsFromGate -> panel pump -> CardView -> wire bytes) and
+//     pins BOTH halves:
+//       重排 ⇒ 红  - card 3's DISPLAY number must still be 3 after card 2
+//         leaves (the panel mint keeps it: first sighting of corr 3 cast 3;
+//         the rebuild must not renumber), and its live FIFO place moves to 2.
 //       丢条 ⇒ 红  - after the cancel exactly two rows remain, card 1 and card
 //         3; nothing behind the cancelled card may vanish (mutation M-drop).
-//     Card 3's live FIFO place DOES move to 2 - that is the honest 当前第几条,
-//     carried on its own key so the stable number never has to lie for it.
 //
 //   - AC#2's occupancy reader (分子分母任一未知 ⇒ 整枚未知): rt.contextOccupancy
 //     returns nil while EITHER half is unmeasured - no usage event yet, or a
@@ -81,22 +84,9 @@ func newGate167() *approval.Gate {
 	})
 }
 
-func cardOf167(t *testing.T, v panel.NativeVerdict) map[string]json.RawMessage {
-	t.Helper()
-	data, err := json.Marshal(v.CardView())
-	if err != nil {
-		t.Fatalf("marshal card: %v", err)
-	}
-	var card map[string]json.RawMessage
-	if err := json.Unmarshal(data, &card); err != nil {
-		t.Fatalf("unmarshal card: %v", err)
-	}
-	return card
-}
-
 // Test167QueueSeqStableAcrossCancel drives AC#3 end to end: real queue, real
-// cancel, the two numbers read off the SAME record the pump renders from
-// (LiveApprovals -> nativeVerdictsFromGate -> CardView -> wire bytes).
+// cancel, the panel-side mint measured through the SAME path production
+// renders (nativeVerdictsFromGate -> panel pump -> CardView -> wire bytes).
 func Test167QueueSeqStableAcrossCancel(t *testing.T) {
 	g := newGate167()
 	corrOf := func(i int) string { return fmt.Sprintf("task167-p%d#call-167-%d", i, i) }
@@ -111,8 +101,32 @@ func Test167QueueSeqStableAcrossCancel(t *testing.T) {
 		if it.CorrelationID != corrOf(i+1) || it.Position != i+1 {
 			t.Errorf("row %d = %q pos %d, want %q pos %d", i, it.CorrelationID, it.Position, corrOf(i+1), i+1)
 		}
-		if it.Seq != uint64(i+1) {
-			t.Errorf("row %d Seq = %d, want the admission number %d", i, it.Seq, i+1)
+	}
+
+	// The panel-side mint, over the mapping production renders from: all three
+	// ids cast in first-seen order 1/2/3 - card 3's number is 3 BEFORE the
+	// cancel, which is the fact the post-cancel half pins.
+	verdicts := nativeVerdictsFromGate(g)
+	if len(verdicts) != 3 {
+		t.Fatalf("pump verdicts = %d, want 3", len(verdicts))
+	}
+	pump := panel.NewSnapshotPump(panel.PumpSources{
+		Verdicts: func() []panel.NativeVerdict { return verdicts },
+	})
+	cardSeq := func(t *testing.T, p *panel.SnapshotPump, corr string) (uint64, int) {
+		t.Helper()
+		snap := p.Snapshot()
+		for _, c := range snap.Pending {
+			if c.CorrelationID == corr {
+				return c.Seq, c.Position
+			}
+		}
+		t.Fatalf("card %q not in the packet's pending section", corr)
+		return 0, 0
+	}
+	for i := 1; i <= 3; i++ {
+		if seq, pos := cardSeq(t, pump, corrOf(i)); seq != uint64(i) || pos != i {
+			t.Errorf("card %d through the pump = seq %d pos %d, want the panel-cast seq %d and FIFO pos %d", i, seq, pos, i, i)
 		}
 	}
 
@@ -132,9 +146,8 @@ func Test167QueueSeqStableAcrossCancel(t *testing.T) {
 		t.Fatal("the cancelled card's parked ask never woke")
 	}
 
-	// 重排 ⇒ 红：card 3 keeps its ADMISSION number 3. It does NOT become "the
-	// second one" in the numbering - only its live FIFO place moves, and that
-	// place travels on its own key.
+	// 重排 ⇒ 红：after the cancel exactly two rows remain and NOTHING behind
+	// the cancelled card was squeezed out.
 	live = g.Queue().LiveApprovals()
 	if len(live) != 2 {
 		t.Fatalf("live rows after the cancel = %d, want exactly 2 (card 2 gone, NOTHING behind it squeezed out)", len(live))
@@ -145,36 +158,49 @@ func Test167QueueSeqStableAcrossCancel(t *testing.T) {
 	if live[1].CorrelationID != corrOf(3) {
 		t.Fatalf("row 1 after the cancel = %q, want %q (card 3 must still be on the queue, not dropped)", live[1].CorrelationID, corrOf(3))
 	}
-	if live[1].Seq != 3 {
-		t.Errorf("card 3 Seq after the cancel = %d, want 3 - the admission number must NOT renumber when an earlier card is cancelled", live[1].Seq)
-	}
-	if live[1].Position != 2 {
-		t.Errorf("card 3 Position after the cancel = %d, want 2 - the live FIFO place IS the honest 当前第几条 and does move", live[1].Position)
-	}
-	if live[0].Seq != 1 || live[0].Position != 1 {
-		t.Errorf("card 1 after the cancel = seq %d pos %d, want 1/1 (untouched)", live[0].Seq, live[0].Position)
-	}
 
-	// The wire: the same rows through the pump's own mapping carry both numbers
-	// verbatim, so the page can show the stable number and the live place.
-	verdicts := nativeVerdictsFromGate(g)
+	// The same pump's packet now: card 3 keeps its DISPLAY number 3 (the panel
+	// mint never renumbers a seen id) while its live FIFO place moved to 2 -
+	// the honest 当前第几条 travels on its own key.
+	verdicts = nativeVerdictsFromGate(g)
 	if len(verdicts) != 2 {
 		t.Fatalf("pump verdicts after the cancel = %d, want 2", len(verdicts))
 	}
-	var card3 panel.NativeVerdict
-	for _, v := range verdicts {
-		if v.CorrelationID == corrOf(3) {
-			card3 = v
+	if seq, pos := cardSeq(t, pump, corrOf(1)); seq != 1 || pos != 1 {
+		t.Errorf("card 1 after the cancel = seq %d pos %d, want 1/1 (untouched)", seq, pos)
+	}
+	if seq, pos := cardSeq(t, pump, corrOf(3)); seq != 3 || pos != 2 {
+		t.Errorf("card 3 after the cancel = seq %d pos %d, want seq 3 (NOT renumbered to 2) pos 2", seq, pos)
+	}
+
+	// And the WIRE: the same packet's JSON carries both numbers verbatim, so
+	// the page can show the stable number and the live place.
+	data, err := pump.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var packet struct {
+		Pending []map[string]json.RawMessage `json:"pending"`
+	}
+	if err := json.Unmarshal(data, &packet); err != nil {
+		t.Fatal(err)
+	}
+	if len(packet.Pending) != 2 {
+		t.Fatalf("wire pending cards = %d, want 2", len(packet.Pending))
+	}
+	var card3 map[string]json.RawMessage
+	for _, c := range packet.Pending {
+		if string(c["correlationId"]) == fmt.Sprintf("%q", corrOf(3)) {
+			card3 = c
 		}
 	}
-	if card3.QueueSeq != 3 || card3.Position != 2 {
-		t.Errorf("pump verdict for %q = seq %d pos %d, want seq 3 pos 2", corrOf(3), card3.QueueSeq, card3.Position)
+	if card3 == nil {
+		t.Fatalf("wire pending has no card %q", corrOf(3))
 	}
-	card := cardOf167(t, card3)
-	if v, ok := card["seq"]; !ok || string(v) != "3" {
+	if v, ok := card3["seq"]; !ok || string(v) != "3" {
 		t.Errorf("wire seq = %s (present %v), want 3", v, ok)
 	}
-	if v, ok := card["position"]; !ok || string(v) != "2" {
+	if v, ok := card3["position"]; !ok || string(v) != "2" {
 		t.Errorf("wire position = %s (present %v), want 2", v, ok)
 	}
 }

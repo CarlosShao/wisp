@@ -64,16 +64,6 @@ type LiveApproval struct {
 	CorrelationID string
 	Decision      tools.Decision
 	Position      int
-	// Seq is the item's ADMISSION number (qitem.Seq): the queue's own
-	// monotone counter stamped once at push (queue.go:165) and never
-	// rewritten afterwards - a cancel or expiry removes one item without
-	// touching the others' Seq, so the number the page shows for a card
-	// does not renumber when an earlier card leaves (ticket 167 AC#3's
-	// 取消不重排 rule). It travels BESIDE Position on purpose: Position is
-	// the place in the FIFO right now and moves as the queue drains, Seq
-	// is the place in line the item was given and does not. Both are
-	// reads off the queue's own record - no second numbering was minted.
-	Seq uint64
 }
 
 // cloneDecision copies one verdict out of the queue's own record. Every field
@@ -189,7 +179,6 @@ func (q *Queue) LiveApprovals() []LiveApproval {
 			CorrelationID: it.Corr,
 			Decision:      panelVerdict(it.Dec),
 			Position:      q.position(it),
-			Seq:           it.Seq,
 		})
 	}
 	return out

@@ -10,9 +10,11 @@ package panel
 //     number (mutation-inventing one reds
 //     TestOccupancyUnknownDenominatorNeverInventsOne).
 //
-// The Q-51 nails for the queue keys are here too: a verdict the queue never
-// numbered carries NEITHER key on the wire (正控种 0 ⇒ absent), and a numbered
-// one carries both values verbatim (反向种 2 ⇒ present).
+// The Q-51 nails for the queue keys are here too: a verdict with no
+// correlation id carries NEITHER key on the wire (正控 ⇒ absent), and a
+// numbered one carries the panel-cast seq plus the host-read place verbatim
+// (the stable number travels through the pump's own mint since AC#7 re-homed
+// the cast to the panel side).
 
 import (
 	"encoding/json"
@@ -110,35 +112,79 @@ func TestOccupancyUnknownDenominatorNeverInventsOne(t *testing.T) {
 }
 
 // TestQueueNumbersTravelAndZeroStaysHome pins the card keys both directions
-// (Q-51's omitempty rule): a verdict with a sequence and a place carries them
-// verbatim (seeded 3 and 2 here - a 2 that must appear, not be swallowed by a
-// zero-check), and a verdict the queue never numbered carries NEITHER key.
+// (Q-51's omitempty rule), now through the pump's own mint (AC#7 re-homed the
+// seq cast to the panel side, so the pump is the only route a number exists
+// through): a verdict WITH a correlation id carries the ledger-cast number
+// and the host-read FIFO place (2 here - a value that must appear, not be
+// swallowed by a zero-check), the same cast is stable across rebuilds, and a
+// verdict with NO correlation id carries NEITHER key (nothing to number, no
+// place read - absent is the honest shape).
 func TestQueueNumbersTravelAndZeroStaysHome(t *testing.T) {
 	numbered := NativeVerdict{
 		CorrelationID: "corr-167-3", Tool: "fs.write", Level: risk.L2,
-		QueueSeq: 3, Position: 2,
-	}.CardView()
-	data, err := json.Marshal(numbered)
+		Position: 2,
+	}
+	pump := NewSnapshotPump(PumpSources{
+		Verdicts: func() []NativeVerdict { return []NativeVerdict{numbered} },
+	})
+	data, err := pump.Marshal()
 	if err != nil {
 		t.Fatal(err)
 	}
-	var card map[string]json.RawMessage
-	if err := json.Unmarshal(data, &card); err != nil {
+	var packet struct {
+		Pending []map[string]json.RawMessage `json:"pending"`
+	}
+	if err := json.Unmarshal(data, &packet); err != nil {
 		t.Fatal(err)
 	}
-	if v, ok := card["seq"]; !ok || string(v) != "3" {
-		t.Errorf("seq = %s (present %v), want the queue's admission number 3", v, ok)
+	if len(packet.Pending) != 1 {
+		t.Fatalf("pending cards = %d, want 1", len(packet.Pending))
+	}
+	card := packet.Pending[0]
+	if v, ok := card["seq"]; !ok || string(v) != "1" {
+		t.Errorf("seq = %s (present %v), want the panel-cast number 1 (first sighting)", v, ok)
 	}
 	if v, ok := card["position"]; !ok || string(v) != "2" {
 		t.Errorf("position = %s (present %v), want the FIFO place 2", v, ok)
 	}
-
-	plain := NativeVerdict{CorrelationID: "corr-167-0", Tool: "fs.write", Level: risk.L2}.CardView()
-	data, err = json.Marshal(plain)
+	// The cast is stable across rebuilds: the same id re-seen gets the SAME
+	// number, not a new one (the property the 取消不重排 rule rests on).
+	data, err = pump.Marshal()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(string(data), `"seq"`) || strings.Contains(string(data), `"position"`) {
-		t.Errorf("an unnumbered verdict carries a zero key: %s (the CLI card path must stay free of the degenerate 0s)", data)
+	var again struct {
+		Pending []map[string]json.RawMessage `json:"pending"`
+	}
+	if err := json.Unmarshal(data, &again); err != nil {
+		t.Fatal(err)
+	}
+	if v, ok := again.Pending[0]["seq"]; !ok || string(v) != "1" {
+		t.Errorf("seq on the rebuild = %s (present %v), want the same cast 1 - the ledger never renumbers a seen id", v, ok)
+	}
+
+	plain := NativeVerdict{Tool: "fs.write", Level: risk.L2}
+	pump2 := NewSnapshotPump(PumpSources{
+		Verdicts: func() []NativeVerdict { return []NativeVerdict{plain} },
+	})
+	data, err = pump2.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var bare struct {
+		Pending []map[string]json.RawMessage `json:"pending"`
+	}
+	if err := json.Unmarshal(data, &bare); err != nil {
+		t.Fatal(err)
+	}
+	if len(bare.Pending) != 1 {
+		t.Fatalf("bare pending cards = %d, want 1", len(bare.Pending))
+	}
+	raw, err := json.Marshal(bare.Pending[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), `"seq"`) || strings.Contains(string(raw), `"position"`) {
+		t.Errorf("an unnumbered verdict carries a zero key: %s (the CLI card path must stay free of the degenerate 0s)", raw)
 	}
 }

@@ -90,11 +90,14 @@ func nativeVerdictsFromGate(g *approval.Gate) []panel.NativeVerdict {
 			RulesHit:               it.Decision.RulesHit,
 			Reason:                 it.Decision.Reason,
 			SessionOverrideBlocked: it.Decision.SessionOverrideBlocked,
-			// Ticket 167 AC#3: the two queue numbers travel verbatim off the
-			// queue's own record - Seq the admission number (never renumbered,
-			// the 取消不重排 half) and Position the 1-based FIFO place right now
-			// (the 当前第几条 half). Both are reads; nothing here derives either.
-			QueueSeq: it.Seq,
+			// Ticket 167 AC#3: Position travels verbatim off the queue's own
+			// record - the 1-based FIFO place right now, the 当前第几条 half.
+			// The stable 取消不重排 number is NOT read here: since AC#7's
+			// contract axis (internal/agent/approval back to zero changed
+			// bytes) the panel's pump casts that number itself, on its own
+			// ledger, on first sight of each correlation id - see
+			// panel.QueueSeqLedger. Nothing here derives or re-derives either
+			// number's meaning.
 			Position: it.Position,
 		}
 		// Readface wave 1 (2026-11-17), ticket 37 AC#5: the aggregate-card
