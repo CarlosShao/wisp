@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 修补 167 的"恒真牙"（审计腿点名 427dd7955 ②）：让 seq 不重排这条真能红（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。审计腿点名：`Test167QueueSeqStableAcrossCancel` 的 seq 来自测试自建的泵＋`QueueSeqLedger` 首次见即铸号 ⇒ **构造性为真**（无法红）。请修：
+1. **让它能红**：把 `internal/panel/pump_queue_seq_167.go` 的铸号改成与"取消不重排"这条命题**可分离**的形状，并补一发**变异可红**的用例：临时把 ledger 改成"每次 Snapshot 重排号"（`Assign` 变成按当前顺序赋 1..n）⇒ 该用例必须红（点名"card 3 seq 从 3 变 2"）；还原后绿。**先证红再证绿**，两发读数都写进证据件。
+2. **补一条真正独立的支撑**：另造一发**不经 `QueueSeqLedger` 内部状态**的用例——从面板出向（pump 的 Snapshot 载荷）读两次：取消第 2 条前 `corr3→seq A`，取消后 `corr3→seq A`（同号）且 `corr1` 号不变；两次读数取自**对外载荷**而非私有字段。
+3. ⛔ **不许**碰 `internal/agent/approval/**`（AC#7 零字节轴仍有效）、⛔ 放宽任何断言、⛔ push、⛔ UI emoji。
+4. 证据件里如实写一句：`internal/agent/approval/queue.go:165 q.seq++` 的 admission 不重排性质**因 AC#7 零字节轴而在包内零测试覆盖**（这是轴要求的取舍，不是放宽）；现在对外可见的号由面板侧铸，其不重排由本腿两发用例守。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；另跑 `go test ./internal/panel -run '^Test167'`。
+三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具 `^Test167` 全绿（含新用例）③`go build ./...` rc=0。
+写面：`internal/panel/**`（票 145 局部解冻内）、`cmd/wisp/**`（唯一）、`docs/evidence/s1/167-tooth-repair-*`。
+回话第一行＝commit hash ＋"变异红／还原绿"两发读数 ＋新用例名 ＋d22scan 末行 ＋载具 rc。
