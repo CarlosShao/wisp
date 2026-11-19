@@ -187,6 +187,24 @@ type OccupancyReading struct {
 	WindowTokens int64
 }
 
+// FailedSendReading is one host reading of the composer's failed-send dimension
+// (ticket 167 AC#5): the verbatim original text of the most recent send that
+// failed, plus the face flag that keeps "no send door here" a different sentence
+// from "the send face exists and nothing failed yet".
+//
+//   - Text is a copy of what the page sent, byte for byte. The host never merges
+//     an older failed draft into it, never trims it and never re-shapes it: the
+//     slot's whole job is that the words the user DID send survive the failure
+//     somewhere the page can reach without overwriting newer typing.
+//   - Known=true means this process has a send face that records failures (the
+//     reader exists and answered). Known=false is only produced by an unbound
+//     runtime reader (a plain `wisp run`), and the pump then leaves BOTH keys off
+//     the wire - the reader-gated absence rule, same as every field above.
+type FailedSendReading struct {
+	Text  string
+	Known bool
+}
+
 // L1WindowWait is one confirmation window the host's gate reports as open right
 // now (ticket 220 AC#2's read-only enumeration, internal/agent/approval's
 // LiveL1Windows), reduced to the two ids a roster row can be joined by.
@@ -250,6 +268,14 @@ type PumpSources struct {
 	// (e.g. falling back to the 128k reference) is exactly the mutation AC#2's
 	// second tooth must catch.
 	Occupancy func() *OccupancyReading
+	// FailedSend reads the composer's failed-send slot (ticket 167 AC#5): the
+	// verbatim original text of the most recent send that failed, under its own
+	// keys - never merged into any other composer field, and never cleared by a
+	// later success (see FailedSendReading). It is a reader like every field
+	// above; a nil reader is the ONLY way the packet carries neither
+	// failedSend* key - both keys are omitempty, so "no send face in this
+	// process" is absence on the wire, not a false flag dressed as a reading.
+	FailedSend func() FailedSendReading
 	// Results reads the streamed assistant text so far.
 	Results func() []ResultChunk
 	// Instructions reads what this process's project-instruction loader actually
@@ -504,6 +530,16 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			composer.ContextTokens = occ.UsedTokens
 			composer.ContextWindow = occ.WindowTokens
 			composer.ContextOccupancyKnown = true
+		}
+	}
+
+	if p.src.FailedSend != nil {
+		// Ticket 167 AC#5: the failed-send slot rides verbatim from the reader -
+		// the pump never merges, trims or clears it, and a nil reader leaves both
+		// keys off the wire (both are omitempty on the composer section).
+		if fs := p.src.FailedSend(); fs.Known {
+			composer.FailedSendKnown = true
+			composer.FailedSendText = fs.Text
 		}
 	}
 

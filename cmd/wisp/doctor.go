@@ -110,6 +110,22 @@ func cmdDoctor() bool {
 		pass("data dir writable ("+env+")", dir)
 	}
 
+	// Ticket 167 AC#6: the crash-scene exit - the scene the panic sink already
+	// wrote (logs\wisp-*.jsonl), made findable and copyable, plus ONE
+	// self-rescue instruction. It is an INFO line on purpose: a PAST crash is a
+	// fact the operator may need, not a broken build, and doctor must not turn
+	// yesterday's recovered panic into today's red gate. The undecided part
+	// (the on-disk stack's truncation, the no-redaction crash file, the
+	// plugin-disable restart) is named in the line's own truncation note and in
+	// docs/evidence/s1/167-stop-draft-rescue-b.md - never promised as available.
+	if dirErr != nil {
+		info("crash scene (logs)", "数据根不可读，这一格没有查找对象："+dirErr.Error())
+	} else if hit, found := doctorCrashScenes(dir); found {
+		info("crash scene (logs)", crashSelfRescueLine(hit))
+	} else {
+		info("crash scene (logs)", crashSceneQuietLine(dir))
+	}
+
 	// Report.
 	fmt.Println("wisp doctor - build chain self-check")
 	fmt.Println(strings.Repeat("-", 72))

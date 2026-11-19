@@ -538,6 +538,15 @@ type agentRuntime struct {
 	// the boot writes it while publishes read it.
 	attMu       sync.Mutex
 	attachments *attachmentDraftLedger
+	// fsMu / failedSend are ticket 167 AC#5's failed-send slot on the runtime
+	// face: the message door (panel_message_453.go) owns the ledger, and the
+	// resident boot binds THAT ledger here on the first line where both objects
+	// exist, so the PIPELINE pump's FailedSend reader (the literal below) reads
+	// the same slot the door writes - not a copy. Unbound (a plain `wisp run`,
+	// which has no send door) answers Known=false and both composer keys stay
+	// off the wire; fsMu guards it for the same reason attMu does.
+	fsMu       sync.Mutex
+	failedSend *failedSendLedger
 	// msgMu / pendingMarks453 are ticket 453's one-slot handoff from the panel
 	// message door to the task boundary. The door stages the ledger rows it
 	// selected; admitTask consumes them under the task id the loop minted (the
@@ -1277,6 +1286,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// field still held at assembly time.
 		Attachments:      rt.attachmentDraftRows,
 		AttachmentReason: rt.attachmentDraftReason,
+		// Ticket 167 AC#5's failed-send reader: the verbatim original of the
+		// most recent send that failed, read out of the ledger the message
+		// door records into (panel_failedsend_167.go). Method value on purpose,
+		// like the two readers above: the resident boot binds the door's ledger
+		// after this literal runs, and the read must see the bound object. An
+		// unbound runtime answers Known=false and both composer keys stay off
+		// the wire (the omitempty rule) - a plain `wisp run` has no send door.
+		FailedSend: rt.failedSendReading,
 		// ticket 200 AC#7's second hop, closed by 200-r2: the carrier existed at
 		// r1 and NOTHING read it, which is the same shape as ledger A408's
 		// "文案在、控件不在" moved from the widget side to the wire side. This

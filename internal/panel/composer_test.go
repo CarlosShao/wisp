@@ -271,7 +271,15 @@ func composerTSGapLedger() map[string][]string {
 		// real wire facts the page's occupancy bar needs, the Go side emits
 		// them (unknown ⇒ known=false and BOTH numbers absent, never zeros),
 		// and the page-side declaration is the UI leg's to land later.
-		"ComposerState": {"contextOccupancyKnown", "contextTokens", "contextWindow"},
+		"ComposerState": {"contextOccupancyKnown", "contextTokens", "contextWindow",
+			// Ticket 167 AC#5 (2026-11-19): the failed-send slot is REGISTERED
+			// the same way - failedSendText is the verbatim original of the most
+			// recent send that failed, failedSendKnown the send-face flag; both
+			// omitempty so a process with no send door carries neither key. The
+			// anti-overwrite rule's Go half lives in the separation itself: the
+			// failed words travel under their own keys and no other composer
+			// field moves when a send fails (cmd/wisp's 167 teeth pin that).
+			"failedSendKnown", "failedSendText"},
 	}
 }
 

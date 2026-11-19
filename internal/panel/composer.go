@@ -479,6 +479,22 @@ type ComposerState struct {
 	ContextTokens         int64 `json:"contextTokens,omitempty"`
 	ContextWindow         int64 `json:"contextWindow,omitempty"`
 	ContextOccupancyKnown bool  `json:"contextOccupancyKnown"`
+	// FailedSendText / FailedSendKnown are ticket 167 AC#5's draft dimension: the
+	// VERBATIM original text of the most recent send that FAILED, carried under
+	// its own keys so the page can offer it back without touching whatever the
+	// user has typed since. The separation IS the anti-overwrite rule's Go half:
+	// the failed original never rides any key a renderer treats as current
+	// content, and the failure path that fills it touches no other field of this
+	// section (the pump-level pin lives in cmd/wisp's 167 teeth). Successes never
+	// clear the slot - a later failure replaces it with ITS OWN text, and only a
+	// page-side consume route (not built here) ever retires it.
+	//
+	// Both keys are omitempty, the reader-gated absence rule: a process with no
+	// send door (plain `wisp run`) carries NEITHER key - "this dimension does not
+	// exist here" - while a process whose send face exists emits failedSendKnown
+	// always, with failedSendText present exactly when a failure is on file.
+	FailedSendText  string `json:"failedSendText,omitempty"`
+	FailedSendKnown bool   `json:"failedSendKnown,omitempty"`
 }
 
 // NewComposerState assembles the composer section from native state.

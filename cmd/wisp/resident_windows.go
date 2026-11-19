@@ -564,6 +564,14 @@ func runResident() {
 	// plain messages by name - the pre-453 behaviour, not a silent drop.
 	bindPanelMessageRelay453(rp, src)
 
+	// Ticket 167 AC#5: the failed-send slot crosses the same ordering gap the
+	// relay bind above crosses. The message door records the verbatim original
+	// of every send it could not deliver; the pipeline pump reads through the
+	// runtime, so the door's ledger is bound onto it here, on the first line
+	// where both objects exist. Absent either side the runtime stays unbound
+	// and both composer keys stay off the wire (the omitempty rule).
+	bindFailedSendLedger453(rp, src)
+
 	// Readface wave 2 (2026-11-17, ticket 38 AC#4): the panel cancel door's
 	// seam. The chain above was assembled before the task pipeline existed,
 	// so this is the first line where both objects do exist; the bind hands

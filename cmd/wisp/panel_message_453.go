@@ -59,6 +59,12 @@ type panelMessageDoor453 struct {
 
 	mu    sync.RWMutex
 	relay panelMessageRelay453
+	// failed is ticket 167 AC#5's failed-send slot: the verbatim original text
+	// of the most recent send THIS DOOR could not deliver, recorded on the two
+	// refusal branches below where a send actually failed (no relay bound; the
+	// relay refused). It is the door's own ledger - created with the door, no
+	// late bind needed - and the snapshot pump reads it through failedSendReading.
+	failed failedSendLedger
 	// forceStage is readface wave 3's (2026-11-17, ticket 38 AC#5) second
 	// late-bound seam: the palette's per-task force chip rides THIS door's
 	// payload (ComposerRequest.ForceMode - the ONE write route the message
@@ -159,6 +165,15 @@ func (d *panelMessageDoor453) HandleMessageRequest(ctx context.Context, req pane
 	}
 	relay := d.relay453()
 	if relay == nil {
+		// Ticket 167 AC#5: a send that reached this door with the user's own
+		// text and cannot leave the process IS a failed send - the original is
+		// booked here verbatim before the refusal goes out, so the words wait
+		// in their own slot instead of dying with the error sentence. A blank
+		// text has no original to keep, and booking one would dress an empty
+		// slot up as a recovery offer.
+		if strings.TrimSpace(req.Text) != "" {
+			d.failed.record(req.RequestID, req.Text)
+		}
 		err := fmt.Errorf("%w: 消息中继未接入（本进程没有任务管线，或任务入口没有起来）：已收下的附件 %d 枚留在本机，但它们没有进模型，也不会被静默丢掉",
 			panel.ErrNoHandlerAttached, len(rows))
 		d.record453(req, len(rows), err)
@@ -190,6 +205,14 @@ func (d *panelMessageDoor453) HandleMessageRequest(ctx context.Context, req pane
 		return err
 	}
 	if err := relay(ctx, rendered, rows); err != nil {
+		// Ticket 167 AC#5: the relay refused the submission - the send FAILED
+		// with the user's own text already in hand, so the verbatim original is
+		// booked into the slot before the refusal goes out (blank stays
+		// unbooked, same rule as the unbound-relay branch). The staged chip
+		// clearing below is unchanged (the 453 rule).
+		if strings.TrimSpace(req.Text) != "" {
+			d.failed.record(req.RequestID, req.Text)
+		}
 		// The submission was refused: the staged chip belongs to THIS message
 		// and must not leak into whatever task the slot runs next (the 453
 		// rule). clearForceOverride453 stages the empty word, which clears.
@@ -205,6 +228,17 @@ func (d *panelMessageDoor453) HandleMessageRequest(ctx context.Context, req pane
 	}
 	d.record453(req, len(rows), nil)
 	return nil
+}
+
+// failedSendReading is the snapshot pump's reader over this door's failed-send
+// slot (ticket 167 AC#5): the verbatim original of the most recent send that
+// failed, with the face flag a live door always answers true. A nil door
+// answers the zero reading, which keeps both composer keys off the wire.
+func (d *panelMessageDoor453) failedSendReading() panel.FailedSendReading {
+	if d == nil {
+		return panel.FailedSendReading{}
+	}
+	return d.failed.reading()
 }
 
 // record453 writes one audit line per attempt. It never carries the text, the

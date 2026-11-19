@@ -25,3 +25,23 @@ func bindPanelMessageRelay453(m *PanelManager, src *residentTaskSource) {
 	}
 	door.bindRelay453(src.SubmitPanelMessage453)
 }
+
+// bindFailedSendLedger453 hands the pipeline pump the message door's failed-send
+// slot (ticket 167 AC#5). The door owns the ledger - it is where sends fail -
+// and the pipeline pump (run.go's PumpSources literal) reads through the runtime,
+// so this bind crosses the ordering the relay bind above crosses: on the first
+// line where both the panel chain and the task source exist, the door's ledger
+// is bound onto src.run and the snapshot's failedSend* keys start carrying the
+// slot the door writes. A boot with no panel, no dispatch chain or no task
+// source leaves the runtime unbound - the pump then answers Known=false and
+// both keys stay off the wire, the honest no-send-face shape.
+func bindFailedSendLedger453(m *PanelManager, src *residentTaskSource) {
+	if m == nil || m.disp == nil || src == nil || src.run == nil {
+		return
+	}
+	door, ok := m.disp.Message.(*panelMessageDoor453)
+	if !ok || door == nil {
+		return
+	}
+	src.run.bindFailedSendLedger(&door.failed)
+}

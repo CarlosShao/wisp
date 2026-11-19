@@ -152,6 +152,16 @@ func residentPumpSources65(gate *approval.Gate, cfg *config.Manager, disp *panel
 		if mw, ok := disp.Mode.(*panel.ModeWriteHandler); ok && mw.Modes != nil {
 			src.Mode = mw.Modes.PermissionMode
 		}
+		// Ticket 167 AC#5: the failed-send slot, read off the message door this
+		// chain actually carries (the door owns its ledger - it is where sends
+		// fail). This shape HAS a send face (the relay just is not bound), so a
+		// failed send here is real and the slot must reach the wire. A chain
+		// whose message socket is not the 453 door keeps the reader nil and
+		// both keys off the wire, the same reader-gated absence the rest of
+		// this literal follows.
+		if d, ok := disp.Message.(*panelMessageDoor453); ok && d != nil {
+			src.FailedSend = d.failedSendReading
+		}
 	}
 	return src
 }
