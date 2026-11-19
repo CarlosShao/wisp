@@ -100,24 +100,48 @@ func TestTicket255SplitOnlyClaimsSectionsWithALiveReader(t *testing.T) {
 	// settings leg now reads the device/rate half off the LIVE Manager per
 	// config.get (cmd/wisp/panel_config_store.go:103/:104), the same per-call
 	// class [llm] rests on, so the hot list's order puts audio first.
-	if strings.Join(split.claimable, " ") != "audio llm agent cost" {
-		t.Errorf("claimable = %v, want exactly [audio llm agent cost]: llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92), agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263), cost by the per-task CostWiring/QuotaWiring ticket 44 landed (cmd/wisp/run.go:1570), and audio by the settings leg's per-call device/rate read the 本机音频 alignment landed (cmd/wisp/panel_config_store.go:103). A section with no live reader must never be in this list.", split.claimable)
+	// Ticket 248 (2026-11-19, receipt-tiers fix) TIGHTENED this assertion: the
+	// claimable set must not carry [llm] any more, because [llm]'s write fields
+	// (provider base_url / api_key_ref / model context_window & price /
+	// roles.chat.model) answer restart on the settings page
+	// (cmd/wisp/panel_config_store.go:556), so printing [llm] under
+	// 「已立即生效」 was the lie the audit caught. This is a strict TIGHTENING:
+	// the old shape (claimable == "audio llm agent cost") allowed [llm]; the
+	// new shape demands "audio agent cost" AND the demoted bucket.
+	if strings.Join(split.claimable, " ") != "audio agent cost" {
+		t.Errorf("claimable = %v, want exactly [audio agent cost] (ticket 248 tightened this from the old \"audio llm agent cost\" by demoting [llm]): llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92) - which is why it USED to be claimable - but its write fields answer restart on the settings page (cmd/wisp/panel_config_store.go:556), so the reload receipt must not say 已立即生效 about it; agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263), cost by the per-task CostWiring/QuotaWiring ticket 44 landed (cmd/wisp/run.go:1570), and audio by the settings leg's per-call device/rate read the 本机音频 alignment landed (cmd/wisp/panel_config_store.go:103). A section with no live reader must never be in this list, and since ticket 248 neither may a section whose write fields need a restart.", split.claimable)
+	}
+	// The demotion must not swallow the section: [llm] owes its own restart
+	// column with the restart field names spelled out.
+	if len(split.restartSections) != 1 || split.restartSections[0] != "llm" {
+		t.Errorf("restartSections = %v, want exactly [llm]: the ticket-248 demotion must move [llm] to the restart column, not drop it from the receipt", split.restartSections)
+	}
+	if len(split.restartKeys) == 0 {
+		t.Errorf("restartKeys is empty: the restart column must name the [llm] fields (provider base_url / api_key_ref / model context_window & price / roles.chat.model), not just the section name")
+	}
+	for _, name := range split.restartSections {
+		if strings.Contains(" "+strings.Join(split.claimable, " ")+" ", " "+name+" ") {
+			t.Errorf("%q is in BOTH the 已立即生效 column and the restart column - the receipt would contradict itself", name)
+		}
 	}
 	quiet := map[string]bool{}
 	for _, name := range split.quiet {
 		quiet[name] = true
 	}
-	claimed := map[string]bool{"audio": true, "llm": true, "agent": true, "cost": true}
+	claimed := map[string]bool{"audio": true, "agent": true, "cost": true}
+	if !splitHasRestart248(split, "llm") {
+		t.Errorf("[llm] is not in the restart column either - it vanished from the receipt (摘尺当修尺, forbidden by AC#1); restartSections=%v restartKeys=%v", split.restartSections, split.restartKeys)
+	}
 	for _, name := range hot {
-		if claimed[name] {
+		if claimed[name] || splitHasRestart248(split, name) {
 			continue
 		}
 		if !quiet[name] {
 			t.Errorf("%q is hot-applied but appears in neither bucket - it would vanish from the receipt (摘尺当修尺, forbidden by AC#1); got claimable=%v quiet=%v", name, split.claimable, split.quiet)
 		}
 	}
-	if len(quiet) != len(hot)-len(claimed) {
-		t.Errorf("quiet = %v, want the %d non-audio/llm/agent/cost hot names", split.quiet, len(hot)-len(claimed))
+	if len(quiet) != len(hot)-len(claimed)-len(split.restartSections) {
+		t.Errorf("quiet = %v, want the %d non-audio/agent/cost/non-restart hot names", split.quiet, len(hot)-len(claimed)-len(split.restartSections))
 	}
 
 	// A name plan() booked that the registry cannot explain is neither claimed nor
@@ -813,13 +837,17 @@ func TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere(t *testing.T) {
 	})
 }
 
-// TestTicket255ReceiptStillNamesTheLiveReadSection is AC#1's negative control: a
-// section this host really does read live must STILL be named by 「已立即生效」, or
-// the fix would be 摘尺. [llm] is that section - the settings leg answers the panel
-// out of the live Manager (cmd/wisp/panel_config_store.go:92), so the case reads
-// that leg back while the run is alive: the new value is what the panel gets, and
-// the boot snapshot still holds the old one. That is what makes the claim "有人按新
-// 值做事" instead of "内存换了".
+// TestTicket255ReceiptStillNamesTheLiveReadSection is AC#1's negative control,
+// re-adjudicated by ticket 248 (2026-11-19): a section this host reads live is
+// still measured, but it no longer belongs in the 「已立即生效」 column -
+// [llm]'s write fields answer restart on the settings page
+// (cmd/wisp/panel_config_store.go:556), so printing [llm] there was the exact
+// lie the audit caught. The live-reader half keeps its proof: the settings leg
+// still answers the planted ref off the live Manager while the boot snapshot
+// holds the old one, the ledger still records the consumed verdict, and the
+// stdout side now owes the RESTART column ([llm] + 需要重启进程 + the field
+// names) instead of the immediate one. Dropping [llm] from the receipt entirely
+// would be 摘尺; putting it back into the immediate line would be the lie.
 func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 	r := newReloadRun223(t, 40*time.Second)
 	// 票 98 C1 / 180 leg: the fixture's ref is chosen per platform by
@@ -841,19 +869,26 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 		if !strings.Contains(applied, "hot=[llm]") {
 			t.Errorf("the reload did not book llm as hot-tier: %q", applied)
 		}
-		out := r.awaitStdout(t, "这些段已立即生效")
-		// [llm] must be claimed, and it must NOT be in the honest bucket. Since
-		// ticket 233 [agent] is claimed too (execute() reads the live Manager per
-		// task), so the honest bucket must not carry it either.
-		line := lastLineWith(out, "这些段已立即生效")
-		if !strings.Contains(line, "[llm]") {
-			t.Errorf("the live-read section is missing from the immediate sentence (摘尺): %q", line)
+		out := r.awaitStdout(t, "需要重启进程才生效")
+		// Ticket 248: [llm] must be in the RESTART column now - named, with its
+		// restart fields spelled out - and must NOT be in the immediate line.
+		// The plant books ONLY [llm], so the immediate line is absent entirely
+		// and the no-reader honest line never appears; the restart line is what
+		// carries the edit.
+		restart := lastLineWith(out, "需要重启进程才生效")
+		if !strings.Contains(restart, "[llm]") {
+			t.Errorf("[llm] is missing from the restart column - the demotion must not swallow the section (摘尺): %q", restart)
 		}
-		if strings.Contains(line, "[panel]") || strings.Contains(line, "[ball]") {
-			t.Errorf("the immediate sentence names a reader-less section: %q", line)
+		if !strings.Contains(restart, "api_key_ref") {
+			t.Errorf("the restart column must name the restart fields (api_key_ref is this plant's own field): %q", restart)
 		}
-		if h := lastLineWith(out, "值已换进本进程内存"); strings.Contains(h, "[llm]") || strings.Contains(h, "[agent]") {
-			t.Errorf("a claimed section was ALSO put in the honest bucket, which contradicts the claim: %q", h)
+		if immediate := lastLineWith(out, "这些段已立即生效"); immediate != "" {
+			t.Errorf("THE TICKET-248 LIE IS BACK: the 已立即生效 line names [llm]: %q", immediate)
+		}
+		// The no-reader honest line must not absorb [llm]: it has a live reader
+		// (the settings leg), so its place is the restart column only.
+		if h := lastLineWith(out, "值已换进本进程内存"); strings.Contains(h, "[llm]") {
+			t.Errorf("[llm] landed in the no-reader bucket too - one section, one column: %q", h)
 		}
 		// The reader itself, read off the live leg while the process is up.
 		view, err := r.rt.settings.ReadSettings(context.Background())
@@ -870,9 +905,9 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 		if got := r.rt.cfg.LLM.Providers["acme"].APIKeyRef; got == r.h.keyRef+"-255r2" {
 			t.Errorf("the boot snapshot moved too, so nothing here separates a live reader from a memory write: %q", got)
 		}
-		ledger := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=llm")
+		ledger := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=llm write_tier=restart")
 		if !strings.Contains(ledger, "consumed:") {
-			t.Errorf("the ledger must record why llm earned the claim: %q", ledger)
+			t.Errorf("the ledger must record why llm was ever a live read (the verdict stays consumed; only the write tier moved): %q", ledger)
 		}
 		if n := r.rt.windowCount(); n != 0 {
 			t.Errorf("a hot-tier llm edit displayed %d cards, want 0", n)
@@ -883,11 +918,13 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 // TestTicket255ReceiptSentenceAssemblyIsFiltered pins the sentence-building half
 // without the tick's timing: it hands reportReload a Report carrying every hot name
 // plan() can book, and demands that the 「已立即生效」 line list only the live-read
-// section while the honest line carries the rest. The two cases above measure the
-// plant-driven production reading; this one exists so a regression that puts
-// rep.Hot back into the claim (the pre-255 shape) reddens on the judgement line
-// itself, not on a missing-sentence deadline. The Report is the production type and
-// reportReload is the production function - nothing here re-implements the sentence.
+// sections ticket 255 certified, that the ticket-248 restart column carry [llm]
+// with its restart fields, and that the honest line carries the rest. The cases
+// above measure the plant-driven production reading; this one exists so a
+// regression that puts rep.Hot back into the claim (the pre-255 shape) reddens
+// on the judgement line itself, not on a missing-sentence deadline. The Report
+// is the production type and reportReload is the production function - nothing
+// here re-implements the sentence.
 func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 	r := newReloadRun223(t, 40*time.Second)
 	r.live(t, func() {
@@ -909,13 +946,24 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 		// per-task CostWiring/QuotaWiring ticket 44 landed read the same live cfg.
 		// 2026-11-11: [audio] joined (the 本机音频 alignment, leg R) - the
 		// settings leg's per-call device/rate read (cmd/wisp/panel_config_store.go:103).
-		if !strings.Contains(immediate, "[llm]") || !strings.Contains(immediate, "[agent]") || !strings.Contains(immediate, "[cost]") || !strings.Contains(immediate, "[audio]") {
+		// Ticket 248 then DEMOTED [llm] to the restart column (its write fields
+		// answer restart), so the immediate sentence carries [agent]/[cost]/
+		// [audio] and must NOT carry [llm] any more - the negative assertion
+		// below is the tightening; the positive ones are unchanged.
+		if !strings.Contains(immediate, "[agent]") || !strings.Contains(immediate, "[cost]") || !strings.Contains(immediate, "[audio]") {
 			t.Errorf("the live-read sections are not claimed: %q", immediate)
+		}
+		if strings.Contains(immediate, "[llm]") {
+			t.Errorf("ticket 248: the 已立即生效 sentence claims [llm], whose write fields answer restart (the audit's [llm] lie): %q", immediate)
 		}
 		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[models]", "[hotkey]"} {
 			if strings.Contains(immediate, forbidden) {
 				t.Errorf("ticket 255 AC#1: the 已立即生效 sentence claims %s, which has no live reader in this host: %q", forbidden, immediate)
 			}
+		}
+		restartLine := lastLineWith(out, "需要重启进程才生效")
+		if !strings.Contains(restartLine, "[llm]") || !strings.Contains(restartLine, "base_url") {
+			t.Errorf("ticket 248: the restart column must carry [llm] with its restart field names, got %q", restartLine)
 		}
 		honest := lastLineWith(out, "值已换进本进程内存")
 		for _, want := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[models]", "[hotkey]"} {
@@ -925,6 +973,11 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 		}
 		if strings.Contains(honest, "[llm]") || strings.Contains(honest, "[agent]") || strings.Contains(honest, "[cost]") || strings.Contains(honest, "[audio]") {
 			t.Errorf("a claimed section is in both buckets: %q", honest)
+		}
+		// Ticket 248: the honest (no-reader) bucket must not absorb the
+		// demoted [llm] either - the restart column is [llm]'s own place.
+		if strings.Contains(honest, "[llm]") {
+			t.Errorf("ticket 248: [llm] landed in the no-reader line as well - one section, one column: %q", honest)
 		}
 		// Logged for the evidence file (run with -v) so both sentences are quoted
 		// off the product, not retyped from the format strings.
@@ -1056,4 +1109,105 @@ func TestTicket255CloudChainAssemblyCallPointIsAlive(t *testing.T) {
 		}
 	}
 	t.Logf("ASSEMBLY CALL POINTS: %v (caller counts: %v)", resolveCallers, identCalls)
+}
+
+// splitHasRestart248 answers whether a name sits in the ticket-248 restart
+// column of a split.
+func splitHasRestart248(s hotSectionSplit, name string) bool {
+	for _, n := range s.restartSections {
+		if n == name {
+			return true
+		}
+	}
+	return false
+}
+
+// Test248ReceiptRestartColumnIsExclusivelLmWithFieldNames is ticket 248's tooth:
+// the [llm] lie was that the reload receipt printed [llm] under
+// 「已立即生效」 while [llm]'s write fields answer restart on the settings page.
+// The repair moves [llm] to its own restart column that names the fields. The
+// tooth asserts the whole shape, so putting [llm] back into the hot column - or
+// dropping it from the receipt, or emptying the field list - reds here.
+func Test248ReceiptRestartColumnIsExclusivelLmWithFieldNames(t *testing.T) {
+	hot := []string{"audio", "llm", "agent", "cost"}
+	split := splitHotTier(hot)
+	if !splitHasRestart248(split, "llm") {
+		t.Fatalf("[llm] is not in the restart column: restartSections=%v - the audit's [llm] lie is back", split.restartSections)
+	}
+	if len(split.restartSections) != 1 {
+		t.Fatalf("restartSections = %v, want exactly [llm]", split.restartSections)
+	}
+	for _, name := range split.restartSections {
+		if strings.Contains(strings.Join(split.claimable, " "), name) {
+			t.Errorf("THE TICKET-248 LIE: [%s] appears in the 已立即生效 column (%v) while its write fields answer restart - the receipt contradicts the settings page again", name, split.claimable)
+		}
+	}
+	if len(split.restartKeys) == 0 {
+		t.Fatal("the restart column names no fields - the operator cannot tell which [llm] fields need the restart")
+	}
+	joined := strings.Join(split.restartKeys, " ")
+	for _, want := range []string{"base_url", "api_key_ref", "context_window", "price", "roles.chat.model"} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("the restart column's field list is missing %q (got %q): the [llm] restart fields must be named out loud", want, joined)
+		}
+	}
+}
+
+// Test248ReceiptSentencePutsLlmInRestartColumnNotHot is the stdout-level tooth
+// of the same shape (no run needed: reportReload renders into the runtime's
+// stdout writer). It feeds the production reportReload a Report whose Hot list
+// is the full hot roster, then reads the sentences back off the captured
+// stream: the 已立即生效 line must not name [llm], a restart line must name
+// [llm] with 需要重启进程 and the field names, and the reader-less honest line
+// keeps carrying the rest of the hot names it always carried (nothing moved
+// INTO the restart column except the demoted ones).
+func Test248ReceiptSentencePutsLlmInRestartColumnNotHot(t *testing.T) {
+	r := newReloadRun223(t, 40*time.Second)
+	r.live(t, func() {
+		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
+		r.rt.reportReload(&config.Report{
+			Hot: []string{
+				"ball", "session", "audio", "llm", "agent", "privacy", "memory",
+				"panel", "cost", "models", "observe", "hotkey", "app", "voice",
+			},
+		})
+		// Wait on the LAST of the three sentences (the honest line), so the
+		// captured window is guaranteed to hold all three of them - the
+		// immediate and restart lines are written before it by the same
+		// synchronous reportReload call (the same ordering trick the
+		// TestTicket255ReceiptSentenceAssemblyIsFiltered above uses).
+		out := r.awaitStdout(t, "值已换进本进程内存")
+		immediate := lastLineWith(out, "这些段已立即生效")
+		if immediate == "" {
+			t.Fatalf("the immediate-tier sentence disappeared - 摘尺当修尺:\n%s", out)
+		}
+		if strings.Contains(immediate, "[llm]") {
+			t.Errorf("THE TICKET-248 LIE IS BACK: the 已立即生效 line names [llm] whose write fields answer restart: %q", immediate)
+		}
+		restart := lastLineWith(out, "需要重启进程才生效")
+		if !strings.Contains(restart, "[llm]") {
+			t.Errorf("the restart column does not name [llm] - the demotion must not swallow the section: %q", restart)
+		}
+		for _, want := range []string{"base_url", "api_key_ref", "context_window", "roles.chat.model"} {
+			if !strings.Contains(restart, want) {
+				t.Errorf("the restart sentence must name the [llm] restart field %q: %q", want, restart)
+			}
+		}
+		if !strings.Contains(restart, "需要重启进程") {
+			t.Errorf("the restart sentence must say 需要重启进程 (the D36 restart word), got %q", restart)
+		}
+		honest := lastLineWith(out, "值已换进本进程内存")
+		if strings.Contains(honest, "[llm]") {
+			t.Errorf("[llm] landed in the no-reader honest line too - one section, one column: %q", honest)
+		}
+		for _, want := range []string{"[panel]", "[ball]"} {
+			if !strings.Contains(honest, want) {
+				t.Errorf("the honest line lost %s when the restart column landed: %q", want, honest)
+			}
+		}
+		ledger := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=llm write_tier=restart")
+		if !strings.Contains(ledger, "consumed:") {
+			t.Errorf("the ledger line for [llm] must keep the consumed verdict (the live reader is real; only the write tier moved): %q", ledger)
+		}
+	})
 }

@@ -1,0 +1,173 @@
+wisp-cli-staged-tests.sh: building test binary (go test -c ./cmd/wisp/)
+wisp-cli-staged-tests.sh: staging pinned sherpa DLLs next to the test binary
+stage-sherpa-dlls: staged onnxruntime.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/onnxruntime.dll (sha256 ok)
+stage-sherpa-dlls: staged sherpa-onnx-c-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-c-api.dll (sha256 ok)
+stage-sherpa-dlls: staged sherpa-onnx-cxx-api.dll -> /d/work/workspace/projects plans/Wisp/.scratch/wisp/stage-cli/sherpa-onnx-cxx-api.dll (sha256 ok)
+wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)
+wisp-cli-staged-tests.sh: running the staged binary from cmd/wisp
+time=2026-11-19T18:31:30.319+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255SplitOnlyClaimsSectionsWithALiveReader
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+=== RUN   TestTicket255ReceiptOmitsPanelFromTheImmediateSentence
+time=2026-11-19T18:31:36.072+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 18:31:36 mockllm: serving on http://127.0.0.1:60082 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T18:31:36.209+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=2 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\\002, 43152965632 bytes free at install, threshold 209715200"
+time=2026-11-19T18:31:36.354+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T18:31:36.380+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T10:31:36Z duration_ms=26
+time=2026-11-19T18:31:36.398+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T18:31:36.414+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T10:31:36Z duration_ms=15
+time=2026-11-19T18:31:36.458+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T18:31:36.512+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T10:31:36Z duration_ms=53
+time=2026-11-19T18:31:36.535+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T18:31:36.561+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T10:31:36Z duration_ms=26
+time=2026-11-19T18:31:36.561+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T18:31:36.715+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T18:31:36.725+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T10:31:36Z duration_ms=10
+time=2026-11-19T18:31:36.738+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence3278410483\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T18:31:36.748+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T10:31:36Z duration_ms=10
+time=2026-11-19T18:31:36.762+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T18:31:36.771+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T18:31:36.776+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T18:31:37.937+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=74a671b6-d4ff-42bf-95ba-8b9d653a72cd
+time=2026-11-19T18:31:37.940+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T18:31:37.962+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestTicket255ReceiptOmitsPanelFromTheImmediateSentence (7.66s)
+=== RUN   TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere
+time=2026-11-19T18:31:43.486+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 18:31:43 mockllm: serving on http://127.0.0.1:62537 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T18:31:43.592+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\\002, 43153055744 bytes free at install, threshold 209715200"
+time=2026-11-19T18:31:43.688+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T18:31:43.706+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T10:31:43Z duration_ms=18
+time=2026-11-19T18:31:43.753+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T18:31:43.780+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T10:31:43Z duration_ms=26
+time=2026-11-19T18:31:43.814+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T18:31:43.857+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T10:31:43Z duration_ms=36
+time=2026-11-19T18:31:43.883+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T18:31:43.913+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T10:31:43Z duration_ms=29
+time=2026-11-19T18:31:43.913+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T18:31:43.946+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T18:31:43.968+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T10:31:43Z duration_ms=21
+time=2026-11-19T18:31:43.992+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3635397562\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T18:31:44.002+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T10:31:43Z duration_ms=9
+time=2026-11-19T18:31:44.007+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T18:31:44.011+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T18:31:44.017+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T18:31:45.144+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=34fd6ec4-bcf1-4312-9838-61c25190d92f
+time=2026-11-19T18:31:45.150+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T18:31:45.372+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere (7.75s)
+=== RUN   TestTicket255ReceiptStillNamesTheLiveReadSection
+time=2026-11-19T18:31:51.469+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 18:31:51 mockllm: serving on http://127.0.0.1:58677 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T18:31:51.572+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\\002, 43152748544 bytes free at install, threshold 209715200"
+time=2026-11-19T18:31:51.669+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T18:31:51.690+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T10:31:51Z duration_ms=20
+time=2026-11-19T18:31:51.712+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T18:31:51.724+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T10:31:51Z duration_ms=11
+time=2026-11-19T18:31:51.754+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T18:31:51.778+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T10:31:51Z duration_ms=21
+time=2026-11-19T18:31:51.844+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T18:31:51.865+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T10:31:51Z duration_ms=18
+time=2026-11-19T18:31:51.865+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T18:31:51.894+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T18:31:51.917+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T10:31:51Z duration_ms=22
+time=2026-11-19T18:31:51.938+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection71687198\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T18:31:52.010+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T10:31:51Z duration_ms=72
+time=2026-11-19T18:31:52.076+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T18:31:52.101+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T18:31:52.113+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T18:31:53.307+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=50987399-2610-43ee-a198-1ed949181a39
+time=2026-11-19T18:31:53.309+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T18:31:53.338+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestTicket255ReceiptStillNamesTheLiveReadSection (7.63s)
+=== RUN   TestTicket255ReceiptSentenceAssemblyIsFiltered
+time=2026-11-19T18:31:59.587+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 18:31:59 mockllm: serving on http://127.0.0.1:51284 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T18:31:59.685+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\\002, 43151073280 bytes free at install, threshold 209715200"
+time=2026-11-19T18:31:59.763+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T18:31:59.784+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T10:31:59Z duration_ms=21
+time=2026-11-19T18:31:59.803+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T18:31:59.814+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T10:31:59Z duration_ms=11
+time=2026-11-19T18:31:59.831+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T18:31:59.843+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T10:31:59Z duration_ms=12
+time=2026-11-19T18:31:59.864+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T18:31:59.877+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T10:31:59Z duration_ms=12
+time=2026-11-19T18:31:59.877+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T18:31:59.901+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T18:31:59.913+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T10:31:59Z duration_ms=11
+time=2026-11-19T18:31:59.940+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered856572897\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T18:31:59.965+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T10:31:59Z duration_ms=24
+time=2026-11-19T18:31:59.974+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T18:31:59.985+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T18:31:59.988+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+    config_receipt_255_test.go:984: SENTENCES
+          IMMEDIATE "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：[audio] [agent] [cost]"
+          HONEST    "wisp run: 配置热加载：这些段的值已换进本进程内存，但本宿主没有会按新值做事的读者，本次运行不会因此改变行为（票 255 AC#1：这一半不许说成「已立即生效」；逐段的读者判定见 HOT-RELOAD-READER 行）：[ball] [session] [privacy] [memory] [panel] [models] [observe] [hotkey] [app] [voice]"
+    config_receipt_255_test.go:993: LEDGER [audit] config: HOT-RELOAD-READER section=panel tier_row=[panel] claims=["panel":other-process: cmd/wisp/panel_resident_windows.go:231 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:380 [Width:  uint(width)], reached from the create); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all; the appearance wave added the write half this row's reader always lacked - cmd/wisp/panel_config_store.go:345 [s.mgr.SetPanelWidth(v)] (and :355 [s.mgr.SetPanelFontSize(v)] for the NEW panel.font_size schema key, a font_size the reader above never carried because the key did not exist until that wave's config leg added it) writes both keys through the guarded path, and the receipt's Note says the honest tense: the per-create reader above picks a written value up on the next show request, no process restart required]
+    config_receipt_255_test.go:993: LEDGER [audit] config: HOT-RELOAD-READER section=llm write_tier=restart tier_row=[llm] claims=["llm":consumed: cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call; the scan also names internal/agent/costbook_44.go, internal/agent/quota_44r4.go and internal/speech/cloudcatalog.go, which read the section off a config they are handed (pinned in sectionReadSites)]
+    config_receipt_255_test.go:993: LEDGER [audit] config: HOT-RELOAD-READER section=app tier_row=[app.theme] claims=["app.theme":other-process: 已接入（票 441 AC#2 重裁，2026-11-18）：boot 种子 cmd/wisp/ball_theme_441_windows.go:51 [switch c.App.Theme] 读 [app].theme，装配根 cmd/wisp/resident_windows.go 拿它调 ball.SetTheme（ball.New 之前）——light/dark 真换渲染器的 ACTIVE C21 palette（internal/ball/renderer_windows.go 的 pal，牙 TestSetTheme441SwitchesTheActivePalette），auto 与读不了的文件不冒充（Warn 具名，dark 默认原地站着）；种子是每次 boot 一发 LoadFile、不读 live Manager，所以已保存的主题随下一次进程启动落到球配色，hot 档的生效节奏如实答 other-process。本行 2026-11-16 的「扫描零命中」判词随这条接线作废——扫描（TestTicket255RosterStillMatchesTheActualReadSites）当场抓到了新读点，这正是它存在的原因。The SECTION's other production reader answers a different key: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it]
+    config_receipt_255_test.go:993: LEDGER [audit] config: HOT-RELOAD-READER section=voice tier_row=[voice.punctuation voice.tts.speed voice.wake_word.thresholds voice.wake_word.veto_words] claims=["voice.punctuation":other-process: cmd/wisp/resident_voice_windows.go:1988 [c.Voice.Punctuation] - the resident voice leg carries the switch in its boot plan (voicePlan.PunctEnabled) and the punctuation stage opens and attaches under it (cmd/wisp/resident_voice_engines_windows.go's OpenPunctuation enabled argument, gated by the ASR-epoch acquire); the section's other production readers answer other keys: cmd/wisp/resident_audio_windows.go:335 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1968 [c.Voice.Enabled] makes the same boot decision for the voice leg, 票 313's cmd/wisp/voice_cloudchain_313_windows.go resolves the two cloud chains off the same boot feed, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins | "voice.tts.speed":other-process: 已接入（票 313 装配腿重裁）：boot 时 cmd/wisp/voice_cloudchain_313_windows.go 的 resolveVoiceCloudChains 调 internal/speech/cloudcatalog.go:119 [ep.Speed = cfg.Voice.TTS.Speed] 把它解析进云端朗读端点，链条随重启装配，speed 也随重启生效（这是 TierReload 语义，不是热的）；装配前那句「ResolveCloudChain 全仓非测试调用者 0 枚」已过时——装配腿就是它现在的生产调用点 (the section's other production readers answer other keys: cmd/wisp/resident_audio_windows.go:335 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1968 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) | "voice.wake_word.thresholds":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:335 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1968 [c.Voice.Enabled] makes the same boot decision for the voice leg, 票 313's cmd/wisp/voice_cloudchain_313_windows.go resolves the two cloud chains off the same boot feed, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet | "voice.wake_word.veto_words":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:335 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1968 [c.Voice.Enabled] makes the same boot decision for the voice leg, 票 313's cmd/wisp/voice_cloudchain_313_windows.go resolves the two cloud chains off the same boot feed, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the veto list is not consumed by the KWS path yet]
+time=2026-11-19T18:32:00.609+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=99539819-c964-4af2-966e-48803129b178
+time=2026-11-19T18:32:00.612+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T18:32:00.700+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestTicket255ReceiptSentenceAssemblyIsFiltered (7.48s)
+=== RUN   Test248ReceiptRestartColumnIsExclusivelLmWithFieldNames
+--- PASS: Test248ReceiptRestartColumnIsExclusivelLmWithFieldNames (0.00s)
+=== RUN   Test248ReceiptSentencePutsLlmInRestartColumnNotHot
+time=2026-11-19T18:32:08.644+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 18:32:08 mockllm: serving on http://127.0.0.1:55031 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T18:32:08.756+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\\002, 43153133568 bytes free at install, threshold 209715200"
+time=2026-11-19T18:32:08.880+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T18:32:08.911+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T10:32:08Z duration_ms=30
+time=2026-11-19T18:32:08.929+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T18:32:08.978+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T10:32:08Z duration_ms=48
+time=2026-11-19T18:32:09.007+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T18:32:09.024+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T10:32:09Z duration_ms=17
+time=2026-11-19T18:32:09.057+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T18:32:09.075+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T10:32:09Z duration_ms=17
+time=2026-11-19T18:32:09.075+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T18:32:09.096+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T18:32:09.112+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T10:32:09Z duration_ms=16
+time=2026-11-19T18:32:09.139+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test248ReceiptSentencePutsLlmInRestartColumnNotHot1748336234\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T18:32:09.165+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T10:32:09Z duration_ms=22
+time=2026-11-19T18:32:09.179+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T18:32:09.189+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T18:32:09.190+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T18:32:09.507+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=b24239ae-bfd9-4adf-b670-35b71db2ca7b
+time=2026-11-19T18:32:09.509+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T18:32:09.530+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: Test248ReceiptSentencePutsLlmInRestartColumnNotHot (8.61s)
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-11-19T18:32:13.964+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/11/19 18:32:14 mockllm: serving on http://127.0.0.1:62778 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-11-19T18:32:14.055+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\logs min_level=info config_source=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\config.toml roll_size_mb=10 roll_days=7 redact_paths=false early_records=0 early_dropped=0 disk_gated=true disk_guard="volume C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223RestartTierSaysItWillNotApply789147030\\002, 43153264640 bytes free at install, threshold 209715200"
+time=2026-11-19T18:32:14.178+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-11-19T18:32:14.233+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-11-19T10:32:14Z duration_ms=54
+time=2026-11-19T18:32:14.383+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-11-19T18:32:14.445+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-11-19T10:32:14Z duration_ms=61
+time=2026-11-19T18:32:14.503+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-11-19T18:32:14.525+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-11-19T10:32:14Z duration_ms=21
+time=2026-11-19T18:32:14.556+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-11-19T18:32:14.579+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-11-19T10:32:14Z duration_ms=22
+time=2026-11-19T18:32:14.579+08:00 level=INFO msg="migration baseline: PRAGMA foreign_key_check found no dangling references" component=memory schema_version=4 orphan_rows=0
+time=2026-11-19T18:32:14.605+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\backup\wisp.db.bak-4-5 from=4 to=5
+time=2026-11-19T18:32:14.625+08:00 level=INFO msg="schema migration step applied" component=memory from=4 to=5 started_at=2026-11-19T10:32:14Z duration_ms=20
+time=2026-11-19T18:32:14.651+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply789147030\002\backup\wisp.db.bak-5-6 from=5 to=6
+time=2026-11-19T18:32:14.664+08:00 level=INFO msg="schema migration step applied" component=memory from=5 to=6 started_at=2026-11-19T10:32:14Z duration_ms=12
+time=2026-11-19T18:32:14.674+08:00 level=INFO msg="schema migration complete" component=memory schema_version=6
+time=2026-11-19T18:32:14.680+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-11-19T18:32:14.681+08:00 level=INFO msg="retention job scheduled" component=memory first_delay=5m0s period=24h0m0s
+time=2026-11-19T18:32:15.716+08:00 level=WARN msg="agent: cost_daily not booked: the wired journal has no cost surface" task=f5de238d-36a6-4e9b-bef8-608590557495
+time=2026-11-19T18:32:15.718+08:00 level=INFO msg="retention job stopped" component=memory
+time=2026-11-19T18:32:15.723+08:00 level=INFO msg="scope disposed" scope=retention-job-host completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (6.18s)
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.language
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.autostart
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.single_instance
+--- PASS: TestTicket255RestartTierKeysAreBackedByATest (0.13s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.language (0.03s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.autostart (0.03s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.single_instance (0.03s)
+PASS
+ok  github.com/CarlosShao/wisp/cmd/wisp	46.00s

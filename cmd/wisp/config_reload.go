@@ -215,8 +215,26 @@ func (rt *agentRuntime) reportReload(rep *config.Report) {
 		for _, name := range rep.Hot {
 			rt.auditf("config: HOT-RELOAD-READER section=%s %s", name, split.verdictFor(name))
 		}
+		for _, name := range split.restartSections {
+			// Ticket 248: the ledger keeps the same consumed verdict - the live
+			// reader is real (that is what the 255 roster row certifies) - while
+			// the stdout sentence above now carries the restart half.
+			rt.auditf("config: HOT-RELOAD-READER section=%s write_tier=restart %s", name, split.verdictFor(name))
+		}
 		if len(split.claimable) > 0 {
 			fmt.Fprintf(rt.stdout, "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：%s\n", bracketed(split.claimable))
+		}
+		if len(split.restartSections) > 0 {
+			// Ticket 248 (receipt tiers): these sections hot-apply into memory,
+			// but their [llm]-style WRITE fields answer restart on the settings
+			// page (panel_config_store.go:556's blanket stamp), so the same name
+			// in the 已立即生效 column was the lie the audit caught. They get
+			// their own column that names the restart fields; the memory-move
+			// fact rides the HOT-RELOAD-READER ledger line, not this sentence.
+			fmt.Fprintf(rt.stdout,
+				"wisp run: 配置热加载：这些段已写进本进程内存（热应用），但它们的写入字段需要重启进程才生效（D36 重启档）——"+
+					"本次运行里模型通路不会重建：%s。涉及字段：%s\n",
+				bracketed(split.restartSections), strings.Join(split.restartKeys, " / "))
 		}
 		if len(split.quiet) > 0 {
 			fmt.Fprintf(rt.stdout,

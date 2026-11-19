@@ -6,6 +6,24 @@ import "sync"
 // number, re-homed here by AC#7's contract axis, 2026-11-19; reshaped the same
 // day by the audit-repair leg "167-d").
 //
+// TWO NUMBERING SYSTEMS EXIST ON HEAD, AND THEY ARE NOT THE SAME NUMBER (the
+// 2026-11-19 audit leg made this explicit; this paragraph is the semantic
+// note the dispatch ordered). The QUEUE's own counter lives in
+// internal/agent/approval/queue.go: `push` increments q.seq (queue.go:165),
+// casts qitem.Seq (queue.go:174) and feeds bindDigest (queue.go:180). It is
+// an ADMISSION number: it is consumed by binding/correlation plumbing inside
+// the approval package and never reaches any user-visible face. THE NUMBER
+// THE USER SEES is cast HERE, on the panel side: pump.go's Snapshot calls
+// castAll + number (pump.go:478/:481) and stamps card.Seq, and that is the
+// value the wire carries (`seq` on ApprovalCardView). The two counters happen
+// to agree on a fresh process (both start at 1 and both are first-seen
+// monotone) but they are two independent counters with no code syncing them,
+// so nothing here may assume they stay equal. Any change that needs a card
+// number must come HERE, not from qitem.Seq:
+// internal/agent/approval/** is the contract axis ticket 167 AC#7 keeps at
+// zero changed bytes, and reading qitem.Seq across the boundary would couple
+// the display face to an admission counter that was never meant for it.
+//
 // WHY THIS EXISTS AND WHY IT LIVES ON THE PANEL SIDE. Ticket 167 AC#3 needs
 // each approval card to carry a number that does NOT renumber when an earlier
 // card is cancelled. The first leg carried it by adding a Seq field to

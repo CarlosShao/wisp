@@ -4,7 +4,11 @@
 - 起手锚：`b3562a37c`（派单存档笔；其父 `c6793d560`）。写面全部落在派单许可面内：`internal/agent/approval/pending_read.go`（只读出口）、`internal/panel/**`（carrier＋尺＋测试）、`cmd/wisp/**`（装配接线＋测试）、本件。
 - ⛔ 本腿零字节未落 `frontend/**`（两个新卡键 seq/position 与三枚占用键的 page 半边走 `composerTSGapLedger` 登记在册，见 §5）；⛔ 未动 thresholds/golden/allowlist/PLAN/specs/D43/design（D32 只读）；⛔ 未动他人在飞件（`composer-states.html`／`44-costmeter-c23-done.md`／`291` 测试／`346-a2-dispatch.txt` 四枚 ` M` 本腿全程未碰，收口 `git status` 复认仍在）。
 
+> **★ 全件读者注意（2026-11-19 audit2 复核后补）**：本件 §1/§2/§3 写的是**交件当时**的形状；当天下午审计修复腿 `427dd7955`（ticket 167 AC#7：internal/agent/approval 回零字节、稳定号改面板侧铸）已**逐节取代**其中的三处断言——逐节取代标注见各节标题下，真现状见文末「现状（427dd7955 之后）」一节。原文一字不抹。
+
 ## 1. 先量后写：四枚今天的出口现量（派单点名的那把 grep）
+
+> ⚠ **已被 `427dd7955` 取代（逐节标注）**：本节的第 3 枚判语（「Seq 复用 `qitem.Seq`」）已不成立——AC#7 把 `pending_read.go` 的 `Seq` 导出逐字节撤回（HEAD blob `ef71c2451` 无 `Seq` 字段），卡面号改由面板侧铸造；现状见文末「现状（427dd7955 之后）」。占用两枚判语（分子/分母）未被取代。
 
 尺（现跑）：`grep -rn "occupancy|context.*token|ContextWindow|queued|queue" --include=*.go internal cmd | grep -v _test | head -30` 等价现量（pwsh Select-String 同词面、非测试）＋逐枚追到函数体。四枚判语：
 
@@ -19,6 +23,8 @@
 
 ## 2. 落地形状
 
+> ⚠ **已被 `427dd7955` 取代（逐节标注）**：本节的 AC#3 半（`LiveApproval.Seq` 字段、`NativeVerdict.QueueSeq: it.Seq` 直取队列号、以及"Seq 复用 qitem.Seq"的分工句）已撤——AC#7 判它违反 167 自己的契约轴（`internal/agent/approval/**` 必须零字节），改为面板侧 `QueueSeqLedger` 铸号（见「现状」节）。AC#2 占用半未被取代。
+
 **AC#3 排队（两枚键，一位不改稳定号）**：
 - `pending_read.go` `LiveApproval` 增 `Seq uint64`（`LiveApprovals` 填 `it.Seq`）——纯只读出口，判据面（`ticket148_panel_whitelist_test` 的 Decision 反射尺）不涉：Seq 在 LiveApproval 包装层，与既有 `Position` 同位。
 - `internal/panel/pump.go` `NativeVerdict` 增 `QueueSeq`/`Position`，`CardView()` 逐字带上。
@@ -32,6 +38,8 @@
 - 接线：`cmd/wisp/panel_pump.go` `contextOccupancy()`＋`contextWindowTokens()`（分母＝`rt.endpoint.ContextWindow`，0 则 `rt.provs[0].Info().MaxContextWindow`，再无则 nil——**与 loop 自己缩放用的两步读同源**；分子＝`rt.runFeed.Section().Usage` 的累计行，in+out，未落 EvUsage 前 nil）；`run.go` PumpSources 挂 `Occupancy: rt.contextOccupancy`。
 
 ## 3. 牙（四发，逐发种→红→还原，读数全部本腿现跑）
+
+> ⚠ **已被 `427dd7955` 取代（逐节标注）**：本节的牙③（「取消重排」那发）种的是 `pending_read.go` 的 `Seq: it.Seq`——那个字段已被 AC#7 撤回，同一命题（取消不重排）今天由 `Test167QueueSeqLedgerNumberSurvivesSetShrinkage`（internal/panel）与改写后的 `Test167QueueSeqStableAcrossCancel`（cmd/wisp）钉，读数见 `167-tooth-repair-d.md` 与「现状」节。牙①②②b④（占用四发）未被取代。
 
 | 发 | 突变位 | 命中的钉（红句要点） | 结果 |
 |---|---|---|---|
@@ -64,3 +72,14 @@
   - **本腿两枚在载具整包内 PASS**：`Test167QueueSeqStableAcrossCancel`（0.02s）／`Test167OccupancyReaderStaysUnknownUntilBothHalvesAreMeasured`（0.00s）；且既有钉 `panel_pump_test.go:265` 的真实包字节里新键已在线上：卡面 `"seq":1,"position":1`、composer `"contextOccupancyKnown":false`（reader 未接＝具名未知随包发布，两数缺席）。
 - `go test ./internal/agent/approval -count=1` ＝ ok 7.362s；`go test ./internal/panel -count=1 -skip TestFrontendHasNoEmoji` ＝ ok 36.647s（skip 仅为 §5 既有红，非放宽）。
 - `go build ./...` ＝ **rc=0**。
+
+## 7. 现状（427dd7955 之后）——audit2 复核后补的一节（2026-11-19）
+
+审计腿#2 对本件第 3 条的判语＝「与代码不符」：本件 §1/§2 描述的 `pending_read.go` Seq 导出形状**已不在 HEAD 上**。本节写清真现状，前文按规矩一字不抹。
+
+- **撤回**：`pending_read.go` 的 `Seq` 导出（`LiveApproval.Seq uint64` ＋ `LiveApprovals()` 里 `Seq: it.Seq`）已由 `427dd7955`（2026-11-19 13:41，ticket 167 AC#7）**逐字节撤回**——`internal/agent/approval` 回到 AC#7 契约轴要求的零改动字节。blob 链凭据：撤回前该文件的 blob 是 `f3f1562ac`（`git rev-parse 427dd7955^:internal/agent/approval/pending_read.go`），HEAD 上现存 blob 是 `ef71c2451`（`git rev-parse HEAD:internal/agent/approval/pending_read.go`），后者**不含 `Seq` 字段**（`git cat-file -p ef71c2451` 里 `Seq` 零命中）——即本件 §2 写的那 11 行导出只存在于撤回前形状。
+- **HEAD 上两套编号器并存，语义不同**：
+  1. **队列（准入）编号器**＝`internal/agent/approval/queue.go:165` `q.seq++`（入队自增），`:174` 铸 `qitem.Seq`，`:180` `bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)` 把它读进绑定摘要——**仅供绑定/关联管道用**，`panelVerdict`/`LiveApprovals` 的出向白名单里没有它，用户永远看不见这个号。
+  2. **面板（卡面）编号器**＝`internal/panel/pump_queue_seq_167.go` 的 `QueueSeqLedger`（correlationID→号 map，`castAll`/`number` 两调用），`internal/panel/pump.go:481` `card.Seq = p.seqs.number(v.CorrelationID)` 铸卡面 `Seq`，随 `ApprovalCardView` 的 `seq` 键上线——**这才是用户看见的号**。它的「取消不重排」命题由 `Test167QueueSeqLedgerNumberSurvivesSetShrinkage`（本包）与改写后的 `Test167QueueSeqStableAcrossCancel`（cmd/wisp，经生产映射 `nativeVerdictsFromGate`→pump→CardView→wire 全链）钉。
+- **语义差已写死在代码注释**：`pump_queue_seq_167.go` 文件头「TWO NUMBERING SYSTEMS EXIST ON HEAD…」一段（本批补注）逐条写明两套编号器的行号、语义差（准入号 vs 卡面号）、以及"卡面号必须铸在这里、不许跨界读 `qitem.Seq`"的契约理由（AC#7 契约轴）。
+- 两套计数器在新进程上数值恰好同为 1 起步的 first-seen 单调数，但**没有任何代码同步它们**，也不允许假设相等——这就是"两套并存"而不是"一套搬家"的原因。

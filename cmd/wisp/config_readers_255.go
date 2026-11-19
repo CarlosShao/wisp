@@ -507,10 +507,36 @@ func hotRowsFor(name string) []string {
 }
 
 // hotSectionSplit is one reload's answer to "may I say 已立即生效 about this".
+// Ticket 248 (receipt-tiers, 2026-11-19) added the third bucket: a hot-applied
+// name whose [llm]-style write tier is restart gets its own sentence that names
+// the restart fields, instead of being folded into the reader-less honest line
+// where the restart fact is invisible.
 type hotSectionSplit struct {
 	claimable []string // every hot row behind it is verdicted consumed
 	quiet     []string // hot-applied, but no reader here acts on the new value
 	disagree  []string // plan() booked it hot and the registry cannot explain it
+	// restartSections (ticket 248): the subset of quiet whose panel write
+	// receipt answers restart (cmd/wisp/panel_config_store.go:556's blanket
+	// stamp; cmd/wisp/panel_config_store.go:646's StoreCredential). These names
+	// print on their own 「需重启进程」 line with the restart field names, so
+	// the operator hears the restart fact and not only the no-reader fact.
+	restartSections []string
+	restartKeys     []string // the restart-tier [llm] field names, dotted
+}
+
+// llmRestartFieldNames names the [llm] fields whose write receipt answers
+// restart (the panel write leg stamps EffectiveRestart on every [llm] write;
+// cmd/wisp/panel_config_store.go:556, and StoreCredential's api_key_ref at
+// :646 - the 187 correction only re-tiers role_chat_thinking, which is an
+// [agent]-roster field, not an [llm] one). The receipt's 需重启 line spells
+// these out so 「[llm] 需重启」 names the fields rather than leaving the
+// operator to guess which half of the section the sentence is about.
+var llmRestartFieldNames = []string{
+	"llm.providers.<服务商>.base_url",
+	"llm.providers.<服务商>.api_key_ref",
+	"llm.providers.<服务商>.models.<模型>.context_window",
+	"llm.providers.<服务商>.models.<模型>.price.in/out",
+	"llm.roles.chat.model",
 }
 
 // splitHotTier sorts Report.Hot by what this host's roster says reads it. It never
@@ -537,7 +563,48 @@ func splitHotTier(hot []string) hotSectionSplit {
 			s.quiet = append(s.quiet, name)
 		}
 	}
+	// Ticket 248: the receipt's 「已立即生效」 line may never carry a name whose
+	// own write receipt answers restart (the [llm] lie). The subset is removed
+	// from the claimable bucket before any sentence is built - a section that
+	// is claimed nowhere keeps the reader-less honest line it always had.
+	restartNames, restartKeys := assignRestart248(s.claimable)
+	if len(restartNames) > 0 {
+		demoted := map[string]bool{}
+		for _, name := range restartNames {
+			demoted[name] = true
+		}
+		kept := s.claimable[:0]
+		for _, name := range s.claimable {
+			if !demoted[name] {
+				kept = append(kept, name)
+			}
+		}
+		s.claimable = kept
+		s.restartSections = restartNames
+		s.restartKeys = restartKeys
+	}
 	return s
+}
+
+// assignRestart248 answers which of the given hot-applied sections carry
+// restart-tier write fields, and what those fields are. It asks the panel write
+// roster (writableField187 / writableField248Tier187), the same source the write
+// receipt's tier answer is produced from, so the reload receipt and the settings
+// receipt cannot disagree about the tier of the same field. Today the roster
+// answers for [llm]: every [llm] write field is stamped restart by the write leg
+// (cmd/wisp/panel_config_store.go:556 and StoreCredential's credential write),
+// while the hot-applied memory move stays hot. A section absent from the answer
+// keeps the bucket it split into.
+func assignRestart248(hot []string) (sections []string, keys []string) {
+	for _, name := range hot {
+		if name != "llm" {
+			continue
+		}
+		fields := append([]string(nil), llmRestartFieldNames...)
+		sort.Strings(fields)
+		return []string{name}, fields
+	}
+	return nil, nil
 }
 
 // verdictFor names, for the audit trail, which rows a hot section's claim rests on
