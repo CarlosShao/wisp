@@ -36,11 +36,17 @@
        summarizer), and the accepted receipt's honest note
        (配置层已生效；引擎未接线；面板侧只能关不能开) and the restart word
        需要重启 ride verbatim instead of being swallowed.
-     tooth 4 (missing is unknown, never a default): rows fed with a key
+     tooth 3b (refusal fixture provenance): the refusal fixture is assembled at run time FROM THE GO CARRIER'S OWN LINES (config_handlers.go's gate sentence + ErrConfigFieldRefused + bridge.go's RefusedEnvelopeForUser prefix, read off the files) - a hand-copied fixture that drifts (or a downstream fold into 保存失败) goes red here (audit407's follow-up on 1d08513ec, suspicious #2).
+      tooth 4 (missing is unknown, never a default): rows fed with a key
        GENUINELY ABSENT (JSON round-trip + delete, the wireAbsentCapsRow
        pattern) render 未知 in that cell - an absent enabled is NOT 已停用
        and mounts NO toggle button; an absent state is NOT a guessed
-       three-state word; an absent note is NOT dressed up as clean.
+       three-state word; an absent note is NOT dressed up as clean. The
+        same rule rides the LIST level: a section with the rows key
+        GENUINELY ABSENT (or null / non-array) renders 未知（读面没有给清单）
+        with zero table markup, never a throw and never the empty sentence -
+        only a GIVEN [] says 还没有插件 (the follow-up's three arms:
+        rows key deleted, rows null, rows []).
 
    Colours: none - this file paints nothing; it reads markup strings.
    ============================================================================ */
@@ -50,7 +56,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PluginInventoryList, PluginsScreen } from "@/components/plugins-screen";
 import { FeedbackLine } from "@/components/settings-controls";
-import { translatePluginToggleReply } from "@/lib/config-feedback";
+import { translatePluginToggleReply, type Feedback } from "@/lib/config-feedback";
 import type { PluginRowView, PluginsSection } from "@/lib/panel";
 
 const failures: string[] = [];
@@ -152,8 +158,77 @@ const FED: PluginsSection = {
    tierSentence(EffectiveRestart)'s 需要重启 verbatim.
    --------------------------------------------------------------------------- */
 
-const REFUSAL_REPLY =
-  '面板请求被拒绝 [config.set r-407-1]：字段 "plugin_enabled" 必须指名插件 id（configPlugin＝[plugins.<id>] 的 <id>；requestId="r-407-1"）';
+/* ---------------------------------------------------------------------------
+   Tooth 3b (audit407's follow-up, suspicious #2): the refusal fixture is NOT
+   hand-copied. The three Go lines the refusal is made of are read off the
+   carrier at run time and assembled the way the wire assembles them:
+     gate sentence   config_handlers.go's fmt.Errorf verb phrase (必须指名插件
+                     id（configPlugin＝[plugins.<id>] 的 <id>；requestId=%q）)
+     error name      ErrConfigFieldRefused (the %w carrier: panel: 配置字段不在
+                     可写名册内) - also asserted below so a renamed constant or
+                     a rewritten sentence cannot silently desync the fixture
+     envelope prefix bridge.go's RefusedEnvelopeForUser Sprintf (面板请求被拒
+                     绝 [%s %s]：%s), filled with the same method/requestId the
+                     fixture names
+   hand-copied fixture could drift from any of those three and the old
+   instrument would stay green; here the fixture IS the carrier's words. The
+   assembly above throws when a carrier line is missing, so the instrument
+   cannot pass on a stale or hand-copied string: a missing Go line fails
+   the run outright instead of the checks passing on a stale string.
+   --------------------------------------------------------------------------- */
+
+function goLine(src: string, needle: string): string {
+  const line = src.split("\n").find((l) => l.includes(needle));
+  if (line === undefined) throw new Error(`render-pluginpage407: Go carrier line not found: ${needle}`);
+  return line;
+}
+
+/** The Go string literal on one line, sliced between the first quote after
+    `marker` and the line's last quote - no regex guessing, a pure slice. */
+function goStringLiteral(line: string, marker: string): string {
+  const at = line.indexOf(marker);
+  if (at < 0) throw new Error(`render-pluginpage407: marker not found on Go line: ${marker}`);
+  const q1 = line.indexOf('"', at);
+  const q2 = line.lastIndexOf('"');
+  if (q1 < 0 || q2 <= q1) throw new Error(`render-pluginpage407: no string literal after ${marker}`);
+  return line.slice(q1 + 1, q2);
+}
+
+const gateHandlersSrc = readFileSync("../internal/panel/config_handlers.go", "utf8");
+const bridgeSrc = readFileSync("../internal/panel/bridge.go", "utf8");
+
+const R407_REQUEST_ID = "r-407-1";
+const R407_FIELD = "plugin_enabled";
+
+// The gate's fmt.Errorf verb phrase (config_handlers.go:577-578): the two %q
+// fill in field order - the field name first, the requestId last.
+const gateFmt = goStringLiteral(goLine(gateHandlersSrc, "必须指名插件 id"), "fmt.Errorf");
+const gateSentence = gateFmt
+  .replace("%w: ", "")
+  .replace("%q", `"${R407_FIELD}"`)
+  .replace("%q", `"${R407_REQUEST_ID}"`);
+// The %w carrier (config_handlers.go:54): also pinned so a rewritten sentence
+// or a renamed constant cannot desync the fixture silently.
+const refusedSentence = goStringLiteral(goLine(gateHandlersSrc, "ErrConfigFieldRefused = errors.New"), "errors.New");
+// The envelope prefix (bridge.go:557, RefusedEnvelopeForUser), filled with the
+// same method / requestId / cause the wire fills it with. The cause here is
+// verbatim err.Error(): the refusal error is unclassified (no observe class
+// on it), so userFacingErrorSentence216 appends nothing ahead of it.
+const refusalPrefixFmt = goStringLiteral(goLine(bridgeSrc, "面板请求被拒绝"), "fmt.Sprintf");
+const REFUSAL_REASON = refusalPrefixFmt
+  .replace("%s", "config.set")
+  .replace("%s", R407_REQUEST_ID)
+  .replace("%s", `${refusedSentence}: ${gateSentence}`);
+check(
+  "tooth 3b: the assembled refusal fixture carries the gate sentence, the configPlugin selector words and the envelope prefix (all read off the Go files, nothing hand-copied)",
+  REFUSAL_REASON.includes("必须指名插件 id") &&
+    REFUSAL_REASON.includes("configPlugin＝[plugins.<id>] 的 <id>") &&
+    REFUSAL_REASON.includes("面板请求被拒绝") &&
+    REFUSAL_REASON.includes("配置字段不在可写名册内"),
+  REFUSAL_REASON.slice(0, 40),
+);
+
+const REFUSAL_REPLY = REFUSAL_REASON;
 const ACCEPTED_REPLY =
   "设置已写入。 实际落盘的键路径：plugins.alpha407.enabled。 这一项立即生效。 " +
   "开关已写入配置层并立即生效（locked 段收紧走同一条热路）。插件引擎未在装配根接线：没有引擎消费这枚开关，清单上该行的生效位由装配探针判，探针上没有这枚＝未生效。" +
@@ -163,6 +238,29 @@ const RESTART_REPLY =
   "设置已写入。 实际落盘的键路径：app.language。 " +
   "这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。需要重启：本次运行不会读取新值。" +
   '\nwisp-config-reload:{"event":"config.reload","tier":"restart","written":["app.language"],"sections":["app"]}';
+
+/* ---------------------------------------------------------------------------
+   The rows arms (tooth 4's list level, audit407's follow-up suspicious #1).
+   Each is the well-formed FED section with the rows LIST mangled the way a
+   malformed or older host can mangle it: key deleted (JSON round trip so the
+   key is truly gone, the wireAbsentCapsRow pattern), null, and a non-array.
+   The GIVEN [] case is the EMPTY section - the positive control that must
+   keep saying 还没有插件 and never degrade into the unknown sentence.
+   --------------------------------------------------------------------------- */
+
+function sectionWithoutRows(section: PluginsSection): PluginsSection {
+  const raw = JSON.parse(JSON.stringify(section)) as Record<string, unknown>;
+  delete raw.rows;
+  return raw as unknown as PluginsSection;
+}
+
+const rowsUnknown = sectionWithoutRows(FED);
+const rowsNull = { ...FED, rows: null } as unknown as PluginsSection;
+const rowsWrongShape = { ...FED, rows: { length: 5 } } as unknown as PluginsSection;
+
+const rowsUnknownHtml = renderToStaticMarkup(<PluginInventoryList section={rowsUnknown} />);
+const rowsNullHtml = renderToStaticMarkup(<PluginInventoryList section={rowsNull} />);
+const rowsWrongShapeHtml = renderToStaticMarkup(<PluginInventoryList section={rowsWrongShape} />);
 
 /* ---------------------------------------------------------------------------
    The renders.
@@ -309,6 +407,53 @@ check(
   epsilonSeg !== undefined && epsilonSeg.includes("未知") && !epsilonSeg.includes(esc("未生效")),
   "absent state",
 );
+
+/* ---------------------------------------------------------------------------
+   Tooth 4's LIST arms (audit407's follow-up, suspicious #1): the rows list
+   itself answers 未知 when the wire did not hand it over - never a throw,
+   never the empty sentence. The GIVEN [] case is the positive control that
+   must keep saying 还没有插件.
+   --------------------------------------------------------------------------- */
+
+const rowsUnknownSentence = esc("未知（读面没有给清单）");
+/* The unknown branch EXPLAINS itself with the word 还没有插件 (这不是「还没
+   有插件」), so the empty-sentence ban targets the empty branch's own shapes:
+   the bare heading element (>还没有插件</p>) and the empty branch's unique
+   explanation line - not any mention of the word. */
+const emptyHeadingShape = "&gt;还没有插件&lt;/p&gt;".replace("&gt;", ">").replace("&lt;/p&gt;", "</p>");
+const emptyExplains = esc("配置里没有声明任何");
+check(
+  "tooth 4 (list): a section whose rows KEY is ABSENT renders 未知（读面没有给清单） with zero table markup - never a throw, never the empty sentence",
+  rowsUnknownHtml.includes(rowsUnknownSentence) &&
+    !rowsUnknownHtml.includes("<table") &&
+    !rowsUnknownHtml.includes(emptyHeadingShape) &&
+    !rowsUnknownHtml.includes(emptyExplains) &&
+    !rowsUnknownHtml.includes("alpha407"),
+  "rows key absent",
+);
+check(
+  "tooth 4 (list): rows:null answers the same 未知 sentence - a null list is not an empty list",
+  rowsNullHtml.includes(rowsUnknownSentence) &&
+    !rowsNullHtml.includes("<table") &&
+    !rowsNullHtml.includes(emptyHeadingShape) &&
+    !rowsNullHtml.includes(emptyExplains) &&
+    !rowsNullHtml.includes("alpha407"),
+  "rows null",
+);
+check(
+  "tooth 4 (list): a non-array rows shape answers the same 未知 sentence (the old page threw on exactly this)",
+  rowsWrongShapeHtml.includes(rowsUnknownSentence) &&
+    !rowsWrongShapeHtml.includes("<table") &&
+    !rowsWrongShapeHtml.includes(emptyHeadingShape) &&
+    !rowsWrongShapeHtml.includes(emptyExplains) &&
+    !rowsWrongShapeHtml.includes("alpha407"),
+  "rows non-array",
+);
+check(
+  "tooth 4 (list, positive control): the GIVEN [] section still says 还没有插件 and never degrades into the unknown sentence",
+  emptyListHtml.includes(esc("还没有插件")) && !emptyListHtml.includes(rowsUnknownSentence),
+  "rows [] stays empty-sentence",
+);
 check(
   "the fed markup must hold zero emoji",
   !EMOJI_RE.test(fedListHtml) && !EMOJI_RE.test(screenFedHtml),
@@ -381,6 +526,34 @@ check(
   "tooth 3 (AC#5 3): 需要重启 is ON SCREEN",
   restartLineHtml.includes(esc("需要重启")),
   "restart on screen",
+);
+
+/* ---------------------------------------------------------------------------
+   Tooth 3c (audit407's follow-up, suspicious #2 second half): the write
+   door's return point never folds an error into the generic 保存失败.
+   performPluginToggleWrite returns translatePluginToggleReply's answer (the
+   source ruler above pins that call), so the assertion rides the
+   translator's outputs: whenever the tone reads error, the text must not be
+   the bare generic line - a refusal carries the host's own prose. The
+   detector is proven able to fire on the exact fold shape, so a downstream
+   fold into 保存失败 cannot slip through green.
+   --------------------------------------------------------------------------- */
+
+function foldsIntoGenericSaveFailure(f: Feedback): boolean {
+  return f.tone === "error" && f.text === "保存失败";
+}
+
+check(
+  "tooth 3c: at the toggle write's return point, tone=error never carries the bare 保存失败 (the refusal prose rides instead)",
+  !foldsIntoGenericSaveFailure(refusalFeedback) &&
+    !foldsIntoGenericSaveFailure(acceptedFeedback) &&
+    !foldsIntoGenericSaveFailure(restartFeedback),
+  `refusal text head: ${refusalFeedback.text.slice(0, 16)}`,
+);
+check(
+  "tooth 3c: the fold detector actually fires on the fold shape (a downstream 保存失败 fold goes red)",
+  foldsIntoGenericSaveFailure({ tone: "error", text: "保存失败" }),
+  "detector self-test",
 );
 
 /* ---------------------------------------------------------------------------
@@ -572,6 +745,12 @@ console.error(
     "keeps the host's prose verbatim (the missing-configPlugin refusal, the locked-loosening " +
     "refusal, the honest note 面板侧只能关不能开 and the restart word 需要重启, the reload-event " +
     "machine line stripped), and absent keys render 未知 - an absent enabled mounts no toggle, an " +
-    "absent state never borrows a wire word, an absent note never dresses up as clean; both " +
+    "absent state never borrows a wire word, an absent note never dresses up as clean, and the " +
+    "rows LIST rides the same unknown rule (a section without a rows array - key absent, null, " +
+    "or a non-array - answers 未知（读面没有给清单） with zero table markup, never a throw, while " +
+    "a GIVEN [] keeps saying 还没有插件); the refusal fixture is assembled at run time from the Go " +
+    "carrier's own lines (config_handlers.go's gate sentence + ErrConfigFieldRefused + bridge.go's " +
+    "RefusedEnvelopeForUser prefix - nothing hand-copied) and the error-return point is pinned so " +
+    "tone=error never carries the bare 保存失败 (the fold detector is proven able to fire); both " +
     "static markups are written to docs/evidence/s1 and are emoji-free",
 );

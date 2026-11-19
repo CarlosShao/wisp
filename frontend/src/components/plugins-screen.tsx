@@ -31,6 +31,14 @@
    0-row fake table. (A section that never arrived at all is the waiting
    sentence in PluginsScreen below: 缺键是读口不在, not 清单为空.)
 
+   THE MISSING ROWS LIST (audit407's follow-up on 1d08513ec, ticket 407).
+   rows itself is a cell too: a section handed over WITHOUT a rows array
+   (key absent / null / not an array) is 未知（读面没有给清单） with ZERO
+   table markup - the same unknown rule the cells follow, never a throw
+   (the typed interface is the well-formed shape, the page eats parsed
+   JSON) and never the empty sentence, which would dress a missing list
+   up as an empty one. Only a GIVEN [] says 还没有插件.
+
    THE HONEST-STATE SENTENCES travel verbatim (engineState: the engine is
    not wired at the assembly root, so enabled=true is configured, not
    running; skillState: the skills dimension has no config keys - 215b,
@@ -106,6 +114,14 @@ function listCell(list: unknown): string {
   return list.length > 0 ? list.map(String).join(" / ") : "（无）";
 }
 
+/** 行级清单的判定（audit407 对 1d08513ec 的可疑①）：rows 与格字段同一条
+    未知规则——TS 接口描述的是良形包，页面吃的是 parsed JSON，缺角或旧宿主
+    可以不给 rows。三态：数组（含空数组）＝读面给了清单；其余（键缺席、
+    null、非数组）＝读面没有给清单，不是清单为空。 */
+function rowsGiven(rows: unknown): rows is PluginRowView[] {
+  return Array.isArray(rows);
+}
+
 /** id 格：行地址。空串或缺键＝未知（没有地址就没有可点的开关）。 */
 function idCell(id: unknown): string {
   return typeof id === "string" && id !== "" ? id : "未知";
@@ -143,7 +159,8 @@ export function PluginInventoryList({
         {textCell(section.skillState, "未知")}
       </p>
 
-      {section.rows.length > 0 ? (
+      {rowsGiven(section.rows) ? (
+        section.rows.length > 0 ? (
         <div className="mt-3 min-w-0 overflow-x-auto">
           <table className="w-full min-w-[520px] border-collapse text-left align-top">
             <thead>
@@ -217,6 +234,15 @@ export function PluginInventoryList({
           <p className="text-[12px] leading-[1.7] text-ink-2">还没有插件</p>
           <p className="mt-1 text-[11px] leading-[1.7] text-ink-3">
             配置里没有声明任何 [plugins.&lt;id&gt;] 条目——这是读到的清单事实，不是读不到。
+          </p>
+        </div>
+      )
+      ) : (
+        <div className="mt-3">
+          <p className="text-[12px] leading-[1.7] text-ink-2">未知（读面没有给清单）</p>
+          <p className="mt-1 text-[11px] leading-[1.7] text-ink-3">
+            快照的 plugins 段落没有给出 rows 清单（键缺席或形状不对）。这不是「还没有插件」：
+            没有清单可读不等于清单为空。
           </p>
         </div>
       )}
