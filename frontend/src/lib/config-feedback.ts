@@ -24,6 +24,7 @@
    ============================================================================ */
 
 import type { ConfigView } from "@/lib/config-view";
+import { CONFIG_RELOAD_MARKER } from "@/lib/config-view";
 
 /** How a line reads: gray = plain information, green = good, orange =
     attention, red = did not work. */
@@ -187,6 +188,49 @@ export function translateTieredWriteReply(reply: string | null): Feedback {
     sentence and this reads it rather than assuming. */
 function restartTier(reply: string): boolean {
   return reply.includes("重启");
+}
+
+/* ---------------------------------------------------------------------------
+   The plugin toggle's own receipt translation (ticket 407).
+   ---------------------------------------------------------------------------
+   WHY THIS IS NOT translateTieredWriteReply. The plugin toggle's receipt is
+   not a generic save line: the accepted receipt carries the leg's honest
+   note (配置层已生效；引擎未接线；面板侧只能关不能开 - cmd/wisp
+   panel_config_store.go:567-579) whose whole point is that enabled=true is
+   NOT "running", and a refused plugin write carries sentences the user must
+   see word for word - the missing-configPlugin gate refusal
+   (internal/panel/config_handlers.go:575-579, "必须指名插件 id（configPlugin
+   ＝[plugins.<id>] 的 <id>…）") and the locked-loosening refusal (R20: the
+   panel is a permission input, not an authority). A translator that
+   collapsed those into 已保存/保存失败 would swallow exactly the sentences
+   ticket 407's teeth exist to keep on screen. Precedent for verbatim prose:
+   translateFetchReply and the probe card render the host's 原文 when the
+   原文 IS the answer.
+
+   The machine half of an accepted reply (the CONFIG_RELOAD_MARKER event
+   line, config_handlers.go:623) is dropped here - notifyConfigReloadListeners
+   already parsed it; it never belongs on screen.
+   -------------------------------------------------------------------------- */
+
+/** The reply's prose minus the reload-event machine line (and surrounding
+    blank lines), ready to be shown verbatim. */
+function pluginReceiptProse(reply: string): string {
+  return reply
+    .split("\n")
+    .filter((line) => !line.startsWith(CONFIG_RELOAD_MARKER))
+    .join("\n")
+    .trim();
+}
+
+/** The plugin toggle's receipt: the host's own words, verbatim, never a
+    summary. tone follows the reply's own verdict word (被拒绝 = error,
+    没有任何键路径发生变化 = neutral no-op, otherwise an accepted write). */
+export function translatePluginToggleReply(reply: string | null): Feedback {
+  if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
+  const prose = pluginReceiptProse(reply);
+  if (reply.includes("被拒绝")) return { tone: "error", text: prose };
+  if (reply.includes("本次没有任何键路径发生变化")) return { tone: "neutral", text: prose };
+  return { tone: "ok", text: prose };
 }
 
 

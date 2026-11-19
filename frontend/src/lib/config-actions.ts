@@ -16,6 +16,7 @@
 
 import {
   translateFetchReply,
+  translatePluginToggleReply,
   translateTieredWriteReply,
   translateWriteReply,
   type Feedback,
@@ -137,8 +138,12 @@ export async function performComposerThinkingWrite(level: string): Promise<Feedb
 
 /** The plugin inventory's switch (ticket 215a): one row, addressed by the
     plugin id, written as the plugin_enabled field through the same settings
-    door. The receipt keeps the host's own tier sentence and its honest note
-    (配置层已生效；引擎未接线；面板侧只能关不能开) - nothing here is optimistic,
+    door. The receipt is translated by the plugin door's OWN translator
+    (translatePluginToggleReply, ticket 407): the host's own prose rides
+    verbatim - the accepted receipt's honest note (配置层已生效；引擎未接线；
+    面板侧只能关不能开) and any refusal's 原话 (the missing-configPlugin gate
+    sentence, the locked-loosening refusal) reach the screen word for word
+    instead of being collapsed into 已保存/保存失败. Nothing is optimistic,
     the row's state is the NEXT snapshot's, exactly like every other write.
     Same drift echo (ticket 39 AC#4). */
 export async function performPluginToggleWrite(id: string, on: boolean): Promise<Feedback> {
@@ -147,7 +152,7 @@ export async function performPluginToggleWrite(id: string, on: boolean): Promise
     baseSHA: currentConfigBaseSHA(),
   });
   notifyConfigReloadListeners(reply);
-  return translateTieredWriteReply(reply);
+  return translatePluginToggleReply(reply);
 }
 
 /** The credential write: the value rides credentialValue and only that key. */
