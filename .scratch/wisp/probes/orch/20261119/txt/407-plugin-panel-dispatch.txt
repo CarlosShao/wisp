@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 票 407 插件面板（前端 face，本编队全权）实现腿（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。做票 407（`.scratch/wisp/issues/407-*.md`，规格与 AC 已由编排者写好，逐条读）。要点：
+1. **只许用现成读面**：`internal/panel/composer.go:223` 的 `Plugins *PluginInventorySection`＋`plugins_inventory_215.go` 的形状；写面＝`config.set` 的 `plugin_enabled`（必带 `configPlugin=<id>`，`config_handlers.go:575-579`）。⛔ 自造字段、⛔ 自造写路。
+2. 页面：清单表（id／启用／来源锁定说明／读面给的其余字段）；**空清单显式"还没有插件"零表格**；某字段读面没给 ⇒ 该格显示"**未知**"，⛔ 编默认值。
+3. 仪器 `render:pluginpage407`：两张静态 markup（空态＋有插件态），零 emoji（仪器文件也在 `TestFrontendHasNoEmoji` 射程）。
+4. 牙（每枚都要能红）：①页面引用 `PluginInventorySection` 不存在的字段⇒红 ②开关没走 `config.set`⇒红 ③缺 `configPlugin` 的拒绝句没上屏/被吞⇒红 ④把缺字段当默认⇒红。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔UI emoji、⛔ 改 `internal/plugin/**` 任何字节（只读）。⚠ 别碰他人在飞件（⛔git restore/checkout）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；前端 build/typecheck/lint＋`TestFrontendHasNoEmoji` 必绿。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具相关全绿 ③`go build ./...` rc=0。
+写面：`frontend/src/**`、`frontend/scripts/render-pluginpage407*`、`frontend/package.json`（加 script）、`cmd/wisp/**`（唯一）、`internal/panel/**`（若读面缺口，只新增字段）、`docs/evidence/s1/407-plugin-panel-*`。
+回话第一行＝commit hash ＋四枚牙名/读数 ＋instrument rc ＋d22scan 末行 ＋前端 rc ＋载具 rc。
