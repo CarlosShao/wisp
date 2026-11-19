@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 只读审计腿（审计路由，不写一行）：昨夜到今天的收件对抗复核
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 任何其它 model、⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读**审计（⛔ 不 commit、⛔ 不改任何文件、⛔ 不 push；临时件只落 D:\tmp\wisp\20261119\audit1）。
+范围＝这些 commit（我昨夜到今天收的件）：`64dfe1290`(37 三格)、`3de613364`/`5b5ea2636`(36 AC#5+deflake)、`c0b7a96d8`(248 AC#8)、`e1049dbf5`(167 AC#2/3)、`6b5b0ccb1`(167 AC#4/5/6)、`427dd7955`/`de9461cf4`(167 AC#7 收轴)。另加更早的 `9acf4160a`/`98e566401`(40 AC#3)、`fc56a04ea`(40 AC#6)、`38cecadca`(40 AC#5)。
+逐枚查这五件（**要有读数，不要形容词**）：
+1. **断言有没有被悄悄放宽**：`git show <c> -- '*_test.go'` 里 diff 有无删除/弱化原断言（`+` 与 `-` 两侧逐条读）；有就点名。
+2. **牙是不是恒真**：每枚新牙，读它断言的量是否**来自被测代码本身**（而非测试自造常量）；点名任何"无论如何都绿"的形状。
+3. **冻结面零字节**：`git diff --name-only <c>~1 <c>` 对 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`internal/risk/**` 是否 0 枚（逐 commit 给枚数）。
+4. **`frontend/dist` 字节**有没有被提交（`git show --name-only <c> | grep -c '^frontend/dist/'` 应为 0）。
+5. **口径诚实**：证据件 `docs/evidence/s1/{37-depth-timeout-fallback-20261118,36-hiddenpause-deflake39-20261118,248-ac8-20261119-r1,167-occupancy-queue-a,167-stop-draft-rescue-b,167-ac7-axis-evidence}.md` 里声称的读数与盘上代码是否一致（抽查每件 2 处）。
+输出：一张表（commit × 五项 通过/不通过/可疑），不通过或可疑的逐条给 `file:line` 与原文。⛔ 不要建议"放宽"；发现问题只如实写。
+回话第一行＝结论一行（「N 枚通过 / M 枚可疑 / K 枚不通过」）。
