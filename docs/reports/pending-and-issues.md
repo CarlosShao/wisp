@@ -37949,3 +37949,9 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1955（11-19 16:1x）：167 假牙修好复结 `4ae5d1557`（13/13 PASS）
 
 变异"每次 Snapshot 重排"⇒ `card 3 payload seq after the cancel = 2, want 3` 红；还原 13 枚全绿（0 SKIP）。`castAll`＋`number` 分离让"取消＝集合收缩、幸存者保号"可独立行使；新增 `Test167SeqReadTwiceFromTheOutboundPayload`（对外载荷取两次号）。`git show --name-only 4ae5d1557 | grep -c agent/approval` = 0。**票 167 复结。票池 402 已结 / 42 未结。**
+## A1956（11-19 16:4x）：审计腿#2 三枚"可疑"查清 = **36 成立／248 夸大／167 证据与代码不符**
+
+- **36 成立**：rAF 读数逐字复现（仪器现跑 OK 句与证据件一致）；「原无隐藏暂停机制」五把尺坐实（父树 `visibilitychange` 0 枚、`panel-visibility.ts` 本提交新建）。唯一瑕疵：证据件引的 grep 尺少 `-E`（可复跑性，非失真）。
+- **248 夸大 ⇒ AC#8 撤回勾**：①`autostart_windows.go:76/:87/:103` 被当"立即生效"命中（该词 0 命中）、漏列真 19 行；②「无一枚对 [llm] 承诺」被 `config_reload.go:219` 证伪（stdout 真把 `[llm]` 印进「已立即生效」名单，免责话只在 Go 串）；③「8 check」实为 9 处/9 枚。**成立**：收据层全 restart、仪器 9 断言全对 rc=0、`保存即生效` 产码 0 命中。
+- **167 证据与代码不符**：四枚出口 file:line 全对，但 `167-occupancy-queue-a.md` 自 `e1049dbf5` 未再更新，§1/§2/§3 关于 `LiveApproval.Seq` 已被 `427dd7955` 撤回；**HEAD 上队列 `q.seq` 与面板 `QueueSeqLedger` 两套编号器并存**（页面 seq 已非入队号）。裁定：功能 AC 仍成立、票保持结；但语义差须写进注释与证据件。
+- 修腿待 `w407` 返回后排（同一 `cmd/wisp` 写面不并发）：①`config_reload.go:219` 按档分列/剔 restart 档＋会红牙 ②修两张证据件（248、167）逐条改准。

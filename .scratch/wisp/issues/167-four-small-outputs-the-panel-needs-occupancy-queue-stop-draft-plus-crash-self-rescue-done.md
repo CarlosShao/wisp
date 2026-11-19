@@ -121,3 +121,10 @@
 - **牙真能红了**：`pump_queue_seq_167.go` 拆成 `castAll(整组)`＋`number(id)`，"取消＝集合收缩、幸存者保号"从此可独立行使；变异"每次 Snapshot 重排 1..n"⇒ `card 3 payload seq after the cancel = 2, want 3` **红**；还原 13 枚全绿。改形前旧牙对同一变异恒真、改形后**旧牙也当场咬住**（`seq 2 pos 2`＋`wire seq = 2`）＝指控被修复的直接反证。
 - 新增独立用例 `Test167SeqReadTwiceFromTheOutboundPayload`：**从对外载荷**取两次号（非私有字段）。
 - 如实笔：`internal/agent/approval/queue.go:165 q.seq++` 的 admission 不重排性质**因 AC#7 零字节轴包内零覆盖**（取舍非放宽）；中间形曾有 env 门致 SKIP，**skip≠绿**，已去门重取两发终态。
+## 审计腿#2 复核（2026-11-19 16:4x，`audsuspect2`）：**167 证据件（`167-occupancy-queue-a.md`）与 HEAD 代码不符**
+
+- **四枚出口 file:line 普查全部正确**（8 处行号逐条对上；「源在、接线断」成立）。
+- 但那张证据件自 `e1049dbf5` 起**一字未改**：其 §1/§2/§3 关于"`LiveApproval.Seq` 增字段／`Seq 复用 qitem.Seq`"的叙述在盘上**已不成立**——`427dd7955`（AC#7 零字节轴）把 `pending_read.go` 逐字节撤回（blob `ef71c2451`）。
+- ⇒ **HEAD 上并存两套编号器**：队列 `internal/agent/approval/queue.go:165 q.seq++`（`:174` 铸 `qitem.Seq`、`:180` 被 `bindDigest` 读）＋ 面板 `internal/panel/pump_queue_seq_167.go` 的 `QueueSeqLedger.next`（`pump.go:481` 铸卡面 `Seq`）。**页面上的 `seq` 不再是队列的入队号**。
+- 占用半"未造第二套"仍成立（唯一求和点 `cmd/wisp/panel_pump.go:400`；分母读点 `:412-417` 与 `loop.go:237-239` 同源）。
+- **裁定（编排者）**：票 167 的功能 AC 仍成立（页面上有稳定号＋当前第几条），**票保持结案**；但两套编号器的**语义差**必须写进代码注释与证据件（队列 `q.seq` 仅供 `bindDigest` 绑定用、不对用户可见；用户看到的号由面板侧铸）。修证据件与注释由下一腿做（`cmd/wisp` 写面）
