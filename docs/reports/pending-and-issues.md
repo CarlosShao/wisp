@@ -37955,3 +37955,9 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - **248 夸大 ⇒ AC#8 撤回勾**：①`autostart_windows.go:76/:87/:103` 被当"立即生效"命中（该词 0 命中）、漏列真 19 行；②「无一枚对 [llm] 承诺」被 `config_reload.go:219` 证伪（stdout 真把 `[llm]` 印进「已立即生效」名单，免责话只在 Go 串）；③「8 check」实为 9 处/9 枚。**成立**：收据层全 restart、仪器 9 断言全对 rc=0、`保存即生效` 产码 0 命中。
 - **167 证据与代码不符**：四枚出口 file:line 全对，但 `167-occupancy-queue-a.md` 自 `e1049dbf5` 未再更新，§1/§2/§3 关于 `LiveApproval.Seq` 已被 `427dd7955` 撤回；**HEAD 上队列 `q.seq` 与面板 `QueueSeqLedger` 两套编号器并存**（页面 seq 已非入队号）。裁定：功能 AC 仍成立、票保持结；但语义差须写进注释与证据件。
 - 修腿待 `w407` 返回后排（同一 `cmd/wisp` 写面不并发）：①`config_reload.go:219` 按档分列/剔 restart 档＋会红牙 ②修两张证据件（248、167）逐条改准。
+## A1957（11-19 17:5x）：审计腿验 407 = **7 通过 / 1 可疑 / 0 不通过**（`1d08513ec`）
+
+八项逐条：字段逐字来自读面（页面 9 枚 row 键＋4 枚 section 键 == Go json tag 全等，反向 0）；空态 markup `table/tr/td/th/ul/li` **全 0**；`enabled` 缺省＝"未知"不画开关；写面 `plugin_enabled` 真写入点**仅 1 处**（`config-actions.ts:151`→`config.set`），Go 侧唯一字节改动 `internal/config/settings_plugins_215.go:138 entry.Enabled = on`；拒绝原话逐字上屏（审计用 `go test -overlay` 探针抓真句喂前端：`REFUSAL_VERBATIM=true / HAS_GATE=true / IS_GENERIC=false`）；`TestFrontendHasNoEmoji` ok（153 文件 0 命中）；仪器 rc=0；五发变异**审计亲跑 5/5 全红且红句与证据件逐字一致**。
+- **可疑①（已收窄）**：段级键有守卫（`plugins-screen.tsx:261`），**行级 `rows` 无守卫**（`:146` 直读 `.length`，缺席/`null`⇒抛）；生产被 `pump.go:703-705` 掩住。⇒ 已派 `w407fix` 加行级守卫＋"未知"分支（三发牙：缺/null/空）。
+- **可疑②**：仪器拒绝 fixture 是**手抄**且译器下游折"保存失败"时不红 ⇒ 已派同腿补两条牙（fixture 从 Go 载体读＋error 态 text≠"保存失败"）。
+**票 407 未翻勾**，等两条修完复跑再勾。
