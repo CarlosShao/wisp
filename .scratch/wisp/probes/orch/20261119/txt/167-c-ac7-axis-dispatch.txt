@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 票 167 AC#7 收轴：`internal/agent/approval/**` 必须零字节（把 Seq 出口挪回 panel 侧）＋跑完三样（写腿，唯一共享编译面写腿＝cmd/wisp）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**只做一件收尾**：票 167 **AC#7 契约轴**（`.scratch/wisp/issues/167-*.md:31`）现被我上一腿越了——`internal/agent/approval/pending_read.go` 被改成导出 `Seq`，而 AC#7 逐字要求 `internal/agent/approval/**` **零字节**。
+1. **撤掉那一处**：把 `internal/agent/approval/pending_read.go` 对 `Seq` 的新增**逐字节还原到 `e1049dbf5~1` 的版本**（`git show e1049dbf5~1:internal/agent/approval/pending_read.go > 该文件` 是禁止的写法吗？——**允许**用 `git show … > file` 恢复**你自己这一处**，因为这是我们要撤回的自家改动；⛔ 不许 restore/checkout 别的文件）。
+2. **Seq 改在 panel 侧铸**：在 `internal/panel/**`（票 145 已批局部解冻范围内，只到新增字段）用一张 `correlationId -> seq` 的稳定映射：**首次见到某待批项时铸一个单调号，取消前面的不重排**；`position` 仍可用现源。⛔ 不造第二条队列、⛔ 不复制审批逻辑。
+3. **牙必须仍绿**：`Test167QueueSeqStableAcrossCancel`（取消第 2 条后第 3 条仍是 3）、以及 167 其余四枚；若某发因撤字段而红，**改在 panel 侧让它重新绿**，⛔ 不许放宽断言。
+4. **AC#7 轴实证**（写成证据）：`git diff --name-only e1049dbf5~1 <你的 commit>` 里 **`internal/agent/approval/**` 0 枚**、`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／`thresholds.go`／golden／`allowlist.txt`／`design/**` 0 枚；`internal/panel/**` 只落 composer/pump/panel_pump 族＋只新增字段（逐枚列出来）。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔放宽断言、⛔push、⛔UI emoji、⛔ 改 `internal/agent/approval/**` 任何字节（目标＝它回到零改动）。
+**串行**：`go test ./cmd/wisp` 只能经载具一次一发（跑前 `Get-Process wisp.test` 有就等，⛔裸跑 A1888）；`go test ./internal/panel -run '^Test167|^TestOccupancy'` 也跑一发。三样现跑：①`sh scripts/d22scan.sh` 0 findings ②载具 `^Test167`＋panel 相关全绿 ③`go build ./...` rc=0。
+写面：`internal/panel/**`（局部解冻内）、`cmd/wisp/**`（唯一）、`internal/agent/approval/pending_read.go`（**只许还原**）、`docs/evidence/s1/167-ac7-axis-*`。
+回话第一行＝commit hash ＋`git diff --name-only` 的 approval 行数（必须 0）＋ 载具/panel 读数 ＋d22scan 末行。没干完写「卡在哪」。
