@@ -466,6 +466,19 @@ type ComposerState struct {
 	// which is a different fact from "nothing is recorded" and must not render as it.
 	Credential      CredentialState `json:"credentialState"`
 	CredentialKnown bool            `json:"credentialKnown"`
+	// ContextTokens / ContextWindow are ticket 167 AC#2's occupancy numbers, and
+	// ContextOccupancyKnown is the named unknown state the dimension renders as
+	// when either one is missing. The rule is the ticket's own: numerator or
+	// denominator unknown ⇒ the whole bar is unknown - the known flag says false
+	// and BOTH numbers stay off the wire (omitempty keeps them absent). A bar
+	// that filled the missing half with a 0 (or drew 0%) would be the exact
+	// degenerate shape the ticket forbids, and its two mutation teeth pin the
+	// pair: numerator filled 0 ⇒ red; denominator invented ⇒ red. Both values
+	// are verbatim copies of what the host's Occupancy reader measured - this
+	// type derives nothing.
+	ContextTokens         int64 `json:"contextTokens,omitempty"`
+	ContextWindow         int64 `json:"contextWindow,omitempty"`
+	ContextOccupancyKnown bool  `json:"contextOccupancyKnown"`
 }
 
 // NewComposerState assembles the composer section from native state.

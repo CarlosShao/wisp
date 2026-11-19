@@ -259,6 +259,19 @@ func composerTSGapLedger() map[string][]string {
 		// (TestApprovalCardViewJSONKeysMatchFrontendTypes walks them with the
 		// rest of the interface). Go dropping one is fresh drift again, red
 		// by the ordinary walk.
+		//
+		// Ticket 167 AC#3 (2026-11-19): the two queue numbers seq/position are
+		// REGISTERED, not skipped - the Go side must emit them (the cancel-no-
+		// renumber tooth at cmd/wisp drives them), the page half has not
+		// declared them yet, and frontend/** stays untouched by this leg's
+		// dispatch. Same procedure as every Go-only wave before it.
+		"ApprovalCardView": {"position", "seq"},
+		// Ticket 167 AC#2 (2026-11-19): the occupancy numbers are REGISTERED
+		// the same way - contextTokens/contextWindow/contextOccupancyKnown are
+		// real wire facts the page's occupancy bar needs, the Go side emits
+		// them (unknown ⇒ known=false and BOTH numbers absent, never zeros),
+		// and the page-side declaration is the UI leg's to land later.
+		"ComposerState": {"contextOccupancyKnown", "contextTokens", "contextWindow"},
 	}
 }
 

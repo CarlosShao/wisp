@@ -90,6 +90,12 @@ func nativeVerdictsFromGate(g *approval.Gate) []panel.NativeVerdict {
 			RulesHit:               it.Decision.RulesHit,
 			Reason:                 it.Decision.Reason,
 			SessionOverrideBlocked: it.Decision.SessionOverrideBlocked,
+			// Ticket 167 AC#3: the two queue numbers travel verbatim off the
+			// queue's own record - Seq the admission number (never renumbered,
+			// the 取消不重排 half) and Position the 1-based FIFO place right now
+			// (the 当前第几条 half). Both are reads; nothing here derives either.
+			QueueSeq: it.Seq,
+			Position: it.Position,
 		}
 		// Readface wave 1 (2026-11-17), ticket 37 AC#5: the aggregate-card
 		// half. approval.CardSummary computes the display fields over the
@@ -353,6 +359,62 @@ func (rt *agentRuntime) currentModel() string {
 		return ""
 	}
 	return rt.endpoint.Model
+}
+
+// contextOccupancy is the pump's reader for ticket 167 AC#2's occupancy
+// dimension: the numerator (used tokens) and the denominator (the resolved
+// context window), read off objects this process is already running.
+//
+// BOTH HALVES OR NOTHING. The reader returns nil - the named unknown answer -
+// whenever either half has no measured value, because a bar that filled the
+// missing half with a 0 or invented a window would be exactly the degenerate
+// shape the ticket forbids (and its two mutation teeth drive):
+//
+//   - numerator: the run feed's latest cumulative usage row (the Cost
+//     accumulator's own totals as the last EvUsage carried them, summed across
+//     turns per cost.go's AddUsage). nil until the first usage event lands -
+//     "nothing was measured" is a different fact from "zero tokens", so the
+//     reader does not hand the pump a zero to display.
+//   - denominator: the window the loop itself scales by (agent/loop.go's
+//     two-step read): the resolved endpoint's declared ContextWindow, falling
+//     back to the provider's own MaxContextWindow, and UNKNOWN (nil) when
+//     neither declares one. No constant stands in - not even the 128k
+//     reference window, which is agent.BudgetsFor's internal scaling baseline
+//     and not a fact about this boot's model.
+func (rt *agentRuntime) contextOccupancy() *panel.OccupancyReading {
+	if rt == nil {
+		return nil
+	}
+	feed := rt.runFeed.Section()
+	if feed == nil || feed.Usage == nil {
+		return nil
+	}
+	window := rt.contextWindowTokens()
+	if window <= 0 {
+		return nil
+	}
+	return &panel.OccupancyReading{
+		UsedTokens:   int64(feed.Usage.TokensIn) + int64(feed.Usage.TokensOut),
+		WindowTokens: int64(window),
+	}
+}
+
+// contextWindowTokens reads the denominator the loop itself scales by: the
+// resolved endpoint's ContextWindow, then the provider's own declared maximum.
+// Zero means unknown and is never replaced by a made-up number.
+func (rt *agentRuntime) contextWindowTokens() int {
+	if rt == nil {
+		return 0
+	}
+	if w := rt.endpoint.ContextWindow; w > 0 {
+		return w
+	}
+	if len(rt.provs) > 0 && rt.provs[0] != nil {
+		if info := rt.provs[0].Info(); info.MaxContextWindow > 0 {
+			return info.MaxContextWindow
+		}
+	}
+	return 0
 }
 
 // panelArgs shapes one live call's argument bytes into the argv-shaped list

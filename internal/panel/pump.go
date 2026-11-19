@@ -114,6 +114,17 @@ type NativeVerdict struct {
 	// card is not about a batch (too few targets, or the taint rule refuses a
 	// summary - the same rule the gate's own aggregation refuses it with).
 	Batch *NativeBatchView
+	// QueueSeq is the queue's own admission number for this item (LiveApproval.Seq,
+	// ticket 167 AC#3): stamped once at push, never rewritten - a cancel or expiry
+	// does not renumber the cards behind it. Zero = the host read no sequence
+	// number for this verdict, and the card then travels without the key
+	// (omitempty) rather than with a fake 0.
+	QueueSeq uint64
+	// Position is the item's 1-based place in the FIFO right now (the depth badge
+	// the queue computes live). Zero = unread; the key then stays absent the same
+	// way. Unlike QueueSeq it MOVES as the queue drains - that is the honest
+	// "当前第几条", and the pair is what keeps it distinct from the stable number.
+	Position int
 }
 
 // CardView renders one live verdict as the card the panel shows, through the
@@ -145,7 +156,35 @@ func (v NativeVerdict) CardView() ApprovalCardView {
 		card.BatchDeferred = b.Deferred
 		card.BatchSummary = b.Summary
 	}
+	// Ticket 167 AC#3: the two queue numbers ride verbatim. Both are omitempty
+	// on the view, so a card rendered from a verdict the host never queued (the
+	// CLI probe path) carries neither key - a 0 would be the exact degenerate
+	// shape Q-51 named for an untagged-int carrier.
+	card.Seq = v.QueueSeq
+	card.Position = v.Position
 	return card
+}
+
+// OccupancyReading is one host reading of the context-occupancy dimension
+// (ticket 167 AC#2): the two numbers the occupancy bar is made of, as the host
+// measured them. It is a plain value, not a pointer-with-flags, because the
+// reader itself is the optionality: a nil return IS the "unknown" answer, and
+// the pump renders it as the composer section's named unknown state
+// (contextOccupancyKnown=false) with BOTH numbers absent - never as zeros.
+//
+//   - UsedTokens is the numerator: the run's cumulative provider-reported token
+//     counters (in+out, the Cost accumulator's own totals as the latest EvUsage
+//     carried them; the counters sum across turns per cost.go). A host with no
+//     usage event yet returns nil - "no number was measured" is a different fact
+//     from "zero tokens used", and only the reader can tell them apart.
+//   - WindowTokens is the denominator: the model context window the boot
+//     actually resolved. A reading with a non-positive window is refused by the
+//     pump (the denominator is unknown), because either half unknown makes the
+//     whole dimension unknown - a bar with a made-up denominator is the lie
+//     AC#2 forbids.
+type OccupancyReading struct {
+	UsedTokens   int64
+	WindowTokens int64
 }
 
 // L1WindowWait is one confirmation window the host's gate reports as open right
@@ -201,6 +240,16 @@ type PumpSources struct {
 	// host assembled without this reader says credentialKnown=false rather than
 	// advertising "not recorded".
 	Credential func() CredentialState
+	// Occupancy reads the context-occupancy dimension (ticket 167 AC#2): the
+	// numerator (used tokens) and the denominator (the resolved context window)
+	// the occupancy bar is made of. It is a reader like every field above, and
+	// a nil return is the named unknown answer - the pump then reports
+	// contextOccupancyKnown=false and carries NEITHER number, never zeros.
+	// A reading with a non-positive window is refused here too: either half
+	// unknown makes the whole dimension unknown, and inventing a denominator
+	// (e.g. falling back to the 128k reference) is exactly the mutation AC#2's
+	// second tooth must catch.
+	Occupancy func() *OccupancyReading
 	// Results reads the streamed assistant text so far.
 	Results func() []ResultChunk
 	// Instructions reads what this process's project-instruction loader actually
@@ -445,6 +494,17 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		}
 		composer.Credential = state
 		composer.CredentialKnown = true
+	}
+	if p.src.Occupancy != nil {
+		// Ticket 167 AC#2: either half unknown ⇒ the whole dimension is the named
+		// unknown state, and BOTH numbers stay off the wire. The pump copies the
+		// reader's two values verbatim when both exist; it never fills one half
+		// and hides the other, and it never substitutes a default window.
+		if occ := p.src.Occupancy(); occ != nil && occ.WindowTokens > 0 && occ.UsedTokens >= 0 {
+			composer.ContextTokens = occ.UsedTokens
+			composer.ContextWindow = occ.WindowTokens
+			composer.ContextOccupancyKnown = true
+		}
 	}
 
 	if p.src.Attachments != nil {

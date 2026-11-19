@@ -1261,7 +1261,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// count of bytes - the dimension exists so the page can say 已录入/未录入
 		// without this process ever having to show a key.
 		Credential: rt.settings.credentialStatus,
-		Results:    rt.stream.Chunks,
+		// Ticket 167 AC#2's occupancy reader: the numerator off this run's own
+		// usage feed, the denominator off the window the loop itself scales by
+		// (endpoint declaration, then the provider's own maximum) - see
+		// panel_pump.go's contextOccupancy. Unknown either half is the reader's
+		// nil, and the wire then says contextOccupancyKnown=false with both
+		// numbers absent, never a 0 or an invented window.
+		Occupancy: rt.contextOccupancy,
+		Results:   rt.stream.Chunks,
 		// ticket 214's composer attachment dimension: the draft rows and the
 		// current refusal sentence, read out of the ledger the panel's ingest
 		// handler records into (panel_attachment_214.go). Readers are method
