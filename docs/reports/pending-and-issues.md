@@ -37930,3 +37930,8 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 
 我复跑：载具 2/2 PASS、panel 两枚占用牙 2/2 PASS、TestFrontendHasNoEmoji ok 0.373s、d22scan clean。占用"未知"具名态（分子/分母任一缺⇒整枚未知，变异填 0／编 128000 各红）；排队 seq/position（取消不重排、不丢条，各红）。四枚出口皆复用现源接线。
 - **记一笔**：36 AC#5 的仪器 `frontend/scripts/render-hiddenpause36.tsx:7` 有 `⛔` 字 ⇒ `TestFrontendHasNoEmoji` 红（仪器文件也在射程内，不只 `src/`）。我已改"禁止"，现绿。撤销口令：把那行改回 `⛔`（不建议）。
+## A1952（11-19 12:5x）：167 AC#4/5/6 勾 `6b5b0ccb1`（票未结，AC#7 轴越界在收）
+
+我复跑载具 `^Test167` **11/11 PASS**、d22scan clean、`go build ./...` rc=0。AC#4 忙态停止（静置 600ms 流不增，变异红）；AC#5 失败原文独立记账（失败不碰其他字段、成功不抹、新失败不并叠）；AC#6 doctor 读既有 JSONL 给可复制现场＋一条指令（明写未裁：512 字上限/未脱敏现场/禁用插件重启）。
+- ⚠ **我自己越了本票 AC#7 的轴**：167a 那腿改了 `internal/agent/approval/pending_read.go`（导出 `Seq`），而 AC#7 要求该包**零字节**。⇒ **167 暂不结**，已派 `w167c` 收轴：撤该文件改动、Seq 改在 panel 侧铸（correlationId→seq 稳定映射），牙仍须绿。
+- 另记：我修 36 仪器 emoji 的那笔（`frontend/scripts/render-hiddenpause36.tsx`）是**独立卫生提交**，不属 167 实现；AC#7 若按提交区间量到这 1 枚，须按此说明读。
