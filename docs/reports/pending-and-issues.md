@@ -37967,3 +37967,10 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1959（11-19 18:4x）：248 AC#8 复勾 `154991465` —— 回执不再把 `[llm]` 说成已生效
 
 我复跑载具 `^(Test248Receipt|TestTicket223|Test255)` **25/25 PASS**、d22scan clean、`go build ./...` rc=0。`config_reload.go:225` hot 列只剩 `[audio] [agent] [cost]`；`[llm]` 进 `:235-237` 的「需重启进程（D36 重启档）」句并点出 5 枚字段名；`tiers.go` 未动。4 条既有断言**往严里改**（零放宽），新增 2 枚牙。证据件改 r2：`autostart` 三行撤下、普查真实 25 行（漏 19 已补）、8 check→9 处、`:392`→`:391`、补 `-E`、绝对句具名撤回。另清 A1956 欠账（167 证据"现状"节＋`pump_queue_seq_167.go` 两套编号器注释）。
+## A1960（11-19 19:3x）：**A-193-a 登记** —— 票 193「轻量级不约束前端动画」Go 侧门禁普查裁定
+
+尺：`git grep -nE "轻量|lightweight|D1\b|D32" -- internal/*.go frontend/*.go tools/*.go scripts/*.go`（剔 `_test.go`）＝非测试 Go **115 行**（`轻量`/`lightweight`＝0；`frontend/` 下 Go＝0）。
+- **放开候选＝0 枚**：115 行里没有一行拿 D1/D32 的数去卡前端动画/过渡/视觉。三句"拿 D32 当理由禁动画"在 `docs/PLAN.md:3451/:3486/:3516`——那是**文档**不是产码，改文字须人工批准（本票只登记，未改）。
+- **保留＝107 枚**：真 D1 2 枚（`internal/models/ads*.go:13`，"模型对抗样本 NTFS 上下文"，与视觉无关）＋真 D32 104 枚（watchdog 20／observe 23／proc 12／ball 14／scripts spike 12／其余 23）＋本腿新注释 1 枚（`schema.go:606`）。误报 8 行（GUID 字节 `0xD1` 等）不计。
+- **另有两条不动**：零 emoji（视觉规范，非性能门）、ban #6「面板侧不得成为批准/执行入口」（安全边界）。
+- **撤销口令**：本裁定只写台账与证据件，未改任何产码门槛；若要回退，删除本条与 `docs/evidence/s1/193-animation-opt-r1.md` 的裁定段即可（产码零影响）。
