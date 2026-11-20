@@ -38014,3 +38014,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1970（11-20 23:0x）：票 191 对抗验收 = **3 成立 / 1 夸大 / 0 不成立**（件 `docs/evidence/s1/191-audit-r1.md`）
 
 overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；AST 独立普查面板生产面 `exec.*` 改前改后同为 2（零新增执行点）；账本收口放宽 0 条。**两处如实记并认领**：①我派单要求"少一次 flush⇒红"——实际不红（marker 跨读分段，丢一次 flush 只晚一轮），牙只兑现"nil 路径也调 sink"那侧，属**我派单口径错**；②我派单那句 `git grep "exec.Command|CommandContext"` 是基本正则、`|` 为字面竖线 ⇒ 命中 0 条无信息量（同为口径错）。**遗留**：`sessionPendingCap` 数值未被钉死（M2a 64→128MiB 全绿）⇒ 追加数值钉小活。
+## A1971（11-20 23:1x）：票 245 AC#9 勾 `08ff5df1d` —— Esc 交付四形尺进仓（245 现只剩 AC#4 阻塞于 228）
+
+我复跑 `go test ./internal/ball -run "245|Esc" -v` **8/8 PASS**（新尺 `TestLive245EscDeliveryRulerFourShapes` PASS 14.96s）。第二进程＝测试自起 helper，机主不用开程序。四形：①闲置别的进程 `keydown_esc=1` ②稳态三枚无裸键 ③卡挂别的进程 0＋本进程否决真响 1 次 ④归还又收到 1。牙A（不 release）⇒④红 `:819`；牙B（稳态绑裸 Esc）⇒②红 `:709`；SHA 还原同串。**AC#4 仍阻塞于票 228**（`resident_ball_windows.go:86` `Hotkeys: ball.DefaultHotkeys()`），不假绿。票池仍 404/39。
