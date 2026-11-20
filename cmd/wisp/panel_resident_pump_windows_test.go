@@ -206,7 +206,10 @@ func Test65ResidentPumpNilManagerOmitsConfigKeys(t *testing.T) {
 		t.Fatalf("one publish must push exactly one packet; got %d", len(calls))
 	}
 	top := decodedSnapshot65(t, calls[0])
-	for _, absent := range []string{"ballStyle", "modelSwitch", "plugins"} {
+	// (panelAnimation joined the config-derived absent list with ticket 193's
+	// wiring leg: the same nil-cfg rule - no Manager, no reader, no key, and
+	// never a made-up tier word where no reading exists.)
+	for _, absent := range []string{"ballStyle", "modelSwitch", "plugins", "panelAnimation"} {
 		if _, ok := top[absent]; ok {
 			t.Errorf("with no config Manager the packet carries a %q key; a zero-value section would read as a made-up answer", absent)
 		}

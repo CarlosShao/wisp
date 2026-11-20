@@ -696,15 +696,16 @@ func renderReloadEvent(r SettingWriteResult) string {
 // there are two rosters (the ticket-248 table here and the 313 additions in
 // config_write_313.go), since ticket 187 a third (config_write_187.go), since ticket 65 a fourth (config_write_65.go), since the appearance wave a fifth
 // (config_write_wave.go), since ticket 215a a sixth (config_write_215.go),
-// since ticket 39 a seventh (config_write_39.go), and since ticket 40's
-// quota-editing half an eighth (config_write_40quota.go); this is the one
-// place the door asks all eight: a field is writable when any roster carries
+// since ticket 39 a seventh (config_write_39.go), since ticket 40's
+// quota-editing half an eighth (config_write_40quota.go), and since ticket
+// 193's wiring leg a ninth (config_write_193.go); this is the one
+// place the door asks all nine: a field is writable when any roster carries
 // it, and the frozen 248 pin keeps describing the 248 table alone.
 func knownWritableField(field string) bool {
 	return listedWritableField(field) || additionalWritableField(field) ||
 		writableField187(field) || writableField65(field) ||
 		writableFieldWave(field) || writableField215(field) || writableField39(field) ||
-		writableField40Quota(field)
+		writableField40Quota(field) || writableField193(field)
 }
 
 // listedWritableField is the ticket-248 table's own lookup, unchanged in shape.

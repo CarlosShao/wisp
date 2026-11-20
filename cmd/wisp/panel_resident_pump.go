@@ -139,6 +139,14 @@ func residentPumpSources65(gate *approval.Gate, cfg *config.Manager, disp *panel
 		src.BallClickThrough = func() panel.BallClickThroughSection { return ballClickThroughSectionFromConfig(cfg) }
 		src.PanelWidth = func() panel.PanelWidthSection { return panelWidthSectionFromConfig(cfg) }
 		src.PanelFontSize = func() panel.PanelFontSizeSection { return panelFontSizeSectionFromConfig(cfg) }
+		// Ticket 193 AC#3's animation-switch dimension, same Manager, same
+		// verbatim rule: the tier word rides every packet the resident shape
+		// pushes (each publish re-reads panel.animation), so a config.set to
+		// panel_animation is on the page's NEXT packet with no restart. A nil
+		// cfg leaves the reader off instead of backing it with a made-up tier
+		// - a fake "off" where no reading exists is exactly what the 193
+		// carrier's pins forbid.
+		src.PanelAnimation = func() panel.PanelAnimationSection { return panelAnimationSectionFromConfig(cfg) }
 		// Ticket 187's picker row, same Manager, same verbatim rule.
 		src.ModelSwitch = func() panel.ModelSwitchSection { return modelSwitchSectionFromConfig(cfg) }
 		// Ticket 215a's inventory, same Manager, same pre-shaped rule.
@@ -233,6 +241,15 @@ func panelWidthSectionFromConfig(m *config.Manager) panel.PanelWidthSection {
 
 func panelFontSizeSectionFromConfig(m *config.Manager) panel.PanelFontSizeSection {
 	return panel.PanelFontSizeSection{FontSize: m.PanelFontSizeOptions().FontSize}
+}
+
+// panelAnimationSectionFromConfig is the config->panel mapping for ticket
+// 193's animation-switch dimension, over the same Manager. The tier word
+// travels verbatim - this helper spells neither full nor reduce nor off, and
+// an unset reading rides as "" (the carrier's honest-empty rule), never as a
+// made-up off.
+func panelAnimationSectionFromConfig(m *config.Manager) panel.PanelAnimationSection {
+	return panel.PanelAnimationSection{Tier: m.PanelAnimationOptions().Tier}
 }
 
 // modelSwitchSectionFromConfig is the config->panel mapping for ticket 187's

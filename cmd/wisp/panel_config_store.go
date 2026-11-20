@@ -54,6 +54,14 @@ import (
 // settings payload.
 const credentialValueKey = "credentialValue"
 
+// keyPathPanelAnimation193 is panel.animation spelled the way internal/config's
+// guarded write path names it (settings_animation_193.go's own
+// keyPathPanelAnimation - unexported there, so this leg spells the same
+// literal once, HERE, and the wiring test pins the receipt against it: a
+// drift between the two spellings reddens the end-to-end tooth, never a
+// silent wrong receipt). The tier lookup and the receipt both use it.
+const keyPathPanelAnimation193 = "panel.animation"
+
 // credentialWriteRequest is the write-only envelope of the credential field. Its
 // two value-bearing keys are NOT on panel.ComposerRequest: the request that arrives
 // on the message route decodes into that one shared type, and this type is only
@@ -514,6 +522,15 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 				fmt.Errorf("字段 %q 要的是正整数（px 字号），收到的值解析不了", w.Field)
 		}
 		written, err = s.mgr.SetPanelFontSize(v)
+	case panel.FieldPanelAnimation:
+		// 票 193 AC#3 接线第三步：动画档（panel.animation，本票 schema 新键，
+		// 默认 reduce＝owner 待拍占位）。值＝档位词本身（full|reduce|off），
+		// 词表只有一条单源：config 侧 SetPanelAnimation 落盘前把关，拒绝句＝
+		// validate.go 的 panelAnimationEnumError——与加载闸逐字同一串，这里
+		// 不另立第二套词表（320/65/413 的同一条形状）。档位不在这里盖：
+		// 下面由 registryEffectiveTier39 问 TierRegistry 答（[panel] 整节行，
+		// hot——D36 的 [panel] 行钉的就是这一档）。
+		written, err = s.mgr.SetPanelAnimation(strings.TrimSpace(w.Value))
 	case panel.FieldPluginEnabled:
 		// 票 215a：插件开关。值＝"true"/"false"，插件 id 在 w.Plugin（门已
 		// 拒空值）；布尔形状在这里替它答一句形状话（上面布尔字段的同款）。
@@ -604,6 +621,24 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 	// 再开」就跟上，不需要重启进程。重启档在这里是保守档，不是谎报的档。
 	if w.Field == panel.FieldPanelWidth || w.Field == panel.FieldPanelFontSize {
 		res.Note = "面板宿主每次建窗现读 [panel]：关窗再开面板（下一次显示请求）即按新值重算，无需重启进程。"
+	}
+	// 票 193 AC#3 接线：动画档的档位与注册表同源（票 39 立的规矩「档位判断
+	// 是注册表的，不是手盖的」，config_tier_39.go）。[panel] 在 TierRegistry
+	// 里是整节行（tiers.go: "panel" = hot；D36 的 [panel] 行），没有 per-key
+	// 行，所以问注册表的是键路径的节名——整节 hot 即本键 hot。hot ⇒ now
+	// （已立即生效列）——这是实测为真的档，不是保守档：写入即落到进程内存
+	// （hot 档语义），快照泵的 PanelAnimation 读面每次发包现读同一个 Manager
+	// （run.go 的 PumpSources 与常驻泵两处接线，本 commit 同落），所以面板
+	// 收到的下一个快照就带着新档位词，页面随包消费，无需重启进程。这正是
+	// 193 证据件 §③ 定 hot 的四条理由里最重的一条：重启档会把开关变成装饰
+	// 品（页面的消费靠泵送，不在建窗时）。
+	if w.Field == panel.FieldPanelAnimation {
+		animationSection := strings.Split(keyPathPanelAnimation193, ".")[0]
+		if t, ok := registryEffectiveTier39(animationSection); ok {
+			res.Tier = t
+		}
+		res.Note = "动画档随快照走：快照每次发送都现读 panel.animation，面板下一次收到快照" +
+			"（每次 show／状态变化都会推送）就按新档位运行，无需重启进程。"
 	}
 	return res, nil
 }

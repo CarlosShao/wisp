@@ -18,11 +18,16 @@ package main
 //	                             conservative word, same as the old blanket)
 //
 // SCOPE, STATED SO NOBODY WIDENS IT BY ACCIDENT: this mapping is consulted for
-// the ticket-39 field (app_language) only. The older fields keep their
-// measured tier stamps (187's next_task correction, 65's applier-measured
-// now, 422's static restart for ball.size) - those are per-field measurements
-// with their own evidence pins, not registry rows, and folding them into this
-// table would re-litigate tickets 187/255/422 with no new fact.
+// the ticket-39 field (app_language, the per-key "app.language" row) and,
+// since ticket 193's wiring leg, for panel_animation - whose tier comes off
+// the same registry's whole-section "panel" row (tiers.go: "panel" = hot,
+// D36's [panel] 行), keyed by the key path the guarded write itself reports.
+// The older fields keep their measured tier stamps (187's next_task
+// correction, 65's applier-measured now, 422's static restart for ball.size,
+// the appearance wave's [panel] restart-with-Note shape) - those are
+// per-field measurements with their own evidence pins, not registry rows, and
+// folding them into this table would re-litigate tickets 187/255/422 with no
+// new fact.
 import (
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/panel"

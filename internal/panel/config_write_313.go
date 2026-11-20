@@ -191,15 +191,16 @@ func additionalWritableField(field string) bool {
 	return false
 }
 
-// acceptedWritableFields is the union of all eight rosters, sorted, for the
+// acceptedWritableFields is the union of all nine rosters, sorted, for the
 // refusal text: a page told "可写的只有 ..." must be told about every name the
 // door would actually accept, or the sentence sends it chasing the wrong list.
 // (Ticket 187's roster joined the two older ones, ticket 65's joined the same
 // way, the appearance wave's roster (config_write_wave.go) joined the same way
 // again, ticket 215a's plugin roster (config_write_215.go) joined the same way
 // once more, ticket 39's app_language roster (config_write_39.go) joined the
-// same way again, and ticket 40's quota roster (config_write_40quota.go)
-// joined the same way once more; the union grew with each.)
+// same way again, ticket 40's quota roster (config_write_40quota.go)
+// joined the same way once more, and ticket 193's panel_animation roster
+// (config_write_193.go) joined the same way again; the union grew with each.)
 func acceptedWritableFields() []string {
 	out := append(WritableFields(), AdditionalWritableFields()...)
 	out = append(out, WritableFields187()...)
@@ -208,17 +209,19 @@ func acceptedWritableFields() []string {
 	out = append(out, WritableFields215()...)
 	out = append(out, WritableFields39()...)
 	out = append(out, WritableFields40Quota()...)
+	out = append(out, WritableFields193()...)
 	sort.Strings(out)
 	return out
 }
 
 // needsProviderFor / needsModelFor / needsPluginFor / takesValueFor answer one
-// selector question across all eight rosters, so the gate's checks stay one
+// selector question across all nine rosters, so the gate's checks stay one
 // loop-shaped question each instead of growing a second branch per column.
 // The 187 roster (config_write_187.go), the 65 roster (config_write_65.go),
 // the appearance wave's roster (config_write_wave.go), ticket 39's roster
-// (config_write_39.go) and ticket 40's quota roster (config_write_40quota.go)
-// join the selector maps below; none of those five carries a
+// (config_write_39.go), ticket 40's quota roster (config_write_40quota.go) and
+// ticket 193's panel_animation roster (config_write_193.go) join the selector
+// maps below; none of those six carries a
 // provider/model/plugin selector column beyond what its own map states, and
 // all of ticket 40's take the plain value half. Ticket 215a's roster
 // (config_write_215.go) introduces the plugin selector column.
@@ -241,5 +244,6 @@ func takesValueFor(field string) bool {
 	return fieldTakesValue[field] || fields313TakesValue[field] ||
 		fields187TakesValue[field] || fields65TakesValue[field] ||
 		fieldsWaveTakesValue[field] || fields215TakesValue[field] ||
-		fields39TakesValue[field] || fields40QuotaTakesValue[field]
+		fields39TakesValue[field] || fields40QuotaTakesValue[field] ||
+		fields193TakesValue[field]
 }

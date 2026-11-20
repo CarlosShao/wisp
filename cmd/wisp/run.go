@@ -1362,6 +1362,21 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		PanelFontSize: func() panel.PanelFontSizeSection {
 			return panel.PanelFontSizeSection{FontSize: mgr.PanelFontSizeOptions().FontSize}
 		},
+		// Ticket 193 AC#3's animation-switch reader: the tier word the live
+		// config holds, read off this run's own Manager by internal/config's
+		// PanelAnimationOptions (the production reader) - the same Manager the
+		// settings leg above (rt.settings) writes through, so the switch shows
+		// what the next ApplySetting would act on, and a write to
+		// panel_animation is on the wire with the NEXT packet (the snapshot
+		// re-reads per publish; hot tier, no restart). The tier travels
+		// verbatim; this literal spells neither full nor reduce nor off, and
+		// it never answers "off" when the config has no reading - the
+		// reader-gated absence (no line, no key) is the shape the carrier's
+		// internal/panel byte nails pin, and an invented tier there is exactly
+		// the fake-off the 193 evidence file forbids.
+		PanelAnimation: func() panel.PanelAnimationSection {
+			return panel.PanelAnimationSection{Tier: mgr.PanelAnimationOptions().Tier}
+		},
 		// Ticket 145's hop 2, the working-state reader: the feed the sink
 		// fills (Publish's EvToolEnd / EvReasoningDelta / EvError / EvStuck
 		// branches) hands its Section here, so the packet's top-level "run"

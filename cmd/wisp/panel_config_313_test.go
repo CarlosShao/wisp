@@ -261,6 +261,11 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 	// every roster before it did - one append here, so a one-sided drop still
 	// moves this test.
 	want = append(want, panel.WritableFields40Quota()...)
+	// Ticket 193: the ninth roster (panel_animation) joined the union the same
+	// way every roster before it did - one append here, so a one-sided drop
+	// still moves this test (A-313's lesson: the roster in internal/panel and
+	// this pin grow together, in the same commit).
+	want = append(want, panel.WritableFields193()...)
 	sort.Strings(want)
 	if !reflect.DeepEqual(reported, want) {
 		t.Errorf("the door reports the union %v; the two rosters say %v (A881: union == table1 + table2)", reported, want)
