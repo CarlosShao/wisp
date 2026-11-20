@@ -219,3 +219,7 @@
 - 四形：**①闲置** 别的进程收到 `keydown_esc=1`（球否决 0 次）；**②稳态** `Bindings()` 活 3 枚（summon/mute/panel）＋`cancel=standby`＋**无裸键**；**③卡挂** 别的进程收 `0`＋本进程否决真触发 1 次（真 Esc 一发、两边同判）；**④归还** 别的进程又收到 `1`（球否决 0 次）。**skip 0 发**，桌面不可用／外人占键／借被拒三条路径都写了具名数字（今天未触发）。
 - 两发牙真跑后还原：牙A（不 release）⇒ ④ 红于 `:819` 逐字「the return did not hand the bare Esc back…observer received keydown_esc=0…cancel gesture fired 1 time(s)」；牙B（稳态绑回裸 Esc）⇒ ② 红于 `:709`「the idle ball holds cancel = "Esc" as a bare key」；两文件 SHA 还原同串。
 - **仍开：AC#4**（`[hotkey] cancel` 要被常驻腿读进去）—— 如实**阻塞于票 228**（`resident_ball_windows.go:86` 逐字 `Hotkeys: ball.DefaultHotkeys(),`），按票面"不许假绿"保持未勾。
+## 编排者补记（2026-11-20 23:2x）：AC#9 的"实质"今天才真正满足
+
+复查发现 **AC#9 那一格的框早先已被勾，但当时它的完成判据（"仓内一条能跑的用例做同样的四形"）并没有兑现** —— 台件还只在验收侧。今天 `08ff5df1d` 把四形尺搬进 `internal/ball/esc_delivery_ruler_245_windows_test.go`（846 行，`TestLive245EscDeliveryRulerFourShapes`），我复跑 PASS 14.96s ⇒ **这一格现在才算真的成立**（先勾后兑现，如实记，不当作流程正确）。
+**本票当前未勾仅 AC#4 一行**（`:37`；`:62` 是审计对 AC#4 的判定行，同一条），**阻塞于票 228**：`resident_ball_windows.go:86` 逐字 `Hotkeys: ball.DefaultHotkeys(),`。
