@@ -178,10 +178,22 @@ func composerTSNameMap() map[string]string {
 		// in the same commit the ledger's PanelSnapshot entry was deleted, so
 		// the identity translation below is live contract, not a registration.
 		"PanelAnimationSection": "PanelAnimationSection",
-		"TreeView":              "FilesSection",
-		"TreeEntry":             "TreeEntryView",
-		"RunSection":            "RunSection",
-		"ToolRunRow":            "ToolRunRowView",
+		// Ticket 191 wave 2's page half joined the live contract with the UI
+		// leg (2026-11-20): panel.ts declared PanelSnapshot.terminal (and the
+		// TerminalSection / TerminalWindow interfaces) in the same commit the
+		// ledger's PanelSnapshot entry was deleted, so the three translations
+		// below are live contract, not registrations. TerminalInputRow and
+		// TerminalOutputRow share one page shape - their wire key sets are
+		// identical (text/truncated/droppedRunes, none omitempty inside a
+		// present row) - so both Go names translate to panel.ts's
+		// TerminalWindow.
+		"TerminalSection":   "TerminalSection",
+		"TerminalInputRow":  "TerminalWindow",
+		"TerminalOutputRow": "TerminalWindow",
+		"TreeView":          "FilesSection",
+		"TreeEntry":         "TreeEntryView",
+		"RunSection":        "RunSection",
+		"ToolRunRow":        "ToolRunRowView",
 		// RunUsageRow joined with the consume wave-2 page half (2026-11-17,
 		// ticket 38 AC#4): the page's TaskRowView now declares costToDate,
 		// so the walk descends into the nested usage struct and needs the
@@ -296,17 +308,14 @@ func composerTSGapLedger() map[string][]string {
 		// the same close-out the appearance wave's four keys followed
 		// (4017962b3).
 		//
-		// Ticket 191 wave 2a (2026-11-20): the panel-terminal carrier's
-		// top-level key is REGISTERED, not skipped - "terminal" is a real
-		// wire fact (the input port's most recent line and the bounded
-		// rolling output window, terminal_carrier_191.go), the Go side emits
-		// it through the reader-gated PumpSources.Terminal, and the page half
-		// belongs to the frontend leg (frontend/** is outside the wave's
-		// write face). Same procedure as every Go-only wave before it: when
-		// the page declares the key, this entry goes stale-red by its own
-		// both-ways rule and the ordinary walk (plus a TerminalSection
-		// translation in composerTSNameMap) takes over in the same commit.
-		"PanelSnapshot": {"terminal"},
+		// Ticket 191 wave 2a's PanelSnapshot entry is GONE (2026-11-20): the
+		// UI leg declared PanelSnapshot.terminal (and the TerminalSection /
+		// TerminalWindow interfaces) in frontend/src/lib/panel.ts in the same
+		// commit, exactly the stale-red this ledger's both-ways rule promised
+		// for the reader-gated carrier (terminal_carrier_191.go). The gap
+		// closed, so the ordinary two-way comparison judges that key from
+		// here on and composerTSNameMap carries the three translations - the
+		// same close-out ticket 193's panelAnimation key followed.
 	}
 }
 

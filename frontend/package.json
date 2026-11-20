@@ -42,7 +42,8 @@
     "render:modelmgmt40b": "vite build --ssr scripts/render-modelmgmt-40b.tsx --outDir node_modules/.tmp/modelmgmt40brender --logLevel warn && node node_modules/.tmp/modelmgmt40brender/render-modelmgmt-40b.js",
     "render:hiddenpause36": "vite build --ssr scripts/render-hiddenpause36.tsx --outDir node_modules/.tmp/hiddenpause36render --logLevel warn && node node_modules/.tmp/hiddenpause36render/render-hiddenpause36.js",
     "render:pluginpage407": "vite build --ssr scripts/render-pluginpage407.tsx --outDir node_modules/.tmp/pluginpage407render --logLevel warn && node node_modules/.tmp/pluginpage407render/render-pluginpage407.js",
-    "render:animation193": "vite build --ssr scripts/render-animation-193.tsx --outDir node_modules/.tmp/anim193render --logLevel warn && node node_modules/.tmp/anim193render/render-animation-193.js"
+    "render:animation193": "vite build --ssr scripts/render-animation-193.tsx --outDir node_modules/.tmp/anim193render --logLevel warn && node node_modules/.tmp/anim193render/render-animation-193.js",
+    "render:terminal191": "vite build --ssr scripts/render-terminal-191.tsx --outDir node_modules/.tmp/terminal191render --logLevel warn && node node_modules/.tmp/terminal191render/render-terminal-191.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

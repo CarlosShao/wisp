@@ -460,6 +460,39 @@ export interface PanelAnimationSection {
   tier: string;
 }
 
+/** The panel-embedded terminal's read windows (ticket 191 wave 2a's carrier,
+    internal/panel/terminal_carrier_191.go TerminalInputRow /
+    TerminalOutputRow; page half declared by this UI leg, 2026-11-20). The Go
+    side carries TWO row structs whose wire key sets are identical, so ONE
+    page shape reads both and composerTSNameMap translates both Go names onto
+    this interface. The three keys are not omitempty inside a present row: a
+    row that travels always carries all three, so none is optional here.
+    THE ROWS ARE DISPLAY DATA: text is the retained tail verbatim - the input
+    port's most recent command line, the output window's arrival-order tail -
+    and nothing on this face executes anything: the typed command rides the
+    same gated tool leg as every other command (terminal_carrier_191.go's
+    import-list proof), and no C17 method arrives with the section. */
+export interface TerminalWindow {
+  text: string;
+  truncated: boolean;
+  droppedRunes: number;
+}
+
+/** The terminal section (internal/panel/terminal_carrier_191.go
+    TerminalSection): the panel-embedded terminal's two read-only readouts,
+    the command line the user typed and the bounded rolling output window.
+    Present on the wire exactly when the pump has the Terminal reader -
+    including when nothing has been typed or streamed yet, which arrives as a
+    section with BOTH rows absent (the honest "wired, nothing yet"); the
+    key's own absence is the DIFFERENT fact "no reader on this pump", which
+    the page renders as 终端未连接, never blank. Each row is absent until its
+    own source delivered something - an absent row is "nothing arrived",
+    never an empty string dressed as "the command printed nothing". */
+export interface TerminalSection {
+  input?: TerminalWindow;
+  output?: TerminalWindow;
+}
+
 /** One working-tree file entry (internal/panel TreeEntry). */
 export interface TreeEntryView {
   path: string;
@@ -610,6 +643,16 @@ export interface PanelSnapshot {
       panel_animation field; refusals render verbatim on the row (the 407
       method). */
   panelAnimation?: PanelAnimationSection;
+  /** The panel-embedded terminal's two read-only readouts (ticket 191 wave
+      2a): the command line the user typed and the bounded rolling output
+      window, each row verbatim with its own truncation flag and evicted-rune
+      count. Same optionality rule as ballStyle: a pump without the Terminal
+      reader sends no key at all - the page reads that as 终端未连接, never
+      blank - and a section whose rows are both absent is the honest "wired,
+      nothing yet". Display data only: no C17 method arrives with it, and the
+      typed command itself rides the same gated tool leg as every other
+      command. */
+  terminal?: TerminalSection;
   /** The working-state rows rendered while a task runs (ticket 145): ended
       tool calls, the reasoning streamed so far, the last classified error
       and the loop's stuck sentence. */

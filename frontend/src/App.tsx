@@ -56,6 +56,7 @@ import {
 } from "@/components/palette-screen";
 import { LineSidebar } from "@/components/react-bits/line-sidebar";
 import { ResultHistory } from "@/components/result-history";
+import { TerminalRegion } from "@/components/terminal-region";
 import { RightRail } from "@/components/harness/right-rail";
 import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
@@ -1022,6 +1023,11 @@ function Conversation({
           </div>
         </div>
       </div>
+      {/* 票 191 wave 2 的终端区（只读，可折叠）：命令行在上、输出尾窗在下，
+          全部逐字读快照的 terminal 节。键缺席显示「终端未连接」而不是空白；
+          区内没有可执行按钮——命令本身走和一切命令相同的门控工具腿，本区
+          不新增执行通路。 */}
+      <TerminalRegion terminal={snapshot.terminal} />
       <div className="shrink-0 border-t border-line bg-surface px-6 pb-4 pt-2.5">
         <div className="mx-auto w-full max-w-[720px]">
           {/* Ticket 187's UI half lives in ComposerRow: the model and
