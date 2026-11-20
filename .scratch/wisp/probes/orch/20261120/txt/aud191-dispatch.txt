@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 对抗验收（只读）：票 191 三波 `6512d5a73`（工具）＋`8513bc2e3`（面板载体）＋`8e3600e2f`（界面）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 其它 model、⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读对抗验收**：⛔ 改文件、⛔ commit、⛔ push、⛔ 载具全包；可跑定向 `go test ./internal/tools -run ...`、`./internal/panel -run ...`、`npx vite build --ssr` + `node`；临时件只落 D:\tmp\wisp\20261120\aud191。
+逐项判（成立/夸大/不成立 ＋ file:line ＋ 你自己跑的读数）：
+1. **"nil 回调逐字节一致"是真的吗**：读 `internal/tools/shell_session.go` 的 OnChunk 接线，自己做变异（把 sink 在 nil 时也调用 / 让 nil 路径少一次 flush）⇒ 定向用例应红；还原。给红句。
+2. **上限真的拦得住**：把 `sessionPendingCap` 或面板 `output` 的 8192 runes 上限改大/去掉 ⇒ 哪枚用例红、红句逐字；还原。
+3. **只读不执行**：`git grep -n "exec.Command\|CommandContext" -- internal/panel` 生产面枚数（应与改前一致＝`git show 8513bc2e3~1` 时点同数）；载体文件 import 名册是否真的只有 `{sync}`；`TerminalFeed` 方法集是否只有 `{Input, OutputChunk, Section}`。
+4. **账本收口没放宽断言**：`git diff 8e3600e2f~1 8e3600e2f -- internal/panel/composer_test.go` 与 `git diff 8513bc2e3~1 8513bc2e3 -- internal/panel/composer_test.go`：逐条列出删除/改写的断言，判"是否等价收紧/收口"或"放宽"。
+5. **界面三态不共用一张脸**：`frontend/scripts/render-terminal-191.tsx` 是否真能三态分开判读（缺席/空/有输出截断），自己跑仪器给 rc 与三段判读句；再变异"缺席态改显示空态文案"⇒ 应红。
+6. **零 emoji / 零 dist 字节 / 未碰他人件**：`git show --stat` 三笔无 dist；`frontend/fixtures/composer-states.html` 未在任一提交里。
+输出六节，每节「判 ＋ 读数」；末行「总判：X 成立 / Y 夸大 / Z 不成立」。回话第一行＝「总判 X/Y/Z ＋1/2/5 三组变异 rc 序列 ＋生产面进程构造点 改前/改后 ＋ 放宽断言 N 条」。
