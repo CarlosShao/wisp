@@ -17,8 +17,8 @@
 - [ ] **AC#2 载体与快照**：输入口／输出流怎么进快照（票 145 的载体扩张），⚠ **输出流里的外泄面**（命令输出会带绝对路径、token、环境变量）——必须过 C25 盖戳与外泄检测那套管子（票 175／177／183 同一条管子，别绕）。
 - [ ] **AC#3 反向判据（本票的牙）**：交付后必须有一枚常驻判据钉住"面板侧送进来的命令**走的是同一套门控**，没有任何一条路径能绕过 `risk` 分级直接执行"。⚠ 若判据在"甲支"上今天就能绿，它是**不许弄坏的守卫**，不许充当本票新增的牙——牙要长在"绕过门控那一形会红"上（造变异现量）。
 - [x] **AC#4 取消与超时语义**：长命令跑到一半用户关掉面板／按取消，今天这套语义是什么（票 176 的取消语义同族），逐形给读数。
-- [ ] **AC#5 契约轴**：`PLAN.md:2027` 那三条**不许由 agent 单方面改写**；D34 表、`allowlist.txt`、`thresholds.go`／golden、审批超时常量一字节不动；C17 若要加方法＝先落 `A##`。
-- [ ] **AC#6 门禁**：`./internal/tools/ ./internal/panel/ ./internal/agent/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
+- [x] **AC#5 契约轴**：`PLAN.md:2027` 那三条**不许由 agent 单方面改写**；D34 表、`allowlist.txt`、`thresholds.go`／golden、审批超时常量一字节不动；C17 若要加方法＝先落 `A##`。
+- [x] **AC#6 门禁**：`./internal/tools/ ./internal/panel/ ./internal/agent/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
 
 ## 本票**不**解决
 不做浏览器／产物预览（＝票 192，那里另有 `AGENTS §2` 未定义即停项）；不做树上写动作与 git 提交推送（票 189／190 的雷区，同样待批）。
@@ -55,3 +55,9 @@
 **我复跑**：`go test ./internal/panel -count=1` **ok 16.249s**、`gofmt -l internal/panel` 空、`d22scan` clean。腿报 panel 四数 `RUN=306 PASS=306 FAIL=0 SKIP=0`（并如实报：票面写的"2 枚已知红"今日不存在，改前基线 `3766819a8` 已全绿 —— 那是 09-28 时点的过期记载）。
 **腿自报的额外动作（具名）**：顺手修平 `config_handlers.go`（8 行对齐）与 `result_golden_200_36_test.go`（62 行注释缩进，内容零改动），二者在 HEAD 即 gofmt 不合规；**本机 gofumpt 未装（该半边门没跑成，只报不装）**。
 **未完**：AC#2 的 C25 盖戳半边卡 `Q-457`（待机主）；AC#3（绕过门控会红的牙）；AC#5／AC#6。**第二波 b（`cmd/wisp` 接真源）在 Q-457 拍前不派**。
+## 编排者收件·AC#5＋AC#6（2026-11-20 22:2x，件 `docs/evidence/s1/191-terminal-ui-receipt.md`／`191-panel-carrier-r1.md`／`191-stream-tools-r1.md`）
+
+- **AC#5 勾（契约零字节）**：本会话全部提交 `git diff --name-only 3bfc17229..HEAD | grep -Ei "PLAN.md|thresholds|golden|allowlist|docs/specs|D43"` 只命中 `internal/panel/result_golden_200_36_test.go`（名字含 golden）；**逐行核过**：该文件的改动**全部是注释重新缩进**（`git diff -w --ignore-blank-lines` 输出为空 ⇒ 零语义），`thresholds.go`／`allowlist.txt`／`PLAN.md`／`docs/specs/**`／D43 **一字节未动**；C17 未加方法。
+- **AC#6 勾（三包＋扫描）**：`go test ./internal/tools -count=1` **ok 27.408s**；`./internal/panel` **ok 18.138s**；`./internal/agent` **ok 6.358s**（158 条 PASS/FAIL/SKIP 行）；`sh scripts/d22scan.sh` **clean 0 findings**（ban #7 internal/tools=52、ban #8 internal=1073 等基线未降）。⚠ `scripts/gate-clauses.sh` **不存在**（`ls scripts/ | grep -i gate` 空），照实记。
+- **仍开**：**AC#2**（输出流外泄面必须过 C25 盖戳——现量 shell 不在 `sensitiveSourceTools`，已挂 `Q-457` 待机主；另泵源接线＝wave 2b）／**AC#3**（"绕过门控会红"的牙，依赖 wave 2b 的真源）。
+- 界面半已交：`panel.ts` 声明 `terminal`＋账本收口＋`terminal-region.tsx`＋`render:terminal191` 三态仪器；我复跑 typecheck rc=0、仪器 rc=0、panel ok 18.138s、d22scan clean。

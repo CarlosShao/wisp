@@ -38002,3 +38002,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1966（11-20 22:0x）：票 191 第二波 a `8513bc2e3` —— 面板终端载体（只读、有上限、到达事实）
 
 `Snapshot.Terminal`（reader-gated）：`input` 4096 runes 尾窗＋`output` 8192 runes 尾窗，`truncated` 终身伴随、`droppedRunes` 记账；没到过就缺席，空态 `"terminal":{}`。只读不执行：import 名册钉死 `{sync}`、方法集只收文本、生产面进程构造点钉死 2 枚。我复跑 panel `ok 16.249s`、`gofmt -l internal/panel` 空、`d22scan` clean。腿报 `RUN=306 PASS=306 FAIL=0 SKIP=0`（票面"2 枚已知红"是过期记载，基线 `3766819a8` 已全绿）。腿另顺手修平两枚 HEAD 即不合规的 gofmt（`config_handlers.go`／`result_golden_200_36_test.go`，零语义）。**本机 gofumpt 未装，该半边门没跑成（只报不装）**。第二波 b（cmd/wisp 接真源）等 `Q-457` 拍板后再派。
+## A1967（11-20 22:2x）：票 191 界面半 `8e3600e2f` ＋ AC#5/AC#6 勾（191 现 5/7）
+
+我复跑：typecheck rc=0、`render:terminal191` rc=0、`internal/panel` ok 18.138s、`internal/tools` ok 27.408s、`internal/agent` ok 6.358s、`d22scan` clean。界面半＝`terminal-region.tsx`（可折叠、缺席显「终端未连接」、空态「尚无输入/尚无输出」两态不共用一张脸、区内唯一按钮是折叠钮）＋`panel.ts` 声明＋账本收口（同提交）。**契约零字节**：`git diff 3bfc17229..HEAD` 对 `PLAN.md/thresholds/allowlist/specs/D43` 无命中；唯一命中 `result_golden_200_36_test.go` 经逐行核为**注释缩进**（`git diff -w --ignore-blank-lines` 空）。`gate-clauses.sh` 不存在，照实记。仍开：AC#2（C25 盖戳卡 `Q-457`＋泵源 wave 2b）、AC#3（绕门控会红的牙，依赖 wave 2b）。
