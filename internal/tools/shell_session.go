@@ -63,6 +63,35 @@ import (
 // call refuses - detached high-volume work belongs to task.spawn.
 const sessionPendingCap = 64 << 20
 
+// SessionOptions is ONE session command's streaming face (ticket 191, tool
+// side). The session's reader goroutine hands every new read of the shell's
+// stdout to OnChunk as it lands - edge delivery - while the marker-boundary
+// protocol and the final Result are untouched: the search loop still
+// accumulates the whole stream and still answers from the marker. The zero
+// value (OnChunk nil) is the pre-191 behavior byte for byte: no chunk is
+// handed out and nothing else differs.
+//
+// The chunk is the RAW session stream in read order - the echoed command
+// line, the command's own output and the host's marker echo line included -
+// because edge delivery mirrors the byte stream without re-parsing it; the
+// marker line stays host machinery and is stripped from the final Result
+// exactly as before (findMarkerCode). A consumer that cannot stand the
+// marker text filters it on its own side; the tool-side increment does not
+// widen what leaves this package: chunks ride the C1 onUpdate seam, so they
+// pass the same bridge plumbing the "已启动" progress line already uses.
+type SessionOptions struct {
+	// OnChunk is called from the session's ONE reader goroutine (the
+	// observe-spawned one, recover boundary included - no second goroutine
+	// exists). It must not block on slow work: the pipe is the session's
+	// only flow control, and a slow consumer backpressures the reads.
+	// Cumulative chunk bytes per command are capped at sessionPendingCap -
+	// the SAME bound the search loop enforces on the buffer - so streaming
+	// opens no second, uncapped buffer anywhere. Past the cap delivery
+	// stops; the loop's own cap path resets the session and refuses the
+	// call as it always did. nil = no streaming.
+	OnChunk func(chunk string)
+}
+
 // ---------------------------------------------------------------------------
 // the task-scoped roster
 // ---------------------------------------------------------------------------
@@ -214,8 +243,10 @@ func (s *shellSessionState) ensureLocked(d ShellDeps, cwd string) (SessionShell,
 
 // spawnReader starts the session's ONE output reader on the D38b per-task
 // roster ("tool-exec-shell-<task id>"): it appends raw bytes to the guarded
-// buffer and ends when the stream ends. The watchdog sees one picture; no
-// bare goroutine exists anywhere in this family (D22 ban #1).
+// buffer - and, when a sink is installed for the command in flight, hands
+// the same bytes to that sink for edge delivery (ticket 191) - and ends when
+// the stream ends. The watchdog sees one picture; no bare goroutine exists
+// anywhere in this family (D22 ban #1).
 func (s *shellSessionState) spawnReader(c SessionShell) {
 	done := s.streamOver
 	pending := &s.pending
@@ -256,7 +287,7 @@ type sessionRun struct {
 }
 
 // run drives ONE command through the live shell. The caller holds s.mu.
-func (s *shellSessionState) run(ctx context.Context, d ShellDeps, argv []string, cwd string) sessionRun {
+func (s *shellSessionState) run(ctx context.Context, d ShellDeps, argv []string, cwd string, opts SessionOptions) sessionRun {
 	carrier, err := s.ensureLocked(d, cwd)
 	if err != nil {
 		if err == errSessionCwdOnLive {
@@ -278,6 +309,27 @@ func (s *shellSessionState) run(ctx context.Context, d ShellDeps, argv []string,
 	// every read below is looking for. This is host machinery - the judged
 	// argv is `line` alone; the appended redirect and echo never pass C19,
 	// and nothing the MODEL sent is modified by them.
+	// The chunk face (ticket 191): installed BEFORE the command line is
+	// written, so the echo of the command itself is already covered; under
+	// the command's own serialization (the caller holds s.mu), consulted by
+	// the reader's appends, and cleared on EVERY return path by the defer
+	// below, so bytes read between commands never reach a stale consumer.
+	// The wrapper enforces the SAME per-command cumulative cap the search
+	// loop below enforces on the buffer - streaming adds no second,
+	// uncapped buffer anywhere. nil OnChunk installs nothing: today's
+	// behavior, byte for byte.
+	if opts.OnChunk != nil {
+		delivered := 0
+		s.pending.setSink(func(chunk string) {
+			if delivered >= sessionPendingCap {
+				return
+			}
+			delivered += len(chunk)
+			opts.OnChunk(chunk)
+		})
+	}
+	defer s.pending.setSink(nil)
+
 	stdin := carrier.Stdin()
 	if _, err := fmt.Fprintf(stdin, "%s 2>&1\r\necho %s %%errorlevel%%\r\n", line, marker); err != nil {
 		// The shell died between commands (its own `exit`, a crash). Reap it
@@ -473,7 +525,7 @@ func (t shellSession) Execute(ctx context.Context, params json.RawMessage, onUpd
 		sess.mu.Unlock()
 		return Result{}, ctx.Err()
 	}
-	run := sess.run(ctx, t.d, a.Argv, cwd)
+	run := sess.run(ctx, t.d, a.Argv, cwd, SessionOptions{OnChunk: onUpdate})
 	sess.mu.Unlock()
 
 	return sessionResult(run), nil
@@ -604,23 +656,49 @@ func (s *cmdSessionShell) Close() error {
 // its own deadline - never on a poll - so a marker that arrives mid-wait
 // wakes the search instead of being discovered only at the deadline (the
 // misjudgment AC#2 forbids).
+//
+// The buffer's take semantics are UNCHANGED by ticket 191: takeAll still
+// returns and clears the whole accumulated stream atomically. What 191 adds
+// is a second, read-only face: a sink (installed per command under the
+// session's own serialization) that each append ALSO hands the fresh bytes
+// to, outside the mutex, for edge delivery - ticket 191's SessionOptions.
+// OnChunk nil installs no sink, and then this type behaves exactly as the
+// pre-191 one did.
 type guardedText struct {
 	mu     sync.Mutex
 	buf    bytes.Buffer
 	notify chan struct{}
+	// sink, when non-nil, is consulted by every append; guarded by mu but
+	// invoked outside it, so a consumer re-entering the buffer cannot
+	// deadlock the reader.
+	sink func(string)
 }
 
 func newGuardedText() guardedText {
 	return guardedText{notify: make(chan struct{}, 1)}
 }
 
+// setSink installs or clears the edge-delivery face. Callers install it
+// while holding the session's command serialization (run), so one command's
+// sink is the only one in flight; clearing is the defer's job on every
+// return path.
+func (g *guardedText) setSink(sink func(string)) {
+	g.mu.Lock()
+	g.sink = sink
+	g.mu.Unlock()
+}
+
 func (g *guardedText) append(p []byte) {
 	g.mu.Lock()
 	g.buf.Write(p)
+	sink := g.sink
 	g.mu.Unlock()
 	select {
 	case g.notify <- struct{}{}:
 	default:
+	}
+	if sink != nil {
+		sink(string(p))
 	}
 }
 
