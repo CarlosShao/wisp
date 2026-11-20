@@ -37977,3 +37977,16 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1961（11-20 20:1x）：断电恢复 —— 193 界面半交件 `acce6ea13`（AC#4/#5 勾，剩 AC#3 接线）
 
 机主 11-19 20:2x 重启打断两腿：`w193ui` 成果留在工作区（typecheck/仪器/panel 包/d22scan 我现跑全绿）⇒ 派接管腿收口，`acce6ea13`（14 件）。四枚牙逐发真改→红→逐字节还原→绿（删 rAF 门红3／off 嵌 media 红1／未知默认 off 红11／删在跑取消红3）。**未提交 dist 字节**；`composer-states.html`(M) 与 `probe-ballsize-render.tsx`(??) 为他人件只报不动。剩余：AC#3＝`cmd/wisp` 泵源两行＋`config.set` 第九名册＋`ApplySetting` case（等 w123b 让出 cmd/wisp 写面后派）。`w123` 上一发零成果（cmd/wisp 无改动）已重发 `w123b`。
+## A1962（11-20 20:4x）：票 191 只读现量归档 —— 无流式工具面；另发现 shell 输出不在 C25 名册（与 175 同型，入 Q）
+
+只读审计腿读数＋我复核两条：①`internal/risk/provenance.go:113-117` `sensitiveSourceTools` 十枚里**没有** shell.exec/shell.session（`grep shell. internal/risk/*.go` 只有 `rules_shell.go:14` 的 R6 注释）⇒ shell stdout 里的路径/token 不进污染索引，R4 对后续出向调用不响；②`internal/panel/composer.go:313` `Results: results` 与 `pump.go:697` `snap.Run` 都在 `composer.go:319` 唯一 `scrubComposerForDisplay` 之外 ⇒ 今天只有 Composer 段被洗。票 191 现状：可跑命令工具面 2 枚、可流式 0 枚、关面板不取消、超时是真 deadline。甲支建议＝`shell.session` 增量交付（不新造第三枚工具）。C25 名册补 shell 属 SPEC-06 §5 契约文字 ⇒ 走 Q 待机主批，不自行实施。件：`docs/evidence/s1/191-readonly-survey-r1.md`。
+
+## Q-1962（11-20）：shell 工具的输出要不要进 C25 敏感源名册（= 改 SPEC-06 §5 的文字）
+
+**现量**：`internal/risk/provenance.go:113-117` 的 `sensitiveSourceTools` 十枚里没有 `shell.exec`／`shell.session`。后果：命令 stdout 里出现的本机绝对路径／凭据片段不进污染索引，后续出向调用（web.fetch 等）的 `Inspect` 扫不到 ⇒ R4 不响。**与票 175 修掉的 `task.output` 洞同型**（175 只补了一枚）。
+**为什么摆你**：补这一枚＝改 `SPEC-06 §5` 的清单文字（契约），按铁律 1「改契约文字须人工批准」，我不能自己动。
+**选项**：
+- 甲（推荐）：**补**，把 `SrcShell` 加进名册（+ `tools/bridge.go:860-873 mark` 对 shell 也盖戳），代价＝shell 输出若含路径，后续同任务的出向调用会升 L2/被拦，**可能多出确认卡**；获得＝堵住与 175 同型的洞。
+- 乙：**不补**，维持现状（shell 输出视为"用户自己要看的东西"，不进污染面）。代价＝上面那条洞继续开着，且与票 175 的裁决口径不一致。
+- 丙：**只补"面板侧来源的 shell"**（加来源标记再盖戳），范围小，但要多一条"来源＝面板"的判据。
+**不答的代价**：默认按乙（不动契约），洞继续存在，我只在台账记着。
