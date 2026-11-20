@@ -38011,3 +38011,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1969（11-20 22:5x）：`cmd/wisp` 5 枚 gofmt 存量脏已清（纯空白，零语义）
 
 `gofmt -l cmd/wisp` 原有 5 枚（`approval_always.go`／`approval_reply.go`／`panel_discovery_force_test.go`／`panel_tools_discovery.go`／`run.go`），全是制表符与注释对齐一处。用 `D:/work/base/gopath/bin/gofumpt.exe -w` 修平：`git diff --stat` 13 增 13 删，**`git diff -w` 输出为空 ⇒ 纯空白零语义**；`gofmt -l cmd/wisp` 与 `gofumpt -l cmd/wisp` 现在**都空**；`go build ./...` rc=0；载具 `^Test193|^Test65ApplySetting|^Test313` rc=0。这是机主偏好「低利害＋可逆的纯洁癖项自己做＋告知」范围（CI 的 gofmt 步骤因此可转绿）。撤销口令：`git revert <本commit>`。
+## A1970（11-20 23:0x）：票 191 对抗验收 = **3 成立 / 1 夸大 / 0 不成立**（件 `docs/evidence/s1/191-audit-r1.md`）
+
+overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；AST 独立普查面板生产面 `exec.*` 改前改后同为 2（零新增执行点）；账本收口放宽 0 条。**两处如实记并认领**：①我派单要求"少一次 flush⇒红"——实际不红（marker 跨读分段，丢一次 flush 只晚一轮），牙只兑现"nil 路径也调 sink"那侧，属**我派单口径错**；②我派单那句 `git grep "exec.Command|CommandContext"` 是基本正则、`|` 为字面竖线 ⇒ 命中 0 条无信息量（同为口径错）。**遗留**：`sessionPendingCap` 数值未被钉死（M2a 64→128MiB 全绿）⇒ 追加数值钉小活。
