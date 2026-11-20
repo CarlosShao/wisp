@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 245 AC#9：把"第二个进程真收到 Esc"那套台件搬进仓里当常驻尺（写面 internal/ball/** ＋ 一枚 test helper）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 245 的乙形实现早已交件（`f91feddd`／`e6d6426f`／`08886b8d`／`60f888c8`），只剩两格：AC#4（阻塞于票 228，⛔ 不许假绿）与 **AC#9**（本腿做的就是这一格）。
+**AC#9 原文要点**：现在"第二个进程真的收到 Esc"这套台件只在验收侧（E1 正常 `keydown_esc=1`；E2 自己占住裸 Esc ⇒ `0` 且 `wm_hotkey=1`；E3 出厂进程挂着仍 `1`；E4 反回去的 `0`）。完成判据＝**仓内一条能跑的用例做同样的四形＋不依赖人工桌面操作**。
+**任务**：
+1. 在 `internal/ball/` 落一枚**常驻尺**（`_windows_test.go`，可 skip 具名并给数字若桌面不可用——⛔ 不许假绿、不许放宽）：四形与验收侧一致：①闲置态别的进程能收到 Esc ②本进程稳态未绑裸 Esc（`HotkeyReport().Bindings()` 三枚）③卡片挂起时 Esc 被借走（别的进程收不到、本进程否决生效）④卡片撤下后 Esc 归还（别的进程又收到）。
+2. 若需第二个真 GUI 进程：用**测试自身起一枚子进程**（`go test` 里 `exec.Command` 起同一 test binary 的 helper 模式，`-test.run=TestHelperProcess` 经典形），⛔ 不许依赖机主手工开程序；helper 只在这一枚 `_windows_test.go` 里。
+3. **牙**：把"归还"那一步改成不 release ⇒ ④ 必须红；把稳态绑回裸 Esc ⇒ ② 必须红。逐发真跑记读数后还原。
+4. 门禁：`go test ./internal/ball -count=1 -run '245|Esc' -v` 四数逐条；`gofmt/gofumpt -l internal/ball`；`go vet`；`sh scripts/d22scan.sh` 0 findings。桌面不可用时那几发必须**具名 skip 并给数字**（不许静默）。
+**硬约束**：⛔ `PLAN.md`／`docs/specs/**`（D43/C12 冻结）／`thresholds.go`／golden／`allowlist.txt`；⛔ `cmd/wisp/**`（本腿不需要）；⛔ 放宽既有断言（票里三枚钉的期望值已收紧，别回退）；⛔ push；⛔ emoji。
+写面：`internal/ball/**`、`docs/evidence/s1/245-esc-ruler-*`。
+回话第一行＝commit hash ＋四形读数（含 skip 具名与数字）＋两发牙读数 ＋d22scan 末行。
