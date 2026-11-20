@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 票 191 补牙：把 `sessionPendingCap` 的**数值**钉死（写面 internal/tools/** 唯一）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。对抗验收（件 `docs/evidence/s1/191-audit-r1.md` 第②节）抓到一处真缺口：`internal/tools/shell_session.go:64` 的 `sessionPendingCap`（64MiB）**只被"上限存在"钉住，数值本身未被钉死** —— 验收把 64MiB 改成 128MiB，`go test ./internal/tools -count=1` **rc=0 全绿**（因为测试期望 `total := sessionPendingCap + (1<<20)` 与 `col.bytes() > sessionPendingCap` 都由同一常量派生，自证型）。
+**任务**：在 `internal/tools` 落一枚**数值钉**（`_test.go`）：
+1. 断言 `sessionPendingCap` **恰等于 `64 << 20`**，并在注释里写清"这个数字为什么是 64MiB（与 C22 预算同源；改了要连 `sessionPendingCap` 的消费方与票面理由一起改）"。
+2. 另加一枚**派生自字面量**（不是派生自常量）的上限用例：喂 `64<<20 + (1<<20)` 字节量级，断言"被拒/被截"这件事，期望里写**字面数字**；这样常量改大时它必须红。
+3. **牙必须真红**：把 `sessionPendingCap` 改成 `128 << 20` ⇒ 上面两枚至少一枚红（给逐字红句），还原后绿。
+4. 门禁：`go test ./internal/tools -count=1` 四数；`gofmt/gofumpt -l internal/tools`；`go vet`；`sh scripts/d22scan.sh` 0 findings。
+**硬约束**：只许动 `internal/tools/**` 与 `docs/evidence/s1/191-cap-pin-*`；⛔ 动 `sessionPendingCap` 的值（只钉不改）；⛔ 放宽任何既有断言；⛔ cmd/wisp、internal/panel、internal/ball（他腿在飞）、⛔ push、⛔ emoji。
+回话第一行＝commit hash ＋两枚新用例名与 PASS 读数 ＋"改 128MiB⇒红"逐字红句 ＋tools 四数 ＋d22scan 末行。
