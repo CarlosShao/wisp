@@ -38,7 +38,7 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/123-*.md` 由验收方出）
 
-- [ ] **AC#1** 先复现并**定因到行**：这 4 枚用例在 CI 上各自在哪一行等 `Confirm`、
+- [x] **AC#1** 先复现并**定因到行**：这 4 枚用例在 CI 上各自在哪一行等 `Confirm`、
       本机为什么不需要等（**要指出那条腿的名字与文件:行**，不许写"本机有环境"）。
       ⚠ 300 秒这条要有直接证据：4 枚耗时加起来是否与"各等满 300s"一致（`TestComposedGate…=301.06s` 就是形状对照）。
 - [ ] **AC#2** 修法**只许**把"确认"做成测试内可编程的注入腿；判据：
@@ -117,3 +117,10 @@
   - **票面标题假设修正**：9-21 本机绿**不是**"有人/有人造的确认腿"——当时树不存在任何应答腿（`t123replyScript` 11-06 才补交）；本机绿是长拼写 `%TEMP%` 让目标在白名单内走 **L1 路线**（L1 窗超时=执行，没有卡被显示）。今天满足 AC#1"那条腿"的是**可编程应答腿 `t123script`**：腿本体 `cmd/wisp/ticket123_replyleg_test.go:117-122`＋注入面 `run_mode101_test.go:95`/`:165-167`（`h.script` 字段与 `h.start` 选择）→ `run.go:1459 attachReplyListener` → 生产 `runReplyLoop`（`approval_reply.go:547`）落**真实**队列；每枚应答行 `run_mode101_test.go:329/:397/:467/:541`、`run_test.go:367`。
   - **AC#2 ★判据读数（真 carrier `wisp-cli-staged-tests.sh`，HEAD `397cd9e9d`）**：第一读数（写面原样）四枚 **PASS** 6.05/9.44/5.75/4.99s，包级 `ok 27.00s` rc0；第二读数（`go build -overlay` 把 5 处批准行**全部反转为 no**，原始文件零改动）同四枚仍 **PASS** 3.78/10.15/3.29/5.91s rc0，且无一枚触今日 fixture 的 40s 队列超时 ⇒ `no` 行真被 `runReplyLoop` 消费、卡是被答了而不是等没了。原样读数里本就含两张真拒绝卡（corr-2 R2 红线、.env R3）仍 PASS。变异副本与 overlay JSON 落 `D:\tmp\wisp\20261113\123\`（只建不删）。
   - **门禁**：`go build ./cmd/wisp/` BUILD-OK / `go vet` VET-OK / `sh scripts/d22scan.sh` **rc=0 clean**（2026-11-13 21:0x；live scope bans#1-5 internal/=403、cmd/=77、ban#7 tools/=51、ban#8 cmd/=276 等，均不低于裁决表末记）。**AC#4** 不归本腿（编排者 push 后取 runner 步 7：期望四枚 `--- PASS`＋`审批超时` 0 命中）。**登记一条**：`ticket123_replyleg_windows_test.go:13-14` 注释前提实测不成立（本卷 8.3 别名**开着**，FSO 实测 `T123SP~1`；本机从未红的真因是 `%TEMP%` 本身长拼写）——2 行注释修正不在本波写面枚举内，未动，留验收方裁定（证据件 §6-2）。
+
+## 编排者收件·AC#1 勾（2026-11-20 21:1x，件 `docs/evidence/s1/123-ci-approver-impl.md` §1）
+
+**定因到行（我抽核过两处）**：超时判拒的唯一产出点 `internal/agent/approval/queue.go:536-539`（`func (q *Queue) expire` 的 `why: fmt.Sprintf("审批超时（%d 秒未确认），C18 一律判拒绝，已自动拒绝", …)`）；L2 等待点 `internal/agent/approval/gate.go:673-675`（`case a := <-it.answer:`）。
+**本机为什么不需要等（腿名＋文件:行）**：本机走 `runSpec.reply`（`cmd/wisp/run.go:134-153` 的 `reply io.Reader`）→ `attachReplyListener` → `runReplyLoop`；测试脚本以程序化行喂同一条生产腿。CI 上无这条腿被装配（脚本无人消费）⇒ 三枚 Ticket101 夹具 `confirm_timeout_sec=40` 各等满（3.10/4.13/4.06s），`TestComposedGate…` 无 `[risk]` 块走 schema 默认 300 ⇒ **301.06s**（300s 形状对照成立）。
+**R4 本机整包（我自己跑，载具）**：`RUN=1016 PASS=1003 FAIL=1 SKIP=13`；唯一 FAIL＝`TestAC4FocusReturnToPriorWindowGap33r5`（已知前台锁环境红：`panel_host_windows_test.go:1120-1124` panel 未抢到前台）。日志 `D:\tmp\wisp\20261120\lead\123-r4-full-count1.log`。
+**仍未勾**：AC#2／AC#3（要我自己复验 overlay 两发：拒绝形 4 绿、拆生产腿 4 红）、AC#4（**CI runner 真读数**：`cmd/wisp CLI tests` 步骤 PASS=33/FAIL=0，需 push 后取 run id＋job id＋step 号）、AC#5（windows 腿 skip 记账：13 枚具名已取，需选"替身/豁免清单"一条）、AC#6（`-count=2` 四数：R5 正在跑）。
