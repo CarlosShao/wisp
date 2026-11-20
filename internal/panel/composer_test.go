@@ -178,10 +178,10 @@ func composerTSNameMap() map[string]string {
 		// in the same commit the ledger's PanelSnapshot entry was deleted, so
 		// the identity translation below is live contract, not a registration.
 		"PanelAnimationSection": "PanelAnimationSection",
-		"TreeView":                "FilesSection",
-		"TreeEntry":               "TreeEntryView",
-		"RunSection":              "RunSection",
-		"ToolRunRow":              "ToolRunRowView",
+		"TreeView":              "FilesSection",
+		"TreeEntry":             "TreeEntryView",
+		"RunSection":            "RunSection",
+		"ToolRunRow":            "ToolRunRowView",
 		// RunUsageRow joined with the consume wave-2 page half (2026-11-17,
 		// ticket 38 AC#4): the page's TaskRowView now declares costToDate,
 		// so the walk descends into the nested usage struct and needs the
@@ -295,6 +295,18 @@ func composerTSGapLedger() map[string][]string {
 		// composerTSNameMap carries the PanelAnimationSection translation -
 		// the same close-out the appearance wave's four keys followed
 		// (4017962b3).
+		//
+		// Ticket 191 wave 2a (2026-11-20): the panel-terminal carrier's
+		// top-level key is REGISTERED, not skipped - "terminal" is a real
+		// wire fact (the input port's most recent line and the bounded
+		// rolling output window, terminal_carrier_191.go), the Go side emits
+		// it through the reader-gated PumpSources.Terminal, and the page half
+		// belongs to the frontend leg (frontend/** is outside the wave's
+		// write face). Same procedure as every Go-only wave before it: when
+		// the page declares the key, this entry goes stale-red by its own
+		// both-ways rule and the ordinary walk (plus a TerminalSection
+		// translation in composerTSNameMap) takes over in the same commit.
+		"PanelSnapshot": {"terminal"},
 	}
 }
 

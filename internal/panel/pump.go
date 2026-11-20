@@ -400,6 +400,17 @@ type PumpSources struct {
 	// as "rows":[] and the two sentences traveling with it (never a bare
 	// empty list dressed as "no plugins").
 	Plugins func() PluginInventorySection
+	// Terminal reads the panel-terminal carrier (ticket 191 wave 2a): the
+	// input port (the command line the user typed, display only) and the
+	// bounded rolling output window the assembly root's TerminalFeed holds,
+	// fed by the host that owns the terminal session. It is a reader like
+	// every field above; a nil reader is the ONLY way the packet carries no
+	// "terminal" key at all - the shape the four-key byte nails pin, and the
+	// shape the running process carries until wave 2b wires the pump source -
+	// and a reader that exists always sends the key, with an empty feed
+	// rendered as "terminal":{} and each row absent until its own source
+	// delivered something (terminal_carrier_191.go's tooth 2).
+	Terminal func() *TerminalSection
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -719,6 +730,15 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 			sec.Rows = []PluginRow{}
 		}
 		snap.Plugins = &sec
+	}
+	if p.src.Terminal != nil {
+		// Ticket 191 wave 2a: same reader-gated rule one block up - a reader
+		// that exists always sends the key. The two rows are the feed's own
+		// arrival facts and the pump invents nothing (no empty-string fill
+		// for a source that has delivered nothing yet - terminal_carrier_
+		// 191.go's tooth 2), and an empty feed travels as "terminal":{} so
+		// "wired" and "nothing yet" never render the same.
+		snap.Terminal = p.src.Terminal()
 	}
 	return snap
 }

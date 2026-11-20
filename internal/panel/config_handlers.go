@@ -975,7 +975,7 @@ type providerPayload struct {
 	// waiting state there and never folds the absence into "every model
 	// enabled" (that folding is exactly the 能装配假象 residual 2 exists to
 	// kill).
-	ModelsEnabled   map[string]bool `json:"modelsEnabled,omitempty"`
+	ModelsEnabled map[string]bool `json:"modelsEnabled,omitempty"`
 	// ModelQuotas is the quota-editing read face (ticket 40 AC#3): one entry
 	// per catalog model, the two spend-cap leaves the C23 gate consumes. Same
 	// omitempty class as the maps above: nil map = the leg did not answer, and
@@ -986,9 +986,9 @@ type providerPayload struct {
 	// quota-editing half). No omitempty on purpose: 0 = "not entered" is an
 	// answered value the page must show as 未设, never as "the leg did not
 	// answer" (that state is the whole row's absence).
-	PlanCreditTotalMicro int64          `json:"planCreditTotalMicro"`
-	CredentialSet        bool           `json:"credentialSet"`
-	CredentialError      string         `json:"credentialError"`
+	PlanCreditTotalMicro int64  `json:"planCreditTotalMicro"`
+	CredentialSet        bool   `json:"credentialSet"`
+	CredentialError      string `json:"credentialError"`
 }
 
 // modelCapsPayload is the wire shape of one model's capability bits; separate

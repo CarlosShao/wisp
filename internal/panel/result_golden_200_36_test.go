@@ -9,36 +9,36 @@
 // shape; NOT one byte of pump.go's truncation rule is changeable to satisfy the
 // old word):
 //
-//   1. NO-JANK BY DECIDABLE FACTS ONLY (no wall clock anywhere): the replay
-//      counts its own incremental publishes - one per Append / Usage / Close
-//      step, exactly how the production sink pushes - and asserts
-//        a. the publish count equals the replay's own step count (no step
-//           silently coalesced away),
-//        b. EVERY intermediate packet stays inside the log's own hard-ceiling
-//           row bound (DefaultStreamKeys * StreamKeyHardCeilingMultiple) - the
-//           per-publish row cap the page can rely on,
-//        c. every row of every packet contains exactly its OWN chunk's unique
-//           marker and never another chunk's - a merge anywhere in the replay
-//           is caught at the step it happens, not only at the end,
-//        d. a key that leaves the packet is gone through the named-dropped
-//           ledger only (DroppedCount accounts for every disappearance).
-//   2. OVERFLOW IS TRUNCATION, NEVER MERGE: 200 golden chunks through a
-//      DefaultStreamKeys=32 log crosses the key bound and the hard ceiling.
-//      The 64 surviving rows must be the first 64 keys in arrival order, each
-//      with its own golden text VERBATIM (the chunks are sized under the
-//      truncated-mode window, so clamping costs nothing and any altered rune
-//      is a defect), the 136 dropped keys must be counted with the last 64
-//      named, and no dropped key's marker may appear in any surviving row.
-//      A second fixture part feeds one 10,000-rune stream BELOW the key bound
-//      and pins the per-row shape: head 4096 + the exact "[truncated: N runes
-//      elided]" marker + tail 4096, the elided count exact, the middle's own
-//      marker absent (that middle is NAMED as lost, never folded anywhere).
-//   3. THE TOKEN COUNTS RECONCILE PER CHUNK: every chunk the golden gives a
-//      usage row to must carry that row VERBATIM off the wire (all five
-//      fields), and every chunk the golden gives none to must travel WITHOUT
-//      the usage key - the explicit "未知" shape, never a fabricated zero.
-//      The wire half is checked on the pump's own marshalled bytes: rows with
-//      usage carry four JSON keys, rows without carry exactly three.
+//  1. NO-JANK BY DECIDABLE FACTS ONLY (no wall clock anywhere): the replay
+//     counts its own incremental publishes - one per Append / Usage / Close
+//     step, exactly how the production sink pushes - and asserts
+//     a. the publish count equals the replay's own step count (no step
+//     silently coalesced away),
+//     b. EVERY intermediate packet stays inside the log's own hard-ceiling
+//     row bound (DefaultStreamKeys * StreamKeyHardCeilingMultiple) - the
+//     per-publish row cap the page can rely on,
+//     c. every row of every packet contains exactly its OWN chunk's unique
+//     marker and never another chunk's - a merge anywhere in the replay
+//     is caught at the step it happens, not only at the end,
+//     d. a key that leaves the packet is gone through the named-dropped
+//     ledger only (DroppedCount accounts for every disappearance).
+//  2. OVERFLOW IS TRUNCATION, NEVER MERGE: 200 golden chunks through a
+//     DefaultStreamKeys=32 log crosses the key bound and the hard ceiling.
+//     The 64 surviving rows must be the first 64 keys in arrival order, each
+//     with its own golden text VERBATIM (the chunks are sized under the
+//     truncated-mode window, so clamping costs nothing and any altered rune
+//     is a defect), the 136 dropped keys must be counted with the last 64
+//     named, and no dropped key's marker may appear in any surviving row.
+//     A second fixture part feeds one 10,000-rune stream BELOW the key bound
+//     and pins the per-row shape: head 4096 + the exact "[truncated: N runes
+//     elided]" marker + tail 4096, the elided count exact, the middle's own
+//     marker absent (that middle is NAMED as lost, never folded anywhere).
+//  3. THE TOKEN COUNTS RECONCILE PER CHUNK: every chunk the golden gives a
+//     usage row to must carry that row VERBATIM off the wire (all five
+//     fields), and every chunk the golden gives none to must travel WITHOUT
+//     the usage key - the explicit "未知" shape, never a fabricated zero.
+//     The wire half is checked on the pump's own marshalled bytes: rows with
+//     usage carry four JSON keys, rows without carry exactly three.
 package panel
 
 import (
@@ -340,7 +340,7 @@ func TestResultGoldenLongRowTruncatesBelowTheKeyBound36(t *testing.T) {
 		t.Fatalf("computed elision %d disagrees with the fixture's own %d", elided, lr.ElidedExact)
 	}
 	expected := string(runes[:streamRowKeepRunes]) +
-		"...[truncated: "+strconv.Itoa(elided)+" runes elided]..."+
+		"...[truncated: " + strconv.Itoa(elided) + " runes elided]..." +
 		string(runes[len(runes)-streamRowKeepRunes:])
 	if row.Text != expected {
 		t.Fatalf("the long row's render drifted from the truncation shape\n got  (len %d)\n want (len %d)\n got head %q\n want head %q",

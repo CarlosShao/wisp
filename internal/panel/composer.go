@@ -230,6 +230,28 @@ type Snapshot struct {
 	// half (switching from the menu) is registered as not wired in the
 	// carrier's own evidence, not smuggled in as a write field.
 	Plugins *PluginInventorySection `json:"plugins,omitempty"`
+	// Terminal is ticket 191 wave 2a's carrier: the panel-embedded terminal's
+	// two read-only readouts - the input port (the command line the user
+	// typed, display only) and the output stream (a bounded rolling window
+	// over the session's most recent output, with the window's truncation
+	// flag and evicted-rune count). See terminal_carrier_191.go for the
+	// shape. The terminal does not execute anything (AC#0's 甲 ruling): a
+	// typed command rides the same gated tool leg as every other command,
+	// the carrier holds and hands out text, and the file's import list plus
+	// the AST nail in terminal_carrier_191_test.go are the shape proof.
+	//
+	// It is a pointer with omitempty for the same reason the fields above
+	// are: a pump assembled WITHOUT the reader sends no key - which is the
+	// shape the running process carries until wave 2b wires the pump source
+	// (cmd/wisp is this wave's forbidden face) - and a pump that has one
+	// always sends the key, with "wired but nothing yet" rendered as
+	// "terminal":{} and each row absent until its own source delivered
+	// something. The page-side declaration is not written yet (frontend/**
+	// is outside this wave's write face), so the two-way reconciliations
+	// judge "terminal" through the gap ledger (composerTSGapLedger's
+	// PanelSnapshot entry). No C17 method arrives with it, and the leak half
+	// of the output stream is Q-457's C25 pipe, not this carrier's.
+	Terminal *TerminalSection `json:"terminal,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.
