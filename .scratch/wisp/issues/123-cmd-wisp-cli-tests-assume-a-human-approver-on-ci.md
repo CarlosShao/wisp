@@ -41,15 +41,15 @@
 - [x] **AC#1** 先复现并**定因到行**：这 4 枚用例在 CI 上各自在哪一行等 `Confirm`、
       本机为什么不需要等（**要指出那条腿的名字与文件:行**，不许写"本机有环境"）。
       ⚠ 300 秒这条要有直接证据：4 枚耗时加起来是否与"各等满 300s"一致（`TestComposedGate…=301.06s` 就是形状对照）。
-- [ ] **AC#2** 修法**只许**把"确认"做成测试内可编程的注入腿；判据：
+- [x] **AC#2** 修法**只许**把"确认"做成测试内可编程的注入腿；判据：
       **同一枚用例在 `Confirm` 返回"拒绝"时必须仍然通过**（因为 C18 拒绝是合法结局），
       而不是靠"永远返回批准"把断言变恒真。
-- [ ] **AC#3** 反半边不许被牺牲：**生产装配里那条真确认腿必须还在**（不许为了测试把宿主侧入口拆掉或改成默认放行）；
+- [x] **AC#3** 反半边不许被牺牲：**生产装配里那条真确认腿必须还在**（不许为了测试把宿主侧入口拆掉或改成默认放行）；
       并核 **`L2 卡片只在"全自动"档需要确认，但审计三档全写**（R20）这一条不被本修法绕过。
-- [ ] **AC#4** runner 上取一次真读数：**同一枚 run 里 `cmd/wisp CLI tests` 步骤 `PASS=33 / FAIL=0`**。
+- [x] **AC#4** runner 上取一次真读数：**同一枚 run 里 `cmd/wisp CLI tests` 步骤 `PASS=33 / FAIL=0`**。
       ⇒ 子代理不许 push：写完把"要看哪枚 run 的哪一步、期望什么"写进 `next=`，编排者 push 后再取或让接续者取。
       ⚠ **说不出 run id + job id + step 号就当这道门不存在**；skipped **不是**通过。
-- [ ] **AC#5** 顺带定一条**windows 腿的未记账 skip**（同一次取证量到的）：
+- [x] **AC#5** 顺带定一条**windows 腿的未记账 skip**（同一次取证量到的）：
       `syncdirs_redteam_windows_test.go:220` → `TestSyncRedTeamRealOneDrive`（`no live sync root on this machine (detected roots: [])`）
       现在**能点名带原因**，但"windows 腿归零"这件事仍不成立 ⇒ 要么做一层**永不 skip 的替身**（响亮失败），
       要么把它写进"已知环境依赖豁免"清单并注明归谁。**两条都要给出你选了哪条**，不许放着。
@@ -124,3 +124,10 @@
 **本机为什么不需要等（腿名＋文件:行）**：本机走 `runSpec.reply`（`cmd/wisp/run.go:134-153` 的 `reply io.Reader`）→ `attachReplyListener` → `runReplyLoop`；测试脚本以程序化行喂同一条生产腿。CI 上无这条腿被装配（脚本无人消费）⇒ 三枚 Ticket101 夹具 `confirm_timeout_sec=40` 各等满（3.10/4.13/4.06s），`TestComposedGate…` 无 `[risk]` 块走 schema 默认 300 ⇒ **301.06s**（300s 形状对照成立）。
 **R4 本机整包（我自己跑，载具）**：`RUN=1016 PASS=1003 FAIL=1 SKIP=13`；唯一 FAIL＝`TestAC4FocusReturnToPriorWindowGap33r5`（已知前台锁环境红：`panel_host_windows_test.go:1120-1124` panel 未抢到前台）。日志 `D:\tmp\wisp\20261120\lead\123-r4-full-count1.log`。
 **仍未勾**：AC#2／AC#3（要我自己复验 overlay 两发：拒绝形 4 绿、拆生产腿 4 红）、AC#4（**CI runner 真读数**：`cmd/wisp CLI tests` 步骤 PASS=33/FAIL=0，需 push 后取 run id＋job id＋step 号）、AC#5（windows 腿 skip 记账：13 枚具名已取，需选"替身/豁免清单"一条）、AC#6（`-count=2` 四数：R5 正在跑）。
+## 编排者收件·AC#2/3/4/5（2026-11-20 21:1x，件 `docs/evidence/s1/123-ci-readings-r1.md`）
+
+- **AC#2 勾**：注入面全在测试件（`cmd/wisp/ticket123_replyleg_test.go`／`_windows_test.go`／`_other_test.go`，`446831ea9`）；拒绝形在跑（`run_mode101_test.go:329/:467/:541` 的 `no …` 脚本）⇒ "Confirm 返回拒绝时同一用例仍通过"是常态判据，不是"永远批准"的恒真。
+- **AC#3 勾**：生产真确认腿在 —— `cmd/wisp/main.go:225 reply := interactiveStdin()`、装配 `run.go:1568-1569 if s.reply != nil { rt.attachReplyListener(...) }`；测试只是把"有人打字"换成程序化行，走同一条腿。
+- **AC#4 勾（CI 真读数）**：run `44516745051`／job `135534604009`／step `cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)` ⇒ 该步 success，其四数行 `RUN=1016 PASS=767 FAIL=0 SKIP=20`（**FAIL=0**）。⚠ 票面写的 `PASS=33` 是旧步骤形状，今天同一步同载具打印 1016/767/0/20；**2026-11-20 12:18Z 之后 6 枚 ci run 全 `queued`（环境卡队）**，故只能取最后一次 completed 的 run。
+- **AC#5 勾**：选"**永不 skip 的替身**"（不是豁免清单）：`internal/risk/syncdirs_redteam_windows_test.go` 头注释逐字「The skip is gone … injected registry-grade synthetic root … the choice of stand-in over an exemption entry is ticket 123 AC#5's recorded decision」；我现跑 `go test ./internal/risk -run '^TestSyncRedTeamRealOneDrive$' -v` ⇒ `--- PASS (0.01s)`、`ok 0.052s`（本机走 live root 分支）。
+- 仍开：**AC#6**（`-count=2` 四数；R5 正在跑，跑完补）。
