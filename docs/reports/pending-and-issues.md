@@ -38005,3 +38005,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1967（11-20 22:2x）：票 191 界面半 `8e3600e2f` ＋ AC#5/AC#6 勾（191 现 5/7）
 
 我复跑：typecheck rc=0、`render:terminal191` rc=0、`internal/panel` ok 18.138s、`internal/tools` ok 27.408s、`internal/agent` ok 6.358s、`d22scan` clean。界面半＝`terminal-region.tsx`（可折叠、缺席显「终端未连接」、空态「尚无输入/尚无输出」两态不共用一张脸、区内唯一按钮是折叠钮）＋`panel.ts` 声明＋账本收口（同提交）。**契约零字节**：`git diff 3bfc17229..HEAD` 对 `PLAN.md/thresholds/allowlist/specs/D43` 无命中；唯一命中 `result_golden_200_36_test.go` 经逐行核为**注释缩进**（`git diff -w --ignore-blank-lines` 空）。`gate-clauses.sh` 不存在，照实记。仍开：AC#2（C25 盖戳卡 `Q-457`＋泵源 wave 2b）、AC#3（绕门控会红的牙，依赖 wave 2b）。
+## A1968（11-20 22:4x）：**票 193 结**（8/8）`2cf7e0afd` —— 动画开关的生产半接线
+
+我复跑载具 `^Test193|^Test248|^Test313` **15/15 PASS**、`go build ./...` rc=0、`d22scan` clean。泵源 `run.go:1365`＋`panel_resident_pump.go`（nil Manager ⇒ 键缺席，不冒充 off）；第九名册 `config_write_193.go`＋门并集＋A881 并集钉**同步**；`ApplySetting` 走 `SetPanelAnimation`，按**节名**问档（`[panel]` 整节 hot）⇒ 已立即生效列；端到端齿真链路（写 off⇒下一包 tier=off）。三发牙各自真红后还原。**票池：404 已结 / 39 未结。**
