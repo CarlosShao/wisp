@@ -37974,3 +37974,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 - **保留＝107 枚**：真 D1 2 枚（`internal/models/ads*.go:13`，"模型对抗样本 NTFS 上下文"，与视觉无关）＋真 D32 104 枚（watchdog 20／observe 23／proc 12／ball 14／scripts spike 12／其余 23）＋本腿新注释 1 枚（`schema.go:606`）。误报 8 行（GUID 字节 `0xD1` 等）不计。
 - **另有两条不动**：零 emoji（视觉规范，非性能门）、ban #6「面板侧不得成为批准/执行入口」（安全边界）。
 - **撤销口令**：本裁定只写台账与证据件，未改任何产码门槛；若要回退，删除本条与 `docs/evidence/s1/193-animation-opt-r1.md` 的裁定段即可（产码零影响）。
+## A1961（11-20 20:1x）：断电恢复 —— 193 界面半交件 `acce6ea13`（AC#4/#5 勾，剩 AC#3 接线）
+
+机主 11-19 20:2x 重启打断两腿：`w193ui` 成果留在工作区（typecheck/仪器/panel 包/d22scan 我现跑全绿）⇒ 派接管腿收口，`acce6ea13`（14 件）。四枚牙逐发真改→红→逐字节还原→绿（删 rAF 门红3／off 嵌 media 红1／未知默认 off 红11／删在跑取消红3）。**未提交 dist 字节**；`composer-states.html`(M) 与 `probe-ballsize-render.tsx`(??) 为他人件只报不动。剩余：AC#3＝`cmd/wisp` 泵源两行＋`config.set` 第九名册＋`ApplySetting` case（等 w123b 让出 cmd/wisp 写面后派）。`w123` 上一发零成果（cmd/wisp 无改动）已重发 `w123b`。

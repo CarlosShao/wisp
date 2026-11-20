@@ -12,8 +12,8 @@
 - [x] **AC#1 先把"卡前端的门禁"逐枚列出来**（只读普查，别凭印象）：至少查这几处并逐枚给"卡不卡前端／卡在哪一句"——`tools/d22scan/main.go` 的 ban #6（`frontend/` 面板批准面 scope）与 ban #8（零 emoji，含 `frontend/` 85 枚文本）、`frontend/**` 里的 hygiene 测试、`docs/PLAN.md` 的 D1／D29／D32 相关段、`SPEC-08` 的视觉与帧率条款、SLO 预算里有没有落到 UI 的那几枚数。⚠ 引规格**逐字引原句**。
 - [x] **AC#2 逐枚给"放开／保留"建议并落 `A##`**：我的**预判**（要现量推翻或坐实）——**放开**：任何把 D1／D32 的数拿来约束动画／过渡／视觉复杂度的条款引用；**保留**：零 emoji（那是你定的视觉规范、不是性能门）、ban #6 的"面板侧不得成为批准／执行入口"（那是安全边界，前端功能不依赖它）。⚠ 每一枚放开都要一条 `A##` 记录（文件／行／理由／边界／撤销口令），不许只留在派单里。
 - [ ] **AC#3 动画开关的字段与生效链**：`config.toml` 里那一节归 D36 的哪一档生效级别（`hot`／`reload`／`restart`）——⚠ 现量：`[panel]` 那一节今天**整节零读者**（`180-c1＋182-c1` 现量 `PanelSection.Width` 等 18 枚带 `default` 但生产零读者，全部已在票 83 的归口表里），所以**开关要连着"生效链"一起做，否则又是一枚装饰品**（票 180 同一枚病）。
-- [ ] **AC#4 关闭档必须可证**：判据要能区分"动画真停了"与"还在跑只是看不见"（例：关闭档下不注册 rAF／不挂 transition；给一发可重跑的尺）。⚠ 不许拿"设了个 CSS 变量"当证明。
-- [ ] **AC#5 界面那半**（★原文"`frontend/**`／`design/**` 归另一枚会话"已作废：机主 2026-11-16 铁律 4，前端归本编队全权）：Go 侧字段＋生效链＋门禁清单由本票交；`panel.ts` 声明＋开关 UI＋"关闭档真停"的前端尺由跟进写腿做（`frontend/**` 本编队写面）。
+- [x] **AC#4 关闭档必须可证**：判据要能区分"动画真停了"与"还在跑只是看不见"（例：关闭档下不注册 rAF／不挂 transition；给一发可重跑的尺）。⚠ 不许拿"设了个 CSS 变量"当证明。
+- [x] **AC#5 界面那半**（★原文"`frontend/**`／`design/**` 归另一枚会话"已作废：机主 2026-11-16 铁律 4，前端归本编队全权）：Go 侧字段＋生效链＋门禁清单由本票交；`panel.ts` 声明＋开关 UI＋"关闭档真停"的前端尺由跟进写腿做（`frontend/**` 本编队写面）。
 - [x] **AC#6 契约轴**：改 D1／D32 的**文字**要人工批准（本票只登记"引用口径"，不改 `PLAN.md` 一字）；`thresholds.go`／golden／SLO 阈值**一字节不许动**（那是 D32 的数，放开前端不等于放宽资源预算）。
 - [x] **AC#7 门禁**：`sh scripts/d22scan.sh`（基线 `ban #8 internal/` 433、`ban #6/#8 frontend/` 各 85）＋`go test -count=1 ./internal/config/ ./internal/panel/`＋`gate-clauses.sh` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记，AC#0 未答之前不许修。
 
@@ -37,3 +37,10 @@
 - **AC#6 勾**：`git diff PLAN.md` 空；`thresholds.go`／golden／SLO 零字节未动。（PLAN.md `:3451/:3486/:3516` 三句"拿 D32 当理由"属**文档文字**，改须人工批准 ⇒ 只登记、不改。）
 - **AC#7 勾**：`d22scan` **0 findings**（首跑 1 枚 ban #9 phantom-citation 是自引未落盘证据件，落盘后复跑干净；positive control PASS=46 FAIL=0）；`./internal/config` ok 10.239s／`./internal/panel` ok 50.925s（全绿 rc=0）；`gate-clauses.sh` **不存在**（Test-Path=False，照实记）。
 - **仍未勾**：AC#3（生产泵源两行未接⇒快照今天不发 `panelAnimation` 键；`config.set` 第九名册未加）、AC#4（前端半"关闭档真停"尺未做）、AC#5（界面半＝`panel.ts` 声明）。
+## 编排者收件·AC#4＋AC#5（2026-11-20 20:1x，`acce6ea13`，件 `docs/evidence/s1/193-animation-ui-r1.md`）
+
+**尺1** 提交在（14 件）。**尺3 我自己复跑**：`npm run typecheck` rc=0、`npm run build` rc=0、仪器 `render-animation-193` rc=0（OK 句含「off 真停: getAnimations()=0 + zero active rAF handles」）、`go test ./internal/panel -count=1` **ok 15.735s**、`d22scan` clean。
+- **AC#5 勾**：`panel.ts` 的 `PanelAnimationSection{tier:string}`＋`panelAnimation?` 与 Go 载体 `composer.go json:"panelAnimation,omitempty"`／`panel_animation_193.go json:"tier"` **逐字一致**（对照表在证据件 §3）；设置页三档（全开／减少／关闭），「减少」档标「（默认，待定）」；写半唯一走 `config.set` 的 `panel_animation`（无第二条路）；读面缺键/空/词表外 ⇒ 「档位未知/档位未设置」，**绝不画成 off/full**。
+- **AC#4 勾**：四枚牙逐发**真改→红→逐字节还原→绿**：①删 rAF 档位门⇒红 3 条 ②把 off 规则嵌进 media 块⇒红（depth=1）③未知默认成 off⇒红 11 条 ④删"在跑取消"⇒红 3 条（`getAnimations()=3` 非 0 仍判停）。
+- **未勾 AC#3**：生产泵源两行＋`config.set` 第九名册＋`ApplySetting` case 尚未接（`cmd/wisp` 写面，下一条腿做）；故此格仍开。
+- 附注：`frontend/fixtures/composer-states.html`（M）与 `probe-ballsize-render.tsx`（??）是他人在飞件，本腿未碰；`frontend/dist` 零字节未提交。
