@@ -37993,3 +37993,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1963（11-20 21:0x）：票 193 对抗验收 —— 6 节全「成立」，0 夸大 0 不成立
 
 只读审计腿亲做四发变异（删 rAF 门／off 规则进 media 块／未知默认 off／删翻档取消）**四发全红**，还原后 SHA256 **13/13 全等**、仪器 rc=0、config/panel 两包 ok。旧断言放宽 **0 条**（`acce6ea13` 删除行只有台账登记一条；`f34210795` 删除行只有 7 行 gofmt 对齐）；三发正控探针（只回退 panel.ts／只删 nameMap 那行／改 Go tag）**三发全红**且红句指名问题 ⇒ 账本收口是真两向比较。tag 逐字一致、默认"待 owner 拍"三处口径一致、"泵源未接不发键"属实、零 dist 零 emoji。件：`docs/evidence/s1/193-audit-r1.md`。
+## A1964（11-20 21:3x）：票 191 第一波 `6512d5a73` —— `shell.session` 边读边交付（工具侧）
+
+`SessionOptions.OnChunk`；回调 nil 时**逐字节一致**（老调用者零改动），`shell_exec.go` 未动，增量帽 64MiB 同源同值，零新增裸 `go func(`。我复跑 `go test ./internal/tools -count=1` **ok 27.408s**、`d22scan` clean。腿报四数 RUN=601/PASS=600/FAIL=0/SKIP=1（`Test23LiveClipboard` 真机存量）。四发牙：nil 一致／分片拼接==整段／只发一次⇒红／去上限⇒红。存量未修两处已具名（重置竞态窗口、桥侧 onUpdate 恒非 nil 时增量被吞）。剩 AC#2（面板载体；C25 盖戳卡 `Q-457`）／AC#3（绕过门控会红的牙）／AC#5／AC#6。

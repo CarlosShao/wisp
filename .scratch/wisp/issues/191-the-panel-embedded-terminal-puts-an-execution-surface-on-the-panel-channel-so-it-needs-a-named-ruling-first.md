@@ -40,3 +40,10 @@
 - **AC#1 勾**：名册级候选 **2 枚**（`shell.exec`／`shell.session`，`internal/tools/shell.go:235-243`，只在 `[risk] shell_enabled=true` 注册）；**能流式回显 0 枚**（`shell_exec.go:112-116` 整段缓冲、`shell_session.go:296-352` 见 marker 才整段取、`shell_exec.go:121-123` 唯一 onUpdate 只发"已启动"、`shell_session.go:431` 零 onUpdate）。结论：甲支可行，只缺"边读边发"一跳。
 - **AC#4 勾**（逐形读数）：任务取消＝有（`internal/tools/cancel.go:21-94`＋`bridge.go:720-730`＋`cmd/wisp/run.go:1441`）；超时＝真 deadline（`shell.go:145-152` 30m→`bridge.go:836-841` `context.WithTimeout`）；**关面板不取消**（`panel_host_windows.go:1287-1329/1345-1351/1368-1379` 三处不碰 task ctx，真取消在进程退出 `resident_windows.go:533-535`）；面板按取消＝有但缺一跳（`panel/bridge.go:266` `roster.cancel`→`composer_dispatch.go:493-497`→`panel_roster_cancel_wave2.go:119-149`）。
 - 仍开：AC#2（实现时输出流必须过 C25 盖戳——现量发现 shell 不在名册，已挂 `Q-457` 待机主）、AC#3（牙要落在"绕过门控会红"）、AC#5（契约不动）、AC#6（门禁）。
+## 进度·第一波交付（2026-11-20 21:3x，`6512d5a73`，件 `docs/evidence/s1/191-stream-tools-r1.md`）
+
+工具侧增量交付已落：`SessionOptions{OnChunk func(chunk string)}`，`shell_session.run()` 在写命令行前装 sink、`defer` 清；`guardedText` 加只读第二面 `setSink`（`takeAll`/缓冲语义一字未变，marker 剥离仍在最终 Result）；`Execute` 把 onUpdate 接缝接进去，**签名零改动 ⇒ 回调 nil 时与今天逐字节一致**；`shell_exec.go` 一字未动；增量帽＝`sessionPendingCap` 64MiB 同源同值；零新增裸 `go func(`。
+**我复跑**：`go test ./internal/tools -count=1` **ok 27.408s**、`d22scan` clean。腿报四数 `RUN=601 PASS=600 FAIL=0 SKIP=1`（SKIP＝`Test23LiveClipboard` 真机存量）。
+**牙四处**：①nil 回调逐字节一致 PASS ②分片按序拼接 == 整段 PASS ③"读协程只发一次"⇒红（已证）④"去掉上限"⇒红（已证）。
+**腿自报的两处存量未修（只报不动）**：①重置时旧读协程对重建 `pending` 的窄竞态（163 起存量）；②桥侧 onUpdate 闭包恒非 nil、宿主未接线时增量被吞（零可见变化）。
+**未完**：AC#2（面板载体＋C25 盖戳，后者卡 `Q-457`）、AC#3（"绕过门控会红"的牙）、AC#5（契约轴）、AC#6（门禁三包）。
