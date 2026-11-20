@@ -47,3 +47,11 @@
 **牙四处**：①nil 回调逐字节一致 PASS ②分片按序拼接 == 整段 PASS ③"读协程只发一次"⇒红（已证）④"去掉上限"⇒红（已证）。
 **腿自报的两处存量未修（只报不动）**：①重置时旧读协程对重建 `pending` 的窄竞态（163 起存量）；②桥侧 onUpdate 闭包恒非 nil、宿主未接线时增量被吞（零可见变化）。
 **未完**：AC#2（面板载体＋C25 盖戳，后者卡 `Q-457`）、AC#3（"绕过门控会红"的牙）、AC#5（契约轴）、AC#6（门禁三包）。
+## 进度·第二波 a 交付（2026-11-20 22:0x，`8513bc2e3`，件 `docs/evidence/s1/191-panel-carrier-r1.md`）
+
+面板侧载体已落：`Snapshot.Terminal`（reader-gated＋omitempty）＝`input`（只读展示，尾窗 4096 runes）＋`output`（滚动尾窗 8192 runes，`truncated` 终身伴随、`droppedRunes` 诚实记账；runes 非 bytes，防劈中文）。**到达事实**：没到过就缺席，不发空串冒充"没有输出"；有读者空态＝`"terminal":{}`。
+**只读不执行**：载体文件 import 名册钉死＝恰好 `{sync}`；`TerminalFeed` 方法集钉死＝`{Input, OutputChunk, Section}`，只收文本；生产面进程构造点普查钉死＝恰 2 枚（`git_readonly_exec.go`／`tree_reader_190.go`）。**我复跑 `git grep -c exec.Command -- internal/panel`** 生产面只 `git_readonly_exec.go:2`／`tree_reader_190.go:1`（其余全在 `_test.go`）。
+**台账**：`composerTSGapLedger` 登记 `"PanelSnapshot": {"terminal"}`（judged gap；页面半归前端腿，本波 frontend 零字节）。
+**我复跑**：`go test ./internal/panel -count=1` **ok 16.249s**、`gofmt -l internal/panel` 空、`d22scan` clean。腿报 panel 四数 `RUN=306 PASS=306 FAIL=0 SKIP=0`（并如实报：票面写的"2 枚已知红"今日不存在，改前基线 `3766819a8` 已全绿 —— 那是 09-28 时点的过期记载）。
+**腿自报的额外动作（具名）**：顺手修平 `config_handlers.go`（8 行对齐）与 `result_golden_200_36_test.go`（62 行注释缩进，内容零改动），二者在 HEAD 即 gofmt 不合规；**本机 gofumpt 未装（该半边门没跑成，只报不装）**。
+**未完**：AC#2 的 C25 盖戳半边卡 `Q-457`（待机主）；AC#3（绕过门控会红的牙）；AC#5／AC#6。**第二波 b（`cmd/wisp` 接真源）在 Q-457 拍前不派**。

@@ -37999,3 +37999,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1965（11-20 21:5x）：**票 123 结**（6/6）—— CI 上那 4 枚不再红，零产码改动
 
 受影响用例 `-count=2`（载具）`RUN=8 PASS=8 FAIL=0 SKIP=0`、ok 30.00s。整包 `-count=2` 如实记 `RC=139 / RUN=1601 PASS=1580 FAIL=7 SKIP=14`：其中 **6 枚是只有 count=2 才红的非幂等**（count=1 整包全 PASS，逐枚比对过 R4 日志），第 7 枚是已知前台锁环境红 ⇒ 与本票无关。`go vet` rc=0、`d22scan` clean；`gofmt/gofumpt -l cmd/wisp` 各 5 枚**存量脏**（`git status cmd/wisp` 空 ⇒ 入库即脏，CI 同样红，另立清理候选）。CI 真读数用 run `44516745051`/job `135534604009`/step「cmd/wisp CLI tests」＝`RUN=1016 PASS=767 FAIL=0 SKIP=20`。修法 `446831ea9` 本就在历史里；本次补的是三把尺与读数。**票池：403 已结 / 40 未结。**
+## A1966（11-20 22:0x）：票 191 第二波 a `8513bc2e3` —— 面板终端载体（只读、有上限、到达事实）
+
+`Snapshot.Terminal`（reader-gated）：`input` 4096 runes 尾窗＋`output` 8192 runes 尾窗，`truncated` 终身伴随、`droppedRunes` 记账；没到过就缺席，空态 `"terminal":{}`。只读不执行：import 名册钉死 `{sync}`、方法集只收文本、生产面进程构造点钉死 2 枚。我复跑 panel `ok 16.249s`、`gofmt -l internal/panel` 空、`d22scan` clean。腿报 `RUN=306 PASS=306 FAIL=0 SKIP=0`（票面"2 枚已知红"是过期记载，基线 `3766819a8` 已全绿）。腿另顺手修平两枚 HEAD 即不合规的 gofmt（`config_handlers.go`／`result_golden_200_36_test.go`，零语义）。**本机 gofumpt 未装，该半边门没跑成（只报不装）**。第二波 b（cmd/wisp 接真源）等 `Q-457` 拍板后再派。
