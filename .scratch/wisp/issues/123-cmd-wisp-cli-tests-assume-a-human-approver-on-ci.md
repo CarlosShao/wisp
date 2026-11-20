@@ -131,3 +131,10 @@
 - **AC#4 勾（CI 真读数）**：run `44516745051`／job `135534604009`／step `cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)` ⇒ 该步 success，其四数行 `RUN=1016 PASS=767 FAIL=0 SKIP=20`（**FAIL=0**）。⚠ 票面写的 `PASS=33` 是旧步骤形状，今天同一步同载具打印 1016/767/0/20；**2026-11-20 12:18Z 之后 6 枚 ci run 全 `queued`（环境卡队）**，故只能取最后一次 completed 的 run。
 - **AC#5 勾**：选"**永不 skip 的替身**"（不是豁免清单）：`internal/risk/syncdirs_redteam_windows_test.go` 头注释逐字「The skip is gone … injected registry-grade synthetic root … the choice of stand-in over an exemption entry is ticket 123 AC#5's recorded decision」；我现跑 `go test ./internal/risk -run '^TestSyncRedTeamRealOneDrive$' -v` ⇒ `--- PASS (0.01s)`、`ok 0.052s`（本机走 live root 分支）。
 - 仍开：**AC#6**（`-count=2` 四数；R5 正在跑，跑完补）。
+## 编排者收件·AC#6 勾＋票结（2026-11-20 21:5x）
+
+**受影响用例 `-count=2`（不缓存，载具）**：`RUN=8 PASS=8 FAIL=0 SKIP=0`、`ok cmd/wisp 30.00s`（4 枚 × 2 遍全绿；日志 `D:\tmp\wisp\20261120\lead\123-r6-targeted-count2.log`）。
+**整包 `-count=2`（载具）如实记**：`RC=139`（进程在真窗区死亡，票 450/314 同族）、`RUN=1601 PASS=1580 FAIL=7 SKIP=14`；7 枚 FAIL 中 **6 枚是"只有 count=2 才红"的非幂等**（`Test219AC2MutationRevokeWriteMustPersistForBytesToComeBack`／`Test65ApplySettingBallStyleFlipsActiveStyle`／`TestAC6CSPOnTheRealPageIsReadFromItsRealResponse33lane2`／`Test38ToolLaunchL1RaisesNoCard`／`TestAC13BringUpRefusesAThreadWithAQueuedClose`／`TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever` —— 这 6 枚在 count=1 整包里 **全部 PASS**，我逐枚比对过 R4 日志），第 7 枚＝`TestAC4FocusReturnToPriorWindowGap33r5`（已知前台锁环境红）。⇒ 整包 count=2 的红与本票无关，属环境/非幂等存量。
+**其它门禁**：`go vet ./cmd/wisp` rc=0；`sh scripts/d22scan.sh` **clean 0 findings**；`gofmt -l cmd/wisp`／`gofumpt -l cmd/wisp` **各 5 枚存量脏**（`approval_always.go`／`approval_reply.go`／`panel_discovery_force_test.go`／`panel_tools_discovery.go`／`run.go`）—— `git status --porcelain cmd/wisp` **空** ⇒ 是入库即脏的存量（CI 的 gofmt 步骤同样红），**不属本票、未碰**，另立清理候选。
+
+**票结**：6/6 全勾。本票**零产码改动**（修法 `446831ea9` 早已在历史里，本次是把提交真在、CI 真读数、四数逐条点名补齐）。
