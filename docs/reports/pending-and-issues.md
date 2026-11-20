@@ -37981,7 +37981,7 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 
 只读审计腿读数＋我复核两条：①`internal/risk/provenance.go:113-117` `sensitiveSourceTools` 十枚里**没有** shell.exec/shell.session（`grep shell. internal/risk/*.go` 只有 `rules_shell.go:14` 的 R6 注释）⇒ shell stdout 里的路径/token 不进污染索引，R4 对后续出向调用不响；②`internal/panel/composer.go:313` `Results: results` 与 `pump.go:697` `snap.Run` 都在 `composer.go:319` 唯一 `scrubComposerForDisplay` 之外 ⇒ 今天只有 Composer 段被洗。票 191 现状：可跑命令工具面 2 枚、可流式 0 枚、关面板不取消、超时是真 deadline。甲支建议＝`shell.session` 增量交付（不新造第三枚工具）。C25 名册补 shell 属 SPEC-06 §5 契约文字 ⇒ 走 Q 待机主批，不自行实施。件：`docs/evidence/s1/191-readonly-survey-r1.md`。
 
-## Q-1962（11-20）：shell 工具的输出要不要进 C25 敏感源名册（= 改 SPEC-06 §5 的文字）
+## Q-457（11-20）：shell 工具的输出要不要进 C25 敏感源名册（= 改 SPEC-06 §5 的文字）  〔编排者自纠：本条初稿误用 A 号序列写成 Q-1962，现改为 Q-457（既有 Q 最大＝456）〕
 
 **现量**：`internal/risk/provenance.go:113-117` 的 `sensitiveSourceTools` 十枚里没有 `shell.exec`／`shell.session`。后果：命令 stdout 里出现的本机绝对路径／凭据片段不进污染索引，后续出向调用（web.fetch 等）的 `Inspect` 扫不到 ⇒ R4 不响。**与票 175 修掉的 `task.output` 洞同型**（175 只补了一枚）。
 **为什么摆你**：补这一枚＝改 `SPEC-06 §5` 的清单文字（契约），按铁律 1「改契约文字须人工批准」，我不能自己动。
