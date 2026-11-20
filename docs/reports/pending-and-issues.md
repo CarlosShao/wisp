@@ -38008,3 +38008,6 @@ AC#0 的答案本就在票正文 21-24 行（依据 D34/SPEC-05、D31/SPEC-12 S7
 ## A1968（11-20 22:4x）：**票 193 结**（8/8）`2cf7e0afd` —— 动画开关的生产半接线
 
 我复跑载具 `^Test193|^Test248|^Test313` **15/15 PASS**、`go build ./...` rc=0、`d22scan` clean。泵源 `run.go:1365`＋`panel_resident_pump.go`（nil Manager ⇒ 键缺席，不冒充 off）；第九名册 `config_write_193.go`＋门并集＋A881 并集钉**同步**；`ApplySetting` 走 `SetPanelAnimation`，按**节名**问档（`[panel]` 整节 hot）⇒ 已立即生效列；端到端齿真链路（写 off⇒下一包 tier=off）。三发牙各自真红后还原。**票池：404 已结 / 39 未结。**
+## A1969（11-20 22:5x）：`cmd/wisp` 5 枚 gofmt 存量脏已清（纯空白，零语义）
+
+`gofmt -l cmd/wisp` 原有 5 枚（`approval_always.go`／`approval_reply.go`／`panel_discovery_force_test.go`／`panel_tools_discovery.go`／`run.go`），全是制表符与注释对齐一处。用 `D:/work/base/gopath/bin/gofumpt.exe -w` 修平：`git diff --stat` 13 增 13 删，**`git diff -w` 输出为空 ⇒ 纯空白零语义**；`gofmt -l cmd/wisp` 与 `gofumpt -l cmd/wisp` 现在**都空**；`go build ./...` rc=0；载具 `^Test193|^Test65ApplySetting|^Test313` rc=0。这是机主偏好「低利害＋可逆的纯洁癖项自己做＋告知」范围（CI 的 gofmt 步骤因此可转绿）。撤销口令：`git revert <本commit>`。

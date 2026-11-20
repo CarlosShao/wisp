@@ -608,7 +608,7 @@ type w38InstrSource struct {
 	manifest []string
 }
 
-func (s *w38InstrSource) BlockForTurn() string    { return s.block }
+func (s *w38InstrSource) BlockForTurn() string      { return s.block }
 func (s *w38InstrSource) ManifestForTurn() []string { return s.manifest }
 
 // ---------------------------------------------------------------------------

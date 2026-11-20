@@ -564,7 +564,7 @@ type agentRuntime struct {
 	snapMu        sync.Mutex
 	lastSnap      panel.Snapshot
 	lastSnapBytes []byte
-	snapSeen      bool	// snapHost is ticket 329 form 甲's destination for the booked bytes: the one
+	snapSeen      bool // snapHost is ticket 329 form 甲's destination for the booked bytes: the one
 	// panel window this process owns, attached by the assembly root after this
 	// runtime is built and read by pushPanelSnapshotToHost on every publish. Nil
 	// means this run has no window to push to - a console `wisp run` is exactly

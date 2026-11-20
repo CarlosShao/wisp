@@ -233,9 +233,9 @@ func (rt *agentRuntime) toolsRosterRows() []panel.ToolRosterRow {
 	rows := make([]panel.ToolRosterRow, 0, len(entries))
 	for _, e := range entries {
 		rows = append(rows, panel.ToolRosterRow{
-			Name:      e.Tool.Name(),
-			Title:     toolTitleW3(e.Tool.Description()),
-			RiskPill:  e.Decl.Declared.String(),
+			Name:       e.Tool.Name(),
+			Title:      toolTitleW3(e.Tool.Description()),
+			RiskPill:   e.Decl.Declared.String(),
 			ArgSummary: toolArgSummaryW3(e.Tool.Parameters()),
 		})
 	}

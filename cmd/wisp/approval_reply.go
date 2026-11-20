@@ -376,14 +376,14 @@ func (s *replySurface) sessionExpand(corr string) (string, error) {
 	s.mu.Unlock()
 	s.record("EXPAND-ARMED", corr, card.Tool, "native/session-expand",
 		fmt.Sprintf("target=%q window=%s", card.TargetProcess, sessionExpandWindow))
-	return "危险档："+"本会话内允许向所有应用注入 —— 不再绑定 "+func() string {
+	return "危险档：" + "本会话内允许向所有应用注入 —— 不再绑定 " + func() string {
 		if card.TargetProcess == "" {
 			return "任何应用"
 		}
 		return card.TargetProcess
-	}()+
-		"，本会话内对任何窗口的注入都不再询问。"+
-		"确认请 30 秒内再发 session-all "+corr+"（二次点击展开，SPEC-06 §8.2）", nil
+	}() +
+		"，本会话内对任何窗口的注入都不再询问。" +
+		"确认请 30 秒内再发 session-all " + corr + "（二次点击展开，SPEC-06 §8.2）", nil
 }
 
 // sessionAll spends the armed expand window and answers the card through the
@@ -1048,7 +1048,7 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 			"L1 窗口存活时任意输入（含回车）＝否决（票 170）· " +
 			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
-		return "", fmt.Errorf("未知答复指令 %q（yes/session/session-all/session-pattern/grants/revoke-grant/" +
+		return "", fmt.Errorf("未知答复指令 %q（yes/session/session-all/session-pattern/grants/revoke-grant/"+
 			"no/veto/always/revoke/decisions/panel-no/panel-yes/head/view/help/quit）", verb)
 	}
 }

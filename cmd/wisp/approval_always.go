@@ -86,9 +86,9 @@ type widenSeat struct {
 	// during assembly, after the surface exists (approval_reply.go's
 	// newReplySurface is called from the same function that builds it), so
 	// capturing it by value here would capture the nil it had at that moment.
-	mgr   func() *config.Manager
-	out   io.Writer
-	mode  func() risk.Mode
+	mgr  func() *config.Manager
+	out  io.Writer
+	mode func() risk.Mode
 }
 
 // widenSeatOf answers "who owns the 长期 branch for this surface": the seat a
