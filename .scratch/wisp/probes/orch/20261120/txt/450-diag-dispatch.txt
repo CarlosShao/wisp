@@ -1,0 +1,11 @@
+# 派单存档（先存档再发）—— 诊断腿（只读、可写 evidence）：票 450／314 真窗区整进程死亡定位
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（诊断属审查类；⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**诊断，不改产码**（可写 `docs/evidence/s1/450-*` 与 `D:\tmp\wisp\20261120\diag450`）。
+**已知事实（我现跑，别当常量，先复核）**：载具 `scripts/wisp-cli-staged-tests.sh` 整包 `-test.count=2` ⇒ `RC=139`、`RUN=1601 PASS=1580 FAIL=7 SKIP=14`，死亡点在真 WebView2 窗那一区；同一载具 `-count=1` 早前一发也在约 2604s 处 `RC=139`。票 450 原文：约 400 秒处整进程死亡，两发两次都不是断言红。票 314：同二进制真窗测试区 4/4 连发复现死亡、同日早些时候 4/4 全活。
+**任务（按顺序，每步给读数）**：
+1. 复核：跑一发载具 `-count=1 -test.v`，日志落 `D:\tmp\wisp\20261120\diag450\full1.log`；给「最后一个 `=== RUN`／最后一行／退出码／耗时／日志行数」四读数。
+2. **定位**：若死亡可复现，按 `-test.run` 分组二分（先按包内 top-level 测试名分 4–8 组，再缩到单枚），找出**最小可复现集合**；每次给「组名／耗时／退出码」表。⛔ 不许放宽或删除任何用例。
+3. 判性质：是 (a) 某枚测试自身崩（panic/access violation）(b) WebView2 进程/环境资源耗尽 (c) 载具 staging 的 onnxruntime 冲突（票 455 同族）。给判据：若 (a) 指出 panic 首行与栈顶三帧；若 (b)(c) 给出崩溃前 200 行的资源/句柄线索。
+4. **产出**：`docs/evidence/s1/450-death-localization-r1.md`：四读数＋二分表＋最小复现集合＋性质判定＋**下一步建议**（改哪一处／要不要机主批）。末行「总判：定位到 X，性质 Y，建议 Z」。
+**硬约束**：⛔ 改产码与用例；⛔ 动 thresholds/golden/allowlist/PLAN/specs；⛔ push；⛔ 与其它腿抢 `go test ./cmd/wisp`（跑前 `Get-Process wisp.test` 有就等 60 秒再看，仍有一律停）；载具一次一发。若桌面被占（前台拿不到）如实记并说明对定位的影响。
+回话第一行＝「退出码 X／死亡点 Y／最小复现集合 Z／性质 N」＋件路径。
