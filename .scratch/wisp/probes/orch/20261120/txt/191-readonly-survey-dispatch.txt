@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 只读设计核（不写一行）：票 191 面板内置终端的 AC#1/AC#4 现量（审计路由）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 其它 model、⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读**（⛔ commit、⛔ 改文件、⛔ push、⛔ 跑载具；临时件只落 D:\tmp\wisp\20261120\relay191）。
+做票 191 的**只读那一半**（`.scratch/wisp/issues/191-*.md:16-20`），只给读数与判断，不实现：
+1. **AC#1**：现有工具面里能承载"跑一条命令并流式回显"的是哪一枚？逐枚给 `file:line`：`grep -rn "shell\." --include=*.go internal | grep -v _test`；票 163 的常驻会话是否在名册级（`grep -rn "session\|resident" internal/tools/*.go | grep -v _test | head`）；把候选按"能流式回显／只能拿最终输出／没有"三档分类，每档给枚数。
+2. **AC#2 载体与外泄面**：命令输出进快照的管道今天有没有（`internal/panel/**` 里 stream/chunk 相关给出 file:line）；输出会带绝对路径/token/环境变量 —— 现量 C25 盖戳与外泄检测（票 175/177 的件）在哪、叫什么（`grep -rn "C25\|redact\|外泄" --include=*.go internal | grep -v _test | head -20`），判断"面板侧命令输出是否必经这套管子"。
+3. **AC#4 取消与超时语义**：长命令跑到一半用户关面板/按取消，今天这套语义是什么？读 `internal/tools/**` 的 exec 路径与票 176 的取消语义，给"有／无／有但没接"三档结论＋file:line。
+4. **AC#3 的可判据**：如果要钉"面板侧送进来的命令走同一套门控、无路绕过 `risk` 分级"，今天有没有现成接缝可钉（给 file:line 与形状），还是必须新增。
+5. **风险清单**：实现这条票会动哪些包（枚数），有没有越出"`internal/tools`＋`internal/panel`＋`internal/agent`"。
+输出：五节，每节 `结论＋file:line 读数`；最后一行给「建议甲支＝接入哪一枚／或判定本票应先立子票」。⛔ 不要建议放宽任何门禁。回话第一行＝「AC#1 候选 N 枚（可流式 X）／AC#2 管道 有|无／AC#4 语义 有|无／AC#3 接缝 有|无」。
