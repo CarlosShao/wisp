@@ -19,13 +19,13 @@ type Decision struct {
 	// AC6). It travels with the verdict for the same reason Mode does: the audit
 	// trail has to answer "which plugin ran this" from the record, and the tool
 	// name cannot answer it. Empty for builtin tools.
-	PluginID     string
-	Params       map[string]any
-	Args         json.RawMessage
-	Level        risk.Level
-	RulesHit     []risk.RuleID
-	Reason       string
-	Paths        []string // canonical, as judged by R2/R3
+	PluginID string
+	Params   map[string]any
+	Args     json.RawMessage
+	Level    risk.Level
+	RulesHit []risk.RuleID
+	Reason   string
+	Paths    []string // canonical, as judged by R2/R3
 	// TargetProcess is ticket 49's input.type binding fact: the RESOLVED
 	// target process name (lowercase image name from the pid the call
 	// targets), filled by the bridge only for input.type calls whose target
@@ -35,7 +35,7 @@ type Decision struct {
 	// a named application, and the session-subject record stores it as the
 	// grant row's pattern (§15 ruling item 7: 绑定 (工具, 目标进程名, 会话)).
 	TargetProcess string
-	Capabilities []Capability
+	Capabilities  []Capability
 	// SessionOverrideBlocked is R4's "no D45 grant covers this" flag.
 	SessionOverrideBlocked bool
 	// Refusal is the MACHINE-READABLE class of a refusal (ticket 20 frame 7

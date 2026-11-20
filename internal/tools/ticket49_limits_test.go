@@ -135,7 +135,7 @@ func TestTicket49ModeSilenceNeverBooksAGrantLink(t *testing.T) {
 		t.Fatal("no tool_call row booked")
 	}
 	if row.Decision == agent.DecisionAllowGrant {
-		t.Errorf("a mode-silenced call booked decision=allow_session_grant: config loosening rode a grant, "+
+		t.Errorf("a mode-silenced call booked decision=allow_session_grant: config loosening rode a grant, " +
 			"which is exactly the D45-3 third limit (安全配置放宽不适用会话授权)")
 	}
 	if row.GrantID != nil {
