@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）——【恢复件】票 193 界面半收尾：盘上已有上一腿未提交成果，接管并交件（写面 frontend/** ＋ internal/panel/composer_test.go 的对账登记）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**背景**：机主 11-19 20:2x 重启电脑，上一条同任务腿被打断，**它的成果还留在工作区未提交**（`git status` 可见）：`frontend/src/lib/panel.ts`(+23)、`frontend/src/lib/motion.ts`、`frontend/src/styles/theme.css`、`frontend/src/components/config-screen.tsx`、`frontend/src/App.tsx`、`frontend/src/components/harness/settings-page.tsx`、`frontend/src/components/glide-highlight.tsx`、`frontend/src/lib/panel-visibility.ts`、`frontend/src/lib/config-actions.ts`、`frontend/package.json`(加了 `render:animation193`)、新文件 `frontend/scripts/render-animation-193.tsx`、以及 `internal/panel/composer_test.go`（把 `panelAnimation` 的 gap-ledger 条目按票 167 先例收口成 `composerTSNameMap` 的 `PanelAnimationSection` 翻译）。
+**我已复跑**：`npm run typecheck` rc=0、仪器 `render-animation-193` rc=0（OK 句含 "off 真停: getAnimations()=0 + zero active rAF handles…"）、`go test ./internal/panel -count=1` ok 17.630s、`d22scan` clean。
+**你的任务＝接管并交件**（⛔ 不要重写已完成的东西，先读盘上现状）：
+1. **逐条自查 AC#5/AC#4 是否都落到位**：`panel.ts` 的 `PanelAnimationSection`/`panelAnimation` 与 Go 载体 `internal/panel/panel_animation_193.go`＋`composer.go` 的 json tag **逐字一致**；设置页三档 UI（全开／减少／关闭）＋默认档标"（默认，待定）"；写走 `config.set`（字段名与 Go 同名，⛔ 自造第二条路）；读面没发 `panelAnimation` 键 ⇒ UI 显「未知」（⛔ 默认成 off/full）。
+2. **补齐缺的**（若有）：仪器四枚牙必须能红 —— ①off 档仍注册 rAF ⇒ 红 ②把 off 当 prefers-reduced-motion ⇒ 红 ③读面缺键时默认成 off ⇒ 红 ④`getAnimations()` 非 0 时仍判"停"⇒ 红。**逐发实际改→红→还原→绿**，读数写进证据件。
+3. **证据件**：`docs/evidence/s1/193-animation-ui-r1.md`（四发变异读数、typecheck/build/instrument rc、与 Go 载体的 tag 对照表、明确写"动画默认档待 owner 拍"）。
+4. **提交**：`git add` **显式 pathspec** 逐个列出上述文件＋证据件；`git commit`（⛔ `add -A`、⛔ amend/reset/rebase/stash/checkout）。⛔ 提交 `frontend/dist` 字节。⛔ 动 `frontend/fixtures/composer-states.html`（他人在飞件，先 `git diff` 确认你没碰它；若它在你进场前就是 M，只报不动）。
+**硬约束**：⛔ thresholds/golden/allowlist/PLAN/specs/D43/design、⛔ 动 `cmd/wisp/**`、⛔ 动 `internal/**` 产码（`composer_test.go` 的账本收口已由上一腿做完，你只许保持/必要时修正登记，不许放宽任何断言）、⛔ 放宽断言、⛔push、⛔UI emoji。
+三样现跑：①`sh scripts/d22scan.sh` 0 findings ②`npm run typecheck`／`npm run build` rc=0 ③仪器 rc=0。
+回话第一行＝commit hash ＋四枚牙读数 ＋instrument rc ＋typecheck rc ＋d22scan 末行 ＋`git show --name-only` 的枚数。
