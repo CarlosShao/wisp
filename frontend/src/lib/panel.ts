@@ -446,6 +446,20 @@ export interface PanelFontSizeSection {
   fontSize: number;
 }
 
+/** The panelAnimation section (internal/panel/panel_animation_193.go
+    PanelAnimationSection, ticket 193's UI leg): the animation tier the live
+    config holds RIGHT NOW - one of the schema's own three words
+    ("full" | "reduce" | "off"; validate.go's panelAnimationVocabulary is the
+    single source, and lib/motion's ANIMATION_TIERS copies it verbatim). ""
+    only when no Manager backed the read: the page treats "" as unset, never
+    as "off". Declared by the UI leg in the same commit the composerTSGapLedger
+    PanelSnapshot entry was deleted - the gap closed, so the ordinary two-way
+    comparison judges the key from here on (the same close-out the appearance
+    wave's four keys followed, 4017962b3). */
+export interface PanelAnimationSection {
+  tier: string;
+}
+
 /** One working-tree file entry (internal/panel TreeEntry). */
 export interface TreeEntryView {
   path: string;
@@ -587,6 +601,15 @@ export interface PanelSnapshot {
       panel_width / panel_font_size fields. Same optionality rule. */
   panelWidth?: PanelWidthSection;
   panelFontSize?: PanelFontSizeSection;
+  /** The animation switch the live config holds (ticket 193): the tier word
+      the settings page's animation row displays and lib/motion's
+      applyPanelAnimationTier applies to the document. Same optionality rule
+      as ballStyle: a pump without the reader sends no key at all, and the
+      row then reads 档位未知 - never a guessed tier ("不发键不等于 off"，
+      the Go side's own tooth, mirrored here). Writes ride config.set's
+      panel_animation field; refusals render verbatim on the row (the 407
+      method). */
+  panelAnimation?: PanelAnimationSection;
   /** The working-state rows rendered while a task runs (ticket 145): ended
       tool calls, the reasoning streamed so far, the last classified error
       and the loop's stuck sentence. */

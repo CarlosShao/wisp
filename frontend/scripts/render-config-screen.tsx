@@ -78,6 +78,7 @@ import type {
   BallOpacityIdleSection,
   BallSizeSection,
   BallStyleSection,
+  PanelAnimationSection,
   PanelFontSizeSection,
   PanelWidthSection,
 } from "@/lib/panel";
@@ -154,15 +155,16 @@ check(
   !live.includes('aria-label="悬浮球大小"'),
 );
 check(
-  "the two page-local rows must badge 仅本次会话, never 即时 (census: page-local CSS is not a config key; 2 row badges + 1 footer mention, needle words verbatim)",
-  (live.match(/仅本次会话/g) ?? []).length === 3 && !live.includes("即时"),
+  "the page-local row must badge 仅本次会话, never 即时 (census: page-local CSS is not a config key; 1 row badge + 1 footer mention, needle words verbatim; ticket 193 retired the old memory-only animations row - the config-backed panel.animation row is THE one animation switch)",
+  (live.match(/仅本次会话/g) ?? []).length === 2 && !live.includes("即时"),
   `${(live.match(/仅本次会话/g) ?? []).length} occurrences of 仅本次会话, ${(live.match(/即时/g) ?? []).length} of 即时`,
 );
 check(
-  "the readerless render must badge its six unfed config rows 未接线 (6 row badges + 1 footer mention) and carry no unfed tier word (the style row alone keeps its 能改 badge, and the footer's own 能改变权限档位 sentence accounts for the second)",
-  (live.match(/未接线/g) ?? []).length === 7 &&
+  "the readerless render must badge its seven unfed config rows 未接线 (7 row badges + 1 footer mention) and carry no unfed tier word (the style row alone keeps its 能改 badge, and the footer's own 能改变权限档位 sentence accounts for the second)",
+  (live.match(/未接线/g) ?? []).length === 8 &&
     !live.includes("立即/重启") &&
     !live.includes("关窗/重启生效") &&
+    !live.includes("下一推快照生效") &&
     !live.includes("缺消费引擎") &&
     (live.match(/能改/g) ?? []).length === 2,
   `${(live.match(/未接线/g) ?? []).length} occurrences of 未接线, ${(live.match(/能改/g) ?? []).length} of 能改`,
@@ -182,11 +184,12 @@ check(
 // field (P9 - the read half is the snapshot's, never a local copy).
 check(
   "without sections the wave's rows must say 等快照 and mount no control",
-  (live.match(/等快照/g) ?? []).length === 6 && // ball.size + the four wave rows + 1 footer mention
+  (live.match(/等快照/g) ?? []).length === 6 && // ball.size + the four wave rows + 1 footer mention (ticket 193's animation row reads 档位未知 instead - its absent-tier state is its own word)
     !live.includes('aria-label="空闲球不透明度"') &&
     !live.includes('role="switch"') &&
     !live.includes('aria-label="面板宽度"') &&
-    !live.includes('aria-label="面板字号"'),
+    !live.includes('aria-label="面板字号"') &&
+    !live.includes('role="tablist"'),
   `${(live.match(/等快照/g) ?? []).length} occurrences`,
 );
 check(
@@ -249,6 +252,7 @@ const BALL_OPACITY: BallOpacityIdleSection = { opacity: 0.7, min: 0, max: 1 };
 const BALL_CLICK: BallClickThroughSection = { enabled: false };
 const PANEL_W: PanelWidthSection = { width: 720 };
 const PANEL_FONT: PanelFontSizeSection = { fontSize: 12 };
+const PANEL_ANIM_193: PanelAnimationSection = { tier: "reduce" };
 const waveLive = renderToStaticMarkup(
   <ConfigScreen
     ballStyle={READ}
@@ -257,6 +261,7 @@ const waveLive = renderToStaticMarkup(
     ballClickThrough={BALL_CLICK}
     panelWidth={PANEL_W}
     panelFontSize={PANEL_FONT}
+    panelAnimation={PANEL_ANIM_193}
   />,
 );
 check(
@@ -278,6 +283,15 @@ check(
     waveLive.includes('value="720"') &&
     waveLive.includes('aria-label="面板字号"') &&
     waveLive.includes('value="12"'),
+);
+// Ticket 193's animation row, fed direction: the three-option segment mounts
+// on the snapshot's own tier word, the reduce option is the one selected, and
+// the owner-pending default marker rides the row.
+check(
+  "ticket 193: the fed animation row must mount the three-option segment with the snapshot's tier (reduce) selected",
+  /aria-selected="true"[^>]*>减少/.test(waveLive) &&
+    !/aria-selected="true"[^>]*>关闭/.test(waveLive) &&
+    waveLive.includes("「减少」档为默认（默认，待定）"),
 );
 // The fed pump's badges, TICKET 441 RE-ADJUDICATION (2026-11-18): the
 // font-size row carries its tier word again - the page now consumes the key
@@ -337,9 +351,10 @@ const rowPairs = [
   /field: "ball_style",\s*section: "ballStyle"/,
   /field: "panel_width",\s*section: "panelWidth"/,
   /field: "panel_font_size",\s*section: "panelFontSize"/,
+  /field: "panel_animation",\s*section: "panelAnimation"/,
 ];
 check(
-  "the row table's six config sources must pair each wire field with its snapshot section",
+  "the row table's seven config sources must pair each wire field with its snapshot section",
   rowPairs.every((re) => re.test(screenSrc)),
   rowPairs.filter((re) => !re.test(screenSrc)).length + " pair(s) missing",
 );
@@ -569,7 +584,7 @@ check(
 const actionsSrc = readFileSync("src/lib/config-actions.ts", "utf8");
 check(
   "every config.set write helper must notify the reload bus off its reply",
-  (actionsSrc.match(/notifyConfigReloadListeners\(reply\)/g) ?? []).length === 5,
+  (actionsSrc.match(/notifyConfigReloadListeners\(reply\)/g) ?? []).length === 6,
   `${(actionsSrc.match(/notifyConfigReloadListeners\(reply\)/g) ?? []).length} notify calls`,
 );
 check(

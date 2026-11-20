@@ -75,7 +75,8 @@ import {
 } from "@/lib/panel";
 import { TIER_NAMES as libTierNames } from "@/lib/tier-names";
 import { applyPanelFontSize } from "@/lib/panel-font";
-import { panelWorkAllowed } from "@/lib/panel-visibility";
+import { applyPanelAnimationTier } from "@/lib/motion";
+import { panelWorkAllowed, syncPanelAnimationWorkToMotionTier } from "@/lib/panel-visibility";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
 
 const EMPTY_COMPOSER: ComposerState = {
@@ -189,6 +190,18 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   useEffect(() => {
     applyPanelFontSize(snapshot.panelFontSize?.fontSize ?? null);
   }, [snapshot.panelFontSize]);
+
+  // 票 193：快照的动画档一到就上文档根（lib/motion 的 applyPanelAnimationTier
+  // ——wire 词 full/reduce/off 逐字应用，off 档当场取消在跑的 CSS 动画：
+  // 真停，不是"跑但看不见"）。读面没发键/空档位/未知词＝未知：撤属性回出厂
+  // 默认，绝不画成关闭或全开（与设置页那行的「档位未知」同一条规矩）。
+  // 注册的 rAF 循环归 panel-visibility 的 sync 半：off/reduce 下立刻停、
+  // start 一律降级——off 档下零活跃 rAF 句柄。每次快照推送幂等重跑，写入经
+  // config.set，生效节奏与下一推快照一致。
+  useEffect(() => {
+    applyPanelAnimationTier(snapshot.panelAnimation?.tier);
+    syncPanelAnimationWorkToMotionTier();
+  }, [snapshot.panelAnimation]);
 
   // ONE state object. The gate pins the count, and the reason is in the
   // render-nav header: a gate derived from what it checks cannot catch that
@@ -779,6 +792,10 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               ballClickThrough={snapshot.ballClickThrough ?? null}
               panelWidth={snapshot.panelWidth ?? null}
               panelFontSize={snapshot.panelFontSize ?? null}
+              /* Ticket 193: the animation row's read half rides the snapshot's
+                 panelAnimation section - null (no reader on this pump) is the
+                 row's honest 档位未知, never a guessed tier. */
+              panelAnimation={snapshot.panelAnimation ?? null}
               /* Ticket 40: the 安全 category reads the tier off the snapshot's
                  composer section, the 技能 category reads the plugin
                  inventory - both pushed every packet, both rendered here and

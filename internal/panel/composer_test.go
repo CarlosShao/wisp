@@ -172,6 +172,12 @@ func composerTSNameMap() map[string]string {
 		"BallClickThroughSection": "BallClickThroughSection",
 		"PanelWidthSection":       "PanelWidthSection",
 		"PanelFontSizeSection":    "PanelFontSizeSection",
+		// Ticket 193's carrier joined the live contract with the UI leg
+		// (2026-11-19): the page half declared PanelSnapshot.panelAnimation
+		// (and the PanelAnimationSection interface) in frontend/src/lib/panel.ts
+		// in the same commit the ledger's PanelSnapshot entry was deleted, so
+		// the identity translation below is live contract, not a registration.
+		"PanelAnimationSection": "PanelAnimationSection",
 		"TreeView":                "FilesSection",
 		"TreeEntry":               "TreeEntryView",
 		"RunSection":              "RunSection",
@@ -280,18 +286,15 @@ func composerTSGapLedger() map[string][]string {
 			// failed words travel under their own keys and no other composer
 			// field moves when a send fails (cmd/wisp's 167 teeth pin that).
 			"failedSendKnown", "failedSendText"},
-		// Ticket 193 (2026-11-19): the animation switch is REGISTERED the same
-		// way - panelAnimation is a real wire fact (the page's animation
-		// option needs the exact tier word full/reduce/off to honour "off
-		// really stops animating", owner ruling A373), the Go side emits it
-		// through the reader-gated carrier (panel_animation_193.go, judged gap
-		// until the cmd/wisp pump-source wiring lands), and the page-side
-		// declaration is the UI leg's to land later. When panel.ts declares
-		// panelAnimation this entry goes stale-red on purpose: delete it, add
-		// composerTSNameMap's PanelAnimationSection translation, and let the
-		// ordinary two-way comparison judge the key from then on - the same
-		// close-out the appearance wave's four keys followed (4017962b3).
-		"PanelSnapshot": {"panelAnimation"},
+		// Ticket 193 (2026-11-19): the animation switch's PanelSnapshot entry
+		// is GONE - the UI leg declared PanelSnapshot.panelAnimation (and the
+		// PanelAnimationSection interface) in frontend/src/lib/panel.ts,
+		// exactly the stale-red this ledger's both-ways rule promised for the
+		// reader-gated carrier (panel_animation_193.go). The gap closed, so
+		// the ordinary two-way comparison judges that key from here on and
+		// composerTSNameMap carries the PanelAnimationSection translation -
+		// the same close-out the appearance wave's four keys followed
+		// (4017962b3).
 	}
 }
 

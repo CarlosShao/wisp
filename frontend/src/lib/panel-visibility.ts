@@ -50,6 +50,7 @@
    ============================================================================ */
 
 import { useEffect, useState } from "react";
+import { motionHeavyAllowed, motionHeavyAllowedOn } from "@/lib/motion";
 
 /** Whether the panel's animation work may currently run. The one fact, read
     off the document - never derived from a timestamp (no wall-clock judging).
@@ -93,6 +94,12 @@ export function createPanelAnimationLoop(
   return {
     start(): void {
       if (isRunning) return;
+      // Ticket 193's tier gate: under off (and reduce - the no-loop boundary)
+      // a start is declined WITHOUT scheduling a frame. Zero rAF handles may
+      // exist under off; the gate reads the tier off the document this loop
+      // runs against (a bare fake without a root keeps the factory default,
+      // which is what the visibility instrument rides).
+      if (!motionHeavyAllowedOn(doc)) return;
       isRunning = true;
       id = view.requestAnimationFrame(tick);
     },
@@ -129,8 +136,15 @@ export function installPanelVisibilityPause(
       // MUTATION-36B (the "stopped but never resumed" tooth): delete exactly
       // the start loop below, keep the clear - hidden still freezes, visible
       // never restarts, and the instrument's post-resume counter delta reddens.
-      for (const loop of suspended) loop.start();
-      suspended.clear();
+      // Ticket 193: the resume half is also the tier's servant - while the
+      // tier forbids heavy work (off/reduce) a suspended loop stays stopped
+      // across hide/show, and the suspended set holds it until the tier
+      // allows again (a resume that restarted loops under off would be the
+      // "off 档仍注册 rAF" shape through the back door).
+      if (motionHeavyAllowedOn(doc)) {
+        for (const loop of suspended) loop.start();
+        suspended.clear();
+      }
       paused = false;
       return;
     }
@@ -161,6 +175,18 @@ export function installPanelVisibilityPause(
     register their loop here instead of owning a visibility listener of their
     own - one subscription per page, N loops on it. */
 export const panelAnimationLoops: PausableWork[] = [];
+
+/** The tier flip's work half (ticket 193): App pairs applyPanelAnimationTier
+    (lib/motion - attribute + cancel-the-CSS-animations) with THIS call on
+    every snapshot push. When the tier stops allowing heavy work (off, and
+    reduce's no-loop boundary), every loop registered on the page's one
+    registry stops immediately (its pending frame is cancelled); loops the
+    registry gains later are declined by start()'s own gate. Under full this
+    is a no-op - a tier flip never invents work. */
+export function syncPanelAnimationWorkToMotionTier(): void {
+  if (motionHeavyAllowed()) return;
+  for (const loop of panelAnimationLoops) loop.stop();
+}
 
 /** A counter that bumps on every visibilitychange of the document. The
     resume signal for scheduling effects (RevealText's ladder): a hidden

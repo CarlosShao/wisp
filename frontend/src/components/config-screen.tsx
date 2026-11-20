@@ -84,11 +84,12 @@ the opacity row  WORKS. The frost is a CSS custom property in this
    now derives from where each row's control lives:
 
      document rows    badge 仅本次会话, never 即时 - the census called the
-                       two page-local knobs out by name (panel.opacity is a
-                       CSS custom property, panel.animations is
-                       html[data-motion]; neither is a config key), so the
-                       badge must say the effect is real but ephemeral and
-                       NOT persisted.
+                       page-local knob out by name (panel.opacity is a
+                       CSS custom property; it is not a config key), so the
+                       badge must say the effect is real but ephemeral and NOT persisted. The
+                       old memory-only animations row retired with ticket 193: the config-backed
+                       panel.animation row is THE one animation switch -
+                       two switches for one thing was a second judge.
 
      config rows      the badge carries its tier word ONLY when the row's
                        snapshot section actually arrived on this pump (the
@@ -134,13 +135,8 @@ import { Chip } from "@/components/ai-native/chip";
 import { ProgressRing } from "@/components/ai-native/progress-ring";
 import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { cn } from "@/lib/cn";
-import {
-  MOTION_TIERS,
-  applyMotionTier,
-  readMotionTier,
-  type MotionTier,
-} from "@/lib/motion";
-import { performConfigWrite } from "@/lib/config-actions";
+import { ANIMATION_TIER_LABELS, type AnimationTier } from "@/lib/motion";
+import { performConfigWrite, performPanelAnimationWrite } from "@/lib/config-actions";
 import { BallStylePicker, FeedbackLine } from "@/components/settings-controls";
 import { Switch } from "@/components/ai-native/switch";
 import { ConfigEditorSection } from "@/components/config-editor";
@@ -149,6 +145,7 @@ import type {
   BallOpacityIdleSection,
   BallSizeSection,
   BallStyleSection,
+  PanelAnimationSection,
   PanelFontSizeSection,
   PanelWidthSection,
 } from "@/lib/panel";
@@ -180,15 +177,16 @@ type SectionKey =
   | "ballOpacityIdle"
   | "ballClickThrough"
   | "panelWidth"
-  | "panelFontSize";
+  | "panelFontSize"
+  | "panelAnimation";
 
 /** Where a row's control writes and reads. The badge derives from THIS, not
     from a hardcoded string (see the file header's census paragraph). */
 type RowSource =
   /** Page-local: restyles this document, is NOT a config write and is NOT
-      persisted (panel.opacity is a CSS custom property, panel.animations is
-      html[data-motion]). The badge says 仅本次会话 - the census wording. */
-  | { kind: "document"; control: "alpha" | "motion" }
+      persisted (panel.opacity is a CSS custom property; it is not a config
+      key). The badge says 仅本次会话 - the census wording. */
+  | { kind: "document"; control: "alpha" }
   /** A real config write through the settings door (`field` is the write
       route's admission word), whose read half is `section`. `tier` is the
       badge word shown only when the section arrived. `consumerMissing`
@@ -264,9 +262,14 @@ const APPEARANCE_ROWS: readonly Row[] = [
   },
   {
     group: "panel",
-    name: "animations",
-    desc: "界面动画（关掉后全部静帧，性能最省；仅本页样式，不落盘）",
-    source: { kind: "document", control: "motion" },
+    name: "animation",
+    desc: "界面动画三档：全开／减少／关闭。「减少」档为默认（默认，待定）——默认档位待 owner 拍板。关闭＝全部真停（不是跑但看不见）；写入后下一推快照起生效",
+    source: {
+      kind: "config",
+      field: "panel_animation",
+      section: "panelAnimation",
+      tier: "下一推快照生效",
+    },
   },
   {
     group: "panel",
@@ -387,15 +390,44 @@ function NumberWriteField({
   );
 }
 
+/** The animation row's three segment options: the wire words' own labels
+    (lib/motion's ANIMATION_TIER_LABELS - one label per word, no fourth
+    option). The current selection is the snapshot's tier word only; an
+    unknown/unset tier mounts NO control at all (see the row branch). */
+const ANIMATION_OPTIONS = [
+  ANIMATION_TIER_LABELS.full,
+  ANIMATION_TIER_LABELS.reduce,
+  ANIMATION_TIER_LABELS.off,
+] as const;
+
+type AnimationOption = (typeof ANIMATION_OPTIONS)[number];
+
+/** Label back to wire word - the segment hands over the label, the write
+    sends the word. The map is total over the three options, so no selection
+    can produce a word the Go vocabulary does not carry. */
+const ANIMATION_OPTION_WORDS: Record<AnimationOption, AnimationTier> = {
+  [ANIMATION_TIER_LABELS.full]: "full",
+  [ANIMATION_TIER_LABELS.reduce]: "reduce",
+  [ANIMATION_TIER_LABELS.off]: "off",
+};
+
+function animationOptionOf(tier: string): AnimationOption | null {
+  if (tier === "full") return ANIMATION_TIER_LABELS.full;
+  if (tier === "reduce") return ANIMATION_TIER_LABELS.reduce;
+  if (tier === "off") return ANIMATION_TIER_LABELS.off;
+  return null;
+}
+
 export function ConfigScreen({
   heading = "设置",
-  lede = "外观一节九行键：两行只改本页自己的样式（不落盘，关掉面板即回默认），六行走设置写入通路落盘并由页面消费，主题一行的球侧已接线、面板页跟随那一半仍等原生宿主。",
+  lede = "外观一节九行键：一行只改本页自己的样式（不落盘，关掉面板即回默认），七行走设置写入通路落盘并由页面消费，主题一行的球侧已接线、面板页跟随那一半仍等原生宿主。",
   ballStyle = null,
   ballSize = null,
   ballOpacityIdle = null,
   ballClickThrough = null,
   panelWidth = null,
   panelFontSize = null,
+  panelAnimation = null,
 }: {
   /** The heading this screen prints for itself. Defaults to 设置 because that
       is what it says standalone (?harness=2 and the render harnesses). The
@@ -435,11 +467,15 @@ export function ConfigScreen({
       half of the panel.font_size row. Same shape and same no-band rule as
       panelWidth. */
   panelFontSize?: PanelFontSizeSection | null;
+  /** The snapshot's panelAnimation section (ticket 193): the read half of
+      the panel.animation row. Null means no reader - the row then reads
+      档位未知, never a guessed tier (the wire's own no-key shape is the
+      Go side's "不发键不等于 off" tooth, mirrored here). A tier of "" is
+      the wire's honest unset (never drawn as off); anything outside the
+      three words is unknown too. */
+  panelAnimation?: PanelAnimationSection | null;
 }) {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
-  // Read the tier back off the document rather than mirroring it: a tier set
-  // anywhere (a test, a future bridge field) is the tier the control shows.
-  const [motion, setMotion] = useState<MotionTier>(() => readMotionTier());
   // The config-write receipt line. The controls themselves stay pure readers
   // of the snapshot sections - no local mirror of any value is kept, so what
   // a row shows is what the host read, and the next snapshot push refreshes
@@ -454,9 +490,22 @@ export function ConfigScreen({
     setAlpha(next);
   }
 
-  function moveMotion(next: MotionTier) {
-    applyMotionTier(next);
-    setMotion(next);
+  /** The panel.animation write (ticket 193): the segment hands over the wire
+      word behind the label and it leaves verbatim - the page derives no
+      fourth word and never sends a label. The write rides the ONE config.set
+      door (performPanelAnimationWrite, field panel_animation - the Go side's
+      ninth-roster spelling); the receipt, and today the door's own refusal
+      until the cmd/wisp wiring leg admits the field, renders verbatim on the
+      shared feedback line (the 407 method). The row's shown value stays the
+      NEXT snapshot's panelAnimation.tier - nothing optimistic, no local
+      mirror. */
+  function movePanelAnimation(next: AnimationTier) {
+    if (writeBusy) return;
+    setWriteBusy(true);
+    void performPanelAnimationWrite(next).then((fb) => {
+      setWriteFeedback(fb);
+      setWriteBusy(false);
+    });
   }
 
   /** The ball.style write: one config.set with the field's value, answered as
@@ -561,6 +610,7 @@ export function ConfigScreen({
     ballClickThrough: ballClickThrough != null,
     panelWidth: panelWidth != null,
     panelFontSize: panelFontSize != null,
+    panelAnimation: panelAnimation != null,
   };
 
   return (
@@ -588,13 +638,7 @@ export function ConfigScreen({
                 <div className="mt-0.5 text-xs text-ink-2">{row.desc}</div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {row.source.kind === "document" && row.source.control === "motion" ? (
-                  <SegmentedControl
-                    onChange={moveMotion}
-                    options={MOTION_TIERS}
-                    value={motion}
-                  />
-                ) : row.source.kind === "document" && row.source.control === "alpha" ? (
+                {row.source.kind === "document" && row.source.control === "alpha" ? (
                   alpha === null ? (
                     <span className="text-xs text-ink-3">
                       读不到 {ALPHA_VAR}
@@ -713,6 +757,36 @@ export function ConfigScreen({
                       value={panelWidth.width}
                     />
                   )
+                ) : row.source.kind === "config" && row.source.section === "panelAnimation" ? (
+                  panelAnimation === null || panelAnimation === undefined ? (
+                    /* No reader on this pump: the key never arrived, and the
+                        dispatch's own word for that state is 未知 - never a
+                        guessed tier and never a control pre-picked to one
+                        ("读面没发键不等于关闭或全开", the Go carrier's own
+                        tooth mirrored here). */
+                    <span className="text-xs text-ink-3">档位未知（快照未携带动画档）</span>
+                  ) : animationOptionOf(panelAnimation.tier) === null ? (
+                    /* The section arrived but carries no tier word: "" is the
+                        wire's honest unset (never drawn as off), and a word
+                        outside the three is unknown - both say so instead of
+                        mounting a control on a made-up selection. */
+                    <span className="text-xs text-ink-3">
+                      {panelAnimation.tier === ""
+                        ? "档位未设置（读面为空档位）"
+                        : "档位未知（读面词不在三档词表内）"}
+                    </span>
+                  ) : (
+                    /* The current selection is the snapshot's tier word, via
+                        the wire word's own label - never remembered, never a
+                        default painted in. The reduce option's pending status
+                        lives on the row's own description (（默认，待定）),
+                        never as a hardcoded selection. */
+                    <SegmentedControl
+                      onChange={(opt) => movePanelAnimation(ANIMATION_OPTION_WORDS[opt])}
+                      options={ANIMATION_OPTIONS}
+                      value={animationOptionOf(panelAnimation.tier)!}
+                    />
+                  )
                 ) : row.source.kind === "config" && row.source.section === "panelFontSize" ? (
                   panelFontSize === null || panelFontSize === undefined ? (
                     <span className="text-xs text-ink-3">等快照</span>
@@ -743,7 +817,7 @@ export function ConfigScreen({
 
       {/* The config-write receipt line: the write's own answer, never a local
           echo of what was sent. It lives under the whole row block so a
-          refusal lands where the eye already is; the six config rows share
+          refusal lands where the eye already is; the seven config rows share
           one line because they never write at the same time. */}
       {writeFeedback ? (
         <div className="mt-1 flex flex-col gap-1">
@@ -752,11 +826,12 @@ export function ConfigScreen({
       ) : null}
 
       <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
-        「仅本次会话」那两行改的是这个页面自己的一层样式：不落盘，关掉面板就回到 token 表里的默认值。
-        悬浮球风格、大小、空闲透明度、穿透和面板宽度、字号那六行不同：它们走设置写入通路真正落盘，
+        「仅本次会话」那一行改的是这个页面自己的一层样式：不落盘，关掉面板就回到 token 表里的默认值。
+        悬浮球风格、大小、空闲透明度、穿透和面板宽度、字号、动画档那七行不同：它们走设置写入通路真正落盘，
         收据句会写明生效时机——穿透是有球当场就生效、没球要重启，宽度是关掉面板再打开就跟着变，
-        其余按收据照实说。徽章写着「未接线」的行是这一泵还没等到它的读口：等快照，不画猜出来的值。
-        字号那一行写入会落盘，但还没有引擎消费它，改了暂时看不到效果。
+        动画档在下一推快照起生效（档位词到了页面才动，写被拒时原话照屏），其余按收据照实说。
+        徽章写着「未接线」的行是这一泵还没等到它的读口：等快照，不画猜出来的值。
+        动画档那一行读面没发键时显「档位未知」——未知不是关闭，也不是全开。
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">

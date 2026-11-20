@@ -33,7 +33,7 @@
    `data-glide-key` on the row. Anything more would be plumbing for a bug.
 
    The motion tiers reach it through CSS: the block transitions, so
-   data-motion="off" pins it, and "lite" lets it glide (it only moves when the
+   data-motion="off" pins it, and "reduce" lets it glide (it only moves when the
    selection moves - not a loop, and nothing at all while it is idle).
    ============================================================================ */
 

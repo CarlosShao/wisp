@@ -57,6 +57,7 @@ import type {
   BallSizeSection,
   BallStyleSection,
   ComposerState,
+  PanelAnimationSection,
   PanelFontSizeSection,
   PanelWidthSection,
   PluginsSection,
@@ -231,6 +232,7 @@ export function SettingsPage({
   ballClickThrough = null,
   panelWidth = null,
   panelFontSize = null,
+  panelAnimation = null,
   composer = null,
   plugins = null,
 }: {
@@ -254,6 +256,10 @@ export function SettingsPage({
   ballClickThrough?: BallClickThroughSection | null;
   panelWidth?: PanelWidthSection | null;
   panelFontSize?: PanelFontSizeSection | null;
+  /** The snapshot's panelAnimation section (ticket 193), handed straight to
+      the appearance screen like panelFontSize. Null when this pump has no
+      reader - the row then reads 档位未知, never a guessed tier. */
+  panelAnimation?: PanelAnimationSection | null;
   /** The snapshot's composer section, handed straight to the 安全 category
       (ticket 40): the mode rides every packet, so the page reads it rather
       than a remembered tier. Null in the hand-assembled render harnesses -
@@ -355,6 +361,7 @@ export function SettingsPage({
               ballClickThrough={ballClickThrough}
               panelWidth={panelWidth}
               panelFontSize={panelFontSize}
+              panelAnimation={panelAnimation}
             />
           ) : cat.control === "model" ? (
             <ModelSettings heading={cat.name} lede={cat.purpose} />

@@ -277,16 +277,23 @@ html[data-harness-banner="row"] #root {
 }
 
 /* ============================================================================
-   Motion tiers (owner 2026-09-27: 动画该装就装，但要有档位，不能只有「用不用」)
+   Motion tiers (ticket 193: the animation tier is a user option backed by
+   config - owner 2026-09-28, ledger A373: "动画会有一个选项让用户选，切换
+   最低就是关闭动画了，那就不会卡了")
    ----------------------------------------------------------------------------
-   The vocabulary lives in src/lib/motion.ts; this is where it bites.
+   The vocabulary lives in src/lib/motion.ts and is the Go side's own three
+   words (validate.go's panelAnimationVocabulary, verbatim); this is where
+   it bites. The tier rides html[data-motion], applied by App straight off
+   the snapshot's panelAnimation section on every push.
 
-     full  (no attribute, or data-motion="full")  everything runs. The default:
-            a panel that never moves is a screenshot, not a product.
-     lite  (data-motion="lite")  only the CPU hogs stop.
-     off   (data-motion="off")   everything stops.
+     full    (data-motion="full")   everything runs.
+     reduce  (data-motion="reduce") only the CPU hogs stop - the boundary
+                                    kept from the old lite tier: nothing
+                                    loops, entrances and hover transitions
+                                    stay.
+     off     (data-motion="off")    everything REALLY stops.
 
-   WHY LITE IS "JUMP TO THE LAST FRAME" AND NOT "animation: none"
+   WHY REDUCE IS "JUMP TO THE LAST FRAME" AND NOT "animation: none"
    ------------------------------------------------------------------
    The expensive half of this tree's motion is loops (`infinite` never lets the
    compositor idle) and filter animations (a blur repaints every frame). Those
@@ -294,7 +301,7 @@ html[data-harness-banner="row"] #root {
    vendored files are not hand-edited - the next re-vendor reverts them, and a
    tier that only works until the next vendor run is not a tier.
 
-   So lite does not reach inside them. It compresses time instead: the
+   So reduce does not reach inside them. It compresses time instead: the
    animation is 1ms long, undelayed, played once, and holds its last frame.
    What you see is the FINISHED state of every entrance (fade-up lands fully
    visible, stream-in lands with no blur, the spin lands a full turn) and a
@@ -309,10 +316,10 @@ html[data-harness-banner="row"] #root {
    fire.
    ============================================================================ */
 
-/* tier: lite - compress time; everything lands on its final frame */
-[data-motion="lite"] *,
-[data-motion="lite"] *::before,
-[data-motion="lite"] *::after {
+/* tier: reduce - compress time; everything lands on its final frame */
+[data-motion="reduce"] *,
+[data-motion="reduce"] *::before,
+[data-motion="reduce"] *::after {
   animation-duration: 1ms !important;
   animation-delay: 0s !important;
   animation-iteration-count: 1 !important;
@@ -323,34 +330,33 @@ html[data-harness-banner="row"] #root {
    The selector is the animation NAME inside the inline style - that is the
    only handle these vendored elements offer, and it is greppable, so a new
    vendored loop with the same problem is one grep away from being caught. */
-[data-motion="lite"] .l2-ball-ring {
+[data-motion="reduce"] .l2-ball-ring {
   opacity: 1 !important;
   transform: none !important;
 }
-[data-motion="lite"] [style*="pixel-on"] {
+[data-motion="reduce"] [style*="pixel-on"] {
   opacity: 1 !important;
 }
-[data-motion="lite"] [style*="eq-bounce"] {
+[data-motion="reduce"] [style*="eq-bounce"] {
   transform: scaleY(1) !important;
 }
 
-/* tier: off - the floor. One selector, every keyframe in the tree goes still,
-   including the two PLAN-frozen loops (the caret breath and the L2 ball ring):
-   a user preference to stop motion outranks a visual spec the same way
-   prefers-reduced-motion does. */
+/* WHY OFF IS "NOT ATTACHED" AND NOT THE OLD 0.01ms HACK (ticket 193 AC#4).
+   The old off tier compressed time to 0.01ms - animations still EXISTED for
+   that instant (getAnimations() non-empty, a transition object created on
+   every hover): "跑但看不见", exactly the fake the ticket forbids. Off now
+   attaches NOTHING: animation: none and transition: none mean the CSS engine
+   creates no Animation objects at all; lib/motion's applyPanelAnimationTier
+   cancels what was already in flight on the flip, and the rAF loop factory
+   declines every start. Off is the user's own choice, applied
+   unconditionally - it never reads the OS media query (off is not
+   prefers-reduced-motion; that block above is the OS accessibility floor
+   and stays untouched). */
 [data-motion="off"] *,
 [data-motion="off"] *::before,
 [data-motion="off"] *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-}
-[data-motion="off"] .nav-glide,
-[data-motion="off"] .m-glide {
+  animation: none !important;
   transition: none !important;
-}
-[data-motion="off"] .screen-enter {
-  animation: none;
 }
 
 

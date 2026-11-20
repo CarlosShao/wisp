@@ -155,6 +155,26 @@ export async function performPluginToggleWrite(id: string, on: boolean): Promise
   return translatePluginToggleReply(reply);
 }
 
+/** The animation switch's write (ticket 193): the tier word leaves as one of
+    the wire's own three words (full/reduce/off, lib/motion's vocabulary -
+    the page derives no fourth word), riding the ONE config.set door under
+    the panel_animation admission word (the Go side's ninth-roster spelling,
+    per docs/evidence/s1/193-animation-opt-r1.md §⑤: internal/panel
+    FieldPanelAnimation = "panel_animation"). The receipt/refusal is
+    translated by the 407 verbatim translator (translatePluginToggleReply):
+    the host's own prose reaches the screen word for word - which is exactly
+    what the row shows until the cmd/wisp wiring leg admits the field (the
+    door's own refusal IS today's answer, never a fake save). Same drift
+    echo (ticket 39 AC#4). */
+export async function performPanelAnimationWrite(tier: string): Promise<Feedback> {
+  const reply = await requestConfigWrite({
+    field: "panel_animation", value: tier,
+    baseSHA: currentConfigBaseSHA(),
+  });
+  notifyConfigReloadListeners(reply);
+  return translatePluginToggleReply(reply);
+}
+
 /** The credential write: the value rides credentialValue and only that key. */
 export async function performCredentialWrite(provider: string, value: string): Promise<Feedback> {
   const reply = await requestCredentialWrite(provider, value);
