@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 191 第二波 a（写面＝internal/panel/** 唯一；⛔ cmd/wisp）：面板侧终端载体（输入口＋输出流）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 191 甲支第二波 a。**工具侧已交付 `6512d5a73`**（`SessionOptions.OnChunk` 增量交付，nil 回调逐字节一致）。本波只做**面板侧载体**，⛔ 不碰 `cmd/wisp`（泵源接线＝第二波 b）。
+**任务**：
+1. 照票 145 的载体先例（`internal/panel` 里既有的 Section/快照字段写法与你 407/193 见过的一致）：加**面板终端**两件读数 —— 输入口（用户敲的命令行，只读展示用）＋**输出流**（最近 N 行/字节的滚动窗口）。字段命名与 Go 结构 json tag 一致，走 `composerTSGapLedger` 登记（页面半由前端腿做，**你现在登记成 judged gap**，⛔ 不许为此改前端）。
+2. **只读、不执行**：本波**不得**新增任何进程创建点（`internal/panel` 现有"包内只有一处进程创建点"的 AST 钉必须仍然绿：`git grep -n "exec.Command" -- internal/panel` 枚数不变）。
+3. **上限**：输出窗口必须有明确上限（字节/行），超限截断并在数据里带"被截断"标记（⛔ 无上限累积）。
+4. **牙（能红）**：①窗口超限 ⇒ 截断且标记为真（去掉上限 ⇒ 红）②未接线的来源 ⇒ 字段缺席（不发空串冒充"没有输出"）③任何"面板侧来源可执行"的形状 ⇒ 红（例如加一条参数能唤起进程的用例，必须被既有 AST 钉或新钉挡住）。
+5. **门禁**：`go test ./internal/panel -count=1` 四数（注：包内 2 枚已知红照实记不修，具名）；`gofmt/gofumpt -l`；`go vet`；`sh scripts/d22scan.sh` 0 findings。
+**硬约束**：⛔ `cmd/wisp/**`、⛔ `internal/tools/**`（已交件）、⛔ `internal/risk/**`（Q-457 待机主）、⛔ `frontend/**`、⛔ thresholds/golden/allowlist、⛔ 放宽断言、⛔ push、⛔ emoji。
+写面：`internal/panel/**`、`docs/evidence/s1/191-panel-carrier-*`。
+回话第一行＝commit hash ＋三发牙读数 ＋panel 四数（含 2 枚已知红具名）＋ exec.Command 枚数(改前/改后) ＋ d22scan 末行。
