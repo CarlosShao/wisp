@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 对抗验收（只读）：票 193 已合并的两笔 Go 侧 `f34210795` ＋ 界面侧 `acce6ea13`
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ 其它 model、⛔ reasoning_effort）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读对抗验收**：⛔ 改文件、⛔ commit、⛔ push、⛔ 跑载具全包（可跑定向 `go test ./internal/config -run ...`、`go test ./internal/panel -run ...`、仪器 `npx vite build --ssr` ＋ `node`，临时件只落 D:\tmp\wisp\20261120\aud193）。
+**对象**：`git show f34210795`（Go 侧：`panel.animation` 字段/hot 档/读面载体/默认占位）、`git show acce6ea13`（界面侧：`panel.ts` 声明＋三档 UI＋`render-animation-193` 仪器＋`internal/panel/composer_test.go` 账本收口）。
+**逐项判（每条给 成立/夸大/不成立 ＋ file:line ＋ 你自己跑出的读数）**：
+1. **牙是真的吗**：亲自做四次变异（①删 off 档的 rAF 门 ②把 off 规则嵌进 `prefers-reduced-motion` media 块 ③读面缺键时默认成 off ④删"翻档时取消在跑动画"），逐发跑仪器 `frontend/scripts/render-animation-193.tsx`（`cd frontend && npx vite build --ssr scripts/render-animation-193.tsx --outDir node_modules/.tmp/aud193 && node node_modules/.tmp/aud193/render-animation-193.js`），记 rc 与红句。**还原必须逐字节**（先备份到 D:\tmp）。
+2. **有没有放宽既有断言**：`git diff acce6ea13~1 acce6ea13 -- internal/panel/composer_test.go` 与 `git diff f34210795~1 f34210795 -- '*.go'` 里，任何被删/被弱化的旧断言点名列出（尤其 `panelAnimation` gap-ledger 那条删除是否走了"两向比较"收口而不是消掉断言）。
+3. **tag 逐字一致**：`frontend/src/lib/panel.ts` 的 `PanelAnimationSection`/`panelAnimation` 与 `internal/panel/panel_animation_193.go`、`internal/panel/composer.go` 的 json tag 逐字比对，给对照表；不一致即判不成立。
+4. **默认值确实是"待 owner 拍"而非既成事实**：schema 默认词、设置页文案、证据件三处口径是否一致；有没有一处把它写成定案。
+5. **诚实边界**：AC#3 的"泵源未接、写完不发键"是否真的成立（`grep -n "PanelAnimation" cmd/wisp/*.go internal/panel/pump.go`），有没有偷偷发假 off。
+6. **零 emoji / 零 dist 字节**：`git show --stat acce6ea13 | grep -i dist` 应为空；新文件里 emoji 扫（用 `tools/d22scan` 逻辑或 `-match`）。
+输出：六节，每节「判 ＋ 读数」；最后一行给「总判：X 成立 / Y 夸大 / Z 不成立」。回话第一行＝「总判 X/Y/Z ＋四发牙 rc 序列 ＋ 放宽断言 N 条 ＋ tag 一致 是|否」。
