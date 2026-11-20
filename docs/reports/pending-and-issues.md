@@ -38017,3 +38017,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1971（11-20 23:1x）：票 245 AC#9 勾 `08ff5df1d` —— Esc 交付四形尺进仓（245 现只剩 AC#4 阻塞于 228）
 
 我复跑 `go test ./internal/ball -run "245|Esc" -v` **8/8 PASS**（新尺 `TestLive245EscDeliveryRulerFourShapes` PASS 14.96s）。第二进程＝测试自起 helper，机主不用开程序。四形：①闲置别的进程 `keydown_esc=1` ②稳态三枚无裸键 ③卡挂别的进程 0＋本进程否决真响 1 次 ④归还又收到 1。牙A（不 release）⇒④红 `:819`；牙B（稳态绑裸 Esc）⇒②红 `:709`；SHA 还原同串。**AC#4 仍阻塞于票 228**（`resident_ball_windows.go:86` `Hotkeys: ball.DefaultHotkeys()`），不假绿。票池仍 404/39。
+## A1972（11-20 23:3x）：191 补牙 `d738d4e52` —— 上限数值钉（零派生）
+
+两枚新钉：`sessionPendingCap == 64<<20` 与"字面 68157440 字节必须走拒因且拒因含 67108864"。我复跑两枚 PASS、`internal/tools` ok 27.000s、`d22scan` clean。腿验"常量改 128MiB⇒两枚都红"。顺带格式化两枚既有漂移件（`gate.go`／`ticket49_limits_test.go`，纯格式零语义，已具名）。

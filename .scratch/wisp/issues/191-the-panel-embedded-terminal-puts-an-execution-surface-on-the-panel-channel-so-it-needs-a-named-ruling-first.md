@@ -61,3 +61,7 @@
 - **AC#6 勾（三包＋扫描）**：`go test ./internal/tools -count=1` **ok 27.408s**；`./internal/panel` **ok 18.138s**；`./internal/agent` **ok 6.358s**（158 条 PASS/FAIL/SKIP 行）；`sh scripts/d22scan.sh` **clean 0 findings**（ban #7 internal/tools=52、ban #8 internal=1073 等基线未降）。⚠ `scripts/gate-clauses.sh` **不存在**（`ls scripts/ | grep -i gate` 空），照实记。
 - **仍开**：**AC#2**（输出流外泄面必须过 C25 盖戳——现量 shell 不在 `sensitiveSourceTools`，已挂 `Q-457` 待机主；另泵源接线＝wave 2b）／**AC#3**（"绕过门控会红"的牙，依赖 wave 2b 的真源）。
 - 界面半已交：`panel.ts` 声明 `terminal`＋账本收口＋`terminal-region.tsx`＋`render:terminal191` 三态仪器；我复跑 typecheck rc=0、仪器 rc=0、panel ok 18.138s、d22scan clean。
+## 进度·补牙：上限数值钉（2026-11-20 23:3x，`d738d4e52`，件 `docs/evidence/s1/191-cap-pin-r1.md`）
+
+对抗验收抓到"上限存在"被钉、"上限数值"没被钉（64→128MiB 全绿）。本笔补两枚**零派生**的钉：`Test191SessionPendingCapNumberPinnedTo64MiB`（断言常量恰 `64<<20`）与 `Test191FloodRefusedPastLiteral68157440Bytes`（剂量与期望全用字面数字，断言拒因含 `67108864`）。**我复跑**：两枚 PASS、`./internal/tools` 整包 **ok 27.000s**、`d22scan` clean。腿自行验：只改常量到 `128<<20` ⇒ **两枚都红**（逐字红句在证据件 §2），还原后 SHA256 逐字节同。
+腿另顺手格式化两枚**既有**漂移件（`gate.go`／`ticket49_limits_test.go`，`git status` 证非本腿引入、纯格式零语义），已在 commit 具名。
