@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 191 第一波（写面＝internal/tools/** 唯一；⛔ cmd/wisp、⛔ internal/panel）：`shell.session` 增量交付
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。票 191 甲支（复用既有工具腿，不放宽边界；AC#0 已裁）。**本波只做工具侧增量交付**，现状读数见 `docs/evidence/s1/191-readonly-survey-r1.md`。
+**任务**：
+1. `internal/tools/shell_session.go`：把今天的"见 marker 才整段取"（`:296-352`）改成**边读边交付** —— 读协程（`:219-236`）把新增字节通过一条**回调/通道**交出去（形如 `func(chunk string)` 注入 `SessionOptions`），保持现有整段 `guardedText`（`:607-635`）语义不变（老调用者零改动：默认回调为 nil 时行为与今天**逐字节一致**）。
+2. `internal/tools/shell_exec.go`：保持一次性输出（短命令语义，不动）。
+3. **交付节流与上限**：增量回调必须尊重既有 C25/内存边界（每发 chunk 累计上限沿用现有限制；⛔ 无上限缓冲；⛔ 新增裸 `go func(` 无 owner/recover — d22scan ban #1 会红）。
+4. **牙（必须能红）**：①回调为 nil ⇒ 输出与今天逐字节一致（回归对照）②回调非 nil ⇒ 分片按序拼接 == 整段输出（顺序/完整性）③把读协程改成"只发一次" ⇒ 红 ④去掉上限 ⇒ 红（或具名说清为何不适用）。
+5. **门禁**：`go test ./internal/tools -count=1` 四数点名；`gofmt -l` / `gofumpt -l` 真跑；`go vet`；`sh scripts/d22scan.sh` 0 findings。
+**硬约束**：⛔ `cmd/wisp/**`（下一波接线）、⛔ `internal/panel/**`（下一波）、⛔ `internal/risk/**`（C25 名册＝Q-457 待机主批，⛔ 自行加）、⛔ thresholds/golden/allowlist、⛔ 放宽断言、⛔ push、⛔ emoji。⚠ 他人在飞件只报不动。
+写面：`internal/tools/**`、`docs/evidence/s1/191-stream-tools-*`。
+回话第一行＝commit hash ＋四发牙读数 ＋四数 ＋d22scan 末行。
