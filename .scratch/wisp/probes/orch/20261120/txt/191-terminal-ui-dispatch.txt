@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 191 界面半：`panel.ts` 声明 `terminal` ＋ 终端面板 UI（只读展示输入口与输出流）＋ 仪器（写面 frontend/** ＋ internal/panel/composer_test.go 的账本收口）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。面板侧载体已交付 `8513bc2e3`：`internal/panel/terminal_carrier_191.go` → `Snapshot.Terminal`，json 形如 `"terminal": {"input": {"text": "...", "truncated": false, "droppedRunes": 0}, "output": {"text": "...", "truncated": true, "droppedRunes": 123}}`；**没到过就缺席**（键可能不存在），有读者空态＝`"terminal": {}`。
+**任务**：
+1. `frontend/src/lib/panel.ts`：声明 `TerminalSection`（`input`/`output` 各一枚 `TerminalWindow{text,truncated,droppedRunes}`），与 Go 结构 json tag **逐字一致**；走该文件对账程序登记。
+2. **账本收口**：`internal/panel/composer_test.go` 的 `composerTSGapLedger` 里 `"PanelSnapshot": {"terminal"}` 这条按 167/193 先例收口（删登记＋`composerTSNameMap` 加翻译），**同一提交内**完成；⛔ 放宽任何断言。
+3. **UI**：面板一个「终端」区（可折叠）：上方只读展示用户命令行（`input`），下方滚动尾窗展示输出（`output`）；`truncated` 为真时显示「已截断，另有 N 字符未显示」（用 `droppedRunes`）；`terminal` 键缺席 ⇒ 显示「终端未连接」**而不是空白**；⛔ 不许画任何可执行按钮（本波只读）。
+4. **仪器** `render:terminal191`：三态渲染（缺席／空态／有输出且截断），并给牙：①缺席时显示"终端未连接"⇒改成空白⇒红 ②`truncated=true` 时不显示截断提示⇒红 ③把 `droppedRunes` 显示错⇒红。
+5. 门禁：`npm run typecheck` rc=0、`npm run build` rc=0、新仪器 rc=0、`go test ./internal/panel -count=1` 四数、`sh scripts/d22scan.sh` 0 findings（⛔ UI emoji）。
+**硬约束**：⛔ `cmd/wisp/**`、⛔ `internal/tools/**`、⛔ `internal/risk/**`、⛔ `internal/panel` 产码（只许 `composer_test.go` 的账本收口）、⛔ thresholds/golden/allowlist、⛔ push、⛔ emoji；⛔ 提交 `frontend/dist` 字节。⚠ 他人在飞件（`frontend/fixtures/composer-states.html` M）只报不动。
+写面：`frontend/**`、`internal/panel/composer_test.go`、`docs/evidence/s1/191-terminal-ui-*`。
+回话第一行＝commit hash ＋三发牙读数 ＋instrument rc ＋typecheck rc ＋panel 四数 ＋d22scan 末行。
