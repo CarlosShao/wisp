@@ -1,0 +1,16 @@
+# 派单存档（先存档再发）—— 票 314 AC#1 实修：**已有一条 5 秒复现**，用它把"真窗两枚同进程"这条死法钉死并修好
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。**你有一条 5 秒复现**（这是本票至今最值钱的读数）：
+```
+scripts/wisp-cli-staged-tests.sh -test.run '<真窗族 13 枚>' -test.count=96   # ⇒ RC=139，约 5 秒，死点 TestAC4PriorFocusSurvivesARefusedPanelSample
+```
+而 **整包减掉这 13 枚真窗族 ⇒ rc=0 跑满 1120s 不死**（对照臂）。时间相关已排除（B 臂 5s 就死；D 臂读码全仓**无**任何进程级 300–450s 时间闸调 `os.Exit/TerminateProcess/panic`）。件＝`docs/evidence/s1/314-time-correlation-r1.md`。
+**任务（按序，允许迭代；每步给命令＋读数）**：
+1. **确认复现**：把上面那条跑 3 发，3 发都 `RC=139` 才算稳（给逐发耗时与死点）。若不稳，改用 `-test.count=200` 并如实记。
+2. **收窄到单枚**：对这 13 枚**每枚单独** `-test.run '^<name>$' -test.count=96`（一次一发），找出「单枚自己重复就死」的有哪几枚（表：枚名／耗时／rc／死点）。⇒ 若有 ⇒ 说明是**进程内重复建面板**；若全 13 枚单跑都不死 ⇒ 说明是**两枚的次序/残留**，再对"可疑两对"逐对跑。
+3. **读 `MARK299` 是谁打的**（`grep -rn "MARK299" --include=*.go cmd internal`）：死前 121 行成片 `MARK299 wndproc … known=true`，先弄清这条日志的宿主与它所在的消息循环，再谈为什么进程会消失。
+4. **修（只许测试夹具/台件面）**：按证据选最小改法，例如 ①前一枚用例结束时**真正拆干净**（DestroyWindow＋等消息循环退出＋等 WebView2 `Close` 完成）②窗口类名/虚拟主机名**每实例唯一**（避免 RegisterClassW 全局类冲突）③夹具改为**同一进程内串行且互斥**（`t.Cleanup` 里 join）。⛔ 不许 `-skip`／放宽断言／改 `t.Parallel` 掩盖。**若判"必须改产码"⇒ 停手，把判断与最小改法写成建议，⛔ 别改产码。**
+5. **自证**：改后 ①复现命令 `-test.count=96` 跑 3 发**全活**（`CARRIER ... ok`，逐发耗时）②整包一发（载具）——**若能跑完就给四数与 rc=0；若仍死就如实给死点**（⛔ 不许只说"改好了"）③`gofmt/gofumpt -l cmd/wisp` 空 ④`sh scripts/d22scan.sh` 0 findings ⑤`sh scripts/check-path-length-budget.sh` GREEN。
+**硬约束**：⛔ 改非 `_test.go` 的产码（要改就停手报告）；⛔ 动 thresholds/golden/allowlist/PLAN/specs；⛔ 放宽/删断言、⛔ `-skip`；⛔ push；⛔ emoji；⛔ kill 任何非本腿自己起的进程；载具**一次一发**，跑前 `Get-Process wisp.test` 有就等 60 秒；单发 >25 分钟未结束就停并如实记。
+写面：`cmd/wisp/**`（只 `_test.go`）、`docs/evidence/s1/314-pair-death-*`、`.scratch/wisp/probes/314/**`。
+回话第一行＝commit hash ＋"5s 复现 3 发的结果" ＋"单枚扫描表要点（哪几枚自重复就死）" ＋"改后 count=96 三发结果" ＋整包结果 ＋d22scan/路径两行末行。
