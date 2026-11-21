@@ -1,0 +1,14 @@
+# 派单存档（先存档再发）—— 票 450 落修：真窗两枚用例 profile 隔离 ＋ 载具终点锚（写面 cmd/wisp/** 的 _test.go ＋ scripts/wisp-cli-staged-tests.sh；⛔ 不动产码）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。诊断已交件：`docs/evidence/s1/450-death-localization-r1.md`（commit `8333de280`，我核过：只碰该 evidence 件）。
+**实测结论（别重新推理）**：整包 `RC=139` 静默消失，死亡点是 `TestAC4PriorFocusSurvivesARefusedPanelSample`（`cmd/wisp/panel_host_windows_test.go:1042`，`--- PASS` 从不出现）；**最小可复现集合＝`{TestPanelHostRealWindowHopAndLifecycle, TestAC4PriorFocusSurvivesARefusedPanelSample}` 两枚真窗用例**（14 发 6 死；单跑各 0 死）；两枚**共用同一 WebView2 profile 前缀 `wisp-33r1-panel-profile`**（`panel_host_windows_test.go:711/:1048`、`panel_host_windows_live_test.go:36`、`panel_host_windows_budget_winlive_test.go:62` 共 4 处）。
+**任务（两件，都只在测试夹具与载具脚本面）**：
+1. **profile 隔离**：给这 4 处调用点**各自不同的** leaf（例如同一函数 `panelProfileLeaf` 传不同后缀：`wisp-33r1-panel-profile-hop`／`-ac4`／`-live`／`-budget`），使两枚真窗用例不再共享同一 profile 目录。⚠ `cmd/wisp/panel_profile_leaf_shape_windows_test.go` 里钉的是**函数行为**（输入→输出形状），改调用点参数**不该**动它；若你发现必须动它，停下来在回话里说清为什么，⛔ 不许放宽它的断言。
+2. **载具终点锚**：`scripts/wisp-cli-staged-tests.sh` 在**整包模式**（没有 `-test.run`）下，跑完必须确认日志里出现了末尾哨兵（用 `^=== RUN   TestZZ315A1RootLoopFirstBridgeCall` 或该包里真实存在的最后一枚，你自己现查确认它一定在整包尾部），**没出现 ⇒ 载具自己响亮判红并打印 `CARRIER_INCOMPLETE: died before the last test`**（今天是 `RUN=412` 看着像跑完，其实中途没了）。⚠ 有 `-test.run` 时**不启用**该锚（定向跑本来就没有哨兵）。
+3. **自证**：
+   - 新夹具下连跑 **3 发** `-test.run '^(TestPanelHostRealWindowHopAndLifecycle|TestAC4)'`（走载具、一次一发），**3 发全活**才写"隔离有效"；若仍死，如实报"3 发 X 死"，⛔ 不许改口径。
+   - 载具终点锚的**正控**：临时用一份把哨兵名写错的副本（⛔ 不进仓），跑一次**短**的整包子集证明它会红（或用一个 5 秒内能跑完的等价臂），给逐字红句；**负控**：正常整包（若时间允许）或正常定向跑 rc=0 不受影响。
+   - 门禁：`go test ./cmd/wisp` 只经载具；`gofmt/gofumpt -l cmd/wisp`；`sh scripts/d22scan.sh` 0 findings；`go build ./...` rc=0。
+**硬约束**：⛔ 改任何非 `_test.go` 的产码；⛔ 动 thresholds/golden/allowlist/PLAN/specs；⛔ 放宽/删除任何断言；⛔ `-skip` 掩盖；⛔ push；⛔ emoji；跑载具前 `Get-Process wisp.test` 有就等 60 秒。
+写面：`cmd/wisp/**`（只 `_test.go`）、`scripts/wisp-cli-staged-tests.sh`、`docs/evidence/s1/450-profile-isolation-*`。
+回话第一行＝commit hash ＋隔离 3 发结果（死/活逐发）＋ 终点锚正控逐字红句 ＋ d22scan 末行。
