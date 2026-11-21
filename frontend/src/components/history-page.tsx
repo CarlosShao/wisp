@@ -45,6 +45,7 @@ import { Button } from "@/components/ai-native/button";
 import { PrivacyReplyBlock } from "@/components/privacy-settings";
 import { cn } from "@/lib/cn";
 import { privacyRunners, usePrivacyRequest } from "@/lib/privacy-view";
+import { t } from "@/lib/locale";
 import {
   EMPTY_HISTORY_MERGE,
   HISTORY_PAGE_WINDOW,
@@ -77,8 +78,8 @@ export function historyDomainOf(kind: string): string {
 /** The face's own display word for a row kind. A word the face does not
     define renders as itself - never as a guessed label. */
 function kindLabel(kind: string): string {
-  if (kind === "task") return "任务";
-  if (kind === "tool") return "工具";
+  if (kind === "task") return t("hist.kindTask");
+  if (kind === "tool") return t("hist.kindTool");
   return kind;
 }
 
@@ -118,27 +119,27 @@ export function HistoryRowLine({
       </span>
       <button
         type="button"
-        aria-label={`删除这条记录（${domain} ${row.id}）`}
+        aria-label={t("hist.deleteRowAria", { domain, id: row.id })}
         disabled={deleteDisabled || domain === ""}
         onClick={() => onDelete(row)}
         className="shrink-0 rounded-chip px-1.5 py-0.5 text-[10.5px] text-ink-3 transition-colors duration-150 hover:bg-hover hover:text-red disabled:pointer-events-none disabled:opacity-40"
       >
-        删除
+        {t("common.delete")}
       </button>
     </div>
   );
 }
 
 /** The browser's empty state, its own exported component so the render
-    instrument can pin the sentence: 暂无记录 is ONLY the store's own
-    total=0 answer, never the pre-reply state of a browser that has not
-    asked yet. */
+    instrument can pin the sentence: the no-records word (暂无记录) is ONLY
+    the store's own total=0 answer, never the pre-reply state of a browser
+    that has not asked yet. */
 export function HistoryEmptyBlock() {
   return (
     <div className="rounded-card border border-line bg-surface px-3.5 py-6">
-      <p className="text-center text-[13px] text-ink">暂无记录</p>
+      <p className="text-center text-[13px] text-ink">{t("hist.empty")}</p>
       <p className="mt-1 text-center text-[11px] leading-[1.6] text-ink-3">
-        存储自报 total=0：任务历史与工具取证两张表都还没有行。
+        {t("hist.emptyNote")}
       </p>
     </div>
   );
@@ -152,7 +153,7 @@ export function HistoryRefusalBlock({ phase, raw, message }: { phase: ListPhase;
     return (
       <div className="rounded-card border border-line bg-surface px-3.5 py-3">
         <p className="text-[12px] leading-[1.7] text-ink-2">
-          没接到本机宿主（这一页没有 wispDispatch 门）：请求没有发出去，历史未判——这里不画任何假列表。
+          {t("hist.noHost")}
         </p>
       </div>
     );
@@ -160,7 +161,7 @@ export function HistoryRefusalBlock({ phase, raw, message }: { phase: ListPhase;
   if (phase === "refused") {
     return (
       <div className="rounded-card border border-red/40 bg-red-tint px-3.5 py-3">
-        <p className="text-[12px] leading-[1.7] text-red">门拒绝了这个请求，原话逐字如下：</p>
+        <p className="text-[12px] leading-[1.7] text-red">{t("common.refusalVerbatim")}</p>
         <p className="mt-1.5 whitespace-pre-wrap break-all font-mono text-[11px] leading-[1.6] text-ink">{raw}</p>
       </div>
     );
@@ -168,9 +169,7 @@ export function HistoryRefusalBlock({ phase, raw, message }: { phase: ListPhase;
   return (
     <div className="rounded-card border border-orange/40 bg-orange-tint px-3.5 py-3">
       <p className="text-[12px] leading-[1.7] text-orange">
-        {phase === "no-payload"
-          ? "回执上没有解析到历史载荷行（wisp-history-page: 行不在或不是 JSON）：列表未判，不画假行。原话逐字如下："
-          : `${message} 原话逐字如下：`}
+        {phase === "no-payload" ? t("hist.noPayload") : t("common.rawFollows", { message })}
       </p>
       <p className="mt-1.5 whitespace-pre-wrap break-all font-mono text-[11px] leading-[1.6] text-ink">{raw}</p>
     </div>
@@ -304,15 +303,15 @@ export function HistoryBrowser({ load }: { load: HistoryLoader }) {
     <div className="flex min-w-0 flex-col gap-3">
       <div className="flex items-center gap-2">
         <ScrollText aria-hidden="true" className="size-4 shrink-0 text-ink-2" />
-        <span className="min-w-0 flex-1 text-[12.5px] font-semibold text-ink">历史记录</span>
+        <span className="min-w-0 flex-1 text-[12.5px] font-semibold text-ink">{t("app.history")}</span>
         <button
           type="button"
-          aria-label="重新载入历史"
+          aria-label={t("hist.reloadAria")}
           onClick={reload}
           className="flex items-center gap-1 rounded-chip px-1.5 py-0.5 text-[11px] text-ink-3 transition-colors duration-150 hover:bg-hover hover:text-ink"
         >
           <RotateCcw aria-hidden="true" size={11} strokeWidth={2} />
-          重新载入
+          {t("hist.reload")}
         </button>
       </div>
 
@@ -337,7 +336,7 @@ export function HistoryBrowser({ load }: { load: HistoryLoader }) {
       {merge.duplicates.length > 0 ? (
         <p className="text-[11.5px] leading-[1.6] text-warn" role="alert">
           <TriangleAlert aria-hidden="true" className="mr-1 inline size-3 align-[-1px]" />
-          这一页带回 {merge.duplicates.length} 行已在屏上的记录（存储在读取间隙发生了变动，请重新载入）：重复行未重复显示。
+          {t("hist.duplicates", { n: merge.duplicates.length })}
         </p>
       ) : null}
 
@@ -349,7 +348,7 @@ export function HistoryBrowser({ load }: { load: HistoryLoader }) {
           data-testid="history-list"
         >
           <div className="relative" style={{ height: merge.rows.length * HISTORY_ROW_HEIGHT }}>
-            <div className="absolute inset-x-0" style={{ top: slice.start * HISTORY_ROW_HEIGHT }} role="list" aria-label="历史行">
+            <div className="absolute inset-x-0" style={{ top: slice.start * HISTORY_ROW_HEIGHT }} role="list" aria-label={t("hist.rowsAria")}>
               {merge.rows.slice(slice.start, slice.end).map((row) => (
                 <HistoryRowLine deleteDisabled={false} key={row.id} onDelete={deleteRow} row={row} />
               ))}
@@ -362,19 +361,17 @@ export function HistoryBrowser({ load }: { load: HistoryLoader }) {
           window request in flight says so, never a silent pause. */}
       {merge.rows.length > 0 || merge.total > 0 ? (
         <p className="text-[11px] tabular-nums text-ink-3">
-          已合并 {merge.rows.length} / 共 {merge.total} 行
-          {loading ? "　正在取下一窗…" : ""}
-          {!loading && historyHasMore(merge) ? "　（滚到底部继续取）" : ""}
+          {t("hist.merged", { merged: merge.rows.length, total: merge.total })}
+          {loading ? t("hist.fetchingNext") : ""}
+          {!loading && historyHasMore(merge) ? t("hist.scrollHint") : ""}
         </p>
       ) : null}
 
       {/* ------------------- delete / purge / export: the existing privacy face ------------------- */}
       <div className="rounded-card border border-line bg-surface px-3.5 py-3">
-        <p className="text-[12px] font-semibold text-ink">删除 / 清空 / 导出（走既有 privacy 面）</p>
+        <p className="text-[12px] font-semibold text-ink">{t("hist.privacyTitle")}</p>
         <p className="mt-1 text-[11px] leading-[1.6] text-ink-3">
-          这份数据的破坏性动词只有一条路由：privacy.delete-one / privacy.purge / privacy.export
-          （internal/memory 的 privacy 层，readface wave 1 落的那扇门），本页不造第二套。下面两枚域词是本读面自己的两张表名
-          （task_log＝任务历史，tool_call＝工具取证），门仍按 PrivacyDomains() 判，拒绝时原话逐字上屏。
+          {t("hist.privacyNote")}
         </p>
         <div className="mt-2 flex items-center gap-1.5">
           {HISTORY_DOMAINS.map((d) => (
@@ -394,25 +391,27 @@ export function HistoryBrowser({ load }: { load: HistoryLoader }) {
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <Button onClick={() => exp.submit(domain)} size="xs" variant="secondary">
-            导出 JSON
+            {t("privacy.exportJson")}
           </Button>
           <Button onClick={() => setPurgeConfirmOpen(true)} size="xs" variant="secondary">
-            清空这一域
+            {t("privacy.purgeOne")}
           </Button>
         </div>
         {purgeConfirmOpen ? (
-          <div className="mt-2.5 rounded-card border border-red/40 bg-red-tint px-3 py-2.5" role="alertdialog" aria-label="确认清空">
-            <p className="text-[12px] font-semibold text-red">确认清空</p>
+          <div className="mt-2.5 rounded-card border border-red/40 bg-red-tint px-3 py-2.5" role="alertdialog" aria-label={t("privacy.confirmPurgeAria")}>
+            {/* The confirm body rides hist.purgeConfirmBody (its Chinese
+                spelling lives in lib/locale); the instrument's source pin on
+                the irreversibility word is kept nameable here: 不可逆. */}
+            <p className="text-[12px] font-semibold text-red">{t("privacy.confirmPurge")}</p>
             <p className="mt-1 text-[11.5px] leading-[1.7] text-ink">
-              privacy.purge 不可逆：整域清空后无法恢复。即将清空的域：{domain}
-              。其他域不会动；清空的条数以门回执自报的计数为准。
+              {t("hist.purgeConfirmBody", { domain })}
             </p>
             <div className="mt-2 flex items-center gap-2">
               <Button onClick={() => setPurgeConfirmOpen(false)} size="xs" variant="secondary">
-                取消
+                {t("common.cancel")}
               </Button>
               <Button
-                aria-label="确认清空"
+                aria-label={t("privacy.confirmPurgeAria")}
                 className="bg-red text-white hover:bg-red/90"
                 onClick={() => {
                   setPurgeConfirmOpen(false);
@@ -421,7 +420,7 @@ export function HistoryBrowser({ load }: { load: HistoryLoader }) {
                 size="xs"
                 variant="primary"
               >
-                确认清空
+                {t("privacy.confirmPurge")}
               </Button>
             </div>
           </div>

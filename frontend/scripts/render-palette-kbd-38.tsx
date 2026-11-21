@@ -198,10 +198,16 @@ check(
 );
 
 // Tab trap: the dialog is queried, the walk wraps, stray focus is pulled in.
+// Wave 2 moved the dialog label's Chinese spelling to zh.ts's app.palette key
+// (App reads it through PALETTE_LABEL = t("app.palette")); the pin rides both
+// halves - the selector's template shape in App, the word in the bundle.
+const zhBundleKbd = readFileSync("src/lib/locale/zh.ts", "utf8");
 check(
   "App must trap Tab inside the palette dialog while it is open",
   appSrc.includes(`event.key === "Tab" && local.paletteOpen`) &&
-    appSrc.includes(`'[role="dialog"][aria-label="命令面板"]'`) &&
+    appSrc.includes('`[role="dialog"][aria-label="${PALETTE_LABEL}"]`') &&
+    appSrc.includes('const PALETTE_LABEL = t("app.palette")') &&
+    zhBundleKbd.includes('"app.palette": "命令面板"') &&
     appSrc.includes("focusables[focusables.length - 1]"),
 );
 check(

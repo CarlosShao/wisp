@@ -75,6 +75,7 @@ import {
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 import { riskPillTone } from "@/lib/tools-discovery-view";
+import { t } from "@/lib/locale";
 
 export interface PaletteItem {
   label: string;
@@ -240,9 +241,9 @@ function RiskPill({ pill }: { pill: string | undefined }) {
       data-pill-tone={known ? tone : "unjudged"}
       data-risk-pill
     >
-      {/* The wire's own word, verbatim. Absent renders 未判 - never a level
-          this page mapped, never a safe-looking default. */}
-      {known ? pill : "未判"}
+      {/* The wire's own word, verbatim. Absent renders unjudged (未判) - never
+          a level this page mapped, never a safe-looking default. */}
+      {known ? pill : t("common.unjudged")}
     </span>
   );
 }
@@ -281,14 +282,14 @@ function ToolRosterSection({
   return (
     <div className="border-t border-line px-2 py-1.5" data-tools-section>
       <p className="px-2 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
-        工具名册
+        {t("palette.toolsTitle")}
       </p>
       {phase === "pending" ? (
-        <p className="px-2 py-1.5 text-[12px] text-ink-3">正在读取名册…</p>
+        <p className="px-2 py-1.5 text-[12px] text-ink-3">{t("palette.toolsLoading")}</p>
       ) : null}
       {phase === "nohost" ? (
         <p className="px-2 py-1.5 text-[12px] text-ink-3">
-          没接到宿主：tools.list 没有送达，名册未判，不画假行
+          {t("palette.toolsNoHost")}
         </p>
       ) : null}
       {phase === "refused" || phase === "no-payload" || phase === "payload-error" ? (
@@ -300,7 +301,7 @@ function ToolRosterSection({
         <p className="px-2 py-1 text-[11px] text-ink-3">{prose}</p>
       ) : null}
       {phase === "roster" && emptyMatch ? (
-        <p className="px-2 py-1.5 text-[12px] text-ink-3">名册里没有匹配的工具</p>
+        <p className="px-2 py-1.5 text-[12px] text-ink-3">{t("palette.toolsNoMatch")}</p>
       ) : null}
       {phase === "roster"
         ? shown.map((row) => (
@@ -323,13 +324,13 @@ function ToolRosterSection({
                 </span>
               ) : null}
               <button
-                aria-label={`启动工具 ${row.name}`}
+                aria-label={t("palette.launchAria", { name: row.name })}
                 className="shrink-0 rounded-control border border-line px-2 py-0.5 text-[11px] text-ink-2 transition-colors duration-100 hover:bg-hover hover:text-ink"
                 data-launch-tool
                 onClick={() => onLaunchTool?.(row)}
                 type="button"
               >
-                启动
+                {t("palette.launch")}
               </button>
             </div>
           ))
@@ -361,20 +362,20 @@ function ForceRulesSection({
   onChipChange?: (next: PaletteForceChip) => void;
 }) {
   const modeWord =
-    view?.mode === undefined ? "未判" : view.mode === "" ? "默认（无强制）" : view.mode;
-  const sourceWord = view?.source === undefined ? "未判" : view.source;
+    view?.mode === undefined ? t("common.unjudged") : view.mode === "" ? t("palette.forceDefaultMode") : view.mode;
+  const sourceWord = view?.source === undefined ? t("common.unjudged") : view.source;
   const pattern = view?.pattern ?? "";
   const rules = view?.rules ?? [];
   return (
     <div className="border-t border-line px-3.5 py-2" data-force-section>
       <p className="pb-1 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
-        模式强制
+        {t("palette.forceTitle")}
       </p>
       {phase === "pending" ? (
-        <p className="text-[12px] text-ink-3">正在读取 force 规则…</p>
+        <p className="text-[12px] text-ink-3">{t("palette.forceLoading")}</p>
       ) : null}
       {phase === "nohost" ? (
-        <p className="text-[12px] text-ink-3">没接到宿主：rules.force 没有送达，规则未判</p>
+        <p className="text-[12px] text-ink-3">{t("palette.forceNoHost")}</p>
       ) : null}
       {phase === "refused" || phase === "no-payload" || phase === "payload-error" ? (
         <p className="text-[12px] leading-[1.6] text-ink-3" data-force-refusal>
@@ -386,8 +387,9 @@ function ForceRulesSection({
           {/* The next-prompt reading, off the payload's own words: mode and
               source verbatim, pattern only when the payload carried one. */}
           <p className="text-[12px] leading-[1.6] text-ink-2" data-force-next>
-            下一 prompt 采用 {modeWord}（来源 {sourceWord}
-            {pattern !== "" ? `，命中 ${pattern}` : ""}）
+            {pattern !== ""
+              ? t("palette.forceNextHit", { mode: modeWord, source: sourceWord, pattern })
+              : t("palette.forceNextPlain", { mode: modeWord, source: sourceWord })}
           </p>
           {view?.instruction ? (
             <p className="pt-0.5 text-[11px] leading-[1.6] text-ink-3" data-force-instruction>
@@ -396,7 +398,7 @@ function ForceRulesSection({
           ) : null}
           <div className="pt-1" data-force-rules>
             {rules.length === 0 ? (
-              <p className="text-[11px] text-ink-3">无登记规则</p>
+              <p className="text-[11px] text-ink-3">{t("palette.noRules")}</p>
             ) : (
               rules.map((rule, index) => (
                 <p
@@ -405,13 +407,13 @@ function ForceRulesSection({
                   key={`${rule.source ?? "unjudged"}-${rule.pattern ?? index}-${rule.mode ?? ""}-${index}`}
                 >
                   <span className="shrink-0 text-ink-3" data-rule-source>
-                    {rule.source ?? "未判"}
+                    {rule.source ?? t("common.unjudged")}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-ink-2" title={rule.pattern ?? ""}>
-                    {rule.pattern ?? "未判"}
+                    {rule.pattern ?? t("common.unjudged")}
                   </span>
                   <span className="shrink-0 tabular-nums text-ink-3" data-rule-mode>
-                    {rule.mode ?? "未判"}
+                    {rule.mode ?? t("common.unjudged")}
                   </span>
                 </p>
               ))
@@ -422,13 +424,13 @@ function ForceRulesSection({
       {/* The per-task chip: two forced states + off. Selecting one changes
           nothing on the host - the word rides the NEXT send's envelope and
           the Go side's admitTask consumes it there. */}
-      <div aria-label="本条任务的强制档" className="flex flex-wrap items-center gap-1.5 pt-1.5" data-force-chip role="group">
-        <span className="text-[11px] text-ink-3">本条任务发送时：</span>
+      <div aria-label={t("palette.forceGroupAria")} className="flex flex-wrap items-center gap-1.5 pt-1.5" data-force-chip role="group">
+        <span className="text-[11px] text-ink-3">{t("palette.forceSendLabel")}</span>
         {(
           [
-            ["", "默认"],
-            ["force_tool", "强制工具"],
-            ["force_chat", "强制对话"],
+            ["", t("palette.chipOff")],
+            ["force_tool", t("palette.chipTool")],
+            ["force_chat", t("palette.chipChat")],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -448,7 +450,7 @@ function ForceRulesSection({
           </button>
         ))}
         <span className="text-[10.5px] text-ink-3">
-          搭 panel.message.send 的 forceMode 顺封套，Go 侧 admitTask 消费
+          {t("palette.chipNote")}
         </span>
       </div>
     </div>
@@ -680,20 +682,20 @@ export function PaletteScreen({
             <path d="M21 21l-4.3-4.3" />
           </svg>
           <input
-            aria-label="搜索命令"
+            aria-label={t("palette.searchAria")}
             aria-activedescendant={flat.length > 0 ? `palette-row-${cursor}` : undefined}
             className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-3"
             onChange={(event) => onQueryChange(event.target.value)}
             onCompositionEnd={() => setComposing(false)}
             onCompositionStart={() => setComposing(true)}
             onKeyDown={onKey}
-            placeholder="输入命令或问题…"
+            placeholder={t("palette.searchPlaceholder")}
             ref={inputRef}
             value={query}
           />
           {query && (
             <button
-              aria-label="清空搜索"
+              aria-label={t("palette.clearSearchAria")}
               className="flex size-6 items-center justify-center rounded-full text-ink-3 transition-colors duration-100 hover:bg-line/70 hover:text-ink"
               onClick={() => onQueryChange("")}
               style={{ animation: "fade-in 150ms ease-out both" }}
@@ -733,8 +735,8 @@ export function PaletteScreen({
                 <path d="M21 21l-4.3-4.3" />
               </svg>
             </span>
-            <span className="text-[13px] font-medium text-ink">没有匹配的命令</span>
-            <span className="text-[12px] text-ink-3">换个说法再试一次</span>
+            <span className="text-[13px] font-medium text-ink">{t("palette.noMatch")}</span>
+            <span className="text-[12px] text-ink-3">{t("palette.noMatchHint")}</span>
           </div>
         ) : (
           /* Two channels, the same split the sidebar uses after the GlideMenu
@@ -748,7 +750,7 @@ export function PaletteScreen({
              option rows, the input's aria-activedescendant pointing INTO this
              region, and the key/focus handlers that keep the vocabulary alive
              when focus has Tabbed onto a row. */
-          <div aria-label="命令列表" onFocusCapture={onSurfaceFocus} onKeyDown={onSurfaceKey} role="listbox">
+          <div aria-label={t("palette.listAria")} onFocusCapture={onSurfaceFocus} onKeyDown={onSurfaceKey} role="listbox">
             <GlideMenu className="p-1.5" highlightClassName="inset-x-1.5 rounded-[6px] bg-hover" rowSelector="[data-menu-row]">
               {shown.map((group) => (
                 <div aria-label={group.name} className="flex flex-col" key={group.name} role="group">
@@ -803,17 +805,17 @@ export function PaletteScreen({
         {roster.length > 0 ? (
           <div className="border-t border-line px-2 py-1.5">
             <p className="px-2 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
-              命令名册
+              {t("palette.rosterTitle")}
             </p>
             {rosterEmpty ? (
-              <p className="px-2 py-1.5 text-[12px] text-ink-3">名册里没有匹配的命令</p>
+              <p className="px-2 py-1.5 text-[12px] text-ink-3">{t("palette.rosterNoMatch")}</p>
             ) : (
               rosterShown.map((row) => (
                 <div
                   className="flex items-baseline gap-2 rounded-[6px] px-2 py-1.5"
                   data-roster-row
                   key={row.name}
-                  title={`参数 ${row.args || "（无）"}；${row.approval}；${row.door}`}
+                  title={t("palette.rosterRowTitle", { args: row.args || t("common.none"), approval: row.approval, door: row.door })}
                 >
                   <span className="shrink-0 font-mono text-[12.5px] text-ink">{row.name}</span>
                   <span className="min-w-0 flex-1 truncate text-[12px] text-ink-2" title={row.summary}>
@@ -873,13 +875,13 @@ export function PaletteScreen({
         <div className="flex items-center gap-3 border-t border-line bg-inset px-3.5 py-2 text-[11px] text-ink-3">
           <span className="flex items-center gap-1">
             <span className="kbd">↑</span>
-            <span className="kbd">↓</span> 选择
+            <span className="kbd">↓</span> {t("palette.kbdSelect")}
           </span>
           <span className="flex items-center gap-1">
-            <span className="kbd">Enter</span> 执行
+            <span className="kbd">Enter</span> {t("palette.kbdRun")}
           </span>
           <span className="flex items-center gap-1">
-            <span className="kbd">ESC</span> 关闭
+            <span className="kbd">ESC</span> {t("palette.kbdClose")}
           </span>
         </div>
       </div>

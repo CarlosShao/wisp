@@ -704,8 +704,9 @@ check(
   "translator call",
 );
 check(
-  "tooth 3 (source): the verbatim translator answers a refusal with the prose - it never routes through the REFUSALS summarizer",
-  pluginTranslateBody.includes("被拒绝") &&
+  "tooth 3 (source): the verbatim translator answers a refusal with the prose - it never routes through the REFUSALS summarizer. Wave 1 moved the user-facing lines to lib/locale (config-protocol.ts carries the sealed match tokens); the branch word is GO_REFUSED (被拒绝, config_handlers.go's verdict word), so the pin rides the token constant and the protocol module keeps the word verbatim",
+  pluginTranslateBody.includes("GO_REFUSED") &&
+    readFileSync("src/lib/config-protocol.ts", "utf8").includes('"被拒绝"') &&
     !pluginTranslateBody.includes("REFUSALS") &&
     !pluginTranslateBody.includes("refusalFeedback"),
   "no summarizer",

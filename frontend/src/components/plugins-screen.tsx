@@ -65,10 +65,14 @@ import { FeedbackLine } from "@/components/settings-controls";
 import { performPluginToggleWrite } from "@/lib/config-actions";
 import type { Feedback } from "@/lib/config-feedback";
 import type { PluginRowView, PluginsSection } from "@/lib/panel";
+import { t } from "@/lib/locale";
 
 /** The three wire states' tones. The WORDS stay the wire's verbatim (the
     state text rendered on the row is row.state itself); only the tone is
-    mapped here, and an unknown word falls to neutral with its own text. */
+    mapped here, and an unknown word falls to neutral with its own text. The
+    two match words below are the Go roster's own three-state vocabulary -
+    matched, never rendered by this file (their render half rides row.state
+    verbatim off the wire; the 未知 rule renders the absence word). */
 function stateTone(state: string): string {
   if (state === "本轮生效") return "bg-accent-tint text-accent-ink";
   if (state === "需重启") return "bg-warn-soft text-warn";
@@ -84,34 +88,34 @@ function stateTone(state: string): string {
 
 /** enabled 的字：true/false 是读面给的布尔，别的形状（缺键）＝未知。 */
 function enabledWord(enabled: unknown): string {
-  if (enabled === true) return "已启用";
-  if (enabled === false) return "已停用";
-  return "未知";
+  if (enabled === true) return t("plugins.enabledOn");
+  if (enabled === false) return t("plugins.enabledOff");
+  return t("common.unknown");
 }
 
 /** state 的字：wire 的三态词原样上屏（未知词也照原样），缺键＝未知。 */
 function stateWord(state: unknown): string {
-  return typeof state === "string" ? state : "未知";
+  return typeof state === "string" ? state : t("common.unknown");
 }
 
 /** 文本格：给了就原样，给了空串（name/version 的"盘上无安装"实测值）用
     空档词，缺键＝未知。 */
 function textCell(value: unknown, emptyWord: string): string {
-  if (typeof value !== "string") return "未知";
+  if (typeof value !== "string") return t("common.unknown");
   return value !== "" ? value : emptyWord;
 }
 
 /** note 格：note 是 omitempty，缺键是常态形状且无法与"没读到"区分——
     按票 407 的格规则答 未知，不许把缺席装扮成"干净"。 */
 function noteCell(note: unknown): string {
-  return typeof note === "string" && note !== "" ? note : "未知";
+  return typeof note === "string" && note !== "" ? note : t("common.unknown");
 }
 
 /** 列表格：给了数组就逐条原文（空数组＝"（无）"，读面给的空清单），
     缺键或形状不对＝未知。 */
 function listCell(list: unknown): string {
-  if (!Array.isArray(list)) return "未知";
-  return list.length > 0 ? list.map(String).join(" / ") : "（无）";
+  if (!Array.isArray(list)) return t("common.unknown");
+  return list.length > 0 ? list.map(String).join(" / ") : t("common.none");
 }
 
 /** 行级清单的判定（audit407 对 1d08513ec 的可疑①）：rows 与格字段同一条
@@ -124,7 +128,7 @@ function rowsGiven(rows: unknown): rows is PluginRowView[] {
 
 /** id 格：行地址。空串或缺键＝未知（没有地址就没有可点的开关）。 */
 function idCell(id: unknown): string {
-  return typeof id === "string" && id !== "" ? id : "未知";
+  return typeof id === "string" && id !== "" ? id : t("common.unknown");
 }
 
 /** 该行有没有可写的地址与已知的当前态：开关按钮只在两者都在时出现——
@@ -153,10 +157,10 @@ export function PluginInventoryList({
   return (
     <>
       <p className="text-[11px] leading-[1.7] text-ink-3" role="note">
-        {textCell(section.engineState, "未知")}
+        {textCell(section.engineState, t("common.unknown"))}
       </p>
       <p className="mt-1 text-[11px] leading-[1.7] text-ink-3" role="note">
-        {textCell(section.skillState, "未知")}
+        {textCell(section.skillState, t("common.unknown"))}
       </p>
 
       {rowsGiven(section.rows) ? (
@@ -166,14 +170,14 @@ export function PluginInventoryList({
             <thead>
               <tr className="border-b border-line">
                 <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">id</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">启用</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">生效</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">名称</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">版本</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">来源/锁定说明</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">能力</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">网络白名单</th>
-                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">宿主面</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thEnabled")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thEffect")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thName")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thVersion")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thNote")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thCaps")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thNet")}</th>
+                <th scope="col" className="px-2 py-1.5 text-[10.5px] font-medium text-ink-3">{t("plugins.thHost")}</th>
               </tr>
             </thead>
             <tbody>
@@ -186,7 +190,7 @@ export function PluginInventoryList({
                     {enabledWord(row.enabled)}
                     {onToggle && rowToggleable(row) ? (
                       <button
-                        aria-label={row.enabled ? `关闭插件 ${row.id}` : `开启插件 ${row.id}`}
+                        aria-label={row.enabled ? t("plugins.disableAria", { id: row.id }) : t("plugins.enableAria", { id: row.id })}
                         className="ml-1.5 rounded-chip bg-inset px-1.5 py-0.5 text-[10.5px] font-medium text-ink-2
                           transition-colors duration-100 hover:bg-hover hover:text-ink
                           disabled:pointer-events-none disabled:opacity-50"
@@ -194,23 +198,23 @@ export function PluginInventoryList({
                         onClick={() => onToggle(row)}
                         type="button"
                       >
-                        {row.enabled ? "关闭" : "开启"}
+                        {row.enabled ? t("plugins.disable") : t("plugins.enable")}
                       </button>
                     ) : null}
                   </td>
                   <td className="whitespace-nowrap px-2 py-1.5">
                     <span
                       className={`inline-block rounded-full px-2 py-0.5 text-[10.5px] font-medium ${stateTone(stateWord(row.state))}`}
-                      title="生效与否由装配探针判，不是配置里的开关字面量"
+                      title={t("plugins.stateTitle")}
                     >
                       {stateWord(row.state)}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-2 py-1.5 text-[10.5px] text-ink-2">
-                    {textCell(row.name, "（无）")}
+                    {textCell(row.name, t("common.none"))}
                   </td>
                   <td className="whitespace-nowrap px-2 py-1.5 font-mono text-[10.5px] text-ink-3">
-                    {textCell(row.version, "（无）")}
+                    {textCell(row.version, t("common.none"))}
                   </td>
                   <td className="px-2 py-1.5 text-[10.5px] leading-[1.6] text-ink-3">
                     {noteCell(row.note)}
@@ -231,18 +235,17 @@ export function PluginInventoryList({
         </div>
       ) : (
         <div className="mt-3">
-          <p className="text-[12px] leading-[1.7] text-ink-2">还没有插件</p>
+          <p className="text-[12px] leading-[1.7] text-ink-2">{t("plugins.empty")}</p>
           <p className="mt-1 text-[11px] leading-[1.7] text-ink-3">
-            配置里没有声明任何 [plugins.&lt;id&gt;] 条目——这是读到的清单事实，不是读不到。
+            {t("plugins.emptyNote")}
           </p>
         </div>
       )
       ) : (
         <div className="mt-3">
-          <p className="text-[12px] leading-[1.7] text-ink-2">未知（读面没有给清单）</p>
+          <p className="text-[12px] leading-[1.7] text-ink-2">{t("plugins.rowsUnknown")}</p>
           <p className="mt-1 text-[11px] leading-[1.7] text-ink-3">
-            快照的 plugins 段落没有给出 rows 清单（键缺席或形状不对）。这不是「还没有插件」：
-            没有清单可读不等于清单为空。
+            {t("plugins.rowsUnknownNote")}
           </p>
         </div>
       )}
@@ -276,7 +279,7 @@ export function PluginsScreen({
   async function toggle(row: PluginRowView) {
     if (busyId !== null) return;
     setBusyId(row.id);
-    setFeedback({ tone: "neutral", text: "写入中…" });
+    setFeedback({ tone: "neutral", text: t("plugins.writing") });
     try {
       setFeedback(await performPluginToggleWrite(row.id, !row.enabled));
     } finally {
@@ -289,8 +292,7 @@ export function PluginsScreen({
       <div className="flex flex-col px-4 py-4">
         <ScreenHeader onClose={onClose} />
         <p className="mt-3 text-[12px] leading-[1.7] text-ink-3">
-          还没收到原生侧的插件清单（快照里没有 plugins 键）。这不是「没有插件」：
-          清单键只在读口装配时上线上，缺键是读口不在，不是清单为空。
+          {t("plugins.waiting")}
         </p>
       </div>
     );
@@ -323,15 +325,15 @@ function ScreenHeader({
 }) {
   return (
     <div className="flex shrink-0 items-center gap-2">
-      <span className="text-[13px] font-medium text-ink">插件清单</span>
+      <span className="text-[13px] font-medium text-ink">{t("plugins.title")}</span>
       {tier2Enabled !== undefined ? (
         <span className="shrink-0 rounded-full bg-inset px-2 py-0.5 text-[10.5px] font-medium text-ink-3">
-          tier2_enabled {tier2Enabled ? "开" : "关"}
+          {t("plugins.tier2Chip", { v: tier2Enabled ? t("voice.on") : t("voice.off") })}
         </span>
       ) : null}
       <span className="min-w-0 flex-1" />
       <button
-        aria-label="关闭插件清单"
+        aria-label={t("plugins.closeAria")}
         className="flex size-6 items-center justify-center rounded-chip text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink"
         onClick={onClose}
         type="button"

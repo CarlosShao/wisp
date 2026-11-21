@@ -150,6 +150,7 @@ import type {
   PanelWidthSection,
 } from "@/lib/panel";
 import type { Feedback } from "@/lib/config-feedback";
+import { t } from "@/lib/locale";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
 const ALPHA_VAR = "--panel-alpha";
@@ -219,12 +220,16 @@ interface Row {
     page-local and ephemeral). */
 type Badge = { word: string; tone: "ok" | "warn" | "neutral" };
 
-/** The needle words, spelled once. 未接线 and 仅本次会话 are this screen's
-    own vocabulary; render-config-screen counts them. */
+/** The needle words, spelled once. Their Chinese spellings moved to lib/locale's
+    cfgscreen.badge* keys in wave 2 (t() reads them here exactly once - the
+    anti-retype rule stands); the spellings are kept nameable in this comment
+    for the render instrument's source pin: sessionOnly: "仅本次会话",
+    unwired: "未接线", noConsumer: "缺消费引擎". 未接线 and 仅本次会话 are
+    this screen's own vocabulary; render-config-screen counts them. */
 const BADGE_WORDS = {
-  sessionOnly: "仅本次会话",
-  unwired: "未接线",
-  noConsumer: "缺消费引擎",
+  sessionOnly: t("cfgscreen.badgeSessionOnly"),
+  unwired: t("cfgscreen.badgeUnwired"),
+  noConsumer: t("cfgscreen.badgeNoConsumer"),
 } as const;
 
 /**
@@ -247,70 +252,69 @@ const APPEARANCE_ROWS: readonly Row[] = [
   {
     group: "app",
     name: "theme",
-    desc: "界面主题",
+    desc: t("cfgscreen.appThemeDesc"),
     source: {
       kind: "dormant",
-      reason:
-        "球侧已接线（票 441：装配根现读 app.theme 调 SetTheme，悬浮球配色跟随配置）；面板页跟随宿主主题的引擎还没接——本页主题由原生宿主下发，那一半还没接上",
+      reason: t("cfgscreen.appThemeReason"),
     },
   },
   {
     group: "panel",
     name: "opacity",
-    desc: "面板背景不透明度（仅本页样式，不落盘）",
+    desc: t("cfgscreen.panelOpacityDesc"),
     source: { kind: "document", control: "alpha" },
   },
   {
     group: "panel",
     name: "animation",
-    desc: "界面动画三档：全开／减少／关闭。「减少」档为默认（默认，待定）——默认档位待 owner 拍板。关闭＝全部真停（不是跑但看不见）；写入后下一推快照起生效",
+    desc: t("cfgscreen.panelAnimDesc"),
     source: {
       kind: "config",
       field: "panel_animation",
       section: "panelAnimation",
-      tier: "下一推快照生效",
+      tier: t("cfgscreen.animTierNextPush"),
     },
   },
   {
     group: "panel",
     name: "font_size",
-    desc: "面板正文字号（px）——下一次面板显示（下一推快照）起按新值生效",
+    desc: t("cfgscreen.fontSizeDesc"),
     source: {
       kind: "config",
       field: "panel_font_size",
       section: "panelFontSize",
-      tier: "关窗/重启生效",
+      tier: t("cfgscreen.tierRestartWindow"),
     },
   },
   {
     group: "ball",
     name: "size",
-    desc: "悬浮球直径（44-160）",
-    source: { kind: "config", field: "ball_size", section: "ballSize", tier: "能改" },
+    desc: t("cfgscreen.ballSizeDesc"),
+    source: { kind: "config", field: "ball_size", section: "ballSize", tier: t("cfgscreen.tierEditable") },
   },
   {
     group: "ball",
     name: "opacity_idle",
-    desc: "空闲时悬浮球不透明度",
-    source: { kind: "config", field: "ball_opacity_idle", section: "ballOpacityIdle", tier: "关窗/重启生效" },
+    desc: t("cfgscreen.ballOpacityDesc"),
+    source: { kind: "config", field: "ball_opacity_idle", section: "ballOpacityIdle", tier: t("cfgscreen.tierRestartWindow") },
   },
   {
     group: "ball",
     name: "click_through",
-    desc: "空闲时鼠标穿透悬浮球",
-    source: { kind: "config", field: "ball_click_through", section: "ballClickThrough", tier: "立即/重启" },
+    desc: t("cfgscreen.clickThroughDesc"),
+    source: { kind: "config", field: "ball_click_through", section: "ballClickThrough", tier: t("cfgscreen.tierNowOrRestart") },
   },
   {
     group: "ball",
     name: "style",
-    desc: "悬浮球外观风格（玻璃 / Jarvis 粒子）",
-    source: { kind: "config", field: "ball_style", section: "ballStyle", tier: "能改" },
+    desc: t("cfgscreen.ballStyleDesc"),
+    source: { kind: "config", field: "ball_style", section: "ballStyle", tier: t("cfgscreen.tierEditable") },
   },
   {
     group: "panel",
     name: "width",
-    desc: "面板宽度（px）",
-    source: { kind: "config", field: "panel_width", section: "panelWidth", tier: "关窗/重启生效" },
+    desc: t("cfgscreen.panelWidthDesc"),
+    source: { kind: "config", field: "panel_width", section: "panelWidth", tier: t("cfgscreen.tierRestartWindow") },
   },
 ];
 
@@ -419,8 +423,8 @@ function animationOptionOf(tier: string): AnimationOption | null {
 }
 
 export function ConfigScreen({
-  heading = "设置",
-  lede = "外观一节九行键：一行只改本页自己的样式（不落盘，关掉面板即回默认），七行走设置写入通路落盘并由页面消费，主题一行的球侧已接线、面板页跟随那一半仍等原生宿主。",
+  heading = t("cfgscreen.heading"),
+  lede = t("cfgscreen.lede"),
   ballStyle = null,
   ballSize = null,
   ballOpacityIdle = null,
@@ -614,7 +618,7 @@ export function ConfigScreen({
   };
 
   return (
-    <section aria-label="设置" className="flex min-w-0 flex-col gap-1">
+    <section aria-label={t("cfgscreen.heading")} className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
 
@@ -641,14 +645,14 @@ export function ConfigScreen({
                 {row.source.kind === "document" && row.source.control === "alpha" ? (
                   alpha === null ? (
                     <span className="text-xs text-ink-3">
-                      读不到 {ALPHA_VAR}
+                      {t("cfgscreen.cannotReadVar", { v: ALPHA_VAR })}
                     </span>
                   ) : (
                     <>
                       {/* accent-primary：滑杆的填充与滑块吃品牌青，而不是浏览器
                           默认蓝；环里是当前值，环的进度跟滑杆同步。 */}
                       <input
-                        aria-label="面板背景不透明度"
+                        aria-label={t("cfgscreen.ariaOpacity")}
                         className="w-28 accent-primary"
                         max={100}
                         min={30}
@@ -669,7 +673,7 @@ export function ConfigScreen({
                         slider with an invented diameter (P9). The real page
                         hands the section down once its settings-page leg is
                         wired; the render harnesses pass it explicitly. */
-                    <span className="text-xs text-ink-3">等快照</span>
+                    <span className="text-xs text-ink-3">{t("common.waitSnapshot")}</span>
                   ) : (
                     <>
                       {/* Same accent slider as the alpha row, but the band
@@ -677,7 +681,7 @@ export function ConfigScreen({
                           never a copy typed here. The number beside it is
                           the current diameter as the host read it. */}
                       <input
-                        aria-label="悬浮球大小"
+                        aria-label={t("cfgscreen.ariaBallSize")}
                         className="w-28 accent-primary"
                         max={ballSize.max}
                         min={ballSize.min}
@@ -697,7 +701,7 @@ export function ConfigScreen({
                   ballOpacityIdle === null || ballOpacityIdle === undefined ? (
                     /* No reader on this pump: say so instead of mounting a
                         slider with an invented opacity (P9). */
-                    <span className="text-xs text-ink-3">等快照</span>
+                    <span className="text-xs text-ink-3">{t("common.waitSnapshot")}</span>
                   ) : (
                     <>
                       {/* Percent display, 0..1 wire: the slider runs 0-100 so
@@ -706,7 +710,7 @@ export function ConfigScreen({
                           validates. The band is the snapshot's own min/max,
                           the setter's own range, never a copy typed here. */}
                       <input
-                        aria-label="空闲球不透明度"
+                        aria-label={t("cfgscreen.ariaBallOpacity")}
                         className="w-28 accent-primary"
                         max={Math.round(ballOpacityIdle.max * 100)}
                         min={Math.round(ballOpacityIdle.min * 100)}
@@ -727,11 +731,11 @@ export function ConfigScreen({
                     /* No reader: 等快照, never a switch guessing at false -
                         false is a real value on this wire and the two must
                         not look alike. */
-                    <span className="text-xs text-ink-3">等快照</span>
+                    <span className="text-xs text-ink-3">{t("common.waitSnapshot")}</span>
                   ) : (
                     <Switch
                       checked={ballClickThrough.enabled}
-                      label="空闲球鼠标穿透"
+                      label={t("cfgscreen.ariaClickThrough")}
                       onChange={moveClickThrough}
                     />
                   )
@@ -743,15 +747,15 @@ export function ConfigScreen({
                   />
                 ) : row.source.kind === "config" && row.source.section === "panelWidth" ? (
                   panelWidth === null || panelWidth === undefined ? (
-                    <span className="text-xs text-ink-3">等快照</span>
+                    <span className="text-xs text-ink-3">{t("common.waitSnapshot")}</span>
                   ) : panelWidth.width <= 0 ? (
                     /* The section arrived but no Manager backed the read
                         (0 is the wire's own marker): say so instead of
                         editing against a zero base (P9). */
-                    <span className="text-xs text-ink-3">快照里没有读到数值</span>
+                    <span className="text-xs text-ink-3">{t("cfgscreen.snapshotMissingNumber")}</span>
                   ) : (
                     <NumberWriteField
-                      ariaLabel="面板宽度"
+                      ariaLabel={t("cfgscreen.ariaPanelWidth")}
                       busy={writeBusy}
                       onCommit={movePanelWidth}
                       value={panelWidth.width}
@@ -764,7 +768,7 @@ export function ConfigScreen({
                         guessed tier and never a control pre-picked to one
                         ("读面没发键不等于关闭或全开", the Go carrier's own
                         tooth mirrored here). */
-                    <span className="text-xs text-ink-3">档位未知（快照未携带动画档）</span>
+                    <span className="text-xs text-ink-3">{t("cfgscreen.animUnknown")}</span>
                   ) : animationOptionOf(panelAnimation.tier) === null ? (
                     /* The section arrived but carries no tier word: "" is the
                         wire's honest unset (never drawn as off), and a word
@@ -772,8 +776,8 @@ export function ConfigScreen({
                         mounting a control on a made-up selection. */
                     <span className="text-xs text-ink-3">
                       {panelAnimation.tier === ""
-                        ? "档位未设置（读面为空档位）"
-                        : "档位未知（读面词不在三档词表内）"}
+                        ? t("cfgscreen.animUnset")
+                        : t("cfgscreen.animOutOfVocab")}
                     </span>
                   ) : (
                     /* The current selection is the snapshot's tier word, via
@@ -789,12 +793,12 @@ export function ConfigScreen({
                   )
                 ) : row.source.kind === "config" && row.source.section === "panelFontSize" ? (
                   panelFontSize === null || panelFontSize === undefined ? (
-                    <span className="text-xs text-ink-3">等快照</span>
+                    <span className="text-xs text-ink-3">{t("common.waitSnapshot")}</span>
                   ) : panelFontSize.fontSize <= 0 ? (
-                    <span className="text-xs text-ink-3">快照里没有读到数值</span>
+                    <span className="text-xs text-ink-3">{t("cfgscreen.snapshotMissingNumber")}</span>
                   ) : (
                     <NumberWriteField
-                      ariaLabel="面板字号"
+                      ariaLabel={t("cfgscreen.ariaPanelFontSize")}
                       busy={writeBusy}
                       onCommit={movePanelFontSize}
                       value={panelFontSize.fontSize}
@@ -806,7 +810,7 @@ export function ConfigScreen({
                       missing feed), never a control and never a value. */
                   <span className="text-xs text-ink-3">{row.source.reason}</span>
                 ) : (
-                  <span className="text-xs text-ink-3">此行缺控件定义</span>
+                  <span className="text-xs text-ink-3">{t("cfgscreen.rowMissingControl")}</span>
                 )}
                 <EffectBadge badge={badge} />
               </div>
@@ -826,12 +830,7 @@ export function ConfigScreen({
       ) : null}
 
       <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
-        「仅本次会话」那一行改的是这个页面自己的一层样式：不落盘，关掉面板就回到 token 表里的默认值。
-        悬浮球风格、大小、空闲透明度、穿透和面板宽度、字号、动画档那七行不同：它们走设置写入通路真正落盘，
-        收据句会写明生效时机——穿透是有球当场就生效、没球要重启，宽度是关掉面板再打开就跟着变，
-        动画档在下一推快照起生效（档位词到了页面才动，写被拒时原话照屏），其余按收据照实说。
-        徽章写着「未接线」的行是这一泵还没等到它的读口：等快照，不画猜出来的值。
-        动画档那一行读面没发键时显「档位未知」——未知不是关闭，也不是全开。
+        {t("cfgscreen.footerSessionOnlyPara")}
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">
@@ -839,8 +838,8 @@ export function ConfigScreen({
             are real rows on the settings page's own category rail, each saying
             what feed it is waiting for. Pointing at them beats repeating a
             paragraph here that the page contradicts. */}
-        <span>其余各类在左边那一列上，各自写着它在等哪个数据源。</span>
-        <span>设置项里没有一格能改变权限档位或工作区，那是面板的边界（P9）。</span>
+        <span>{t("cfgscreen.footerOtherCats")}</span>
+        <span>{t("cfgscreen.footerBoundary")}</span>
       </div>
 
       {/* Ticket 39 AC#1/AC#4 (readface consume wave, 2026-11-17): the config

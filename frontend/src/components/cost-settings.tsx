@@ -48,6 +48,7 @@ import { Button } from "@/components/ai-native/button";
 import { SettingsCard, StateTag } from "@/components/settings-controls";
 import { cn } from "@/lib/cn";
 import { useCostSummary, type CostAggregateView, type CostDayRowView } from "@/lib/cost-view";
+import { t } from "@/lib/locale";
 
 /** The pure per-day table. Fed rows come back out verbatim - the behavioural
     tooth the render instrument feeds (scripts/render-security-cost-40.tsx).
@@ -68,22 +69,22 @@ export function CostDayTable({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <span className="text-[11.5px] text-ink-3">IN = 输入 token，OUT = 输出 token，金额 = costMicros（1e-6 货币单位，整数逐字；币种列不在这一行上）</span>
+        <span className="text-[11.5px] text-ink-3">{t("cost.unitsLine")}</span>
       </div>
       {days.length === 0 ? (
         <p className="text-[12px] leading-[1.7] text-ink-2">
-          成本表是空的——这是读到的表事实（这一天没有任务记账），不是读不到。
+          {t("cost.emptyTable")}
         </p>
       ) : (
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-line">
-              <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">日期</th>
+              <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">{t("cost.thDay")}</th>
               <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">IN</th>
               <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">OUT</th>
               <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">CACHED</th>
-              <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">金额（costMicros）</th>
-              <th className="py-1.5 text-[11px] font-medium text-ink-3">任务</th>
+              <th className="py-1.5 pr-3 text-[11px] font-medium text-ink-3">{t("cost.thAmount")}</th>
+              <th className="py-1.5 text-[11px] font-medium text-ink-3">{t("cost.thTasks")}</th>
             </tr>
           </thead>
           <tbody>
@@ -93,7 +94,7 @@ export function CostDayTable({
                 <td className="py-1.5 pr-3 font-mono text-[12px] tabular-nums text-ink-2">{row.tokensIn}</td>
                 <td className="py-1.5 pr-3 font-mono text-[12px] tabular-nums text-ink-2">{row.tokensOut}</td>
                 <td className="py-1.5 pr-3 font-mono text-[12px] tabular-nums text-ink-2">
-                  {cachedKnown ? row.cachedTokens : "未知"}
+                  {cachedKnown ? row.cachedTokens : t("common.unknown")}
                 </td>
                 <td className="py-1.5 pr-3 font-mono text-[12px] tabular-nums text-ink-2">{row.costMicros}</td>
                 <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink-2">{row.tasks}</td>
@@ -104,10 +105,10 @@ export function CostDayTable({
       )}
       {skipped > 0 ? (
         <p className="text-[11px] leading-[1.6] text-orange" role="note">
-          有 {skipped} 行字段残缺，没有上屏——宁可少一行，不补零。
+          {t("cost.skippedNote", { n: skipped })}
         </p>
       ) : null}
-      <p className="text-[11px] leading-[1.6] text-ink-3">共 {count} 行（新的一天在前，行序是读口自己的）。</p>
+      <p className="text-[11px] leading-[1.6] text-ink-3">{t("cost.rowsCount", { n: count })}</p>
     </div>
   );
 }
@@ -126,13 +127,13 @@ export function BudgetStateBar({ state, allowNewTask }: { state: string; allowNe
   const active: "normal" | "warn" | "paused" | null =
     state === "normal" ? "normal" : state === "warn" ? "warn" : state === "paused" ? "paused" : null;
   const segments: readonly { key: "normal" | "warn" | "paused"; label: string }[] = [
-    { key: "normal", label: "未满 80%（normal）" },
-    { key: "warn", label: "80% 及以上（warn）" },
-    { key: "paused", label: "100% 及以上（paused）" },
+    { key: "normal", label: t("cost.segNormal") },
+    { key: "warn", label: t("cost.segWarn") },
+    { key: "paused", label: t("cost.segPaused") },
   ];
   return (
     <div className="flex flex-col gap-1.5">
-      <div aria-label={`预算状态条：${state}`} className="flex flex-wrap items-center gap-1.5" role="img">
+      <div aria-label={t("cost.budgetAria", { state })} className="flex flex-wrap items-center gap-1.5" role="img">
         {segments.map((seg) => (
           <span
             className={cn(
@@ -149,10 +150,9 @@ export function BudgetStateBar({ state, allowNewTask }: { state: string; allowNe
         ))}
       </div>
       <p className="text-[11px] leading-[1.6] text-ink-3">
-        状态词读自 aggregate.budgetState（逐字：{state}），三态判定在原生侧（internal/observe 的整数基点判定），页面不复算。
-        {active === null ? " 这个词不在三态词表里：条不定格，词照原样显示。" : ""}
-        新任务准入读 aggregate.budgetAllowNewTask（逐字）：
-        {allowNewTask ? "允许" : "停止"}。
+        {t("cost.budgetStateNote", { state })}
+        {active === null ? t("cost.stateOutOfVocab") : ""}
+        {t("cost.admissionNote", { v: allowNewTask ? t("cost.allow") : t("cost.stop") })}
       </p>
     </div>
   );
@@ -164,33 +164,33 @@ export function BudgetStateBar({ state, allowNewTask }: { state: string; allowNe
     (cost_handlers.go:79-82: 0/"" renders as unknown, never a version). */
 export function CostAggregateCard({ aggregate }: { aggregate: CostAggregateView }) {
   const budgetWord = (micros: number): string =>
-    micros === 0 ? "不封顶（0 = 未设预算）" : `${micros} micro`;
+    micros === 0 ? t("cost.budgetUncapped") : `${micros} micro`;
   return (
     <div className="flex flex-col gap-2">
       <table className="w-full border-collapse text-left">
         <tbody>
           <tr className="border-b border-line">
-            <td className="py-1.5 pr-3 text-[11px] text-ink-3">月累计 IN</td>
+            <td className="py-1.5 pr-3 text-[11px] text-ink-3">{t("cost.monthIn")}</td>
             <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink">{aggregate.monthTokensIn}</td>
           </tr>
           <tr className="border-b border-line">
-            <td className="py-1.5 pr-3 text-[11px] text-ink-3">月累计 OUT</td>
+            <td className="py-1.5 pr-3 text-[11px] text-ink-3">{t("cost.monthOut")}</td>
             <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink">{aggregate.monthTokensOut}</td>
           </tr>
           <tr className="border-b border-line">
-            <td className="py-1.5 pr-3 text-[11px] text-ink-3">月累计金额（micro，整数逐字）</td>
+            <td className="py-1.5 pr-3 text-[11px] text-ink-3">{t("cost.monthAmount")}</td>
             <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink">{aggregate.monthCostMicros}</td>
           </tr>
           <tr className="border-b border-line">
-            <td className="py-1.5 pr-3 text-[11px] text-ink-3">今日金额（micro，整数逐字）</td>
+            <td className="py-1.5 pr-3 text-[11px] text-ink-3">{t("cost.dayAmount")}</td>
             <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink">{aggregate.dayCostMicros}</td>
           </tr>
           <tr className="border-b border-line">
-            <td className="py-1.5 pr-3 text-[11px] text-ink-3">日预算</td>
+            <td className="py-1.5 pr-3 text-[11px] text-ink-3">{t("cost.dailyBudget")}</td>
             <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink">{budgetWord(aggregate.dailyBudgetMicros)}</td>
           </tr>
           <tr>
-            <td className="py-1.5 pr-3 text-[11px] text-ink-3">月预算</td>
+            <td className="py-1.5 pr-3 text-[11px] text-ink-3">{t("cost.monthlyBudget")}</td>
             <td className="py-1.5 font-mono text-[12px] tabular-nums text-ink">{budgetWord(aggregate.monthlyBudgetMicros)}</td>
           </tr>
         </tbody>
@@ -198,8 +198,8 @@ export function CostAggregateCard({ aggregate }: { aggregate: CostAggregateView 
       <BudgetStateBar allowNewTask={aggregate.budgetAllowNewTask} state={aggregate.budgetState} />
       <p className="text-[11px] leading-[1.6] text-ink-3">
         {aggregate.pricingVersion === 0 || aggregate.pricingUpdated === ""
-          ? "计价版本未知——读口没能读到价表（0/空 = 未知，页面不编一个版本号）。"
-          : `计价版本 ${aggregate.pricingVersion}（${aggregate.pricingUpdated} 更新），读自 aggregate.pricingVersion/pricingUpdated 逐字。`}
+          ? t("cost.pricingUnknown")
+          : t("cost.pricingVersion", { v: aggregate.pricingVersion, updated: aggregate.pricingUpdated })}
       </p>
     </div>
   );
@@ -215,22 +215,33 @@ export function CostAggregateCard({ aggregate }: { aggregate: CostAggregateView 
         when it did not (no face, or the read failed - the prose says which)
         aggregateKnown=false and not one aggregate/budget/pricing number is
         drawn. */
+/* The wire's gates and named absences. Each row states a fact about THIS
+    build's wire, true whether or not the current read was fed:
+      - cachedKnown is false BY CONSTRUCTION on this build (no cached column
+        on cost_daily, D35's table the leg may not widen) - the CACHED column
+        shows unknown (未知), never the structural zero.
+      - the aggregate face is OPTIONAL (CostAggregateReader): when the leg
+        answered it the aggregate card above draws every field verbatim;
+        when it did not (no face, or the read failed - the prose says which)
+        aggregateKnown=false and not one aggregate/budget/pricing number is
+        drawn. Source pins kept nameable here: cost_handlers.go:36-45,
+        cost_handlers.go:92, cost_handlers.go:54-83, internal/observe,
+        页面不复算, 计价版本未知 (the render instrument's source-level
+        needles ride these comment words since wave 2 moved the copy). */
 const ABSENCES: readonly { label: string; reason: string }[] = [
   {
-    label: "CACHED（缓存命中 token）",
-    reason:
-      "本 build 的 cost_daily 没有 cached 列（D35 表，读面腿不许加宽，cost_handlers.go:36-45）⇒ payload 恒带 cachedKnown=false，缓存列显示「未知」，绝不把结构零画成读数。cachedKnown 翻 true（存储开始聚合）时数字才上屏。",
+    label: t("cost.cachedLabel"),
+    reason: t("cost.cachedReason"),
   },
   {
-    label: "月累计 / 预算 / 计价版本（聚合面未取到时）",
-    reason:
-      "聚合面是可选的第二读面（CostAggregateReader，cost_handlers.go:92；CostAggregateRow 在 :54-83）：聚合面没接或读取失败时 payload 带 aggregateKnown=false，prose 也写明「未取到」——这一格一格数字都不画，页面也不自己加总（:26-29 禁派生总数）。聚合面接上时逐字段上屏，预算三态读 state 词、不复算。",
+    label: t("cost.aggregateLabel"),
+    reason: t("cost.aggregateReason"),
   },
 ];
 
 export function CostSettings({
-  heading = "成本",
-  lede = "每轮花费、本月累计、预算与超支提醒。",
+  heading = t("cost.heading"),
+  lede = t("cost.lede"),
 }: {
   heading?: string;
   lede?: string;
@@ -238,64 +249,64 @@ export function CostSettings({
   const { state, reload } = useCostSummary();
 
   return (
-    <section aria-label="成本" className="flex min-w-0 flex-col gap-1">
+    <section aria-label={t("cost.heading")} className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
 
       <div className="mt-2 flex items-center gap-2">
-        <Button aria-label="刷新成本" onClick={reload} size="xs" variant="quiet">
-          刷新
+        <Button aria-label={t("cost.refreshAria")} onClick={reload} size="xs" variant="quiet">
+          {t("common.refresh")}
         </Button>
       </div>
 
-      {state.phase === "loading" ? <p className="mt-2 text-[12px] text-ink-3">正在读取成本...</p> : null}
+      {state.phase === "loading" ? <p className="mt-2 text-[12px] text-ink-3">{t("cost.loading")}</p> : null}
       {state.phase === "no-host" ? (
         <div className="mt-2 rounded-card border border-line bg-surface px-3.5 py-3">
           <p className="text-[12px] leading-[1.7] text-ink-2">
-            暂未连接到本机服务，读不到成本（cost.summary 门在本机侧，浏览器页没有宿主）。
+            {t("cost.noHost")}
           </p>
         </div>
       ) : null}
       {state.phase === "payload-error" ? (
         <div className="mt-2 flex flex-col gap-2 rounded-card border border-line bg-surface px-3.5 py-3">
           <p className="text-[12px] leading-[1.7] text-ink-2">
-            成本读口的载荷没排出来（payloadError），原话如下：
+            {t("cost.payloadError")}
           </p>
           <p className="font-mono text-[11px] leading-[1.6] text-ink-3">{state.message}</p>
           <Button className="self-start" onClick={reload} size="xs" variant="secondary">
-            重试
+            {t("cost.retry")}
           </Button>
         </div>
       ) : null}
       {state.phase === "unreadable" ? (
         <div className="mt-2 flex flex-col gap-2 rounded-card border border-line bg-surface px-3.5 py-3">
-          <p className="text-[12px] leading-[1.7] text-ink-2">读口拒绝了这个请求，原话逐字如下（没有载荷行）：</p>
+          <p className="text-[12px] leading-[1.7] text-ink-2">{t("cost.refused")}</p>
           <p className="whitespace-pre-wrap font-mono text-[11px] leading-[1.6] text-ink-3">{state.raw}</p>
           <Button className="self-start" onClick={reload} size="xs" variant="secondary">
-            重试
+            {t("cost.retry")}
           </Button>
         </div>
       ) : null}
       {state.phase === "ready" ? (
         <>
           <div className="mt-2 flex items-center gap-2">
-            <StateTag tone="ok" text="读自 cost.summary（票 194 的只读门）" />
+            <StateTag tone="ok" text={t("cost.gateTag")} />
           </div>
           {state.prose !== "" ? (
             <p className="mt-2 text-[12px] leading-[1.7] text-ink-2">{state.prose}</p>
           ) : null}
-          <SettingsCard title="按天成本" description="cost_daily 表逐行上屏，新的一天在前；页面不派生任何表里没有的数字。CACHED 列听 cachedKnown 门的：false 显示未知，不画结构零。">
+          <SettingsCard title={t("cost.dailyTitle")} description={t("cost.dailyDesc")}>
             <CostDayTable cachedKnown={state.cachedKnown} count={state.count} days={state.days} skipped={state.skipped} />
           </SettingsCard>
           {state.aggregateKnown && state.aggregate ? (
-            <SettingsCard title="本月累计与预算" description="CostAggregateRow 逐字段上屏（月累计/预算/三态/计价版本）；三态条只听 state 词，页面不复算百分比。">
+            <SettingsCard title={t("cost.aggregateTitle")} description={t("cost.aggregateDesc")}>
               <CostAggregateCard aggregate={state.aggregate} />
             </SettingsCard>
           ) : null}
         </>
       ) : null}
 
-      <SettingsCard title="这扇门的门与缺" description="每行写明 wire 上的门（cachedKnown）与可选面（aggregateKnown）的语义；门没开就不画数字。">
+      <SettingsCard title={t("cost.gatesTitle")} description={t("cost.gatesDesc")}>
         <div className="flex flex-col">
           {ABSENCES.map((row) => (
             <div
@@ -306,7 +317,7 @@ export function CostSettings({
                 <span className="text-[12.5px] font-medium text-ink">{row.label}</span>
                 <p className="mt-0.5 text-[11px] leading-[1.6] text-ink-3">{row.reason}</p>
               </div>
-              <StateTag tone="neutral" text="门控" />
+              <StateTag tone="neutral" text={t("cost.gated")} />
             </div>
           ))}
         </div>

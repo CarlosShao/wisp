@@ -210,24 +210,28 @@ check("Escape must close the palette", appSrc.includes("paletteOpen: false"));
 //     own wire functions - a stronger pin, not a loosened one (the face's
 //     rendering is pinned tooth-by-tooth by render:forcechip38 and the
 //     discovery face by render:discovery38).
+const zhBundle = readFileSync("src/lib/locale/zh.ts", "utf8");
 check(
-  "the cancel note must say the door landed and name it (roster.cancel; the monitor carries the real gate)",
-  appSrc.includes("取消任务 已接线") &&
-    appSrc.includes("roster.cancel") &&
+  "the cancel note must say the door landed and name it (roster.cancel; the monitor carries the real gate) - wave 2 moved the sentence to lib/locale's app.cancelWired* keys, App still binds the real door",
+  appSrc.includes('t("app.cancelWired")') &&
+    zhBundle.includes("取消任务 已接线") &&
+    zhBundle.includes("roster.cancel") &&
     appSrc.includes("cancelDoors={{ cancelTask: requestRosterCancel, historyLoad: requestHistoryPage }}"),
 );
 check(
-  "the force note must say the doors landed and name them (rules.force read + forceMode payload; the chip rides the send envelope)",
-  appSrc.includes("模式强制 已接线") &&
-    appSrc.includes("rules.force") &&
+  "the force note must say the doors landed and name them (rules.force read + forceMode payload; the chip rides the send envelope) - the sentence half lives in zh.ts's app.forceWired* keys since wave 2",
+  appSrc.includes('t("app.forceWired")') &&
+    zhBundle.includes("模式强制 已接线") &&
+    zhBundle.includes("rules.force") &&
     appSrc.includes("forceMode") &&
     appSrc.includes("requestRulesForce") &&
     appSrc.includes("requestToolsList") &&
     appSrc.includes("requestToolLaunch"),
 );
 check(
-  "the commands no-reader note must name the missing reader (PumpSources.Commands)",
-  appSrc.includes("PumpSources.Commands"),
+  "the commands no-reader note must name the missing reader (PumpSources.Commands) - the sentence half lives in zh.ts's app.rosterUnwiredReason since wave 2",
+  appSrc.includes('t("app.rosterUnwiredReason")') &&
+    zhBundle.includes("PumpSources.Commands"),
 );
 
 /* ---------------------------------------------------------------------------

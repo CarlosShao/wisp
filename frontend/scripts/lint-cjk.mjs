@@ -87,12 +87,14 @@ const REGISTRY = {
   // ---- protocol ----
   [PROTOCOL_FILE]: { cap: 23, kind: "protocol", reason: PROTOCOL_REASON },
   // ---- product-face backlog (registered debt, cap = count at landing) ----
-  "src/components/config-screen.tsx": { cap: 49, kind: "backlog", reason: BACKLOG_REASON },
-  "src/components/cost-settings.tsx": { cap: 49, kind: "backlog", reason: BACKLOG_REASON },
+  // (config-screen.tsx externalized in wave 2: its entry was pruned when the
+  // file reached 0 - the stale-entry control would red on a kept entry.)
+  // (cost-settings.tsx externalized in wave 2 too: entry pruned at 0.)
+  // (privacy-settings.tsx externalized in wave 2 too: entry pruned at 0.)
+  // (palette-screen.tsx externalized in wave 2 too: entry pruned at 0.)
+  // (history-page.tsx externalized in wave 2 too: entry pruned at 0. Its
+  // irreversible-purge sentence rode history.purgeConfirmBody to lib/locale.)
   "src/components/plugins-screen.tsx": { cap: 40, kind: "backlog", reason: BACKLOG_REASON },
-  "src/components/privacy-settings.tsx": { cap: 40, kind: "backlog", reason: BACKLOG_REASON },
-  "src/components/palette-screen.tsx": { cap: 37, kind: "backlog", reason: BACKLOG_REASON },
-  "src/components/history-page.tsx": { cap: 31, kind: "backlog", reason: BACKLOG_REASON },
   "src/components/diagnostics-settings.tsx": { cap: 30, kind: "backlog", reason: BACKLOG_REASON },
   "src/components/config-editor.tsx": { cap: 25, kind: "backlog", reason: BACKLOG_REASON },
   "src/components/security-settings.tsx": { cap: 25, kind: "backlog", reason: BACKLOG_REASON },

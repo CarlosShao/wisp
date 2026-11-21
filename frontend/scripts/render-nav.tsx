@@ -286,9 +286,13 @@ check("the right rail must have exactly one toggle in the chrome",
 
 // Controls that were drawn with no handler. The command palette shipped as a
 // dead button: 「点命令面板图标毫无反应」. Checked in the SOURCE, because a
-// compiled bundle has no onClick left in it to find.
+// compiled bundle has no onClick left in it to find. Wave 2 moved the button's
+// label spelling to zh.ts's app.palette key (App reads it through
+// PALETTE_LABEL = t("app.palette")); the pin rides both halves.
 check("the command palette control must have a handler",
-  /aria-label="命令面板"[\s\S]{0,400}?onClick/.test(appSrc));
+  /aria-label=\{PALETTE_LABEL\}[\s\S]{0,400}?onClick/.test(appSrc) &&
+    appSrc.includes('const PALETTE_LABEL = t("app.palette")') &&
+    readFileSync("src/lib/locale/zh.ts", "utf8").includes('"app.palette": "命令面板"'));
 check("Ctrl+K must be wired (the chip in the header promises it)",
   /key\.toLowerCase\(\) === "k"/.test(appSrc));
 // Escape shipped unhandled on the palette until 2026-09-28: a modal you could

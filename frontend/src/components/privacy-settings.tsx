@@ -55,6 +55,7 @@ import { Button } from "@/components/ai-native/button";
 import { SettingsCard } from "@/components/settings-controls";
 import { cn } from "@/lib/cn";
 import { privacyRunners, usePrivacyRequest, type PrivacyActionState } from "@/lib/privacy-view";
+import { t } from "@/lib/locale";
 
 const INPUT_CLASS =
   "h-[30px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3";
@@ -68,13 +69,13 @@ const INPUT_CLASS =
 export function PrivacyReplyBlock({ state }: { state: PrivacyActionState }) {
   if (state.phase === "idle") return null;
   if (state.phase === "sending") {
-    return <p className="text-[12px] leading-[1.7] text-ink-3">请求已在桥上，等门回话...</p>;
+    return <p className="text-[12px] leading-[1.7] text-ink-3">{t("privacy.sending")}</p>;
   }
   if (state.phase === "no-host") {
     return (
       <div className="rounded-card border border-line bg-surface px-3.5 py-3">
         <p className="text-[12px] leading-[1.7] text-ink-2">
-          没接到本机宿主（这一页没有 wispDispatch 门）：请求没有发出去，回执未判——这里不画任何假结果。
+          {t("privacy.noHost")}
         </p>
       </div>
     );
@@ -82,7 +83,7 @@ export function PrivacyReplyBlock({ state }: { state: PrivacyActionState }) {
   if (state.phase === "refused") {
     return (
       <div className="rounded-card border border-red/40 bg-red-tint px-3.5 py-3">
-        <p className="text-[12px] leading-[1.7] text-red">门拒绝了这个请求，原话逐字如下：</p>
+        <p className="text-[12px] leading-[1.7] text-red">{t("common.refusalVerbatim")}</p>
         <p className="mt-1.5 whitespace-pre-wrap break-all font-mono text-[11px] leading-[1.6] text-ink">
           {state.raw}
         </p>
@@ -92,7 +93,7 @@ export function PrivacyReplyBlock({ state }: { state: PrivacyActionState }) {
   if (state.phase === "receipt") {
     return (
       <div className="rounded-card border border-green/40 bg-green-tint px-3.5 py-3">
-        <p className="text-[12px] leading-[1.7] text-ink">回执逐字：</p>
+        <p className="text-[12px] leading-[1.7] text-ink">{t("common.receiptVerbatim")}</p>
         <p className="mt-1 whitespace-pre-wrap font-mono text-[11.5px] leading-[1.6] text-ink">{state.text}</p>
       </div>
     );
@@ -101,7 +102,7 @@ export function PrivacyReplyBlock({ state }: { state: PrivacyActionState }) {
     return (
       <div className="rounded-card border border-orange/40 bg-orange-tint px-3.5 py-3">
         <p className="text-[12px] leading-[1.7] text-orange">
-          回执上没有解析到导出载荷行（wisp-privacy-export: 行不在或不是 JSON）：records 未判，不画 0。原话逐字如下：
+          {t("privacy.noPayload")}
         </p>
         <p className="mt-1.5 whitespace-pre-wrap break-all font-mono text-[11px] leading-[1.6] text-ink">
           {state.raw}
@@ -125,15 +126,15 @@ export function PrivacyReplyBlock({ state }: { state: PrivacyActionState }) {
   // data, not a summary, so the rows stay on screen verbatim.
   return (
     <div className="rounded-card border border-green/40 bg-green-tint px-3.5 py-3">
-      <p className="text-[12px] leading-[1.7] text-ink">回执逐字：</p>
+      <p className="text-[12px] leading-[1.7] text-ink">{t("common.receiptVerbatim")}</p>
       <p className="mt-1 whitespace-pre-wrap font-mono text-[11.5px] leading-[1.6] text-ink">{state.prose}</p>
       <p className="mt-2 text-[12px] leading-[1.7] text-ink">
-        records={state.envelope.recordsCount}
-        <span className="text-ink-3">（读自载荷 records 数组的长度，与回执句子同一读数）</span>
+        {t("privacy.recordsLine", { n: state.envelope.recordsCount })}
+        <span className="text-ink-3">{t("privacy.recordsSource")}</span>
       </p>
       <p className="mt-1 text-[11px] leading-[1.6] text-ink-3">
-        域（载荷自报）：{state.envelope.domain}
-        {state.envelope.exportedAt === "" ? "" : `　导出时刻：${state.envelope.exportedAt}`}
+        {t("privacy.domainSelfReport", { domain: state.envelope.domain })}
+        {state.envelope.exportedAt === "" ? "" : t("privacy.exportedAt", { v: state.envelope.exportedAt })}
       </p>
       <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-all rounded-control border border-line bg-inset px-3 py-2 font-mono text-[11px] leading-[1.5] text-ink">
         {JSON.stringify(state.envelope.records)}
@@ -169,13 +170,14 @@ function PrivacyField({
 }
 
 /** The caption under the domain inputs - the ask-don't-copy rule, stated
-    where the user can read it. */
-const DOMAIN_CAPTION =
-  "域词由 internal/memory 的 PrivacyDomains() 拥有（D35 五域），本页不复制词表：你填的词原样上桥，门拒绝时拒绝句会点名可用的域，逐字显示在下面。";
+    where the user can read it. Source pins kept nameable here for the render
+    instrument's source-level needles (wave 2 moved the copy to lib/locale):
+    不可逆, 取消, 没有隐私条目的清单读面, PrivacyDomains(). */
+const DOMAIN_CAPTION = t("privacy.domainCaption");
 
 export function PrivacySettings({
-  heading = "隐私",
-  lede = "本机数据的删除、清空与导出（D35 五域，走真桥）。",
+  heading = t("privacy.heading"),
+  lede = t("privacy.lede"),
 }: {
   heading?: string;
   lede?: string;
@@ -192,25 +194,25 @@ export function PrivacySettings({
   const exp = usePrivacyRequest("export", privacyRunners.export);
 
   return (
-    <section aria-label="隐私" className="flex min-w-0 flex-col gap-1">
+    <section aria-label={t("privacy.heading")} className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
 
       <SettingsCard
-        title="删除一条"
-        description="privacy.delete-one：一域一条，回执点名 id。面板没有隐私条目的清单读面（名册只有这三扇门），id 需要你手头有；不填 id 这一格不发起。这一次点击就是确认：请求带 privacyConfirmed:true，门上没有确认位的同源伪造请求会被具名拒绝、零删除。"
+        title={t("privacy.deleteOneTitle")}
+        description={t("privacy.deleteOneDesc")}
       >
         <div className="flex flex-wrap items-end gap-3">
-          <PrivacyField label="域（privacyDomain）" onChange={setDeleteDomain} placeholder="域词" value={deleteDomain} />
-          <PrivacyField label="对象 id（privacyItemId）" onChange={setDeleteItemId} placeholder="记录 id" value={deleteItemId} />
+          <PrivacyField label={t("privacy.domainLabel")} onChange={setDeleteDomain} placeholder={t("privacy.domainPlaceholder")} value={deleteDomain} />
+          <PrivacyField label={t("privacy.idLabel")} onChange={setDeleteItemId} placeholder={t("privacy.idPlaceholder")} value={deleteItemId} />
           <Button
-            aria-label="删除一条隐私记录"
+            aria-label={t("privacy.deleteOneAria")}
             disabled={deleteItemId.trim() === ""}
             onClick={() => del.submit(deleteDomain, deleteItemId)}
             size="sm"
             variant="primary"
           >
-            发起删除
+            {t("privacy.deleteOneSubmit")}
           </Button>
         </div>
         <p className="mt-2 text-[11px] leading-[1.6] text-ink-3">{DOMAIN_CAPTION}</p>
@@ -220,34 +222,33 @@ export function PrivacySettings({
       </SettingsCard>
 
       <SettingsCard
-        title="清空某域"
-        description="privacy.purge：整域清空，不可逆（SPEC-08:170 自己写着 purge 需确认）。这里没有一键清空：第一下只开确认卡，请求只从卡上的确认键发出；门上也没有「全清」参数，域词必填。"
+        title={t("privacy.purgeTitle")}
+        description={t("privacy.purgeDesc")}
       >
         <div className="flex flex-wrap items-end gap-3">
-          <PrivacyField label="域（privacyDomain）" onChange={setPurgeDomain} placeholder="域词" value={purgeDomain} />
+          <PrivacyField label={t("privacy.domainLabel")} onChange={setPurgeDomain} placeholder={t("privacy.domainPlaceholder")} value={purgeDomain} />
           <Button
-            aria-label="清空域（先确认）"
+            aria-label={t("privacy.purgeFirstAria")}
             disabled={purgeDomain.trim() === ""}
             onClick={() => setPurgeConfirmOpen(true)}
             size="sm"
             variant="secondary"
           >
-            清空这一域
+            {t("privacy.purgeOne")}
           </Button>
         </div>
         {purgeConfirmOpen ? (
-          <div className="mt-3 rounded-card border border-red/40 bg-red-tint px-3.5 py-3" role="alertdialog" aria-label="确认清空">
-            <p className="text-[12.5px] font-semibold text-red">确认清空</p>
+          <div className="mt-3 rounded-card border border-red/40 bg-red-tint px-3.5 py-3" role="alertdialog" aria-label={t("privacy.confirmPurgeAria")}>
+            <p className="text-[12.5px] font-semibold text-red">{t("privacy.confirmPurge")}</p>
             <p className="mt-1 text-[12px] leading-[1.7] text-ink">
-              privacy.purge 不可逆：整域清空后无法恢复。即将清空的域：{purgeDomain.trim()}
-              （词原样上桥，门按 PrivacyDomains() 判）。其他域不会动；清空的条数以门回执自报的计数为准。
+              {t("privacy.purgeConfirmBody", { domain: purgeDomain.trim() })}
             </p>
             <div className="mt-2.5 flex items-center gap-2">
               <Button onClick={() => setPurgeConfirmOpen(false)} size="xs" variant="secondary">
-                取消
+                {t("common.cancel")}
               </Button>
               <Button
-                aria-label="确认清空"
+                aria-label={t("privacy.confirmPurgeAria")}
                 className={cn("bg-red text-white hover:bg-red/90")}
                 onClick={() => {
                   setPurgeConfirmOpen(false);
@@ -256,7 +257,7 @@ export function PrivacySettings({
                 size="xs"
                 variant="primary"
               >
-                确认清空
+                {t("privacy.confirmPurge")}
               </Button>
             </div>
           </div>
@@ -268,18 +269,18 @@ export function PrivacySettings({
       </SettingsCard>
 
       <SettingsCard
-        title="导出某域"
-        description="privacy.export：整域导出为存储自报的 JSON（导出即你自己的数据，不是摘要）；回执 prose 逐字上屏，records=N 读自载荷 records 数组，载荷行不在就明说未判，不画 0。"
+        title={t("privacy.exportTitle")}
+        description={t("privacy.exportDesc")}
       >
         <div className="flex flex-wrap items-end gap-3">
-          <PrivacyField label="域（privacyDomain）" onChange={setExportDomain} placeholder="域词" value={exportDomain} />
+          <PrivacyField label={t("privacy.domainLabel")} onChange={setExportDomain} placeholder={t("privacy.domainPlaceholder")} value={exportDomain} />
           <Button
-            aria-label="导出域 JSON"
+            aria-label={t("privacy.exportAria")}
             onClick={() => exp.submit(exportDomain)}
             size="sm"
             variant="secondary"
           >
-            导出 JSON
+            {t("privacy.exportJson")}
           </Button>
         </div>
         <p className="mt-2 text-[11px] leading-[1.6] text-ink-3">{DOMAIN_CAPTION}</p>
