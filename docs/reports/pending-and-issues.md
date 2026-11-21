@@ -38042,3 +38042,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1979（11-21 15:1x）：票 62 AC#9 按"第二支"结 —— 把 winlive-only 的零定时器实测用例在 SLO 表里具名写死
 
 件 `dd020acd8`（只碰 `docs/SLO.md` 一行原位加缀＋本票 Progress 两行；阈值/读数**一字节未动**）。我盘上复核：`internal/ball/hotkey_live_test.go:1` 逐字 `//go:build windows && winlive`、`:454` 逐字 `func TestLiveSleepingZeroTimerHandles`；`docs/SLO.md:231` 那行 `timers=no / PASS` 原文保留、后接一句具名说明（CI 只有 `go vet -tags winlive` 编译门、无运行步骤；手动跑法逐字）。AC#9 完成判据＝该句（票面允许的第二支）。**票 62 仍开放**（剩 5 枚：会话态动效／音频驱动／靠边吸附／资源复测／可运行原型＝都要真球真窗机 → 进窗口批）。
+## A1980（11-21 16:1x）：票 33 AC#10 结（非实现者裁）`eb791fabc` —— `[panel]` width/height/scale 三键第一次真到窗口
+
+我复跑 `scripts/wisp-cli-staged-tests.sh '-test.run=^TestAC10'` ⇒ **rc=0、23 行 PASS、0 FAIL/SKIP**（⛔ 未跑真窗用例，桌面没弹窗）。三键生产者：`panel_resident_windows.go:244` 三源→`panelWindowGeometry`(panel_geometry_ac10.go:53)→建窗 `panel_host_windows.go:1016`／re-show `:1292`；`scale` 走 `applyGeometryWin32`(panel_geometry_ac10.go:119) `SetWindowPos` 窗框缩放（720×480@1.25⇒900×600），hot 同 `[panel]` 整节口径。**语义如实记**：`scale` 是**窗框缩放**、不是页面内容缩放（真内容缩放要 fork 包 `PutZoomFactor`）⇒ 若机主要"字更大"，另立票。旧钉 `TestAC10ScaleHasNoProducerAndTheReasonIsNamed` 未被碰、仍 PASS。**欠一发**：本刀动了建窗参数 ⇒ 窗口批第 5 条必须复跑一枚真窗 bring-up，⛔ 之前不许说"面板整体无回归"。**票 33 现 12/14**（剩 cold/hot 延迟读数与焦点往返＝都真窗）。
