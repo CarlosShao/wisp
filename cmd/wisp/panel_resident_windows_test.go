@@ -66,15 +66,52 @@ func uniqueProfileLeaf(prefix string) string {
 // manager (real embedded assets, a real user-data folder under the system temp
 // dir, the real fail-closed dispatch chain) and returns it with the cleanups
 // already registered.
+//
+// 314 (2026-11-21): the leaf is panelProfileLeaf's swept-and-never-deleted shape
+// now, replacing uniqueProfileLeaf + t.Cleanup(os.RemoveAll), and the stop is
+// stopResidentPanelClean's Close-then-Destroy-then-wait shape. Two measured
+// reasons, both in docs/evidence/s1/314-pair-death-r1.md: (a) the RemoveAll ran
+// AFTER rp.stop(), whose WM_QUIT path leaves the posted WM_CLOSE undispatched,
+// so the browser was still alive when its profile folder vanished under it -
+// the count=96 single-run scan measured the process dying exactly at that
+// cleanup (single-09, its --- PASS never arrived); (b) no teardown ever closed
+// the WebView2 controller, so every run abandoned a live environment and a
+// later environment creation died with it.
 func startPanelForTest(t *testing.T) (*residentPanel, *PanelManager) {
 	t.Helper()
-	dataPath := uniqueProfileLeaf("wisp-33r5-panel-profile")
-	t.Cleanup(func() { _ = os.RemoveAll(dataPath) })
+	dataPath := panelProfileLeaf("wisp-33r5-panel-profile")
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 	rp := startResidentPanel(observe.NewRegistry(), mgr)
-	t.Cleanup(rp.stop)
+	t.Cleanup(func() { stopResidentPanelClean(rp) })
 	return rp, mgr
+}
+
+// stopResidentPanelClean is startPanelForTest's cleanup: close the WebView2
+// controller ON the panel thread while its pump is still running, then destroy
+// the window through the product's own WM_CLOSE chain, wait the WM_DESTROY out
+// (IsWindow from the reporting goroutine - it takes no thread affinity), and
+// only then hand over to rp.stop(). rp.stop() alone cannot do any of this: its
+// Terminate posts the WM_QUIT, Run() returns on it, and the WM_CLOSE teardown
+// posts AFTER that is never dispatched - the window survived every stop and the
+// thread died with a live embedded WebView2, which is the accumulation the 314
+// deaths are made of. A thread that never created a window (start-up refusal)
+// skips the whole destroy half and goes to rp.stop() as before.
+func stopResidentPanelClean(rp *residentPanel) {
+	hwnd := rp.mgr.windowHandle()
+	if hwnd != 0 && rp.post(func() {
+		panelCloseWebView2Controller(rp.mgr)
+		rp.mgr.Destroy()
+	}) {
+		deadline := time.Now().Add(panelThreadWait)
+		for time.Now().Before(deadline) {
+			if !isLiveWindow(uintptr(hwnd)) {
+				break
+			}
+			time.Sleep(5 * time.Millisecond)
+		}
+	}
+	rp.stop()
 }
 
 // builtinAssetsOrTestNil reads the embed through the same Go API the product uses.
@@ -169,7 +206,23 @@ func editorOnPanelThread(t *testing.T, rp *residentPanel) windows.HWND {
 	if hwnd == 0 {
 		t.Fatalf("CreateWindowExW returned 0 with no error code")
 	}
-	t.Cleanup(func() { destroyEditorWindow(hwnd) })
+	t.Cleanup(func() {
+		// 314: the editor is owned by the panel thread. A cross-thread
+		// DestroyWindow fails silently (the old shape left the editor to die with
+		// the thread's termination), so the destroy rides the thread's own task
+		// port while the pump is still running, and the WM_DESTROY is waited out -
+		// the same really-clean standard the panel window's teardown (below, and
+		// stopResidentPanelClean) is held to.
+		if hwnd != 0 && rp.post(func() { destroyEditorWindow(hwnd) }) {
+			deadline := time.Now().Add(panelThreadWait)
+			for time.Now().Before(deadline) {
+				if !isLiveWindow(uintptr(hwnd)) {
+					break
+				}
+				time.Sleep(5 * time.Millisecond)
+			}
+		}
+	})
 	return hwnd
 }
 
@@ -655,8 +708,10 @@ func releaseThreadClean() (int, int, string) {
 // releaseThreadClean call and the two checks below go red on this thread, here, now -
 // not in whichever later test the scheduler happens to poison.
 func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
-	dataPath := uniqueProfileLeaf("wisp-33r6-reused-thread-quit")
-	t.Cleanup(func() { _ = os.RemoveAll(dataPath) })
+	// 314: panelProfileLeaf (swept, never deleted) instead of a RemoveAll cleanup
+	// - the browser this bring-up starts must not have its profile folder pulled
+	// out from under it while it is still shutting down (see startPanelForTest).
+	dataPath := panelProfileLeaf("wisp-33r6-reused-thread-quit")
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 
@@ -684,6 +739,10 @@ func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 		o.err = mgr.bringUp(context.Background())
 		// Read the verdict BEFORE teardown clears it.
 		o.created = mgr.IsCreated()
+		// 314: Close the controller before the window chain - a Destroy alone
+		// leaves the environment abandoned on this thread, and abandoned
+		// environments are what a later same-process bring-up dies on.
+		panelCloseWebView2Controller(mgr)
 		mgr.Destroy()
 		// And now the duty this test used to skip: this thread owned a real WebView2
 		// window. Nothing may be left on it when it goes back to the pool.
@@ -733,8 +792,9 @@ func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 // red on the spot with the recovered nil-pointer panic (created=false, panicked!=nil),
 // not with a timeout.
 func TestAC13BringUpRefusesAThreadWithAQueuedClose(t *testing.T) {
-	dataPath := uniqueProfileLeaf("wisp-33r7-queued-close")
-	t.Cleanup(func() { _ = os.RemoveAll(dataPath); _ = os.RemoveAll(dataPath + "-second") })
+	// 314: panelProfileLeaf (swept, never deleted) instead of a RemoveAll cleanup
+	// - same reason as TestAC13BringUpSurvivesAReusedThreadQuit above.
+	dataPath := panelProfileLeaf("wisp-33r7-queued-close")
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 	mgr2 := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath+"-second")
@@ -767,6 +827,11 @@ func TestAC13BringUpRefusesAThreadWithAQueuedClose(t *testing.T) {
 			return
 		}
 		o.pumpedToIdle = pumpThreadToQuiet(4096)
+		// 314: Close the controller before the Destroy that plants the queued
+		// close - the plant (a posted WM_CLOSE) is unchanged by it, and the
+		// environment this first bring-up made stops being abandoned on this
+		// thread. mgr2 never created a window, so there is nothing to close for it.
+		panelCloseWebView2Controller(mgr)
 		mgr.Destroy()
 		o.plantQueued, o.plantHwnd = staleCloseQueued()
 		// The subject: bringUp must refuse this thread, not create on it.

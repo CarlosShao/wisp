@@ -174,7 +174,7 @@ func TestPanelPageFetchesItsOwnAssets299(t *testing.T) {
 		t.Fatalf("bringUp on the test thread: %v (a window that cannot be created on this box is a red, not a skip)", err)
 	}
 	defer hh.stopHostThread()
-	defer mgr.Destroy()
+	defer panelHostTeardownClean(t, hh, 0, mgr)
 	if !mgr.IsCreated() {
 		t.Fatalf("host reports not created after bring-up")
 	}

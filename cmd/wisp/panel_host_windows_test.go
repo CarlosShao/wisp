@@ -138,6 +138,11 @@ func isPanelProfileLeafName(name, prefix string) bool {
 // stopHostThread is called.
 type hostThreadHarness struct {
 	stopping atomic.Bool
+	// pumpDead reports that the pump goroutine has left its loop (its fn panicked
+	// and recovered out, or stopping was observed). Once it is set no task port
+	// answer can be expected, so a teardown must not wait on hh.call - the 314
+	// cleanup below uses it to keep a t.Fatal path from hanging on a dead pump.
+	pumpDead atomic.Bool
 	// tasks is the harness's own port onto the pumping thread, so a ruler can call
 	// the host the way the product does (on the window's thread) instead of from a
 	// goroutine that merely happens to hold the manager.
@@ -171,6 +176,7 @@ func (hh *hostThreadHarness) runOnThread(fn func() error) error {
 		// owner: test panel-host thread; recover below.
 		defer func() {
 			if r := recover(); r != nil {
+				hh.pumpDead.Store(true)
 				errCh <- fmt.Errorf("panel host pump panicked: %v", r)
 			}
 		}()
@@ -185,6 +191,7 @@ func (hh *hostThreadHarness) runOnThread(fn func() error) error {
 			pnlPumpOnce()
 			time.Sleep(5 * time.Millisecond)
 		}
+		hh.pumpDead.Store(true)
 		// DO NOT runtime.UnlockOSThread() here. This goroutine owns a real WebView2
 		// window; when the test's mgr.Destroy() posts WM_CLOSE and the pump dispatches
 		// it, go-webview2's wndproc calls w.Terminate() on WM_DESTROY (webview.go:242-243),
@@ -210,6 +217,141 @@ func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) err
 }
 
 func (hh *hostThreadHarness) stopHostThread() { hh.stopping.Store(true) }
+
+// ---------------------------------------------------------------------------
+// 314: the fixture-side WebView2 teardown (ticket 314, 2026-11-21).
+//
+// WHAT THE DEATH WAS. The real-window rulers (this file's lifecycle and AC#4
+// hop, panel_assets_299's AC#2, panel_resident_windows_test.go's resident-panel
+// fixtures) each created a live WebView2 environment + browser-process set, and
+// NO teardown ever closed the controller: pkg/edge's Chromium has no Close and
+// the vtbl field it hides is unexported. Measured with -test.count=96, one such
+// ruler repeated ALONE kills the process (RC=139, native access violation, zero
+// --- FAIL lines) after 1-4 rounds, and the tree's msedgewebview2 count GROWS
+// per round (single-06's round 4 read our tree 16 -> 22 across one round): the
+// abandoned environments accumulate and a later environment creation in the
+// same process dies. In family order the death landed on the NEXT panel test's
+// bring-up (the 5-second family repro: TestAC4PriorFocusSurvivesARefusedPanelSample,
+// whose --- PASS never arrived, preceded by TestAC4FocusReturnToPriorWindowGap33r5's
+// window that never even saw a WM_CLOSE); in full-package order on the same
+// neighbours at 327/400/403/422 s. Evidence: docs/evidence/s1/314-pair-death-r1.md.
+//
+// WHAT THE FIX IS (fixture surface only - no production file moves).
+// panelCloseWebView2Controller closes the controller through the COM vtable the
+// wrapper itself spells, ON the owning thread while its STA is alive; then the
+// window goes through its own WM_CLOSE -> DestroyWindow -> WM_DESTROY chain;
+// then a bounded monotonic wait proves the WM_DESTROY was DISPATCHED (the
+// window is really gone), not merely posted. Close is what lets each
+// environment's browser children tear down instead of accumulating.
+//
+// WHY THE SLOT IS THE RIGHT ONE. The shadow struct below mirrors pkg/edge's
+// unexported _ICoreWebView2ControllerVtbl field for field (3 IUnknown procs +
+// 23, Close the 25th). The layout's tail is pinned by production behaviour, not
+// by trust: slot 23 (NotifyParentWindowPositionChanged) fires on every WM_MOVE
+// of every real panel (panel_control_windows.go's ctlWndProc), slot 25
+// (GetCoreWebView2) is what every Embed calls, slot 12 (MoveFocus) is Focus()'s
+// path - and the official interface spells exactly one method between 23 and
+// 25: Close. No uintptr round trip anywhere (pointer-to-pointer reinterpret only),
+// so `go vet -tags winlive ./cmd/wisp/` stays clean.
+// ---------------------------------------------------------------------------
+
+// panelTestControllerVtbl mirrors pkg/edge's unexported
+// _ICoreWebView2ControllerVtbl: field order and sizes must stay identical to
+// ICoreWebView2Controller.go's _ICoreWebView2ControllerVtbl (read the wrapper's
+// file before changing anything here - a drifted layout calls the wrong COM
+// method).
+type panelTestControllerVtbl struct {
+	queryInterface, addRef, release                       uintptr
+	getIsVisible, putIsVisible, getBounds, putBounds      uintptr
+	getZoomFactor, putZoomFactor                          uintptr
+	addZoomFactorChanged, removeZoomFactorChanged         uintptr
+	setBoundsAndZoomFactor, moveFocus                     uintptr
+	addMoveFocusRequested, removeMoveFocusRequested       uintptr
+	addGotFocus, removeGotFocus                           uintptr
+	addLostFocus, removeLostFocus                         uintptr
+	addAcceleratorKeyPressed, removeAcceleratorKeyPressed uintptr
+	getParentWindow, putParentWindow                      uintptr
+	notifyParentWindowPositionChanged                     uintptr
+	close                                                 uintptr
+	getCoreWebView2                                       uintptr
+}
+
+// panelTestController mirrors pkg/edge.ICoreWebView2Controller's one-field
+// layout so the unexported vtbl pointer becomes readable from this package.
+type panelTestController struct {
+	vtbl *panelTestControllerVtbl
+}
+
+// panelCloseWebView2Controller runs ICoreWebView2Controller::Close ONCE, on the
+// calling thread - the caller must already be the thread that owns the browser
+// (the harness task port, the panel thread, or the locked bring-up thread).
+// A manager with no window, a non-panelControl control or a control whose
+// Embed never completed answers without doing anything: teardowns must stay
+// total no matter how far bring-up got. Close is fire-and-forget here - its
+// failure (a COM error) would surface as the browser-children reading below,
+// and the window chain that follows does not depend on it.
+func panelCloseWebView2Controller(mgr *PanelManager) {
+	if mgr == nil {
+		return
+	}
+	w := mgr.currentWindow()
+	if w == nil {
+		return
+	}
+	pc, ok := w.(*panelControl)
+	if !ok || pc.browser == nil {
+		return
+	}
+	ctrl := pc.browser.GetController()
+	if ctrl == nil {
+		return
+	}
+	tc := (*panelTestController)(unsafe.Pointer(ctrl))
+	if tc.vtbl == nil || tc.vtbl.close == 0 {
+		return
+	}
+	_, _, _ = syscall.SyscallN(tc.vtbl.close, uintptr(unsafe.Pointer(ctrl)))
+}
+
+// panelHostTeardownClean is the harness tests' end of life, and it replaces the
+// deferred `mgr.Destroy()` pair that raced stopHostThread: the deferred Destroy
+// only POSTS the WM_CLOSE and stopHostThread ran before the pump's next 5 ms
+// beat could dispatch it, so the window outlived the teardown with a live
+// embedded WebView2 while its owning OS thread was destroyed under it. The
+// sequence here is: close the controller on the owning thread, Destroy (posts
+// the WM_CLOSE), destroy the ruler's own editor window on the same thread
+// (DestroyWindow from the test goroutine cannot destroy another thread's
+// window - the old cross-thread call silently failed), then WAIT until both
+// windows are really gone. Only after this returns does the caller's
+// hh.stopHostThread() end the pump; any WM_QUIT the WM_DESTROY posted dies with
+// the locked thread, which is the shape the pump loop's own comment already
+// guarantees.
+func panelHostTeardownClean(t *testing.T, hh *hostThreadHarness, editor windows.HWND, mgr *PanelManager) {
+	if hh.pumpDead.Load() {
+		// The pump goroutine is gone (its fn panicked): nothing can dispatch a
+		// WM_CLOSE anymore, so the honest teardown is the report - the test is
+		// already red through that panic, and a hang here would bury it.
+		t.Logf("314 teardown: pump already dead, skipping the on-thread destroy (window 0x%x will die with its thread)", uintptr(mgr.windowHandle()))
+		return
+	}
+	panelHwnd := mgr.windowHandle()
+	hh.call(func() {
+		panelCloseWebView2Controller(mgr)
+		mgr.Destroy()
+		destroyEditorWindow(editor)
+	})
+	deadline := time.Now().Add(15 * time.Second)
+	for time.Now().Before(deadline) {
+		panelGone := panelHwnd == 0 || !isLiveWindow(uintptr(panelHwnd))
+		editorGone := editor == 0 || !isLiveWindow(uintptr(editor))
+		if panelGone && editorGone {
+			return
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	t.Logf("314 teardown: budget out with a window still alive (panel hwnd 0x%x alive=%v, editor hwnd 0x%x alive=%v) - the WM_DESTROY was never dispatched; reported, not failed, so the reading stays visible",
+		panelHwnd, panelHwnd != 0 && isLiveWindow(uintptr(panelHwnd)), editor, editor != 0 && isLiveWindow(uintptr(editor)))
+}
 
 // ---------------------------------------------------------------------------
 // The "editor" window AC#4's own sentence starts from.
@@ -742,7 +884,7 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 		t.Fatalf("bringUp on the test thread: %v (WebView2 window creation is available on this box - the S0 spike coldonly returned coldMs=862.431 at %s; a nil here means the host, not the environment)", err, time.Now().Format(time.RFC3339))
 	}
 	defer hh.stopHostThread()
-	defer mgr.Destroy()
+	defer panelHostTeardownClean(t, hh, 0, mgr)
 
 	if !mgr.IsCreated() {
 		t.Fatalf("host reports not created after bring-up")
@@ -963,8 +1105,12 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 		t.Errorf("the panel window was up but our process tree held %d msedgewebview2 process(es) - either the tree walk is blind (a browser child re-parented away from us would read 0) or no browser served this window. Machine-wide count was %d and is reported only", after.TreeWebview, after.MachineNamed)
 	}
 
-	// Destroy for good leaves no window (the recreate path starts clean).
-	mgr.Destroy()
+	// Destroy for good leaves no window (the recreate path starts clean). 314:
+	// the controller is Closed first (the wrapper ships no Close) and the
+	// WM_DESTROY is waited out - panelHostTeardownClean's own comment carries the
+	// whole reading; a bare Destroy here left the environment abandoned per
+	// round, which the count=96 scan measured dying on.
+	panelHostTeardownClean(t, hh, 0, mgr)
 	if mgr.IsCreated() {
 		t.Fatalf("IsCreated still true after Destroy")
 	}
@@ -1094,8 +1240,7 @@ func TestAC4FocusReturnToPriorWindowGap33r5(t *testing.T) {
 		t.Fatalf("the product's first Show, the one a panel gesture drives and which creates the window, failed on the host thread: %v", err)
 	}
 	defer hh.stopHostThread()
-	defer mgr.Destroy()
-	defer destroyEditorWindow(editor)
+	defer panelHostTeardownClean(t, hh, editor, mgr)
 	if editor == 0 {
 		t.Fatalf("no editor window for the focus round trip - the ruler has no 'where the user came from' (failed measurement)")
 	}
