@@ -38029,3 +38029,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1975（11-21 13:3x）：**票 450 结**（5/5）`851b5a144` —— 死法变可判＋一对已隔离；残死因交 314
 
 落修：两枚真窗用例 profile 各给独立 leaf（`-hop`／`-ac4`／`-live`／`-budget`）＋载具**终点锚**（整包没跑到最后一枚测试就响亮判红 `CARRIER_INCOMPLETE`）。定向 3 发全活（3 发 0 死）；锚正控逐字红。**但整包仍死**：改后一发 `RC=139`（403s，`RUN=589/PASS=451/FAIL=0/SKIP=1`），新死点 `TestResyncOnShowDeliversFreshSnapshotFieldByField35g6`——而它用的是 `uniqueProfileLeaf`（本就每发唯一）⇒ "共享 profile"假说解释不了，交票 314 AC#1 换假说。**我的派单越界如实记**：450 写面写"载具仅注释"，实交包含载具逻辑与三枚 `_test.go`；技术正确但越界，归属记在 314 AC#1 名下。**票池：405 已结 / 38 未结。**
+## A1976（11-21 13:4x）：票 314 AC#1 记新数据（不勾）—— 共享 profile 假说被一条反证打掉，转"时间相关"判决实验
+
+`851b5a144` 已按 314 AC#1 的"每发独立 profile"落地（定向 3 发全活），但改后整包仍 `RC=139`（403s，`RUN=589`），新死点 `TestResyncOnShowDeliversFreshSnapshotFieldByField35g6` 用的是**本就唯一**的 `uniqueProfileLeaf` ⇒ 共享假说不成立。三次死亡耗时 327/400/403s、死点换两次 ⇒ 转"经过时间/累计资源"假说，已派判决实验腿（A/B/D 三臂，≤4 发）。**载具终点锚**（同一 commit）从此让"半截跑"响亮判红。

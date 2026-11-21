@@ -202,3 +202,10 @@
 ### 边界（照实）
 本机**没留 WER/dump**（Application 日志 0 命中、CrashDumps 空）⇒ **故障模块点名不了**；盘上唯一 `wisp.test.exe` 的 WER 旧档是 2026-10-22（同 `c0000005`、Fault Module＝自身 +0x95393），**仅历史旁证**。
 ⇒ 要点名模块，得再开一发并在崩溃路径挂 LocalDumps/调试器 —— **那要机主同意占机**，不在本格射程。
+
+## 编排者收件·新数据（2026-11-21 13:4x，来自票 450 的诊断与落修；AC#1 仍未勾）
+
+- **AC#1 的修法候选（每发独立 profile）已按你的口径落地**：commit `851b5a144`（我核过：只碰 `cmd/wisp` 三枚 `_test.go`＋载具脚本＋证据件，零生产码）。给两枚真窗用例各自 leaf：`wisp-33r1-panel-profile-hop`／`-ac4`／`-live`／`-budget`。**定向复跑 3 发全活（3 发 0 死）** —— 但见下一条，这**不足以**判 AC#1 "(a) 共享夹状态是否充分"。
+- **反证一条（很重要）**：改后整包一发**仍 `RC=139`**（403s，`RUN=589/PASS=451/FAIL=0/SKIP=1`），新死点＝`TestResyncOnShowDeliversFreshSnapshotFieldByField35g6`；而它走 `startPanelForTest`（`panel_resident_windows_test.go:71`）用的是 **`uniqueProfileLeaf`（本就每发唯一）** ⇒ **"共享 profile"假说解释不了新死点**。
+- **新线索（强）**：三次死亡耗时 **327s／400s／403s**、死点**换了两次** ⇒ 更像**与经过时间/累计资源相关**。已派一条诊断腿做判决实验（A 臂整包正控／B 臂只跑真窗族但拖过 450s／D 臂只读码找进程级 300–450s 时间闸），件将落 `docs/evidence/s1/314-time-correlation-r1.md`。**AC#2 的"安静桌面"那两发仍要编排者约机主时间**，腿不自约。
+- **载具现在不会再撒谎**：整包没跑到最后一枚测试就打印 `CARRIER_INCOMPLETE: died before the last test` 并判红（`851b5a144`），所以今后任何"整包绿"都可信。
