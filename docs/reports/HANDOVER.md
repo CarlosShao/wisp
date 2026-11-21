@@ -4346,3 +4346,14 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - **顺手做的（低利害可逆，已告知）**：`cmd/wisp` 5 枚 gofmt 存量脏用 gofumpt 修平（`git diff -w` 空 ⇒ 零语义）；internal/tools 2 枚、internal/panel 2 枚同类漂移由各腿在写面内顺带修平并具名。
 - **机主在等的 5 件（⛔ 替他决定）**：① `Q-457`（shell 输出进不进 C25 名册：甲补／乙不动／丙只补面板来源）② 票 39 契约文字改动（api_key 末四位）「改/不改」③ 票 264 路径抹除 甲/乙/丙 ④ 票 193 动画默认档（减少/全开/关闭）⑤ 票 201/170 的方向（L1 到点该不该先问人）。眼签欠账：39 AC#5／36 AC#1／37 AC#6／40 AC#7。
 - **下一个接手的注意**：`go test ./cmd/wisp` 只能经 `scripts/wisp-cli-staged-tests.sh`（A1888）；整包 `-count=2` 会 `RC=139`（票 450 家族，`diag450` 正在定位）；`-count=2` 的 6 枚非幂等红在 `-count=1` 全绿，逐枚名单见票 123 收件。
+
+### 4.0ge（2026-11-21 15:1x +08，编排者 goal round 183）★★ 机主投诉"面板疯狂闪现"＝**我的真窗测试腿在循环建窗**；立"桌面礼貌"规矩；450 结、314 病根挖到、302 前提可能已被 303/305 抹掉
+
+- **现状快照（现跑）**：HEAD `c3ce0cb1e`；未推 **0**；票池 总 **444**／done **405**／未结 **38**；`go build ./...` rc=0；`d22scan` OK；`check-path-length-budget` GREEN；后台**无**在飞腿（我 kill 了那条循环建窗的）。
+- **★事故与处置**：14:5x 机主截图"反复弹 Wisp panel／wisp 33-r5 AC#4 editor"。**真因＝我派的票 314 实修腿**跑的正是我给的"5 秒复现" `-test.run '<真窗13枚>' -test.count=96` ——那是**循环 96 次建真 WebView2 窗**。处置：`job_kill workflow-5e82ae3452ea4745`、`Stop-Process wisp.test` 清零（现 wisp 进程 0；机主的 msedgewebview2 一个没动）。腿的 WIP 已 `go vet ./cmd/wisp` **rc=0**、gofumpt 空 ⇒ WIP commit 落库（只三枚 `_test.go`＋证据件）。
+- **★★立规矩（本轮第一件）**：`cmd/wisp` 的**真窗族**（`TestPanelHost*`／`TestAC4*`／`TestResync*`／`*winlive`／任何 `startPanelForTest`）**会弹真实窗口**：①只在机主明确"我走开/可以跑"时跑；②⛔ 再跑 `-test.count>1` 或循环建窗的复现；③需要验证就改用不建窗的等价臂或约一次时间跑完。⚠ **想把它写进 goal 失败**（`update_goal edit` 在自动轮里被拒："requires a direct human turn"）⇒ 已落在台账 `A` 段＋本节＋`window-batch-1-plan.txt`；**下一次机主真人说话时补写进 goal**。
+- **票 450 结（5/5）** `851b5a144`：两枚真窗用例 profile 隔离（`-hop`/`-ac4`/`-live`/`-budget`）＋载具**终点锚**（整包没跑到最后一枚测试 ⇒ 响亮判红 `CARRIER_INCOMPLETE`）。定向 3 发全活；**整包仍死**（403s，新死点 `TestResyncOnShow…35g6`，用的是本就唯一的 `uniqueProfileLeaf`）。**越界如实记**：450 写面写"载具仅注释"，实交含载具逻辑＋三枚 `_test.go`，归属记在 314 AC#1。
+- **票 314 病根（实修腿挖到，WIP 未验）**：**真窗用例每轮真建一套 WebView2＋浏览器进程，而没有任何 teardown 关闭 controller；还在浏览器存活时 `os.RemoveAll` 掉 profile 目录**。两条实测：① `count=96` 单枚扫描里进程**死在那段 cleanup 上**；② 每轮留下一个活的 WebView2 环境，攒到后面创建就死。修复形状（WIP）＝`stopResidentPanelClean`：面板线程上先 `Close` controller→`Destroy`→等 `IsWindow` 消失→再 `rp.stop()`，profile 改走 `panelProfileLeaf`（永不删）。**验它必须真窗 ⇒ 进窗口批**。
+- **票 302 裁形暂缓（省一发无效改码）**：普查件读完了。三枚里 1 枚随**票 303**（done）、另 2 枚随**票 305**（done）——**前提可能已被抹掉**。⇒ 先跑一发看现色：全绿 ⇒ 裁**丙（不动）**、本票可结；仍红 ⇒ 裁**甲**（搬新 `_winlive_test.go`，判据一字不动；AC#1② 的"⛔ 动 cmd/wisp"按范围收紧读＝"判据本体⛔ 动"）；**⛔ 选乙**（会撞 `portable-tests.sh:617` 未分档 universe 的 sherpa LOAD 墙，可能把两枚今天的绿数拖红）。
+- **★"一次窗口批"清单已备好**：`.scratch/wisp/probes/orch/20261121/txt/window-batch-1-plan.txt` —— A 批 8–12 分钟（314 终验／302 复尺／455 AC#4′／245 AC#4），B 批眼签四屏，C 批真麦。
+- **机主在等的（⛔ 替他决定）**：① **给一次"可以跑"窗口**（A 批）② `Q-457`（191 闸门 甲/乙/丙）③票 39 api_key 末四位「改/不改」④票 264 路径抹除 甲/乙/丙 ⑤票 193 动画默认档 ⑥票 201/170 方向 ⑦票 215b 需批准给 `config.toml` 加 `[skills]` section（批准前不开工）⑧130 万秒级的 LocalDumps 调试器（查"崩在哪个 DLL"，要占机）。
