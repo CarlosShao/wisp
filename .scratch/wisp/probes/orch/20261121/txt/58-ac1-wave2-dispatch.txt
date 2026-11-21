@@ -1,0 +1,12 @@
+# 派单存档 —— 票 58 AC#1 第二波（外置下一批产品面文件；接上一波 76abd9c97）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**接票 58 AC#1 第一波（`76abd9c97`）继续外置**。
+**现状（先自己现跑核）**：`cd frontend && node scripts/lint-cjk.mjs` ⇒ `registry entries=55 findings: 0`；`frontend/src/lib/locale/{zh,en,index}.ts` 已存在（手写 `t(key, params?)`，零依赖）；`frontend/scripts/lint-cjk.mjs` 的 REGISTRY 是 55 条带理由的 backlog cap（产品面 40 文件 587 枚／演示面 14 文件 618 枚／协议令牌 1 文件 23 枚）。
+**任务（只做外置，⛔ 改扫描器逻辑、⛔ 改已有上限数字）**：
+1. 从 REGISTRY 里挑**产品面**（非 demo、非 protocol 令牌）里枚数最多的 **4–6 个文件**，把其中文字面量搬进 `zh.ts`/`en.ts`，代码改 `t('key')`。键名规范沿用第一波（看 `git show 76abd9c97 -- frontend/src/lib/locale/zh.ts | head -40`）。
+2. **每把一个文件清零就把它从 REGISTRY 里摘掉**（摘不干净＝`stale registry entry` 红，那是牙在咬你，别绕过）。
+3. **⛔ 降低任何已登记文件的 cap 数字**除非该文件真的清零（清零就整条摘掉）；⛔ 给任何文件"提高上限"。
+4. **⛔ 碰** `frontend/fixtures/composer-states.html`（工作树里有别人未提交的改动，不属你）；⛔ 碰 `design/**`、`docs/PLAN.md`、`docs/specs/**`、thresholds、golden、allowlist；⛔ emoji；⛔ push；⛔ 加 npm 依赖。
+5. 自证：`cd frontend && npx tsc -b` rc=0；`node scripts/lint-cjk.mjs` findings=0 且 **registry entries 从 55 降到 55−k**（k＝你清零的文件数）；`node scripts/lint-cjk.mjs --self-test` 仍 6 路全红；`npm run build` rc=0。
+6. 把"本波清零的文件与枚数／registry 55→N／余下总数"写进 `.scratch/wisp/issues/58-*.md` Progress 末尾（⛔ 勾 AC#1）。
+回话第一行＝commit hash ＋"清零文件清单（文件:枚数）" ＋"registry 55→N" ＋"余下 CJK 总枚数" ＋tsc/cjk/build 三行读数。
