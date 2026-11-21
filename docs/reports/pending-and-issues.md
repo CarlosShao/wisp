@@ -38045,3 +38045,9 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1980（11-21 16:1x）：票 33 AC#10 结（非实现者裁）`eb791fabc` —— `[panel]` width/height/scale 三键第一次真到窗口
 
 我复跑 `scripts/wisp-cli-staged-tests.sh '-test.run=^TestAC10'` ⇒ **rc=0、23 行 PASS、0 FAIL/SKIP**（⛔ 未跑真窗用例，桌面没弹窗）。三键生产者：`panel_resident_windows.go:244` 三源→`panelWindowGeometry`(panel_geometry_ac10.go:53)→建窗 `panel_host_windows.go:1016`／re-show `:1292`；`scale` 走 `applyGeometryWin32`(panel_geometry_ac10.go:119) `SetWindowPos` 窗框缩放（720×480@1.25⇒900×600），hot 同 `[panel]` 整节口径。**语义如实记**：`scale` 是**窗框缩放**、不是页面内容缩放（真内容缩放要 fork 包 `PutZoomFactor`）⇒ 若机主要"字更大"，另立票。旧钉 `TestAC10ScaleHasNoProducerAndTheReasonIsNamed` 未被碰、仍 PASS。**欠一发**：本刀动了建窗参数 ⇒ 窗口批第 5 条必须复跑一枚真窗 bring-up，⛔ 之前不许说"面板整体无回归"。**票 33 现 12/14**（剩 cold/hot 延迟读数与焦点往返＝都真窗）。
+## A1981（11-21 16:5x）：票 58 AC#1 第一波落 `76abd9c97` —— **AC#1 未结，但债不再涨**（⛔ 把"扫描绿"读成"AC#1 做完"）
+
+件 `76abd9c97`（12 文件，禁区零命中、零新依赖）。**我自己复跑**：`node scripts/lint-cjk.mjs` ⇒ `closure files=100 scanned=93 registry entries=55 findings: 0`；`--self-test` ⇒ **6 路正控全红**（字面量/JSX 文本节点/超上限/过期条目/scanFiles 判语/真盘临时树）＋ clean 样本绿。
+**诚实读数**：改前渲染路径闭包 92 文件 **1602 枚** CJK；本波外置 4 个最重产品面文件 **397 枚**（model-settings 169→0／config-feedback 93→0／voice-settings 71→0／App.tsx 64→0）；**余 1228 枚压在 55 条 backlog 登记里**（产品面 40 文件 587＋演示面 14 文件 618＋协议令牌 1 文件 23，每条带理由）＋`locale/zh.ts` 286 枚（中文唯一合法居所）。Go 侧（panel 277＋cmd/wisp 992 等）**未建牙**，全记欠账。
+⇒ **AC#1 判据是"零"，现在不零** ⇒ **不勾**。本波买到的是"债只减不增"（过期条目即红、超上限即红、未登记即红）。
+**我另接的 CI 两步**（`ci.yml` lint-frontend 末尾，只加不改、带 `!cancelled()`）：`npm run cjk:self-test`＋`npm run cjk`；YAML 用 bundled python `yaml.safe_load` 验过（16 steps，末两枚即此二）。**撤销**：删这两步。**没有这两步，扫描牙只在我本机有牙。**

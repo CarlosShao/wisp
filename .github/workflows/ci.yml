@@ -1760,3 +1760,43 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run seeds
 
+      # ADDED STEPS ONLY (ticket 58 AC#1 wave 1, 2026-11-21, orchestrator wiring
+      # after the leg's dispatch said ci.yml was outside its write face): no
+      # existing step was moved, edited, deleted, given an `if:` it did not have,
+      # or made continue-on-error. Both sit in the next free slot at the bottom
+      # of the job, in the position rule this file wrote for itself when ticket
+      # 161 started adding steps, and both carry the settled `!cancelled()`
+      # guard so they produce a verdict even when a step above is red.
+      #
+      # WHAT THEY RUN. frontend/scripts/lint-cjk.mjs (zero new dependencies,
+      # node:fs/path only) is AC#1's own measurement: "zero hardcoded Chinese in
+      # frontend render paths (scan)". Without a step here the scanner has teeth
+      # only on the developer's machine - the same silent-denominator shape the
+      # ticket-77 block above describes.
+      #
+      # WHAT "GREEN" MEANS TODAY, stated so nobody reads it as AC#1 being done:
+      # wave 1 externalized the four heaviest product-face files to t() (397
+      # literal sites) and registered the REST as a 55-entry backlog cap with a
+      # per-entry reason (demo fixtures, protocol tokens that must match Go
+      # sentences verbatim, and product files not yet externalized). The scan is
+      # green when (a) no unregistered render-path file carries CJK, (b) no
+      # registered file exceeds its recorded cap, and (c) no registry entry has
+      # gone stale. So the step stops the debt GROWING; AC#1 closes only when the
+      # cap count reaches zero. The registry is shrink-only by construction: a
+      # stale entry is red, and an entry may not be raised without a red control.
+      #
+      # WHY TWO STEPS, in this order - same reasoning as the ticket-77 pair
+      # above: step 1 is the seeded control (clean sample green + six seeded
+      # shapes red: literal, JSX text node, growth past cap, stale entry,
+      # scanFiles verdict, on-disk temp tree), because a gate that has never
+      # gone red cannot be trusted green; step 2 is the production scan.
+      # Exit codes: 0 clean, 1 findings or a misbehaving control, 2 empty
+      # denominator - a scan that matched nothing can never read as green.
+      - name: "CJK scanner self-test (ticket 58 AC#1 - clean control green, literal/JSX/growth/stale seeds red)"
+        if: ${{ !cancelled() }}
+        run: npm run cjk:self-test
+
+      - name: "CJK scan frontend render paths (ticket 58 AC#1 - zero unregistered hardcoded Chinese)"
+        if: ${{ !cancelled() }}
+        run: npm run cjk
+
