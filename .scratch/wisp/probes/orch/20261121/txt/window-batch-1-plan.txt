@@ -14,3 +14,6 @@
 # 批次 C（要机主出声/开麦）：247／290／291／449 的真麦克风读数。
 #
 # 规矩：①跑前 `Get-Process wisp.test` 有就等 60 秒；②每发之间停 5 秒让上一枚窗口退干净；③任何一发 RC=139 立刻停并留日志；④结果只记盘上读数，⛔ 报形容词。
+
+#   5.（新增 11-21 16:1x）票 33 AC#10 落地后回归：`scripts/wisp-cli-staged-tests.sh '-test.run=^TestAC10AssemblyRootWiresBothSources$|^TestPanelHostRealWindowHopAndLifecycle$'`
+#      ⇒ 本刀改了 panel_host_windows.go 的建窗参数；机主批的窗口里必须证明"真窗仍建得起、尺寸按配置走"。⛔ 之前不许声称面板整体无回归。

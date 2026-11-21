@@ -242,7 +242,7 @@ declaration consumed by 37's native card.
   `github.com/CarlosShao/wisp/frontend` 那枚 `all:dist` embed，副本必须带上 `frontend/dist`）花两枚、M1 首发写残 `_ = ctx` 导致 build failed 重跑花两枚、终态门禁复跑三件花三枚。
   **未据此放宽任何断言、未改任何冻结件。**
   **撤销口令：「撤 33 progress 33-r3」**（撤＝只删本节＋留一行撤销记录，不改写上面任何一行）。
-- [ ] **AC#10（09-28 17:5x 编排者追加，来路＝`180-a1` 普查＋账 `A391`；不勾，勾要非实现者裁）**：宿主真起来那天，**`[panel]` 那五枚字段必须有生产者**——`width`／`height`／`scale` 要真去设窗口边界（`internal/config/schema.go:525-535` 是定义处，生产读取方现量＝**各 0**），且规格逐字要求 `hot` 生效（`PLAN.md:2743`＋`SPEC-03:39`）。⚠ 判据要能区分"读值并真设边界"与"只在测试里读一下"；**不许用"把 `default:"640"` 改掉"交差**（票 180 `AC#3` 同一条雷）。
+- [x] **AC#10（09-28 17:5x 编排者追加，来路＝`180-a1` 普查＋账 `A391`；不勾，勾要非实现者裁）**：宿主真起来那天，**`[panel]` 那五枚字段必须有生产者**——`width`／`height`／`scale` 要真去设窗口边界（`internal/config/schema.go:525-535` 是定义处，生产读取方现量＝**各 0**），且规格逐字要求 `hot` 生效（`PLAN.md:2743`＋`SPEC-03:39`）。⚠ 判据要能区分"读值并真设边界"与"只在测试里读一下"；**不许用"把 `default:"640"` 改掉"交差**（票 180 `AC#3` 同一条雷）。
 
 ---
 
@@ -450,3 +450,12 @@ CI／新鲜检出里 embed 只有 `.gitkeep` ⇒ 走 not-built 分支，那一�
 
 **本波翻**：AC#7（全量包字节生产链逐字：`publishPanelSnapshot`→`panel_pump.go:511 Publish`→`pump.go:572 Marshal`→`panel_pump.go:523`→`panel_snapshot_deliver_329.go:95 lastPanelSnapshot()`→`:105 evalPanelJS`→`panel_host_windows.go:661/728/772 w.Eval`→页面 `window.wispOnPanelSnapshot`；**MUTANT-A 摘生产读者⇒RED 双点**）、AC#8（ⓐ clamp 4/4＋MUTANT-C RED；ⓑ `EvToolStart` 发射者在位 `loop.go:651-662`→`run.go:2747`，MUTANT-B 摘 case⇒RED `running=[]`；整包 `-coverprofile` 落实"量一次"，两枚零执行真分支各补会响用例＋MUTANT-D/E 各自 RED）。
 **⛔ `:76` 不翻（环境红，具名跳过）**：采样时前台属**外进程 Weixin pid 44296** ⇒ editor 的 `SetForegroundWindow` 被拒，往返第一环无 subject。可判事实仍到手：`prevFocus≠面板`（宿主没把自己记成来处）＋`Hide 后回前台回 prior`（跨进程还原成功）两枚 PASS。**留 `:74` 与 `:76` 同队，等机主关球/安静桌面复量**；AC#10-scale 仍缺生产者。
+## 编排者收件·AC#10 勾（2026-11-21 16:1x，非实现者裁；件 `eb791fabc`，我复跑过）
+
+**尺1（提交真在）**：`eb791fabc` 六枚文件＝`cmd/wisp/panel_geometry_ac10.go`(+130)／`cmd/wisp/panel_geometry_ac10_windows_test.go`(+352)／`cmd/wisp/panel_host_windows.go`(+81/−6)／`cmd/wisp/panel_resident_windows.go`(+39/−3)／`internal/config/settings_appearance_wave.go`(+36)／`internal/config/settings_panel_geometry_ac10_test.go`(+113)；**禁区零命中**（无 PLAN/specs/thresholds/golden/allowlist/frontend/design）。
+**尺3（我自己复跑）**：`scripts/wisp-cli-staged-tests.sh '-test.run=^TestAC10'` ⇒ **rc=0，23 行 `--- PASS` / 0 FAIL / 0 SKIP**（含 `TestAC10PanelWindowGeometryMapsTheThreeKeys` 6 子值、`TestAC10PanelKeysRewrittenInTheSameProcessReachTheNextShow` 0.02s、`TestAC10RecorderProvesTheProductionPathCallsApplyGeometry` 0.00s、`TestAC10AssemblyWiresTheTripleSourceScaleFollowsTheDisk` 0.01s）。**⛔ 未跑任何真窗用例**（机主桌面不弹窗）。
+**三键生产者（我读码核）**：`width`/`height` 经 `panelGeometryTripleSource`（`cmd/wisp/panel_resident_windows.go:244`）→ 纯函数 `panelWindowGeometry`（`panel_geometry_ac10.go:53`）→ 建窗 `panel_host_windows.go:1016` 与 re-show `:1292`；`scale` 经 `applyGeometryWin32`（`panel_geometry_ac10.go:119`）走 `SetWindowPos` 真设窗框（720×480@1.25 ⇒ 900×600）。热档＝`[panel]` 整节 TierHot 口径，同进程改键下一次 show/hide 即生效。
+**★必须说清的语义（不算缺陷，但别让人误读）**：`scale` 今天落的是**窗框按系数缩放**（派单点名的 SetWindowPos/DPI 路径），**不是页面内容缩放**——真内容缩放要把 fork 的 `PutZoomFactor` 包成 Go（`panel_config_ac10_windows_test.go:324` 那枚旧钉仍在，且它只钉 fork 无 Go 包装，与本格不冲突）。若机主要"页面字更大"而不是"窗更大"，那是**另一枚票**（fork 包装＋内容缩放），⛔ 拿本格冒充。
+**旧钉未被放软**：`TestAC10ScaleHasNoProducerAndTheReasonIsNamed` 原文只断言 fork 里没有 Go 版 `PutZoomFactor`，本腿**没碰这枚文件**（六枚清单里没有 `panel_config_ac10_windows_test.go`），它今天仍 PASS。
+**待补的一发（进窗口批）**：本刀动了 `panel_host_windows.go` 建窗参数，**必须**在机主批准的真窗窗口里复跑一枚面板 bring-up 用例（见 `window-batch-1-plan.txt` 第 5 条），⛔ 在那之前不许写"面板整体没坏"。
+**撤销**：本勾作废＝删本节并改回 `[ ]`；代码撤销＝`git revert eb791fabc`。
