@@ -38051,3 +38051,10 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 **诚实读数**：改前渲染路径闭包 92 文件 **1602 枚** CJK；本波外置 4 个最重产品面文件 **397 枚**（model-settings 169→0／config-feedback 93→0／voice-settings 71→0／App.tsx 64→0）；**余 1228 枚压在 55 条 backlog 登记里**（产品面 40 文件 587＋演示面 14 文件 618＋协议令牌 1 文件 23，每条带理由）＋`locale/zh.ts` 286 枚（中文唯一合法居所）。Go 侧（panel 277＋cmd/wisp 992 等）**未建牙**，全记欠账。
 ⇒ **AC#1 判据是"零"，现在不零** ⇒ **不勾**。本波买到的是"债只减不增"（过期条目即红、超上限即红、未登记即红）。
 **我另接的 CI 两步**（`ci.yml` lint-frontend 末尾，只加不改、带 `!cancelled()`）：`npm run cjk:self-test`＋`npm run cjk`；YAML 用 bundled python `yaml.safe_load` 验过（16 steps，末两枚即此二）。**撤销**：删这两步。**没有这两步，扫描牙只在我本机有牙。**
+## A1982（11-21 18:4x）：票 58 AC#1 第二波 `c0e02b0a1`（registry 55→50，余 961）＋★我自己漏跑仪器的教训
+
+**件** `c0e02b0a1`（14 文件）。清零并摘条：config-screen 49／cost-settings 49／privacy-settings 40／palette-screen 37／history-page 31；plugins-screen 40→2（余 2 是 `state === "本轮生效"` 这类**匹配令牌**，与 config-protocol 同性质，cap 满不许涨、留源文件带注释）。`locale/zh.ts`＋184 键。
+**我复跑（三把尺）**：`node scripts/lint-cjk.mjs` ⇒ `registry entries=50 findings: 0` rc=0；`npx tsc -b` rc=0；`npm run build` rc=0。
+**★★我自己的一枚漏检（如实记）**：第一波 `76abd9c97` 之后我**只跑了 lint-cjk 与 tsc**，没跑 render 仪器 ⇒ **它把 4 台仪器跑红了**（`render:nav`／`pluginpage407`／`palette38`／`palette38kbd`，它们把中文 copy 钉在源码里）。第二波腿自己发现并按"钉随真相迁移、绝不放宽"修好——我**逐行读过 diff**：每条钉子从"断言源码里有这句中文"改成"断言 App 走 `t()` 的那一半 ＋ `zh.ts` 里句式的那一半"，**比原来更咬**，零放宽。
+**我补的一把全量尺（以后每波都跑）**：`package.json` 里**全部 36 个 `render:*` 仪器 ＋ seeds/seeds-self-test/cjk/cjk-self-test/tokens:check/typecheck/lint` 一次跑完 ⇒ 唯一非零是 `render:l2`（rc=2 是"缺 fixture 参数"的 usage，CI 里是带 `fixtures/l2-card-fs-delete.json` 跑的，带参 rc=0）⇒ **前端门禁全绿**。
+**余账**：registry 50 条 961 枚（演示面 618＋产品面 343＋协议 23）；闭包普查 1602→1454。**AC#1 仍未结**。下一波最大余量：diagnostics-settings 30／config-editor 25／security-settings 25／prompt-bar 23。

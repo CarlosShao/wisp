@@ -1,0 +1,8 @@
+# 派单存档 —— 票 58 AC#1 第三波（接 c0e02b0a1）。路由：magpie/auto/glm-5.3-flash
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**接第二波 `c0e02b0a1`（registry 50 条、余 961 枚）继续外置**。
+下一波目标（按余量）：`diagnostics-settings` 30／`config-editor` 25／`security-settings` 25／`prompt-bar` 23（若其中某个是协议令牌性质则跳过并说明）。
+**规矩（同前两波，一条不改）**：⛔ 改扫描器逻辑／⛔ 改任何 cap 数字（清零就整条摘）；清一个就摘一条（stale 红是牙在咬）；⛔ 碰 `frontend/fixtures/composer-states.html`（别人未提交改动）／`design/**`／PLAN／specs／thresholds／golden／allowlist；⛔ emoji；⛔ npm 依赖；⛔ push。
+**★新增一条硬要求（因第一波把 4 台 render 仪器跑红过）**：凡你搬走的中文若被某台 `frontend/scripts/render-*.tsx` 钉在源码里，**必须把钉迁到两半（App/组件的 `t()` 接线 + zh.ts 的句子），⛔ 删钉、⛔ 放宽**；并在提交后**跑全量**：
+`cd frontend && for s in $(node -e "console.log(Object.keys(require('./package.json').scripts).filter(k=>k.startsWith('render:')).join(' '))"); do npm run --silent $s >/dev/null 2>&1 || echo "RED $s"; done`（`render:l2` 需带 fixture 参数，跳过它或带 `fixtures/l2-card-fs-delete.json`）。**任何一台红 ⇒ 修到绿再交**，不许只说"只是钉子过期"。
+自证：`npx tsc -b` rc=0／`node scripts/lint-cjk.mjs` findings=0 且 entries 从 50 降到 50−k／`--self-test` 6 路全红／`npm run build` rc=0／**全量仪器零红**。
+回话第一行＝commit hash＋清零文件清单（文件:枚数）＋registry 50→N＋余下总枚数＋全量仪器"零红/或列出红名"＋四行读数。Progress 写进 `.scratch/wisp/issues/58-*.md` 末尾（⛔ 勾 AC#1）。
