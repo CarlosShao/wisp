@@ -38039,3 +38039,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 
 机主 14:5x 发来截图：桌面反复弹出「wisp 33-r5 AC#4 editor」「Wisp panel」。**真因＝我派的票 314 实修腿**（`scripts/wisp-cli-staged-tests.sh -test.run '<真窗 13 枚>' -test.count=96`）——那条正是我为了拿"5 秒复现"而让它循环 96 次建真窗；每次建一套 WebView2 窗＋一枚 AC#4 editor 窗 ⇒ 看上去就是疯狂闪现。**处置**：①`job_kill workflow-5e82ae3452ea4745`（已 killed）②`Stop-Process wisp.test` 清零，现 `Get-Process` 里 **0 个 wisp/wisp.test**（仅剩 `msedgewebview2` 属机主自己的 wetype/SearchHost/Alma 与 1 个 11:29 的孤儿 22320，未动）。③腿的 WIP 已 `go vet ./cmd/wisp` **rc=0**、gofumpt 空，作为 WIP commit 落库（**只 `_test.go` 三枚＋证据件**），证据 `docs/evidence/s1/314-pair-death-r1.md`（它已定位到机制：**teardown 从不关 WebView2 controller，且在浏览器存活时删掉 profile 目录**）。
 **★新规矩（我立、即刻生效）**：`cmd/wisp` 的**真窗用例族**（`TestPanelHost*`／`TestAC4*`／`TestResync*`／`*winlive*`）会**在物理桌面弹窗**：①只在机主**明确说"我走开/可以跑"**时跑；②⛔ 再跑 `-test.count>1`（那等于循环弹窗）；③需要快复现时改用**不建 OS 窗**的等价臂，或让机主约时间一次跑完。撤销：本规矩作废＝删本节。
+## A1979（11-21 15:1x）：票 62 AC#9 按"第二支"结 —— 把 winlive-only 的零定时器实测用例在 SLO 表里具名写死
+
+件 `dd020acd8`（只碰 `docs/SLO.md` 一行原位加缀＋本票 Progress 两行；阈值/读数**一字节未动**）。我盘上复核：`internal/ball/hotkey_live_test.go:1` 逐字 `//go:build windows && winlive`、`:454` 逐字 `func TestLiveSleepingZeroTimerHandles`；`docs/SLO.md:231` 那行 `timers=no / PASS` 原文保留、后接一句具名说明（CI 只有 `go vet -tags winlive` 编译门、无运行步骤；手动跑法逐字）。AC#9 完成判据＝该句（票面允许的第二支）。**票 62 仍开放**（剩 5 枚：会话态动效／音频驱动／靠边吸附／资源复测／可运行原型＝都要真球真窗机 → 进窗口批）。
