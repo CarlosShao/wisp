@@ -198,8 +198,8 @@ const residentPanelHotReloadNote = "panel host (resident): this leg does not tic
 // What still does not move, and this line says so out loud instead of letting the
 // operator infer it: the tick, and with it every OTHER hot section of this
 // process, keeps needing a restart.
-const residentPanelGeometryNote = "config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height " +
-	"detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时" +
+const residentPanelGeometryNote = "config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height/scale " +
+	"detail=\"面板宿主每次建窗现读一次 [panel] width/height/scale（票 33 AC#10：scale 经 SetWindowPos 落到窗框）：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时" +
 	"也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
 
 // panelGeometrySource is [panel] width/height, re-read from disk every time the
@@ -229,6 +229,28 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 			return 0, 0
 		}
 		return cfg.Panel.Width, cfg.Panel.Height
+	}
+}
+
+// panelGeometryTripleSource is AC#10's wide source: ONE config read answers
+// width, height AND scale, mapped through panelWindowGeometry (the pure
+// mapping whose fallback rules are the ones windowOptions carried since 票
+// 255). The unreadable branch answers the host's own constants directly -
+// the same loud direction panelEnabledSource's true takes - so the consumer
+// needs no second spelling of the fallback rule. Built by the assembly root,
+// handed down as a function value: cmd/wisp/panel_host_windows.go imports
+// nothing that parses config.toml (票 255 AC#4's ⛔ no panel->config edge,
+// ⛔ no host reading the disk itself).
+func panelGeometryTripleSource(dataDir string) func() (w, h int, scale float64) {
+	cfgPath := filepath.Join(dataDir, configFileName)
+	return func() (int, int, float64) {
+		cfg, _, err := config.LoadFile(cfgPath, nil)
+		if err != nil {
+			slog.Warn("panel host: [panel] geometry source unreadable, sizing at the host's own default",
+				"path", cfgPath, "err", err, "default", fmt.Sprintf("%dx%d", panelWidthPx, panelHeightPx))
+			return panelWidthPx, panelHeightPx, 0
+		}
+		return panelWindowGeometry(cfg.Panel)
 	}
 }
 
@@ -376,8 +398,19 @@ func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelM
 	// it per window creation rather than holding it. Said once per start, in the
 	// same posture as the hot-reload note above.
 	auditf("%s", residentPanelGeometryNote)
+	// AC#10: ONE wide source answers width, height AND scale from a single file
+	// version - the value windowOptions consumes when present, the numbers the
+	// create tail's SetWindowPos hop and the re-show fold carry. The 票 255
+	// AC#4 pair hand-off stays wired beside it as a view of the SAME read (its
+	// ruler reads this file for the wiring text); a host handed only the pair
+	// still sizes exactly as it did.
+	geometryTriple := panelGeometryTripleSource(dataDir)
 	return NewPanelManager(disp, assets, dataPath,
-		withGeometrySource(panelGeometrySource(dataDir)),
+		withGeometrySource(func() (width, height int) {
+			w, h, _ := geometryTriple()
+			return w, h
+		}),
+		withGeometryTriple(geometryTriple),
 		// AC#10: the other two [panel] fields that decide whether a window may
 		// exist at all and how long it survives a hide. Both are read per
 		// event, both default to the schema's true, and both are closures for

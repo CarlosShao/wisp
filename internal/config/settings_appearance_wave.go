@@ -37,6 +37,7 @@ package config
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/CarlosShao/wisp/internal/observe"
 )
@@ -46,6 +47,8 @@ const (
 	keyPathBallClickThrough = "ball.click_through"
 	keyPathPanelWidth       = "panel.width"
 	keyPathPanelFontSize    = "panel.font_size"
+	keyPathPanelHeight      = "panel.height"
+	keyPathPanelScale       = "panel.scale"
 )
 
 // SetBallOpacityIdle writes ball.opacity_idle through the same guarded
@@ -99,6 +102,39 @@ func (m *Manager) SetPanelFontSize(px int) ([]string, error) {
 	}
 	return m.writeOneKey(keyPathPanelFontSize, func(base *Config) bool {
 		base.Panel.FontSize = px
+		return true
+	}, nil)
+}
+
+// SetPanelHeight writes panel.height (ticket 33 AC#10's second geometry key).
+// The refusal rule is deliberately NOT the width one: height 0 is the schema's
+// own "auto from content" spelling, so only a negative is meaningless in every
+// consumer and is refused by name. Writing 0 is the legitimate "back to the
+// default" - the host answers it from its own constant (票 255's ruling has
+// auto-height registered as NOT DONE; this setter invents no second answer).
+func (m *Manager) SetPanelHeight(px int) ([]string, error) {
+	if px < 0 {
+		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config: panel.height: %d 不是有效的非负 px 高度；0 表示由内容定高，这一枚只收非负整数", px))
+	}
+	return m.writeOneKey(keyPathPanelHeight, func(base *Config) bool {
+		base.Panel.Height = px
+		return true
+	}, nil)
+}
+
+// SetPanelScale writes panel.scale (ticket 33 AC#10's zoom key). 0 is legal -
+// the schema's own "follow system DPI" - so like height only a negative is
+// refused by name, plus the two float values no consumer can act on. No upper
+// band is invented on top of a schema that froze none: the consumer owns what
+// a written factor means (the panel host multiplies its resolved bounds by it).
+func (m *Manager) SetPanelScale(v float64) ([]string, error) {
+	if v < 0 || math.IsNaN(v) || math.IsInf(v, 0) {
+		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config: panel.scale: %v 不是有效的非负缩放；0 表示跟随系统 DPI，这一枚只收非负的有限数", v))
+	}
+	return m.writeOneKey(keyPathPanelScale, func(base *Config) bool {
+		base.Panel.Scale = v
 		return true
 	}, nil)
 }

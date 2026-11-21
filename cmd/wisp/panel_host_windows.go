@@ -153,6 +153,7 @@ var (
 	pnlTranslateMsg  = pnlModUser32.NewProc("TranslateMessage")
 	pnlSetForeground = pnlModUser32.NewProc("SetForegroundWindow")
 	pnlGetAncestor   = pnlModUser32.NewProc("GetAncestor")
+	pnlSetWindowPos  = pnlModUser32.NewProc("SetWindowPos")
 )
 
 // GetAncestor flags (winuser.h). GA_ROOT walks to the top-level window a handle
@@ -248,6 +249,32 @@ type PanelManager struct {
 	// root keeps the parsing and this file keeps only the asking. Set by
 	// withGeometrySource; never mutated after construction, so it needs no lock.
 	geometry func() (width, height int)
+
+	// geometryTriple answers the same question geometry does, WIDE (AC#10):
+	// one call hands back width, height AND [panel] scale, all three resolved
+	// from ONE config file version (panelGeometryTripleSource runs the pure
+	// mapping panelWindowGeometry and answers the host's own constants on an
+	// unreadable file, so this branch needs no second spelling of the
+	// fallback). The assembly root wires BOTH fields from the same read;
+	// windowOptions consults this one when present and keeps the pair branch
+	// above for every host that was handed only the pair - the pre-ticket
+	// construction sites and the 票 255 rulers. nil means nobody handed one.
+	geometryTriple func() (w, h int, scale float64)
+
+	// applyGeometry is the ONE seam a resolved geometry crosses on its way to
+	// Win32 (AC#10): the production value posts ONE SetWindowPos onto the live
+	// window (panel_geometry_ac10.go's applyGeometryWin32), and a test
+	// injects a recorder here to watch the production path really deliver the
+	// numbers it resolved. NewPanelManager installs the production value when
+	// nobody handed one; never mutated after that, so it needs no lock.
+	applyGeometry func(w, h int, scale float64)
+
+	// resolved is the triple windowOptions last resolved, kept so the create
+	// tail's applier hop and the re-show's scale fold consume the SAME read
+	// (one read per create and one per re-show - the 票 255 note's
+	// two-versions rule). Guarded by m.mu; windowOptions fills it on every
+	// call and nothing else writes it.
+	resolved panelResolved
 
 	// enabled answers "may this host open a window at all", read from
 	// [panel] enabled on every bring-up. nil means nobody handed this host a
@@ -384,6 +411,19 @@ func withGeometrySource(src func() (width, height int)) panelHostOption {
 	return func(m *PanelManager) { m.geometry = src }
 }
 
+// withGeometryTriple hands the host the AC#10 wide source: one call answers
+// width, height AND [panel] scale from ONE config file version. Same closure
+// rule as withGeometrySource - the host never reads the file itself.
+func withGeometryTriple(src func() (w, h int, scale float64)) panelHostOption {
+	return func(m *PanelManager) { m.geometryTriple = src }
+}
+
+// withApplyGeometry replaces the seam's production value - the recorder a test
+// injects to watch the create path really deliver the numbers it resolved.
+func withApplyGeometry(apply func(w, h int, scale float64)) panelHostOption {
+	return func(m *PanelManager) { m.applyGeometry = apply }
+}
+
 // withPanelEnabled hands the host [panel] enabled - "may a window be opened at
 // all". A nil src, or one answering true, leaves the host enabled, which is the
 // schema default (`default:"true"`) and therefore the behaviour every pre-ticket
@@ -449,6 +489,12 @@ func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPat
 	for _, opt := range opts {
 		opt(m)
 	}
+	// AC#10's seam default: a host nobody handed an applier to still crosses
+	// the seam in production - the Win32 value answers, so the create tail's
+	// hop and a test's recorder observe the SAME call point.
+	if m.applyGeometry == nil {
+		m.applyGeometry = m.applyGeometryWin32
+	}
 	return m
 }
 
@@ -468,8 +514,15 @@ func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPat
 // window the answer through requestGeometryOnReshow, which reads the pair as a CLIENT
 // area while this one reads the OUTER FRAME - so one configured value is two widths.
 func (m *PanelManager) windowOptions() webview2.WindowOptions {
-	width, height := panelWidthPx, panelHeightPx
-	if m.geometry != nil {
+	width, height, scale := panelWidthPx, panelHeightPx, 0.0
+	if m.geometryTriple != nil {
+		// AC#10's production shape: ONE read answers the mapped triple (width,
+		// height AND scale from the same file version), and the source itself
+		// answers the host's own constants on an unreadable config, so this
+		// branch takes the answer verbatim - no second spelling of the
+		// fallback rule lives here.
+		width, height, scale = m.geometryTriple()
+	} else if m.geometry != nil {
 		// ONE call per create. Two would be two reads of the same disk file with
 		// nothing guaranteeing they answer the same question, and "the number the
 		// window was born with is the one the config held at that instant" is the
@@ -491,6 +544,12 @@ func (m *PanelManager) windowOptions() webview2.WindowOptions {
 			height = gh
 		}
 	}
+	// AC#10: the triple travels to the seam consumers under m.mu - the create
+	// tail's applier hop and the re-show's scale fold read THIS resolution,
+	// never a second one.
+	m.mu.Lock()
+	m.resolved = panelResolved{w: width, h: height, scale: scale, ok: true}
+	m.mu.Unlock()
 	return webview2.WindowOptions{
 		Title:  panelTitle,
 		Width:  uint(width),
@@ -949,6 +1008,13 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	m.created = true
 	m.mu.Unlock()
 
+	// AC#10: the frame CreateWindowExW made is the pair windowOptions resolved,
+	// read as the OUTER frame. This hop is where [panel] scale reaches Win32 -
+	// ONE SetWindowPos onto the live window (the "一次 SetWindowPos 就体现"
+	// half of the hot-tier sentence); scale 0 answers follow-DPI and the
+	// applier keeps the frame exactly as the create made it.
+	m.applyResolvedGeometry()
+
 	// AC#13's order lives in coldStartPageHandover (33-r10 moved it out verbatim:
 	// same statements, same order, nothing added or dropped). Read the reason there.
 	rtMs := m.coldStartPageHandover(ctx, t0)
@@ -1201,7 +1267,7 @@ func (m *PanelManager) LastRaiseSetForeground() uintptr {
 // That last consequence is worth naming: with an unreadable config a re-show moves
 // the window to those constants, just as a fresh create would.
 func (m *PanelManager) requestGeometryOnReshow() {
-	if m.geometry == nil {
+	if m.geometryTriple == nil && m.geometry == nil {
 		return
 	}
 	m.mu.Lock()
@@ -1215,6 +1281,15 @@ func (m *PanelManager) requestGeometryOnReshow() {
 	}
 	options := m.windowOptions()
 	width, height := int(options.Width), int(options.Height)
+
+	// AC#10: [panel] scale folds into the posted pair HERE, from the triple the
+	// windowOptions call above resolved (still exactly ONE read per re-show).
+	// scale 0 - follow system DPI - answers the same pair the pre-ticket shape
+	// posted, byte for byte.
+	m.mu.Lock()
+	scale := m.resolved.scale
+	m.mu.Unlock()
+	width, height = panelScaledSize(width, height, scale)
 
 	w.Dispatch(func() {
 		w.SetSize(width, height, webview2.HintNone)
