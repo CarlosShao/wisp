@@ -228,7 +228,7 @@ D32 `Sleeping` 行 CPU ≤0.5% 一项 FAIL（0.5450% / 0.6285%），阈值未改
 |---|---|---|---|
 | 私有工作集 | ≤25MB | **11.79MB**（树外测）·8.43–9.10MB（树内采样器） | **PASS**，余量 13.2MB |
 | CPU | ≤0.5% 全核 | **0.000%**（球，树外测） | **PASS**（球本体；树内口径见 A.1/A.4#2） |
-| 定时器 | 零 | **timers=no**（读活对象，非策略表） | **PASS** |
+| 定时器 | 零 | **timers=no**（读活对象，非策略表） | **PASS**<br>该实测用例挂在 `winlive` 构建标签下，CI 默认不跑（`ci.yml` 无 `-tags winlive` 的运行步骤，只有 `go vet -tags winlive` 的编译门）；要在本机跑＝`go test -tags winlive ./internal/ball -run 'TestLiveSleepingZeroTimerHandles'` |
 | 句柄 | <600（裁定 1） | 358 | **PASS** |
 | GDI | <200 | 4 | **PASS** |
 | USER | 记录项 | 7 | 记录 |
