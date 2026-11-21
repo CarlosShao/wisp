@@ -33,6 +33,7 @@ import { Switch } from "@/components/ai-native/switch";
 import { ConfigReadGate } from "@/components/config-read-state";
 import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { COPY, configStatus, keyLabel, type Feedback } from "@/lib/config-feedback";
+import { t } from "@/lib/locale";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
 import {
   performConfigWrite,
@@ -82,14 +83,14 @@ export interface ModelSettingsViewProps {
 }
 
 export function ModelSettings({
-  heading = "模型",
-  lede = "添加供应商、保存密钥，并选择默认聊天模型。",
+  heading = t("model.heading"),
+  lede = t("model.lede"),
 }: {
   heading?: string;
   lede?: string;
 }) {
   return (
-    <section aria-label="模型" className="flex min-w-0 flex-col gap-1">
+    <section aria-label={t("model.heading")} className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
         <ConfigReadGate>
@@ -145,16 +146,16 @@ export function ModelSettingsView({
       <div className="flex items-center gap-2">
         <StateTag text={status.label} tone={status.tone} />
         <span className="min-w-0 flex-1" />
-        <Button aria-label="刷新" onClick={onReload} size="xs" variant="quiet">
+        <Button aria-label={t("common.refresh")} onClick={onReload} size="xs" variant="quiet">
           <RefreshCw aria-hidden="true" size={11} strokeWidth={2} />
-          刷新
+          {t("common.refresh")}
         </Button>
       </div>
 
       {!view.readable ? (
-        <SettingsCard title="配置">
+        <SettingsCard title={t("common.config")}>
           <p className="text-[12px] leading-[1.7] text-ink-2">
-            暂时读不到配置，请稍后刷新。
+            {t("common.configUnreadable")}
           </p>
         </SettingsCard>
       ) : (
@@ -247,7 +248,7 @@ function ProvidersCard({
       : "";
 
   return (
-    <SettingsCard title="供应商" description="密钥只保存在本机；界面上不会再显示密钥内容。">
+    <SettingsCard title={t("model.label.providers")} description={t("model.providersDesc")}>
       {rows.length === 0 && !addOpen ? (
         <EmptyState actionLabel={COPY.addProvider} onAction={() => setAddOpen(true)} text={COPY.noProvidersYet} />
       ) : (
@@ -330,8 +331,8 @@ type ProbeState =
 /** One capability's verdict word. Words, never glyphs (the emoji ban): the
     pairing the ticket asks for ("declared vs measured") said in text. */
 function probeOutcomeWord(outcome: { attempted: boolean; ok: boolean }): string {
-  if (!outcome.attempted) return "未实测";
-  return outcome.ok ? "实测可用" : "实测不可用";
+  if (!outcome.attempted) return t("model.probeNotRun");
+  return outcome.ok ? t("model.probeOk") : t("model.probeFail");
 }
 
 /** Exported for the render instrument (scripts/render-model-settings.tsx):
@@ -416,18 +417,18 @@ export function ProviderRow({
         <span className="shrink-0 text-[12.5px] font-medium text-ink">{row.name}</span>
         {row.billing === "plan" || row.billing === "pay-per-token" ? (
           <span className="shrink-0 rounded-chip bg-inset px-1.5 py-0.5 text-[10.5px] text-ink-2">
-            {row.billing === "plan" ? "套餐" : "按量"}
+            {row.billing === "plan" ? t("model.billingPlan") : t("model.billingPayg")}
           </span>
         ) : null}
         {row.protocol !== "" ? (
           <span className="shrink-0 font-mono text-[10.5px] text-ink-3">{row.protocol}</span>
         ) : null}
         <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-3" title={row.baseURL}>
-          {row.baseURL !== "" ? row.baseURL : "默认基址（预设）"}
+          {row.baseURL !== "" ? row.baseURL : t("model.baseDefault")}
         </span>
         <span className="shrink-0 text-[11px] text-ink-3">{key.label}</span>
         <span className="shrink-0 text-[11px] text-ink-3">
-          {row.modelCount > 0 ? `${row.modelCount} 个模型` : "暂无模型"}
+          {row.modelCount > 0 ? t("model.modelCount", { n: row.modelCount }) : t("model.noModels")}
         </span>
         <div className="flex shrink-0 items-center gap-0.5">
           <Button
@@ -440,27 +441,27 @@ export function ProviderRow({
             {fetch.phase === "loading" ? (
               <span className="flex items-center gap-1">
                 <LoaderCircle aria-hidden="true" className="animate-spin" size={11} strokeWidth={2} />
-                拉取中…
+                {t("model.fetching")}
               </span>
             ) : (
-              "拉取模型列表"
+              t("model.fetchList")
             )}
           </Button>
           <Button onClick={onEditing} size="xs" variant="quiet">
-            {editing ? "收起" : "编辑"}
+            {editing ? t("common.collapse") : t("common.edit")}
           </Button>
           {confirmRemove ? (
             <>
               <Button disabled={busy !== null} onClick={removeRow} size="xs" variant="primary">
-                确认删除
+                {t("model.confirmDelete")}
               </Button>
               <Button onClick={() => setConfirmRemove(false)} size="xs" variant="quiet">
-                取消
+                {t("common.cancel")}
               </Button>
             </>
           ) : (
             <Button onClick={() => setConfirmRemove(true)} size="xs" variant="quiet">
-              删除
+              {t("common.delete")}
             </Button>
           )}
         </div>
@@ -500,11 +501,11 @@ export function ModelProbeResultCard({
   if (probe.phase === "failed") {
     return (
       <div className="flex flex-col gap-1 rounded-control bg-inset p-2.5">
-        <p className="text-[11.5px] text-ink-2">{probe.model} 的探测没有完成：</p>
+        <p className="text-[11.5px] text-ink-2">{t("model.probeFailedLine", { name: probe.model })}</p>
         <p className="whitespace-pre-wrap font-mono text-[11px] text-ink-2">{probe.text}</p>
         <div>
           <Button onClick={onDismiss} size="xs" variant="quiet">
-            知道了
+            {t("common.gotIt")}
           </Button>
         </div>
       </div>
@@ -514,34 +515,34 @@ export function ModelProbeResultCard({
   return (
     <div className="flex flex-col gap-1.5 rounded-control bg-inset p-2.5">
       <p className="text-[11.5px] text-ink-2">
-        {result.provider}/{result.model} 实测 p50 {result.latencyMS}ms
-        {result.error ? `；探测未完成：${result.error}` : ""}
+        {t("model.probeResultLine", { provider: result.provider, model: result.model, ms: result.latencyMS })}
+        {result.error ? t("model.probeIncomplete", { err: result.error }) : ""}
       </p>
       {result.outcomes.map((o) => (
         <p className="text-[11.5px] text-ink-2" key={o.capability}>
-          {o.capability}：{o.declared ? "声明可用" : "未声明"}，{probeOutcomeWord(o)}
+          {t("model.outcomeLine", { capability: o.capability, declared: o.declared ? t("model.declaredOk") : t("model.declaredNo"), outcome: probeOutcomeWord(o) })}
           {o.detail && !o.ok ? (
-            <span className="font-mono text-[10.5px] text-ink-3">（细节：{o.detail}）</span>
+            <span className="font-mono text-[10.5px] text-ink-3">{t("model.detailWrap", { d: o.detail })}</span>
           ) : null}
         </p>
       ))}
       {result.outcomes.length === 0 && !result.error ? (
-        <p className="text-[11.5px] text-ink-3">本次没有任何能力发出实测请求。</p>
+        <p className="text-[11.5px] text-ink-3">{t("model.probeNoCalls")}</p>
       ) : null}
       {result.mismatches.map((m) => (
         <p className="text-[11.5px] text-ink-2" key={m.capability}>
           {m.label}
-          <span className="font-mono text-[10.5px] text-ink-3">（细节：{m.detail}）</span>
+          <span className="font-mono text-[10.5px] text-ink-3">{t("model.detailWrap", { d: m.detail })}</span>
         </p>
       ))}
       <p className="text-[11px] text-ink-3">
         {result.written
-          ? "判定已写入 provider_health；探测不改配置，不落 config.toml。"
-          : "判定没有写入 provider_health（本次只测未录）；探测不改配置。"}
+          ? t("model.verdictWritten")
+          : t("model.verdictNotWritten")}
       </p>
       <div>
         <Button onClick={onDismiss} size="xs" variant="quiet">
-          收起
+          {t("common.collapse")}
         </Button>
       </div>
     </div>
@@ -594,11 +595,11 @@ function QuotaLeafInput({
 }) {
   const [draft, setDraft] = useState("");
   const currentText =
-    current === undefined ? "等快照" : current === 0 ? currentWord : `${current}`;
+    current === undefined ? t("common.waitSnapshot") : current === 0 ? currentWord : `${current}`;
   function save() {
     const v = draft.trim();
     if (v === "") {
-      onFeedback({ tone: "error", text: "请先填入额度数值（micro-USD 整数；0 = 不封顶/未录入）" });
+      onFeedback({ tone: "error", text: t("quota.valueRequired") });
       return;
     }
     void run(`${field}:${provider}:${model ?? "-"}`, () =>
@@ -627,10 +628,10 @@ function QuotaLeafInput({
         value={draft}
       />
       <Button disabled={busy !== null} onClick={save} size="xs" variant="secondary">
-        保存
+        {t("copy.save")}
       </Button>
       <span className="text-[11px] text-ink-3">
-        当前：{currentText}（{caption}）
+        {t("model.currentWithUnit", { v: currentText, unit: caption })}
       </span>
     </div>
   );
@@ -660,7 +661,7 @@ export function ModelQuotaEditor({
   const quotas = row.modelQuotas ?? null;
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[11.5px] text-ink-3">额度（quota）</span>
+      <span className="text-[11.5px] text-ink-3">{t("quota.title")}</span>
       {row.models !== null && row.models.length > 0 ? (
         row.models.map((id) => {
           const limits = quotas === null ? undefined : (quotas[id] ?? undefined);
@@ -668,7 +669,7 @@ export function ModelQuotaEditor({
             return (
               <div className="flex flex-wrap items-center gap-2" key={`quota-${id}`}>
                 <span className="font-mono text-[11px] text-ink-2">{id}</span>
-                <StateTag text="等快照" tone="neutral" />
+                <StateTag text={t("common.waitSnapshot")} tone="neutral" />
               </div>
             );
           }
@@ -676,13 +677,13 @@ export function ModelQuotaEditor({
             <div className="flex flex-col gap-1.5 rounded-control bg-surface/60 px-2 py-1.5" key={`quota-${id}`}>
               <span className="font-mono text-[11px] text-ink-2">{id}</span>
               <QuotaLeafInput
-                ariaLabel={`${id} 的日额度`}
+                ariaLabel={t("quota.dailyAria", { id })}
                 busy={busy}
-                caption="micro-USD/天，0 = 不封顶"
+                caption={t("quota.dailyCaption")}
                 current={limits.dailyMicro}
-                currentWord="未设（0 = 不封顶）"
+                currentWord={t("quota.unsetWord")}
                 field="model_quota_daily_micro"
-                label="日额度"
+                label={t("quota.daily")}
                 model={id}
                 onFeedback={onFeedback}
                 performWrite={performWrite}
@@ -690,13 +691,13 @@ export function ModelQuotaEditor({
                 run={run}
               />
               <QuotaLeafInput
-                ariaLabel={`${id} 的月额度`}
+                ariaLabel={t("quota.monthlyAria", { id })}
                 busy={busy}
-                caption="micro-USD/月，0 = 不封顶"
+                caption={t("quota.monthlyCaption")}
                 current={limits.monthlyMicro}
-                currentWord="未设（0 = 不封顶）"
+                currentWord={t("quota.unsetWord")}
                 field="model_quota_monthly_micro"
-                label="月额度"
+                label={t("quota.monthly")}
                 model={id}
                 onFeedback={onFeedback}
                 performWrite={performWrite}
@@ -708,19 +709,19 @@ export function ModelQuotaEditor({
         })
       ) : (
         <span className="text-[11.5px] text-ink-3">
-          {row.models === null ? "暂时读不到模型清单，额度读不到当前值" : "暂无模型"}
+          {row.models === null ? t("quota.modelsUnreadable") : t("model.noModels")}
         </span>
       )}
       <div className="flex flex-col gap-1.5 rounded-control bg-surface/60 px-2 py-1.5">
-        <span className="font-mono text-[11px] text-ink-2">{row.name} 的套餐 credit 总额</span>
+        <span className="font-mono text-[11px] text-ink-2">{t("quota.planCreditTitle", { name: row.name })}</span>
         <QuotaLeafInput
-          ariaLabel={`${row.name} 的套餐 credit 总额`}
+          ariaLabel={t("quota.planCreditTitle", { name: row.name })}
           busy={busy}
-          caption="micro-USD，0 = 未录入（未录入不拦派发）"
+          caption={t("quota.planCreditCaption")}
           current={row.planCreditTotalMicro}
-          currentWord="未录入（0）"
+          currentWord={t("quota.planCreditWord")}
           field="provider_plan_credit_total_micro"
-          label="总额"
+          label={t("quota.total")}
           onFeedback={onFeedback}
           performWrite={performWrite}
           provider={row.name}
@@ -728,7 +729,7 @@ export function ModelQuotaEditor({
         />
       </div>
       <p className="text-[11.5px] leading-[1.6] text-ink-3">
-        额度写保存后重启生效；范围（不能为负，0 = 不封顶）由配置写入腿按名拒绝，越界值不会落盘。
+        {t("quota.note")}
       </p>
     </div>
   );
@@ -787,7 +788,7 @@ function ProviderEdit({
     if (!input) return;
     const value = input.value;
     if (value === "") {
-      onFeedback({ tone: "error", text: "请先填入密钥" });
+      onFeedback({ tone: "error", text: t("refusal.credFieldEmpty") });
       return;
     }
     // The value leaves the DOM the instant it is sent; nothing puts it into
@@ -808,7 +809,7 @@ function ProviderEdit({
   function addOneModel(id: string) {
     const model = id.trim();
     if (model === "") {
-      onFeedback({ tone: "error", text: "请先填入模型 id" });
+      onFeedback({ tone: "error", text: t("refusal.modelIdRequired") });
       return;
     }
     void run(`models:${row.name}`, () =>
@@ -833,7 +834,7 @@ function ProviderEdit({
   function addFetchedModels() {
     const ids = fetchedNew.filter((id) => ticked.has(id));
     if (ids.length === 0) {
-      onFeedback({ tone: "error", text: "先勾选要添加的模型" });
+      onFeedback({ tone: "error", text: t("model.selectFirst") });
       return;
     }
     void run(`models:${row.name}`, async () => {
@@ -846,11 +847,11 @@ function ProviderEdit({
       }
       if (firstError === null) {
         onDismissFetch();
-        return { tone: "ok" as const, text: `已保存 ${saved} 个模型，重启后生效` };
+        return { tone: "ok" as const, text: t("model.bulkSaved", { n: saved }) };
       }
       return {
         tone: "error" as const,
-        text: saved > 0 ? `${saved} 个已保存；其余没有写成：${firstError.text}` : firstError.text,
+        text: saved > 0 ? t("model.bulkPartial", { n: saved, err: firstError.text }) : firstError.text,
       };
     }).then(onFeedback);
   }
@@ -858,9 +859,9 @@ function ProviderEdit({
   return (
     <div className="flex flex-col gap-3 pb-3 pl-5">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">基址</span>
+        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">{t("model.label.baseURL")}</span>
         <input
-          aria-label={`${row.name} 的接口基址`}
+          aria-label={t("model.baseAria", { name: row.name })}
           className="h-[30px] w-[320px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
           onChange={(e) => setBaseURL(e.currentTarget.value)}
           placeholder="https://…"
@@ -870,7 +871,7 @@ function ProviderEdit({
           disabled={busy !== null}
           onClick={() => {
             if (baseURL.trim() === "") {
-              onFeedback({ tone: "error", text: "基址不能为空" });
+              onFeedback({ tone: "error", text: t("model.baseRequired") });
               return;
             }
             void run(`base:${row.name}`, () =>
@@ -880,39 +881,39 @@ function ProviderEdit({
           size="xs"
           variant="secondary"
         >
-          保存基址
+          {t("model.saveBase")}
         </Button>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">密钥</span>
+        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">{t("model.label.key")}</span>
         {row.credentialSet && !replacingKey ? (
           <>
             <span className="text-[11.5px] text-ink-2">
-              已保存{row.apiKeyRef !== "" ? `（${row.apiKeyRef}）` : ""}
+              {t("save.saved")}{row.apiKeyRef !== "" ? t("model.refWrap", { ref: row.apiKeyRef }) : ""}
             </span>
             <Button onClick={() => setReplacingKey(true)} size="xs" variant="secondary">
-              更换
+              {t("model.replaceKey")}
             </Button>
           </>
         ) : (
           <>
             <input
-              aria-label={`${row.name} 的密钥`}
+              aria-label={t("model.keyAria", { name: row.name })}
               className="h-[30px] w-[260px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
               onKeyDown={(e) => {
                 if (e.key === "Enter") saveKey();
               }}
-              placeholder="粘贴密钥（保存后不再显示）"
+              placeholder={t("model.keyPlaceholder")}
               ref={keyInputRef}
               type="password"
             />
             <Button disabled={busy !== null} onClick={saveKey} size="xs" variant="secondary">
-              保存密钥
+              {t("model.saveKey")}
             </Button>
             {replacingKey ? (
               <Button onClick={() => setReplacingKey(false)} size="xs" variant="quiet">
-                取消
+                {t("common.cancel")}
               </Button>
             ) : null}
           </>
@@ -922,19 +923,19 @@ function ProviderEdit({
           size="xs"
           variant="quiet"
         >
-          测试密钥
+          {t("model.testKey")}
         </Button>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">计费模式</span>
+        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">{t("model.label.billing")}</span>
         <Button
           disabled={busy !== null}
           onClick={() => setBilling("plan")}
           size="xs"
           variant={row.billing === "plan" ? "primary" : "secondary"}
         >
-          套餐
+          {t("model.billingPlan")}
         </Button>
         <Button
           disabled={busy !== null}
@@ -942,19 +943,19 @@ function ProviderEdit({
           size="xs"
           variant={row.billing === "pay-per-token" ? "primary" : "secondary"}
         >
-          按量
+          {t("model.billingPayg")}
         </Button>
         <span className="text-[11px] text-ink-3">
           {row.billing === "plan"
-            ? "当前：套餐（点击「按量」即改）"
+            ? t("model.billingCurrentPlan")
             : row.billing === "pay-per-token"
-              ? "当前：按量（点击「套餐」即改）"
-              : "未设置；点击即保存（同一厂商两个计费口各记各的）"}
+              ? t("model.billingCurrentPayg")
+              : t("model.billingUnset")}
         </span>
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-[11.5px] text-ink-3">模型目录</span>
+        <span className="text-[11.5px] text-ink-3">{t("model.label.catalog")}</span>
         <div className="flex flex-col gap-1">
           {row.models !== null && row.models.length > 0 ? (
             row.models.map((id) => {
@@ -980,10 +981,10 @@ function ProviderEdit({
                   <span className="font-mono text-[11px] text-ink-2">{id}</span>
                   {bits ? (
                     <>
-                      <span className="text-[10.5px] text-ink-3">能力位</span>
+                      <span className="text-[10.5px] text-ink-3">{t("model.caps")}</span>
                       <Switch
                         checked={bits.audioIn}
-                        label={`${id} 的 audio in 能力位`}
+                        label={t("model.capsInAria", { id })}
                         onChange={(next) => {
                           void run(`caps:${row.name}:${id}:in`, () =>
                             performWrite({
@@ -998,7 +999,7 @@ function ProviderEdit({
                       <span className="font-mono text-[10.5px] text-ink-3">audio in</span>
                       <Switch
                         checked={bits.audioOut}
-                        label={`${id} 的 audio out 能力位`}
+                        label={t("model.capsOutAria", { id })}
                         onChange={(next) => {
                           void run(`caps:${row.name}:${id}:out`, () =>
                             performWrite({
@@ -1013,7 +1014,7 @@ function ProviderEdit({
                       <span className="font-mono text-[10.5px] text-ink-3">audio out</span>
                     </>
                   ) : (
-                    <StateTag text="等快照" tone="neutral" />
+                    <StateTag text={t("common.waitSnapshot")} tone="neutral" />
                   )}
                   <span className="min-w-0 flex-1" />
                   <Button
@@ -1023,10 +1024,10 @@ function ProviderEdit({
                     size="xs"
                     variant="quiet"
                   >
-                    {probe.phase === "loading" && probe.model === id ? "探测中…" : "测试"}
+                    {probe.phase === "loading" && probe.model === id ? t("model.probing") : t("model.test")}
                   </Button>
                   <button
-                    aria-label={`删除模型 ${id}`}
+                    aria-label={t("model.deleteModelAria", { id })}
                     className="rounded-full px-1 text-[13px] leading-none text-ink-3 hover:text-ink disabled:opacity-40"
                     disabled={busy !== null}
                     onClick={() => removeOneModel(id)}
@@ -1039,13 +1040,12 @@ function ProviderEdit({
             })
           ) : (
             <span className="text-[11.5px] text-ink-3">
-              {row.models === null ? "暂时读不到模型清单" : "暂无模型"}
+              {row.models === null ? t("model.modelsUnreadable") : t("model.noModels")}
             </span>
           )}
         </div>
         <p className="text-[11.5px] leading-[1.6] text-ink-3">
-          能力位 audio in / audio out 是语音装配的门槛：听写链要求该模型勾上 audio in，朗读链要求
-          audio out（默认关，保存后重启生效）。
+          {t("model.capsNote")}
         </p>
 
         {/* The probe block (ticket 40 AC#3): the host's own measurement,
@@ -1054,7 +1054,7 @@ function ProviderEdit({
         {probe.phase === "loading" ? (
           <p className="flex items-center gap-1.5 text-[11.5px] text-ink-3">
             <LoaderCircle aria-hidden="true" className="animate-spin" size={11} strokeWidth={2} />
-            正在实测 {row.name}/{probe.model}（向上游发探测请求，可能要几十秒）…
+            {t("model.probeRunning", { name: row.name, model: probe.model })}
           </p>
         ) : probe.phase === "failed" || probe.phase === "done" ? (
           <ModelProbeResultCard
@@ -1066,27 +1066,27 @@ function ProviderEdit({
         {fetch.phase === "loading" ? (
           <p className="flex items-center gap-1.5 text-[11.5px] text-ink-3">
             <LoaderCircle aria-hidden="true" className="animate-spin" size={11} strokeWidth={2} />
-            正在向上游拉取模型列表…
+            {t("model.fetchRunning")}
           </p>
         ) : fetch.phase === "error" ? (
           <div className="flex flex-col gap-1">
             <FeedbackLine feedback={fetch.feedback} />
             <div>
               <Button onClick={onDismissFetch} size="xs" variant="quiet">
-                知道了
+                {t("common.gotIt")}
               </Button>
             </div>
           </div>
         ) : fetch.phase === "ready" ? (
           <div className="flex flex-col gap-2 rounded-control bg-inset p-2.5">
             {fetch.models.length === 0 ? (
-              <p className="text-[11.5px] text-ink-3">上游返回的清单是空的。</p>
+              <p className="text-[11.5px] text-ink-3">{t("model.fetchEmpty")}</p>
             ) : fetchedNew.length === 0 ? (
-              <p className="text-[11.5px] text-ink-3">上游清单里的模型都已经在目录里了。</p>
+              <p className="text-[11.5px] text-ink-3">{t("model.fetchAllKnown")}</p>
             ) : (
               <>
                 <p className="text-[11.5px] text-ink-3">
-                  拉到 {fetchedNew.length} 个新模型，勾选后写入：
+                  {t("model.fetchedCount", { n: fetchedNew.length })}
                 </p>
                 <div className="flex max-h-44 flex-col gap-0.5 overflow-y-auto">
                   {fetchedNew.map((id) => (
@@ -1118,7 +1118,7 @@ function ProviderEdit({
                 </div>
                 <div className="flex items-center gap-2">
                   <Button disabled={busy !== null} onClick={addFetchedModels} size="xs" variant="primary">
-                    写入所选
+                    {t("model.writeSelected")}
                   </Button>
                   <Button
                     onClick={() =>
@@ -1131,10 +1131,10 @@ function ProviderEdit({
                     size="xs"
                     variant="quiet"
                   >
-                    全选
+                    {t("model.selectAll")}
                   </Button>
                   <Button onClick={onDismissFetch} size="xs" variant="quiet">
-                    取消
+                    {t("common.cancel")}
                   </Button>
                 </div>
               </>
@@ -1142,7 +1142,7 @@ function ProviderEdit({
             {fetch.models.length > 0 && fetchedNew.length === 0 ? (
               <div>
                 <Button onClick={onDismissFetch} size="xs" variant="quiet">
-                  取消
+                  {t("common.cancel")}
                 </Button>
               </div>
             ) : null}
@@ -1151,17 +1151,17 @@ function ProviderEdit({
 
         <div className="flex flex-wrap items-center gap-2">
           <input
-            aria-label="模型 id"
+            aria-label={t("model.modelId")}
             className="h-[30px] w-[220px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
             onChange={(e) => setManualModel(e.currentTarget.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") addOneModel(manualModel);
             }}
-            placeholder="模型 id"
+            placeholder={t("model.modelId")}
             value={manualModel}
           />
           <Button disabled={busy !== null} onClick={() => addOneModel(manualModel)} size="xs" variant="secondary">
-            添加
+            {t("model.add")}
           </Button>
         </div>
       </div>
@@ -1209,9 +1209,13 @@ export function AddProviderForm({
   performCredential: (provider: string, value: string) => Promise<Feedback>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
-  const MODES = ["内置供应商", "自定义接入"] as const;
-  const BILLING = ["套餐（plan）", "按量（pay-per-token）"] as const;
-  const [selectedMode, setSelectedMode] = useState<(typeof MODES)[number]>("内置供应商");
+  const MODE_PRESET = t("model.mode.preset");
+  const MODE_CUSTOM = t("model.mode.custom");
+  const BILL_PLAN = t("model.billingPlanLabel");
+  const BILL_PAYG = t("model.billingPaygLabel");
+  const MODES = [MODE_PRESET, MODE_CUSTOM] as const;
+  const BILLING = [BILL_PLAN, BILL_PAYG] as const;
+  const [selectedMode, setSelectedMode] = useState<(typeof MODES)[number]>(MODE_PRESET);
   // 票 313 AC#1: the pre-selection lands here, once, as the initial value.
   // The picker above it stays fully in the user's hands from the first click.
   const [provider, setProvider] = useState(defaultProvider);
@@ -1229,7 +1233,7 @@ export function AddProviderForm({
   // guessed; the plan-side address is the operator's own and is never invented
   // here.
   const KNOWN_ALT_ENDPOINTS: Record<string, { label: string; base: string }> = {
-    stepfun: { label: "按量（API）口", base: "https://api.stepfun.com/v1" },
+    stepfun: { label: t("model.altApiLabel"), base: "https://api.stepfun.com/v1" },
   };
   const vendorKey = customName.trim().split("-")[0]?.toLowerCase() ?? "";
   const altEndpoint = KNOWN_ALT_ENDPOINTS[vendorKey];
@@ -1247,7 +1251,7 @@ export function AddProviderForm({
   });
 
   function prefillSecondRow(row: { name: string; base: string }) {
-    setSelectedMode("自定义接入");
+    setSelectedMode(MODE_CUSTOM);
     setCustomName(row.name);
     setProtocol("openai-chat");
     setCustomBase(row.base);
@@ -1257,34 +1261,34 @@ export function AddProviderForm({
   function submit() {
     const keyValue = keyInputRef.current?.value ?? "";
     const billingValue = billing === "" ? "" : billing === BILLING[0] ? "plan" : "pay-per-token";
-    if (selectedMode === "内置供应商") {
+    if (selectedMode === MODE_PRESET) {
       if (provider === "") {
-        onFeedback({ tone: "error", text: "请先选择供应商" });
+        onFeedback({ tone: "error", text: t("model.pickProviderFirst") });
         return;
       }
     } else {
       if (customName.trim() === "") {
-        onFeedback({ tone: "error", text: "请先填行名" });
+        onFeedback({ tone: "error", text: t("model.rowNameFirst") });
         return;
       }
       if (presets !== null && presets.includes(customName.trim())) {
-        onFeedback({ tone: "error", text: "这是内置供应商名，请用「内置供应商」添加" });
+        onFeedback({ tone: "error", text: t("model.presetNameAdd") });
         return;
       }
       if (protocol === "") {
-        onFeedback({ tone: "error", text: "请先选择协议" });
+        onFeedback({ tone: "error", text: t("model.pickProtocolFirst") });
         return;
       }
       if (customBase.trim() === "") {
-        onFeedback({ tone: "error", text: "请先填基址" });
+        onFeedback({ tone: "error", text: t("model.baseFillFirst") });
         return;
       }
     }
     if (keyInputRef.current) keyInputRef.current.value = "";
-    const name = selectedMode === "内置供应商" ? provider : customName.trim();
+    const name = selectedMode === MODE_PRESET ? provider : customName.trim();
     void run("add-provider", async () => {
       const created = await performWrite(
-        selectedMode === "内置供应商"
+        selectedMode === MODE_PRESET
           ? {
               field: "provider_row_create",
               provider: name,
@@ -1304,14 +1308,14 @@ export function AddProviderForm({
       if (billingValue !== "") {
         const billed = await performWrite({ field: "provider_billing", provider: name, value: billingValue });
         if (billed.tone !== "ok") {
-          return { tone: "error" as const, text: `供应商已添加，但计费模式没有写入：${billed.text}` };
+          return { tone: "error" as const, text: t("model.addedBillingFail", { err: billed.text }) };
         }
       }
       if (keyValue === "") return created;
       const keyed = await performCredential(name, keyValue);
       return keyed.tone === "ok"
         ? created
-        : { tone: "error" as const, text: `供应商已添加，但密钥没有保存：${keyed.text}` };
+        : { tone: "error" as const, text: t("model.addedKeyFail", { err: keyed.text }) };
     }).then((fb) => {
       onFeedback(fb);
       if (fb.tone === "ok") onDone(name);
@@ -1331,50 +1335,49 @@ export function AddProviderForm({
         <SegmentedControl onChange={setSelectedMode} options={MODES} value={selectedMode} />
       </div>
 
-      {selectedMode === "内置供应商" ? (
+      {selectedMode === MODE_PRESET ? (
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={rowLabel}>供应商</span>
+            <span className={rowLabel}>{t("model.label.providers")}</span>
             {available === null ? (
-              <span className="text-[11.5px] text-ink-3">暂未读取到供应商列表，请稍后刷新</span>
+              <span className="text-[11.5px] text-ink-3">{t("model.presetsUnread")}</span>
             ) : (
               <Picker
-                ariaLabel="供应商"
+                ariaLabel={t("model.label.providers")}
                 className="w-[220px]"
-                emptyText="内置供应商都已添加"
+                emptyText={t("model.presetsAllAdded")}
                 onSelect={setProvider}
-                options={available.map((name) => ({ value: name, note: name === "stepfun" ? "推荐" : "" }))}
-                placeholder="选择供应商"
+                options={available.map((name) => ({ value: name, note: name === "stepfun" ? t("model.recommended") : "" }))}
+                placeholder={t("model.pickProvider")}
                 value={provider}
               />
             )}
             <span className="text-[11px] text-ink-3">
-              这里只列还没添加过的内置供应商；同一家要第二行请用下面那条
+              {t("model.presetsNote")}
             </span>
           </div>
           {takenAll.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] text-ink-3">已添加：{takenAll.join("、")}</span>
+              <span className="text-[11px] text-ink-3">{t("model.addedNote", { names: takenAll.join("、") })}</span>
             </div>
           ) : null}
           {secondRows.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2 rounded-control bg-surface/60 px-2 py-1.5">
-              <span className={rowLabel}>常用第二行</span>
+              <span className={rowLabel}>{t("model.secondRowLabel")}</span>
               {secondRows.map((row) => (
                 <Button key={row.name} onClick={() => prefillSecondRow(row)} size="xs" variant="quiet">
-                  加一行 {row.name}（{row.label}）
+                  {t("model.addSecondRow", { name: row.name, label: row.label })}
                 </Button>
               ))}
               <span className="text-[11px] text-ink-3">
-                同一厂商两行并存：各用各的基址、各拉各的模型清单
+                {t("model.secondRowNote")}
               </span>
             </div>
           ) : null}
           {provider !== "" && KNOWN_ALT_ENDPOINTS[provider.toLowerCase()] ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-ink-3">
-                {provider} 还有另一个计费口（{KNOWN_ALT_ENDPOINTS[provider.toLowerCase()].label}）
-                ——同一厂商两行并存时，两行各有各的基址与模型目录：
+                {t("model.altEndpointNote", { name: provider, label: KNOWN_ALT_ENDPOINTS[provider.toLowerCase()].label })}
               </span>
               <Button
                 onClick={() =>
@@ -1386,7 +1389,7 @@ export function AddProviderForm({
                 size="xs"
                 variant="quiet"
               >
-                切到自定义并预填这一行
+                {t("model.switchToCustom")}
               </Button>
             </div>
           ) : null}
@@ -1394,35 +1397,35 @@ export function AddProviderForm({
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={rowLabel}>行名</span>
+            <span className={rowLabel}>{t("model.label.rowName")}</span>
             <input
-              aria-label="行名"
+              aria-label={t("model.label.rowName")}
               className={`${inputCls} w-[220px]`}
               onChange={(e) => setCustomName(e.currentTarget.value)}
-              placeholder="例如 stepfun-api"
+              placeholder={t("model.rowNameExample")}
               value={customName}
             />
-            <span className="text-[11px] text-ink-3">同一厂商可以两行并存，各用各的基址与密钥</span>
+            <span className="text-[11px] text-ink-3">{t("model.rowNameNote")}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={rowLabel}>协议</span>
+            <span className={rowLabel}>{t("model.label.protocol")}</span>
             <Picker
-              ariaLabel="协议"
+              ariaLabel={t("model.label.protocol")}
               className="w-[220px]"
               onSelect={setProtocol}
               options={[
-                { value: "openai-chat", note: "OpenAI 兼容" },
-                { value: "openai-responses", note: "OpenAI 响应式" },
+                { value: "openai-chat", note: t("model.protoOpenaiNote") },
+                { value: "openai-responses", note: t("model.protoResponsesNote") },
                 { value: "anthropic", note: "Anthropic" },
               ]}
-              placeholder="选择协议"
+              placeholder={t("model.pickProtocol")}
               value={protocol}
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={rowLabel}>基址</span>
+            <span className={rowLabel}>{t("model.label.baseURL")}</span>
             <input
-              aria-label="基址"
+              aria-label={t("model.label.baseURL")}
               className={`${inputCls} w-[320px]`}
               onChange={(e) => setCustomBase(e.currentTarget.value)}
               placeholder="https://…"
@@ -1432,7 +1435,7 @@ export function AddProviderForm({
           {altEndpoint ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-ink-3">
-                {vendorKey} 的{altEndpoint.label}已知基址：{altEndpoint.base}
+                {t("model.altKnownBase", { vendor: vendorKey, label: altEndpoint.label, base: altEndpoint.base })}
               </span>
               <Button
                 onClick={() => {
@@ -1442,12 +1445,12 @@ export function AddProviderForm({
                 size="xs"
                 variant="quiet"
               >
-                填入
+                {t("model.fillIn")}
               </Button>
             </div>
           ) : null}
           <div className="flex flex-wrap items-center gap-2">
-            <span className={rowLabel}>计费模式</span>
+            <span className={rowLabel}>{t("model.label.billing")}</span>
             <SegmentedControl
               onChange={(next) =>
                 setBilling(next === BILLING[0] ? BILLING[0] : next === BILLING[1] ? BILLING[1] : "")
@@ -1455,38 +1458,38 @@ export function AddProviderForm({
               options={BILLING}
               value={billing === BILLING[0] ? BILLING[0] : billing === BILLING[1] ? BILLING[1] : ""}
             />
-            <span className="text-[11px] text-ink-3">选填；同一厂商两个计费口各记各的</span>
+            <span className="text-[11px] text-ink-3">{t("model.billingOptionalNote")}</span>
           </div>
         </>
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className={rowLabel}>模型 id</span>
+        <span className={rowLabel}>{t("model.modelId")}</span>
         <input
-          aria-label="模型 id（选填）"
+          aria-label={t("model.modelIdOptional")}
           className={`${inputCls} w-[220px]`}
           onChange={(e) => setModel(e.currentTarget.value)}
-          placeholder="选填"
+          placeholder={t("model.optional")}
           value={model}
         />
-        <span className="text-[11px] text-ink-3">选填；添加后会自动拉一次这行的模型清单</span>
+        <span className="text-[11px] text-ink-3">{t("model.modelIdNote")}</span>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className={rowLabel}>密钥</span>
+        <span className={rowLabel}>{t("model.label.key")}</span>
         <input
-          aria-label="密钥（选填）"
+          aria-label={t("model.keyOptionalAria")}
           className={`${inputCls} w-[260px]`}
-          placeholder="粘贴密钥（保存后不再显示）"
+          placeholder={t("model.keyPlaceholder")}
           ref={keyInputRef}
           type="password"
         />
       </div>
       <div className="flex items-center gap-2 pl-18">
         <Button disabled={busy !== null} onClick={submit} size="sm" variant="primary">
-          {busy === "add-provider" ? COPY.saving : "添加"}
+          {busy === "add-provider" ? COPY.saving : t("model.add")}
         </Button>
         <Button onClick={onCancel} size="sm" variant="quiet">
-          取消
+          {t("common.cancel")}
         </Button>
       </div>
     </div>
@@ -1523,8 +1526,8 @@ function ChatModelCard({
   const current = view.chatModelKnown
     ? view.chatProvider !== "" && view.chatModel !== ""
       ? `${view.chatProvider} / ${view.chatModel}`
-      : "未设置"
-    : "暂未读取";
+      : t("common.unset")
+    : t("credential.unknown");
 
   function save() {
     if (chatProvider === "" || chatModel === "") {
@@ -1535,7 +1538,7 @@ function ChatModelCard({
         text: chatProvider === ""
           ? COPY.chatPairMissing
           : noModels
-            ? "这家供应商还没有模型；在供应商行的「编辑」里用「拉取模型列表」或手动添加"
+            ? t("model.chatNoModelsHint")
             : COPY.pairMissing,
       });
       return;
@@ -1546,9 +1549,9 @@ function ChatModelCard({
   }
 
   return (
-    <SettingsCard title="默认聊天模型" description="对话默认使用的供应商与模型。">
+    <SettingsCard title={t("model.chatTitle")} description={t("model.chatDesc")}>
       {view.providers.length === 0 ? (
-        <EmptyState text="先添加一个供应商，然后就能选择聊天模型。" />
+        <EmptyState text={t("model.chatEmptyHint")} />
       ) : (
         <div className="flex flex-col gap-2.5">
           <div className="flex flex-wrap items-center gap-2">
@@ -1564,7 +1567,7 @@ function ChatModelCard({
               {busy === "chat-pair" ? COPY.saving : COPY.save}
             </Button>
           </div>
-          <p className="text-[11.5px] text-ink-3">当前：{current}</p>
+          <p className="text-[11.5px] text-ink-3">{t("common.current", { v: current })}</p>
           <FeedbackLine feedback={feedback} />
         </div>
       )}

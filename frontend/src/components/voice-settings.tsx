@@ -80,6 +80,7 @@ import { Button } from "@/components/ai-native/button";
 import { Switch } from "@/components/ai-native/switch";
 import { ConfigReadGate } from "@/components/config-read-state";
 import { COPY, configStatus, type Feedback } from "@/lib/config-feedback";
+import { t } from "@/lib/locale";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
 import { performConfigWrite, type ConfigWireWrite } from "@/lib/config-actions";
 import { OWNER_DEFAULT_PROVIDER } from "@/components/model-settings";
@@ -226,13 +227,13 @@ function chainAssembly(
     const model = cut < 0 ? "" : el.slice(cut + 1);
     const row = providers.find((p) => p.name === provider);
     if (provider === "" || model === "" || !row || row.models === null || !row.models.includes(model)) {
-      missing.push(`${el}：目录里没有这一行`);
+      missing.push(t("voice.elNotInCatalog", { el }));
       continue;
     }
     // Gate 2 (cloudcatalog.go:87-90): enabled=false refuses by name.
     const enabled = enabledOfModel(enabledOf(row), model);
     if (enabled === false) {
-      disabled.push(`${el} 已停用（enabled=false）`);
+      disabled.push(t("voice.elDisabled", { el }));
       continue;
     }
     if (enabled === null) allAnswered = false;
@@ -241,7 +242,7 @@ function chainAssembly(
     if (bits === null) {
       allAnswered = false;
     } else if (!bits[DIRECTION_BIT[direction]]) {
-      missing.push(`${el} 缺 capabilities.${DIRECTION_CONFIG_KEY[direction]}`);
+      missing.push(t("voice.elLacksBit", { el, bit: DIRECTION_CONFIG_KEY[direction] }));
     }
     // Gate 4 (cloudcatalog.go:121-131): a declared api_key_ref the read face
     // cannot affirm a resolvable credential behind. An EMPTY ref passes - the
@@ -249,8 +250,8 @@ function chainAssembly(
     if (row.apiKeyRef !== "" && (row.credentialError !== "" || !row.credentialSet)) {
       nokey.push(
         row.credentialError !== ""
-          ? `${provider} 无法核对密钥（${row.credentialError}）`
-          : `${provider} 缺 API Key（api_key_ref ${row.apiKeyRef} 未就绪）`,
+          ? t("voice.providerUncheckable", { name: provider, err: row.credentialError })
+          : t("voice.providerNoKey", { name: provider, ref: row.apiKeyRef }),
       );
     }
   }
@@ -279,20 +280,20 @@ function voiceDefaultProvider(providers: readonly ConfigViewProvider[]): string 
     exactly for the card that still needs it. */
 function placeholderReceipt(feedback: Feedback): Feedback {
   return feedback.tone === "ok"
-    ? { tone: "warn", text: "已写入配置文件；这一项还没有接到运行路径，当前不生效" }
+    ? { tone: "warn", text: t("voice.placeholderReceipt") }
     : feedback;
 }
 
 
 export function VoiceSettings({
-  heading = "语音",
-  lede = "云端听写链与云端朗读链已接入常驻语音的装配——门槛：链里每个模型都要在能力位里勾上对应的 audio in / audio out（「模型」页的模型行），保存后重启生效，链尽回退本地引擎；实时语音的引擎尚未实现仍是占位；本机音频三项显示真当前值，回声消除与输入设备可改可存。",
+  heading = t("voice.heading"),
+  lede = t("voice.lede"),
 }: {
   heading?: string;
   lede?: string;
 }) {
   return (
-    <section aria-label="语音" className="flex min-w-0 flex-col gap-1">
+    <section aria-label={t("voice.heading")} className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
       <ConfigReadGate>
@@ -331,19 +332,19 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
       <div className="flex items-center gap-2">
         <StateTag text={status.label} tone={status.tone} />
         <span className="min-w-0 flex-1" />
-        <Button aria-label="刷新" onClick={onReload} size="xs" variant="quiet">
+        <Button aria-label={t("common.refresh")} onClick={onReload} size="xs" variant="quiet">
           <RefreshCw aria-hidden="true" size={11} strokeWidth={2} />
-          刷新
+          {t("common.refresh")}
         </Button>
       </div>
 
       {!view.readable ? (
-        <SettingsCard title="配置">
-          <p className="text-[12px] leading-[1.7] text-ink-2">暂时读不到配置，请稍后刷新。</p>
+        <SettingsCard title={t("common.config")}>
+          <p className="text-[12px] leading-[1.7] text-ink-2">{t("common.configUnreadable")}</p>
         </SettingsCard>
       ) : view.providers.length === 0 ? (
-        <SettingsCard title="语音">
-          <EmptyState text="先在「模型」页添加一个供应商，再回来配置语音。" />
+        <SettingsCard title={t("voice.heading")}>
+          <EmptyState text={t("voice.emptyHint")} />
         </SettingsCard>
       ) : (
         <>
@@ -356,32 +357,32 @@ export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSetting
             .filter((p) => p.credentialError !== "")
             .map((p) => (
               <p className="text-[11.5px] text-orange" key={p.name}>
-                无法核对密钥：{p.name}（{p.credentialError}）
+                {t("voice.credUncheckable", { name: p.name, err: p.credentialError })}
               </p>
             ))}
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
-            description="已接入：常驻语音启动时按这条链的顺序装配云端听写，链尽回退本地引擎。链段可拖动（或上移/下移）重排，保存按现序写入配置文件，重启后按同序读回。门槛：链里每个模型都要在能力位里勾上 audio in（「模型」页的模型行），保存后重启生效。"
+            description={t("voice.asrDesc")}
             direction="asr"
             field="voice_cloud_asr_chain"
             initial={view.voice.cloudASRChain}
             performWrite={performWrite}
             providers={view.providers}
             run={run}
-            title="听写（ASR）"
+            title={t("voice.asrTitle")}
           />
           <ChainEditor
             busy={busy}
             defaultProvider={voiceDefaultProvider(view.providers)}
-            description="已接入：常驻语音启动时按这条链的顺序装配云端朗读，链尽回退本地引擎。链段可拖动（或上移/下移）重排，保存按现序写入配置文件，重启后按同序读回。门槛：链里每个模型都要在能力位里勾上 audio out（「模型」页的模型行），保存后重启生效。"
+            description={t("voice.ttsDesc")}
             direction="tts"
             field="voice_cloud_tts_chain"
             initial={view.voice.cloudTTSChain}
             performWrite={performWrite}
             providers={view.providers}
             run={run}
-            title="朗读（TTS）"
+            title={t("voice.ttsTitle")}
           />
           <RealtimeCard
             busy={busy}
@@ -418,7 +419,7 @@ function parseChain(chain: string[] | null): ChainSegment[] {
 }
 
 function chainText(chain: string[] | null): string {
-  if (chain === null || chain.length === 0) return "未设置";
+  if (chain === null || chain.length === 0) return t("common.unset");
   return chain.join(", ");
 }
 
@@ -466,18 +467,18 @@ function ChainEditor({
   // passed and none is missing.
   const savedVerdict = chainAssembly(initial, providers, direction);
   const savedTag = ((): { text: string; tone: "ok" | "warn" | "neutral" | "error" } => {
-    if (initial === null || initial.length === 0) return { text: "未设置", tone: "neutral" };
+    if (initial === null || initial.length === 0) return { text: t("common.unset"), tone: "neutral" };
     switch (savedVerdict.kind) {
       case "disabled":
-        return { text: "装配不了·模型已停用", tone: "warn" };
+        return { text: t("voice.tagDisabled"), tone: "warn" };
       case "nokey":
-        return { text: "装配不了·缺 API Key", tone: "warn" };
+        return { text: t("voice.tagNoKey"), tone: "warn" };
       case "lacks":
-        return { text: "装配不了·缺能力位", tone: "warn" };
+        return { text: t("voice.tagLacks"), tone: "warn" };
       case "unknown":
-        return { text: "已接入·装配未判（等快照）", tone: "neutral" };
+        return { text: t("voice.tagUnknown"), tone: "neutral" };
       default:
-        return { text: "已接入·重启生效", tone: "ok" };
+        return { text: t("voice.tagOk"), tone: "ok" };
     }
   })();
   // Every gate's hit list, element-first in the boot's own vocabulary: the
@@ -522,7 +523,7 @@ function ChainEditor({
         const noModels = seg.provider !== "" && row !== undefined && (row.models === null || row.models.length === 0);
         setFeedback({
           tone: "error",
-          text: noModels ? "这家供应商还没有模型" : COPY.chainSegmentMissing,
+          text: noModels ? t("voice.noModelsYet") : COPY.chainSegmentMissing,
         });
         return;
       }
@@ -542,28 +543,28 @@ function ChainEditor({
         if (verdict.kind === "disabled") {
           return {
             tone: "error",
-            text: `已写入配置文件，但这条链现在装配不了：${verdict.models.join("；")}。把这个模型启用或换一个模型，再回来存这条链，重启生效。`,
+            text: t("voice.receiptDisabled", { lines: verdict.models.join("；") }),
           };
         }
         if (verdict.kind === "nokey") {
           return {
             tone: "error",
-            text: `已写入配置文件，但这条链现在装配不了：${verdict.providers.join("；")}。在「模型」页把这一家的密钥录好，再回来存这条链，重启生效。`,
+            text: t("voice.receiptNoKey", { lines: verdict.providers.join("；") }),
           };
         }
         if (verdict.kind === "lacks") {
           return {
             tone: "error",
-            text: `已写入配置文件，但这条链现在装配不了：${verdict.missing.join("；")}。在「模型」页把缺的那一位打开并保存，再回来存这条链，重启生效。`,
+            text: t("voice.receiptLacks", { lines: verdict.missing.join("；") }),
           };
         }
         if (verdict.kind === "unknown") {
           return {
             tone: "warn",
-            text: "已保存，重启后生效；这条链现在能不能装配判不了（快照还没读到能力位或启用位）。",
+            text: t("voice.receiptUnknown"),
           };
         }
-        return { tone: "ok", text: "已接入：保存后重启生效" };
+        return { tone: "ok", text: t("voice.receiptOk") };
       }),
     ).then((feedback) => setFeedback(feedback));
   }
@@ -574,7 +575,7 @@ function ChainEditor({
         <div className="flex flex-wrap items-center gap-2">
           <StateTag text={savedTag.text} tone={savedTag.tone} />
           {refusalLines.length > 0 ? (
-            <span className="text-[11.5px] text-orange">现在装配不了：{refusalLines.join("；")}</span>
+            <span className="text-[11.5px] text-orange">{t("voice.cannotAssemble", { lines: refusalLines.join("；") })}</span>
           ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -608,7 +609,7 @@ function ChainEditor({
                 if (from !== null) moveTo(from, index);
               }}
             >
-              <span className="w-8 shrink-0 cursor-grab font-mono text-[11px] text-ink-3" title="拖动调整顺序">
+              <span className="w-8 shrink-0 cursor-grab font-mono text-[11px] text-ink-3" title={t("voice.dragTitle")}>
                 {index + 1}
               </span>
               <PairFields
@@ -621,7 +622,7 @@ function ChainEditor({
                 providers={providers}
               />
               <Button
-                aria-label={`第 ${index + 1} 段上移`}
+                aria-label={t("voice.moveUpAria", { n: index + 1 })}
                 disabled={index === 0 || busy !== null}
                 onClick={() => moveTo(index, index - 1)}
                 size="xs"
@@ -630,7 +631,7 @@ function ChainEditor({
                 <ChevronUp aria-hidden="true" size={12} strokeWidth={2} />
               </Button>
               <Button
-                aria-label={`第 ${index + 1} 段下移`}
+                aria-label={t("voice.moveDownAria", { n: index + 1 })}
                 disabled={index === segments.length - 1 || busy !== null}
                 onClick={() => moveTo(index, index + 1)}
                 size="xs"
@@ -639,7 +640,7 @@ function ChainEditor({
                 <ChevronDown aria-hidden="true" size={12} strokeWidth={2} />
               </Button>
               <Button
-                aria-label={`移除第 ${index + 1} 段`}
+                aria-label={t("voice.removeAria", { n: index + 1 })}
                 onClick={() => setSegments((all) => all.filter((_, i) => i !== index))}
                 size="xs"
                 variant="quiet"
@@ -656,13 +657,13 @@ function ChainEditor({
             variant="secondary"
           >
             <Plus aria-hidden="true" size={12} strokeWidth={2} />
-            添加一段
+            {t("voice.addSegment")}
           </Button>
           <Button disabled={busy !== null} onClick={save} size="sm" variant="primary">
             {busy === field ? COPY.saving : COPY.save}
           </Button>
         </div>
-        <p className="text-[11.5px] text-ink-3">当前：{chainText(initial)}</p>
+        <p className="text-[11.5px] text-ink-3">{t("common.current", { v: chainText(initial) })}</p>
         <FeedbackLine feedback={feedback} />
       </div>
     </SettingsCard>
@@ -720,7 +721,7 @@ function LocalAudioCard({
   const aecBuildable = (view.voice.aecBuildAvailable ?? null) !== false;
   const deviceShown =
     view.voice.inputDevice === "" || view.voice.inputDevice === "default"
-      ? "default（跟随系统默认）"
+      ? t("voice.deviceDefault")
       : (view.voice.inputDevice ?? "");
 
   function saveAec() {
@@ -732,7 +733,7 @@ function LocalAudioCard({
   function saveDevice() {
     const v = deviceDraft.trim();
     if (v === "") {
-      setDeviceFeedback({ tone: "error", text: "输入设备名不能为空；跟随系统默认请填 default" });
+      setDeviceFeedback({ tone: "error", text: t("voice.deviceRequired") });
       return;
     }
     void run("audio_input_device", () =>
@@ -742,23 +743,23 @@ function LocalAudioCard({
 
   return (
     <SettingsCard
-      title="本机音频"
-      description="三项显示配置里的真当前值；回声消除与输入设备可改可存（保存后重启生效），采样率是采集链的加载期守卫（只跑 16000），只显示不提供修改。"
+      title={t("voice.localTitle")}
+      description={t("voice.localDesc")}
     >
       <div className="flex flex-col gap-2.5">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-[12px] font-medium text-ink">回声消除</span>
+          <span className="text-[12px] font-medium text-ink">{t("voice.aec")}</span>
           <span className="font-mono text-[10.5px] text-ink-3">voice.aec.enabled</span>
           <span className="min-w-0 flex-1" />
           {aecKnown ? (
             <>
               <span className="text-[11.5px] text-ink-2">
-                当前：{view.voice.aecEnabled ? "开" : "关"}
+                {t("common.current", { v: view.voice.aecEnabled ? t("voice.on") : t("voice.off") })}
               </span>
               {aecBuildable ? (
-                <Switch checked={aecDraft} label="回声消除开关" onChange={setAecDraft} />
+                <Switch checked={aecDraft} label={t("voice.aecSwitch")} onChange={setAecDraft} />
               ) : (
-                <StateTag text="本包无 AEC" tone="warn" />
+                <StateTag text={t("voice.noAecBuild")} tone="warn" />
               )}
               <Button
                 disabled={busy !== null || !aecBuildable}
@@ -770,70 +771,70 @@ function LocalAudioCard({
               </Button>
             </>
           ) : (
-            <StateTag text="等快照" tone="neutral" />
+            <StateTag text={t("common.waitSnapshot")} tone="neutral" />
           )}
         </div>
         {!aecKnown ? (
           <p className="text-[11.5px] leading-[1.6] text-ink-2">
-            后端已接：喂给打断监测的回声消除开关（重启后生效）。
+            {t("voice.aecWaitingNote")}
           </p>
         ) : aecBuildable ? (
           <p className="text-[11.5px] leading-[1.6] text-ink-3">
-            喂给打断监测的回声消除开关；写入走 config.set 的受保护写路径，重启后生效。
+            {t("voice.aecNote")}
           </p>
         ) : (
           <p className="text-[11.5px] leading-[1.6] text-orange">
-            这枚二进制没有编译回声消除（缺 webrtcap 构建标签），开关只能保存配置意图，当前不会生效。
+            {t("voice.aecUnavailableNote")}
           </p>
         )}
         <FeedbackLine feedback={aecFeedback} />
 
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-[12px] font-medium text-ink">输入设备</span>
+          <span className="text-[12px] font-medium text-ink">{t("voice.device")}</span>
           <span className="font-mono text-[10.5px] text-ink-3">audio.input_device</span>
           <span className="min-w-0 flex-1" />
           {deviceKnown ? (
-            <span className="text-[11.5px] text-ink-2">当前：{deviceShown}</span>
+            <span className="text-[11.5px] text-ink-2">{t("common.current", { v: deviceShown })}</span>
           ) : (
-            <StateTag text="等快照" tone="neutral" />
+            <StateTag text={t("common.waitSnapshot")} tone="neutral" />
           )}
         </div>
         {deviceKnown ? (
           <div className="flex flex-wrap items-center gap-2">
             <input
-              aria-label="输入设备名"
+              aria-label={t("voice.deviceNameAria")}
               className="h-[30px] w-[240px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
               onChange={(e) => setDeviceDraft(e.currentTarget.value)}
-              placeholder="设备名（default = 跟随系统默认）"
+              placeholder={t("voice.devicePlaceholder")}
               value={deviceDraft}
             />
             <Button disabled={busy !== null} onClick={saveDevice} size="sm" variant="primary">
               {busy === "audio_input_device" ? COPY.saving : COPY.save}
             </Button>
             <span className="min-w-0 flex-1 basis-40 text-[11px] leading-[1.6] text-ink-3">
-              每次开麦与热插拔重开都按这个名字解析设备；解析不到会在开麦时按名拒绝并列出在场端点。
+              {t("voice.deviceNote")}
             </span>
           </div>
         ) : (
           <p className="text-[11.5px] leading-[1.6] text-ink-2">
-            后端已接：每次开麦与热插拔重开都按这个名字解析设备。
+            {t("voice.deviceWaitingNote")}
           </p>
         )}
         <FeedbackLine feedback={deviceFeedback} />
 
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-[12px] font-medium text-ink">采样率</span>
+          <span className="text-[12px] font-medium text-ink">{t("voice.rate")}</span>
           <span className="font-mono text-[10.5px] text-ink-3">audio.sample_rate</span>
           <span className="min-w-0 flex-1" />
           {rateKnown ? (
-            <span className="text-[11.5px] text-ink-2">当前：{view.voice.sampleRate} Hz</span>
+            <span className="text-[11.5px] text-ink-2">{t("voice.rateCurrent", { rate: view.voice.sampleRate ?? "" })}</span>
           ) : (
-            <StateTag text="等快照" tone="neutral" />
+            <StateTag text={t("common.waitSnapshot")} tone="neutral" />
           )}
-          <StateTag text="守卫·只读" tone="neutral" />
+          <StateTag text={t("voice.rateGuard")} tone="neutral" />
         </div>
         <p className="text-[11.5px] leading-[1.6] text-ink-3">
-          后端守卫：采集链只跑 16000，配置里写别的值会被加载闸按名拒绝；本页不提供修改，也不写坏值。
+          {t("voice.rateNote")}
         </p>
       </div>
     </SettingsCard>
@@ -869,7 +870,7 @@ function RealtimeCard({
   const current =
     view.voice.realtimeProvider !== "" || view.voice.realtimeModel !== ""
       ? `${view.voice.realtimeProvider} / ${view.voice.realtimeModel}`
-      : "未设置";
+      : t("common.unset");
 
   function save() {
     if (provider === "" || model === "") {
@@ -885,9 +886,9 @@ function RealtimeCard({
   }
 
   return (
-    <SettingsCard title="实时语音" description="占位卡：实时通话引擎尚未实现，这里配置的供应商与模型暂时没有通话链使用；写入会保存，接入前不生效。">
+    <SettingsCard title={t("voice.realtimeTitle")} description={t("voice.realtimeDesc")}>
       <div className="flex flex-col gap-2">
-        <StateTag text="占位·当前不生效" tone="warn" />
+        <StateTag text={t("voice.placeholderTag")} tone="warn" />
         <div className="flex flex-wrap items-center gap-2">
           <PairFields
             manualFallback
@@ -907,7 +908,7 @@ function RealtimeCard({
             {busy === "realtime" ? COPY.saving : COPY.save}
           </Button>
         </div>
-        <p className="text-[11.5px] text-ink-3">当前：{current}</p>
+        <p className="text-[11.5px] text-ink-3">{t("common.current", { v: current })}</p>
         <FeedbackLine feedback={feedback} />
       </div>
     </SettingsCard>

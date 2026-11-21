@@ -79,6 +79,12 @@ import { applyPanelFontSize } from "@/lib/panel-font";
 import { applyPanelAnimationTier } from "@/lib/motion";
 import { panelWorkAllowed, syncPanelAnimationWorkToMotionTier } from "@/lib/panel-visibility";
 import type { ComposerState, GitView, PanelSnapshot, RunSection, TaskRosterSection } from "@/lib/panel";
+import { t } from "@/lib/locale";
+
+/** The palette dialog's label, computed once: the dialog's aria-label and the
+    Tab-trap querySelector must spell the SAME string, so both read this one
+    constant (App's own one-source rule). */
+const PALETTE_LABEL = t("app.palette");
 
 const EMPTY_COMPOSER: ComposerState = {
   mode: { current: "unknown", names: [], l2ConfirmNames: [] },
@@ -88,7 +94,7 @@ const EMPTY_COMPOSER: ComposerState = {
     canonical: "",
     reparse: false,
     rewritten: false,
-    reason: "尚未收到原生侧的状态快照",
+    reason: t("app.workspaceNoSnapshot"),
   },
   attachments: [],
   acceptedAttachmentMimes: [],
@@ -248,7 +254,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
     view: null,
     railOpen: false,
     settingsOpen: false,
-    settingsSection: "通用",
+    settingsSection: t("app.sectionGeneral"),
     dark: false,
     monitorOpen: false,
     paletteOpen: false,
@@ -274,10 +280,10 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   // category, which is where it belongs. Sending it to the conversation column
   // would put a setting request in a chat window.
   const CATEGORY_VIEW: Partial<Record<PanelViewId, string>> = {
-    config: "外观",
-    security: "安全",
-    privacy: "隐私",
-    cost: "成本",
+    config: t("app.catAppearance"),
+    security: t("app.catSecurity"),
+    privacy: t("app.catPrivacy"),
+    cost: t("app.catCost"),
   };
   const categoryOf = CATEGORY_VIEW[view];
   const narrow = useNarrow();
@@ -339,7 +345,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
         return;
       }
       if (event.key === "Tab" && local.paletteOpen) {
-        const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-label="命令面板"]');
+        const dialog = document.querySelector<HTMLElement>(`[role="dialog"][aria-label="${PALETTE_LABEL}"]`);
         if (dialog) {
           const focusables = Array.from(
             dialog.querySelectorAll<HTMLElement>("input, button:not([disabled])"),
@@ -462,20 +468,20 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   const paletteGroups: PaletteGroup[] = [];
   if (paletteQueryTrim !== "") {
     paletteGroups.push({
-      name: "发送任务",
+      name: t("app.groupSend"),
       items: [
-        { label: `以任务发送：${paletteQueryTrim}`, icon: "terminal", hint: "Enter", action: "send" },
+        { label: t("app.sendAsTask", { q: paletteQueryTrim }), icon: "terminal", hint: "Enter", action: "send" },
       ],
     });
   }
   paletteGroups.push({
-    name: "面板",
+    name: t("app.groupPanel"),
     items: [
-      { label: "打开设置", icon: "settings", action: "settings" },
-      { label: local.dark ? "切到浅色主题" : "切到深色主题", icon: local.dark ? "sun" : "moon", action: "theme" },
-      { label: "任务监控", icon: "activity", action: "monitor" },
-      { label: "新建会话", icon: "message-square-plus", action: "new-task" },
-      { label: local.railOpen ? "收起右侧栏" : "展开右侧栏", icon: "panel-right", action: "rail" },
+      { label: t("app.openSettings"), icon: "settings", action: "settings" },
+      { label: local.dark ? t("app.toLight") : t("app.toDark"), icon: local.dark ? "sun" : "moon", action: "theme" },
+      { label: t("app.monitor"), icon: "activity", action: "monitor" },
+      { label: t("app.newSession"), icon: "message-square-plus", action: "new-task" },
+      { label: local.railOpen ? t("app.railCollapse") : t("app.railExpand"), icon: "panel-right", action: "rail" },
     ],
   });
 
@@ -490,44 +496,39 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   const paletteNotes: PaletteNote[] = [];
   if (commands === undefined) {
     paletteNotes.push({
-      word: "命令名册 未接线",
-      reason:
-        "快照没有 commands 键：面板装配没接名册读取器（PumpSources.Commands，internal/panel/pump.go:221）",
+      word: t("app.rosterUnwired"),
+      reason: t("app.rosterUnwiredReason"),
     });
   } else if ((commands.reason ?? "") !== "") {
-    paletteNotes.push({ word: "命令名册 装配拒绝", reason: commands.reason ?? "" });
+    paletteNotes.push({ word: t("app.rosterRefused"), reason: commands.reason ?? "" });
   }
   paletteNotes.push(
     {
-      word: "命令执行 未接线",
-      reason:
-        "名册只承载不执行（internal/panel/commands_roster_213.go:21-26），C17 名册（internal/panel/bridge.go:41-107）没有执行通路，名册行不可点",
+      word: t("app.execUnwired"),
+      reason: t("app.execUnwiredReason"),
     },
     {
       // Readface wave 2 (2026-11-17): roster.cancel landed on the C17 roster,
       // so this is no longer dormant - the stop button lives on the task
       // monitor's rows (monitor-popover.tsx), behind its own confirm card.
-      word: "取消任务 已接线",
-      reason:
-        "走 roster.cancel（internal/panel/bridge.go 的取消门，票 38 AC#4）：任务监控浮层的每一行有停止键，先确认再取消；回执逐字上屏，已落地步骤读数走 history.page 的取证行。",
+      word: t("app.cancelWired"),
+      reason: t("app.cancelWiredReason"),
     },
     {
       // Readface wave 3 (2026-11-17): the force doors landed on the C17
       // roster (internal/panel/bridge.go's MethodRulesForce, ticket 38
       // AC#5's Go half), so this is no longer dormant - the read face
       // reports the effective rules and the chip rides the send envelope.
-      word: "模式强制 已接线",
-      reason:
-        "走 rules.force（internal/panel/bridge.go 的 force 规则门，票 38 AC#5）：本面板只读显示生效规则＋来源（override/toml/default）＋下一 prompt 采用 mode；per-task 覆盖搭 panel.message.send 的 forceMode 顺封套，由 Go 侧 admitTask 消费——本页不预判档位、不置 allow。",
+      word: t("app.forceWired"),
+      reason: t("app.forceWiredReason"),
     },
     {
       // Readface wave 3 (2026-11-17): the discovery face landed too - the
       // palette's 工具名册 section reads tools.list and its launch keys go
       // through tool.launch, the real gate. The Tier-2 plugin inventory
       // keeps its own composer plus-menu face (snapshot.plugins).
-      word: "第三方工具清单",
-      reason:
-        "内置工具走本面板的工具名册（tools.list 只读名册＋tool.launch 真门，票 38 AC#3）；Tier-2 插件清单走 composer 加号菜单（snapshot.plugins，internal/panel/plugins_inventory_215.go 的读取面，composer-row.tsx 已接）",
+      word: t("app.thirdPartyTools"),
+      reason: t("app.thirdPartyReason"),
     },
   );
 
@@ -552,7 +553,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
           }
         } catch (err) {
           const detail = err instanceof Error ? err.message : String(err);
-          setLocal((c) => ({ ...c, paletteError: `消息没有发出去：${detail}` }));
+          setLocal((c) => ({ ...c, paletteError: t("app.sendFailed", { detail }) }));
           return;
         }
         // The chip is per task: it applied to THIS send (the Go side's
@@ -590,7 +591,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
   // button, no verdict is predicted, and no allow vocabulary rides along.
   function launchTool(row: PaletteToolRow) {
     requestToolLaunch(row.name).then((reply) => {
-      setLocal((c) => ({ ...c, paletteLaunchNote: reply ?? "没接到宿主：tool.launch 没有送达，工具未被触碰" }));
+      setLocal((c) => ({ ...c, paletteLaunchNote: reply ?? t("app.launchNoHost") }));
     });
   }
 
@@ -604,7 +605,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
           {narrow ? (
             <button
               type="button"
-              aria-label={sidebarOpen ? "收起会话树" : "展开会话树"}
+              aria-label={sidebarOpen ? t("app.treeCollapse") : t("app.treeExpand")}
               aria-expanded={sidebarOpen}
               onClick={() => setSidebarOpen((v) => !v)}
               className="flex size-7 shrink-0 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
@@ -613,13 +614,13 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
             </button>
           ) : null}
           <span aria-hidden="true" className="size-2.5 rounded-full bg-accent" />
-          <span className="shrink-0 text-[13px] font-medium text-ink">一缕</span>
+          <span className="shrink-0 text-[13px] font-medium text-ink">{t("app.brand")}</span>
           {/* 审批 is a COUNT here, not a place. It lights only when something
               is actually waiting, which is the whole point of moving it out
               of the sidebar. */}
           {snapshot.pending.length > 0 ? (
             <span className="shrink-0 rounded-full bg-warn-soft px-2 py-0.5 text-[10.5px] font-medium tabular-nums text-warn">
-              待审批 {snapshot.pending.length}
+              {t("app.pendingCount", { n: snapshot.pending.length })}
             </span>
           ) : null}
         </div>
@@ -648,7 +649,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
             <button
               type="button"
               aria-expanded={local.monitorOpen}
-              aria-label="任务监控"
+              aria-label={t("app.monitor")}
               onClick={() => setLocal((c) => ({ ...c, monitorOpen: !c.monitorOpen }))}
               className={`flex h-7 size-7 shrink-0 items-center justify-center rounded-control transition-colors duration-150 ${
                 local.monitorOpen ? "bg-hover text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"
@@ -661,8 +662,8 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                 <MonitorPopover
                   open
                   env={[
-                    { label: "工作区", value: composer.workspace.set ? composer.workspace.canonical : "尚未收到" },
-                    { label: "分支", value: "尚未读到" },
+                    { label: t("app.envWorkspace"), value: composer.workspace.set ? composer.workspace.canonical : t("app.envNotReceived") },
+                    { label: t("app.envBranch"), value: t("app.envBranchUnread") },
                   ]}
                   agents={monitorAgents(snapshot.tasks)}
                   rosterPresent={snapshot.tasks !== undefined}
@@ -690,11 +691,11 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               button opens the paged list the face does answer. */}
           <button
             type="button"
-            aria-label="历史记录"
+            aria-label={t("app.history")}
             aria-expanded={local.historyOpen}
             className="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
             onClick={() => setLocal((c) => ({ ...c, historyOpen: !c.historyOpen }))}
-            title="历史记录"
+            title={t("app.history")}
           >
             <ScrollText aria-hidden="true" size={14} strokeWidth={1.9} />
           </button>
@@ -702,7 +703,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
           <kbd className="kbd hidden sm:flex">Ctrl K</kbd>
           <button
             type="button"
-            aria-label="命令面板"
+            aria-label={PALETTE_LABEL}
             className="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
             onClick={() => {
               // The button is the second open path; whoever used it gets
@@ -720,25 +721,25 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                 paletteLaunchNote: "",
               }));
             }}
-            title="命令面板"
+            title={PALETTE_LABEL}
           >
             <Command aria-hidden="true" size={14} strokeWidth={1.9} />
           </button>
           <button
             type="button"
-            aria-label={local.railOpen ? "收起右侧栏" : "展开右侧栏"}
+            aria-label={local.railOpen ? t("app.railCollapse") : t("app.railExpand")}
             className="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
             onClick={() => setLocal((c) => ({ ...c, railOpen: !c.railOpen }))}
-            title={local.railOpen ? "收起右侧栏" : "展开右侧栏"}
+            title={local.railOpen ? t("app.railCollapse") : t("app.railExpand")}
           >
             {local.railOpen ? <PanelRightClose aria-hidden="true" size={15} /> : <PanelRight aria-hidden="true" size={15} />}
           </button>
           <button
             type="button"
-            aria-label="切换主题"
+            aria-label={t("app.toggleTheme")}
             className="flex size-7 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
             onClick={toggleTheme}
-            title="切换主题"
+            title={t("app.toggleTheme")}
           >
             {local.dark ? <Sun aria-hidden="true" size={15} /> : <Moon aria-hidden="true" size={15} />}
           </button>
@@ -771,8 +772,8 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               onToggleTheme={toggleTheme}
               settingsOpen={local.settingsOpen}
               theme={local.dark ? "dark" : "light"}
-              workspaceName="一缕"
-              workspacePath={composer.workspace.set ? composer.workspace.canonical : "尚未收到工作区"}
+              workspaceName={t("app.brand")}
+              workspacePath={composer.workspace.set ? composer.workspace.canonical : t("app.workspaceNotReceived")}
               /* Same engine gap as historyGroups: no session-list reader
                  exists on the snapshot (ticket 166 owns the feed per
                  panel-sidebar.tsx's own prop doc). */
@@ -847,7 +848,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
 
       {local.paletteOpen ? (
         <div
-          aria-label="命令面板"
+          aria-label={PALETTE_LABEL}
           aria-modal="true"
           className="fixed inset-0 z-40 flex items-start justify-center bg-black/35 pt-[12vh]"
           onClick={(e) => {
@@ -893,7 +894,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
           backdrop and the dismiss paths (backdrop click, Escape). */}
       {local.historyOpen ? (
         <div
-          aria-label="历史记录"
+          aria-label={t("app.history")}
           aria-modal="true"
           className="fixed inset-0 z-40 flex items-start justify-center bg-black/35 pt-[10vh]"
           onClick={(e) => {
@@ -984,7 +985,7 @@ function Conversation({
   // two marks to be worth drawing, and TurnRail hides itself below that.
   const turns = snapshot.results.map((chunk) => ({
     id: chunk.correlationId,
-    label: chunk.text.slice(0, 18) || "（空）",
+    label: chunk.text.slice(0, 18) || t("app.turnEmpty"),
   }));
 
   return (
@@ -1058,28 +1059,28 @@ function Conversation({
    that explains itself, instead of on a blank screen. */
 function RetiredView({ id }: { id: PanelViewId }) {
   const copy: Record<string, string> = {
-    approval: "审批不是一屏，是一个卡片：真有高危请求时它会自己出现在面板顶部，右上角的计数告诉你有几个在等你。",
-    tasks: "任务不是一个地方，是一个浮层：点顶栏的「任务监控」看正在跑的活。",
-    ball: "悬浮球是原生画的（D29），不在面板里。球的设置在设置页。",
+    approval: t("app.retiredApproval"),
+    tasks: t("app.retiredTasks"),
+    ball: t("app.retiredBall"),
   };
   return (
     <div className="flex min-h-0 flex-1 items-start justify-center px-6 py-10">
       <div className="w-full max-w-[520px]" style={{ animation: "fade-up 320ms var(--ease-out-strong) both" }}>
-        <p className="text-[13px] leading-[1.8] text-ink-2">{copy[id] ?? "这一屏已经不存在了。"}</p>
+        <p className="text-[13px] leading-[1.8] text-ink-2">{copy[id] ?? t("app.retiredUnknown")}</p>
       </div>
     </div>
   );
 }
 
-const ARRIVES = ["流式回复", "工具调用", "思考过程"] as const;
+const ARRIVES = [t("app.arriveStream"), t("app.arriveTool"), t("app.arriveThinking")] as const;
 
 function ConversationPlaceholder() {
   return (
     <div className="flex flex-1 items-start justify-center pt-[13vh]">
       <div className="w-full max-w-[440px] text-center" style={{ animation: "fade-up 320ms var(--ease-out-strong) both" }}>
-        <p className="text-[15px] font-medium text-ink">一缕在这儿</p>
+        <p className="text-[15px] font-medium text-ink">{t("app.hereTitle")}</p>
         <p className="mx-auto mt-1.5 max-w-[360px] text-[12.5px] leading-[1.7] text-ink-3">
-          面板不自己造内容。在下面说一句话，或者从悬浮球开口，原生侧会把结果一条条推上来。
+          {t("app.hereBody")}
         </p>
         <div className="mt-4 flex items-center justify-center gap-1.5">
           {ARRIVES.map((label) => (
@@ -1088,7 +1089,7 @@ function ConversationPlaceholder() {
             </span>
           ))}
         </div>
-        <p className="mt-3.5 text-[10.5px] text-ink-3">还没收到任何一条</p>
+        <p className="mt-3.5 text-[10.5px] text-ink-3">{t("app.nothingYet")}</p>
       </div>
     </div>
   );

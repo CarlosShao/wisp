@@ -11,6 +11,8 @@
     "lint": "oxlint",
     "seeds": "node scripts/lint-seeds.mjs",
     "seeds:self-test": "node scripts/lint-seeds.mjs --self-test",
+    "cjk": "node scripts/lint-cjk.mjs",
+    "cjk:self-test": "node scripts/lint-cjk.mjs --self-test",
     "tokens": "node scripts/gen-tokens.mjs",
     "tokens:check": "node scripts/gen-tokens.mjs --check",
     "render:l2": "vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js",

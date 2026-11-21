@@ -25,6 +25,8 @@
 
 import type { ConfigView } from "@/lib/config-view";
 import { CONFIG_RELOAD_MARKER } from "@/lib/config-view";
+import { t } from "@/lib/locale";
+import { GO_KEY_STORED, GO_NEXT_TASK, GO_NO_CHANGE, GO_REFUSED, GO_RESTART, GO_WRITTEN, REFUSAL_RULES } from "@/lib/config-protocol";
 
 /** How a line reads: gray = plain information, green = good, orange =
     attention, red = did not work. */
@@ -48,11 +50,11 @@ export interface ConfigStatus {
     the config: nothing has been set AND nothing has been answered must not
     look alike. */
 export function configStatus(view: ConfigView): ConfigStatus {
-  if (!view.readable) return { label: "未读取", tone: "neutral" };
-  if (!view.configuredKnown) return { label: "未读取", tone: "neutral" };
+  if (!view.readable) return { label: t("status.unread"), tone: "neutral" };
+  if (!view.configuredKnown) return { label: t("status.unread"), tone: "neutral" };
   return view.configured
-    ? { label: "已配置", tone: "ok" }
-    : { label: "未配置", tone: "warn" };
+    ? { label: t("status.configured"), tone: "ok" }
+    : { label: t("status.unconfigured"), tone: "warn" };
 }
 
 /** The five credential states as words. `unknown` is "nobody answered", which
@@ -60,17 +62,17 @@ export function configStatus(view: ConfigView): ConfigStatus {
 export function credentialLabel(state: string): string {
   switch (state) {
     case "unknown":
-      return "暂未读取";
+      return t("credential.unknown");
     case "config_unreadable":
-      return "读取不到配置";
+      return t("credential.unreadable");
     case "no_ref_declared":
-      return "未声明密钥";
+      return t("credential.noRef");
     case "all_recorded":
-      return "密钥已全部就绪";
+      return t("credential.allReady");
     case "partly_missing":
-      return "部分密钥缺失";
+      return t("credential.someMissing");
     default:
-      return "暂未读取";
+      return t("credential.unknown");
   }
 }
 
@@ -79,10 +81,10 @@ export function keyLabel(row: { credentialSet: boolean; credentialError: string 
   label: string;
   tone: Tone;
 } {
-  if (row.credentialError !== "") return { label: "密钥未读取", tone: "neutral" };
+  if (row.credentialError !== "") return { label: t("key.unread"), tone: "neutral" };
   return row.credentialSet
-    ? { label: "密钥已保存", tone: "ok" }
-    : { label: "密钥未保存", tone: "warn" };
+    ? { label: t("key.saved"), tone: "ok" }
+    : { label: t("key.unsaved"), tone: "warn" };
 }
 
 /* ---------------------------------------------------------------------------
@@ -94,43 +96,14 @@ export function keyLabel(row: { credentialSet: boolean; credentialError: string 
     a word (a model row's "already exists" must not be read as a provider's;
     the drift refusal's 盘上已变 is matched before anything generic could eat
     it). */
-const REFUSALS: readonly { match: string; text: string }[] = [
-  // Ticket 39 AC#4's drift refusal (cmd/wisp's refused-drift) first: it is
-  // the one refusal that says the DISK moved, and the person must re-read
-  // before saving again - a generic 保存失败 would hide exactly that.
-  { match: "盘上已变", text: "配置文件刚被外部修改过，这次保存没有执行。请重新打开本页读取最新配置后再保存。" },
-  { match: "无法核对盘上是否已变", text: "配置文件现在读不出来，这次保存没有执行。" },
-  { match: "没有对应的写入腿", text: "这项暂不支持在界面上保存" },
-  { match: "不是面板 composer 通路的能力入口", text: "暂不支持拉取模型列表" },
-  { match: "建目录条目必须点名模型 id", text: "请先填入模型 id" },
-  { match: "这一步是「建条目」", text: "这个模型已经在目录里了" },
-  // The two provider-name refusals both quote the word `protocol` further
-  // along, so they are matched before the protocol line itself.
-  { match: "预设行请走", text: "这是内置供应商名，请用「内置供应商」入口添加" },
-  { match: "不是内置预设名", text: "只能添加内置供应商" },
-  { match: "billing", text: "计费模式只支持「套餐」或「按量」" },
-  { match: "protocol", text: "协议只支持 openai-chat / openai-responses / anthropic" },
-  { match: "两半", text: "自定义接入需要协议和基址两项" },
-  { match: "already exists", text: "这家供应商已经存在（不会覆盖）" },
-  { match: "必须一起点名", text: "供应商与模型要一起选好再保存" },
-  { match: "空值不会被写成默认", text: "这项不能留空" },
-  { match: "has no model", text: "这家供应商名下没有这个模型" },
-  { match: "没有 model", text: "这家供应商名下没有这个模型" },
-  { match: "凭据存储或配置对象未接入", text: "暂不支持在本机保存密钥" },
-  { match: "凭据字段是空的", text: "请先填入密钥" },
-  { match: "引用形状不合法", text: "密钥格式不对" },
-  { match: "密钥没有写进凭据存储", text: "密钥没有保存成功" },
-  { match: "密钥已进凭据存储", text: "密钥已保存，但供应商没有更新成功" },
-];
-
 /** The refusal half both write translators share: a matched sealed sentence
     becomes its human line; anything else is the generic "保存失败", never a
     guess dressed up as a diagnosis. */
 function refusalFeedback(reply: string): Feedback {
-  for (const rule of REFUSALS) {
-    if (reply.includes(rule.match)) return { tone: "error", text: rule.text };
+  for (const rule of REFUSAL_RULES) {
+    if (reply.includes(rule.match)) return { tone: "error", text: t(rule.key) };
   }
-  return { tone: "error", text: "保存失败" };
+  return { tone: "error", text: t("save.failed") };
 }
 
 /** Translate one write reply into the single sentence shown to the user.
@@ -138,25 +111,25 @@ function refusalFeedback(reply: string): Feedback {
     carries the value, ticket 39 AC#4) is its own answer - "没有变化", not a
     green 已保存 that reads as if something was written. */
 export function translateWriteReply(reply: string | null): Feedback {
-  if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
-  if (reply.includes("被拒绝")) {
+  if (reply === null) return { tone: "error", text: t("save.noHost") };
+  if (reply.includes(GO_REFUSED)) {
     return refusalFeedback(reply);
   }
-  if (reply.includes("本次没有任何键路径发生变化")) {
-    return { tone: "neutral", text: "没有变化：文件里已经是这个值。" };
+  if (reply.includes(GO_NO_CHANGE)) {
+    return { tone: "neutral", text: t("save.noChange") };
   }
-  if (reply.includes("密钥已录入")) {
-    return { tone: "ok", text: restartTier(reply) ? "密钥已保存，需要重启后生效" : "密钥已保存" };
+  if (reply.includes(GO_KEY_STORED)) {
+    return { tone: "ok", text: restartTier(reply) ? t("save.keySavedRestart") : t("key.saved") };
   }
-  if (reply.includes("已写入")) {
+  if (reply.includes(GO_WRITTEN)) {
     // Ticket 39 AC#1: the restart-required line on screen carries 需要重启
     // verbatim - the same word the Go receipt's restart sentence is pinned by
     // (tierSentence), so the page and the receipt say one thing word for word.
-    return { tone: "ok", text: restartTier(reply) ? "已保存，需要重启后生效" : "已保存" };
+    return { tone: "ok", text: restartTier(reply) ? t("save.savedRestart") : t("save.saved") };
   }
   // Anything that is neither a known receipt nor a refusal: say so plainly
   // rather than claim a save.
-  return { tone: "error", text: "保存失败" };
+  return { tone: "error", text: t("save.failed") };
 }
 
 /** The composer row's model/thinking switches (ticket 187) translate through
@@ -169,25 +142,25 @@ export function translateWriteReply(reply: string | null): Feedback {
     So the receipt's own tier wording is kept. Refusals match exactly like
     translateWriteReply. */
 export function translateTieredWriteReply(reply: string | null): Feedback {
-  if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
-  if (reply.includes("被拒绝")) {
+  if (reply === null) return { tone: "error", text: t("save.noHost") };
+  if (reply.includes(GO_REFUSED)) {
     return refusalFeedback(reply);
   }
-  if (reply.includes("本次没有任何键路径发生变化")) {
-    return { tone: "neutral", text: "没有变化：文件里已经是这个值。" };
+  if (reply.includes(GO_NO_CHANGE)) {
+    return { tone: "neutral", text: t("save.noChange") };
   }
-  if (reply.includes("已写入")) {
-    if (reply.includes("下一次任务")) return { tone: "ok", text: "已保存，下一次任务开始时生效" };
-    if (reply.includes("重启")) return { tone: "ok", text: "已保存，重启进程后生效" };
-    return { tone: "ok", text: "已保存" };
+  if (reply.includes(GO_WRITTEN)) {
+    if (reply.includes(GO_NEXT_TASK)) return { tone: "ok", text: t("save.savedNextTask") };
+    if (reply.includes(GO_RESTART)) return { tone: "ok", text: t("save.savedRestartProcess") };
+    return { tone: "ok", text: t("save.saved") };
   }
-  return { tone: "error", text: "保存失败" };
+  return { tone: "error", text: t("save.failed") };
 }
 
 /** All settings writes are restart-tier today; the receipt carries the tier
     sentence and this reads it rather than assuming. */
 function restartTier(reply: string): boolean {
-  return reply.includes("重启");
+  return reply.includes(GO_RESTART);
 }
 
 /* ---------------------------------------------------------------------------
@@ -226,10 +199,10 @@ function pluginReceiptProse(reply: string): string {
     summary. tone follows the reply's own verdict word (被拒绝 = error,
     没有任何键路径发生变化 = neutral no-op, otherwise an accepted write). */
 export function translatePluginToggleReply(reply: string | null): Feedback {
-  if (reply === null) return { tone: "error", text: "未连接到本机服务，未保存" };
+  if (reply === null) return { tone: "error", text: t("save.noHost") };
   const prose = pluginReceiptProse(reply);
-  if (reply.includes("被拒绝")) return { tone: "error", text: prose };
-  if (reply.includes("本次没有任何键路径发生变化")) return { tone: "neutral", text: prose };
+  if (reply.includes(GO_REFUSED)) return { tone: "error", text: prose };
+  if (reply.includes(GO_NO_CHANGE)) return { tone: "neutral", text: prose };
   return { tone: "ok", text: prose };
 }
 
@@ -239,30 +212,30 @@ export function translatePluginToggleReply(reply: string | null): Feedback {
     verbatim - the fetch has no receipt to translate, and inventing a summary
     for prose this page never parsed would be a guess. */
 export function translateFetchReply(reply: string | null): Feedback {
-  if (reply === null) return { tone: "error", text: "未连接到本机服务，未拉取" };
-  if (reply.includes("被拒绝")) {
-    for (const rule of REFUSALS) {
-      if (reply.includes(rule.match)) return { tone: "error", text: rule.text };
+  if (reply === null) return { tone: "error", text: t("fetch.noHost") };
+  if (reply.includes(GO_REFUSED)) {
+    for (const rule of REFUSAL_RULES) {
+      if (reply.includes(rule.match)) return { tone: "error", text: t(rule.key) };
     }
   }
   const text = reply.trim();
-  return { tone: "error", text: text === "" ? "拉取失败" : text };
+  return { tone: "error", text: text === "" ? t("fetch.failed") : text };
 }
 
 /** Local validation lines (checked before anything is sent - the pair rule is
     stated at save time, not by disabling the button, which reads as a black
     box to the person looking at it). */
 export const COPY = {
-  pairMissing: "供应商与模型都要选好再保存",
-  chainSegmentMissing: "每一段都要同时选好供应商和模型",
-  chainEmpty: "至少保留一段；链不能为空",
-  chatPairMissing: "供应商与模型都要选好再保存",
-  testKeyUnavailable: "暂不支持密钥测试",
-  deleteUnavailable: "暂不支持删除供应商",
-  editUnavailable: "暂不支持编辑",
-  baseURLSaved: "已保存，重启后生效",
-  noProvidersYet: "还没有供应商。添加一个供应商并填入密钥，就可以选择模型。",
-  addProvider: "添加供应商",
-  save: "保存",
-  saving: "保存中…",
+  pairMissing: t("copy.pairMissing"),
+  chainSegmentMissing: t("copy.chainSegmentMissing"),
+  chainEmpty: t("copy.chainEmpty"),
+  chatPairMissing: t("copy.pairMissing"),
+  testKeyUnavailable: t("copy.testKeyUnavailable"),
+  deleteUnavailable: t("copy.deleteUnavailable"),
+  editUnavailable: t("copy.editUnavailable"),
+  baseURLSaved: t("save.savedRestart"),
+  noProvidersYet: t("copy.noProvidersYet"),
+  addProvider: t("copy.addProvider"),
+  save: t("copy.save"),
+  saving: t("copy.saving"),
 } as const;
