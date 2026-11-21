@@ -1,0 +1,15 @@
+# 派单存档（先存档再发）—— 票 33 AC#10：[panel] width/height/scale 必须有真生产者（写面 internal/panel/** ＋ cmd/wisp/panel_host_windows.go）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"（⛔ deepseek）
+Wisp 仓 D:\work\workspace\projects plans\Wisp 写腿。
+**现状（我现读，引用前自己复核）**：`internal/config/schema.go:584-603` 的 `PanelSection` 有 `width`(default 640)／`height`(0=auto)／`scale`(0=follow DPI)／`font_size`／`enabled`／`keep_alive_in_session`／`animation`。`internal/config/settings_appearance_wave.go` 已有 `SetPanelWidth`＋`PanelWidthOptions`（设置页那条读/写面），`cmd/wisp/panel_resident_pump.go:239`／`run.go:1360` 把它送进 `PanelWidthSection`（**只喂设置页显示，不设窗口边界**）。真正建窗在 `cmd/wisp/panel_control_windows.go:415`（`windowWidth := options.Width`，0 ⇒ 640；height 0 ⇒ 480），而注释逐字写「The shipping host never takes it: windowOptions answers the host's own constants when nobody sized it」⇒ **config 的 width/height/scale 今天不设窗口边界**。
+**任务（票 33 AC#10 的全部要求）**：
+1. **生产者**：`[panel] width`／`height`／`scale` 三个键各要有**生产读取方**，并且**真去设窗口边界/缩放**（`CreateWindowExW` 的尺寸参数与 `SetWindowPos`/DPI 缩放路径），⛔ 只喂设置页显示。
+2. **热档**：规格（`PLAN.md:2743`）要求 `hot` 生效 ⇒ 改键后**同一进程内下一次 show/hide 周期或一次 `SetWindowPos`** 就体现（与票 193 的 `[panel]` 整段 hot 同一档；那套 `registryEffectiveTier39(...)` 已存在，照它的口径来）。
+3. **接缝可断言（⛔ 弹真窗）**：把"窗口尺寸/缩放"落成一个**可注入的接缝**（例如 `windowOptions` 变纯函数：`func panelWindowGeometry(cfg PanelSection) (w,h int, scale float64)`，再加一个 `applyGeometry func(w,h int, scale float64)` 的字段，生产实现调 Win32、测试注入录号器）。要给：
+   - 单测：config 三档（640 默认／写下 720／height 0 ⇒ auto／scale 1.25）→ 纯函数输出逐值断言；
+   - 单测：改键（`SetPanelWidth`/新增 `SetPanelHeight`/`SetPanelScale`）后**同一进程**再算一次 ⇒ 新值（热档牙）；
+   - 单测：注入录号器 ⇒ 断言"生产路径真的调了 applyGeometry(720,…)"（=0 读数的反恒真牙，⛔ 只 grep 字段名）。
+4. **写面**：`internal/panel/**`、`internal/config/settings_appearance_wave.go`（如需新增 height/scale setter，字段名与 `config_write_wave.go` 的 `FieldPanelWidth` 同族）、`cmd/wisp/panel_host_windows.go`＋`panel_control_windows.go`（只动几何参数与接缝，⛔ 动消息循环/生命周期）。
+5. **⛔ 硬约束**：**⛔ 跑任何真窗用例**（`TestPanelHost*`／`TestAC4*`／`*winlive*`／任何 `startPanelForTest`）——机主桌面会被弹窗；只准 `go test ./internal/panel -run '<你新加的用例名>'`、`go test ./internal/config -run '<...>'`，`./cmd/wisp` 若要跑只经 `scripts/wisp-cli-staged-tests.sh -test.run '<新用例名>'`（只选新用例，⛔ 选真窗族）。⛔ 动 thresholds/golden/allowlist/PLAN/specs；⛔ 放宽/删任何现有断言；⛔ push；⛔ emoji；⛔ kill 任何进程。
+6. **自证**：`go build ./...` rc=0；`gofumpt -l` 空（D:\work\base\gopath\bin\gofumpt.exe）；`sh scripts/d22scan.sh` 0 findings；`sh scripts/check-path-length-budget.sh` GREEN；把你新加用例的 `-v` 读数逐枚贴出。
+**回话第一行＝commit hash ＋"三键生产者 file:line 各一枚" ＋"接缝牙三枚 PASS 读数" ＋"⛔ 未跑任何真窗用例" ＋d22scan/路径两行末行。** 没干完写「卡在哪」。

@@ -1,0 +1,10 @@
+# 派单存档（先存档再发）—— 票 62 AC#9：把"零活动定时器实测用例只挂在 winlive 下、CI 默认根本不跑"这件事**具名写死**（只动 docs/SLO.md 与本票 Progress，⛔ 动门形状）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只写文档**，⛔ 任何产码/脚本/门形状（票面逐字："⛔ 动门形状＝另批"）。
+**任务**：
+1. 先现读：`git grep -n "go:build.*winlive" -- 'internal/ball/*_test.go' 'cmd/wisp/*_test.go'` 找出那枚"零活动定时器"实测用例（票面指 `docs/SLO.md` 里"零活动定时器"那条）。给出它的**文件:行 与用例名**（逐字）。
+2. 在 `docs/SLO.md` 里找到那条登记（⛔ 改任何阈值数字，⛔ 改任何已有读数），在该条**同一段**追加一句具名说明：**「该实测用例挂在 `winlive` 构建标签下，CI 默认不跑（`ci.yml` 无 `-tags winlive` 的运行步骤，只有 `go vet -tags winlive` 的编译门）；要在本机跑＝`go test -tags winlive ./internal/ball -run '<用例名>'`」**，并把 `<用例名>` 换成第 1 步现读到的真名。
+3. 在本票 `.scratch/wisp/issues/62-*.md` 的 Progress log **末尾**追加一节：日期 `2026-11-21`、`agent=编排者`、`did=` 一句（写清：按票面允许的第二支＝"在 docs/SLO.md／本票面具名写明"办理，AC#9 的完成判据即此句；⛔ 声称 CI 已跑）、并附第 1 步的 file:line。
+4. 若 `docs/SLO.md` 里**根本没有**"零活动定时器"这条 ⇒ **停手**，回话说明（盘上原句逐字），⛔ 自己另起一条登记。
+**硬约束**：⛔ 动 `docs/PLAN.md`／`docs/specs/**`／thresholds／golden／allowlist／`frontend/**`／`design/**`；⛔ 改任何数字/阈值；⛔ push；⛔ 跑任何测试（只需 grep/读）。
+**回话第一行＝commit hash ＋用例名与 file:line ＋docs/SLO.md 追加句逐字 ＋本票 Progress 节首行。**
