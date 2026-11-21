@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 314 AC#1 续：**"死与经过时间相关"假说**的判决实验（诊断，只读；≤4 发整包/等价，总时长 ≤70 分钟）
+# 路由：provider:"magpie", model:"group/group-review-and-audit"（⛔ reasoning_effort、⛔ fallback model）
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只读诊断**，可写 `docs/evidence/s1/314-*`、`D:\tmp\wisp\20261121\diag314b`。
+**已有事实（勿重推）**：整包 `RC=139` 静默消失，零 WER/panic/timeout；三次死亡**耗时 327s／400s／403s**，死点分别是 `TestAC4PriorFocus…`（两次）与 `TestResyncOnShowDeliversFreshSnapshotFieldByField35g6`（一次）——**死点会变、耗时几乎不变** ⇒ 强假说：**与经过时间/累计资源相关，而非某一枚测试**。已排除：球争用、WebView2 泄漏、onnxruntime 冲突、profile 共享（35g6 用的是 `uniqueProfileLeaf`，本就每发唯一）。
+**唯一任务：判"时间相关"真假。按顺序，最多 4 发：**
+1. **A 臂（正控，时间相关则应在 ~300–450s 死）**：正常整包一发（载具，`-test.v`），记录死亡/完成＋耗时＋死点。若这一发**跑完（不死了）**，本假说立刻降级，直接跳到第 3 步。
+2. **B 臂（时间相关则应在同一条时间线上死，即使换了测试集合）**：用 `-test.run` 只选**真窗那一族**（`TestPanelHost*|TestAC4*|TestResync*|winlive` 等，现查真实名字），使这一臂**总耗时 ≥450s**（若不够长，重复跑该族 2–3 轮以超过 450s）。⇒ 若它在 ~400s 附近死（且死点与该族无关），**时间相关成立**。
+3. **C 臂（若 A 跑完、B 也跑完）**：改判为"偶发/环境"——给 3 个读数（A、B、之前 3 发）说明分布，不要硬造结论。
+4. **D 臂（若时间相关成立，找时间闸的落点）**：在**不改正码**的前提下只做读码：`grep -rn "time.After\|Ticker\|watchdog\|300 \* time.Second\|400 \* time.Second" --include=*.go cmd internal | head -40`，看有没有"进程级 300–450s 定时器/超时"能杀掉整个进程；有则点名 file:line 与它 kill 的方式（`os.Exit`／`TerminateProcess`／`panic`）。**⛔ 不改任何码。**
+**产出** `docs/evidence/s1/314-time-correlation-r1.md`：每臂「集合／耗时／退出码／死点」表＋判「时间相关＝成立/不成立/证据不足」＋若成立，D 臂点名的嫌疑行或"未找到"。
+**硬约束**：⛔ 改产码/用例/脚本；⛔ 动 thresholds/golden/allowlist/PLAN/specs；⛔ push；⛔ kill 任何非本腿自己起的进程（尤其机主的 wisp.exe/浏览器）；跑载具前 `Get-Process wisp.test` 有就等 60 秒，仍有就停；**载具一次一发**；单发超 25 分钟未结束就停下如实记。
+回话第一行＝「A 臂 死/活@耗时／B 臂 死/活@耗时／判：时间相关 X／嫌疑行 Y」＋件路径。
