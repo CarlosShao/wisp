@@ -59,7 +59,9 @@ import (
 // with teeth, and it re-drives the SAME production HotShow path so the
 // recorded LastHotMs is this run's own measurement, not a stale field.
 func TestPanelHostRealWindowHopAndLifecycle_WinLive(t *testing.T) {
-	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
+	// Ticket 450: own profile family (-budget) so this winlive window never
+	// shares a user-data family with the default-tier real-window pair.
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile-budget")
 	h := &recordingModeHandler{}
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
 	ctx, cancel := context.WithCancel(context.Background())

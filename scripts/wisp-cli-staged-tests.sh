@@ -480,7 +480,8 @@ $fixture_literal_pattern")
 	# allowed to skip anything: a -skip that matches zero tests is the
 	# green-no-op shape ticket 71 AC#3 was written against. go test -list
 	# evaluates the same expression (cheap, no test executes).
-	listed=$(cd cmd/wisp && "$abs_stage/wisp.test.exe" -test.list "$voice_case_pattern" | grep -c . || true)
+	listed_names=$(cd cmd/wisp && "$abs_stage/wisp.test.exe" -test.list "$voice_case_pattern" | grep . || true)
+	listed=$(printf '%s\n' "$listed_names" | grep -c . || true)
 	if [ "$listed" -eq 0 ]; then
 		echo "wisp-cli-staged-tests.sh: GUARD - the fixture-skip pattern matched ZERO names in the" >&2
 		echo "wisp-cli-staged-tests.sh:   compiled test binary (go test -list). The voice cases were renamed" >&2
@@ -503,6 +504,68 @@ $fixture_literal_pattern")
 	echo "wisp-cli-staged-tests.sh:   powershell -File scripts/fetch-voice-fixtures.ps1 to restore the full run." >&2
 else
 	echo "wisp-cli-staged-tests.sh: voice fixture environment resolved (caller values win)"
+fi
+
+# ---------------------------------------------------------------------------
+# TICKET 450 END ANCHOR (2026-11-21). The 450 diagnostic leg measured the
+# whole-package run dying mid-way with RC=139 and ZERO --- FAIL lines: the
+# binary's last "=== RUN" never got its "--- PASS" and the process vanished
+# silently (native-side access violation shape, ticket 314). From the outside
+# such a run looks deceptively complete - RUN=412, FAIL=0 - because nothing
+# ever says "the roster did not finish". The anchor closes that hole: the
+# sentinel is the LAST name of the binary's own run order (go test -list '.*'
+# against THIS build, computed fresh every run so a rename or a new tail test
+# cannot rot it; measured 2026-11-21:
+# TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask, 790 top-level
+# names). The anchor arms itself by what will actually run, not by which flags
+# were passed: with a caller -test.run / -test.skip, and with the wave-8b
+# fixture roster in fallback mode, it consults the same binary's -test.list -
+# armed when the sentinel survives the restriction, off when the caller's
+# subset does not include it (a directed run legitimately has no sentinel).
+# ---------------------------------------------------------------------------
+whole_roster=$("$abs_stage/wisp.test.exe" -test.list '.*') || true
+end_anchor_name=$(printf '%s\n' "$whole_roster" | tail -n 1)
+if [ -z "$end_anchor_name" ]; then
+	echo "wisp-cli-staged-tests.sh: GUARD - the end-anchor roster is EMPTY (-test.list '.*'" >&2
+	echo "wisp-cli-staged-tests.sh:   listed no tests). The scan broke; refusing to run without an anchor." >&2
+	exit 1
+fi
+
+anchor_run_pat=""
+anchor_skip_pat=""
+anchor_flag_next=""
+for anchor_arg in "$@"; do
+	case "$anchor_flag_next" in
+	run) anchor_run_pat=$anchor_arg; anchor_flag_next=""; continue ;;
+	skip) anchor_skip_pat=$anchor_arg; anchor_flag_next=""; continue ;;
+	esac
+	case "$anchor_arg" in
+	-test.run=*) anchor_run_pat=${anchor_arg#-test.run=} ;;
+	-test.skip=*) anchor_skip_pat=${anchor_arg#-test.skip=} ;;
+	-test.run) anchor_flag_next=run ;;
+	-test.skip) anchor_flag_next=skip ;;
+	esac
+done
+
+end_anchor_armed=1
+end_anchor_reason="whole-package run: every top-level test executes, the sentinel must appear"
+if [ -n "$anchor_skip_pat" ] && ! "$abs_stage/wisp.test.exe" -test.skip "$anchor_skip_pat" -test.list '.*' | grep -Fxq "$end_anchor_name"; then
+	end_anchor_armed=0
+	end_anchor_reason="the sentinel is in the caller's -test.skip set"
+fi
+if [ "$end_anchor_armed" -eq 1 ] && [ "${#skip_args[@]}" -gt 0 ] && printf '%s\n' "${listed_names:-}" | grep -Fxq "$end_anchor_name"; then
+	end_anchor_armed=0
+	end_anchor_reason="the sentinel is in the named-fallback fixture roster"
+fi
+if [ "$end_anchor_armed" -eq 1 ] && [ -n "$anchor_run_pat" ] && ! "$abs_stage/wisp.test.exe" -test.list "$anchor_run_pat" | grep -Fxq "$end_anchor_name"; then
+	end_anchor_armed=0
+	end_anchor_reason="the sentinel is not in the caller's -test.run set"
+fi
+if [ "$end_anchor_armed" -eq 1 ]; then
+	echo "wisp-cli-staged-tests.sh: end anchor ARMED: run order's last test is $end_anchor_name;" >&2
+	echo "wisp-cli-staged-tests.sh:   the log must reach '=== RUN   $end_anchor_name' or the run is judged incomplete." >&2
+else
+	echo "wisp-cli-staged-tests.sh: end anchor OFF ($end_anchor_reason)" >&2
 fi
 
 # Run from the package directory: the same cwd contract "go test" itself uses,
@@ -532,6 +595,24 @@ if [ "$bin_rc" -eq 0 ]; then
 	printf 'ok  %s\t%d.00s\n' "$cli_pkg" "$run_dur"
 else
 	printf 'FAIL  %s\t%d.00s\n' "$cli_pkg" "$run_dur"
+fi
+
+# TICKET 450 END ANCHOR verdict: a run whose log never reaches the run order's
+# last test did not finish, however plausible its four numbers look (the 450
+# death read RUN=412, FAIL=0 and still was a corpse). Red is loud and named,
+# before any other verdict block; the binary's own exit code is preserved when
+# non-zero so a native-death 139 still reads as 139.
+if [ "$end_anchor_armed" -eq 1 ]; then
+	if grep -Eq "^=== RUN   ${end_anchor_name}$" "$log"; then
+		echo "wisp-cli-staged-tests.sh: end anchor seen: the run reached its last test ($end_anchor_name)" >&2
+	else
+		echo "CARRIER_INCOMPLETE: died before the last test" >&2
+		echo "wisp-cli-staged-tests.sh: the log never reached '=== RUN   $end_anchor_name' - the binary stopped" >&2
+		echo "wisp-cli-staged-tests.sh:   before its last test (ticket 450's silent-death shape: zero --- FAIL," >&2
+		echo "wisp-cli-staged-tests.sh:   the four numbers still look finished). Carrier verdict: RED." >&2
+		if [ "$bin_rc" -ne 0 ]; then exit "$bin_rc"; fi
+		exit 1
+	fi
 fi
 
 if [ -n "$voice_missing" ]; then

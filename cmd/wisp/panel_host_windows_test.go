@@ -79,8 +79,9 @@ func panelProfileLeaf(prefix string) string {
 const stalePanelProfileAge = time.Hour
 
 // sweptPanelProfilePrefixes makes the sweep run once per prefix per process:
-// three fixtures share two prefixes, and re-listing the temp dir per test buys
-// nothing.
+// every fixture site in the family carries its own prefix now (ticket 450 split
+// the four that shared wisp-33r1-panel-profile into -hop/-ac4/-live/-budget),
+// and re-listing the temp dir per test buys nothing.
 var sweptPanelProfilePrefixes sync.Map
 
 // sweepStalePanelProfiles removes the leaves uniqueProfileLeaf would have made
@@ -708,7 +709,15 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 	// unique now, because the fixed name put two concurrent runs on ONE WebView2
 	// user-data folder. The stale-sibling sweep inside panelProfileLeaf is what
 	// keeps "never delete" from leaking one folder per run.
-	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
+	//
+	// And since ticket 450 the PREFIX is this test's own (-hop): the two
+	// real-window tests of this file used to share the wisp-33r1-panel-profile
+	// family even though each run's leaf was unique, and that pair is the
+	// measured minimal death set (6 of 14 runs together, 0 of 4 single,
+	// docs/evidence/s1/450-death-localization-r1.md). One window's browser
+	// teardown must never meet the next window's environment bring-up on the
+	// same user-data family.
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile-hop")
 	h := &recordingModeHandler{}
 	disp := &panel.ComposerDispatch{Mode: h}
 	mgr := NewPanelManager(disp, nil, dataPath)
@@ -1045,7 +1054,15 @@ func TestAC4FocusReturnToPriorWindowGap33r5(t *testing.T) {
 	// Per-run unique for the same reason as the lifecycle test above: the fixed
 	// name shared one WebView2 user-data folder with it, and this test runs a real
 	// window too. Lifetime unchanged - still never deleted by the fixture.
-	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
+	//
+	// Ticket 450 goes one step further: per-run unique was NOT enough, because
+	// this test and the lifecycle test still shared the wisp-33r1-panel-profile
+	// PREFIX family, and that pair is the measured minimal death set (6 of 14
+	// runs together, 0 of 4 single, docs/evidence/s1/
+	// 450-death-localization-r1.md). The -ac4 suffix puts this window's browser
+	// on a user-data family the lifecycle test never touches. No assertion in
+	// this test moved - only the fixture leaf.
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile-ac4")
 	h := &recordingModeHandler{}
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
 

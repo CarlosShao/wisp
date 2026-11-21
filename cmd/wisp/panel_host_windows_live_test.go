@@ -33,7 +33,9 @@ import (
 )
 
 func TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive(t *testing.T) {
-	dataPath := panelProfileLeaf("wisp-33r1-panel-profile")
+	// Ticket 450: own profile family (-live) so this winlive window never shares
+	// a user-data family with the default-tier real-window pair.
+	dataPath := panelProfileLeaf("wisp-33r1-panel-profile-live")
 	h := &recordingModeHandler{}
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
 
