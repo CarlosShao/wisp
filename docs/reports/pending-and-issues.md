@@ -38058,3 +38058,7 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 **★★我自己的一枚漏检（如实记）**：第一波 `76abd9c97` 之后我**只跑了 lint-cjk 与 tsc**，没跑 render 仪器 ⇒ **它把 4 台仪器跑红了**（`render:nav`／`pluginpage407`／`palette38`／`palette38kbd`，它们把中文 copy 钉在源码里）。第二波腿自己发现并按"钉随真相迁移、绝不放宽"修好——我**逐行读过 diff**：每条钉子从"断言源码里有这句中文"改成"断言 App 走 `t()` 的那一半 ＋ `zh.ts` 里句式的那一半"，**比原来更咬**，零放宽。
 **我补的一把全量尺（以后每波都跑）**：`package.json` 里**全部 36 个 `render:*` 仪器 ＋ seeds/seeds-self-test/cjk/cjk-self-test/tokens:check/typecheck/lint` 一次跑完 ⇒ 唯一非零是 `render:l2`（rc=2 是"缺 fixture 参数"的 usage，CI 里是带 `fixtures/l2-card-fs-delete.json` 跑的，带参 rc=0）⇒ **前端门禁全绿**。
 **余账**：registry 50 条 961 枚（演示面 618＋产品面 343＋协议 23）；闭包普查 1602→1454。**AC#1 仍未结**。下一波最大余量：diagnostics-settings 30／config-editor 25／security-settings 25／prompt-bar 23。
+## A1983（11-21 19:0x）：票 58 AC#1 第三波 **没跑起来** —— `magpie/auto/glm-5.3-flash` 连续 3 次返 null（按令停手，⛔ 未换模型、⛔ 未试路由）
+
+派单 `w58ac1c`（件 `58-ac1-wave3-dispatch.txt`，已存档）三次 `agent()` 全 null ⇒ workflow 返回 `★glm 三次 null`。**盘上核查**：无新 commit（HEAD 仍 `0808f917f`）、工作树无本腿残留（仅 `frontend/fixtures/composer-states.html` 旧脏＋`probe-ballsize-render.tsx` 旧未跟踪，都不是本腿的）、`lint-cjk` 仍 `entries=50 findings:0` ⇒ **第三波零产出、零损伤**。
+按机主令「连续 null ⇒ 停下如实问怎么发，⛔ 自行换 model、⛔ 试探路由」⇒ 停在这里等指示。第二波成果不受影响（`c0e02b0a1` 已推）。
