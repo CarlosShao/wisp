@@ -38023,3 +38023,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1973（11-21 12:5x）：票 450 定位成功 `8333de280` —— 死因是**两枚真窗用例共用同一 WebView2 profile**，与球无关
 
 14 发 6 死；死亡点 `TestAC4PriorFocusSurvivesARefusedPanelSample`（`panel_host_windows_test.go:1042`），尾部成片 `MARK299 wndproc known=true`，零 WER。**最小复现集合＝`{TestPanelHostRealWindowHopAndLifecycle, TestAC4…}`**（单跑各 0 死，一起 6/14 死），两枚共用 `wisp-33r1-panel-profile`（4 处调用点）。AC#2 两形：球停着仍死（今天 6/14）、球跑着能跑完（11-15 两发 RUN=861），⇒ 与球无关。WebView2 泄漏与 onnxruntime 冲突均以读数排除。已派落修腿（profile 隔离＋载具终点锚）存档 `20261121/txt/450-fix-dispatch.txt`。**顺带记一条工具坑（诊断腿自报）**：`rx-x2.txt` 正则三名连成一名 ⇒ 6 发"全 PASS"是空跑，已作废不进判定。
+## A1974（11-21 13:2x）：path-length 闸 RED 的真因＝**票名改 -done 后名册没跟上**（两枚陈旧键），已修绿
+
+`sh scripts/check-path-length-budget.sh` 原报 `70 entries vs 69 over-budget paths`。逐枚核：①**193** 我改 `-done` 后，名册里还是旧名（`...-named.md`）⇒ guard B 红；已把该键指向 `...-named-done.md`（131 字符，仍超 100 字帽，必须留在名册）。②**197** 的名册键是**上一任改名前的长名**（`197-the-panel-must-show-...`），其现名 `197-subagent-entity-state-and-stream-page-done.md`（70 字符）**已不超预算** ⇒ 该键是**陈旧豁免**（不是我的改动造成），按 guard B 设计删除。修后：`over the hat=69 / roster entries=69` ⇒ **VERDICT GREEN**，`--with-self-test` 控制臂 rc=0。撤销：`git revert <本 commit>`。
