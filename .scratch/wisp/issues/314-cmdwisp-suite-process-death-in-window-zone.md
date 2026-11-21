@@ -209,3 +209,16 @@
 - **反证一条（很重要）**：改后整包一发**仍 `RC=139`**（403s，`RUN=589/PASS=451/FAIL=0/SKIP=1`），新死点＝`TestResyncOnShowDeliversFreshSnapshotFieldByField35g6`；而它走 `startPanelForTest`（`panel_resident_windows_test.go:71`）用的是 **`uniqueProfileLeaf`（本就每发唯一）** ⇒ **"共享 profile"假说解释不了新死点**。
 - **新线索（强）**：三次死亡耗时 **327s／400s／403s**、死点**换了两次** ⇒ 更像**与经过时间/累计资源相关**。已派一条诊断腿做判决实验（A 臂整包正控／B 臂只跑真窗族但拖过 450s／D 臂只读码找进程级 300–450s 时间闸），件将落 `docs/evidence/s1/314-time-correlation-r1.md`。**AC#2 的"安静桌面"那两发仍要编排者约机主时间**，腿不自约。
 - **载具现在不会再撒谎**：整包没跑到最后一枚测试就打印 `CARRIER_INCOMPLETE: died before the last test` 并判红（`851b5a144`），所以今后任何"整包绿"都可信。
+## 编排者收件·时间相关假说被否＋拿到 5 秒复现（2026-11-21 13:5x，件 `docs/evidence/s1/314-time-correlation-r1.md`）
+
+**四臂读数（诊断腿跑，我核过件与四数口径）**：
+| 臂 | 集合 | 耗时 | rc | 死点 |
+|---|---|---|---|---|
+| A（正控） | 整包 | 422s | **139** | `TestResyncOnShow…35g6` |
+| B | 只真窗族 13 枚 × `-test.count=96` | **5s** | **139** | `TestAC4PriorFocus…` |
+| B2 | 同 B 逐字复跑 | **5s** | **139** | 同 |
+| C | 整包 **减** 真窗族 13 枚 | **1120s** | **0** | 无（终点锚哨兵走到） |
+⇒ **"与经过时间相关"判不成立**：B 臂 5 秒就死（时间闸活不到 300s）；C 臂同一条整包命令**跳掉那 13 枚就活满 1120s**。D 臂读码全仓三个 300s 字面量全是"域内超时→返错/派事件"，**无一处 `os.Exit`/`TerminateProcess`/`panic`**；产码 `TerminateProcess` **零处**。四次死亡耗时相近是"整包跑到那里的累计耗时恰好相近"的**果**，不是因。
+**新事实（最值钱）**：**5 秒复现**（`-test.count=96` 只跑真窗族）＋ C 臂反证（建了 7 次真窗却不死）⇒ 死因是**特定真窗用例的组合／次序**（与 450 的最小死亡集同一对：`TestPanelHostRealWindowHopAndLifecycle` → `TestAC4PriorFocus…`）；B 臂死时"panel window is up"计数 **0**、日志尾部 121 行 `MARK299 wndproc` 成片。
+**已派实修腿**（存档 `.scratch/wisp/probes/orch/20261121/txt/314-fix-dispatch.txt`）：用这条 5 秒复现先收窄到单枚，再按"夹具真正拆干净／窗口类名与虚拟主机名每实例唯一／同进程串行互斥"里选最小改法，改后 `-test.count=96` 三发全活＋整包一发。**若必须改产码则停手给我建议**。
+**一处如实说明（腿自报）**：B 臂第一次发是**空跑**（正则的 `$` 经 shell→PS→bash 转义链被吞 ⇒ `no tests to run` rc=0），已作废、改用文件传参重做。
