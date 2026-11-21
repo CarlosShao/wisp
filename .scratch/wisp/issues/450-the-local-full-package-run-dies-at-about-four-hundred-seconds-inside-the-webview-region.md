@@ -19,7 +19,7 @@
 ## AC
 
 - [x] **AC#1 先把"死"变成可判事实**：复现一次，抓**退出码／最后一行输出／Windows 事件日志里的 application error 条目（进程名＋模块）**。⛔ 用"卡住了"描述。
-- [ ] **AC#2 二分：球在跑 vs 球不在跑**：同一命令各跑 1 发 —— (a) 球在跑；(b) 球停（**由机主停，⛔ 腿自己 kill**；若机主不在，用"从未起过球的干净用户会话"替代并写明）。给两发的 `RUN/PASS/FAIL/SKIP` 与是否死亡。
+- [x] **AC#2 二分：球在跑 vs 球不在跑**：同一命令各跑 1 发 —— (a) 球在跑；(b) 球停（**由机主停，⛔ 腿自己 kill**；若机主不在，用"从未起过球的干净用户会话"替代并写明）。给两发的 `RUN/PASS/FAIL/SKIP` 与是否死亡。
 - [x] **AC#3 二分：WebView2 窗那一区 vs 其余**：把死亡点附近那几枚用 `-test.run` 单独跑（含 `Test145ArgsJSON*`、`TestAC4PriorFocus*`），看在**没有整包负载**时是否也死。
 - [ ] **AC#4 判归属并落成规矩**：若 (a) 死 (b) 不死 ⇒ 真因＝驻留球争用，**把"跑整包前必须停球"写进本仓的测试前置说明**（`scripts/wisp-cli-staged-tests.sh` 的注释或 `docs/evidence/` 一份具名说明，⛔ 改 `docs/specs/**`）。若不是 ⇒ 交回可判事实与最小复现，**本票不许自己猜着改产码**。
 - [ ] **AC#5 门禁**：本票若只改脚本注释/证据件，跑 `d22scan` 与 path-length 即够；若动产码，按整包 + 本机两枚已知红具名口径执行。
@@ -88,3 +88,14 @@ A1 `Test145ArgsJSON…` 单独 → **exit 0，PASS 0.22s**；A2 `TestAC4PriorFoc
 
 ⇒ **本票的现态更新**：不是"现象不复现"，而是**条件性 native AV（1/2）**，成因在**收尾/拆卸段**，而不是驻留球、不是 WebView2 建窗。
 ⇒ 剩下的活是**点名故障模块**（要 LocalDumps 或调试器 ⇒ 要机主同意占机），以及**让收尾段可判**（D38 teardown 顺序）。⛔ 本票仍不许改名结案。
+
+## 编排者收件·AC#2 勾＋诊断结论（2026-11-21 12:5x，件 `docs/evidence/s1/450-death-localization-r1.md`，commit `8333de280`）
+
+**尺1** 提交在（我核过：该 commit **只碰该 evidence 件**，268 行；产码/用例/脚本 `git status --porcelain -- cmd internal scripts` 空）。**尺3** 诊断腿自跑 14 发（我未复跑整包，理由：整包 20 分钟且本票是定位票；我复跑了它引用的关键臂见下）。
+**AC#2 两形读数（同一条载具命令）**：
+- **(b) 球不在跑**：今天 14 发里 **6 死 8 活**（`RC=139` 静默消失，零 WER、零 `panic:`、零 `test timed out`）。
+- **(a) 球在跑**：2026-11-15 那波（球 PID 49348 全程在跑）**两发整包都跑到底** `RUN=861 / PASS=619 / FAIL=2 / SKIP=17`、`exit 1`（两枚红均已具名：前台被占 + `TestAC246DevLegIgnoresTheTestTaskInjection`）。
+⇒ **死与球无关**（球停着也死、球跑着能跑完）。
+**定位（本票的真收获）**：死亡点＝`TestAC4PriorFocusSurvivesARefusedPanelSample`（`cmd/wisp/panel_host_windows_test.go:1042`，`--- PASS` 从不出现），尾部成片 `MARK299 wndproc … known=true`；**最小可复现集合＝`{TestPanelHostRealWindowHopAndLifecycle, TestAC4PriorFocus…}` 两枚真窗用例**（单跑各 0 死；两枚一起 6/14 死）—— 两枚**共用同一 WebView2 profile 前缀 `wisp-33r1-panel-profile`**（4 处调用点）。性质：**原生侧 AV／次序共享态**；(b) WebView2 泄漏已用读数排除（全机 31 枚、wisp 自家 1 枚、`added=[] mine-died=[]`、杀自家树不改变死亡率）；(c) onnxruntime 冲突已排除（pin 字节数在位、语音族全绿）。
+**AC#4 已派落修腿**（存档 `.scratch/wisp/probes/orch/20261121/txt/450-fix-dispatch.txt`）：①两枚 profile 隔离 ②载具加**终点锚**（整包末尾没命中哨兵就响亮判红——今天 `RUN=412` 看着像跑完其实中途死了）。
+**撤销**：本票撤＝删 AC#2 这一勾＋删本节（证据件保留）。

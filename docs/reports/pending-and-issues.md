@@ -38020,3 +38020,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1972（11-20 23:3x）：191 补牙 `d738d4e52` —— 上限数值钉（零派生）
 
 两枚新钉：`sessionPendingCap == 64<<20` 与"字面 68157440 字节必须走拒因且拒因含 67108864"。我复跑两枚 PASS、`internal/tools` ok 27.000s、`d22scan` clean。腿验"常量改 128MiB⇒两枚都红"。顺带格式化两枚既有漂移件（`gate.go`／`ticket49_limits_test.go`，纯格式零语义，已具名）。
+## A1973（11-21 12:5x）：票 450 定位成功 `8333de280` —— 死因是**两枚真窗用例共用同一 WebView2 profile**，与球无关
+
+14 发 6 死；死亡点 `TestAC4PriorFocusSurvivesARefusedPanelSample`（`panel_host_windows_test.go:1042`），尾部成片 `MARK299 wndproc known=true`，零 WER。**最小复现集合＝`{TestPanelHostRealWindowHopAndLifecycle, TestAC4…}`**（单跑各 0 死，一起 6/14 死），两枚共用 `wisp-33r1-panel-profile`（4 处调用点）。AC#2 两形：球停着仍死（今天 6/14）、球跑着能跑完（11-15 两发 RUN=861），⇒ 与球无关。WebView2 泄漏与 onnxruntime 冲突均以读数排除。已派落修腿（profile 隔离＋载具终点锚）存档 `20261121/txt/450-fix-dispatch.txt`。**顺带记一条工具坑（诊断腿自报）**：`rx-x2.txt` 正则三名连成一名 ⇒ 6 发"全 PASS"是空跑，已作废不进判定。
