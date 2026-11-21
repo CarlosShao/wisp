@@ -1,0 +1,12 @@
+# 派单存档（先存档再发）—— 票 58 AC#1：UI 文案外置 + "渲染路径零硬编码中文"扫描（只做 AC#1；语音那三格仍阻塞于票 54/机型选择，⛔ 碰）
+# 路由：provider:"magpie", model:"auto/glm-5.3-flash"
+Wisp 仓 D:\work\workspace\projects plans\Wisp。**只做票 58 的 AC#1**（票面 `:42` 逐字「All UI via locale files; zero hardcoded Chinese in frontend/native render paths (scan)」）。
+**为什么只做这一格**：票 58 的 `Blocked by` 含"票 54 + 机主 go-ahead + 英文语音模型选择"，那三条管的是**语音链**（AC#2/AC#3）；AC#1 是**界面文案外置**，不前置于任何一条。
+**任务**：
+1. **先普查**（要数字，不要形容词）：`frontend/src/**` 里**渲染路径**（`.tsx` 与 `.ts` 里被 JSX/模板直接消费的字符串）中**含中日韩字符**的字符串字面量枚数，按文件列 top10；Go 侧"native render paths"（若存在：搜 `cmd/**`／`internal/**` 里拼 HTML/文案的字符串）同样给枚数。
+2. **建 locale 基础**：`frontend/src/lib/locale/` 下建 `zh.ts`（键→中文）＋`en.ts`（键→英文，**可先机翻但必须通顺、⛔ 留 TODO 占位**）＋`index.ts`（`t(key)` 与当前语言选择，默认 `zh`，⛔ 引入任何 npm 依赖，⛔ 引入 i18n 库；手写最小实现即可）。
+3. **外置**：把**面板主界面**（你普查出来枚数最多的那 3–6 个文件）的中文字面量搬进 locale，代码改 `t('key')`。⛔ 一次改全仓；**没搬完的逐文件列出枚数**（这就是诚实的欠账清单）。
+4. **扫描牙（AC#1 的判据）**：加一枚测试（放 `frontend/` 的 instruments 或 `internal/panel` 的测试里均可，选最省事的），扫**渲染路径**文件中 CJK 字面量 ⇒ 断言 = 0（或 = 你列的已登记欠账白名单，且白名单每条带理由）。正控：往临时文件里种一句中文 ⇒ 必须红（给逐字红句）。
+5. **自证**：`cd frontend && npx tsc -b` rc=0；`node tools/d22scan` 等价（`sh scripts/d22scan.sh`）0 findings；**⛔ 跑任何真窗用例**；⛔ 动 `docs/PLAN.md`／`docs/specs/**`／thresholds／golden／allowlist／`design/**`；⛔ emoji；⛔ push。
+6. 把结果与欠账清单写进 `.scratch/wisp/issues/58-*.md` 的 Progress log 末尾（⛔ 勾 AC#1，勾归非实现者）。
+写面：`frontend/src/**`、`frontend/package.json`（如需 script）、本票 Progress。回话第一行＝commit hash ＋"普查枚数（前端/Go 侧）" ＋"已外置文件数与余下欠账枚数" ＋"扫描牙正控逐字红句" ＋tsc/d22scan 两行末行。
