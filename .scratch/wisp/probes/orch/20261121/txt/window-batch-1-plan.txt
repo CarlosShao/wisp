@@ -1,0 +1,16 @@
+# 「一次窗口批」清单（机主说"可以跑/我走开"时，按此顺序一次性跑完；⛔ 平时跑，⛔ count>1 循环）
+# 立此件的起因：2026-11-21 14:5x 机主投诉"面板疯狂闪现"＝真窗用例弹窗。以下是**所有必须真窗/真机窗口**才能收的活，攒成一批。
+#
+# 批次 A（约 8–12 分钟，全部串行、载具一次一发）：
+#   1. 票 314 终验：`scripts/wisp-cli-staged-tests.sh -test.run '^TestPanelHostRealWindowHopAndLifecycle$|^TestAC4PriorFocusSurvivesARefusedPanelSample$' -test.count=2`
+#      ⇒ 期望：不再崩（rc=0 或至少不 RC=139）；再跑一发整包 ⇒ 若仍死，如实记死点（WIP 修复＝teardown 关 WebView2 + 不再删活 profile）。
+#   2. 票 302 复尺：`-test.run '^TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe$|^TestAC14AwaitedBindingReplyReachesThePage$|^TestAC14GoSideEvalPushReachesThePage$'`
+#      ⇒ 若三枚全绿：302 的"恒红"前提已随票 303/305 结案消失 ⇒ 裁形＝**丙（不动）**并留读数为证 ⇒ 302 可结。
+#      ⇒ 若仍红：按我 302 票面记的裁形＝**甲**（把红的搬进新 `_winlive_test.go`，判据一字不动）。
+#   3. 票 455 AC#4′：载具整包一发，红册按层分类（绑定层应 0）；终点锚必须命中。
+#   4. 票 245 AC#4 复验（若票 228 已落）：`go test ./internal/ball -run '245|Esc' -v`。
+#
+# 批次 B（机主本人在场才做，眼签）：39 AC#5／36 AC#1／37 AC#6／40 AC#7 四屏截图核对；36 的 14 态清单。
+# 批次 C（要机主出声/开麦）：247／290／291／449 的真麦克风读数。
+#
+# 规矩：①跑前 `Get-Process wisp.test` 有就等 60 秒；②每发之间停 5 秒让上一枚窗口退干净；③任何一发 RC=139 立刻停并留日志；④结果只记盘上读数，⛔ 报形容词。

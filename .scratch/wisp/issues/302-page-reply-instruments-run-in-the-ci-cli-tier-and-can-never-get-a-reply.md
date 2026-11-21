@@ -120,3 +120,17 @@ next=票 301 `AC#4`/`AC#5` 的验收腿 `301-v3`（在飞）→ `302-a1`（`AC#0
 
 - Progress log：
   - [2026-10-10 19:1x +0800] agent=编排者 did=取 CI 改后那一发（run `38045508579`／job `114194107792`／headSha `05db4bc6`）⇒ **§⑥ 前置条件 (ii) 判死**：托管 runner 上拿到了页面原话 `REPLIED,REPLIED,REPLIED`（`:825` 逐字）⇒ **甲／乙都⛔ 落**、`AC#1` **继续按住**且⛔ 翻框（本票⛔ 有可落的形，⛔ 是"做完了"）；★票面 `:11` 那句"1 枚基线红→改后 SKIP"这一发**又翻回去**（`TestPanelHostLatencyPercentilesAC2` 具名 SKIP→`--- FAIL`，逐字 `cold P95 2747.460 ms … exceeds the D32 panel cold budget 1500 ms`）＝回执接上的**次生色**，⛔ 本票射程、⛔ 新坏（基线发同枚 `--- FAIL (0.00s)`），归口交下一程；⚠ 四数尺 `FAIL=8↔8` 与名册作差⛔ 同物（同一枚坑本票第二次踩到，我按 `:11` 原句口径写清）；残差清单三条各自归口（票 305／预算归口未定／`internal/risk` 12 枚留 `A817`）；★`r7` 里我那格"ImageVersion ⛔ 命中"改正是**我的 grep 找错载体**（日志那行叫 `Version:`），定式并回＝换载体取读数先现量字面写法；本票⛔ 改 `-done`；next=票 303 `303-v1`（含本件 ② 那枚归口的必答题）→ `305-a1`
+
+## 编排者裁形前记（2026-11-21 15:1x）：前提可能已被票 303＋305 结案抹掉 ⇒ 先量再裁
+
+普查件 `probes/302/a1/40-census.md` 我在盘上读了（三形代价表 §192-264 全读）。**关键发现**：三枚里
+- `TestAC14AwaitedBindingReplyReachesThePage` 已随**票 303**（已 `-done`）修复 ⇒ 该枚在 HEAD 上**应已绿**；
+- 另两枚（`TestAC13ColdStart…`／`TestAC14GoSideEvalPush…`）在本票面上被搬到**票 305**，而 **305 也已 `-done`** ⇒ 三枚在 HEAD 上**可能全绿**。
+
+⇒ **裁形暂缓一发**（不是拖延，是省一发无效改码）：先跑一发这三枚的"现色"，再裁。
+- **若三枚全绿** ⇒ 裁 **丙（⛔ 不动）**：本票要治的"常红灯"已随 303/305 消失，丙的代价（名册可读性）不再成立；本票可以就此结案，凭据＝那一发的 `--- PASS` 三行。
+- **若仍红** ⇒ 裁 **甲**（搬进新 `cmd/wisp/…_winlive_test.go`，**判据本体一字⛔ 动**），并**在此同时定死 AC#1② 那处冲突**：AC#1② 的"⛔ 动 `cmd/wisp/**` 的产码"我按**范围收紧**读＝"判据本体⛔ 动"，**搬测试函数（逐字不改断言）允许**；凭据＝`git diff -M` 里被搬的三段逐字相同。
+- **⛔ 选乙**：普查件 §表③·乙 已量到 ledger 的包会进 `portable-tests.sh:617` 的**未分档 universe**，撞 sherpa DLL LOAD 墙 ⇒ 最坏把 `test-core` 与 `--scope=windows` 两枚今天的绿数一起拖红。乙的收益（名字进 ledger）换不到这个风险。
+
+⚠ **这一发必须真窗**（三枚都 `startPanelForTest`）⇒ 按台账新规矩只在机主明确"可以跑"的窗口里跑，清单见 `.scratch/wisp/probes/orch/20261121/txt/window-batch-1-plan.txt` 第 2 条。
+**撤销**：本裁形作废＝删本节；若已按甲落地＝`git revert <落地 commit>`。
