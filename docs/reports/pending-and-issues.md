@@ -38026,3 +38026,6 @@ overlay 对照证明 nil 回调零字节差；面板 8192 上限改大即红；A
 ## A1974（11-21 13:2x）：path-length 闸 RED 的真因＝**票名改 -done 后名册没跟上**（两枚陈旧键），已修绿
 
 `sh scripts/check-path-length-budget.sh` 原报 `70 entries vs 69 over-budget paths`。逐枚核：①**193** 我改 `-done` 后，名册里还是旧名（`...-named.md`）⇒ guard B 红；已把该键指向 `...-named-done.md`（131 字符，仍超 100 字帽，必须留在名册）。②**197** 的名册键是**上一任改名前的长名**（`197-the-panel-must-show-...`），其现名 `197-subagent-entity-state-and-stream-page-done.md`（70 字符）**已不超预算** ⇒ 该键是**陈旧豁免**（不是我的改动造成），按 guard B 设计删除。修后：`over the hat=69 / roster entries=69` ⇒ **VERDICT GREEN**，`--with-self-test` 控制臂 rc=0。撤销：`git revert <本 commit>`。
+## A1975（11-21 13:3x）：**票 450 结**（5/5）`851b5a144` —— 死法变可判＋一对已隔离；残死因交 314
+
+落修：两枚真窗用例 profile 各给独立 leaf（`-hop`／`-ac4`／`-live`／`-budget`）＋载具**终点锚**（整包没跑到最后一枚测试就响亮判红 `CARRIER_INCOMPLETE`）。定向 3 发全活（3 发 0 死）；锚正控逐字红。**但整包仍死**：改后一发 `RC=139`（403s，`RUN=589/PASS=451/FAIL=0/SKIP=1`），新死点 `TestResyncOnShowDeliversFreshSnapshotFieldByField35g6`——而它用的是 `uniqueProfileLeaf`（本就每发唯一）⇒ "共享 profile"假说解释不了，交票 314 AC#1 换假说。**我的派单越界如实记**：450 写面写"载具仅注释"，实交包含载具逻辑与三枚 `_test.go`；技术正确但越界，归属记在 314 AC#1 名下。**票池：405 已结 / 38 未结。**
